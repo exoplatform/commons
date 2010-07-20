@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <parent>
-      <groupId>org.exoplatform.platform</groupId>
+      <groupId>org.exoplatform.commons</groupId>
       <artifactId>exo.platform.commons.comet</artifactId>
       <version>3.0.0-Beta01-SNAPSHOT</version>
       <relativePath>../..</relativePath>
@@ -27,7 +27,7 @@
          <artifactId>exo.kernel.component.common</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.exoplatform.platform</groupId>
+         <groupId>org.exoplatform.commons</groupId>
          <artifactId>exo.platform.commons.comet.service</artifactId>                   
          <version>${project.version}</version>
       </dependency>
