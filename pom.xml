@@ -22,6 +22,12 @@
     <module>webui/ext</module>
   </modules>
 
+  <scm>
+    <connection>scm:svn:http://svn.exoplatform.org/projects/commons/trunk</connection>
+    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/commons/trunk</developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects/commons/trunk</url>
+  </scm>
+
   <properties>
     <org.exoplatform.kernel.version>2.2.0-GA</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>2.3.0-GA</org.exoplatform.core.version>
