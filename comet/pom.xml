@@ -12,7 +12,6 @@
   <properties>
     <exo.product.name>exo.platform.commons.comet</exo.product.name>
     <exo.product.specification>2.1</exo.product.specification>
-    <exo.test.classesdirectory>target/test-classes</exo.test.classesdirectory>
   </properties>
   <dependencyManagement>
     <dependencies>
