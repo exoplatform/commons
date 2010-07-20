@@ -1,33 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  
   <parent>
     <groupId>org.exoplatform</groupId>
     <artifactId>exo.parent</artifactId>
     <version>7</version>
   </parent>
-  
-
   <groupId>org.exoplatform.commons</groupId>
   <artifactId>exo.platform.commons</artifactId>
   <version>3.0.0-Beta01-SNAPSHOT</version>
   <packaging>pom</packaging>
-
   <name>eXo Commons</name>
-
-  <modules>
-    <module>comet</module>
-    <module>testing</module>
-    <module>webui/ext</module>
-  </modules>
-
   <scm>
     <connection>scm:svn:http://svn.exoplatform.org/projects/commons/trunk</connection>
     <developerConnection>scm:svn:http://svn.exoplatform.org/projects/commons/trunk</developerConnection>
     <url>http://fisheye.exoplatform.org/browse/projects/commons/trunk</url>
   </scm>
-
   <properties>
     <org.exoplatform.kernel.version>2.2.0-GA</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>2.3.0-GA</org.exoplatform.core.version>
@@ -42,7 +30,6 @@
     <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
     <org.slf4j.slf4j-simple.version>1.5.6</org.slf4j.slf4j-simple.version>
   </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -64,7 +51,7 @@
         <groupId>org.exoplatform.portal</groupId>
         <artifactId>exo.portal.component.resources</artifactId>
         <version>${org.exoplatform.portal.version}</version>
-      </dependency>      
+      </dependency>
       <dependency>
         <groupId>org.exoplatform.portal</groupId>
         <artifactId>exo.portal.component.web</artifactId>
@@ -75,12 +62,12 @@
         <artifactId>testng</artifactId>
         <version>${testng.version}</version>
         <classifier>jdk15</classifier>
-      </dependency>      
+      </dependency>
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
-      </dependency> 
+      </dependency>
       <dependency>
         <groupId>org.exoplatform.core</groupId>
         <artifactId>exo.core.component.organization.api</artifactId>
@@ -100,12 +87,12 @@
         <groupId>org.exoplatform.portal</groupId>
         <artifactId>exo.portal.webui.core</artifactId>
         <version>${org.exoplatform.portal.version}</version>
-      </dependency>                        
+      </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>${javax.servlet.servlet-api.version}</version>
-      </dependency>     
+      </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-all</artifactId>
@@ -113,5 +100,9 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
+  <modules>
+    <module>comet</module>
+    <module>testing</module>
+    <module>webui/ext</module>
+  </modules>
 </project>
