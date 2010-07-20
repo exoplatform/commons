@@ -3,7 +3,7 @@
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>exo.platform.commons.comet</artifactId>
       <version>3.0.0-Beta01-SNAPSHOT</version>
-      <relativePath>../..</relativePath>
+      <relativePath>../../pom.xml</relativePath>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>exo.platform.commons.comet.ext.rest</artifactId>
