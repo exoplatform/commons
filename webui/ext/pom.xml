@@ -7,7 +7,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>exo.platform.commons.webui.ext</artifactId>
-  <name>eXo Platform Commons WebUI Extension</name>
+  <name>eXo Commons WebUI Extension</name>
   <packaging>jar</packaging>
   <description />
    

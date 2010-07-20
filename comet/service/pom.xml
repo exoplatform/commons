@@ -6,7 +6,7 @@
    </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>exo.platform.commons.comet.service</artifactId>
-    <name>eXo Platform Commons Comet Service</name>
+    <name>eXo Commons Comet Service</name>
     <packaging>jar</packaging>
    <description />
    <dependencies>

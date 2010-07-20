@@ -7,7 +7,7 @@
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>exo.platform.commons.comet.ext.service</artifactId>
-   <name>eXo Platform Commons Comet Ext Service (use for test only)</name>
+   <name>eXo Commons Comet Ext Service (use for test only)</name>
    <description>for test only</description>
    <dependencies>
       <dependency>
