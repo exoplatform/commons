@@ -7,6 +7,7 @@
     <version>1.0.0-CR01-SNAPSHOT</version>
   </parent>
   <artifactId>exo.platform.commons.comet</artifactId>
+  <version>1.0.0-CR01-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Commons Comet</name>
   <properties>
@@ -99,4 +100,10 @@
     <module>ext/webapp-rest</module>
     <module>ext/webapp-cometd</module>
   </modules>
+
+  <scm>
+    <connection>scm:svn:http://svn.exoplatform.org/projects/commons/branches/1.0.x</connection>
+    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/commons/branches/1.0.x</developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects/commons/branches/1.0.x</url>
+  </scm>
 </project>
