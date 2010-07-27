@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.commons</groupId>
     <artifactId>exo.platform.commons.comet</artifactId>
-    <version>1.0.0-CR01-SNAPSHOT</version>
+    <version>3.0.0-Beta01-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>exo.platform.commons.comet.ext.webapp</artifactId>
   <packaging>war</packaging>
   <name>eXo Commons Comet Ext WebApp (use for test only)</name>
-  <description />
-  <dependencies />
+  <description/>
+  <dependencies/>
 </project>
