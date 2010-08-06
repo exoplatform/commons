@@ -5,7 +5,7 @@
     <artifactId>exo.platform.commons</artifactId>
     <version>1.0.0-CR01-SNAPSHOT</version>
   </parent>
-  <artifactId>exo.platform..commons.fck</artifactId>
+  <artifactId>exo.platform.commons.fck</artifactId>
   <packaging>war</packaging>
   <name>eXo Platform Web FCK</name>
   <build>
