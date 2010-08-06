@@ -104,5 +104,6 @@
     <module>comet</module>
     <module>testing</module>
     <module>webui/ext</module>
+	<module>fck</module>
   </modules>
 </project>
