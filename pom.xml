@@ -8,13 +8,13 @@
   </parent>
   <groupId>org.exoplatform.commons</groupId>
   <artifactId>exo.platform.commons</artifactId>
-  <version>1.0.0-CR02-SNAPSHOT</version>
+  <version>1.0.0-GA</version>
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <scm>
-    <connection>scm:svn:http://svn.exoplatform.org/projects/commons/branches/1.0.x</connection>
-    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/commons/branches/1.0.x</developerConnection>
-    <url>http://fisheye.exoplatform.org/browse/projects/commons/branches/1.0.x</url>
+    <connection>scm:svn:http://svn.exoplatform.org/projects/commons/tags/1.0.0-GA</connection>
+    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/commons/tags/1.0.0-GA</developerConnection>
+    <url>http://fisheye.exoplatform.org/browse/projects/commons/tags/1.0.0-GA</url>
   </scm>
   <properties>
     <org.exoplatform.kernel.version>2.2.4-GA</org.exoplatform.kernel.version>
