@@ -88,9 +88,9 @@
     </dependencies>
   </dependencyManagement>
   <!-- 
-    <org.exoplatform.kernel.version>2.2.4-GA</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>2.3.4-GA</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>2.1.4-GA</org.exoplatform.ws.version>
+    <org.exoplatform.kernel.version>2.2.5-GA-SNAPSHOT</org.exoplatform.kernel.version>
+    <org.exoplatform.core.version>2.3.5-GA-SNAPSHOT</org.exoplatform.core.version>
+    <org.exoplatform.ws.version>2.1.5-GA-SNAPSHOT</org.exoplatform.ws.version>
     -->
   <modules>
     <module>service</module>
