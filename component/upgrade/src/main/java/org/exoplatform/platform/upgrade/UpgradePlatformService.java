@@ -35,8 +35,6 @@ import org.exoplatform.services.log.Log;
 import org.picocontainer.Startable;
 
 public class UpgradePlatformService implements Startable {
-  private static final String DEFAULT_REPOSITORY = "repository";
-
   private static final String FIRST_VERSION_LABEL = "FirstVersion";
 
   private static final Log log = ExoLogger.getLogger(UpgradePlatformService.class);
