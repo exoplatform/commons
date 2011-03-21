@@ -17,11 +17,11 @@
     <url>http://fisheye.exoplatform.org/browse/projects/commons/trunk</url>
   </scm>
   <properties>
-    <org.exoplatform.kernel.version>2.2.4-GA</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>2.3.4-GA</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>2.1.4-GA</org.exoplatform.ws.version>
-    <org.exoplatform.jcr.version>1.12.4-GA</org.exoplatform.jcr.version>
-    <org.exoplatform.portal.version>3.1.0-GA</org.exoplatform.portal.version>
+	<org.exoplatform.kernel.version>2.3.0-Beta03</org.exoplatform.kernel.version>
+	<org.exoplatform.core.version>2.4.0-Beta03</org.exoplatform.core.version>
+	<org.exoplatform.ws.version>2.2.0-Beta03</org.exoplatform.ws.version>
+	<org.exoplatform.jcr.version>1.14.0-Beta03</org.exoplatform.jcr.version>
+	<org.exoplatform.portal.version>3.2.0-PLF-SNAPSHOT</org.exoplatform.portal.version>
     <picocontainer.version>1.1</picocontainer.version>
     <javax.jcr.api.version>1.0</javax.jcr.api.version>
     <testng.version>5.10</testng.version>
@@ -54,7 +54,7 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.portal</groupId>
-        <artifactId>exo.portal.component.web</artifactId>
+        <artifactId>exo.portal.component.web.api</artifactId>
         <version>${org.exoplatform.portal.version}</version>
       </dependency>
       <dependency>
@@ -105,5 +105,6 @@
     <module>testing</module>
     <module>webui/ext</module>
     <module>gifbackport</module>
+	<module>fck</module>
   </modules>
 </project>
