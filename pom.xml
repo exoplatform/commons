@@ -102,6 +102,7 @@
   </dependencyManagement>
   <modules>
     <module>comet</module>
+    <module>component/product</module>
     <module>testing</module>
     <module>webui/ext</module>
     <module>gifbackport</module>
