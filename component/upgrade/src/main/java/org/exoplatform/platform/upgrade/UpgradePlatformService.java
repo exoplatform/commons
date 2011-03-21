@@ -108,7 +108,6 @@ public class UpgradePlatformService implements Startable {
   /**
    * This method is called by eXo Kernel when starting the parent ExoContainer
    */
-  @Override
   public void start() {
     if (log.isDebugEnabled()) {
       log.debug("start method begin");
@@ -168,7 +167,6 @@ public class UpgradePlatformService implements Startable {
   /**
    * This method is called by eXo Kernel when stopping the parent ExoContainer
    */
-  @Override
   public void stop() {}
 
   private void storePlatformVersion(Node platformVersionDeclarationNode) throws VersionException,
