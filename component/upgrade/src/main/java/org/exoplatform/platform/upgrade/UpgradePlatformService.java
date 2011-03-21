@@ -23,7 +23,9 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 
 import org.exoplatform.component.product.ProductInformations;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
@@ -33,6 +35,8 @@ import org.exoplatform.services.log.Log;
 import org.picocontainer.Startable;
 
 public class UpgradePlatformService implements Startable {
+  private static final String DEFAULT_REPOSITORY = "repository";
+
   private static final String FIRST_VERSION_LABEL = "FirstVersion";
 
   private static final Log log = ExoLogger.getLogger(UpgradePlatformService.class);
@@ -57,6 +61,7 @@ public class UpgradePlatformService implements Startable {
    */
   public static final String PLATFORM_VERSION_DECLARATION_NODE_NAME = "platformVersionDeclarationNode";
 
+  private String workspaceName = null;
   private Set<UpgradePlatformPlugin> upgradePlugins = new HashSet<UpgradePlatformPlugin>();
   private String applicationDataRootNodePath = null;
   private String currentVersion = null;
@@ -72,10 +77,14 @@ public class UpgradePlatformService implements Startable {
    * @param nodeHierarchyCreator
    */
   public UpgradePlatformService(RepositoryService repositoryService, SessionProviderService sessionProviderService,
-      NodeHierarchyCreator nodeHierarchyCreator, ProductInformations productInformations) {
+      NodeHierarchyCreator nodeHierarchyCreator, ProductInformations productInformations, InitParams initParams)
+      throws RepositoryException, RepositoryConfigurationException {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
 
+    if (initParams.containsKey("working.worspace.name")) {
+      workspaceName = initParams.getValueParam("working.worspace.name").getValue();
+    }
     applicationDataRootNodePath = nodeHierarchyCreator.getJcrPath(EXO_APPLICATIONS_DATA_NODE_ALIAS);
     if (applicationDataRootNodePath.indexOf("/") == 0) {
       applicationDataRootNodePath = applicationDataRootNodePath.replaceFirst("/", "");
@@ -106,6 +115,18 @@ public class UpgradePlatformService implements Startable {
     if (log.isDebugEnabled()) {
       log.debug("start method begin");
     }
+
+    if (workspaceName == null || workspaceName.equals("")) {
+      log.info("Workspace wasn't specified, use default one.");
+      try {
+        workspaceName = repositoryService.getDefaultRepository().getConfiguration().getDefaultWorkspaceName();
+      } catch (RepositoryException exception) {
+        log.error(exception);
+      } catch (RepositoryConfigurationException exception) {
+        log.error(exception);
+      }
+    }
+
     Session session = null;
     try {
       // Get a JCR Session
@@ -122,7 +143,7 @@ public class UpgradePlatformService implements Startable {
         }
 
         // The platform has been upgraded successfully, so we have to change the platform version in the JCR
-        storePlatformVersion(session, platformVersionDeclarationNode);
+        storePlatformVersion(platformVersionDeclarationNode);
 
         log.info("Platform upgraded successfully.");
         /* End: Proceed upgrading Platform */
@@ -152,18 +173,18 @@ public class UpgradePlatformService implements Startable {
   @Override
   public void stop() {}
 
-  private void storePlatformVersion(Session session, Node platformVersionDeclarationNode) throws VersionException,
+  private void storePlatformVersion(Node platformVersionDeclarationNode) throws VersionException,
       UnsupportedRepositoryOperationException, InvalidItemStateException, LockException, RepositoryException,
       PathNotFoundException, ValueFormatException, ConstraintViolationException, AccessDeniedException, ItemExistsException,
       NoSuchNodeTypeException {
     Version version = platformVersionDeclarationNode.checkin();
-    session.save();
+    platformVersionDeclarationNode.getSession().save();
     platformVersionDeclarationNode.getVersionHistory().addVersionLabel(version.getName(), oldVersion, false);
     platformVersionDeclarationNode.checkout();
     Node platformVersionDeclarationNodeContent = platformVersionDeclarationNode.getNode("jcr:content");
     platformVersionDeclarationNodeContent.setProperty("jcr:data", currentVersion);
     platformVersionDeclarationNodeContent.setProperty("jcr:lastModified", new Date().getTime());
-    session.save();
+    platformVersionDeclarationNode.getSession().save();
   }
 
   private Node readPlatformVersion(Session session) throws RepositoryException, PathNotFoundException, ItemExistsException,
@@ -216,7 +237,7 @@ public class UpgradePlatformService implements Startable {
     Session session;
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     ManageableRepository repository = repositoryService.getCurrentRepository();
-    session = sessionProvider.getSession(repository.getConfiguration().getDefaultWorkspaceName(), repository);
+    session = sessionProvider.getSession(workspaceName, repository);
     return session;
   }
 
