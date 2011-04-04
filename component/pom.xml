@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>exo.platform.commons.component</artifactId>
 	<packaging>pom</packaging>
-	<name>eXo Platform - Component</name>
+	<name>eXo Platform - Upgrade</name>
 	<modules>
 		<module>product</module>
 		<module>upgrade</module>
