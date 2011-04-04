@@ -18,10 +18,10 @@
  */
 package org.exoplatform.commons.info;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Properties;
@@ -255,7 +255,7 @@ public class ProductInformations implements Startable {
         String previousVersionData = ((Property) session.getItem(productVersionDeclarationNode.getPath()
             + "/jcr:content/jcr:data")).getString();
         previousProductInformationProperties = new Properties();
-        previousProductInformationProperties.load(new StringReader(previousVersionData));
+        previousProductInformationProperties.load(new ByteArrayInputStream(previousVersionData.getBytes()));
       } else {// This is the first time that this Service starts up
         if (log.isDebugEnabled()) {
           log.debug("Product server first run: setup product Version Declaration Node");
