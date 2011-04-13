@@ -21,11 +21,11 @@
 	<org.exoplatform.core.version>2.4.0-Beta03</org.exoplatform.core.version>
 	<org.exoplatform.ws.version>2.2.0-Beta03</org.exoplatform.ws.version>
 	<org.exoplatform.jcr.version>1.14.0-Beta03</org.exoplatform.jcr.version>
-	<org.exoplatform.portal.version>3.2.0-PLF-SNAPSHOT</org.exoplatform.portal.version>
+	<org.exoplatform.portal.version>3.2.0-PLF-Beta2</org.exoplatform.portal.version>
     <picocontainer.version>1.1</picocontainer.version>
     <javax.jcr.api.version>1.0</javax.jcr.api.version>
     <testng.version>5.10</testng.version>
-    <junit.version>3.8.2</junit.version>
+    <junit.version>3.8.1</junit.version>
     <mockito.version>1.8.1</mockito.version>
     <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
     <org.slf4j.slf4j-simple.version>1.5.6</org.slf4j.slf4j-simple.version>
