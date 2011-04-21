@@ -17,10 +17,10 @@
     <url>http://fisheye.exoplatform.org/browse/projects/commons/trunk</url>
   </scm>
   <properties>
-	<org.exoplatform.kernel.version>2.3.0-Beta03</org.exoplatform.kernel.version>
-	<org.exoplatform.core.version>2.4.0-Beta03</org.exoplatform.core.version>
-	<org.exoplatform.ws.version>2.2.0-Beta03</org.exoplatform.ws.version>
-	<org.exoplatform.jcr.version>1.14.0-Beta03</org.exoplatform.jcr.version>
+	<org.exoplatform.kernel.version>2.3.0-CR1</org.exoplatform.kernel.version>
+	<org.exoplatform.core.version>2.4.0-CR1</org.exoplatform.core.version>
+	<org.exoplatform.ws.version>2.2.0-CR1</org.exoplatform.ws.version>
+	<org.exoplatform.jcr.version>1.14.0-CR1</org.exoplatform.jcr.version>
 	<org.exoplatform.portal.version>3.2.0-PLF-SNAPSHOT</org.exoplatform.portal.version>
     <picocontainer.version>1.1</picocontainer.version>
     <javax.jcr.api.version>1.0</javax.jcr.api.version>
@@ -29,6 +29,7 @@
     <mockito.version>1.8.1</mockito.version>
     <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
     <org.slf4j.slf4j-simple.version>1.5.6</org.slf4j.slf4j-simple.version>
+    <org.hsqldb.version>2.0.0</org.hsqldb.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -67,6 +68,11 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>${org.hsqldb.version}</version>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.core</groupId>
