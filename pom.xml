@@ -112,7 +112,7 @@
     <module>testing</module>
     <module>webui/ext</module>
     <module>gifbackport</module>
-	<module>fck</module>
+    <module>fck</module>
   </modules>
   <profiles>
     <profile>
