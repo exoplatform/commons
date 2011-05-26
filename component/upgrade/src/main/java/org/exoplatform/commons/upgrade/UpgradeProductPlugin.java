@@ -13,12 +13,17 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 
 import org.exoplatform.commons.info.ProductInformations;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 
-public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
+public abstract class UpgradeProductPlugin extends BaseComponentPlugin implements Comparable<UpgradeProductPlugin> {
 
   private static final String PRODUCT_GROUP_ID = "product.group.id";
+  private static final String UPGRADE_PLUGIN_EXECUTION_ORDER = "plugin.execution.order";
+  private static final String UPGRADE_PLUGIN_ENABLE = "commons.upgrade.{$0}.enable";
+  
+  private int pluginExecutionOrder;
 
   /**
    * The plugin's product maven group identifier, by example: org.exoplatform.portal for gatein.
@@ -30,10 +35,32 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
       throw new RuntimeException("Couldn't find the init value param: " + PRODUCT_GROUP_ID);
     }
     productGroupId = initParams.getValueParam(PRODUCT_GROUP_ID).getValue();
+    if (!initParams.containsKey(UPGRADE_PLUGIN_EXECUTION_ORDER)) {
+      pluginExecutionOrder = 0;
+    }else{
+      pluginExecutionOrder = Integer.parseInt(initParams.getValueParam(UPGRADE_PLUGIN_EXECUTION_ORDER).getValue());
+    }
   }
 
   public String getProductGroupId() {
     return productGroupId;
+  }
+  
+  /**
+   * Determines if the plugin is enabled, this method will be called when adding the plugin to the upgradePlugins list.
+   * See {@link UpgradeProductService#addUpgradePlugin(UpgradeProductPlugin)}
+   * 
+   * @return
+   *          true: if the plugin is enabled: should be added to the upgradePlugins list
+   *          false: if the plugin is disabled: should not be added to the upgradePlugins list
+   */
+  public boolean isEnabled(){
+    String isEnabledProperty = PropertyManager.getProperty(UPGRADE_PLUGIN_ENABLE.replace("{$0}", getName()));
+    if(isEnabledProperty == null || isEnabledProperty.equals("true")){
+      return true;
+    }else {
+      return false;
+    }
   }
 
   /**
@@ -112,6 +139,25 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
    */
   public final int hashCode() {
     return this.getName().hashCode();
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public int compareTo(UpgradeProductPlugin o) {
+    if(this.equals(o)){
+      //doesn't allow two plugins with the same name
+      return 0;
+    }else if(this.getPluginExecutionOrder() == o.getPluginExecutionOrder()){
+      //execution order doesn't matter in this case
+      return -1;
+      }
+    //execution order will be used in the upgradePlugins' list sorting
+    return (this.getPluginExecutionOrder() - o.getPluginExecutionOrder());
+  }
+
+  public int getPluginExecutionOrder() {
+    return pluginExecutionOrder;
   }
 
 }

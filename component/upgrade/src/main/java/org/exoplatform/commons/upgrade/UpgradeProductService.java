@@ -1,7 +1,7 @@
 package org.exoplatform.commons.upgrade;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.exoplatform.commons.info.MissingProductInformationException;
 import org.exoplatform.commons.info.ProductInformations;
@@ -14,7 +14,7 @@ public class UpgradeProductService implements Startable {
 
   private static final Log log = ExoLogger.getLogger(UpgradeProductService.class);
 
-  private Set<UpgradeProductPlugin> upgradePlugins = new HashSet<UpgradeProductPlugin>();
+  private Set<UpgradeProductPlugin> upgradePlugins = new TreeSet<UpgradeProductPlugin>();
   private ProductInformations productInformations = null;
 
   /**
@@ -35,10 +35,13 @@ public class UpgradeProductService implements Startable {
     if (log.isDebugEnabled()) {
       log.debug("Add Product UpgradePlugin: name = " + upgradeProductPlugin.getName());
     }
-    if (upgradePlugins.contains(upgradeProductPlugin.getName())) {
+    if (upgradePlugins.contains(upgradeProductPlugin)) {
       log.warn(upgradeProductPlugin.getName() + " upgrade plugin is duplicated. One of duplicated plugins will be ignore!");
     }
-    upgradePlugins.add(upgradeProductPlugin);
+    //add only enabled plugins
+    if(upgradeProductPlugin.isEnabled()){
+      upgradePlugins.add(upgradeProductPlugin); 
+    }
   }
 
   /**
@@ -64,7 +67,7 @@ public class UpgradeProductService implements Startable {
 
             if (upgradeProductPlugin.shouldProceedToUpgrade(currentProductPluginVersion, previousProductPluginVersion)) {
               log.info("Proceed upgrade plugin: name = " + upgradeProductPlugin.getName() + " from version "
-                  + previousProductPluginVersion + " to " + currentProductPluginVersion);
+                  + previousProductPluginVersion + " to " + currentProductPluginVersion + " with execution order = " + upgradeProductPlugin.getPluginExecutionOrder());
               upgradeProductPlugin.processUpgrade(previousProductPluginVersion, currentProductPluginVersion);
             }
           } catch (Exception exception) {
