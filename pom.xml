@@ -111,6 +111,8 @@
     <module>component</module>
     <module>testing</module>
     <module>webui/ext</module>
+    <module>webui/component</module>
+    <module>webui/resources</module>
     <module>gifbackport</module>
     <module>fck</module>
   </modules>

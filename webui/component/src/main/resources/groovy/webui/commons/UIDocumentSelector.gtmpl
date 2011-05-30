@@ -1,0 +1,77 @@
+<%
+  def rcontext = _ctx.getRequestContext() ;
+  String workspaceName = uicomponent.currentWorkspaceName;
+  String userRootPath =  uicomponent.rootPath;
+  String restContext = uicomponent.getRestContext();
+  boolean allowAddFolder = uicomponent.allowAddFolder;
+  boolean allowDeleteItem = uicomponent.allowDeleteItem;
+  String selectFileLink =uicomponent.event(uicomponent.SELECTFILE,"TempParam");
+  String selectFolderLink =uicomponent.event(uicomponent.SELECTFOLDER,"TempParam");
+  
+  def jsManager = rcontext.getJavascriptManager();
+  
+  jsManager.addJavascript("eXo.commons.DocumentSelector.getFoldersAndFiles = '" + uicomponent.GETFOLDERSANDFILES + "';");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.deleteFolderOrFile = '" + uicomponent.DELETEFOLDERORFILE + "';");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.createFolder = '" + uicomponent.CREATEFOLDER + "';");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.workspaceParam = '" + uicomponent.PARAM_WORKSPACE + "';");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.nodePathParam = '" + uicomponent.PARAM_NODEPATH + "';");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.parentPathParam = '" + uicomponent.PARAM_PARENTPATH + "';");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.isFolderOnlyParam = '" + uicomponent.PARAM_ISFOLDERONLY + "';");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.folderNameParam = '" + uicomponent.PARAM_FOLDERNAME + "';");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.allowDeleteItem = " + allowDeleteItem + ";");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.init('" + uicomponent.id + "','" + restContext + "','"+workspaceName +"','"+userRootPath +"');"); 
+%>
+<div class="UIDocumentSelector" id="$uicomponent.id">
+  <% uicomponent.renderChild(uicomponent.EMPTYCOMPONENT); %>
+  <a style="display:none;" href="$selectFileLink" class="SelectFile"></a>
+  <a style="display:none;" href="$selectFolderLink" class="SelectFolder"></a>
+  <div class="ListContainer">
+    <div class="LeftWorkspace" id="LeftWorkspace">
+      <!-- Navigation tree goes here -->
+    </div>
+    <div class="RightWorkspace" id="RightWorkspace">
+      <div class=ListView>
+        <table cellspacing="0" style="table-layout: fixed; width: 100%;" id="ListRecords">
+          <thead>
+            <tr>
+              <th class="THBar">
+                Name 
+              </th>
+              <th class="THBar" style="width: 120px;">
+                Date 
+              </th>
+              <th class="THBar" style="width: 80px;">
+                Size 
+              </th>
+              <% if (allowDeleteItem) { %>
+              <th class="THBar" style="width: 80px;">
+                Action 
+              </th>
+              <% } %>
+            </tr>
+          </thead>
+          <tr>
+            <td class="Item TRNoContent" colspan="3">
+              There is no folder or file
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>  
+    <div style="clear: both;">
+      <span></span>
+    </div>
+    <div style="float:left;">
+    <div class="HomeIcon">
+      <span></span>
+    </div>
+    <div class="BreadcumbsContainer" id="BreadcumbsContainer">      
+    </div>
+    </div>
+      <% if (allowDeleteItem) { %>
+    <div style="float:right" >
+      <input type="button" value="New folder" onclick="eXo.commons.DocumentSelector.newFolder()" />
+    </div>
+    <% }%>
+  </div>
+</div>
