@@ -108,7 +108,9 @@
   </dependencyManagement>
   <modules>
     <module>comet</module>
-    <module>component</module>
+    <module>component/common</module>
+    <module>component/product</module>
+    <module>component/upgrade</module>
     <module>testing</module>
     <module>webui/ext</module>
     <module>webui/component</module>
