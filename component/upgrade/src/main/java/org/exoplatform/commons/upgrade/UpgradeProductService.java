@@ -93,11 +93,10 @@ public class UpgradeProductService implements Startable {
               }
             }
           }
-        }
         // The product has been upgraded, change the product version in the JCR
         productInformations.storeProductsInformationsInJCR();
-
         log.info("Version upgrade completed.");
+      }
     } catch (MissingProductInformationException missingProductInformationException) {
       log.error("Can't proceed to the upgrade", missingProductInformationException);
     }
