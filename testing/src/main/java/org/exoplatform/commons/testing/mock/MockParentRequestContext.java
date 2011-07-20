@@ -22,6 +22,10 @@ import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.application.Application;
 import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.application.URLBuilder;
+import org.exoplatform.web.url.ControllerURL;
+import org.exoplatform.web.url.LocatorProvider;
+import org.exoplatform.web.url.ResourceLocator;
+import org.exoplatform.web.url.ResourceType;
 
 /**
  * @author <a href="mailto:patrice.lamarque@exoplatform.com">Patrice Lamarque</a>
@@ -29,8 +33,8 @@ import org.exoplatform.web.application.URLBuilder;
  */
 public class MockParentRequestContext extends RequestContext {
 
-  public MockParentRequestContext(Application app) {
-    super(app);
+  public MockParentRequestContext(RequestContext parentAppRequestContext, Application app) {
+    super(parentAppRequestContext, app);
     
   }
 
@@ -66,6 +70,17 @@ public class MockParentRequestContext extends RequestContext {
   public boolean useAjax() {
 
     return false;
+  }
+
+  @Override
+  public LocatorProvider getLocatorProvider() {
+    return null;
+  }
+
+  @Override
+  public <R, L extends ResourceLocator<R>> ControllerURL<R, L> newURL(ResourceType<R, L> resourceType,
+                                                                      L locator) {
+    return null;
   }
 
 }
