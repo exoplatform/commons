@@ -18,12 +18,7 @@ package org.exoplatform.commons.testing.mock;
 
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.application.Application;
-import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.application.URLBuilder;
-import org.exoplatform.web.url.ControllerURL;
-import org.exoplatform.web.url.LocatorProvider;
-import org.exoplatform.web.url.ResourceLocator;
-import org.exoplatform.web.url.ResourceType;
 import org.exoplatform.webui.application.WebuiRequestContext;
 
 /**
@@ -32,8 +27,8 @@ import org.exoplatform.webui.application.WebuiRequestContext;
  */
 public class MockWebUIRequestContext extends WebuiRequestContext {
 
-  public MockWebUIRequestContext(RequestContext parentAppRequestContext, Application app) {
-    super(parentAppRequestContext, app);
+  public MockWebUIRequestContext(Application app) {
+    super(app);
   }
 
   @Override
@@ -89,17 +84,6 @@ public class MockWebUIRequestContext extends WebuiRequestContext {
   public boolean useAjax() {
     
     return false;
-  }
-
-  @Override
-  public LocatorProvider getLocatorProvider() {
-    return null;
-  }
-
-  @Override
-  public <R, L extends ResourceLocator<R>> ControllerURL<R, L> newURL(ResourceType<R, L> resourceType,
-                                                                      L locator) {
-    return null;
   }
 
 }
