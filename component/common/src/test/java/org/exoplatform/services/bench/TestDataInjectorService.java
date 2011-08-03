@@ -146,7 +146,7 @@ public class TestDataInjectorService extends TestCase {
   }
   
   public void testReject() {
-    service.reject(injector.getName());
+    service.reject(injector.getName(), uriInfo);
     assertFalse(injector.isInitialized());
   }
   

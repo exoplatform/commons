@@ -62,19 +62,23 @@ public abstract class DataInjector extends BaseComponentPlugin {
   public abstract boolean isInitialized();
   
   /**
-   * transform parameters set by user to variables.
-   * @param initParams
+   * Transform parameters set by user to variables. 
+   * <br>
+   * The parameters can be value-params declared in plugin declaration part of portal configuration file or query parameters of a RESTful request.
+   * <br>
+   * Using {@link InitParams#getValueParam(String)} to get value of parameters.
+   * @param initParams - includes value-params only.
    */
   public abstract void initParams(InitParams initParams);
   
   /**
-   * inject data
+   * This function should be implemented to inject data into the product.
    * @throws Exception
    */
   public abstract void inject() throws Exception;
   
   /**
-   * reject data
+   * This function should be implemented to clear data that is injected before by {@link #inject()}.
    * @throws Exception
    */
   public abstract void reject() throws Exception;

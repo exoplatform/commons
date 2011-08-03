@@ -116,23 +116,20 @@ public class DataInjectorService implements ResourceContainer {
   @GET
   @Path("/reject/{injectorId}")
   @RolesAllowed("administrators")
-  public Response reject(@PathParam("injectorId") String type) {
+  public Response reject(@PathParam("injectorId") String type, @Context UriInfo info) {
     DataInjector injector = getDataInjector(type);
     if (injector == null) {
       return Response.status(Status.BAD_REQUEST).entity("Injector id is missed").cacheControl(cc).build();
     }
-    
-    if (injector.isInitialized()) {
-      try {
-        injector.reject();
-      } catch (Exception e) {
-        if (log.isWarnEnabled()) log.warn(String.format("%s rejected failed", injector.getName()), e);
-        return Response.serverError().entity(String.format("%1$s rejected failed due to %2$s", injector.getName(), e.getMessage())).build();
-      }
-      return Response.ok(String.format("%s rejected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
-    } else {
-      return Response.ok(String.format("%s has not been injected yet. Skipping rejection!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
+    InitParams params = initParams(info.getQueryParameters());
+    injector.initParams(params);
+    try {
+      injector.reject();
+    } catch (Exception e) {
+      if (log.isWarnEnabled()) log.warn(String.format("%s rejected failed", injector.getName()), e);
+      return Response.serverError().entity(String.format("%1$s rejected failed due to %2$s", injector.getName(), e.getMessage())).build();
     }
+    return Response.ok(String.format("%s rejected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
   }
   
 }
