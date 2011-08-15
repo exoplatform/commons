@@ -22,6 +22,9 @@ import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.application.Application;
 import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.application.URLBuilder;
+import org.exoplatform.web.url.PortalURL;
+import org.exoplatform.web.url.ResourceType;
+import org.exoplatform.web.url.URLFactory;
 
 /**
  * @author <a href="mailto:patrice.lamarque@exoplatform.com">Patrice Lamarque</a>
@@ -29,8 +32,8 @@ import org.exoplatform.web.application.URLBuilder;
  */
 public class MockParentRequestContext extends RequestContext {
 
-  public MockParentRequestContext(Application app) {
-    super(app);
+  public MockParentRequestContext(RequestContext parentAppRequestContext, Application app) {
+    super(parentAppRequestContext, app);
     
   }
 
@@ -66,6 +69,16 @@ public class MockParentRequestContext extends RequestContext {
   public boolean useAjax() {
 
     return false;
+  }
+
+  @Override
+  public URLFactory getURLFactory() {
+    return null;
+  }
+
+  @Override
+  public <R, U extends PortalURL<R, U>> U newURL(ResourceType<R, U> resourceType, URLFactory urlFactory) {
+    return null;
   }
 
 }

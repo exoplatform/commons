@@ -18,7 +18,11 @@ package org.exoplatform.commons.testing.mock;
 
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.application.Application;
+import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.web.application.URLBuilder;
+import org.exoplatform.web.url.PortalURL;
+import org.exoplatform.web.url.ResourceType;
+import org.exoplatform.web.url.URLFactory;
 import org.exoplatform.webui.application.WebuiRequestContext;
 
 /**
@@ -27,8 +31,8 @@ import org.exoplatform.webui.application.WebuiRequestContext;
  */
 public class MockWebUIRequestContext extends WebuiRequestContext {
 
-  public MockWebUIRequestContext(Application app) {
-    super(app);
+  public MockWebUIRequestContext(RequestContext parentAppRequestContext, Application app) {
+    super(parentAppRequestContext, app);
   }
 
   @Override
@@ -84,6 +88,16 @@ public class MockWebUIRequestContext extends WebuiRequestContext {
   public boolean useAjax() {
     
     return false;
+  }
+
+  @Override
+  public URLFactory getURLFactory() {
+    return null;
+  }
+
+  @Override
+  public <R, U extends PortalURL<R, U>> U newURL(ResourceType<R, U> resourceType, URLFactory urlFactory) {
+    return null;
   }
 
 }

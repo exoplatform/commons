@@ -52,8 +52,7 @@ public abstract class AbstractWebuiTestCase extends TestCase {
 
 
   private void initRequest() {
-    MockWebUIRequestContext context = new MockWebUIRequestContext(webuiApplication);
-    context.setParentAppRequestContext(new MockParentRequestContext(null)); // a webuirequestcontext requires a parent...
+    MockWebUIRequestContext context = new MockWebUIRequestContext(new MockParentRequestContext(null, null), webuiApplication);
     WebuiRequestContext.setCurrentInstance(context);
   }
   
