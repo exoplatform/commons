@@ -71,6 +71,8 @@ public class UIDocumentSelector extends UIContainer {
   protected static final String PARAM_ISFOLDERONLY   = "isFolderOnly";
 
   protected static final String PARAM_FOLDERNAME     = "folderName";
+  
+  protected static final String DATA_ID              = "dataId";
 
   protected String              currentWorkspaceName = "";
 
@@ -145,7 +147,7 @@ public class UIDocumentSelector extends UIContainer {
   static public class SelectFileActionListener extends EventListener<UIDocumentSelector> {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
-      component.seletedFile = event.getRequestContext().getRequestParameter(OBJECTID);
+      component.seletedFile = event.getRequestContext().getRequestParameter(DATA_ID);
       event.getRequestContext()
            .addUIComponentToUpdateByAjax(component.getChildById(EMPTYCOMPONENT));
     }
@@ -154,7 +156,7 @@ public class UIDocumentSelector extends UIContainer {
   static public class SelectFolderActionListener extends EventListener<UIDocumentSelector> {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
-      component.seletedFolder = event.getRequestContext().getRequestParameter(OBJECTID);
+      component.seletedFolder = event.getRequestContext().getRequestParameter(DATA_ID);
       event.getRequestContext()
            .addUIComponentToUpdateByAjax(component.getChildById(EMPTYCOMPONENT));
     }

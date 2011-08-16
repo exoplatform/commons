@@ -5,8 +5,8 @@
   String restContext = uicomponent.getRestContext();
   boolean allowAddFolder = uicomponent.allowAddFolder;
   boolean allowDeleteItem = uicomponent.allowDeleteItem;
-  String selectFileLink =uicomponent.event(uicomponent.SELECTFILE,"TempParam");
-  String selectFolderLink =uicomponent.event(uicomponent.SELECTFOLDER,"TempParam");
+  String selectFileLink =uicomponent.event(uicomponent.SELECTFILE);
+  String selectFolderLink =uicomponent.event(uicomponent.SELECTFOLDER);
   
   def jsManager = rcontext.getJavascriptManager();
   
@@ -19,6 +19,7 @@
   jsManager.addJavascript("eXo.commons.DocumentSelector.isFolderOnlyParam = '" + uicomponent.PARAM_ISFOLDERONLY + "';");
   jsManager.addJavascript("eXo.commons.DocumentSelector.folderNameParam = '" + uicomponent.PARAM_FOLDERNAME + "';");
   jsManager.addJavascript("eXo.commons.DocumentSelector.allowDeleteItem = " + allowDeleteItem + ";");
+  jsManager.addJavascript("eXo.commons.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
   jsManager.addJavascript("eXo.commons.DocumentSelector.init('" + uicomponent.id + "','" + restContext + "','"+workspaceName +"','"+userRootPath +"');"); 
 %>
 <div class="UIDocumentSelector" id="$uicomponent.id">

@@ -21,6 +21,7 @@ function DocumentSelector(){
   this.selectFileLink = null;
   this.selectFolderLink = null;
   this.allowDeleteItem = true;
+  this.dataId = null;
 };
 
 DocumentSelector.prototype.init = function(uicomponentId, restContext, workspaceName, rootPath){
@@ -285,7 +286,9 @@ DocumentSelector.prototype.submitSelectedFile = function(tableCell){
   var nodePath = detailNode.getAttribute("path");
   if (me.selectFileLink) {
     var link = me.selectFileLink.href;
-    link = link.replace("TempParam", nodePath);
+    var endParamIndex = link.lastIndexOf("')");
+    if (endParamIndex > 0)
+      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + nodePath + "')";
     window.location = link;
   }
   if (me.selectFile) {
@@ -304,7 +307,9 @@ DocumentSelector.prototype.submitSelectedFolder = function(folderNode){
   var path = folderNode.getAttribute("path");
   if (me.selectFolderLink) {
     var link = me.selectFolderLink.href;
-    link = link.replace("TempParam", path);
+    var endParamIndex = link.lastIndexOf("')");
+    if (endParamIndex > 0)
+      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + path + "')";
     window.location = link;
   }
 };
