@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.exoplatform.platform</groupId>
   <artifactId>exo.platform.commons.gifbackport</artifactId>
-  <version>1.1.1-GA-SHAPSHOT</version>
+  <version>1.1.1-GA-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>eXo Platform - Component javax.imageio GIF plugin backport</name>
   <description>eXo GIF plugin backport</description>
