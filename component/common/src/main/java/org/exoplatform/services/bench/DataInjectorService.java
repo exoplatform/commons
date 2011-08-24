@@ -16,6 +16,7 @@
  */
 package org.exoplatform.services.bench;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,8 +34,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -57,20 +56,18 @@ public class DataInjectorService implements ResourceContainer {
   
   private List<DataInjector> listOfInjectors = new LinkedList<DataInjector>();
   
-  private InitParams initParams(MultivaluedMap<String, String> paramsMap) {
-    InitParams initParams = new InitParams();
+  private HashMap<String, String> initParams(MultivaluedMap<String, String> paramsMap) {
+    HashMap<String, String> parameters = new HashMap<String, String>();
     Iterator<Entry<String, List<String>>> iterator = paramsMap.entrySet().iterator();
     while (iterator.hasNext()) {
       Entry<String, List<String>> entry = iterator.next();
       String key = entry.getKey();
       List<String> values = entry.getValue();
       String value = values.size() > 0 ? values.get(0) : null;
-      ValueParam valueParam = new ValueParam();
-      valueParam.setValue(value);
-      initParams.put(key, valueParam);
+      parameters.put(key, value);
     }
     
-    return initParams;
+    return parameters;
   }
   
   private DataInjector getDataInjector(String injectorId) {
@@ -91,26 +88,39 @@ public class DataInjectorService implements ResourceContainer {
   }
   
   @GET
+  @Path("/execute/{injectorId}")
+  @RolesAllowed("administrators")
+  public Response execute(@PathParam("injectorId") String type, @Context UriInfo info) {
+    DataInjector injector = getDataInjector(type);
+    if (injector == null) {
+      return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect!").cacheControl(cc).build();
+    }
+    HashMap<String, String> params = initParams(info.getQueryParameters());
+    try {
+      Object response = injector.execute(params);
+      return Response.ok(response, MediaType.APPLICATION_JSON).cacheControl(cc).build();
+    } catch (Exception e) {
+      if (log.isWarnEnabled()) log.warn(String.format("%s executed failed", injector.getName()), e);
+      return Response.serverError().entity(String.format("%1$s executed failed due to %2$s", injector.getName(), e.getMessage())).build();
+    }
+  }
+  
+  @GET
   @Path("/inject/{injectorId}")
   @RolesAllowed("administrators")
   public Response inject(@PathParam("injectorId") String type, @Context UriInfo info) {
     DataInjector injector = getDataInjector(type);
     if (injector == null) {
-      return Response.status(Status.BAD_REQUEST).entity("Injector id is not properly!").cacheControl(cc).build();
+      return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect!").cacheControl(cc).build();
     }
-    InitParams params = initParams(info.getQueryParameters());
-    injector.initParams(params);
-    if (!injector.isInitialized()) {
-      try {
-        injector.inject();
-      } catch (Exception e) {
-        if (log.isWarnEnabled()) log.warn(String.format("%s injected failed", injector.getName()), e);
-        return Response.serverError().entity(String.format("%1$s injected failed due to %2$s", injector.getName(), e.getMessage())).build();
-      }
-      return Response.ok(String.format("%s injected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
-    } else {
-      return Response.ok(String.format("Injector %s has been executed before. Skipping!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
+    HashMap<String, String> params = initParams(info.getQueryParameters());
+    try {
+      injector.inject(params);
+    } catch (Exception e) {
+      if (log.isWarnEnabled()) log.warn(String.format("%s injected failed", injector.getName()), e);
+      return Response.serverError().entity(String.format("%1$s injected failed due to %2$s", injector.getName(), e.getMessage())).build();
     }
+    return Response.ok(String.format("%s injected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
   }
   
   @GET
@@ -119,12 +129,11 @@ public class DataInjectorService implements ResourceContainer {
   public Response reject(@PathParam("injectorId") String type, @Context UriInfo info) {
     DataInjector injector = getDataInjector(type);
     if (injector == null) {
-      return Response.status(Status.BAD_REQUEST).entity("Injector id is missed").cacheControl(cc).build();
+      return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect").cacheControl(cc).build();
     }
-    InitParams params = initParams(info.getQueryParameters());
-    injector.initParams(params);
+    HashMap<String, String> params = initParams(info.getQueryParameters());
     try {
-      injector.reject();
+      injector.reject(params);
     } catch (Exception e) {
       if (log.isWarnEnabled()) log.warn(String.format("%s rejected failed", injector.getName()), e);
       return Response.serverError().entity(String.format("%1$s rejected failed due to %2$s", injector.getName(), e.getMessage())).build();

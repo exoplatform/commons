@@ -17,11 +17,11 @@
 package org.exoplatform.services.bench;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import org.exoplatform.container.component.BaseComponentPlugin;
-import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.Log;
 
 /**
@@ -55,34 +55,46 @@ public abstract class DataInjector extends BaseComponentPlugin {
   public abstract Log getLog();
 
   /**
-   * check whether data is initialized or not.
-   * 
-   * @return true if data is initialized.
-   */
-  public abstract boolean isInitialized();
-  
-  /**
-   * Transform parameters set by user to variables. 
+   * This function should be implemented to execute tasks that require to response data to client.
    * <br>
-   * The parameters can be value-params declared in plugin declaration part of portal configuration file or query parameters of a RESTful request.
-   * <br>
-   * Using {@link InitParams#getValueParam(String)} to get value of parameters.
-   * @param initParams - includes value-params only.
+   * @param params query parameters of a HTTP GET request.
+   * @return object that can be serialized to JSON object.
+   * @throws Exception
    */
-  public abstract void initParams(InitParams initParams);
+  public abstract Object execute(HashMap<String , String> params) throws Exception;
   
   /**
    * This function should be implemented to inject data into the product.
+   * @param params parameters for injecting. They can be query parameters of a HTTP GET request.  
    * @throws Exception
    */
-  public abstract void inject() throws Exception;
+  public abstract void inject(HashMap<String , String> params) throws Exception;
   
   /**
    * This function should be implemented to clear data that is injected before by {@link #inject()}.
+   * @param params parameters for rejecting. They can be query parameters of a HTTP GET request.
    * @throws Exception
    */
-  public abstract void reject() throws Exception;
+  public abstract void reject(HashMap<String , String> params) throws Exception;
 
+  /**
+   * get pseudo words.
+   * @param amount number of words
+   * @return pseudo words
+   */
+  public final String words(int amount) {
+    return textGen.getWords(amount);
+  }
+  
+  /**
+   * get pseudo paragraphs.
+   * @param amount number of paragraphs
+   * @return pseudo paragraphs
+   */
+  public final String paragraphs(int amount) {
+    return textGen.getParagraphs(amount);
+  }
+  
   /**
    * get random user id.
    */

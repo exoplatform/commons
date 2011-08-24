@@ -17,6 +17,8 @@ package org.exoplatform.services.bench;
  */
 
 
+import java.util.HashMap;
+
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.bench.DataInjector;
 import org.exoplatform.services.log.Log;
@@ -43,22 +45,26 @@ public class FakeDataInjector extends DataInjector {
     return null;
   }
 
-  @Override
   public boolean isInitialized() {
     return isInjected;
   }
 
   @Override
-  public void initParams(InitParams initParams) {}
+  public Object execute(HashMap<String, String> params) throws Exception {
+    // TODO Auto-generated method stub
+    return new Object();
+  }
 
   @Override
-  public void inject() throws Exception {
+  public void inject(HashMap<String, String> params) throws Exception {
     isInjected = true;
   }
 
   @Override
-  public void reject() throws Exception {
+  public void reject(HashMap<String, String> params) throws Exception {
     isInjected = false;
   }
+  
+  
   
 }

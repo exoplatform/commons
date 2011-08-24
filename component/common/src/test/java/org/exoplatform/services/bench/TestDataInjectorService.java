@@ -150,4 +150,9 @@ public class TestDataInjectorService extends TestCase {
     assertFalse(injector.isInitialized());
   }
   
+  public void testExecute() {
+    Object obj = service.execute(injector.getName(), uriInfo);
+    assertNotNull(obj);
+  }
+  
 }
