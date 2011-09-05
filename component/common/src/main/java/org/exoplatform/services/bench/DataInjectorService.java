@@ -47,6 +47,10 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 public class DataInjectorService implements ResourceContainer {
   
   private static Log         log             = ExoLogger.getLogger(DataInjectorService.class);
+  
+  private enum Actions {
+    INJECT, REJECT, EXECUTE
+  }
 
   private static CacheControl cc = new CacheControl();
   static {
@@ -56,7 +60,7 @@ public class DataInjectorService implements ResourceContainer {
   
   private List<DataInjector> listOfInjectors = new LinkedList<DataInjector>();
   
-  private HashMap<String, String> initParams(MultivaluedMap<String, String> paramsMap) {
+  private HashMap<String, String> convertToHashMap(MultivaluedMap<String, String> paramsMap) {
     HashMap<String, String> parameters = new HashMap<String, String>();
     Iterator<Entry<String, List<String>>> iterator = paramsMap.entrySet().iterator();
     while (iterator.hasNext()) {
@@ -95,12 +99,13 @@ public class DataInjectorService implements ResourceContainer {
     if (injector == null) {
       return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect!").cacheControl(cc).build();
     }
-    HashMap<String, String> params = initParams(info.getQueryParameters());
+    HashMap<String, String> params = convertToHashMap(info.getQueryParameters());
     try {
+      beginPrintInfo(params, Actions.EXECUTE);
       Object response = injector.execute(params);
       return Response.ok(response, MediaType.APPLICATION_JSON).cacheControl(cc).build();
     } catch (Exception e) {
-      if (log.isWarnEnabled()) log.warn(String.format("%s executed failed", injector.getName()), e);
+      errorPrintInfo(injector, Actions.EXECUTE, e);
       return Response.serverError().entity(String.format("%1$s executed failed due to %2$s", injector.getName(), e.getMessage())).build();
     }
   }
@@ -113,13 +118,15 @@ public class DataInjectorService implements ResourceContainer {
     if (injector == null) {
       return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect!").cacheControl(cc).build();
     }
-    HashMap<String, String> params = initParams(info.getQueryParameters());
+    HashMap<String, String> params = convertToHashMap(info.getQueryParameters());
     try {
+      beginPrintInfo(params, Actions.INJECT);
       injector.inject(params);
     } catch (Exception e) {
-      if (log.isWarnEnabled()) log.warn(String.format("%s injected failed", injector.getName()), e);
+      errorPrintInfo(injector, Actions.INJECT, e);
       return Response.serverError().entity(String.format("%1$s injected failed due to %2$s", injector.getName(), e.getMessage())).build();
     }
+    endPrintInfo(Actions.INJECT);
     return Response.ok(String.format("%s injected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
   }
   
@@ -131,14 +138,37 @@ public class DataInjectorService implements ResourceContainer {
     if (injector == null) {
       return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect").cacheControl(cc).build();
     }
-    HashMap<String, String> params = initParams(info.getQueryParameters());
+    HashMap<String, String> params = convertToHashMap(info.getQueryParameters());
     try {
+      beginPrintInfo(params, Actions.REJECT);
       injector.reject(params);
     } catch (Exception e) {
-      if (log.isWarnEnabled()) log.warn(String.format("%s rejected failed", injector.getName()), e);
+      errorPrintInfo(injector, Actions.REJECT, e);
       return Response.serverError().entity(String.format("%1$s rejected failed due to %2$s", injector.getName(), e.getMessage())).build();
     }
+    endPrintInfo(Actions.REJECT);
     return Response.ok(String.format("%s rejected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
   }
-  
+
+  private void beginPrintInfo(HashMap<String, String> params, Actions action) {
+    log.info(String.format("Start to %s............... ", action.toString().toLowerCase()));
+    StringBuilder sb = new StringBuilder();
+    sb.append("PARAMS: \n");
+    Iterator<String> keys = params.keySet().iterator();
+    while (keys.hasNext()) {
+      String key = keys.next();
+      sb.append(String.format("%1$10s    :    %2$10s \n", key, params.get(key)));
+    }
+    log.info(sb.toString());
+  }
+
+  private void endPrintInfo(Actions action) {
+    log.info(String.format("%sing data has been done successfully!", action.toString().toLowerCase()));
+  }
+
+  private void errorPrintInfo(DataInjector injector, Actions action, Exception ex) {
+    if (log.isWarnEnabled())
+      log.warn(String.format("%s %sed failed", injector.getName(), action.toString().toLowerCase()), ex);
+  }
+
 }

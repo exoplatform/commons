@@ -18,6 +18,7 @@ package org.exoplatform.services.bench;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -37,6 +38,8 @@ public abstract class DataInjector extends BaseComponentPlugin {
   private Random       rand    = new Random();
 
   private LoremIpsum4J textGen = new LoremIpsum4J();
+  
+  public static final String             ARRAY_SPLIT   = ",";
   
   private String restId;
   
@@ -138,6 +141,46 @@ public abstract class DataInjector extends BaseComponentPlugin {
       sb.append("A"); // each A character spends one byte in UTF-8.
     }
     return sb.toString();
+  }  
+
+  public List<String> readGroupsIfExist(HashMap<String, String> queryParams) {
+    List<String> groups = new LinkedList<String>();
+    String value = queryParams.get("groups");
+    if (value != null) {
+      String[] groupsString = value.split(ARRAY_SPLIT);
+      for (String s : groupsString) {
+        if (s.length() > 0)
+          groups.add(s.trim());
+      }
+    }
+    return groups;
+  }
+  
+  public List<String> readUsersIfExist(HashMap<String, String> queryParams) {
+    List<String> users = new LinkedList<String>();
+    String value = queryParams.get("users");
+    if (value != null) {
+      String[] groupsString = value.split(ARRAY_SPLIT);
+      for (String s : groupsString) {
+        if (s.length() > 0)
+          users.add(s.trim());
+      }
+    }
+    return users;    
+  }  
+
+  public List<String> readMembershipIfExist(HashMap<String, String> queryParams) {
+    List<String> memberships = new LinkedList<String>();
+    
+    String value = queryParams.get("memship");
+    if (value != null) {
+      String[] memshipsString = value.split(ARRAY_SPLIT);
+      for (String s : memshipsString) {
+        if (s.length() > 0)
+          memberships.add(s.trim());
+      }
+    }
+    return memberships;
   }
   
 }
