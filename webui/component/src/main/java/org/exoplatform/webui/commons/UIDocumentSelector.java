@@ -16,6 +16,7 @@
  */
 package org.exoplatform.webui.commons;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -148,6 +149,7 @@ public class UIDocumentSelector extends UIContainer {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
       component.seletedFile = event.getRequestContext().getRequestParameter(DATA_ID);
+      component.seletedFolder = StringUtils.EMPTY;
       event.getRequestContext()
            .addUIComponentToUpdateByAjax(component.getChildById(EMPTYCOMPONENT));
     }
@@ -157,6 +159,7 @@ public class UIDocumentSelector extends UIContainer {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
       component.seletedFolder = event.getRequestContext().getRequestParameter(DATA_ID);
+      component.seletedFile = StringUtils.EMPTY;
       event.getRequestContext()
            .addUIComponentToUpdateByAjax(component.getChildById(EMPTYCOMPONENT));
     }
