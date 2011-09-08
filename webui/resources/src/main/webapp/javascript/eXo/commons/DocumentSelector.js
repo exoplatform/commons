@@ -144,7 +144,7 @@ DocumentSelector.prototype.renderTreeNode = function(nodeList){
       else {
         treeHTML += '<div class="NoneIcon">';
       }
-      treeHTML += '<a title="' + decodeURIComponent(strName) + '" href="javascript:void(0);" class="NodeIcon Folder" onclick="event.cancelBubble=true;eXo.commons.DocumentSelector.viewDetails(this);" name="' + decodeURIComponent(strName) + '" id="' + path + '" path="' + path + '">';
+      treeHTML += '<a title="' + decodeURIComponent(strName) + '" href="javascript:void(0);" class="NodeIcon Folder" onclick="event.cancelBubble=true;eXo.commons.DocumentSelector.viewDetails(this);eXo.commons.DocumentSelector.colExpNode(this.parentNode.parentNode);" name="' + decodeURIComponent(strName) + '" id="' + path + '" path="' + path + '">';
       treeHTML += strName;
       treeHTML += '</a>';
       treeHTML += '</div>';
