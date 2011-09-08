@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.testing.mock;
 
+import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.resources.Orientation;
 import org.exoplatform.web.application.Application;
 import org.exoplatform.web.application.RequestContext;
@@ -97,6 +98,11 @@ public class MockWebUIRequestContext extends WebuiRequestContext {
 
   @Override
   public <R, U extends PortalURL<R, U>> U newURL(ResourceType<R, U> resourceType, URLFactory urlFactory) {
+    return null;
+  }
+
+  @Override
+  public UserPortal getUserPortal() {
     return null;
   }
 
