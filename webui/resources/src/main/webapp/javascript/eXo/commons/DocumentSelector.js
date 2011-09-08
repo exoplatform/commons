@@ -72,7 +72,9 @@ DocumentSelector.prototype.colExpNode = function(treeNode){
   
   if (!nextElt || nextElt.className != "ChildrenContainer") {
     me.renderChildren(treeNode);
-    var childrenCotainer = domUtil.findFirstChildByClass(treeNode, "div", "ChildrenContainer");
+    if(childrenCotainer){
+      var childrenCotainer = domUtil.findFirstChildByClass(treeNode, "div", "ChildrenContainer");
+    }
     iconElt = domUtil.findPreviousElementByTagName(childrenCotainer, "div");
     if (childrenCotainer) {
       iconElt.className = 'CollapseIcon';
