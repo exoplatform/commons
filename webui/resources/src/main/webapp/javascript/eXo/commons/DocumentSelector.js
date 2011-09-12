@@ -22,13 +22,14 @@ function DocumentSelector(){
   this.selectFolderLink = null;
   this.allowDeleteItem = true;
   this.dataId = null;
+  this.uiComponent = null;
 };
 
 DocumentSelector.prototype.init = function(uicomponentId, restContext, workspaceName, rootPath){
   var me = eXo.commons.DocumentSelector;
-  var uiComponent = document.getElementById(uicomponentId);
-  this.selectFileLink = eXo.core.DOMUtil.findFirstDescendantByClass(uiComponent, "a", "SelectFile");
-  this.selectFolderLink = eXo.core.DOMUtil.findFirstDescendantByClass(uiComponent, "a", "SelectFolder");
+  this.uiComponent = document.getElementById(uicomponentId);
+  this.selectFileLink = eXo.core.DOMUtil.findFirstDescendantByClass(this.uiComponent, "a", "SelectFile");
+  this.selectFolderLink = eXo.core.DOMUtil.findFirstDescendantByClass(this.uiComponent, "a", "SelectFolder");
   this.restContext = restContext;
   this.getFoldersAndFilesURL = restContext + this.getFoldersAndFiles;
   this.deleteFolderOrFileURL = restContext + this.deleteFolderOrFile;
@@ -361,39 +362,49 @@ DocumentSelector.prototype.remove = function(tableCell){
   }
 };
 
-DocumentSelector.prototype.newFolder = function(){
+DocumentSelector.prototype.newFolder = function(inputFolderName){
   var me = eXo.commons.DocumentSelector;
+  var msg_select_folder = inputFolderName.getAttribute("msg_select_folder");
+  var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
+  var msg_empty_folder_name = inputFolderName.getAttribute("msg_empty_folder_name");
+  
   var domUtil = eXo.core.DOMUtil;
   if (!me.selectedTreeNode) {
-    alert("Please select a folder to add");
+    alert(msg_select_folder);
     return;
   }
-  var folderName = prompt("Please enter new folder's name", "");
-  if (folderName && folderName != "" && me.selectedTreeNode) {
-    var itemNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
-    var nodePath = itemNode.getAttribute("path");
-    var url = me.createFolderURL;
-    url += "?" + me.workspaceParam + "=" + me.workspaceName;
-    url += "&" + me.parentPathParam + "=" + nodePath;
-    url += "&" + me.folderNameParam + "=" + folderName;
-    try {
-      me.request(url);
-      if (me.selectedTreeNode) {
-        me.renderChildren(me.selectedTreeNode);
-        var iconElt = eXo.core.DOMUtil.getChildrenByTagName(me.selectedTreeNode, "div")[0];
-        if (domUtil.hasClass(iconElt, "NoneIcon")) 
-          domUtil.replaceClass(iconElt, "NoneIcon", "CollapseIcon");
-        if (domUtil.hasClass(iconElt, "ExpandIcon")) 
-          domUtil.replaceClass(iconElt, "ExpandIcon", "CollapseIcon");
-        var itemNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
-        me.viewDetails(itemNode);
+  
+  var folderName = prompt(msg_enter_folder_name, "");
+  if (folderName == null || folderName == "") {
+    alert(msg_empty_folder_name);
+    return;
+  }
+  
+  var itemNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
+  var nodePath = itemNode.getAttribute("path");
+  var url = me.createFolderURL;
+  url += "?" + me.workspaceParam + "=" + me.workspaceName;
+  url += "&" + me.parentPathParam + "=" + nodePath;
+  url += "&" + me.folderNameParam + "=" + folderName;
+  try {
+    me.request(url);
+    if (me.selectedTreeNode) {
+      me.renderChildren(me.selectedTreeNode);
+      var iconElt = eXo.core.DOMUtil.getChildrenByTagName(me.selectedTreeNode, "div")[0];
+      if (domUtil.hasClass(iconElt, "NoneIcon")) {
+        domUtil.replaceClass(iconElt, "NoneIcon", "CollapseIcon");
       }
-    } 
-    catch (e) {
-      window.console.error(e);
+      if (domUtil.hasClass(iconElt, "ExpandIcon")) { 
+        domUtil.replaceClass(iconElt, "ExpandIcon", "CollapseIcon");
+      }
+      var itemNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
+      me.viewDetails(itemNode);
     }
+  } catch (e) {
+    window.console.error(e);
   }
 };
+
 DocumentSelector.prototype.actionBreadcrumbs = function(nodePath){
   var me = eXo.commons.DocumentSelector;
   var folderNode = document.getElementById(nodePath);
