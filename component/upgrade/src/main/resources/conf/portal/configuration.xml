@@ -3,11 +3,10 @@
 	<component>
 		<type>org.exoplatform.commons.upgrade.UpgradeProductService</type>
 		<init-params>
+			<!-- Proceed to the upgrade if it's first time you run this service -->
 			<value-param>
-				<name>working.worspace.name</name>
-				<!-- Workspace that contains Version declaration : -->
-				<!-- You can specify a workspace name, else use default one -->
-				<value></value>
+				<name>proceedUpgradeWhenFirstRun</name>
+				<value>${commons.upgrade.proceedIfFirstRun}</value>
 			</value-param>
 		</init-params>
 	</component>

@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.jcr.LoginException;
 import javax.jcr.NoSuchWorkspaceException;
@@ -47,7 +48,8 @@ import org.exoplatform.services.log.Log;
 import org.picocontainer.Startable;
 
 /**
- * @author <a href="mailto:anouar.chattouna@exoplatform.com">Anouar Chattouna</a>
+ * @author <a href="mailto:anouar.chattouna@exoplatform.com">Anouar
+ *         Chattouna</a>
  * @version $Revision$
  */
 public class ProductInformations implements Startable {
@@ -59,10 +61,14 @@ public class ProductInformations implements Startable {
 
   public static final String PRODUCT_VERSIONS_DECLARATION_FILE = "product.versions.declaration.file";
 
+  public static final String PROCEED_UPGRADE_FIRST_TIME_KEY = "proceedUpgradeFirstTime";
+
   public static final String WORKING_WORSPACE_NAME = "working.worspace.name";
 
+
   /**
-   * Constant that will be used in nodeHierarchyCreator.getJcrPath: it represents the Application data root node Alias
+   * Constant that will be used in nodeHierarchyCreator.getJcrPath: it
+   * represents the Application data root node Alias
    */
   public static final String EXO_APPLICATIONS_DATA_NODE_ALIAS = "exoApplicationDataNode";
 
@@ -89,6 +95,7 @@ public class ProductInformations implements Startable {
   private String workspaceName = null;
   private String applicationDataRootNodePath = null;
   private String productVersionDeclarationNodePath = null;
+  private boolean firstRun = false;
 
   private RepositoryService repositoryService = null;
   private SessionProviderService sessionProviderService = null;
@@ -135,7 +142,8 @@ public class ProductInformations implements Startable {
   }
 
   /**
-   * @return This method return the product version, selected by its maven groupId.
+   * @return This method return the product version, selected by its maven
+   *         groupId.
    */
   public String getVersion(String productGroupId) throws MissingProductInformationException {
     if (!productInformationProperties.containsKey(productGroupId)) {
@@ -175,14 +183,16 @@ public class ProductInformations implements Startable {
   }
 
   /**
-   * @return the platform.version property. This method return the platform version.
+   * @return the platform.version property. This method return the platform
+   *         version.
    */
   public String getPreviousVersion() throws MissingProductInformationException {
     return getPreviousVersion(getCurrentProductGroupId());
   }
 
   /**
-   * @return the platform.version property. This method return the platform version.
+   * @return the platform.version property. This method return the platform
+   *         version.
    */
   public String getPreviousVersion(String productGroupId) throws MissingProductInformationException {
     if (!previousProductInformationProperties.containsKey(productGroupId)) {
@@ -192,7 +202,9 @@ public class ProductInformations implements Startable {
   }
 
   /**
-   * @return an empty string if the properties file is not found, otherwise the platform.buildNumber property. This method return the build number of the platform.
+   * @return an empty string if the properties file is not found, otherwise
+   *         the platform.buildNumber property. This method return the
+   *         build number of the platform.
    */
   public String getPreviousBuildNumber() throws MissingProductInformationException {
     if (!previousProductInformationProperties.containsKey(PRODUCT_BUILD_NUMBER)) {
@@ -202,7 +214,8 @@ public class ProductInformations implements Startable {
   }
 
   /**
-   * @return the value of product.revision property. This method return the current revison of the platform.
+   * @return the value of product.revision property. This method return the
+   *         current revison of the platform.
    */
   public String getPreviousRevision() throws MissingProductInformationException {
     if (!previousProductInformationProperties.containsKey(PRODUCT_REVISION)) {
@@ -211,8 +224,13 @@ public class ProductInformations implements Startable {
     return previousProductInformationProperties.getProperty(PRODUCT_REVISION);
   }
 
+  public boolean isFirstRun() {
+    return this.firstRun;
+  }
+
   /**
-   * This method loads from the JCR the stored products versions. If it's the first server start up, then store the declared one.
+   * This method loads from the JCR the stored products versions. If it's
+   * the first server start up, then store the declared one.
    */
   public void start() {
     if (log.isDebugEnabled()) {
@@ -245,12 +263,20 @@ public class ProductInformations implements Startable {
         applicationDataNode.addMixin("exo:hiddenable");
       }
 
-      // This node's path is "WS_NAME:/exo;services/ProductInformationsService/productVersionDeclarationNode"
+      // This node's path is
+      // "WS_NAME:/exo;services/ProductInformationsService/productVersionDeclarationNode"
       Node productVersionDeclarationNode = null;
-      if (applicationDataNode.hasNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME)) {// reads from the JCR the previous version
+      if (applicationDataNode.hasNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME)) {// reads
+                                                                           // from
+                                                                           // the
+                                                                           // JCR
+                                                                           // the
+                                                                           // previous
+                                                                           // version
         productVersionDeclarationNode = applicationDataNode.getNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME + "/"
             + PRODUCT_VERSION_DECLARATION_NODE_NAME);
-        // get the previous product informations, stored in a JCR property, this will be by example:
+        // get the previous product informations, stored in a JCR property,
+        // this will be by example:
         // "WS_NAME:/exo:services/ProductInformationsService/productVersionDeclarationNode/jcr:content/jcr:data"
         String previousVersionData = ((Property) session.getItem(productVersionDeclarationNode.getPath()
             + "/jcr:content/jcr:data")).getString();
@@ -260,6 +286,7 @@ public class ProductInformations implements Startable {
         if (log.isDebugEnabled()) {
           log.debug("Product server first run: setup product Version Declaration Node");
         }
+        firstRun = true;
         Node UpgradeProductServiceNode = applicationDataNode.addNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME, "nt:unstructured");
         productVersionDeclarationNode = UpgradeProductServiceNode.addNode(PRODUCT_VERSION_DECLARATION_NODE_NAME, "nt:file");
         Node productVersionDeclarationNodeContent = productVersionDeclarationNode.addNode("jcr:content", "nt:resource");
@@ -272,7 +299,7 @@ public class ProductInformations implements Startable {
         }
         session.save();
         session.refresh(true);
-        previousProductInformationProperties = productInformationProperties;
+        previousProductInformationProperties = new Properties(productInformationProperties);
       }
     } catch (LoginException exception) {
       throw new RuntimeException("Can't load product informations from the JCR: Error when getting JCR session.", exception);
@@ -294,7 +321,8 @@ public class ProductInformations implements Startable {
   }
 
   /**
-   * This method is called by eXo Kernel when stopping the parent ExoContainer
+   * This method is called by eXo Kernel when stopping the parent
+   * ExoContainer
    */
   public void stop() {}
 
@@ -304,13 +332,15 @@ public class ProductInformations implements Startable {
       session = getSession();
       Node productVersionDeclarationNode = (Node) session.getItem(productVersionDeclarationNodePath);
 
-      // Add a version of product informations node, with the previous informations
+      // Add a version of product informations node, with the previous
+      // informations
       Version version = productVersionDeclarationNode.checkin();
       productVersionDeclarationNode.getSession().save();
       productVersionDeclarationNode.getVersionHistory().addVersionLabel(version.getName(), getPreviousVersion(), false);
       productVersionDeclarationNode.checkout();
 
-      // Update the content of the product informations node, with the new content
+      // Update the content of the product informations node, with the new
+      // content
       Node productVersionDeclarationNodeContent = productVersionDeclarationNode.getNode("jcr:content");
       productVersionDeclarationNodeContent.setProperty("jcr:data", getCurrentProductInformationsAsString());
       productVersionDeclarationNodeContent.setProperty("jcr:lastModified", new Date().getTime());
@@ -346,6 +376,16 @@ public class ProductInformations implements Startable {
 
   public String getProductVersionDeclarationNodePath() {
     return this.productVersionDeclarationNodePath;
+  }
+
+  public void setPreviousVersionsIfFirstRun(String defaultVersion) {
+    if (isFirstRun()) {
+      previousProductInformationProperties = new Properties(productInformationProperties);
+      Set<?> keys = previousProductInformationProperties.keySet();
+      for (Object key : keys) {
+        previousProductInformationProperties.setProperty((String) key, defaultVersion);
+      }
+    }
   }
 
 }
