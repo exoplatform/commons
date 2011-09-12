@@ -23,9 +23,10 @@ function DocumentSelector(){
   this.allowDeleteItem = true;
   this.dataId = null;
   this.uiComponent = null;
+  this.rootPath = null;
 };
 
-DocumentSelector.prototype.init = function(uicomponentId, restContext, workspaceName, rootPath){
+DocumentSelector.prototype.init = function(uicomponentId, restContext, workspaceName, _rootPath){
   var me = eXo.commons.DocumentSelector;
   this.uiComponent = document.getElementById(uicomponentId);
   this.selectFileLink = eXo.core.DOMUtil.findFirstDescendantByClass(this.uiComponent, "a", "SelectFile");
@@ -35,12 +36,14 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext, workspace
   this.deleteFolderOrFileURL = restContext + this.deleteFolderOrFile;
   this.createFolderURL = restContext + this.createFolder;
   this.workspaceName = workspaceName;
+  this.rootPath = _rootPath;
   var url = this.getFoldersAndFilesURL;
   url += "?" + this.workspaceParam + "=" + this.workspaceName;
-  url += "&" + this.nodePathParam + "=" + rootPath;
+  url += "&" + this.nodePathParam + "=" + this.rootPath;
   url += "&" + this.isFolderOnlyParam + "=true";
   var data = me.request(url);
   me.buildTree(null, data);
+  me.actionBreadcrumbs(this.rootPath);
 };
 
 DocumentSelector.prototype.buildTree = function(treeNode, data){
@@ -52,7 +55,11 @@ DocumentSelector.prototype.buildTree = function(treeNode, data){
   if (!treeNode) {
     var uiLeftWorkspace = document.getElementById('LeftWorkspace');
     if (uiLeftWorkspace) 
-      uiLeftWorkspace.innerHTML = childrenHTML;
+      rootHtml = '<div class="Node" onclick="event.cancelBubble=true;eXo.commons.DocumentSelector.colExpNode(this);">'
+      rootHtml += '<div class="CollapseIcon" style="display:none;" >'
+      rootHtml += '<a id="'+this.rootPath+'" class="NodeIcon Folder Selected" path="'+this.rootPath+'" name="'+this.rootPath+'" href="javascript:void(0);" >'+this.rootPath+'</a></div>';
+      rootHtml +=	childrenHTML
+      uiLeftWorkspace.innerHTML = rootHtml;	
   }
   else {
     var childrenContainer = eXo.core.DOMUtil.findFirstDescendantByClass(treeNode, "div", "ChildrenContainer");
@@ -430,7 +437,7 @@ DocumentSelector.prototype.renderBreadcrumbs = function(folderNode, fileName){
     var curName = folderNode.getAttribute("name");
     var nodePath = folderNode.getAttribute("path");
     
-    if (curName) {
+    if (curName && curName != this.rootPath) {
       var tmpNode = document.createElement("div");
       tmpNode.className = 'BreadcumbTab';
       var strHTML = '';

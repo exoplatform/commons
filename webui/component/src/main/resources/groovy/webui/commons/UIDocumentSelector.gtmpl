@@ -63,9 +63,7 @@
       <span></span>
     </div>
     <div style="float:left;">
-    <div class="HomeIcon">
-      <span></span>
-    </div>
+    <a class="HomeIcon" href="javascript:void(0);" onclick="eXo.commons.DocumentSelector.actionBreadcrumbs('$userRootPath');"></a>
     <div class="BreadcumbsContainer" id="BreadcumbsContainer">      
     </div>
     </div>
