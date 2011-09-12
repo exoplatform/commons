@@ -58,7 +58,7 @@ DocumentSelector.prototype.buildTree = function(treeNode, data){
       rootHtml = '<div class="Node" onclick="event.cancelBubble=true;eXo.commons.DocumentSelector.colExpNode(this);">'
       rootHtml += '<div class="CollapseIcon" style="display:none;" >'
       rootHtml += '<a id="'+this.rootPath+'" class="NodeIcon Folder Selected" path="'+this.rootPath+'" name="'+this.rootPath+'" href="javascript:void(0);" >'+this.rootPath+'</a></div>';
-      rootHtml +=	childrenHTML
+      rootHtml += childrenHTML
       uiLeftWorkspace.innerHTML = rootHtml;	
   }
   else {
