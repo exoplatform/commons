@@ -71,7 +71,8 @@
     </div>
       <% if (allowDeleteItem) { %>
     <div style="float:right" >
-      <input type="button" value="New folder" onclick="eXo.commons.DocumentSelector.newFolder()" />
+      <input type="button" value="<%=_ctx.appRes(uicomponent.id + '.label.new-folder') %>" onclick="eXo.commons.DocumentSelector.newFolder(this)" msg_select_folder="<%=_ctx.appRes(uicomponent.id + '.label.select-folder') %>" msg_enter_folder_name="<%=_ctx.appRes(uicomponent.id + '.label.enter-folder-name') %>" msg_empty_folder_name="<%=_ctx.appRes(uicomponent.id + '.label.empty-folder-name') %>"
+      />
     </div>
     <% }%>
   </div>

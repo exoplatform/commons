@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <UIDocumentSelector>
+    <label>
+      <new-folder>New Folder</new-folder>
+      <select-folder>Please select a folder to add.</select-folder>
+      <enter-folder-name>Please enter new folder's name.</enter-folder-name>
+      <empty-folder-name>Folder's name can not be empty.</empty-folder-name>
+    </label>
+  </UIDocumentSelector>
+</bundle>
+
