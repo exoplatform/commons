@@ -87,13 +87,7 @@ public abstract class UIExtensionAbstractFilter implements UIExtensionFilter {
    * Creates a popup to display the message
    */
   private void createUIPopupMessages(Map<String, Object> context, ApplicationMessage message) {
-    UIApplication uiApp = (UIApplication) context.get(UIApplication.class.getName());
-    WebuiRequestContext requestContext = (WebuiRequestContext) context.get(WebuiRequestContext.class.getName());
-    uiApp.addMessage(message);
-    UIComponent uicomponent = uiApp.getUIPopupMessages();
-    Set<UIComponent> sComponents = requestContext.getUIComponentToUpdateByAjax();
-    if (sComponents == null || !sComponents.contains(uicomponent)) {
-      requestContext.addUIComponentToUpdateByAjax(uicomponent);          
-    }
+    UIApplication uiApp = (UIApplication) context.get(UIApplication.class.getName());    
+    uiApp.addMessage(message);    
   }
 }
