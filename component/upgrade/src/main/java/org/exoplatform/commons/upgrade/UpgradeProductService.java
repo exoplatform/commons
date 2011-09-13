@@ -33,7 +33,7 @@ public class UpgradeProductService implements Startable {
       log.warn("init param '" + PROCEED_UPGRADE_FIRST_RUN_KEY + "' isn't set, use default value (" + proceedUpgradeFirstRun
           + "). Don't proceed upgrade when this service will run for the first time.");
     } else {
-      proceedUpgradeFirstRun = Boolean.getBoolean(initParams.getValueParam(PROCEED_UPGRADE_FIRST_RUN_KEY).getValue());
+      proceedUpgradeFirstRun = Boolean.parseBoolean(initParams.getValueParam(PROCEED_UPGRADE_FIRST_RUN_KEY).getValue());
     }
   }
 
