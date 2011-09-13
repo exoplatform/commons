@@ -299,7 +299,7 @@ public class ProductInformations implements Startable {
         }
         session.save();
         session.refresh(true);
-        previousProductInformationProperties = new Properties(productInformationProperties);
+        previousProductInformationProperties = (Properties)productInformationProperties.clone();
       }
     } catch (LoginException exception) {
       throw new RuntimeException("Can't load product informations from the JCR: Error when getting JCR session.", exception);
@@ -380,7 +380,7 @@ public class ProductInformations implements Startable {
 
   public void setPreviousVersionsIfFirstRun(String defaultVersion) {
     if (isFirstRun()) {
-      previousProductInformationProperties = new Properties(productInformationProperties);
+      previousProductInformationProperties = (Properties)productInformationProperties.clone();
       Set<?> keys = previousProductInformationProperties.keySet();
       for (Object key : keys) {
         previousProductInformationProperties.setProperty((String) key, defaultVersion);
