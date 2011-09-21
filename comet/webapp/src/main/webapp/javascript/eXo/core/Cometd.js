@@ -138,7 +138,7 @@ Cometd.prototype._deliver = function(message){
 				break;
 			case '/meta/unsubscribe':
 				if(!message.successful){
-					throw (new('todo manage error unsubscription'));
+					throw (new Error('todo manage error unsubscription'));
 					return;
 				}
 				break;
