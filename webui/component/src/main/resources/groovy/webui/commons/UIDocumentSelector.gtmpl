@@ -27,51 +27,55 @@
   <a style="display:none;" href="$selectFileLink" class="SelectFile"></a>
   <a style="display:none;" href="$selectFolderLink" class="SelectFolder"></a>
   <div class="ListContainer">
-    <div class="LeftWorkspace" id="LeftWorkspace">
-      <!-- Navigation tree goes here -->
-    </div>
-    <div class="RightWorkspace" id="RightWorkspace">
-      <div class=ListView>
-        <table cellspacing="0" style="table-layout: fixed; width: 100%;" id="ListRecords">
-          <thead>
-            <tr>
-              <th class="THBar">
-                Name 
-              </th>
-              <th class="THBar" style="width: 120px;">
-                Date 
-              </th>
-              <th class="THBar" style="width: 80px;">
-                Size 
-              </th>
-              <% if (allowDeleteItem) { %>
-              <th class="THBar" style="width: 80px;">
-                Action 
-              </th>
-              <% } %>
-            </tr>
-          </thead>
-          <tr>
-            <td class="Item TRNoContent" colspan="3">
-              There is no folder or file
-            </td>
-          </tr>
-        </table>
+    <div class="ClearFix">
+      <div class="LeftWorkspace" id="LeftWorkspace">
+        <!-- Navigation tree goes here -->
       </div>
-    </div>  
-    <div style="clear: both;">
-      <span></span>
+      <div class="RightWorkspace" id="RightWorkspace">
+        <div class=ListView>
+          <table cellspacing="0" style="table-layout: fixed; width: 100%;" id="ListRecords">
+            <thead>
+              <tr>
+                <th class="THBar">
+                  Name 
+                </th>
+                <th class="THBar" style="width: 120px;">
+                  Date 
+                </th>
+                <th class="THBar" style="width: 80px;">
+                  Size 
+                </th>
+                <% if (allowDeleteItem) { %>
+                <th class="THBar" style="width: 80px;">
+                  Action 
+                </th>
+                <% } %>
+              </tr>
+            </thead>
+            <tr>
+              <td class="Item TRNoContent" colspan="3">
+                There is no folder or file
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </div>
-    <div style="float:left;">
-    <a class="HomeIcon" href="javascript:void(0);" onclick="eXo.commons.DocumentSelector.actionBreadcrumbs('$userRootPath');"></a>
-    <div class="BreadcumbsContainer" id="BreadcumbsContainer">      
+     <% 
+        String flR="", input="";
+        if (allowDeleteItem) { 
+          input = "<input type=\"button\" value=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder') + "\"" +  
+                  " onclick=\"eXo.commons.DocumentSelector.newFolder(this)\"" + 
+                  " msg_select_folder=\"" + _ctx.appRes(uicomponent.id + '.label.select-folder') + "\"" +
+                  " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +
+                  " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\"/>";
+          flR="style=\"float:right;\"";
+        }
+     %>
+    <div class="ClearFix Breadcumbs">
+      <a class="HomeIcon" href="javascript:void(0);" onclick="eXo.commons.DocumentSelector.actionBreadcrumbs('$userRootPath');"></a>
+      <div class="BreadcumbsContainer" id="BreadcumbsContainer"></div>
+      <div $flR>$input</div>
     </div>
-    </div>
-      <% if (allowDeleteItem) { %>
-    <div style="float:right" >
-      <input type="button" value="<%=_ctx.appRes(uicomponent.id + '.label.new-folder') %>" onclick="eXo.commons.DocumentSelector.newFolder(this)" msg_select_folder="<%=_ctx.appRes(uicomponent.id + '.label.select-folder') %>" msg_enter_folder_name="<%=_ctx.appRes(uicomponent.id + '.label.enter-folder-name') %>" msg_empty_folder_name="<%=_ctx.appRes(uicomponent.id + '.label.empty-folder-name') %>"
-      />
-    </div>
-    <% }%>
   </div>
 </div>

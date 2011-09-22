@@ -1,0 +1,22 @@
+<% 
+  String cancel = uicomponent.event(uicomponent.CANCEL);
+  String saveFile = uicomponent.event(uicomponent.SAVEFILE);
+%>
+<div class="UISaveAttachment">
+  <% uiform.begin() %>
+  <center>
+    <div style="margin:5px">
+      Save this file as: &nbsp; <% uiform.renderChild(uiform.FIELD_INPUT); %>
+    </div>
+  </center>
+  <% uiform.renderChild(uiform.UIDOCUMENTSELECTOR); %>
+  <div style="clear:both;">
+  </div>
+  <center>
+    <div class="Action">
+      <input type="button" onclick="$saveFile" value="Save"/>
+      <input type="button" onclick="$cancel" value ="Cancel"/>
+    </div>
+  </center>
+  <% uiform.end() %>
+</div>

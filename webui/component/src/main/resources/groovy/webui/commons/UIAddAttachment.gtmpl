@@ -1,0 +1,17 @@
+<% 
+  String cancel = uicomponent.event(uicomponent.CANCEL);
+  String attach = uicomponent.event(uicomponent.ATTACH);
+  String attachLink = uicomponent.event(uicomponent.ATTACHLINK);
+%>
+<div class="UIAddAttachment" id="$uicomponent.id">
+  <% uicomponent.renderChild(uicomponent.UIDOCUMENTSELECTOR); %>
+  <div style="clear:both;">
+  </div>
+  <center>
+  <div class="Action">
+    <input type="button" onclick="$attach" value="Attach"/>
+    <input type="button" onclick="$attachLink" value="Attach Link" />
+    <input type="button" onclick="$cancel" value ="Cancel"/>
+  </div>
+  </center>
+</div>
