@@ -5,13 +5,11 @@
 %>
 <div class="UIAddAttachment" id="$uicomponent.id">
   <% uicomponent.renderChild(uicomponent.UIDOCUMENTSELECTOR); %>
-  <div style="clear:both;">
-  </div>
   <center>
-  <div class="Action">
-    <input type="button" onclick="$attach" value="Attach"/>
-    <input type="button" onclick="$attachLink" value="Attach Link" />
-    <input type="button" onclick="$cancel" value ="Cancel"/>
-  </div>
+    <div class="Action">
+      <input type="button" onclick="$attach" value="<%=_ctx.appRes(uicomponent.id + ".label.Attach");%>"/>
+      <input type="button" onclick="$attachLink" value="<%=_ctx.appRes(uicomponent.id + ".label.AttachLink");%>" />
+      <input type="button" onclick="$cancel" value ="<%=_ctx.appRes(uicomponent.id + ".label.Cancel");%>"/>
+    </div>
   </center>
 </div>

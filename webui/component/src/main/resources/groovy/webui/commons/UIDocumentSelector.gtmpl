@@ -36,26 +36,16 @@
           <table cellspacing="0" style="table-layout: fixed; width: 100%;" id="ListRecords">
             <thead>
               <tr>
-                <th class="THBar">
-                  Name 
-                </th>
-                <th class="THBar" style="width: 120px;">
-                  Date 
-                </th>
-                <th class="THBar" style="width: 80px;">
-                  Size 
-                </th>
+                <th class="THBar"><%=_ctx.appRes(uicomponent.id + ".label.Name");%></th>
+                <th class="THBar" style="width: 120px;"><%=_ctx.appRes(uicomponent.id + ".label.Date");%></th>
+                <th class="THBar" style="width: 80px;"><%=_ctx.appRes(uicomponent.id + ".label.Size");%></th>
                 <% if (allowDeleteItem) { %>
-                <th class="THBar" style="width: 80px;">
-                  Action 
-                </th>
+                <th class="THBar" style="width: 80px;"><%=_ctx.appRes(uicomponent.id + ".label.Action");%></th>
                 <% } %>
               </tr>
             </thead>
             <tr>
-              <td class="Item TRNoContent" colspan="3">
-                There is no folder or file
-              </td>
+              <td class="Item TRNoContent" colspan="3"><%=_ctx.appRes(uicomponent.id + ".label.NoFolderOrFile");%></td>
             </tr>
           </table>
         </div>

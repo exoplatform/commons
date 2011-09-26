@@ -13,6 +13,10 @@
   display: block;
 }
 
+.UISaveAttachment #FileNameInput {
+  width: 320px;
+}
+
 .UIDocumentSelector {
   font-family: verdana;
   font-size: 11px;

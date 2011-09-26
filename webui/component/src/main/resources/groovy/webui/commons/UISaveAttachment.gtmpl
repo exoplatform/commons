@@ -5,8 +5,8 @@
 <div class="UISaveAttachment">
   <% uiform.begin() %>
   <center>
-    <div style="margin:5px">
-      Save this file as: &nbsp; <% uiform.renderChild(uiform.FIELD_INPUT); %>
+    <div style="margin:5px 0px">
+      <spam><%=_ctx.appRes(uicomponent.id + ".label.SaveFile");%>: </span><span> <% uiform.renderChild(uiform.FIELD_INPUT); %></span>
     </div>
   </center>
   <% uiform.renderChild(uiform.UIDOCUMENTSELECTOR); %>
@@ -14,8 +14,8 @@
   </div>
   <center>
     <div class="Action">
-      <input type="button" onclick="$saveFile" value="Save"/>
-      <input type="button" onclick="$cancel" value ="Cancel"/>
+      <input type="button" onclick="$saveFile" value="<%=_ctx.appRes(uicomponent.id + ".label.Save");%>"/>
+      <input type="button" onclick="$cancel" value ="<%=_ctx.appRes(uicomponent.id + ".label.Cancel");%>"/>
     </div>
   </center>
   <% uiform.end() %>
