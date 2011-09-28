@@ -4,6 +4,10 @@
 
 <web-app>
   <display-name>CommonsResources</display-name>
+  
+  <listener>
+	  <listener-class>org.exoplatform.webui.ckeditor.CKConfigListener</listener-class>
+  </listener>
 
   <filter>
     <filter-name>ResourceRequestFilter</filter-name>
