@@ -9,6 +9,7 @@
     <skin-name>Default</skin-name>
     <skin-module>DocumentSelector</skin-module>
     <css-path>/skin/DefaultSkin/commons/Stylesheet.css</css-path>
+	<css-priority>5</css-priority>
   </portal-skin>
 
    <javascript>
