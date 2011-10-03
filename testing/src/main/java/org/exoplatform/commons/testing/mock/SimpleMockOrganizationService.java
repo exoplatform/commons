@@ -183,6 +183,12 @@ public class SimpleMockOrganizationService implements OrganizationService {
 
     }
 
+    @Override
+    public void removeGroupEventListener(GroupEventListener listener) {
+      // TODO Auto-generated method stub
+      
+    }
+
   }
 
   class MockMembershipHandler implements MembershipHandler {
@@ -281,6 +287,12 @@ public class SimpleMockOrganizationService implements OrganizationService {
     public ListAccess<Membership> findAllMembershipsByGroup(Group group) throws Exception {
       // TODO Auto-generated method stub
       return null;
+    }
+
+    @Override
+    public void removeMembershipEventListener(MembershipEventListener listener) {
+      // TODO Auto-generated method stub
+      
     }
   }
 
@@ -382,6 +394,12 @@ public class SimpleMockOrganizationService implements OrganizationService {
     public ListAccess<User> findUsersByQuery(Query query) throws Exception {
       // TODO Auto-generated method stub
       return null;
+    }
+
+    @Override
+    public void removeUserEventListener(UserEventListener listener) {
+      // TODO Auto-generated method stub
+      
     }
 
   }
