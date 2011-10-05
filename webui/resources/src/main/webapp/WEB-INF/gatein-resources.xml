@@ -19,12 +19,5 @@
     </param>
   </javascript>
   
-  <javascript>
-    <param>
-      <js-module>eXo.commons.CKEditor</js-module>
-      <js-path>/ckeditor/exoeditor.js</js-path>
-    </param>
-  </javascript>
-
 </gatein-resources>
 
