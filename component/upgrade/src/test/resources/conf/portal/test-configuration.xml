@@ -159,5 +159,4 @@
 			</init-params>
 		</component-plugin>
 	</external-component-plugins>
-	<import>classpath:/conf/jcr/test-jcr-configuration.xml</import>
 </configuration>
