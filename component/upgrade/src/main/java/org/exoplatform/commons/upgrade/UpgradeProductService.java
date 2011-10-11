@@ -43,15 +43,15 @@ public class UpgradeProductService implements Startable {
    * @param upgradeProductPlugin
    */
   public void addUpgradePlugin(UpgradeProductPlugin upgradeProductPlugin) {
-    if (log.isDebugEnabled()) {
-      log.debug("Add Product UpgradePlugin: name = " + upgradeProductPlugin.getName());
-    }
+    log.info("Add Product UpgradePlugin: name = " + upgradeProductPlugin.getName());
     if (upgradePlugins.contains(upgradeProductPlugin)) {
       log.warn(upgradeProductPlugin.getName() + " upgrade plugin is duplicated. One of the duplicated plugins will be ignored!");
     }
     // add only enabled plugins
     if (upgradeProductPlugin.isEnabled()) {
       upgradePlugins.add(upgradeProductPlugin);
+    } else {
+      log.info("UpgradePlugin: name = '" + upgradeProductPlugin.getName() + "' will be ignored, because it is not enabled.");
     }
   }
 
@@ -138,6 +138,9 @@ public class UpgradeProductService implements Startable {
         log.info("Proceed upgrade plugin: name = " + upgradeProductPlugin.getName() + " from version "
             + previousProductPluginVersion + " to " + currentProductPluginVersion + " with execution order = " + order);
         upgradeProductPlugin.processUpgrade(previousProductPluginVersion, currentProductPluginVersion);
+      } else {
+        log.info("'" + upgradeProductPlugin.getName()
+            + "' upgrade plugin execution will be ignored because shouldProceedToUpgrade = false");
       }
     } catch (Exception exception) {
       log.error("The plugin " + upgradeProductPlugin.getName() + " generated an error.", exception);
