@@ -117,6 +117,7 @@
     <module>webui/resources</module>
     <module>gifbackport</module>
     <module>fck</module>
+    <module>extension</module>
   </modules>
   <profiles>
     <profile>
