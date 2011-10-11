@@ -1,20 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="iso-8859-1"?>
 <configuration
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
- <component>
-  <key>org.mortbay.cometd.continuation.AbstractBayeux</key>
-  <type>org.mortbay.cometd.continuation.EXoContinuationBayeux</type>
- </component>    
- <component>
-  <type>org.exoplatform.ws.frameworks.cometd.ContinuationService</type>
- </component>
- <component>
-  <key>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceDelegate</key>
-  <type>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceLocalDelegate</type>
- </component>
- <!-- 
+	<component>
+		<type>org.exoplatform.frameworks.cometd.ext.TransferMessages</type>
+	</component>
+	<component>
+		<key>org.mortbay.cometd.continuation.AbstractBayeux</key>
+		<type>org.mortbay.cometd.continuation.EXoContinuationBayeux</type>
+	</component>    
+	<component>
+		<type>org.exoplatform.ws.frameworks.cometd.ContinuationService</type>
+	</component>
+	<component>
+		<key>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceDelegate</key>
+		<type>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceLocalDelegate</type>
+	</component>
+	<!-- 
  <component>
   <type>org.exoplatform.ws.frameworks.cometd.transport.RESTContinuationService</type>
  </component>
@@ -51,5 +54,4 @@
 </init-params>
  </component>
  -->
-</configuration>  
-   
+</configuration>

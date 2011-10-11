@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+  <import>war:/conf/commons-extension/cometd-configuration.xml</import>
+  <import>war:/conf/commons-extension/common-configuration.xml</import>
+  <import>war:/conf/commons-extension/jcr-ext-configuration.xml</import>
+  <import>war:/conf/commons-extension/upgrade-configuration.xml</import>
+  <import>war:/conf/commons-extension/webui-configuration.xml</import>
+</configuration>
