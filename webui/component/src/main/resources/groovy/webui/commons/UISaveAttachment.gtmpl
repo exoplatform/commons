@@ -6,7 +6,7 @@
   <% uiform.begin() %>
   <center>
     <div style="margin:5px 0px">
-      <spam><%=_ctx.appRes(uicomponent.id + ".label.SaveFile");%>: </span><span> <% uiform.renderChild(uiform.FIELD_INPUT); %></span>
+      <span><%=_ctx.appRes(uicomponent.id + ".label.SaveFile");%>: </span><span> <% uiform.renderChild(uiform.FIELD_INPUT); %></span>
     </div>
   </center>
   <% uiform.renderChild(uiform.UIDOCUMENTSELECTOR); %>

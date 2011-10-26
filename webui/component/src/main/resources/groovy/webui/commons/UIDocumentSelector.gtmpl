@@ -23,7 +23,6 @@
   jsManager.addJavascript("eXo.commons.DocumentSelector.init('" + uicomponent.id + "','" + restContext + "','"+workspaceName +"','"+userRootPath +"');"); 
 %>
 <div class="UIDocumentSelector" id="$uicomponent.id">
-  <% uicomponent.renderChild(uicomponent.EMPTYCOMPONENT); %>
   <a style="display:none;" href="$selectFileLink" class="SelectFile"></a>
   <a style="display:none;" href="$selectFolderLink" class="SelectFolder"></a>
   <div class="ListContainer">

@@ -30,10 +30,8 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.application.WebuiRequestContext;
-import org.exoplatform.webui.commons.UIDocumentSelector;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
-import org.exoplatform.webui.core.UIApplication;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.core.UIPopupComponent;
@@ -99,7 +97,7 @@ public class UIAddAttachment extends UIContainer implements UIPopupComponent {
   static public class CancelActionListener extends EventListener<UIAddAttachment> {
     public void execute(Event<UIAddAttachment> event) throws Exception {
       UIPopupWindow uiPopupWindow = event.getSource().getParent();
-      uiPopupWindow.setShow(false);
+      uiPopupWindow.setUIComponent(null);
       uiPopupWindow.setRendered(false);
       event.getRequestContext().addUIComponentToUpdateByAjax(uiPopupWindow.getParent());
     }
@@ -140,17 +138,18 @@ public class UIAddAttachment extends UIContainer implements UIPopupComponent {
       if (!StringUtils.isEmpty(getSelectedFile(event))) {
         processEvent(event);
       } else {
-        UIApplication uiApp = event.getSource().getAncestorOfType(UIApplication.class);
-        uiApp.addMessage(new ApplicationMessage("UIAddAttachment.msg.not-a-file", null, ApplicationMessage.WARNING));
-        event.getRequestContext().addUIComponentToUpdateByAjax(uiApp.getUIPopupMessages());
+        event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UIAddAttachment.msg.not-a-file",
+                                                                                       null,
+                                                                                       ApplicationMessage.WARNING));
+        ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
         return;
       }
       if (xEvent != null) {
         xEvent.broadcast();
       }
       UIPopupWindow uiPopupWindow = event.getSource().getParent();
-      uiPopupWindow.setShow(false);
       uiPopupWindow.setRendered(false);
+      uiPopupWindow.setUIComponent(null);
       event.getRequestContext().addUIComponentToUpdateByAjax(uiPopupWindow.getParent());
     }
     

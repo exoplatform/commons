@@ -26,6 +26,7 @@ import javax.jcr.Value;
 
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.datamodel.IllegalNameException;
@@ -33,10 +34,8 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.application.WebuiRequestContext;
-import org.exoplatform.webui.commons.UIDocumentSelector;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
-import org.exoplatform.webui.core.UIApplication;
 import org.exoplatform.webui.core.UIPopupComponent;
 import org.exoplatform.webui.core.UIPopupWindow;
 import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
@@ -114,7 +113,7 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
   static public class CancelActionListener extends EventListener<UISaveAttachment> {
     public void execute(Event<UISaveAttachment> event) throws Exception {
       UIPopupWindow uiPopupWindow = event.getSource().getParent();
-      uiPopupWindow.setShow(false);
+      uiPopupWindow.setUIComponent(null);
       uiPopupWindow.setRendered(false);
       event.getRequestContext().addUIComponentToUpdateByAjax(uiPopupWindow.getParent());
     }
@@ -123,17 +122,16 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
   static public class SaveFileActionListener extends EventListener<UISaveAttachment> {
     public void execute(Event<UISaveAttachment> event) throws Exception {
       UISaveAttachment component = event.getSource();
-      UIApplication uiApp = component.getAncestorOfType(UIApplication.class);
       UIDocumentSelector selector = component.getChildById(UIDOCUMENTSELECTOR);
       UIFormStringInput nameInput = component.getChildById(FIELD_INPUT);
       String fileName = nameInput.getValue();
       String tempPath = component.filePath.substring(1);
       String workspaceName = tempPath.substring(0, tempPath.indexOf("/"));
       if (fileName == null || fileName.trim().length() == 0) {
-        uiApp.addMessage(new ApplicationMessage("UISaveAttachment.msg.file-name-not-null",
-                                                null,
-                                                ApplicationMessage.WARNING));
-        event.getRequestContext().addUIComponentToUpdateByAjax(uiApp.getUIPopupMessages());
+        event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UISaveAttachment.msg.file-name-not-null",
+                                                                                       null,
+                                                                                       ApplicationMessage.WARNING));
+        ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
         return;
       } else {
         String nodePath = tempPath.substring(tempPath.indexOf("/"));
@@ -146,18 +144,20 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
         Session desSession = component.getDefaultSession();
         String selectedFolder = selector.getSeletedFolder();
         if (StringUtils.isEmpty(selectedFolder)) {
-          uiApp.addMessage(new ApplicationMessage("UISaveAttachment.msg.not-a-folder", null, ApplicationMessage.WARNING));
-          event.getRequestContext().addUIComponentToUpdateByAjax(uiApp.getUIPopupMessages());
+          event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UISaveAttachment.msg.not-a-folder",
+                                                                                         null,
+                                                                                         ApplicationMessage.WARNING));
+          ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
           return;
         }
         Node desNode = (Node) desSession.getItem(selector.getSeletedFolder());
         try {
           validate(fileName);
         } catch (IllegalNameException e) {
-          uiApp.addMessage(new ApplicationMessage("UISaveAttachment.msg.not-valid-name",
+          event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UISaveAttachment.msg.not-valid-name",
                                                   new String[] { invalidCharacters },
                                                   ApplicationMessage.WARNING));
-          event.getRequestContext().addUIComponentToUpdateByAjax(uiApp.getUIPopupMessages());
+          ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
           return;
         }
         Node file = desNode.addNode(fileName, "nt:file");
@@ -169,11 +169,12 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
         desSession.logout();
 
         UIPopupWindow uiPopupWindow = event.getSource().getParent();
-        uiPopupWindow.setShow(false);
+        uiPopupWindow.setUIComponent(null);
         uiPopupWindow.setRendered(false);
-        uiApp.addMessage(new ApplicationMessage("UISaveAttachment.msg.saved-successfully", null, ApplicationMessage.INFO));
+        event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UISaveAttachment.msg.saved-successfully",
+                                                                                       null,
+                                                                                       ApplicationMessage.INFO));
         event.getRequestContext().addUIComponentToUpdateByAjax(uiPopupWindow.getParent());
-        event.getRequestContext().addUIComponentToUpdateByAjax(uiApp.getUIPopupMessages());
       }
     }
   }

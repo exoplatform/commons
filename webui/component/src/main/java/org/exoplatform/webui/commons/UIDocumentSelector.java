@@ -53,8 +53,6 @@ public class UIDocumentSelector extends UIContainer {
 
   protected static final String SELECTFOLDER         = "SelectFolder";
 
-  protected static final String EMPTYCOMPONENT       = "EmptyComponent";
-
   protected static final String RESTPREFIX           = "/managedocument";
 
   protected static final String GETFOLDERSANDFILES   = RESTPREFIX + "/getFoldersAndFiles";
@@ -93,7 +91,6 @@ public class UIDocumentSelector extends UIContainer {
       RepositoryService jcrService_ = (RepositoryService) PortalContainer.getComponent(RepositoryService.class);
       ManageableRepository currentRepo = jcrService_.getCurrentRepository();
       currentWorkspaceName = currentRepo.getConfiguration().getDefaultWorkspaceName();
-      this.addChild(UIContainer.class, null, EMPTYCOMPONENT);
     } catch (Exception e) {
       logger.debug("Can't init ui component UIDocumentSelector :  " + e.getMessage());
     }
@@ -150,8 +147,7 @@ public class UIDocumentSelector extends UIContainer {
       UIDocumentSelector component = event.getSource();
       component.seletedFile = event.getRequestContext().getRequestParameter(DATA_ID);
       component.seletedFolder = StringUtils.EMPTY;
-      event.getRequestContext()
-           .addUIComponentToUpdateByAjax(component.getChildById(EMPTYCOMPONENT));
+      ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
     }
   }
 
@@ -160,8 +156,7 @@ public class UIDocumentSelector extends UIContainer {
       UIDocumentSelector component = event.getSource();
       component.seletedFolder = event.getRequestContext().getRequestParameter(DATA_ID);
       component.seletedFile = StringUtils.EMPTY;
-      event.getRequestContext()
-           .addUIComponentToUpdateByAjax(component.getChildById(EMPTYCOMPONENT));
+      ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
     }
   }
 }

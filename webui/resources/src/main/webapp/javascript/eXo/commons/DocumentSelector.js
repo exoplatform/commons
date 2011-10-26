@@ -170,11 +170,17 @@ DocumentSelector.prototype.viewDetails = function(folderNode){
   me.renderBreadcrumbs(folderNode, null);
   if (me.selectedTreeNode) {
     var oldItemNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
+    if (oldItemNode){
     domUtil.removeClass(oldItemNode, "Selected");
+    }
   }
   me.selectedTreeNode = domUtil.findAncestorByClass(folderNode, "Node");
   domUtil.addClass(folderNode, "Selected");
-  folderNode.focus();
+  // To avoid case IE can't focus if item is invisible
+  try {
+    folderNode.focus();
+  } catch (e){    
+  }  
   var nodePath = folderNode.getAttribute("path");
   var url = this.getFoldersAndFilesURL;
   url += "?" + this.workspaceParam + "=" + this.workspaceName;
