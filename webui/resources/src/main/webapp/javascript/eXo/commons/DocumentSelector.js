@@ -6,289 +6,247 @@ if (!eXo.commons)
   eXo.commons = {};
 
 function DocumentSelector(){
+  this.defaultDriveType = "personal";
+  this.getDrives = "";
   this.getFoldersAndFiles = "";
   this.deleteFolderOrFile = "";
   this.createFolder = "";
-  this.workspaceParam = "";
-  this.nodePathParam = "";
-  this.parentPathParam = "";
   this.isFolderOnlyParam = "";
   this.folderNameParam = "";
+  this.driveTypeParam = "";
+  this.driveNameParam = "";
+  this.workspaceNameParam = "";
+  this.currentFolderParam = "";
+  this.itemPathParam = "";
   this.xmlHttpRequest = false;
-  this.workspaceName = "";
-  this.selectedTreeNode = null;
   this.selectFile = null;
   this.selectFileLink = null;
   this.selectFolderLink = null;
   this.allowDeleteItem = true;
   this.dataId = null;
-  this.uiComponent = null;
-  this.rootPath = null;
+  this.selectedItem = null;
 };
 
-DocumentSelector.prototype.init = function(uicomponentId, restContext, workspaceName, _rootPath){
+function DocumentItem(){
+  driveType = null;
+  driveName = null;
+  workspaceName = null;
+  currentFolder = null;
+  jcrPath = null;
+};
+
+DocumentSelector.prototype.init = function(uicomponentId, restContext){
   var me = eXo.commons.DocumentSelector;
   this.uiComponent = document.getElementById(uicomponentId);
   this.selectFileLink = eXo.core.DOMUtil.findFirstDescendantByClass(this.uiComponent, "a", "SelectFile");
   this.selectFolderLink = eXo.core.DOMUtil.findFirstDescendantByClass(this.uiComponent, "a", "SelectFolder");
-  this.restContext = restContext;
+  this.getDrivesURL = restContext + this.getDrives;
   this.getFoldersAndFilesURL = restContext + this.getFoldersAndFiles;
   this.deleteFolderOrFileURL = restContext + this.deleteFolderOrFile;
   this.createFolderURL = restContext + this.createFolder;
-  this.workspaceName = workspaceName;
-  this.rootPath = _rootPath;
+  var documentItem = new DocumentItem();
+  documentItem.driveType = this.defaultDriveType;
+  me.renderDetails(documentItem);
+};
+
+DocumentSelector.prototype.changeDrive = function(selectBox){
+  var documentItem = new DocumentItem();
+  documentItem.driveType = selectBox.value;
+  eXo.commons.DocumentSelector.renderDetails(documentItem);
+};
+
+DocumentSelector.prototype.renderDetails = function(documentItem) {
+  var me = eXo.commons.DocumentSelector;
+  var domUtil = eXo.core.DOMUtil;
+  // Clear old data
+  var rightWS = domUtil.findFirstDescendantByClass(this.uiComponent, "div",
+      "RightWorkspace");
+  var tblRWS = domUtil.findDescendantsByTagName(rightWS, "table")[0];
+  var rowsRWS = domUtil.findDescendantsByTagName(tblRWS, "tr");
+  if (rowsRWS && rowsRWS.length > 0) {
+    for ( var i = 0; i < rowsRWS.length; i++) {
+      if (i > 0)
+        tblRWS.deleteRow(rowsRWS[i].rowIndex);
+    }
+  }
+  me.selectedItem = documentItem;
+  me.renderBreadcrumbs(documentItem, null);
+  if (!documentItem.driveName) {
+    me.renderDrives(tblRWS, documentItem);
+  } else {    
+    me.renderDetailsFolder(tblRWS, documentItem);
+  }
+};
+
+DocumentSelector.prototype.renderDrives = function(tableContainer, documentItem) {
+ var me = eXo.commons.DocumentSelector;
+ var driveType = documentItem.driveType;
+ var url = this.getDrivesURL;
+ url += "?" + this.driveTypeParam + "=" + driveType;
+ var data = me.request(url);
+ var folderContainer = data.getElementsByTagName("Folders")[0];
+ var folderList = folderContainer.getElementsByTagName("Folder");
+ if (!folderList || folderList.length <= 0) {
+   var tdNoContent = tableContainer.insertRow(1).insertCell(0);
+   tdNoContent.innerHTML = "There is no drive";
+   tdNoContent.className = "Item TRNoContent";
+   //if (me.allowDeleteItem == true) {
+     //tdNoContent.setAttribute("colspan", 4);
+   //} else {
+     //tdNoContent.setAttribute("colspan", 3);
+   //}   
+   return;
+ }
+ var clazz = 'EventItem';
+ var k = 0;
+ for ( var i = 0; i < folderList.length; i++) {
+   k = i + 1;
+   //if (clazz == 'EventItem') {
+     //clazz = 'OddItem';
+   //} else if (clazz == 'OddItem') {
+     //clazz = 'EventItem';
+   //}
+   var name = folderList[i].getAttribute("name");
+   var driveName = folderList[i].getAttribute("name");
+   var workspaceName = folderList[i].getAttribute("workspaceName");
+   var canAddChild = folderList[i].getAttribute("canAddChild");
+   var newRow = tableContainer.insertRow(i + 1);
+   newRow.className = clazz + " Cell";
+   var cellZero = newRow.insertCell(0);
+   cellZero.onclick = function() {
+     eXo.commons.DocumentSelector.browseFolder(this);
+   }
+   cellZero.innerHTML = '<a class="Item Folder" name="' + name
+        + '" driveType="' + driveType+ '" driveName="' + driveName
+        + '" workspaceName="' + workspaceName + '" canAddChild="' + canAddChild
+        + '" onclick="javascript:void(0);">' + decodeURIComponent(name)
+        + '</a>';
+   //newRow.insertCell(1);
+   //newRow.insertCell(2);
+   //if (me.allowDeleteItem == true) {
+     //newRow.insertCell(3);
+   //}
+ }
+};
+
+DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documentItem) {
+  var me = eXo.commons.DocumentSelector;
+  var driveType = documentItem.driveType;
+  var driveName = documentItem.driveName;
+  var workSpaceName = documentItem.workspaceName;
+  var currentFolder = documentItem.currentFolder;
+  if (!currentFolder)
+    currentFolder = "";
   var url = this.getFoldersAndFilesURL;
-  url += "?" + this.workspaceParam + "=" + this.workspaceName;
-  url += "&" + this.nodePathParam + "=" + this.rootPath;
-  url += "&" + this.isFolderOnlyParam + "=true";
-  var data = me.request(url);
-  me.buildTree(null, data);
-  me.actionBreadcrumbs(this.rootPath);
-};
-
-DocumentSelector.prototype.buildTree = function(treeNode, data){
-  var me = eXo.commons.DocumentSelector;
-  var xmlTreeNodes = data;
-  var folderContainer = xmlTreeNodes.getElementsByTagName("Folders")[0];
-  var nodeList = folderContainer.getElementsByTagName("Folder");
-  var childrenHTML = eXo.commons.DocumentSelector.renderTreeNode(nodeList);
-  if (!treeNode) {
-    var uiLeftWorkspace = document.getElementById('LeftWorkspace');
-    if (uiLeftWorkspace) 
-      rootHtml = '<div class="Node" onclick="event.cancelBubble=true;eXo.commons.DocumentSelector.colExpNode(this);">'
-      rootHtml += '<div class="CollapseIcon" style="display:none;" >'
-      rootHtml += '<a id="'+this.rootPath+'" class="NodeIcon Folder Selected" path="'+this.rootPath+'" name="'+this.rootPath+'" href="javascript:void(0);" >'+this.rootPath+'</a></div>';
-      rootHtml += childrenHTML
-      uiLeftWorkspace.innerHTML = rootHtml;	
-  }
-  else {
-    var childrenContainer = eXo.core.DOMUtil.findFirstDescendantByClass(treeNode, "div", "ChildrenContainer");
-    if (childrenContainer) {
-      treeNode.removeChild(childrenContainer);
-    }
-    treeNode.innerHTML += childrenHTML;
-  }
-};
-
-DocumentSelector.prototype.colExpNode = function(treeNode){
-  var me = eXo.commons.DocumentSelector;
-  var domUtil = eXo.core.DOMUtil;
-  if (!treeNode) 
-    return;
-  var iconElt = domUtil.getChildrenByTagName(treeNode, "div")[0];
-  var nextElt = domUtil.findNextElementByTagName(iconElt, "div");
-  
-  if (!nextElt || nextElt.className != "ChildrenContainer") {
-    me.renderChildren(treeNode);
-    var childrenCotainer = domUtil.findFirstChildByClass(treeNode, "div", "ChildrenContainer");
-    if (childrenCotainer) {
-      iconElt = domUtil.findPreviousElementByTagName(childrenCotainer, "div");
-      iconElt.className = 'CollapseIcon';
-    }
-  }
-  else {
-    if (nextElt.style.display != 'block') {
-      nextElt.style.display = 'block';
-      iconElt.className = 'CollapseIcon';
-    }
-    else {
-      nextElt.style.display = 'none';
-      iconElt.className = 'ExpandIcon';
-    }
-  }
-};
-
-DocumentSelector.prototype.expNode = function(treeNode){
-  var me = eXo.commons.DocumentSelector;
-  var domUtil = eXo.core.DOMUtil;
-  if (!treeNode) 
-    return;
-  var iconElt = domUtil.getChildrenByTagName(treeNode, "div")[0];
-  var nextElt = domUtil.findNextElementByTagName(iconElt, "div");
-  
-  if (!nextElt || nextElt.className != "ChildrenContainer") {
-    me.renderChildren(treeNode);
-    var childrenCotainer = domUtil.findFirstChildByClass(treeNode, "div", "ChildrenContainer");
-    if (childrenCotainer) {
-      iconElt = domUtil.getChildrenByTagName(treeNode, "div")[0]
-      iconElt.className = 'CollapseIcon';
-    }
-  }
-  else {
-    nextElt.style.display = 'block';
-    iconElt.className = 'CollapseIcon';
-  }
-};
-
-DocumentSelector.prototype.renderChildren = function(treeNode){
-  var domUtil = eXo.core.DOMUtil;
-  var me = eXo.commons.DocumentSelector;
-  var currentNode = domUtil.findFirstDescendantByClass(treeNode, "a", "NodeIcon");
-  if (currentNode != null) {
-    var nodePath = currentNode.getAttribute("path");
-    var url = this.getFoldersAndFilesURL;
-    url += "?" + this.workspaceParam + "=" + this.workspaceName;
-    url += "&" + this.nodePathParam + "=" + nodePath;
-    url += "&" + this.isFolderOnlyParam + "=true";
-    var data = me.request(url);
-    me.buildTree(treeNode, data);
-  }
-  else 
-    return;
-};
-
-DocumentSelector.prototype.renderTreeNode = function(nodeList){
-  var treeHTML = '';
-  if (nodeList && nodeList.length > 0) {
-    treeHTML += '<div class="ChildrenContainer" style="display:block;">';
-    for (var i = 0; i < nodeList.length; i++) {
-      var strName = nodeList[i].getAttribute("name");
-      var path = nodeList[i].getAttribute("path");
-      var hasChild = nodeList[i].getAttribute("hasChild");
-      treeHTML += '<div class="Node" onclick="event.cancelBubble=true;eXo.commons.DocumentSelector.colExpNode(this);">';
-      if (hasChild == "true") {
-        treeHTML += '<div class="ExpandIcon">';
-      }
-      else {
-        treeHTML += '<div class="NoneIcon">';
-      }
-      treeHTML += '<a title="' + decodeURIComponent(strName) + '" href="javascript:void(0);" class="NodeIcon Folder" onclick="event.cancelBubble=true;eXo.commons.DocumentSelector.viewDetails(this);eXo.commons.DocumentSelector.colExpNode(this.parentNode.parentNode);" name="' + decodeURIComponent(strName) + '" id="' + path + '" path="' + path + '">';
-      treeHTML += strName;
-      treeHTML += '</a>';
-      treeHTML += '</div>';
-      treeHTML += '</div>';
-    }
-    treeHTML += '</div>';
-  }
-  return treeHTML;
-};
-
-DocumentSelector.prototype.viewDetails = function(folderNode){
-  var me = eXo.commons.DocumentSelector;
-  var domUtil = eXo.core.DOMUtil;
-  me.submitSelectedFolder(folderNode);
-  me.renderBreadcrumbs(folderNode, null);
-  if (me.selectedTreeNode) {
-    var oldItemNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
-    if (oldItemNode){
-    domUtil.removeClass(oldItemNode, "Selected");
-    }
-  }
-  me.selectedTreeNode = domUtil.findAncestorByClass(folderNode, "Node");
-  domUtil.addClass(folderNode, "Selected");
-  // To avoid case IE can't focus if item is invisible
-  try {
-    folderNode.focus();
-  } catch (e){    
-  }  
-  var nodePath = folderNode.getAttribute("path");
-  var url = this.getFoldersAndFilesURL;
-  url += "?" + this.workspaceParam + "=" + this.workspaceName;
-  url += "&" + this.nodePathParam + "=" + nodePath;
+  url += "?" + this.driveNameParam + "=" + driveName;
+  url += "&" + this.workspaceNameParam + "=" + workSpaceName;
+  url += "&" + this.currentFolderParam + "=" + currentFolder;
   url += "&" + this.isFolderOnlyParam + "=false";
   var data = me.request(url);
   var folderContainer = data.getElementsByTagName("Folders")[0];
   var folderList = folderContainer.getElementsByTagName("Folder");
   var fileContainer = data.getElementsByTagName("Files")[0];
   var fileList = fileContainer.getElementsByTagName("File");
-  
-  // Render data from response
-  var rightWS = document.getElementById('RightWorkspace');
-  var tblRWS = eXo.core.DOMUtil.findDescendantsByTagName(rightWS, "table")[0];
-  var rowsRWS = eXo.core.DOMUtil.findDescendantsByTagName(tblRWS, "tr");
-  if (rowsRWS && rowsRWS.length > 0) {
-    for (var i = 0; i < rowsRWS.length; i++) {
-      if (i > 0) 
-        tblRWS.deleteRow(rowsRWS[i].rowIndex);
-    }
-  }
-  if ((!fileList || fileList.length <= 0) && (!folderList || folderList.length <= 0)) {
-    var tdNoContent = tblRWS.insertRow(1).insertCell(0);
+
+  if ((!fileList || fileList.length <= 0)
+      && (!folderList || folderList.length <= 0)) {
+    var tdNoContent = tableContainer.insertRow(1).insertCell(0);
     tdNoContent.innerHTML = "There is no folder or file";
     tdNoContent.className = "Item TRNoContent";
-    if (me.allowDeleteItem == true) {
-      tdNoContent.setAttribute("colspan", 4);
-    }
-    else {
-      tdNoContent.setAttribute("colspan", 3);
-    }
-    tdNoContent.userLanguage = "UserLanguage.NoContent";
+    //if (me.allowDeleteItem == true) {
+      //tdNoContent.setAttribute("colspan", 4);
+    //} else {
+      //tdNoContent.setAttribute("colspan", 3);
+    //}    
     return;
-  }
-  else {
+  } else {
     var listItem = '';
-    var clazz = 'OddItem';
+    var clazz = 'EventItem';
     var k = 0;
-    for (var i = 0; i < folderList.length; i++) {
+    for ( var i = 0; i < folderList.length; i++) {
       k = i + 1;
-      if (clazz == 'EventItem') {
-        clazz = 'OddItem';
-      }
-      else 
-        if (clazz == 'OddItem') {
-          clazz = 'EventItem';
-        }
+      //if (clazz == 'EventItem') {
+        //clazz = 'OddItem';
+      //} else if (clazz == 'OddItem') {
+        //clazz = 'EventItem';
+      //}
       var clazzItem = me.getClazzIcon(folderList[i].getAttribute("nodeType"));
-      var path = folderList[i].getAttribute("path");
+      var jcrPath = folderList[i].getAttribute("path");
       var nodeType = folderList[i].getAttribute("folderType");
       var name = folderList[i].getAttribute("name");
-      var newRow = tblRWS.insertRow(i + 1);
+      
+      var childFolder = folderList[i].getAttribute("currentFolder");
+      var canRemove = folderList[i].getAttribute("canRemove");
+      var canAddChild = folderList[i].getAttribute("canAddChild");
+
+      var newRow = tableContainer.insertRow(i + 1);
       newRow.className = clazz + " Cell";
+      
       var cellZero = newRow.insertCell(0);
-      cellZero.onclick = function(){
+      cellZero.onclick = function() {
         eXo.commons.DocumentSelector.browseFolder(this);
       }
-      cellZero.innerHTML = '<a class="Item Folder ' + clazzItem + '" name="' + name + '" path="' + path + '" nodeType="' + nodeType + '" onclick="javascript:void(0);">' + decodeURIComponent(name) + '</a>';
-      newRow.insertCell(1);
-      newRow.insertCell(2);
-      if (me.allowDeleteItem == true) {
-        var cellThird = newRow.insertCell(3);
-        cellThird.onclick = function(){
-          eXo.commons.DocumentSelector.remove(this);
-        }
-        cellThird.innerHTML = '<a class="Item" name="' + name + '"  path="' + path + '" onclick="javascript:void(0);">Remove</a>';
-      }
+      cellZero.innerHTML = '<a class="Item Folder ' + clazzItem + '" name="'
+          + name + '" driveType="' + driveType + '" driveName="'
+          + driveName + '"workSpaceName="' + workSpaceName + '" canAddChild="' + canAddChild
+          + '" currentFolder="' + childFolder + '" jcrPath="' + jcrPath
+          + '" onclick="javascript:void(0);">' + decodeURIComponent(name)
+          + '</a>';
+      //newRow.insertCell(1);
+      //newRow.insertCell(2);
+      //if (me.allowDeleteItem == true) {
+        //var cellThird = newRow.insertCell(3);
+        //cellThird.onclick = function() {
+          //eXo.commons.DocumentSelector.remove(this);
+        //}
+        //cellThird.innerHTML = '<a class="Item" name="' + name + '"driveName="'
+            //+ driveName + '"workSpaceName="' + workSpaceName + '"itemPath="'
+            //+ childFolder + '" onclick="javascript:void(0);">Remove</a>';
+      //}
     }
-    for (var j = 0; j < fileList.length; j++) {
-      if (clazz == 'EventItem') {
-        clazz = 'OddItem';
-      }
-      else 
-        if (clazz == 'OddItem') {
-          clazz = 'EventItem';
-        }
-      var path = fileList[j].getAttribute("path");
+    for ( var j = 0; j < fileList.length; j++) {
+      //if (clazz == 'EventItem') {
+        //clazz = 'OddItem';
+      //} else if (clazz == 'OddItem') {
+        //clazz = 'EventItem';
+      //}
+      var jcrPath = fileList[j].getAttribute("path");
       var nodeType = fileList[j].getAttribute("nodeType");
       var nodeTypeIcon = nodeType.replace(":", "_") + "48x48Icon Folder";
       var node = fileList[j].getAttribute("name");
       var size = fileList[j].getAttribute("size");
-      if (size < 1024) 
+      if (size < 1024)
         size += '&nbsp;Byte(s)';
-      else if (size >1024 && size <(1024*1024)) {
-        size = (Math.round(size / 1024 *100))/100;
+      else if (size > 1024 && size < (1024 * 1024)) {
+        size = (Math.round(size / 1024 * 100)) / 100;
         size += '&nbsp;KB';
       } else {
-          size = (Math.round(size/(1024 *1024) *100))/100;
+        size = (Math.round(size / (1024 * 1024) * 100)) / 100;
         size += '&nbsp;MB';
       }
-      var tblRWS = eXo.core.DOMUtil.findDescendantsByTagName(rightWS, "table")[0];
       var clazzItem = me.getClazzIcon(fileList[j].getAttribute("nodeType"));
-      var newRow = tblRWS.insertRow(k + j + 1);
+      var newRow = tableContainer.insertRow(k + j + 1);
       newRow.className = clazz + " Cell";
       var cellZero = newRow.insertCell(0);
-      cellZero.onclick = function(){
+      cellZero.onclick = function() {
         eXo.commons.DocumentSelector.submitSelectedFile(this);
       }
-      cellZero.innerHTML = '<a class="Item ' + clazzItem + '" path="' + path + '" nodeType="' + nodeType + '" style ="overflow:hidden;" title="' + decodeURIComponent(node) + '" onclick="javascript:void(0);">' + decodeURIComponent(node) + '</a>';
-      newRow.insertCell(1).innerHTML = '<div class="Item">' + fileList[j].getAttribute("dateCreated") + '</div>';
-      newRow.insertCell(2).innerHTML = '<div class="Item">' + size + '</div>';
-      if (me.allowDeleteItem == true) {
-        var cellThird = newRow.insertCell(3);
-        cellThird.onclick = function(){
-          eXo.commons.DocumentSelector.remove(this);
-        }
-        cellThird.innerHTML = '<a class="Item" name="' + node + '"  path="' + path + '" onclick="javascript:void(0);">Remove</a>';
-      }
+      cellZero.innerHTML = '<a class="Item ' + clazzItem + '" jcrPath="'
+          + jcrPath + '" name="'+ node+'" onclick="javascript:void(0);">'
+          + decodeURIComponent(node) + '</a>';
+      //newRow.insertCell(1).innerHTML = '<div class="Item">' + fileList[j]
+          //.getAttribute("dateCreated") + '</div>';
+      //newRow.insertCell(2).innerHTML = '<div class="Item">' + size + '</div>';
+      //if (me.allowDeleteItem == true) {
+        //var cellThird = newRow.insertCell(3);
+        //cellThird.onclick = function() {
+          //eXo.commons.DocumentSelector.remove(this);
+        //}
+        //cellThird.innerHTML = '<a class="Item"  name="' + node
+            //+ '" driveName="' + driveName + '"workSpaceName="'
+            //+ workSpaceName + '"itemPath="' + currentFolder + '/' + node
+            //+ '" onclick="javascript:void(0);">Remove</a>';
+      //}
     }
   }
 };
@@ -297,7 +255,8 @@ DocumentSelector.prototype.submitSelectedFile = function(tableCell){
   var me = eXo.commons.DocumentSelector;
   var domUtil = eXo.core.DOMUtil;
   var detailNode = domUtil.getChildrenByTagName(tableCell, "a")[0];
-  var nodePath = detailNode.getAttribute("path");
+  var nodePath = detailNode.getAttribute("jcrPath");
+  var fileName = detailNode.getAttribute("name");
   if (me.selectFileLink) {
     var link = me.selectFileLink.href;
     var endParamIndex = link.lastIndexOf("')");
@@ -311,19 +270,22 @@ DocumentSelector.prototype.submitSelectedFile = function(tableCell){
     }
   }
   me.selectFile = tableCell.parentNode;
-  eXo.core.DOMUtil.addClass(me.selectFile, "Selected");
-  var folderNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
-  me.renderBreadcrumbs(folderNode, detailNode.getAttribute("title"));
+  domUtil.addClass(me.selectFile, "Selected");
+  if (me.selectedItem) {
+    me.renderBreadcrumbs(me.selectedItem, fileName);
+  }
 };
 
-DocumentSelector.prototype.submitSelectedFolder = function(folderNode){
+DocumentSelector.prototype.submitSelectedFolder = function(documentItem){
   var me = eXo.commons.DocumentSelector;
-  var path = folderNode.getAttribute("path");
+  var workspaceName = documentItem.workspaceName;
+  var jcrPath = documentItem.jcrPath;
   if (me.selectFolderLink) {
     var link = me.selectFolderLink.href;
     var endParamIndex = link.lastIndexOf("')");
     if (endParamIndex > 0)
-      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + path + "')";
+      link = link.substring(0, endParamIndex) + "&" + me.dataId + "="
+          + workspaceName + jcrPath + "')";
     window.location = link;
   }
 };
@@ -332,144 +294,186 @@ DocumentSelector.prototype.browseFolder = function(tableCell){
   var me = eXo.commons.DocumentSelector;
   var domUtil = eXo.core.DOMUtil;
   var detailNode = domUtil.getChildrenByTagName(tableCell, "a")[0];
-  var nodePath = detailNode.getAttribute("path");
-  if (me.selectedTreeNode) {
-    me.expNode(me.selectedTreeNode);
-    var folderNode = document.getElementById(nodePath);
-    var treeNode = domUtil.findAncestorByClass(folderNode, "Node");
-    me.viewDetails(domUtil.findFirstDescendantByClass(treeNode, "a", "NodeIcon"));
-  }
+  var documentItem = new DocumentItem();
+  documentItem.driveType = detailNode.getAttribute("driveType");
+  documentItem.driveName = detailNode.getAttribute("driveName");
+  documentItem.workspaceName = detailNode.getAttribute("workspaceName");
+  documentItem.currentFolder = detailNode.getAttribute("currentFolder");
+  documentItem.jcrPath = detailNode.getAttribute("jcrPath");
+  documentItem.canAddChild = detailNode.getAttribute("canAddChild");
+  me.renderDetails(documentItem);
+  me.submitSelectedFolder(documentItem);
 };
 
-DocumentSelector.prototype.remove = function(tableCell){
+DocumentSelector.prototype.remove = function(tableCell) {
   var me = eXo.commons.DocumentSelector;
   var domUtil = eXo.core.DOMUtil;
   var detailNode = domUtil.getChildrenByTagName(tableCell, "a")[0];
   var name = detailNode.getAttribute("name");
   var r = confirm("Are you sure you want remove " + name + " ?");
-  if (r == false) 
+  if (r == false)
     return;
-  var nodePath = detailNode.getAttribute("path");
+  var driveName = detailNode.getAttribute("driveName");
+  var workspaceName = detailNode.getAttribute("workspaceName");
+  var itemPath = detailNode.getAttribute("itemPath");
   var url = me.deleteFolderOrFileURL;
-  url += "?" + me.workspaceParam + "=" + me.workspaceName;
-  url += "&" + me.nodePathParam + "=" + nodePath;
-  try {
-    me.request(url);
-    if (me.selectedTreeNode) {
-      me.renderChildren(me.selectedTreeNode);
-      var childrenContainer = eXo.core.DOMUtil.findFirstDescendantByClass(me.selectedTreeNode, "div", "ChildrenContainer");
-      var iconElt = eXo.core.DOMUtil.getChildrenByTagName(me.selectedTreeNode, "div")[0];
-      if (domUtil.hasClass(iconElt, "ExpandIcon")) 
-        domUtil.replaceClass(iconElt, "ExpandIcon", "CollapseIcon");
-      if (!childrenContainer) {
-        if (domUtil.hasClass(iconElt, "ExpandIcon")) 
-          domUtil.replaceClass(iconElt, "ExpandIcon", "NoneIcon");
-        if (domUtil.hasClass(iconElt, "CollapseIcon")) 
-          domUtil.replaceClass(iconElt, "CollapseIcon", "NoneIcon");
-      }
-      me.viewDetails(domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon"));
-    }
-  } 
-  catch (e) {
-    window.console.error(e);
+  url += "?" + me.driveNameParam + "=" + driveName;
+  url += "&" + me.workspaceNameParam + "=" + workspaceName;
+  url += "&" + me.itemPathParam + "=" + itemPath;
+  me.request(url);
+  if (me.selectedItem) {
+    me.renderDetails(me.selectedItem);
   }
+
 };
 
 DocumentSelector.prototype.newFolder = function(inputFolderName){
-  var me = eXo.commons.DocumentSelector;
+  var me = eXo.commons.DocumentSelector; 
+  var domUtil = eXo.core.DOMUtil;
+  
+  var msg_new_folder_not_allow = inputFolderName.getAttribute("msg_new_folder_not_allow");
   var msg_select_folder = inputFolderName.getAttribute("msg_select_folder");
   var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
   var msg_empty_folder_name = inputFolderName.getAttribute("msg_empty_folder_name");
   
-  var domUtil = eXo.core.DOMUtil;
-  if (!me.selectedTreeNode) {
+  if (!me.selectedItem || !me.selectedItem.driveName) {
     alert(msg_select_folder);
     return;
   }
-  
+
   var folderName = prompt(msg_enter_folder_name, "");
   if (folderName == null || folderName == "") {
     alert(msg_empty_folder_name);
     return;
   }
-  
-  var itemNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
-  var nodePath = itemNode.getAttribute("path");
-  var url = me.createFolderURL;
-  url += "?" + me.workspaceParam + "=" + me.workspaceName;
-  url += "&" + me.parentPathParam + "=" + nodePath;
-  url += "&" + me.folderNameParam + "=" + folderName;
-  try {
-    me.request(url);
-    if (me.selectedTreeNode) {
-      me.renderChildren(me.selectedTreeNode);
-      var iconElt = eXo.core.DOMUtil.getChildrenByTagName(me.selectedTreeNode, "div")[0];
-      if (domUtil.hasClass(iconElt, "NoneIcon")) {
-        domUtil.replaceClass(iconElt, "NoneIcon", "CollapseIcon");
-      }
-      if (domUtil.hasClass(iconElt, "ExpandIcon")) { 
-        domUtil.replaceClass(iconElt, "ExpandIcon", "CollapseIcon");
-      }
-      var itemNode = domUtil.findFirstDescendantByClass(me.selectedTreeNode, "a", "NodeIcon");
-      me.viewDetails(itemNode);
-    }
-  } catch (e) {
-    window.console.error(e);
+
+  var canAddChild = me.selectedItem.canAddChild;
+  if (canAddChild == "false") {
+    alert(msg_new_folder_not_allow);
+    return;
   }
+  var driveName = me.selectedItem.driveName;
+  var workspaceName = me.selectedItem.workspaceName;
+  var currentFolder = me.selectedItem.currentFolder;
+  if (!currentFolder)
+    currentFolder = '';
+  var url = me.createFolderURL;
+  url += "?" + me.driveNameParam + "=" + driveName;
+  url += "&" + me.workspaceNameParam + "=" + workspaceName;
+  url += "&" + me.currentFolderParam + "=" + currentFolder;
+  url += "&" + me.folderNameParam + "=" + folderName;  
+  me.request(url);
+  me.renderDetails(me.selectedItem);
 };
 
-DocumentSelector.prototype.actionBreadcrumbs = function(nodePath){
-  var me = eXo.commons.DocumentSelector;
-  var folderNode = document.getElementById(nodePath);
-  var treeNode = eXo.core.DOMUtil.findAncestorByClass(folderNode, "Node");
-  me.viewDetails(folderNode);
-  me.expNode(treeNode);
+DocumentSelector.prototype.actionBreadcrumbs = function(driveType, driveName,
+    workspaceName, currentFolder) {
+  var documentItem = new DocumentItem();
+  documentItem.driveType = driveType;
+  documentItem.driveName = driveName;
+  documentItem.workspaceName = workspaceName;
+  documentItem.currentFolder = currentFolder;
+  eXo.commons.DocumentSelector.renderDetails(documentItem);
 }
 
-DocumentSelector.prototype.renderBreadcrumbs = function(folderNode, fileName){
-  var breadcrumbContainer = document.getElementById("BreadcumbsContainer");
+DocumentSelector.prototype.renderBreadcrumbs = function(documentItem, fileName) {
+  var domUtil = eXo.core.DOMUtil;
+  var breadcrumbContainer = domUtil.findFirstDescendantByClass(
+      this.uiComponent, "div", "BreadcumbsContainer");
   breadcrumbContainer.innerHTML = '';
-  var beforeNode = null;
-  var fileNode = null;
-  
-  if (fileName) {
-    fileNode = document.createElement("div");
-    fileNode.className = 'BreadcumbTab';
-    fileNode.innerHTML = '<a class="Selected">' + decodeURIComponent(fileName) + '</a>';
-    breadcrumbContainer.appendChild(fileNode);
+  var breadCrumbObject = new BreadCrumbs();
+  breadCrumbObject.breadCrumb = breadcrumbContainer;
+  if (fileName){
+    breadCrumbObject.renderFileName(documentItem,fileName);
+  } else if (documentItem.currentFolder){
+    breadCrumbObject.renderFolder(documentItem,fileName);    
+  } else if (documentItem.driveName){
+    breadCrumbObject.renderDrive(documentItem,fileName);
+  } else {
+    breadCrumbObject.renderDriveType(documentItem,fileName);
   }
-  beforeNode = fileNode;
-  while (folderNode.className != "LeftWorkspace") {
-    var curName = folderNode.getAttribute("name");
-    var nodePath = folderNode.getAttribute("path");
-    
-    if (curName && curName != this.rootPath) {
-      var tmpNode = document.createElement("div");
-      tmpNode.className = 'BreadcumbTab';
-      var strHTML = '';
-      var strOnclick = "eXo.commons.DocumentSelector.actionBreadcrumbs('" + nodePath + "');";
-      if (beforeNode == null) {
-        strHTML += '<a class="Selected" href="javascript:void(0);" onclick="' + strOnclick + '">' + decodeURIComponent(curName) + '</a>';
-        tmpNode.innerHTML = strHTML;
-        breadcrumbContainer.appendChild(tmpNode);
-      }
-      else {
-        strHTML += '<a class="Nomal" href="javascript:void(0);" onclick="' + strOnclick + '">' + decodeURIComponent(curName) + '</a>';
-        strHTML += '<div class="RightArrowIcon"><span></span></div>';
-        tmpNode.innerHTML = strHTML;
-        breadcrumbContainer.insertBefore(tmpNode, beforeNode);
-      }
-      beforeNode = tmpNode;
-    }
-    folderNode = folderNode.parentNode;
-    if (folderNode != null && folderNode.className == 'ChildrenContainer') {
-      folderNode = folderNode.parentNode;
-      if (folderNode.className != "LeftWorkspace") {
-        folderNode = folderNode.getElementsByTagName('div')[0].getElementsByTagName('a')[0];
-      }
-    }
-  }
+  var linkNode = eXo.core.DOMUtil.findDescendantsByTagName(breadcrumbContainer,
+      "a");
+  eXo.core.DOMUtil.replaceClass(linkNode[linkNode.length - 1], 'Normal',
+      'Selected');
 };
+
+DocumentSelector.prototype.scrollBottom = function() {
+  var listView = eXo.core.DOMUtil.findFirstDescendantByClass(
+      this.uiComponent, "div", "ListView");
+  listView.scrollTop = listView.scrollHeight;
+};
+
+function BreadCrumbs() {
+  breadCrumb = null;
+  
+  BreadCrumbs.prototype.renderDriveType = function(documentItem) {
+    if (this.breadCrumb){
+      this.appendBreadCrumbNode(documentItem, '/');
+    }
+  };
+
+  BreadCrumbs.prototype.renderDrive = function(documentItem) {
+    if (this.breadCrumb) {
+      var tmpDocumentItem = new DocumentItem();
+      tmpDocumentItem.driveType = documentItem.driveType;
+      this.renderDriveType(tmpDocumentItem);
+      this.appendBreadCrumbNode(documentItem, documentItem.driveName);
+    }
+  };
+
+  BreadCrumbs.prototype.renderFolder = function(documentItem) {
+    if (this.breadCrumb) {
+      var tmpDocumentItem = new DocumentItem();
+      tmpDocumentItem.driveType = documentItem.driveType;
+      tmpDocumentItem.driveName = documentItem.driveName;
+      tmpDocumentItem.workspaceName = documentItem.workspaceName;
+      this.renderDrive(tmpDocumentItem);
+      var breadCrumbItem = documentItem.currentFolder.split("/");
+      tmpDocumentItem.currentFolder = '';
+      for ( var i = 0; i < breadCrumbItem.length; i++) {
+        tmpDocumentItem.currentFolder += breadCrumbItem[i];
+        this.appendBreadCrumbNode(tmpDocumentItem, breadCrumbItem[i]);
+        tmpDocumentItem.currentFolder += "/";
+      }
+    }
+  };
+  
+
+  BreadCrumbs.prototype.renderFileName = function(documentItem, fileName) {
+  if (this.breadCrumb) {
+      this.renderFolder(documentItem)
+      var fileNode = document.createElement("div");
+      fileNode.className = 'BreadcumbTab';
+      fileNode.innerHTML = '<a class="Normal">' + decodeURIComponent(fileName) + '</a>';
+      this.breadCrumb.appendChild(fileNode);
+    }
+  };
+  
+  BreadCrumbs.prototype.appendBreadCrumbNode = function(documentItem, name) {
+    var node = document.createElement("div");
+    var driveType = documentItem.driveType;
+    if (driveType)
+      driveType = "'" + driveType + "'";
+    var driveName = documentItem.driveName;
+    if (driveName)
+      driveName = "'" + driveName + "'";
+    var workspaceName = documentItem.workspaceName;
+    if (workspaceName)
+      workspaceName = "'" + workspaceName + "'";
+    var currentFolder = documentItem.currentFolder;
+    if (currentFolder)
+      currentFolder = "'" + currentFolder + "'";
+    node.className = 'BreadcumbTab';
+    strOnclick = "eXo.commons.DocumentSelector.actionBreadcrumbs(" + driveType
+        + "," + driveName + "," + workspaceName + "," + currentFolder + ");";
+    node.innerHTML = '<a class="Normal" href="javascript:void(0);" onclick="'
+        + strOnclick + '">' + decodeURIComponent(name)
+        + '</a>&nbsp;&nbsp;';
+    this.breadCrumb.appendChild(node);
+  };
+};
+
 
 DocumentSelector.prototype.getClazzIcon = function(nodeType){
   var strClassIcon = '';

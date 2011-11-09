@@ -76,11 +76,7 @@ public class UIAddAttachment extends UIContainer implements UIPopupComponent {
   
   public UIAddAttachment() {
     try {
-      UIDocumentSelector documentSelector = addChild(UIDocumentSelector.class,
-                                                     null,
-                                                     UIDOCUMENTSELECTOR);
-      documentSelector.setAllowAddFolder(false);
-      documentSelector.setAllowDeleteItem(false);
+      addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
     } catch (Exception e) {
       log.error("An exception happens when init UIAddAttachment", e);
     }
@@ -141,7 +137,7 @@ public class UIAddAttachment extends UIContainer implements UIPopupComponent {
         event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UIAddAttachment.msg.not-a-file",
                                                                                        null,
                                                                                        ApplicationMessage.WARNING));
-        ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
+        ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
         return;
       }
       if (xEvent != null) {

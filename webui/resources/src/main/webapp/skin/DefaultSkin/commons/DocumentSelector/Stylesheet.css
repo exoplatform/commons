@@ -1,4 +1,3 @@
-
 .ClearFix:after {
   content: ".";
   display: block;
@@ -17,69 +16,21 @@
   width: 320px;
 }
 
+.UIDocumentSelector select {
+  width: 200px;
+}
+
 .UIDocumentSelector {
   font-family: verdana;
   font-size: 11px;
   margin: auto;
 }
 
-.UIDocumentSelector  .UIHomePageDT {
-  background: #9d9fa2;
-  padding: 10px;
-  -moz-border-radius-bottomleft: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-bottom-right-radius: 5px;
-}
-
-.UIDocumentSelector  .UIBannerPortlet {
-  padding: 8px;
-}
-
-.UIDocumentSelector .LeftWorkspace .CollapseIcon .Folder {
-	background: url('images/folder_open.png') no-repeat left top;
-}
-
-.UIDocumentSelector .LeftWorkspace .ExpandIcon .Folder {
-	background: url('images/folder_closed.png') no-repeat left top;
-}
-
-.UIDocumentSelector .LeftWorkspace .NoneIcon .Folder {
-	background: url('images/folder_closed.png') no-repeat left top;
-}
-
 .UIDocumentSelector .RightWorkspace .Folder {
-	background: url('images/folder_closed.png') no-repeat left top;
-}
-
-.UIDocumentSelector  .TitleBar {
-  background: #0a4da5;
-  -moz-border-radius-topleft: 3px;
-  -webkit-border-top-left-radius: 3px;
-  -moz-border-radius-topright: 3px;
-  -webkit-border-top-right-radius: 3px;
-  padding: 0px 8px 0px 20px;
-  color: white;
-  line-height: 24px;
-  height: 24px;
-}
-
-.UIDocumentSelector .ListContainer {
-  margin-top: 8px;
-}
-
-.UIDocumentSelector .ListContainer .LeftWorkspace {
-  width: 210px;
-  float: left;
-  border: 1px solid #f4f4f4;
-  background: #fafafa;
-  overflow: auto;
-  overflow-x: hidden;
-  height: 300px;
+  background: url('images/folder_closed.png') no-repeat left top;
 }
 
 .UIDocumentSelector .ListContainer .RightWorkspace {
-  margin-left: 218px;
   background: #fafafa;
 }
 
@@ -87,16 +38,8 @@
   color: black;
 }
 
-.UIDocumentSelector .ActionBar {
-  background: #f5f5f5;
-  border: 1px solid #d7d7d7;
-  padding: 0px 8px 0px 16px;
-  height: 30px;
-}
-
 .UIDocumentSelector .Breadcumbs {
-  padding: 8px 8px 0;
-  line-height: 18px;
+  padding: 8px 5px 0;
 }
 
 .UIDocumentSelector  a {
@@ -108,20 +51,23 @@
   margin-top: 5px;
 }
 
-.UIDocumentSelector .HomeIcon {
-  background: url('images/HomeIcon.gif') no-repeat center;
-  float: left;
-  margin: 0px 8px 0px 0px;
-  height: 16px;
-  width: 16px;
-}
-
 .UIDocumentSelector  .BreadcumbsContainer {
   Float: left;
+  margin-top: 5px;
+  width: 80%;
 }
 
 .UIDocumentSelector .BreadcumbsContainer  .BreadcumbTab {
   Float: left;
+  height: 26px;
+}
+
+.UIDocumentSelector .BreadcumbsContainer .BreadcumbTab a {
+  padding: 3px;
+  border: 1px solid #999;
+  margin-left: 2px;
+  background: white;
+  display: block;
 }
 
 .UIDocumentSelector .BreadcumbsContainer .RightArrowIcon {
@@ -133,10 +79,8 @@
 }
 
 .UIDocumentSelector .BreadcumbsContainer  .Selected {
-  float: left;
-  display: block;
-  margin: 0px 8px 0px 0px;
   color: #058EE6;
+  font-weight: bold;
 }
 
 .UIDocumentSelector .BreadcumbsContainer  .Nomal {
@@ -157,7 +101,7 @@
 
 .UIDocumentSelector .RightWorkspace .TRNoContent {
   font-style: italic;
-  color: #FF5604;
+  color: #999;
   text-align: center;
 }
 
@@ -191,20 +135,8 @@
   background-color: #E7F3FF;
 }
 
-.UIDocumentSelector .LeftWorkspace .Node {
-  line-height: 18px;
-  padding-top: 7px;
-  white-space: nowrap;
-}
-
 .UIDocumentSelector .LeftWorkspace .ChildrenContainer {
   margin-left: 15px;
-}
-
-.UIDocumentSelector .LeftWorkspace .Node .ExpandIcon {
-  background: url('images/ExpandIcon.gif') no-repeat scroll left center;
-  height: auto;
-  padding-left: 18px;
 }
 
 .UIDocumentSelector .LeftWorkspace .Node .CollapseIcon {
@@ -213,28 +145,60 @@
   padding-left: 18px;
 }
 
-.UIDocumentSelector .LeftWorkspace .Node .NoneIcon {
-  height: auto;
-  padding-left: 18px;
-}
-
-.UIDocumentSelector .LeftWorkspace .Node .NodeIcon:Hover {
-  background-color: #F2F8FF;
-}
-
-.UIDocumentSelector .LeftWorkspace .Node .Selected {
-  background-color: #E7F3FF;
-}
-
-.UIDocumentSelector .LeftWorkspace .Node .NodeIcon {
-  background-position: left center;
-  height: 20px;
-  padding-left: 20px;
-  display: block;
-}
-
 .UIDocumentSelector .RightWorkspace .ListView {
   border: 1px solid #e7e7e7;
-  height: 300px;
+  height: 220px;
   overflow: auto;
+}
+
+.UIDocumentSelector .UIDSUploadInput .ProgressBarFrame {
+  float: right;
+  padding: 3px 3px;
+  border: 1px solid #999;
+  background: white;
+}
+
+.UIDocumentSelector .UIDSUploadInput .UploadIframe iframe {
+  float: right;
+  width: 30px;
+  height: 30px;
+}
+
+.UIDocumentSelector .UIDSUploadInput .ProgressBarLabel {
+  width: 32px;
+  height: 15px;
+  position: static;
+  float: right;
+  margin-top: 2px;
+}
+
+.UIDocumentSelector .ProgressBarFrame {
+  height: 18px;
+}
+
+.UIDocumentSelector .DeleteFileFrame {
+  float: right;
+  background:
+    url('/eXoResources/skin/DefaultSkin/webui/component/UIUpload/background/Round18x18.gif')
+    no-repeat;
+  cursor: pointer;
+  padding-left: 15px;
+  height: 18px;
+}
+
+.UIDocumentSelector .NewFolder {
+  float: right;
+  padding: 5px 11px;
+  border: 1px solid #999;
+  background: white
+    url('/ecmexplorer/skin/icons/24x24/DefaultSkin/AddFolder.gif')
+    no-repeat 2px center;
+  padding: 5px 11px 4px 11px;
+  margin-top: 1px;
+  margin-left: 2px;
+}
+
+.UIDocumentSelector .ActionBar {
+  float: right;
+  width: 100px;
 }

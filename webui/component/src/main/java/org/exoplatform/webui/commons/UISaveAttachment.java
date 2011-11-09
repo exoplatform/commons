@@ -28,8 +28,11 @@ import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.access.PermissionType;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.datamodel.IllegalNameException;
+import org.exoplatform.services.jcr.ext.app.SessionProviderService;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.web.application.ApplicationMessage;
@@ -80,9 +83,7 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
   public UISaveAttachment() {
     try {
       addUIFormInput(new UIFormStringInput(FIELD_INPUT, null, null));
-      UIDocumentSelector documentSelector = addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
-      documentSelector.setAllowAddFolder(true);
-      documentSelector.setAllowDeleteItem(true);
+      addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
     } catch (Exception e) {
       log.error("An exception happens when init UISaveAttachment", e);
     }
@@ -131,33 +132,44 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
         event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UISaveAttachment.msg.file-name-not-null",
                                                                                        null,
                                                                                        ApplicationMessage.WARNING));
-        ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
+        ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
         return;
       } else {
         String nodePath = tempPath.substring(tempPath.indexOf("/"));
-        Session srcSession = component.getSession(workspaceName);
+        Session srcSession = component.getUserSession(workspaceName);
         Node srcNode = (Node) srcSession.getItem(nodePath);
         Node srcContent = srcNode.getNode("jcr:content");
         Value value = srcContent.getProperty("jcr:data").getValue();
         String mimeType = srcContent.getProperty("jcr:mimeType").getString();
         srcSession.logout();
-        Session desSession = component.getDefaultSession();
         String selectedFolder = selector.getSeletedFolder();
         if (StringUtils.isEmpty(selectedFolder)) {
           event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UISaveAttachment.msg.not-a-folder",
                                                                                          null,
                                                                                          ApplicationMessage.WARNING));
-          ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
+          ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
           return;
         }
-        Node desNode = (Node) desSession.getItem(selector.getSeletedFolder());
+        String desWorkSpace = selectedFolder.substring(0, selectedFolder.indexOf("/"));
+        Session desSession = component.getUserSession(desWorkSpace);
+        selectedFolder = selectedFolder.substring(selectedFolder.indexOf("/"));
+        Node desNode = (Node) desSession.getItem(selectedFolder);
+        try {
+          desSession.checkPermission(desNode.getPath(), PermissionType.ADD_NODE);
+        } catch (Exception e) {
+          event.getRequestContext()
+               .getUIApplication()
+               .addMessage(new ApplicationMessage("UISaveAttachment.msg.save-file-not-allow", null, ApplicationMessage.WARNING));
+          ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
+          return;
+        }
         try {
           validate(fileName);
         } catch (IllegalNameException e) {
           event.getRequestContext().getUIApplication().addMessage(new ApplicationMessage("UISaveAttachment.msg.not-valid-name",
                                                   new String[] { invalidCharacters },
                                                   ApplicationMessage.WARNING));
-          ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
+          ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
           return;
         }
         Node file = desNode.addNode(fileName, "nt:file");
@@ -179,15 +191,12 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
     }
   }
   
-  public Session getSession(String workspace) throws Exception {
+  public Session getUserSession(String workspace) throws Exception {
     ManageableRepository repository = getCurrentRepository();
-    return repository.getSystemSession(workspace);
-  }
-  
-  public Session getDefaultSession() throws Exception {
-    ManageableRepository repository = getCurrentRepository();
-    String defaultWorkspace = repository.getConfiguration().getDefaultWorkspaceName();
-    return repository.getSystemSession(defaultWorkspace);
+    SessionProviderService sessionProviderService = (SessionProviderService) PortalContainer.getInstance()
+                                                                                            .getComponentInstanceOfType(SessionProviderService.class);
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    return sessionProvider.getSession(workspace, repository);
   }
   
   private ManageableRepository getCurrentRepository() throws RepositoryException {
@@ -216,7 +225,7 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
       } else {
         throw new IllegalNameException(invalidCharacters);
       }
-    }     
+    }
   }  
   
   @Override

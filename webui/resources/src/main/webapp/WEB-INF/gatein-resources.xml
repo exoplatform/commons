@@ -19,5 +19,12 @@
     </param>
   </javascript>
   
+  <javascript>
+    <param>
+      <js-module>eXo.commons.UIDSUpload</js-module>
+      <js-path>/javascript/eXo/commons/UIDSUpload.js</js-path>
+    </param>
+  </javascript>
+  
 </gatein-resources>
 

@@ -19,8 +19,6 @@ package org.exoplatform.webui.commons;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.application.WebuiRequestContext;
@@ -42,60 +40,55 @@ import org.exoplatform.webui.event.EventListener;
   template = "classpath:groovy/webui/commons/UIDocumentSelector.gtmpl",
   events = {
     @EventConfig(listeners = UIDocumentSelector.SelectFileActionListener.class),
+    @EventConfig(listeners = UIDocumentSelector.SelectFolderActionListener.class),
     @EventConfig(listeners = UIDocumentSelector.SelectFolderActionListener.class)
   }  
  )
 public class UIDocumentSelector extends UIContainer {
   
-  protected static final Log    logger               = ExoLogger.getLogger(UIDocumentSelector.class);
+  protected static final Log    logger                = ExoLogger.getLogger(UIDocumentSelector.class);    
 
-  protected static final String SELECTFILE           = "SelectFile";
-
-  protected static final String SELECTFOLDER         = "SelectFolder";
-
-  protected static final String RESTPREFIX           = "/managedocument";
-
-  protected static final String GETFOLDERSANDFILES   = RESTPREFIX + "/getFoldersAndFiles";
-
-  protected static final String DELETEFOLDERORFILE   = RESTPREFIX + "/deleteFolderOrFile";
-
-  protected static final String CREATEFOLDER         = RESTPREFIX + "/createFolder";
-
-  protected static final String PARAM_WORKSPACE      = "workspaceName";
-
-  protected static final String PARAM_NODEPATH       = "nodePath";
-
-  protected static final String PARAM_PARENTPATH     = "parentPath";
-
-  protected static final String PARAM_ISFOLDERONLY   = "isFolderOnly";
-
-  protected static final String PARAM_FOLDERNAME     = "folderName";
+  protected static final String UPLOAD_AREA            = "UPLOAD_AREA";
   
-  protected static final String DATA_ID              = "dataId";
+  protected static final String SELECT_FILE            = "SelectFile";
 
-  protected String              currentWorkspaceName = "";
+  protected static final String SELECT_FOLDER          = "SelectFolder";
 
-  protected String              rootPath             = "/";
+  protected static final String REST_PREFIX           = "/managedocument";
 
-  protected String              seletedFile          = "";
+  protected static final String GET_DRIVES           = REST_PREFIX + "/getDrives";
 
-  protected String              seletedFolder        = "";
+  protected static final String GET_FOLDERS_AND_FILES = REST_PREFIX + "/getFoldersAndFiles";
 
-  private boolean               allowAddFolder       = false;
+  protected static final String DELETE_FOLDER_OR_FILE = REST_PREFIX + "/deleteFolderOrFile";
 
-  private boolean               allowDeleteItem      = false;
+  protected static final String CREATE_FOLDER         = REST_PREFIX + "/createFolder";
 
+  protected static final String PARAM_DRIVE_TYPE     = "driveType";
+
+  protected static final String PARAM_DRIVE_NAME     = "driveName";
+
+  protected static final String PARAM_WORKSPACE_NAME  = "workspaceName";
+
+  protected static final String PARAM_CURRENT_FOLDER  = "currentFolder";
+
+  protected static final String PARAM_IS_FOLDER_ONLY  = "isFolderOnly";
+
+  protected static final String PARAM_FOLDER_NAME     = "folderName";
+
+  protected static final String PARAM_ITEM_PATH       = "itemPath";
+
+  protected static final String DATA_ID               = "dataId";
+
+  protected String              seletedFile           = "";
+
+  protected String              seletedFolder         = "";
   
-  public UIDocumentSelector() {
-    try {
-      RepositoryService jcrService_ = (RepositoryService) PortalContainer.getComponent(RepositoryService.class);
-      ManageableRepository currentRepo = jcrService_.getCurrentRepository();
-      currentWorkspaceName = currentRepo.getConfiguration().getDefaultWorkspaceName();
-    } catch (Exception e) {
-      logger.debug("Can't init ui component UIDocumentSelector :  " + e.getMessage());
-    }
+  public UIDocumentSelector() throws Exception {
+    super();
+    addChild(UIUploadArea.class, null, UPLOAD_AREA);
   }
-  
+
   public String getSeletedFile() {
     return seletedFile;
   }
@@ -128,26 +121,13 @@ public class UIDocumentSelector extends UIContainer {
       .append(restContextName);
     return sb.toString();
   }
-  
-  public boolean isAllowAddFolder() {
-    return allowAddFolder;
-  }
-  public void setAllowAddFolder(boolean allowAddFolder) {
-    this.allowAddFolder = allowAddFolder;
-  }
-  public boolean isAllowDeleteItem() {
-    return allowDeleteItem;
-  }
-  public void setAllowDeleteItem(boolean allowDeleteItem) {
-    this.allowDeleteItem = allowDeleteItem;
-  }
 
   static public class SelectFileActionListener extends EventListener<UIDocumentSelector> {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
       component.seletedFile = event.getRequestContext().getRequestParameter(DATA_ID);
       component.seletedFolder = StringUtils.EMPTY;
-      ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
+      ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
     }
   }
 
@@ -156,7 +136,7 @@ public class UIDocumentSelector extends UIContainer {
       UIDocumentSelector component = event.getSource();
       component.seletedFolder = event.getRequestContext().getRequestParameter(DATA_ID);
       component.seletedFile = StringUtils.EMPTY;
-      ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).setFullRender(true);
+      ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
     }
   }
 }
