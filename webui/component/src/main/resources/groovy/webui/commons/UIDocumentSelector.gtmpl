@@ -39,12 +39,12 @@
                   " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +
                   " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\">&nbsp;</a>";
      %>
-    <div class="ClearFix Breadcumbs">      
-      <div class="BreadcumbsContainer" id="BreadcumbsContainer"></div>      
-      <div class="ActionBar">
+    <div class="ClearFix Breadcumbs">
+    <div class="ActionBar">
       $newFolderLink
       <% uicomponent.renderChild(uicomponent.UPLOAD_AREA);  %>
-	    </div>
+	  </div>
+    <div class="BreadcumbsContainer" id="BreadcumbsContainer"></div>  
     </div>
   <div class="ListContainer">
     <div class="ClearFix">      
