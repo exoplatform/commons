@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<bundle>
   <UIDocumentSelector>
     <label>
       <new-folder>New Folder</new-folder>
@@ -7,5 +8,24 @@
       <empty-folder-name>Folder's name can not be empty.</empty-folder-name>
     </label>
   </UIDocumentSelector>
+  <TimeConvert>
+    <type>
+      <DAY>ngày trước</DAY>
+      <DAYS>ngày trước</DAYS>
+      <DECADE>thập kỷ trước</DECADE>
+      <DECADES>thập kỷ trước</DECADES>
+      <HOUR>giờ trước</HOUR>
+      <HOURS>giờ trước</HOURS>
+      <JUSTNOW>Vừa tạo</JUSTNOW>
+      <MINUTE>phút trước</MINUTE>
+      <MINUTES>phút trước</MINUTES>
+      <MONTH>tháng trước</MONTH>
+      <MONTHS>tháng trước</MONTHS>
+      <WEEK>tuần trước</WEEK>
+      <WEEKS>tuần trước</WEEKS>
+      <YEAR>năm trước</YEAR>
+      <YEARS>năm trước</YEARS>
+    </type>
+  </TimeConvert>
 </bundle>
 

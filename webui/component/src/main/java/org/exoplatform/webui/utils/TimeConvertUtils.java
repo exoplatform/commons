@@ -24,10 +24,10 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.portal.webui.util.Util;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.webui.application.WebuiRequestContext;
 
 /**
@@ -103,15 +103,23 @@ public class TimeConvertUtils {
     return convertXTimeAgo(myDate, format, null, limit);
   }
 
+  /**
+   * Convert date to display string with format X time ago
+   * 
+   * @param myDate The object date input for convert, it must has ZoneTime is GMT+0
+   * @param format The date/time format
+   * @param locale The Local of current location(language/country).
+   * @param limit The value set for limit convert x time ago. It must is: TimeConvertUtils.YEAR, MONTH, WEEK, DAY.
+   * @return String 
+   */
   public static String convertXTimeAgo(Date myDate, String format, Locale locale, int limit) {
     try {
       String[] values = convertXTimeAgo(myDate).split(SPACE);
       if (values[0].equals(JUSTNOW))
-        return getResourceBundle(RESOURCE_KEY + JUSTNOW);
+        return getResourceBundle(RESOURCE_KEY + JUSTNOW, locale);
       int i = ArrayUtils.indexOf(strs, values[1].replace(STR_S, STR_EMPTY));
       if (limit == 0 || i < limit) {
-        return new StringBuilder(values[0]).append(SPACE)
-                   .append(getResourceBundle(RESOURCE_KEY + values[1].replace(UNDERSCORE, STR_EMPTY))).toString();
+        return getMessage(getResourceBundle(RESOURCE_KEY + values[1].replace(UNDERSCORE, STR_EMPTY), locale), new String[]{values[0]});
       }
     } catch (Exception e) {}
     if (locale != null) {
@@ -132,15 +140,37 @@ public class TimeConvertUtils {
     return new SimpleDateFormat(format, locale).format(myDate);
   }
 
-  private static String getResourceBundle(String key) {
+  private static String getResourceBundle(String key, Locale locale) {
+    if (locale == null) {
+      locale = getLocale();
+    }
     try {
-      WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-      ResourceBundle res = context.getApplicationResourceBundle();
+      ResourceBundle res = null;
+      try {
+        res = WebuiRequestContext.getCurrentInstance().getApplicationResourceBundle();
+      } catch (Exception e) {
+        ResourceBundleService bundleService = (ResourceBundleService) ExoContainerContext.getCurrentContainer()
+                                              .getComponentInstanceOfType(ResourceBundleService.class);
+        res = bundleService.getResourceBundle("locale.commons.Commons", locale);
+      }
       return res.getString(key);
     } catch (Exception e) {
       log.warn("Can not resource bundle by key: " + key);
-      return key.substring(key.lastIndexOf(".")+1).toLowerCase();
+      return key.substring(key.lastIndexOf(".") + 1).toLowerCase();
     }
+  }
+  
+  private static String getMessage(String message, String[] args) {
+    if (message != null && args != null) {
+      String oldMes = message;
+      for (int i = 0; i < args.length; i++) {
+        message = message.replace("{" + i + "}", args[i]);
+      }
+      if(message.equals(oldMes) && args.length == 1) {
+        message = args[0] + SPACE + message;
+      }
+    }
+    return message;
   }
 
   /**
@@ -149,8 +179,7 @@ public class TimeConvertUtils {
    */
   public static Locale getLocale() {
     try {
-      PortalRequestContext portalContext = Util.getPortalRequestContext();
-      return new Locale(portalContext.getLocale().getLanguage(), portalContext.getLocale().getCountry());
+      return WebuiRequestContext.getCurrentInstance().getLocale();
     } catch (Exception e) {
       return Locale.ENGLISH;
     }
