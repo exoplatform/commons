@@ -191,7 +191,7 @@ UIDSUpload.prototype.refeshProgress = function(elementId) {
       }
       me.saveUploaded(elementId, fileName);
       documentSelector.renderDetails(selectedItem);
-      documentSelector.scrollBottom();
+      documentSelector.selectUploadedFile(fileName);
       var refreshUpload = eXo.core.DOMUtil.findFirstDescendantByClass(container, "a", "RefreshUpload") ; 
       if (refreshUpload){
         eval(refreshUpload.href);
@@ -209,11 +209,10 @@ UIDSUpload.prototype.refeshProgress = function(elementId) {
 UIDSUpload.prototype.saveUploaded = function(uploadId, fileName) {
   var me = eXo.commons.UIDSUpload;
   var selectedItem = eXo.commons.DocumentSelector.selectedItem;
-  var currentFolder = selectedItem.currentFolder;
   var url = me.restContext + "/control?" ;  
   url += "action=save" + "&workspaceName=" + selectedItem.workspaceName
   + "&driveName=" + selectedItem.driveName + "&currentFolder="
-  + currentFolder + "&currentPortal=" + eXo.env.portal.portalName + "&language="
+  + selectedItem.currentFolder + "&currentPortal=" + eXo.env.portal.portalName + "&language="
   + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" +fileName;
   var responseText = ajaxAsyncGetRequest(url, false);
 };
@@ -299,8 +298,8 @@ UIDSUpload.prototype.upload = function(clickEle, id) {
   var container = parent.document.getElementById(id);
   var uploadIFrame = parent.document.getElementById(id+"UploadIframe");
   var uploadFrame = parent.document.getElementById(id+"uploadFrame");
-  if (!selectedItem || !selectedItem.currentFolder) {
-    alert(uploadIFrame.getAttribute("select_folder"));
+  if (!selectedItem || !selectedItem.driveName) {
+    alert(uploadIFrame.getAttribute("select_drive"));
     file.value == '';
     return;
   }

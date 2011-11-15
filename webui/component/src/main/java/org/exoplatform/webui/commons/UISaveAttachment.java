@@ -83,7 +83,8 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
   public UISaveAttachment() {
     try {
       addUIFormInput(new UIFormStringInput(FIELD_INPUT, null, null));
-      addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
+      UIDocumentSelector documentSelector = addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
+      documentSelector.setShowUpload(false);
     } catch (Exception e) {
       log.error("An exception happens when init UISaveAttachment", e);
     }

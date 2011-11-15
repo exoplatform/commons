@@ -84,9 +84,19 @@ public class UIDocumentSelector extends UIContainer {
 
   protected String              seletedFolder         = "";
   
+  private boolean               isShowUpload          = true;
+  
   public UIDocumentSelector() throws Exception {
     super();
     addChild(UIUploadArea.class, null, UPLOAD_AREA);
+  }
+
+  public boolean isShowUpload() {
+    return isShowUpload;
+  }
+
+  public void setShowUpload(boolean isShowUpload) {
+    this.isShowUpload = isShowUpload;
   }
 
   public String getSeletedFile() {

@@ -70,6 +70,7 @@ DocumentSelector.prototype.renderDetails = function(documentItem) {
     }
   }
   me.selectedItem = documentItem;
+  if (!me.selectedItem.currentFolder) me.selectedItem.currentFolder ='';
   me.renderBreadcrumbs(documentItem, null);
   if (!documentItem.driveName) {
     me.renderDrives(tblRWS, documentItem);
@@ -228,6 +229,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
       var newRow = tableContainer.insertRow(k + j + 1);
       newRow.className = clazz + " Cell";
       var cellZero = newRow.insertCell(0);
+      cellZero.tabIndex = "1";
       cellZero.onclick = function() {
         eXo.commons.DocumentSelector.submitSelectedFile(this);
       }
@@ -250,6 +252,23 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
     }
   }
 };
+
+DocumentSelector.prototype.selectUploadedFile = function(fileName){
+  var domUtil = eXo.core.DOMUtil;
+  var rightWS = domUtil.findFirstDescendantByClass(this.uiComponent, "div",
+      "RightWorkspace");
+  var tblRWS = domUtil.findDescendantsByTagName(rightWS, "table")[0];
+  var items = domUtil.findDescendantsByClass(tblRWS, "a", "Item");
+  for ( var j = 0; j < items.length; j++) {
+    var item = items[j];
+    var itemName = item.getAttribute("name");
+    if (itemName && itemName == fileName) {
+      item.parentNode.onclick();
+      item.parentNode.focus();
+    }
+  }
+};
+
 
 DocumentSelector.prototype.submitSelectedFile = function(tableCell){
   var me = eXo.commons.DocumentSelector;
@@ -332,7 +351,7 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   var domUtil = eXo.core.DOMUtil;
   
   var msg_new_folder_not_allow = inputFolderName.getAttribute("msg_new_folder_not_allow");
-  var msg_select_folder = inputFolderName.getAttribute("msg_select_folder");
+  var msg_select_folder = inputFolderName.getAttribute("msg_select_drive");
   var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
   var msg_empty_folder_name = inputFolderName.getAttribute("msg_empty_folder_name");
   
@@ -354,13 +373,10 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   }
   var driveName = me.selectedItem.driveName;
   var workspaceName = me.selectedItem.workspaceName;
-  var currentFolder = me.selectedItem.currentFolder;
-  if (!currentFolder)
-    currentFolder = '';
   var url = me.createFolderURL;
   url += "?" + me.driveNameParam + "=" + driveName;
   url += "&" + me.workspaceNameParam + "=" + workspaceName;
-  url += "&" + me.currentFolderParam + "=" + currentFolder;
+  url += "&" + me.currentFolderParam + "=" + me.selectedItem.currentFolder;
   url += "&" + me.folderNameParam + "=" + folderName;  
   me.request(url);
   me.renderDetails(me.selectedItem);
@@ -398,12 +414,6 @@ DocumentSelector.prototype.renderBreadcrumbs = function(documentItem, fileName) 
       'Selected');
 };
 
-DocumentSelector.prototype.scrollBottom = function() {
-  var listView = eXo.core.DOMUtil.findFirstDescendantByClass(
-      this.uiComponent, "div", "ListView");
-  listView.scrollTop = listView.scrollHeight;
-};
-
 function BreadCrumbs() {
   breadCrumb = null;
   
@@ -430,11 +440,13 @@ function BreadCrumbs() {
       tmpDocumentItem.workspaceName = documentItem.workspaceName;
       this.renderDrive(tmpDocumentItem);
       var breadCrumbItem = documentItem.currentFolder.split("/");
-      tmpDocumentItem.currentFolder = '';
-      for ( var i = 0; i < breadCrumbItem.length; i++) {
-        tmpDocumentItem.currentFolder += breadCrumbItem[i];
-        this.appendBreadCrumbNode(tmpDocumentItem, breadCrumbItem[i]);
-        tmpDocumentItem.currentFolder += "/";
+      if (breadCrumbItem != "") {
+        tmpDocumentItem.currentFolder = '';
+        for ( var i = 0; i < breadCrumbItem.length; i++) {
+          tmpDocumentItem.currentFolder += breadCrumbItem[i];
+          this.appendBreadCrumbNode(tmpDocumentItem, breadCrumbItem[i]);
+          tmpDocumentItem.currentFolder += "/";
+        }
       }
     }
   };

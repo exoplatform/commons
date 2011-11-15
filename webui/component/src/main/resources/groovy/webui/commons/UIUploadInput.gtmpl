@@ -8,7 +8,7 @@
 <div class="UIDSUploadInput" id="$uploadId" upload_failed="<%= _ctx.appRes("UIFormUploadInput.msg.upload_failed"); %>">
 	<div class="LimitMessage" style="display: none;"><%= _ctx.appRes("UIFormUploadInput.msg.limit"); %></div>
 	<input type="hidden" id="input$uploadId" name="<%=uicomponent.getName();%>" value="false"/>
-	<div id="<%=uploadId;%>UploadIframe" class="UploadIframe" select_folder="<%= _ctx.appRes("UIDSUploadInput.msg.select-folder"); %>" permission_required="<%= _ctx.appRes("UIDSUploadInput.msg.permission-required"); %>" title="<%=_ctx.appRes("UIDSUploadInput.label.Upload");%>">
+	<div id="<%=uploadId;%>UploadIframe" class="UploadIframe" select_drive="<%= _ctx.appRes("UIDSUploadInput.msg.select-drive"); %>" permission_required="<%= _ctx.appRes("UIDSUploadInput.msg.permission-required"); %>" title="<%=_ctx.appRes("UIDSUploadInput.label.Upload");%>">
 		<iframe width="100%" allowTransparency="true" scrolling="no" frameborder="0" framespacing="0" id="<%=uploadId;%>uploadFrame"></iframe>
 	</div>
 	<div id="<%=uploadId;%>ProgressIframe" class="ProgressIframe" style="display: none;"></div>			
