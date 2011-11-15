@@ -12,11 +12,10 @@
   <% uiform.renderChild(uiform.UIDOCUMENTSELECTOR); %>
   <div style="clear:both;">
   </div>
-  <center>
-    <div class="Action">
-      <input type="button" onclick="$saveFile" value="<%=_ctx.appRes(uicomponent.id + ".label.Save");%>"/>
-      <input type="button" onclick="$cancel" value ="<%=_ctx.appRes(uicomponent.id + ".label.Cancel");%>"/>
-    </div>
-  </center>
+  <div class="ClearBoth"></div>
+    <div class="UIAction">
+      <a href="javascript:void(0);" class="ActionButton LightBlueStyle" onclick="$saveFile"><%=_ctx.appRes(uicomponent.id + ".label.Save");%></a>
+      <a href="javascript:void(0);" class="ActionButton LightBlueStyle" onclick="$cancel"><%=_ctx.appRes(uicomponent.id + ".label.Cancel");%></a>
+    </div>    
   <% uiform.end() %>
 </div>
