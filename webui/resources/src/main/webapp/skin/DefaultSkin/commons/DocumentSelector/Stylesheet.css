@@ -1,16 +1,3 @@
-.ClearFix:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-
-.ClearFix { !
-  display: inline-block; !
-  zoom: 1; !
-  display: block;
-}
 
 .UISaveAttachment #FileNameInput {
   width: 320px;
@@ -57,16 +44,15 @@
 }
 
 .UIDocumentSelector .BreadcumbsContainer  .BreadcumbTab {
-  Float: left;
+  float: left;
   height: 26px;
 }
 
 .UIDocumentSelector .BreadcumbsContainer .BreadcumbTab a {
-  padding: 3px;
-  border: 1px solid #999;
+  padding: 3px 0px;
   margin-left: 2px;
-  background: white;
   display: block;
+  cursor: pointer;
 }
 
 .UIDocumentSelector .BreadcumbsContainer .RightArrowIcon {
@@ -79,7 +65,6 @@
 
 .UIDocumentSelector .BreadcumbsContainer  .Selected {
   color: #058EE6;
-  font-weight: bold;
 }
 
 .UIDocumentSelector .BreadcumbsContainer  .Nomal {
@@ -123,11 +108,10 @@
 }
 
 .UIDocumentSelector .RightWorkspace .Item {
-  border-left: 1px solid #f4f4f4;
-  line-height: 26px;
-  background-position: left 3px;
+  line-height: 28px;
   cursor: pointer;
-  padding: 2px 0 2px 20px;
+  padding: 4px 0 5px 35px;
+  margin-left: 10px;
 }
 
 .UIDocumentSelector .RightWorkspace .Selected {
@@ -152,9 +136,13 @@
 
 .UIDocumentSelector .UIDSUploadInput .ProgressBarFrame {
   float: right;
-  padding: 3px 3px;
-  border: 1px solid #999;
-  background: white;
+  background: url('images/BgProgress.png') repeat-x left top;
+  height: 18px;
+  line-height: 18px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 0px 3px;
 }
 
 .UIDocumentSelector .UIDSUploadInput .UploadIframe iframe {
@@ -168,7 +156,7 @@
   height: 15px;
   position: static;
   float: right;
-  margin-top: 2px;
+  color: #fff;
 }
 
 .UIDocumentSelector .ProgressBarFrame {
@@ -177,21 +165,16 @@
 
 .UIDocumentSelector .DeleteFileFrame {
   float: right;
-  background:
-    url('/eXoResources/skin/DefaultSkin/webui/component/UIUpload/background/Round18x18.gif')
-    no-repeat;
+  background: url('images/IconProgressBarFrame.png') no-repeat;
   cursor: pointer;
-  padding-left: 15px;
-  height: 18px;
+  padding-left: 10px;
+  margin-left: 7px;
 }
 
 .UIDocumentSelector .NewFolder {
   float: right;
   padding: 5px 11px;
-  border: 1px solid #999;
-  background: white
-    url('/ecmexplorer/skin/icons/24x24/DefaultSkin/AddFolder.png')
-    no-repeat 2px center;
+  background: url('/ecmexplorer/skin/icons/24x24/DefaultSkin/AddFolder.png') no-repeat 2px center;
   padding: 5px 11px 4px 11px;
   margin-top: 1px;
   margin-left: 2px;
@@ -200,4 +183,78 @@
 .UIDocumentSelector .ActionBar {
   float: right;
   width: 100px;
+}
+
+.UIDocumentSelector .RightWorkspace .IconDefault{
+	background: url('images/IconDocumentSelect.png') no-repeat left -210px;
+}
+
+.UIDocumentSelector .RightWorkspace .Drive_general{
+	background: url('images/IconDocumentSelect.png') no-repeat left -450px;
+}
+
+.UIDocumentSelector .RightWorkspace .Drive_group{
+	background: url('images/IconDocumentSelect.png') no-repeat left -570px;
+}
+
+.UIDocumentSelector .RightWorkspace .Drive_personal{
+	background: url('images/IconDocumentSelect.png') no-repeat left -370px;
+}
+
+.UIDocumentSelector .RightWorkspace .Public{
+	background: url('images/IconDocumentSelect.png') no-repeat left -10px;
+}
+
+.UIDocumentSelector .RightWorkspace .Private{
+	background: url('images/IconDocumentSelect.png') no-repeat left -330px;
+}
+
+.UIDocumentSelector .RightWorkspace .IconAdministratorCategory{
+	background: url('images/IconDocumentSelect.png') no-repeat left -490px;
+}
+
+.UIDocumentSelector .RightWorkspace .Trash{
+	background: url('images/IconDocumentSelect.png') no-repeat left -530px;
+}
+
+.UIDocumentSelector .BreadcumbsContainer .HomeIcon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -610px;
+	height: 20px;
+	width: 20px;
+}
+
+.UIDocumentSelector .RightWorkspace .IconBookmark{
+	background: url('images/IconDocumentSelect.png') no-repeat left -130px;
+}
+
+.UIDocumentSelector .RightWorkspace .exo_documentfolder16x16Icon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -10px;
+}
+
+.UIDocumentSelector .RightWorkspace .exo_picturefolder16x16Icon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -50px;
+}
+
+.UIDocumentSelector .RightWorkspace .exo_favoritefolder16x16Icon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -90px;
+}
+
+.UIDocumentSelector .RightWorkspace .exo_videofolder16x16Icon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -170px;
+}
+
+.UIDocumentSelector .RightWorkspace .nt_unstructured16x16Icon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -210px;
+}
+
+.UIDocumentSelector .RightWorkspace .IconFolksonomy16x16Icon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -250px;
+}
+
+.UIDocumentSelector .RightWorkspace .exo_searchfolder16x16Icon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -290px;
+}
+
+.UIDocumentSelector .RightWorkspace .exo_musicfolder16x16Icon{
+	background: url('images/IconDocumentSelect.png') no-repeat left -410px;
 }
