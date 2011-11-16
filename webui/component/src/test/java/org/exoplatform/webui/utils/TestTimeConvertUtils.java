@@ -97,10 +97,8 @@ public class TestTimeConvertUtils extends TestCase {
     assertEquals("2 minutes", TimeConvertUtils.convertXTimeAgo(calendar.getTime(), format, null, 0));
 
     // test for less than 1 minute ago
-    calendar.setTimeInMillis(timeNow - 59 * 1000);
+    calendar.setTimeInMillis(timeNow - 40 * 1000);
     assertEquals("justnow", TimeConvertUtils.convertXTimeAgo(calendar.getTime(), format, null, 0));
-    calendar.setTimeInMillis(timeNow - 120 * 1000);
-
   }
 
   public void testGetResourceBundle() {
