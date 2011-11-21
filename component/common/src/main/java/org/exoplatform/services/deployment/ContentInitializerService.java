@@ -78,7 +78,6 @@ public class ContentInitializerService implements Startable{
             logData.append("deploy " + deploymentPlugin.getName()
                 + " deployment plugin succesful at " + date.toString() + "\n");
           } catch (Exception e) {
-            e.printStackTrace();
             LOG.error("deploy " + deploymentPlugin.getName() + " deployment plugin failure at "
                 + date.toString() + " by " + e.getMessage() + "\n");
             logData.append("deploy " + deploymentPlugin.getName()
