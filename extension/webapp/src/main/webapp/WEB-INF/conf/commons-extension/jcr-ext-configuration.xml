@@ -27,12 +27,12 @@
 					<description>configuration for the cms path</description>
 					<object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
 						<field name="repository">
-							<string>repository</string>
+							<string>${gatein.jcr.repository.default}</string>
 						</field>
 						<field name="workspaces">
 							<collection type="java.util.ArrayList">
 								<value>
-									<string>collaboration</string>
+									<string>${gatein.jcr.workspace.default}</string>
 								</value>
 							</collection>
 						</field>
