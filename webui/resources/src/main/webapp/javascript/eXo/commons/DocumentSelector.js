@@ -32,7 +32,9 @@ function DocumentItem(){
   driveName = null;
   workspaceName = null;
   currentFolder = null;
+  titlePath = null;
   jcrPath = null;
+  titlePath = null;
 };
 
 DocumentSelector.prototype.init = function(uicomponentId, restContext){
@@ -184,6 +186,8 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
       var jcrPath = folderList[i].getAttribute("path");
       var nodeType = folderList[i].getAttribute("folderType");
       var name = folderList[i].getAttribute("name");
+      var title = folderList[i].getAttribute("title");
+      var titlePath = folderList[i].getAttribute("titlePath");
       
       var childFolder = folderList[i].getAttribute("currentFolder");
       var canRemove = folderList[i].getAttribute("canRemove");
@@ -197,10 +201,10 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
         eXo.commons.DocumentSelector.browseFolder(this);
       }
       cellZero.innerHTML = '<a class="Item IconDefault ' + clazzItem + '" name="'
-          + name + '" driveType="' + driveType + '" driveName="'
+          + name + '" title="'+ title  + '" driveType="' + driveType + '" driveName="'
           + driveName + '"workSpaceName="' + workSpaceName + '" canAddChild="' + canAddChild
-          + '" currentFolder="' + childFolder + '" jcrPath="' + jcrPath
-          + '" onclick="javascript:void(0);">' + name
+          + '" currentFolder="' + childFolder + '" titlePath="'+ titlePath  + '" jcrPath="' + jcrPath
+          + '" onclick="javascript:void(0);">' + title
           + '</a>';
       //newRow.insertCell(1);
       //newRow.insertCell(2);
@@ -224,6 +228,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
       var nodeType = fileList[j].getAttribute("nodeType");
       var nodeTypeIcon = nodeType.replace(":", "_") + "48x48Icon Folder";
       var node = fileList[j].getAttribute("name");
+      var title = fileList[j].getAttribute("title");
       var size = fileList[j].getAttribute("size");
       if (size < 1024)
         size += '&nbsp;Byte(s)';
@@ -243,8 +248,8 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
         eXo.commons.DocumentSelector.submitSelectedFile(this);
       }
       cellZero.innerHTML = '<a class="Item ' + clazzItem + '" jcrPath="'
-          + jcrPath + '" name="'+ node+'" onclick="javascript:void(0);">'
-          + node + '</a>';
+          + jcrPath + '" name="'+ node+'" title ="'+ title +'" onclick="javascript:void(0);">'
+          + title + '</a>';
       //newRow.insertCell(1).innerHTML = '<div class="Item">' + fileList[j]
           //.getAttribute("dateCreated") + '</div>';
       //newRow.insertCell(2).innerHTML = '<div class="Item">' + size + '</div>';
@@ -284,12 +289,12 @@ DocumentSelector.prototype.submitSelectedFile = function(tableCell){
   var domUtil = eXo.core.DOMUtil;
   var detailNode = domUtil.getChildrenByTagName(tableCell, "a")[0];
   var nodePath = detailNode.getAttribute("jcrPath");
-  var fileName = detailNode.getAttribute("name");
+  var fileName = detailNode.getAttribute("title");
   if (me.selectFileLink) {
     var link = me.selectFileLink.href;
     var endParamIndex = link.lastIndexOf("')");
     if (endParamIndex > 0)
-      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + nodePath + "')";
+      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + encodeURI(nodePath) + "')";
     window.location = link;
   }
   if (me.selectFile) {
@@ -313,7 +318,7 @@ DocumentSelector.prototype.submitSelectedFolder = function(documentItem){
     var endParamIndex = link.lastIndexOf("')");
     if (endParamIndex > 0)
       link = link.substring(0, endParamIndex) + "&" + me.dataId + "="
-          + workspaceName + jcrPath + "')";
+          + workspaceName + encodeURI(jcrPath) + "')";
     window.location = link;
   }
 };
@@ -329,6 +334,7 @@ DocumentSelector.prototype.browseFolder = function(tableCell){
   documentItem.currentFolder = detailNode.getAttribute("currentFolder");
   documentItem.jcrPath = detailNode.getAttribute("jcrPath");
   documentItem.canAddChild = detailNode.getAttribute("canAddChild");
+  documentItem.titlePath = detailNode.getAttribute("titlePath");
   me.renderDetails(documentItem);
   me.submitSelectedFolder(documentItem);
 };
@@ -391,13 +397,13 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   me.renderDetails(me.selectedItem);
 };
 
-DocumentSelector.prototype.actionBreadcrumbs = function(driveType, driveName,
-    workspaceName, currentFolder) {
-  var documentItem = new DocumentItem();
-  documentItem.driveType = driveType;
-  documentItem.driveName = driveName;
-  documentItem.workspaceName = workspaceName;
-  documentItem.currentFolder = currentFolder;
+DocumentSelector.prototype.actionBreadcrumbs = function(element) {
+  var documentItem = new DocumentItem();  
+  documentItem.driveType = element.getAttribute("driveType");
+  documentItem.driveName = element.getAttribute("driveName");
+  documentItem.workspaceName = element.getAttribute("workspaceName");
+  documentItem.currentFolder = element.getAttribute("currentFolder");
+  documentItem.titlePath = element.getAttribute("titlePath");
   eXo.commons.DocumentSelector.renderDetails(documentItem);
 }
 
@@ -411,11 +417,11 @@ DocumentSelector.prototype.renderBreadcrumbs = function(documentItem, fileName) 
   if (fileName){
     breadCrumbObject.renderFileName(documentItem,fileName);
   } else if (documentItem.currentFolder){
-    breadCrumbObject.renderFolder(documentItem,fileName);    
+    breadCrumbObject.renderFolder(documentItem);    
   } else if (documentItem.driveName){
-    breadCrumbObject.renderDrive(documentItem,fileName);
+    breadCrumbObject.renderDrive(documentItem);
   } else {
-    breadCrumbObject.renderDriveType(documentItem,fileName);
+    breadCrumbObject.renderDriveType(documentItem);
   }
   var linkNode = eXo.core.DOMUtil.findDescendantsByTagName(breadcrumbContainer,
       "a");
@@ -449,12 +455,16 @@ function BreadCrumbs() {
       tmpDocumentItem.workspaceName = documentItem.workspaceName;
       this.renderDrive(tmpDocumentItem);
       var breadCrumbItem = documentItem.currentFolder.split("/");
+      var breadCrumbTitle = documentItem.titlePath.split("/");
       if (breadCrumbItem != "") {
         tmpDocumentItem.currentFolder = '';
+        tmpDocumentItem.titlePath = '';
         for ( var i = 0; i < breadCrumbItem.length; i++) {
           tmpDocumentItem.currentFolder += breadCrumbItem[i];
-          this.appendBreadCrumbNode(tmpDocumentItem, breadCrumbItem[i]);
+          tmpDocumentItem.titlePath += breadCrumbTitle[i];
+          this.appendBreadCrumbNode(tmpDocumentItem, breadCrumbTitle[i]);
           tmpDocumentItem.currentFolder += "/";
+          tmpDocumentItem.titlePath += "/";
         }
       }
     }
@@ -481,24 +491,27 @@ function BreadCrumbs() {
     } else {
       name = "/" + name;
     }
-    var driveType = documentItem.driveType;
-    if (driveType)
-      driveType = "'" + driveType + "'";
-    var driveName = documentItem.driveName;
-    if (driveName)
-      driveName = "'" + driveName + "'";
-    var workspaceName = documentItem.workspaceName;
-    if (workspaceName)
-      workspaceName = "'" + workspaceName + "'";
-    var currentFolder = documentItem.currentFolder;
-    if (currentFolder)
-      currentFolder = "'" + currentFolder + "'";
+    var driveType = (documentItem.driveType) ? ' driveType="'
+        + documentItem.driveType + '"' : "";
+    var driveName = (documentItem.driveName) ? ' driveName="'
+        + documentItem.driveName + '"' : "";
+    var workspaceName = (documentItem.workspaceName) ? ' workspaceName="'
+        + documentItem.workspaceName + '"' : "";
+    var currentFolder = (documentItem.currentFolder) ? ' currentFolder="'
+        + documentItem.currentFolder + '"' : "";
+    var titlePath = (documentItem.titlePath) ? ' titlePath="' + documentItem.titlePath + '"'
+        : "";
     node.className = 'BreadcumbTab';
-    strOnclick = "eXo.commons.DocumentSelector.actionBreadcrumbs(" + driveType
-        + "," + driveName + "," + workspaceName + "," + currentFolder + ");";
-    node.innerHTML = '<a class="'+ className +' href="javascript:void(0);" onclick="'
-        + strOnclick + '">' + name
-        + '</a>&nbsp;&nbsp;';
+    node.innerHTML = '<a class="'
+        + className
+        + '"'
+        + driveType
+        + driveName
+        + workspaceName
+        + currentFolder
+        + titlePath
+        + '" href="javascript:void(0);" onclick="eXo.commons.DocumentSelector.actionBreadcrumbs(this);">'
+        + name + '</a>&nbsp;&nbsp;';
     this.breadCrumb.appendChild(node);
   };
 };

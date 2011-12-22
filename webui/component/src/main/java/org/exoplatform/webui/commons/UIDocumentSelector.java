@@ -40,7 +40,6 @@ import org.exoplatform.webui.event.EventListener;
   template = "classpath:groovy/webui/commons/UIDocumentSelector.gtmpl",
   events = {
     @EventConfig(listeners = UIDocumentSelector.SelectFileActionListener.class),
-    @EventConfig(listeners = UIDocumentSelector.SelectFolderActionListener.class),
     @EventConfig(listeners = UIDocumentSelector.SelectFolderActionListener.class)
   }  
  )
