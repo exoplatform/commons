@@ -80,7 +80,10 @@ DocumentSelector.prototype.renderDetails = function(documentItem) {
   } else {
     actionBar.style.display = "block";
   }
-  if (!me.selectedItem.currentFolder) me.selectedItem.currentFolder ='';
+  if (!me.selectedItem.currentFolder){
+    me.selectedItem.currentFolder ='';
+    me.selectedItem.titlePath ='';
+  }
   me.renderBreadcrumbs(documentItem, null);
   if (!documentItem.driveName) {
     me.renderDrives(tblRWS, documentItem);
