@@ -157,6 +157,8 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
   url += "&" + this.workspaceNameParam + "=" + workSpaceName;
   url += "&" + this.currentFolderParam + "=" + currentFolder;
   url += "&" + this.isFolderOnlyParam + "=false";
+  // To avoid the problem ajax caching on IE (issue: COMMONS-109)
+  url += "&dummy=" + new Date().getTime();
   var data = me.request(url);
   var folderContainer = data.getElementsByTagName("Folders")[0];
   var folderList = folderContainer.getElementsByTagName("Folder");
