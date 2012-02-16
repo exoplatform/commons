@@ -64,6 +64,11 @@ public class EXoContinuationBayeux
    private String cometdContextName = "cometd";
    
    /**
+    * Used to send message to all client or a specific client that listen a specific channel
+    */
+   private ClientImpl systemClient;
+   
+   /**
     * Logger.
     */
    private static Log log = ExoLogger.getLogger("ws.EXoContinuationBayeux");
@@ -184,7 +189,7 @@ public class EXoContinuationBayeux
     */
    public void sendBroadcastMessage(String channel, Object data, String msgId)
    {
-      ClientImpl fromClient = (ClientImpl) newClient("EXoContinuationBayeux");
+      ClientImpl fromClient = getSystemClient();
       Channel ch = getChannel(channel);
       if (ch != null)
       {
@@ -219,7 +224,7 @@ public class EXoContinuationBayeux
    public void sendMessage(String eXoId, String channel, Object data, String id)
    {
       EXoContinuationClient toClient = getClientByEXoId(eXoId);
-      ClientImpl fromClient = (ClientImpl) this.newClient("EXoContinuationBayeux");
+      ClientImpl fromClient = getSystemClient();
       if (toClient != null)
       {
          toClient.deliver(fromClient, channel, data, id);
@@ -234,6 +239,13 @@ public class EXoContinuationBayeux
       }
    }
 
+  private ClientImpl getSystemClient() {
+    if (systemClient == null) {
+      systemClient = (ClientImpl) newClient("EXoContinuationBayeux");
+    }
+    return systemClient;
+  }
+   
    /* ------------------------------------------------------------ */
    /**
     * @author vetal
