@@ -1,0 +1,896 @@
+Index: component/common/src/test/java/org/exoplatform/services/bench/TestDataInjector.java
+===================================================================
+--- component/common/src/test/java/org/exoplatform/services/bench/TestDataInjector.java	(revision 0)
++++ component/common/src/test/java/org/exoplatform/services/bench/TestDataInjector.java	(revision 0)
+@@ -0,0 +1,54 @@
++/*
++ * Copyright (C) 2003-2011 eXo Platform SAS.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Affero General Public License
++ * as published by the Free Software Foundation; either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see<http://www.gnu.org/licenses/>.
++ */
++package org.exoplatform.services.bench;
++
++
++import junit.framework.TestCase;
++
++/**
++ * Created by The eXo Platform SAS
++ * Author : eXoPlatform
++ *          exo@exoplatform.com
++ * Aug 2, 2011  
++ */
++public class TestDataInjector extends TestCase {
++  
++  FakeDataInjector dataInjector;
++  
++  @Override
++  protected void setUp() throws Exception {
++    dataInjector = new FakeDataInjector();
++    super.setUp();
++  }
++
++  public void testRandomUser() {
++    assertNotNull(dataInjector.randomUser());
++  }
++  
++  public void testRandomWords() {
++    assertNotNull(dataInjector.randomWords(10));
++  }
++  
++  public void testRandomParagraph() {
++    assertNotNull(dataInjector.randomParagraphs(10));
++  }
++  
++  public void testCreateTextResource() {
++    assertTrue(dataInjector.createTextResource(10).getBytes().length == (10 * 1024));
++  }
++  
++}
+Index: component/common/src/test/java/org/exoplatform/services/bench/TestDataInjectorService.java
+===================================================================
+--- component/common/src/test/java/org/exoplatform/services/bench/TestDataInjectorService.java	(revision 0)
++++ component/common/src/test/java/org/exoplatform/services/bench/TestDataInjectorService.java	(revision 0)
+@@ -0,0 +1,158 @@
++/*
++ * Copyright (C) 2003-2011 eXo Platform SAS.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Affero General Public License
++ * as published by the Free Software Foundation; either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see<http://www.gnu.org/licenses/>.
++ */
++package org.exoplatform.services.bench;
++
++import java.net.URI;
++import java.util.List;
++
++import javax.ws.rs.core.MultivaluedMap;
++import javax.ws.rs.core.PathSegment;
++import javax.ws.rs.core.UriBuilder;
++import javax.ws.rs.core.UriInfo;
++import javax.ws.rs.ext.RuntimeDelegate;
++
++import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
++import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
++
++import junit.framework.TestCase;
++
++/**
++ * Created by The eXo Platform SAS
++ * Author : eXoPlatform
++ *          exo@exoplatform.com
++ * Aug 2, 2011  
++ */
++public class TestDataInjectorService extends TestCase {
++  
++  DataInjectorService service;
++  
++  FakeDataInjector injector;
++  
++  UriInfo uriInfo;
++  
++  @Override
++  protected void setUp() throws Exception {
++    super.setUp();
++    RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
++    service = new DataInjectorService();
++    injector = new FakeDataInjector();
++    service.addInjector(injector);
++    uriInfo = new UriInfo() {
++      
++      @Override
++      public UriBuilder getRequestUriBuilder() {
++        return null;
++      }
++      
++      @Override
++      public URI getRequestUri() {
++        return null;
++      }
++      
++      @Override
++      public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
++        return new MultivaluedMapImpl();
++      }
++      
++      @Override
++      public MultivaluedMap<String, String> getQueryParameters() {
++        return new MultivaluedMapImpl();
++      }
++      
++      @Override
++      public List<PathSegment> getPathSegments(boolean decode) {
++        return null;
++      }
++      
++      @Override
++      public List<PathSegment> getPathSegments() {
++        return null;
++      }
++      
++      @Override
++      public MultivaluedMap<String, String> getPathParameters(boolean decode) {
++        return null;
++      }
++      
++      @Override
++      public MultivaluedMap<String, String> getPathParameters() {
++        return null;
++      }
++      
++      @Override
++      public String getPath(boolean decode) {
++        return null;
++      }
++      
++      @Override
++      public String getPath() {
++        return null;
++      }
++      
++      @Override
++      public List<String> getMatchedURIs(boolean decode) {
++        return null;
++      }
++      
++      @Override
++      public List<String> getMatchedURIs() {
++        return null;
++      }
++      
++      @Override
++      public List<Object> getMatchedResources() {
++        return null;
++      }
++      
++      @Override
++      public UriBuilder getBaseUriBuilder() {
++        return null;
++      }
++      
++      @Override
++      public URI getBaseUri() {
++        return null;
++      }
++      
++      @Override
++      public UriBuilder getAbsolutePathBuilder() {
++        return null;
++      }
++      
++      @Override
++      public URI getAbsolutePath() {
++        return null;
++      }
++    };
++  }
++  
++  public void testInject() {
++    service.inject(injector.getName(), uriInfo);
++    assertTrue(injector.isInitialized());
++  }
++  
++  public void testReject() {
++    service.reject(injector.getName(), uriInfo);
++    assertFalse(injector.isInitialized());
++  }
++  
++  public void testExecute() {
++    Object obj = service.execute(injector.getName(), uriInfo);
++    assertNotNull(obj);
++  }
++  
++}
+Index: component/common/src/test/java/org/exoplatform/services/bench/FakeDataInjector.java
+===================================================================
+--- component/common/src/test/java/org/exoplatform/services/bench/FakeDataInjector.java	(revision 0)
++++ component/common/src/test/java/org/exoplatform/services/bench/FakeDataInjector.java	(revision 0)
+@@ -0,0 +1,70 @@
++package org.exoplatform.services.bench;
++/*
++ * Copyright (C) 2003-2011 eXo Platform SAS.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Affero General Public License
++ * as published by the Free Software Foundation; either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see<http://www.gnu.org/licenses/>.
++ */
++
++
++import java.util.HashMap;
++
++import org.exoplatform.container.xml.InitParams;
++import org.exoplatform.services.bench.DataInjector;
++import org.exoplatform.services.log.Log;
++
++/**
++ * Created by The eXo Platform SAS
++ * Author : eXoPlatform
++ *          exo@exoplatform.com
++ * Aug 2, 2011  
++ */
++public class FakeDataInjector extends DataInjector {
++  
++  private boolean isInjected = false;
++  
++  
++  
++  @Override
++  public String getName() {
++    return FakeDataInjector.class.getName();
++  }
++
++  @Override
++  public Log getLog() {
++    return null;
++  }
++
++  public boolean isInitialized() {
++    return isInjected;
++  }
++
++  @Override
++  public Object execute(HashMap<String, String> params) throws Exception {
++    // TODO Auto-generated method stub
++    return new Object();
++  }
++
++  @Override
++  public void inject(HashMap<String, String> params) throws Exception {
++    isInjected = true;
++  }
++
++  @Override
++  public void reject(HashMap<String, String> params) throws Exception {
++    isInjected = false;
++  }
++  
++  
++  
++}
+Index: component/common/src/main/java/org/exoplatform/services/bench/DataInjector.java
+===================================================================
+--- component/common/src/main/java/org/exoplatform/services/bench/DataInjector.java	(revision 0)
++++ component/common/src/main/java/org/exoplatform/services/bench/DataInjector.java	(revision 0)
+@@ -0,0 +1,186 @@
++/*
++ * Copyright (C) 2003-2011 eXo Platform SAS.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Affero General Public License
++ * as published by the Free Software Foundation; either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see<http://www.gnu.org/licenses/>.
++ */
++package org.exoplatform.services.bench;
++
++import java.util.Arrays;
++import java.util.HashMap;
++import java.util.LinkedList;
++import java.util.List;
++import java.util.Random;
++
++import org.exoplatform.container.component.BaseComponentPlugin;
++import org.exoplatform.services.log.Log;
++
++/**
++ * Created by The eXo Platform SAS
++ * 
++ * @Author : <a href="mailto:quanglt@exoplatform.com">Le Thanh Quang</a> Jul 20,
++ *         2011
++ */
++public abstract class DataInjector extends BaseComponentPlugin {
++
++  private List<String> users   = Arrays.asList(new String[] { "root", "demo", "mary", "john" });
++
++  private Random       rand    = new Random();
++
++  private LoremIpsum4J textGen = new LoremIpsum4J();
++  
++  public static final String             ARRAY_SPLIT   = ",";
++  
++  private String restId;
++  
++  public String getRestId() {
++    return restId;
++  }
++
++  public void setRestId(String restId) {
++    this.restId = restId;
++  }
++  
++  /**
++   * get log object.
++   * @return
++   */
++  public abstract Log getLog();
++
++  /**
++   * This function should be implemented to execute tasks that require to response data to client.
++   * <br>
++   * @param params query parameters of a HTTP GET request.
++   * @return object that can be serialized to JSON object.
++   * @throws Exception
++   */
++  public abstract Object execute(HashMap<String , String> params) throws Exception;
++  
++  /**
++   * This function should be implemented to inject data into the product.
++   * @param params parameters for injecting. They can be query parameters of a HTTP GET request.  
++   * @throws Exception
++   */
++  public abstract void inject(HashMap<String , String> params) throws Exception;
++  
++  /**
++   * This function should be implemented to clear data that is injected before by {@link #inject()}.
++   * @param params parameters for rejecting. They can be query parameters of a HTTP GET request.
++   * @throws Exception
++   */
++  public abstract void reject(HashMap<String , String> params) throws Exception;
++
++  /**
++   * get pseudo words.
++   * @param amount number of words
++   * @return pseudo words
++   */
++  public final String words(int amount) {
++    return textGen.getWords(amount);
++  }
++  
++  /**
++   * get pseudo paragraphs.
++   * @param amount number of paragraphs
++   * @return pseudo paragraphs
++   */
++  public final String paragraphs(int amount) {
++    return textGen.getParagraphs(amount);
++  }
++  
++  /**
++   * get random user id.
++   */
++  public final String randomUser() {
++    return users.get(rand.nextInt(4));
++  }
++
++  /**
++   * get random words.
++   * 
++   * @param i maximum number of words. the number of words is between 0 and i.
++   * @return
++   */
++  public final String randomWords(int i) {
++    int wordCount = rand.nextInt(i + 1) + 1;
++    String words = textGen.getWords(wordCount);
++    return words;
++  }
++
++  /**
++   * get random paragraphs
++   * 
++   * @param i maximum number of paragraphs.
++   * @return
++   */
++  public final String randomParagraphs(int i) {
++    int paragraphCount = rand.nextInt(i + 1) + 1;
++    String paragraphs = textGen.getParagraphs(paragraphCount);
++    return paragraphs.replaceAll("\\n\\n", "<br/><br/>");
++  }
++  
++  /**
++   * create text/plain resource by size.
++   * @param size in kilobyte
++   * @return
++   */
++  public String createTextResource(int size) {
++    int sizeInByte = size * 1024; // byte
++    StringBuilder sb = new StringBuilder();
++    for (int i = 0; i < sizeInByte; i++) {
++      sb.append("A"); // each A character spends one byte in UTF-8.
++    }
++    return sb.toString();
++  }  
++
++  public List<String> readGroupsIfExist(HashMap<String, String> queryParams) {
++    List<String> groups = new LinkedList<String>();
++    String value = queryParams.get("groups");
++    if (value != null) {
++      String[] groupsString = value.split(ARRAY_SPLIT);
++      for (String s : groupsString) {
++        if (s.length() > 0)
++          groups.add(s.trim());
++      }
++    }
++    return groups;
++  }
++  
++  public List<String> readUsersIfExist(HashMap<String, String> queryParams) {
++    List<String> users = new LinkedList<String>();
++    String value = queryParams.get("users");
++    if (value != null) {
++      String[] groupsString = value.split(ARRAY_SPLIT);
++      for (String s : groupsString) {
++        if (s.length() > 0)
++          users.add(s.trim());
++      }
++    }
++    return users;    
++  }  
++
++  public List<String> readMembershipIfExist(HashMap<String, String> queryParams) {
++    List<String> memberships = new LinkedList<String>();
++    
++    String value = queryParams.get("memship");
++    if (value != null) {
++      String[] memshipsString = value.split(ARRAY_SPLIT);
++      for (String s : memshipsString) {
++        if (s.length() > 0)
++          memberships.add(s.trim());
++      }
++    }
++    return memberships;
++  }
++  
++}
+Index: component/common/src/main/java/org/exoplatform/services/bench/DataInjectorService.java
+===================================================================
+--- component/common/src/main/java/org/exoplatform/services/bench/DataInjectorService.java	(revision 0)
++++ component/common/src/main/java/org/exoplatform/services/bench/DataInjectorService.java	(revision 0)
+@@ -0,0 +1,174 @@
++/*
++ * Copyright (C) 2003-2011 eXo Platform SAS.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Affero General Public License
++ * as published by the Free Software Foundation; either version 3
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see<http://www.gnu.org/licenses/>.
++ */
++package org.exoplatform.services.bench;
++
++import java.util.HashMap;
++import java.util.Iterator;
++import java.util.LinkedList;
++import java.util.List;
++import java.util.Map.Entry;
++
++import javax.annotation.security.RolesAllowed;
++import javax.ws.rs.GET;
++import javax.ws.rs.Path;
++import javax.ws.rs.PathParam;
++import javax.ws.rs.core.CacheControl;
++import javax.ws.rs.core.Context;
++import javax.ws.rs.core.MediaType;
++import javax.ws.rs.core.MultivaluedMap;
++import javax.ws.rs.core.Response;
++import javax.ws.rs.core.Response.Status;
++import javax.ws.rs.core.UriInfo;
++
++import org.exoplatform.services.log.ExoLogger;
++import org.exoplatform.services.log.Log;
++import org.exoplatform.services.rest.resource.ResourceContainer;
++
++/**
++ * Created by The eXo Platform SAS
++ * @Author : <a href="mailto:quanglt@exoplatform.com">Le Thanh Quang</a>
++ * Jul 20, 2011  
++ */
++@Path("/bench")
++public class DataInjectorService implements ResourceContainer {
++  
++  private static Log         log             = ExoLogger.getLogger(DataInjectorService.class);
++  
++  private enum Actions {
++    INJECT, REJECT, EXECUTE
++  }
++
++  private static CacheControl cc = new CacheControl();
++  static {
++    cc.setNoCache(true);
++    cc.setNoStore(true);
++  }
++  
++  private List<DataInjector> listOfInjectors = new LinkedList<DataInjector>();
++  
++  private HashMap<String, String> convertToHashMap(MultivaluedMap<String, String> paramsMap) {
++    HashMap<String, String> parameters = new HashMap<String, String>();
++    Iterator<Entry<String, List<String>>> iterator = paramsMap.entrySet().iterator();
++    while (iterator.hasNext()) {
++      Entry<String, List<String>> entry = iterator.next();
++      String key = entry.getKey();
++      List<String> values = entry.getValue();
++      String value = values.size() > 0 ? values.get(0) : null;
++      parameters.put(key, value);
++    }
++    
++    return parameters;
++  }
++  
++  private DataInjector getDataInjector(String injectorId) {
++    for (DataInjector di : listOfInjectors) {
++      if (injectorId.equals(di.getName())) {
++        return di;
++      }
++    }
++    return null;
++  }
++  
++  /**
++   * this function is used to add DataInjector plugins.
++   * @param dataInjector
++   */
++  public void addInjector(DataInjector dataInjector) {
++    listOfInjectors.add(dataInjector);
++  }
++  
++  @GET
++  @Path("/execute/{injectorId}")
++  @RolesAllowed("administrators")
++  public Response execute(@PathParam("injectorId") String type, @Context UriInfo info) {
++    DataInjector injector = getDataInjector(type);
++    if (injector == null) {
++      return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect!").cacheControl(cc).build();
++    }
++    HashMap<String, String> params = convertToHashMap(info.getQueryParameters());
++    try {
++      beginPrintInfo(params, Actions.EXECUTE);
++      Object response = injector.execute(params);
++      return Response.ok(response, MediaType.APPLICATION_JSON).cacheControl(cc).build();
++    } catch (Exception e) {
++      errorPrintInfo(injector, Actions.EXECUTE, e);
++      return Response.serverError().entity(String.format("%1$s executed failed due to %2$s", injector.getName(), e.getMessage())).build();
++    }
++  }
++  
++  @GET
++  @Path("/inject/{injectorId}")
++  @RolesAllowed("administrators")
++  public Response inject(@PathParam("injectorId") String type, @Context UriInfo info) {
++    DataInjector injector = getDataInjector(type);
++    if (injector == null) {
++      return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect!").cacheControl(cc).build();
++    }
++    HashMap<String, String> params = convertToHashMap(info.getQueryParameters());
++    try {
++      beginPrintInfo(params, Actions.INJECT);
++      injector.inject(params);
++    } catch (Exception e) {
++      errorPrintInfo(injector, Actions.INJECT, e);
++      return Response.serverError().entity(String.format("%1$s injected failed due to %2$s", injector.getName(), e.getMessage())).build();
++    }
++    endPrintInfo(Actions.INJECT);
++    return Response.ok(String.format("%s injected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
++  }
++  
++  @GET
++  @Path("/reject/{injectorId}")
++  @RolesAllowed("administrators")
++  public Response reject(@PathParam("injectorId") String type, @Context UriInfo info) {
++    DataInjector injector = getDataInjector(type);
++    if (injector == null) {
++      return Response.status(Status.BAD_REQUEST).entity("Injector id is incorrect").cacheControl(cc).build();
++    }
++    HashMap<String, String> params = convertToHashMap(info.getQueryParameters());
++    try {
++      beginPrintInfo(params, Actions.REJECT);
++      injector.reject(params);
++    } catch (Exception e) {
++      errorPrintInfo(injector, Actions.REJECT, e);
++      return Response.serverError().entity(String.format("%1$s rejected failed due to %2$s", injector.getName(), e.getMessage())).build();
++    }
++    endPrintInfo(Actions.REJECT);
++    return Response.ok(String.format("%s rejected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
++  }
++
++  private void beginPrintInfo(HashMap<String, String> params, Actions action) {
++    log.info(String.format("Start to %s............... ", action.toString().toLowerCase()));
++    StringBuilder sb = new StringBuilder();
++    sb.append("PARAMS: \n");
++    Iterator<String> keys = params.keySet().iterator();
++    while (keys.hasNext()) {
++      String key = keys.next();
++      sb.append(String.format("%1$10s    :    %2$10s \n", key, params.get(key)));
++    }
++    log.info(sb.toString());
++  }
++
++  private void endPrintInfo(Actions action) {
++    log.info(String.format("%sing data has been done successfully!", action.toString().toLowerCase()));
++  }
++
++  private void errorPrintInfo(DataInjector injector, Actions action, Exception ex) {
++    if (log.isWarnEnabled())
++      log.warn(String.format("%s %sed failed", injector.getName(), action.toString().toLowerCase()), ex);
++  }
++
++}
+Index: component/common/src/main/java/org/exoplatform/services/bench/LoremIpsum4J.java
+===================================================================
+--- component/common/src/main/java/org/exoplatform/services/bench/LoremIpsum4J.java	(revision 0)
++++ component/common/src/main/java/org/exoplatform/services/bench/LoremIpsum4J.java	(revision 0)
+@@ -0,0 +1,171 @@
++/* Copyright (c) 2008 Sven Jacobs
++
++
++   Permission is hereby granted, free of charge, to any person obtaining a copy
++
++   of this software and associated documentation files (the "Software"), to deal
++
++   in the Software without restriction, including without limitation the rights
++
++   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++
++   copies of the Software, and to permit persons to whom the Software is
++
++   furnished to do so, subject to the following conditions:
++
++
++   The above copyright notice and this permission notice shall be included in
++
++   all copies or substantial portions of the Software.
++
++
++   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++
++   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++
++   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++
++   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++
++   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++
++   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++
++   THE SOFTWARE. 
++
++ */
++
++package org.exoplatform.services.bench;
++
++/**
++ * Simple lorem ipsum text generator.
++ * <p>
++ * Suitable for creating sample data for test cases and performance tests.
++ * </p>
++ * 
++ * @author Sven Jacobs
++ * @version 1.0
++ */
++
++public class LoremIpsum4J {
++
++  public static final String LOREM_IPSUM = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
++
++  private String[]           loremIpsumWords;
++
++  public LoremIpsum4J() {
++
++    this.loremIpsumWords = LOREM_IPSUM.split("\\s");
++
++  }
++
++  /**
++   * Returns one sentence (50 words) of the lorem ipsum text.
++   * 
++   * @return 50 words of lorem ipsum text
++   */
++
++  public String getWords() {
++
++    return getWords(50);
++
++  }
++
++  /**
++   * Returns words from the lorem ipsum text.
++   * 
++   * @param amount Amount of words
++   * @return Lorem ipsum text
++   */
++
++  public String getWords(int amount) {
++
++    return getWords(amount, 0);
++
++  }
++
++  /**
++   * Returns words from the lorem ipsum text.
++   * 
++   * @param amount Amount of words
++   * @param startIndex Start index of word to begin with (must be >= 0 and < 50)
++   * @return Lorem ipsum text
++   * @throws IndexOutOfBoundsException If startIndex is < 0 or > 49
++   */
++
++  public String getWords(int amount, int startIndex) {
++
++    if (startIndex < 0 || startIndex > 49) {
++
++      throw new IndexOutOfBoundsException("startIndex must be >= 0 and < 50");
++
++    }
++
++    int word = startIndex;
++
++    StringBuilder lorem = new StringBuilder();
++
++    for (int i = 0; i < amount; i++) {
++
++      if (word == 50) {
++
++        word = 0;
++
++      }
++
++      lorem.append(loremIpsumWords[word]);
++
++      if (i < amount - 1) {
++
++        lorem.append(' ');
++
++      }
++
++      word++;
++
++    }
++
++    return lorem.toString();
++
++  }
++
++  /**
++   * Returns two paragraphs of lorem ipsum.
++   * 
++   * @return Lorem ipsum paragraphs
++   */
++
++  public String getParagraphs() {
++
++    return getParagraphs(2);
++
++  }
++
++  /**
++   * Returns paragraphs of lorem ipsum.
++   * 
++   * @param amount Amount of paragraphs
++   * @return Lorem ipsum paragraphs
++   */
++
++  public String getParagraphs(int amount) {
++
++    StringBuilder lorem = new StringBuilder();
++
++    for (int i = 0; i < amount; i++) {
++
++      lorem.append(LOREM_IPSUM);
++
++      if (i < amount - 1) {
++
++        lorem.append("\n\n");
++
++      }
++
++    }
++
++    return lorem.toString();
++
++  }
++
++}
+Index: component/common/pom.xml
+===================================================================
+--- component/common/pom.xml	(revision 0)
++++ component/common/pom.xml	(revision 0)
+@@ -0,0 +1,36 @@
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++  <parent>
++    <groupId>org.exoplatform.commons</groupId>
++    <artifactId>exo.platform.commons</artifactId>
++    <version>1.0.7-SNAPSHOT</version>
++  </parent>
++  <modelVersion>4.0.0</modelVersion>
++  <artifactId>exo.platform.commons.component</artifactId>
++  <packaging>jar</packaging>
++  <name>eXo Common Services</name>
++  <dependencies>
++    <dependency>
++      <groupId>org.exoplatform.kernel</groupId>
++      <artifactId>exo.kernel.commons</artifactId>
++      <version>${org.exoplatform.kernel.version}</version>
++      <scope>provided</scope>
++    </dependency>
++    <dependency>
++      <groupId>org.exoplatform.jcr</groupId>
++      <artifactId>exo.jcr.component.core</artifactId>
++      <version>${org.exoplatform.jcr.version}</version>
++      <scope>provided</scope>
++    </dependency>
++    <dependency>
++      <groupId>org.exoplatform.jcr</groupId>
++      <artifactId>exo.jcr.component.ext</artifactId>
++      <version>${org.exoplatform.jcr.version}</version>
++      <scope>provided</scope>
++    </dependency>
++    <dependency>
++      <groupId>javax.jcr</groupId>
++      <artifactId>jcr</artifactId>
++      <version>${javax.jcr.api.version}</version>
++    </dependency>
++  </dependencies>
++</project>
+Index: pom.xml
+===================================================================
+--- pom.xml	(revision 79500)
++++ pom.xml	(working copy)
+@@ -139,6 +139,7 @@
+ 
+   <modules>
+     <module>comet</module>
++    <module>component/common</module>
+     <module>testing</module>
+     <module>webui/ext</module>
+ 	<module>fck</module>

@@ -139,6 +139,7 @@
 
   <modules>
     <module>comet</module>
+    <module>component/common</module>
     <module>testing</module>
     <module>webui/ext</module>
 	<module>fck</module>
