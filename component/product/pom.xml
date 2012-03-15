@@ -5,6 +5,7 @@
     <groupId>org.exoplatform.commons</groupId>
     <artifactId>exo.platform.commons</artifactId>
     <version>1.1.8-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>exo.platform.commons.component.product</artifactId>
   <packaging>jar</packaging>
