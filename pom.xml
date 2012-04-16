@@ -14,7 +14,7 @@
   <scm>
     <connection>scm:git:ssh://github.com/exoplatform/commons.git</connection>
     <developerConnection>scm:git:ssh://github.com/exoplatform/commons.git</developerConnection>
-    <url>http://fisheye.exoplatform.org/browse/projects/commons/trunk</url>
+    <url>http://fisheye.exoplatform.org/browse/projects/commons</url>
   </scm>
   <properties>
     <org.exoplatform.kernel.version>2.3.7-GA</org.exoplatform.kernel.version>
