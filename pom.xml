@@ -12,8 +12,8 @@
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <scm>
-    <connection>scm:svn:http://svn.exoplatform.org/projects/commons/trunk</connection>
-    <developerConnection>scm:svn:http://svn.exoplatform.org/projects/commons/trunk</developerConnection>
+    <connection>scm:git:ssh://github.com/exoplatform/commons.git</connection>
+    <developerConnection>scm:git:ssh://github.com/exoplatform/commons.git</developerConnection>
     <url>http://fisheye.exoplatform.org/browse/projects/commons/trunk</url>
   </scm>
   <properties>
