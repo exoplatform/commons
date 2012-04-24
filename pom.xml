@@ -12,8 +12,8 @@
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <scm>
-    <connection>scm:git:ssh://github.com/exoplatform/commons.git</connection>
-    <developerConnection>scm:git:ssh://github.com/exoplatform/commons.git</developerConnection>
+    <connection>scm:git:git://github.com/exoplatform/commons.git</connection>
+    <developerConnection>scm:git:git@github.com:exoplatform/commons.git</developerConnection>
     <url>http://fisheye.exoplatform.org/browse/projects/commons</url>
   </scm>
   <properties>
