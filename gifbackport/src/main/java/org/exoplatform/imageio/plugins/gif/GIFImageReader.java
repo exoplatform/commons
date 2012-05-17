@@ -48,11 +48,18 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import org.exoplatform.imageio.plugins.common.ReaderUtil;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * version: openjdk-7-ea-src-b35-11_sep_2008
  */
 public class GIFImageReader extends ImageReader {
+	   /**
+	    * Class logger.
+	    */	
+	private static final Log LOG = ExoLogger.getLogger(GIFImageReader.class);
+
 
     // The current ImageInputStream source.
     ImageInputStream stream = null;
@@ -986,7 +993,6 @@ public class GIFImageReader extends ImageReader {
             processReadAborted();
             return theImage;
         } catch (IOException e) {
-            e.printStackTrace();
             throw new IIOException("I/O error reading image!", e);
         }
     }

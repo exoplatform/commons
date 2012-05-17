@@ -192,7 +192,7 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+         log.error("get comet url by channel error ",e);
       }
       return null;
    }
