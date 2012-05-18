@@ -77,7 +77,7 @@ public class TimeConvertUtils {
 
   private static String  RESOURCE_KEY         = "TimeConvert.type.";
 
-  private static String convertXTimeAgo(Date myDate) throws Exception {
+  private static String convertXTimeAgo(Date myDate){
     float delta = (getGreenwichMeanTime().getTimeInMillis() - myDate.getTime());
     int i = 0;
     for (i = 0; (delta >= timeLength[i]) && i < timeLength.length - 1; i++) {
@@ -113,15 +113,14 @@ public class TimeConvertUtils {
    * @return String 
    */
   public static String convertXTimeAgo(Date myDate, String format, Locale locale, int limit) {
-    try {
-      String[] values = convertXTimeAgo(myDate).split(SPACE);
-      if (values[0].equals(JUSTNOW))
-        return getResourceBundle(RESOURCE_KEY + JUSTNOW, locale);
-      int i = ArrayUtils.indexOf(strs, values[1].replace(STR_S, STR_EMPTY));
-      if (limit == 0 || i < limit) {
-        return getMessage(getResourceBundle(RESOURCE_KEY + values[1].replace(UNDERSCORE, STR_EMPTY), locale), new String[]{values[0]});
-      }
-    } catch (Exception e) {}
+    String[] values = convertXTimeAgo(myDate).split(SPACE);
+    if (values[0].equals(JUSTNOW))
+      return getResourceBundle(RESOURCE_KEY + JUSTNOW, locale);
+    int i = ArrayUtils.indexOf(strs, values[1].replace(STR_S, STR_EMPTY));
+    if (limit == 0 || i < limit) {
+      return getMessage(getResourceBundle(RESOURCE_KEY + values[1].replace(UNDERSCORE, STR_EMPTY), locale), new String[]{values[0]});
+    }
+          
     if (locale != null) {
       return getFormatDate(myDate, format, locale);
     } else {

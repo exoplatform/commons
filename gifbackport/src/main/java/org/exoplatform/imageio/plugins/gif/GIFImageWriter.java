@@ -310,7 +310,7 @@ public class GIFImageWriter extends ImageWriter {
                 Node root = inData.getAsTree(formatName);
                 outData.mergeTree(formatName, root);
             } catch(IIOInvalidTreeException e) {
-                // ignore
+                // ignore            	         
             }
         }
     }
@@ -758,13 +758,9 @@ public class GIFImageWriter extends ImageWriter {
         } else {
             // Check for GraphicControlExtension element.
             NodeList list = null;
-            try {
-                IIOMetadataNode root = (IIOMetadataNode)
-                    imageMetadata.getAsTree(IMAGE_METADATA_NAME);
-                list = root.getElementsByTagName("GraphicControlExtension");
-            } catch(IllegalArgumentException iae) {
-                // Should never happen.
-            }
+            IIOMetadataNode root = (IIOMetadataNode)
+            imageMetadata.getAsTree(IMAGE_METADATA_NAME);
+            list = root.getElementsByTagName("GraphicControlExtension");
 
             // Set GraphicControlExtension flag if element present.
             writeGraphicsControlExtension =
