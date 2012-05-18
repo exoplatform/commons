@@ -34,33 +34,35 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
-import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Locale;
+
 import javax.imageio.IIOException;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataFormatImpl;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+
 import org.exoplatform.imageio.plugins.common.LZWCompressor;
 import org.exoplatform.imageio.plugins.common.PaletteBuilder;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * version: openjdk-7-ea-src-b35-11_sep_2008
  */
 public class GIFImageWriter extends ImageWriter {
-    private static final boolean DEBUG = false; // XXX false for release!
+    private static final Log LOG = ExoLogger.getLogger(GIFImageWriter.class);
 
     static final String STANDARD_METADATA_NAME =
     IIOMetadataFormatImpl.standardMetadataFormatName;
@@ -264,9 +266,7 @@ public class GIFImageWriter extends ImageWriter {
 
     public GIFImageWriter(GIFImageWriterSpi originatingProvider) {
         super(originatingProvider);
-        if (DEBUG) {
-            System.err.println("GIF Writer is created");
-        }
+        LOG.debug("GIF Writer is created");
     }
 
     public boolean canWriteSequence() {
@@ -821,7 +821,7 @@ public class GIFImageWriter extends ImageWriter {
                            int dy, int ddy, int dw, int dh,
                            int numRowsWritten, int progressReportRowPeriod)
       throws IOException {
-        if (DEBUG) System.out.println("Writing unoptimized");
+        LOG.debug("Writing unoptimized");
 
         int[] sbuf = new int[sw];
         byte[] dbuf = new byte[dw];
@@ -853,7 +853,7 @@ public class GIFImageWriter extends ImageWriter {
                               int dy, int ddy, int dw, int dh,
                               int numRowsWritten, int progressReportRowPeriod)
       throws IOException {
-        if (DEBUG) System.out.println("Writing optimized");
+        LOG.debug("Writing optimized");
 
         offset += dy*lineStride;
         lineStride *= ddy;
@@ -921,7 +921,7 @@ public class GIFImageWriter extends ImageWriter {
         processImageStarted(imageIndex);
 
         if (interlaceFlag) {
-            if (DEBUG) System.out.println("Writing interlaced");
+            LOG.debug("Writing interlaced");
 
             if (isOptimizedCase) {
                 Raster tile = image.getTile(0, 0);
@@ -1009,7 +1009,7 @@ public class GIFImageWriter extends ImageWriter {
                           numRowsWritten, progressReportRowPeriod);
             }
         } else {
-            if (DEBUG) System.out.println("Writing non-interlaced");
+            LOG.debug("Writing non-interlaced");
 
             if (isOptimizedCase) {
                 Raster tile = image.getTile(0, 0);

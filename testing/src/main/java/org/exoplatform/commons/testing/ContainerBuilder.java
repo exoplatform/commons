@@ -31,6 +31,8 @@ import junit.framework.AssertionFailedError;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * <p>An helper for building a root container and a portal container. I have done several attempt to make easily
@@ -43,6 +45,7 @@ import org.exoplatform.container.RootContainer;
  */
 public class ContainerBuilder
 {
+  private static final Log LOG = ExoLogger.getLogger(ContainerBuilder.class);
 
    /** A hack used during the boot of a portal container. */
    private final ThreadLocal<String> bootedPortalName = new ThreadLocal<String>();
@@ -200,9 +203,13 @@ public class ContainerBuilder
             }
             
             if (resources!=null && resources.hasMoreElements()) {
-              System.out.println("Loaded " + name);
+              if (LOG.isInfoEnabled()) {
+                LOG.info("Loaded " + name);
+              }
             } else {
-              System.err.println("No resource found " + name);
+              if (LOG.isInfoEnabled()) {
+                LOG.info("No resource found " + name);
+              }
             }
             return resources;
             
