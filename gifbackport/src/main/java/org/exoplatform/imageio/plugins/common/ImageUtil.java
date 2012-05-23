@@ -25,7 +25,6 @@
 
 package org.exoplatform.imageio.plugins.common;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -46,12 +45,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
-
-//import javax.imageio.ImageTypeSpecifier;
-
 import javax.imageio.IIOException;
-import javax.imageio.IIOImage;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriter;
 import javax.imageio.spi.ImageWriterSpi;

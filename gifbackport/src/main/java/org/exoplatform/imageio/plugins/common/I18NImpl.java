@@ -27,7 +27,6 @@ package org.exoplatform.imageio.plugins.common;
 
 import java.io.InputStream;
 import java.util.PropertyResourceBundle;
-import java.net.URL;
 
 /**
  * version: openjdk-7-ea-src-b35-11_sep_2008

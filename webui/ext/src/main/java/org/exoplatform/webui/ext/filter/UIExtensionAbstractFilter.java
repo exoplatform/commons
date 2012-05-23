@@ -17,12 +17,9 @@
 package org.exoplatform.webui.ext.filter;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.exoplatform.web.application.ApplicationMessage;
-import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.core.UIApplication;
-import org.exoplatform.webui.core.UIComponent;
 
 /**
  * Created by The eXo Platform SAS
