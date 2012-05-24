@@ -1,10 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<configuration
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
-   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
-
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd http://www.exoplaform.org/xml/ns/kernel_1_2.xsd"
+	xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
   <component>
      <key>org.exoplatform.services.idgenerator.IDGeneratorService</key>
      <type>org.exoplatform.services.idgenerator.impl.IDGeneratorServiceImpl</type>
@@ -20,6 +16,21 @@
   </component>
 
   <component>
+    <key>org.exoplatform.services.jdbc.DataSourceProvider</key>
+    <type>org.exoplatform.services.jdbc.impl.DataSourceProviderImpl</type>
+  </component>
+  
+  <component>
+    <type>org.exoplatform.services.jcr.impl.RepositoryCreationSynchronizer</type>
+    <init-params>
+       <value-param>
+          <name>disabled</name>
+          <value>false</value>
+       </value-param>
+    </init-params>
+  </component>
+  
+  <component>
     <key>org.exoplatform.services.jcr.config.RepositoryServiceConfiguration</key>
     <type>org.exoplatform.services.jcr.impl.config.RepositoryServiceConfigurationImpl</type>
     <init-params>
@@ -28,6 +39,13 @@
         <description>JCR configuration file</description>
         <value>jar:/conf/jcr/repository-configuration.xml</value>
       </value-param>
+      <properties-param>
+				<name>working-conf</name>
+				<description>working-conf</description>
+				<property name="source-name" value="jdbcexo"/>
+				<property name="dialect" value="hsqldb"/>
+				<property name="persister-class-name" value="org.exoplatform.services.jcr.impl.config.JDBCConfigurationPersister"/>
+			</properties-param>
     </init-params>
   </component>
 

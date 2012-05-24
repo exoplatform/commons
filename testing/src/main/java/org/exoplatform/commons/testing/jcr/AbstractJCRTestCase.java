@@ -35,19 +35,19 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 
 /**
- * @author <a href="mailto:patrice.lamarque@exoplatform.com">Patrice Lamarque</a>
+ * @author <a href="mailto:patrice.lamarque@exoplatform.com">Patrice
+ *         Lamarque</a>
  * @version $Revision$
  */
-@ConfiguredBy({@ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr/jcr-configuration.xml")})
-public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase
-{
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr/jcr-configuration.xml") })
+public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
 
   private String tempDir;
-  
-  
+
   public void beforeContainerStart() {
     initTempDir();
   }
@@ -58,196 +58,201 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase
   }
 
   /**
-    * 
-    * @return The ManageableRepository for this test
-    */
-   ManageableRepository getRepo() {
-     try {
-       RepositoryService repos = getComponent(RepositoryService.class);
-       ManageableRepository repo = repos.getDefaultRepository();
-       return repo;
-     } catch (Exception e) {
-       throw new RuntimeException(e);
-     }
-   }
+   * @return The ManageableRepository for this test
+   * @throws RepositoryConfigurationException 
+   * @throws RepositoryException 
+   */
+  ManageableRepository getRepo() throws RepositoryException, RepositoryConfigurationException {
+    RepositoryService repos = getComponent(RepositoryService.class);
+    ManageableRepository repo = repos.getDefaultRepository();
+    return repo;
+  }
 
-   /**
-    * Get the workspace available for test data
-    * @return workspace name
-    */
-   protected String getWorkspace() {
-     return getRepo().getConfiguration().getDefaultWorkspaceName();
-   }
+  /**
+   * Get the workspace available for test data
+   * 
+   * @return workspace name
+   * @throws RepositoryConfigurationException 
+   * @throws RepositoryException 
+   */
+  protected String getWorkspace() throws RepositoryException, RepositoryConfigurationException {
+    return getRepo().getConfiguration().getDefaultWorkspaceName();
+  }
 
-   /**
-    * Get the repository for the current test
-    * @return repository name
-    */
-   protected String getRepository() {
-     return getRepo().getConfiguration().getName();
-   }
+  /**
+   * Get the repository for the current test
+   * 
+   * @return repository name
+   * @throws RepositoryConfigurationException 
+   * @throws RepositoryException 
+   */
+  protected String getRepository() throws RepositoryException, RepositoryConfigurationException {
+    return getRepo().getConfiguration().getName();
+  }
 
-   /**
-    * Asserts a node exists at the given path
-    * @param path path relative to root of test workspace
-    */
-   protected void assertNodeExists(String path) {
-     Session session = null;
-     try {
-       session = getSession();
-       boolean exists = session.getRootNode().hasNode(path);
-       if (!exists) {
-         fail("no node exists at " + path);
-       }
-     } catch (Exception e) {
-       throw new RuntimeException("failed to assert node exists", e);
-     }
-     finally {
-       if (session != null) {
-         session.logout();
-       }
-     }
-   }
-   
-   /**
-    * Asserts a node does not exists at the given path
-    * @param path relative path to root of test workspace
-    */
-   protected void assertNodeNotExists(String path) {
-     Session session = null;
-     try {
-       session = getSession();
-       boolean exists = session.getRootNode().hasNode(path);
-       if (exists) {
-         fail("node exists at " + path);
-       }
-     } catch (Exception e) {
-       throw new RuntimeException("failed to assert node exists", e);
-     }
-     finally {
-       if (session != null) {
-         session.logout();
-       }
-     }
-   }
-   
-   /**
-    * Load a node from path
-    * @param path
-    * @return
-    */
-   protected Node getNode(String path) {
-     Session session = null;
-     try {
-       session = getSession();
-       return session.getRootNode().getNode(path);
-     } catch (Exception e) {
-       throw new RuntimeException("failed to load node exists", e);
-     }
-     finally {
-       if (session != null) {
-         session.logout();
-       }
-     }
-   }
+  /**
+   * Asserts a node exists at the given path
+   * 
+   * @param path path relative to root of test workspace
+   */
+  protected void assertNodeExists(String path) {
+    Session session = null;
+    try {
+      session = getSession();
+      boolean exists = session.getRootNode().hasNode(path);
+      if (!exists) {
+        fail("no node exists at " + path);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("failed to assert node exists", e);
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+  }
 
+  /**
+   * Asserts a node does not exists at the given path
+   * 
+   * @param path relative path to root of test workspace
+   */
+  protected void assertNodeNotExists(String path) {
+    Session session = null;
+    try {
+      session = getSession();
+      boolean exists = session.getRootNode().hasNode(path);
+      if (exists) {
+        fail("node exists at " + path);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("failed to assert node exists", e);
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+  }
 
-   /**
-    * Get a session on the test workspace
-    * @return a new system session
-    * @throws Exception
-    */
-   protected Session getSession() throws Exception {
-     try {
-       Session session = getRepo().getSystemSession(getWorkspace());
-       return session;
-     } catch (Exception e) {
-       throw new RuntimeException("failed to initiate JCR session on " + getWorkspace(), e);
-     }     
+  /**
+   * Load a node from path
+   * 
+   * @param path
+   * @return
+   */
+  protected Node getNode(String path) {
+    Session session = null;
+    try {
+      session = getSession();
+      return session.getRootNode().getNode(path);
+    } catch (Exception e) {
+      throw new RuntimeException("failed to load node exists", e);
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+  }
 
-   }
-   
-   /**
-    * Add a new node to a given path. intermediary are created if needed.
-    * @param path relative path to root
-    * @return the newly added node
-    */
-   protected Node addNode(String path) {
-     return addNode(path, null);
-   }
+  /**
+   * Get a session on the test workspace
+   * 
+   * @return a new system session
+   * @throws Exception
+   */
+  protected Session getSession() throws Exception {
+    try {
+      Session session = getRepo().getSystemSession(getWorkspace());
+      return session;
+    } catch (Exception e) {
+      throw new RuntimeException("failed to initiate JCR session on " + getWorkspace(), e);
+    }
 
-   /**
-    * Add a new node to a given path. intermediary are created if needed.
-    * @param path relative path to root
-    * @param nodetype nodetype for the last node to create 
-    * @return the newly added node
-    */
-   protected Node addNode(String path, String nodetype) {
-     Session session = null;
-     try {
-       session = getSession();
-       Node parent = session.getRootNode();
-       String[] sections = path.split("/");
-       for (String section : sections) {
+  }
+
+  /**
+   * Add a new node to a given path. intermediary are created if needed.
+   * 
+   * @param path relative path to root
+   * @return the newly added node
+   */
+  protected Node addNode(String path) {
+    return addNode(path, null);
+  }
+
+  /**
+   * Add a new node to a given path. intermediary are created if needed.
+   * 
+   * @param path relative path to root
+   * @param nodetype nodetype for the last node to create
+   * @return the newly added node
+   */
+  protected Node addNode(String path, String nodetype) {
+    Session session = null;
+    try {
+      session = getSession();
+      Node parent = session.getRootNode();
+      String[] sections = path.split("/");
+      for (String section : sections) {
         if (section.length() > 0 && !parent.hasNode(section)) {
           if (nodetype != null && path.endsWith(section)) {
-            parent.addNode(section, nodetype); // add child 
+            parent.addNode(section, nodetype); // add child
           } else {
             parent.addNode(section);
           }
         }
         parent = parent.getNode(section); // jump into
-       }
-     session.save();
-     return parent;
-     }
-     catch (Exception e) {
-       throw new RuntimeException("failed to add node" + path, e);
-     }
-     finally {
-       if (session != null) {
-         session.logout();
-       }
-     }
-   }
-   
-   /**
-    * Add a file at a given path. An nt:file is added at 'path' with a sample text/plain jcr:content for the string "stuff"
-    * @param path relative path to root
-    * @return the node for the newly added file
-    */
-   protected Node addFile(String path) {
-     Session session = null;
-     try {
-       session = getSession();
-       Node parent = session.getRootNode();
-       String[] sections = path.split("/");
-       for (String section : sections) {
+      }
+      session.save();
+      return parent;
+    } catch (Exception e) {
+      throw new RuntimeException("failed to add node" + path, e);
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+  }
+
+  /**
+   * Add a file at a given path. An nt:file is added at 'path' with a sample
+   * text/plain jcr:content for the string "stuff"
+   * 
+   * @param path relative path to root
+   * @return the node for the newly added file
+   */
+  protected Node addFile(String path) {
+    Session session = null;
+    try {
+      session = getSession();
+      Node parent = session.getRootNode();
+      String[] sections = path.split("/");
+      for (String section : sections) {
         if (section.length() > 0 && !parent.hasNode(section)) {
           if (path.endsWith(section)) {
             Node ntfile = parent.addNode(section, "nt:file");
             Node nodeContent = ntfile.addNode("jcr:content", "nt:resource");
             nodeContent.setProperty("jcr:mimeType", "text/plain");
             nodeContent.setProperty("jcr:data", new ByteArrayInputStream("stuff".getBytes()));
-            nodeContent.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());           
+            nodeContent.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());
           } else {
             parent.addNode(section);
           }
         }
         parent = parent.getNode(section); // jump into
-       }
-     session.save();
-     return parent;
-     }
-     catch (Exception e) {
-       throw new RuntimeException("failed to add node" + path, e);
-     }   
-   }
+      }
+      session.save();
+      return parent;
+    } catch (Exception e) {
+      throw new RuntimeException("failed to add node" + path, e);
+    }
+  }
 
-   /**
-    * removes a node at a given path
-    * @param path relative path from root
-    */
+  /**
+   * removes a node at a given path
+   * 
+   * @param path relative path from root
+   */
   protected void deleteNode(String path) {
     Session session = null;
     try {
@@ -267,20 +272,21 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase
 
   /**
    * Asserts a node has a property
+   * 
    * @param node note to assert
    * @param property propertyName
    */
   protected void assertPropertyExists(Node node, String property) {
     try {
-      assertTrue("Node misses property " + property, node.hasProperty(property)) ;
+      assertTrue("Node misses property " + property, node.hasProperty(property));
     } catch (RepositoryException e) {
       throw new RuntimeException(e);
     }
-  }   
-  
-  
+  }
+
   /**
    * Asserts a property value is not empty
+   * 
    * @param node
    * @param property
    */
@@ -318,6 +324,5 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase
       throw new RuntimeException(e);
     }
   }
-   
-   
+
 }

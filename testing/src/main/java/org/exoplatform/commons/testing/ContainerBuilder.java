@@ -137,6 +137,7 @@ public class ContainerBuilder
       }
       catch (Exception e)
       {
+    	  e.printStackTrace();
          AssertionFailedError err = new AssertionFailedError();
          err.initCause(e);
          throw err;

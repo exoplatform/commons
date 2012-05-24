@@ -16,8 +16,8 @@
  */
 package org.exoplatform.commons.testing.jcr;
 
-
 import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 import org.exoplatform.commons.testing.AssertUtils;
@@ -26,91 +26,111 @@ import org.exoplatform.commons.testing.jcr.AbstractJCRTestCase;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.testng.annotations.Test;
 
-import static  org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @version $Revision$
  */
- @ConfiguredBy({@ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr/jcr-configuration.xml")})
-public class TestAbstractJCRTestCase extends AbstractJCRTestCase
-{
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr/jcr-configuration.xml") })
+public class TestAbstractJCRTestCase extends AbstractJCRTestCase {
 
-   //@Test
-   public void testGetSession() throws Exception
-   {
-     Session session = getSession();   
-     assertNotNull("Session was null", session);
-     assertEquals(getWorkspace(), session.getWorkspace().getName());
-     session.logout();
-   }
-   
-   //@Test
-   public void testRepository() {
-     assertNotNull("repository was null", getRepository());
-   }
-   
-   //@Test
-   public void testWorkspace() {
-     assertNotNull("workspace was null", getWorkspace());
-   }
-   
-   //@Test
-   public void testAssertNodeExists() throws Exception {
-     Session session = getSession();
-     Node root = session.getRootNode();
-     Node node = root.addNode("this");
-     node = node.addNode("path");
-     node = node.addNode("exists");
-     session.save();    
-     assertNodeExists("this/path/exists");
-     assertNodeNotExists("this/path/does/not/exist");
-     session.logout();     
-   }
- 
-   //@Test
-   public void testAddNode() throws Exception {
-     
-     addNode("addnode");
-     Session session = getSession();
-     Node root = session.getRootNode();
-     assertNotNull(root.getNode("addnode"));
-     
-     addNode("addnode/hierarchy");
-     root.refresh(false);
-     assertNotNull(root.getNode("addnode/hierarchy"));     
-     
-     addNode("addnode/with/no/ancestors");
-     root.refresh(false);
-     assertNotNull(root.getNode("addnode/with/no/ancestors"));
-     
-     AssertUtils.assertException(RuntimeException.class, new Closure() {public void dothis() { addNode("/absolute/path/not/allowed");}}); 
+  @Test
+  public void testGetSession() throws Exception {
+    Session session = getSession();
+    assertNotNull("Session was null", session);
+    assertEquals(getWorkspace(), session.getWorkspace().getName());
+    session.logout();
+  }
 
-     session.logout();     
-   }
-   
-   //@Test
-   public void testAddFile() throws Exception {
-     
-     addFile("addfile");
-     Session session = getSession();
-     Node root = session.getRootNode();
-     Node actual = root.getNode("addfile");
-     assertNotNull(actual);
-     assertTrue(actual.isNodeType("nt:file"));
-     
-     addFile("addfile2/hierarchy");
-     root.refresh(false);
-     assertNotNull(root.getNode("addfile2/hierarchy"));     
-     
-     addFile("addfile3/with/no/ancestors");
-     root.refresh(false);
-     assertNotNull(root.getNode("addfile3/with/no/ancestors"));
-     
-     AssertUtils.assertException(RuntimeException.class, new Closure() {public void dothis() { addFile("/absolute2/addfile/not/allowed");}}); 
+  @Test
+  public void testRepository() {    
+    try{
+      assertNotNull("repository was null", getRepository());
+    }catch(RepositoryConfigurationException e){
+      fail("RepositoryConfigurationException :"+e);
+    } catch (RepositoryException e) { 
+      fail("RepositoryException :"+e);
+    }
+    
+  }
 
-     session.logout();     
-   }
+  @Test
+  public void testWorkspace() {
+    try{
+      assertNotNull("workspace was null", getWorkspace());
+    }catch(RepositoryConfigurationException e){
+      fail("RepositoryConfigurationException :"+e);
+    } catch (RepositoryException e) { 
+      fail("RepositoryException :"+e);
+    }
+  }
+
+  @Test
+  public void testAssertNodeExists() throws Exception {
+    Session session = getSession();
+    Node root = session.getRootNode();
+    Node node = root.addNode("this");
+    node = node.addNode("path");
+    node = node.addNode("exists");
+    session.save();
+    assertNodeExists("this/path/exists");
+    assertNodeNotExists("this/path/does/not/exist");
+    session.logout();
+  }
+
+  @Test
+  public void testAddNode() throws Exception {
+
+    addNode("addnode");
+    Session session = getSession();
+    Node root = session.getRootNode();
+    assertNotNull(root.getNode("addnode"));
+
+    addNode("addnode/hierarchy");
+    root.refresh(false);
+    assertNotNull(root.getNode("addnode/hierarchy"));
+
+    addNode("addnode/with/no/ancestors");
+    root.refresh(false);
+    assertNotNull(root.getNode("addnode/with/no/ancestors"));
+
+    AssertUtils.assertException(RuntimeException.class, new Closure() {
+      public void dothis() {
+        addNode("/absolute/path/not/allowed");
+      }
+    });
+
+    session.logout();
+  }
+
+  @Test
+  public void testAddFile() throws Exception {
+
+    addFile("addfile");
+    Session session = getSession();
+    Node root = session.getRootNode();
+    Node actual = root.getNode("addfile");
+    assertNotNull(actual);
+    assertTrue(actual.isNodeType("nt:file"));
+
+    addFile("addfile2/hierarchy");
+    root.refresh(false);
+    assertNotNull(root.getNode("addfile2/hierarchy"));
+
+    addFile("addfile3/with/no/ancestors");
+    root.refresh(false);
+    assertNotNull(root.getNode("addfile3/with/no/ancestors"));
+
+    AssertUtils.assertException(RuntimeException.class, new Closure() {
+      public void dothis() {
+        addFile("/absolute2/addfile/not/allowed");
+      }
+    });
+
+    session.logout();
+  }
 
 }

@@ -34,9 +34,10 @@ import org.testng.annotations.BeforeClass;
  * StandaloneContainer. <u>Example usage</u> :
  * 
  * <pre>
- * @ConfiguredBy({@ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/custom.xml"),@ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/some.xml"),  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/other.xml")})
+ * @ConfiguredBy({@ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/custom.xml")
+ *               ,@ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/some.xml")
+ *               ,@ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/other.xml")})
  * </pre>
- * 
  * 
  * @author <a href="mailto:patrice.lamarque@exoplatform.com">Patrice
  *         Lamarque</a>
@@ -44,30 +45,27 @@ import org.testng.annotations.BeforeClass;
  */
 public abstract class AbstractExoContainerTestCase {
 
-
   @BeforeClass
-  public void startContainer() throws Exception {
+  public void startContainer() {
     beforeContainerStart();
     initExoContainer();
     afterContainerStart();
   }
-  
-  
+
   protected void afterContainerStart() {
   }
-
 
   protected void beforeContainerStart() {
   }
 
+  private void initExoContainer() {
 
-  private void initExoContainer() throws ClassNotFoundException {
-    //
     Set<String> rootConfigPaths = new HashSet<String>();
     rootConfigPaths.add("conf/test-root-configuration.xml");
 
     Set<String> portalConfigPaths = new HashSet<String>();
     portalConfigPaths.add("conf/test-portal-configuration.xml");
+
     portalConfigPaths.add("conf/" + getClass().getSimpleName() + ".xml");
 
     EnumMap<ContainerScope, Set<String>> configs = new EnumMap<ContainerScope, Set<String>>(ContainerScope.class);
@@ -83,24 +81,26 @@ public abstract class AbstractExoContainerTestCase {
     }
 
     ContainerBuilder builder = new ContainerBuilder();
-
     Set<String> rootConfs = configs.get(ContainerScope.ROOT);
     for (String rootConf : rootConfs) {
       builder.withRoot(rootConf);
     }
 
-    Set<String> portalConfs = configs.get(ContainerScope.PORTAL);
-    for (String portalConf : portalConfs) {
-      builder.withPortal(portalConf);
-    }
+    try {
+      Set<String> portalConfs = configs.get(ContainerScope.PORTAL);
+      for (String portalConf : portalConfs) {
+        builder.withPortal(portalConf);
+      }
 
-    builder.build();
-  
+      builder.build();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
-  
-   
+
   /**
    * Register a component to the container
+   * 
    * @param key component key
    * @param instance component instance to register
    */
@@ -121,9 +121,11 @@ public abstract class AbstractExoContainerTestCase {
     ExoContainer container = PortalContainer.getInstance();
     return (U) container.getComponentInstanceOfType(key);
   }
-  
+
   /**
-   * Replace a component implementation by registering it against the current container
+   * Replace a component implementation by registering it against the current
+   * container
+   * 
    * @param key component key
    * @param instance component instance to register
    */
@@ -131,7 +133,5 @@ public abstract class AbstractExoContainerTestCase {
     ExoContainerContext.getCurrentContainer().unregisterComponent(key);
     registerComponent(key, instance);
   }
-  
-
 
 }
