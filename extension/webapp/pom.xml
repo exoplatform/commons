@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.exoplatform.commons</groupId>
     <artifactId>exo.platform.commons.extension</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0.Alpha1-SNAPSHOT</version>
   </parent>
   <artifactId>exo.platform.commons.extension.webapp</artifactId>
   <packaging>war</packaging>
