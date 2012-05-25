@@ -13,9 +13,9 @@ import java.util.Set;
  * CKEditor event handler class. <b>Usage:</b>
  * 
  * <pre>
- *   		EventHandler eventHandler = new EventHandler();
- * 		eventHandler.addEventHandler("instanceReady","function (ev) {
- * 			alert(\"Loaded: \" + ev.editor.name); }");
+ *   	EventHandler eventHandler = new EventHandler();
+ * 	eventHandler.addEventHandler("instanceReady","function (ev) {
+ * 		alert(\"Loaded: \" + ev.editor.name); }");
  * </pre>
  */
 public class EventHandler {
