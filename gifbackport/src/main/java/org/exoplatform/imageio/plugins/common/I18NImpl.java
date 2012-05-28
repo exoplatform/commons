@@ -25,8 +25,12 @@
 
 package org.exoplatform.imageio.plugins.common;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.PropertyResourceBundle;
+
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * version: openjdk-7-ea-src-b35-11_sep_2008
@@ -43,21 +47,24 @@ import java.util.PropertyResourceBundle;
  * <code>String</code>.
  */
 public class I18NImpl {
-    /**
-     * Returns the message string with the specified key from the
-     * "properties" file in the package containing the class with
-     * the specified name.
-     */
-    protected static final String getString(String className, String resource_name, String key) {
-        PropertyResourceBundle bundle = null;
-        try {
-            InputStream stream =
-                Class.forName(className).getResourceAsStream(resource_name);
-            bundle = new PropertyResourceBundle(stream);
-        } catch(Throwable e) {
-            throw new RuntimeException(e); // Chain the exception.
-        }
 
-        return (String)bundle.handleGetObject(key);
+  private static final Log log = ExoLogger.getLogger(I18NImpl.class);
+
+  /**
+   * Returns the message string with the specified key from the "properties"
+   * file in the package containing the class with the specified name.
+   */
+  protected static final String getString(String className, String resource_name, String key) {
+    PropertyResourceBundle bundle = null;
+    try {
+      InputStream stream = Class.forName(className).getResourceAsStream(resource_name);
+      bundle = new PropertyResourceBundle(stream);
+    } catch (ClassNotFoundException e) {
+      log.error("ClassNotFoundException: ", e);
+    } catch (IOException e) {
+      log.error("IOException: ", e);
     }
+
+    return (String) bundle.handleGetObject(key);
+  }
 }
