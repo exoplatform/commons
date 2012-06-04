@@ -24,13 +24,14 @@ public class TagHelper {
    * @param input input String
    * @return input wrapped with a JavaScript tag
    */
-  public static String script(final String input) {
-    String out = "<script type=\"text/javascript\">";
-    out += "//<![CDATA[\n";
-    out += input;
-    out += "\n//]]>";
-    out += "</script>\n";
-    return out;
+  public static String script(final String input) {    
+    StringBuffer out = new StringBuffer();
+    out.append("<script type=\"text/javascript\">");
+    out.append("//<![CDATA[\n");
+    out.append(input);
+    out.append("\n//]]>");
+    out.append("</script>\n");    
+    return out.toString();
   }
 
   /**
