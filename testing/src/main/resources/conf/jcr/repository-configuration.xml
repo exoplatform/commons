@@ -15,7 +15,7 @@
               <property name="multi-db" value="false"/>
               <property name="update-storage" value="true"/>
               <property name="max-buffer-size" value="204800"/>
-              <property name="swap-directory" value="${test.tmpdir}/swap/system"/>
+              <property name="swap-directory" value="target/temp/swap/system"/>
             </properties>
           </container>
           <initializer class="org.exoplatform.services.jcr.impl.core.ScratchWorkspaceInitializer">
@@ -32,14 +32,14 @@
           </cache>
           <query-handler class="org.exoplatform.services.jcr.impl.core.query.lucene.SearchIndex">
             <properties>
-              <property name="index-dir" value="${test.tmpdir}/jcrlucenedb/system"/>
+              <property name="index-dir" value="target/temp/jcrlucenedb/system"/>
             </properties>
           </query-handler>
           <lock-manager>
             <time-out>15m</time-out><!-- 15min -->
             <persister class="org.exoplatform.services.jcr.impl.core.lock.FileSystemLockPersister">
               <properties>
-                <property name="path" value="${test.tmpdir}/lock/system"/>
+                <property name="path" value="target/temp/lock/system"/>
               </properties>
             </persister>
            </lock-manager>
@@ -54,7 +54,7 @@
               <property name="multi-db" value="false"/>
               <property name="update-storage" value="true"/>
               <property name="max-buffer-size" value="204800"/>
-              <property name="swap-directory" value="${test.tmpdir}/swap/portal-test"/>
+              <property name="swap-directory" value="target/temp/swap/portal-test"/>
             </properties>
           </container>
           <initializer class="org.exoplatform.services.jcr.impl.core.ScratchWorkspaceInitializer">
@@ -71,14 +71,14 @@
           </cache>
           <query-handler class="org.exoplatform.services.jcr.impl.core.query.lucene.SearchIndex">
             <properties>
-              <property name="index-dir" value="${test.tmpdir}/jcrlucenedb/portal-test"/>
+              <property name="index-dir" value="target/temp/jcrlucenedb/portal-test"/>
             </properties>
           </query-handler>
           <lock-manager>
             <time-out>15m</time-out><!-- 15min -->
             <persister class="org.exoplatform.services.jcr.impl.core.lock.FileSystemLockPersister">
               <properties>
-                <property name="path" value="${test.tmpdir}/lock/portal-test"/>
+                <property name="path" value="target/temp/lock/portal-test"/>
               </properties>
             </persister>
           </lock-manager>
