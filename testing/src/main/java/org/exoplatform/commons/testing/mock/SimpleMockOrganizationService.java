@@ -90,7 +90,6 @@ public class SimpleMockOrganizationService implements OrganizationService {
   }
 
   public void addListenerPlugin(ComponentPlugin listener) throws Exception {
-    // TODO Auto-generated method stub
 
   }
 
@@ -164,28 +163,23 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public Group createGroupInstance() {
-      // TODO Auto-generated method stub
       return null;
     }
 
     public void createGroup(Group group, boolean broadcast) throws Exception {
-      // TODO Auto-generated method stub
 
     }
 
     public void addGroupEventListener(GroupEventListener listener) {
-      // TODO Auto-generated method stub
 
     }
 
     public void addChild(Group parent, Group child, boolean broadcast) throws Exception {
-      // TODO Auto-generated method stub
 
     }
 
     @Override
     public void removeGroupEventListener(GroupEventListener listener) {
-      // TODO Auto-generated method stub
       
     }
 
@@ -197,12 +191,10 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public Collection<Membership> removeMembershipByUser(String username, boolean broadcast) throws Exception {
-      // TODO Auto-generated method stub
       return null;
     }
 
     public Membership removeMembership(String id, boolean broadcast) throws Exception {
-      // TODO Auto-generated method stub
       return null;
     }
 
@@ -271,27 +263,22 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public Membership createMembershipInstance() {
-      // TODO Auto-generated method stub
       return null;
     }
 
     public void createMembership(Membership m, boolean broadcast) throws Exception {
-      // TODO Auto-generated method stub
     }
 
     public void addMembershipEventListener(MembershipEventListener listener) {
-      // TODO Auto-generated method stub
     }
 
     @Override
     public ListAccess<Membership> findAllMembershipsByGroup(Group group) throws Exception {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public void removeMembershipEventListener(MembershipEventListener listener) {
-      // TODO Auto-generated method stub
       
     }
   }
@@ -299,11 +286,9 @@ public class SimpleMockOrganizationService implements OrganizationService {
   class MockUserHandler implements UserHandler {
 
     public void saveUser(User user, boolean broadcast) throws Exception {
-      // TODO Auto-generated method stub
     }
 
     public User removeUser(String userName, boolean broadcast) throws Exception {
-      // TODO Auto-generated method stub
       return null;
     }
 
@@ -357,48 +342,39 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public User createUserInstance(String username) {
-      // TODO Auto-generated method stub
       return null;
     }
 
     public User createUserInstance() {
-      // TODO Auto-generated method stub
       return null;
     }
 
     public void createUser(User user, boolean broadcast) throws Exception {
-      // TODO Auto-generated method stub
 
     }
 
     public boolean authenticate(String username, String password) throws Exception {
-      // TODO Auto-generated method stub
       return false;
     }
 
     public void addUserEventListener(UserEventListener listener) {
-      // TODO Auto-generated method stub
 
     }
 
     public ListAccess<User> findAllUsers() throws Exception {
-      // TODO Auto-generated method stub
       return null;
     }
 
     public ListAccess<User> findUsersByGroupId(String groupId) throws Exception {
-      // TODO Auto-generated method stub
       return null;
     }
 
     public ListAccess<User> findUsersByQuery(Query query) throws Exception {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public void removeUserEventListener(UserEventListener listener) {
-      // TODO Auto-generated method stub
       
     }
 
@@ -465,47 +441,38 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public void setCreatedDate(Date t) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setEmail(String s) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setFirstName(String s) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setFullName(String s) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setLastLoginTime(Date t) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setLastName(String s) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setOrganizationId(String organizationId) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setPassword(String s) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setUserName(String s) {
-      // TODO Auto-generated method stub
 
     }
   }
@@ -555,17 +522,14 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public void setDescription(String desc) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setGroupName(String name) {
-      // TODO Auto-generated method stub
 
     }
 
     public void setLabel(String name) {
-      // TODO Auto-generated method stub
 
     }
 
@@ -618,7 +582,6 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public void setMembershipType(String type) {
-      // TODO Auto-generated method stub
 
     }
 
