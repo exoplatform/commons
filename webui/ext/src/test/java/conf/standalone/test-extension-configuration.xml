@@ -1,9 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<component>
-		<key>org.exoplatform.services.jcr.ext.distribution.DataDistributionManager</key>
-		<type>org.exoplatform.services.jcr.ext.distribution.impl.DataDistributionManagerImpl</type>
+		<key>org.exoplatform.services.jcr.ext.distribution.DataDistributionManager
+		</key>
+		<type>org.exoplatform.services.jcr.ext.distribution.impl.DataDistributionManagerImpl
+		</type>
 	</component>
+
+	<!-- UserACLFilterTest -->
+	<!-- UserACL -->
+	<component>
+		<key>org.exoplatform.portal.config.UserACL</key>
+		<type>org.exoplatform.portal.config.UserACL</type>
+		<init-params>
+			<value-param>
+				<name>super.user</name>
+				<description>administrator</description>
+				<value>root</value>
+			</value-param>
+
+			<value-param>
+				<name>portal.administrator.groups</name>
+				<description>administrator</description>
+				<value>/platform/administrators</value>
+			</value-param>
+
+			<value-param>
+				<name>portal.administrator.mstype</name>
+				<description>administrator</description>
+				<value>manager</value>
+			</value-param>
+
+			<value-param>
+				<name>portal.creator.groups</name>
+				<description>groups with membership type have permission to manage
+					portal
+				</description>
+				<value>*:/platform/administrators,*:/organization/management/executive-board
+				</value>
+			</value-param>
+
+			<value-param>
+				<name>navigation.creator.membership.type</name>
+				<description>specific membership type have full permission with
+					group navigation
+				</description>
+				<value>manager</value>
+			</value-param>
+			<value-param>
+				<name>guests.group</name>
+				<description>guests group</description>
+				<value>/platform/guests</value>
+			</value-param>
+			<values-param>
+				<name>mandatory.groups</name>
+				<description>Groups that can not be deleted.</description>
+				<value>/platform/administrators</value>
+				<value>/platform/users</value>
+				<value>/platform/guests</value>
+			</values-param>
+			<values-param>
+				<name>mandatory.mstypes</name>
+				<description>Membership type that can not be deleted.</description>
+				<value>member</value>
+			</values-param>
+		</init-params>
+	</component>
+
 	<component>
 		<key>org.exoplatform.webui.ext.UIExtensionManager</key>
 		<type>org.exoplatform.webui.ext.impl.UIExtensionManagerImpl</type>
@@ -17,13 +80,15 @@
 						<name>null-empty</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-empty</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentEmpty</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentEmpty
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -31,13 +96,15 @@
 						<name>null-null</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-null</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -45,13 +112,15 @@
 						<name>null-true</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-true</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentTrue</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentTrue
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -59,13 +128,15 @@
 						<name>null-false</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-false</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -73,13 +144,15 @@
 						<name>null-false2</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-false2</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse2</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse2
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -87,13 +160,15 @@
 						<name>null-false3</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-false3</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse3</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse3
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -101,13 +176,15 @@
 						<name>null-false4</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-false4</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse4</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse4
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -115,13 +192,15 @@
 						<name>null-exception</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-exception</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -129,13 +208,15 @@
 						<name>null-exception2</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-exception2</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException2</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException2
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -143,13 +224,15 @@
 						<name>null-exception3</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-exception3</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException3</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException3
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -157,13 +240,15 @@
 						<name>null-exception4</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-exception4</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException4</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException4
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -171,13 +256,15 @@
 						<name>null-exception5</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-exception5</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException5</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException5
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -185,13 +272,15 @@
 						<name>null-exception6</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-exception6</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException6</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentException6
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -199,13 +288,15 @@
 						<name>null-multiTrue</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiTrue</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiTrue</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiTrue
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -213,13 +304,15 @@
 						<name>null-multiFalse</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiFalse</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -227,13 +320,15 @@
 						<name>null-multiFalse2</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiFalse2</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse2</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse2
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -241,13 +336,15 @@
 						<name>null-multiFalse3</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiFalse3</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse3</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse3
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -255,13 +352,15 @@
 						<name>null-multiFalse4</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiFalse4</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse4</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse4
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -269,13 +368,15 @@
 						<name>null-multiFalse5</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiFalse5</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse5</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse5
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -283,13 +384,15 @@
 						<name>null-multiFalse6</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiFalse6</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse6</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiFalse6
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -297,13 +400,15 @@
 						<name>null-multiException</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiException</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -311,13 +416,15 @@
 						<name>null-multiException2</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiException2</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException2</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException2
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -325,13 +432,15 @@
 						<name>null-multiException3</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiException3</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException3</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException3
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -339,13 +448,15 @@
 						<name>null-multiException4</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiException4</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException4</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException4
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -353,13 +464,15 @@
 						<name>null-multiException5</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiException5</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException5</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException5
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -367,13 +480,15 @@
 						<name>null-multiException6</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiException6</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException6</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException6
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -381,13 +496,15 @@
 						<name>null-multiException7</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiException7</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException7</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException7
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -395,13 +512,15 @@
 						<name>null-multiException8</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension null-multiException8</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException8</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentMultiException8
+								</string>
 							</field>
 						</object>
 					</object-param>
@@ -409,18 +528,21 @@
 						<name>true-null</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension true-null</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull
+								</string>
 							</field>
 							<field name="extendedFilters">
 								<collection type="java.util.ArrayList">
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue" />
 									</value>
 								</collection>
 							</field>
@@ -430,18 +552,21 @@
 						<name>true-true</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension true-true</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentTrue</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentTrue
+								</string>
 							</field>
 							<field name="extendedFilters">
 								<collection type="java.util.ArrayList">
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue" />
 									</value>
 								</collection>
 							</field>
@@ -451,18 +576,21 @@
 						<name>true-false</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension true-false</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentFalse
+								</string>
 							</field>
 							<field name="extendedFilters">
 								<collection type="java.util.ArrayList">
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue" />
 									</value>
 								</collection>
 							</field>
@@ -472,18 +600,21 @@
 						<name>false-null</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension false-null</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull
+								</string>
 							</field>
 							<field name="extendedFilters">
 								<collection type="java.util.ArrayList">
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterFalse"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterFalse" />
 									</value>
 								</collection>
 							</field>
@@ -493,18 +624,21 @@
 						<name>exception-null</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension exception-null</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull
+								</string>
 							</field>
 							<field name="extendedFilters">
 								<collection type="java.util.ArrayList">
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterException"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterException" />
 									</value>
 								</collection>
 							</field>
@@ -514,21 +648,25 @@
 						<name>multiTrue-null</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension multiTrue-null</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull
+								</string>
 							</field>
 							<field name="extendedFilters">
 								<collection type="java.util.ArrayList">
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue" />
 									</value>
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue" />
 									</value>
 								</collection>
 							</field>
@@ -538,21 +676,25 @@
 						<name>multiFalse-null</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension multiFalse-null</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull
+								</string>
 							</field>
 							<field name="extendedFilters">
 								<collection type="java.util.ArrayList">
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue" />
 									</value>
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterFalse"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterFalse" />
 									</value>
 								</collection>
 							</field>
@@ -562,21 +704,89 @@
 						<name>multiException-null</name>
 						<object type="org.exoplatform.webui.ext.UIExtension">
 							<field name="type">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyOwner
+								</string>
 							</field>
 							<field name="name">
 								<string>Extension multiException-null</string>
 							</field>
 							<field name="component">
-								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull</string>
+								<string>org.exoplatform.webui.ext.impl.UIExtensionManagerTest$MyUIExtensionComponentNull
+								</string>
 							</field>
 							<field name="extendedFilters">
 								<collection type="java.util.ArrayList">
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterTrue" />
 									</value>
 									<value>
-										<object type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterException"/>
+										<object
+											type="org.exoplatform.webui.ext.impl.UIExtensionManagerTest$UIExtensionFilterException" />
+									</value>
+								</collection>
+							</field>
+						</object>
+					</object-param>
+
+					<!-- UserACLFilterTest config -->
+					<object-param>
+						<name>perm-private</name>
+						<object type="org.exoplatform.webui.ext.UIExtension">
+							<field name="type">
+								<string>org.exoplatform.webui.ext.filter.impl.UserACLFilerTest$MyOwner
+								</string>
+							</field>
+							<field name="name">
+								<string>private-extension</string>
+							</field>
+							<field name="component">
+								<string>org.exoplatform.webui.ext.filter.impl.UserACLFilerTest$MyUIExtensionComponent
+								</string>
+							</field>
+							<field name="extendedFilters">
+								<collection type="java.util.ArrayList">
+									<value>
+										<object type="org.exoplatform.webui.ext.filter.impl.UserACLFilter">
+											<field name="permissions">
+												<collection type="java.util.ArrayList">
+													<value>
+														<string>*:/platform/administrators</string>
+													</value>
+												</collection>
+											</field>
+										</object>
+									</value>
+								</collection>
+							</field>
+						</object>
+					</object-param>
+					<object-param>
+						<name>perm-public</name>
+						<object type="org.exoplatform.webui.ext.UIExtension">
+							<field name="type">
+								<string>org.exoplatform.webui.ext.filter.impl.UserACLFilerTest$MyOwner
+								</string>
+							</field>
+							<field name="name">
+								<string>public-extension</string>
+							</field>
+							<field name="component">
+								<string>org.exoplatform.webui.ext.filter.impl.UserACLFilerTest$MyUIExtensionComponent
+								</string>
+							</field>
+							<field name="extendedFilters">
+								<collection type="java.util.ArrayList">
+									<value>
+										<object type="org.exoplatform.webui.ext.filter.impl.UserACLFilter">
+											<field name="permissions">
+												<collection type="java.util.ArrayList">
+													<value>
+														<string>*:/platform/guests</string>
+													</value>
+												</collection>
+											</field>
+										</object>
 									</value>
 								</collection>
 							</field>
