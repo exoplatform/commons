@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.commons</groupId>
-    <artifactId>exo.platform.commons</artifactId>
+    <artifactId>commons</artifactId>
     <version>4.0.0.Alpha1-SNAPSHOT</version>
   </parent>
-  <artifactId>exo.platform.commons.testing</artifactId>
+  <artifactId>commons-testing</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons Testing</name>
+  <name>eXo Commons - Testing</name>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.portal</groupId>

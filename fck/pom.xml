@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.commons</groupId>
-    <artifactId>exo.platform.commons</artifactId>
+    <artifactId>commons</artifactId>
     <version>4.0.0.Alpha1-SNAPSHOT</version>
   </parent>
-  <artifactId>exo.platform.commons.fck</artifactId>
+  <artifactId>commons-fck</artifactId>
   <packaging>war</packaging>
-  <name>eXo Platform Web FCK</name>
+  <name>eXo Platform - Web FCK</name>
   <build>
     <finalName>fck</finalName>
   </build>

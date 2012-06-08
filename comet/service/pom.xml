@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.commons</groupId>
-    <artifactId>exo.platform.commons.comet</artifactId>
+    <artifactId>commons-comet</artifactId>
     <version>4.0.0.Alpha1-SNAPSHOT</version>
   </parent>
-  <artifactId>exo.platform.commons.comet.service</artifactId>
+  <artifactId>commons-comet-service</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons Comet Service</name>
+  <name>eXo Commons - Comet Services</name>
   <description />
   <dependencies>
     <dependency>

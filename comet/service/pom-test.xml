@@ -1,15 +1,13 @@
 <project>
    <parent>
       <groupId>org.exoplatform.platform</groupId>
-      <artifactId>exo.platform.commons.comet</artifactId>
-      <version>3.0.0-CR01-SNAPSHOT</version>
+      <artifactId>commons-comet</artifactId>
+      <version>4.0.0.Alpha1-SNAPSHOT</version>
    </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>exo.platform.commons.comet.service</artifactId>
-    <name>eXo Platform Commons Comet Service</name>
+    <artifactId>commons-comet-service</artifactId>
+    <name>eXo Platform - Commons Comet Service</name>
     <packaging>jar</packaging>
-   
-   
    <dependencies>
       <dependency>
          <groupId>javax.ws.rs</groupId>

@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.commons</groupId>
-    <artifactId>exo.platform.commons.comet</artifactId>
+    <artifactId>commons-comet</artifactId>
     <version>4.0.0.Alpha1-SNAPSHOT</version>
   </parent>
-  <artifactId>exo.platform.commons.comet.webapp</artifactId>
+  <artifactId>commons-comet-webapp</artifactId>
   <packaging>war</packaging>
-  <name>eXo Commons Comet WebApp</name>
+  <name>eXo Commons - Comet WebApp</name>
   <description />
   <dependencies />
   <build>

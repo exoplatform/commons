@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.commons</groupId>
-    <artifactId>exo.platform.commons.comet</artifactId>
+    <artifactId>commons-comet</artifactId>
     <version>4.0.0.Alpha1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
-  <artifactId>exo.platform.commons.comet.ext.webapp</artifactId>
+  <artifactId>commons-comet-ext-webapp-cometd</artifactId>
   <packaging>war</packaging>
-  <name>eXo Commons Comet Ext WebApp (use for test only)</name>
+  <name>eXo Commons - Comet Ext WebApp (test only)</name>
   <description />
   <dependencies />
 </project>

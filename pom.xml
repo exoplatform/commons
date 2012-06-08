@@ -7,7 +7,7 @@
     <version>7.1</version>
   </parent>
   <groupId>org.exoplatform.commons</groupId>
-  <artifactId>exo.platform.commons</artifactId>
+  <artifactId>commons</artifactId>
   <version>4.0.0.Alpha1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Commons</name>

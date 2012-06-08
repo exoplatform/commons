@@ -4,15 +4,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.exoplatform.commons</groupId>
-		<artifactId>exo.platform.commons</artifactId>
+		<artifactId>commons</artifactId>
 		<version>4.0.0.Alpha1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.exoplatform.platform</groupId>
-	<artifactId>exo.platform.commons.gifbackport</artifactId>
+	<artifactId>commons-gifbackport</artifactId>
 	<version>4.0.0.Alpha1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>eXo Platform - Component javax.imageio GIF plugin backport</name>
-	<description>eXo GIF plugin backport</description>
+	<name>eXo Platform - Component GIF plugin backport</name>
+	<description>eXo javax.imageio GIF plugin backport</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.exoplatform.kernel</groupId>
@@ -28,8 +28,4 @@
 			</resource>
 		</resources>
 	</build>
-
-
-
-
 </project>

@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.exoplatform.commons</groupId>
-    <artifactId>exo.platform.commons</artifactId>
+    <artifactId>commons</artifactId>
     <version>4.0.0.Alpha1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>exo.platform.commons.component.upgrade</artifactId>
-  <name>eXo Transparent Upgrade Framework Implementation</name>
+  <artifactId>commons-component-upgrade</artifactId>
+  <name>eXo Commons - Transparent Upgrade Framework</name>
   <url>http://www.exoplatform.org</url>
   <dependencies>
     <dependency>

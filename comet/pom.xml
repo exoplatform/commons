@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.commons</groupId>
-    <artifactId>exo.platform.commons</artifactId>
+    <artifactId>commons</artifactId>
     <version>4.0.0.Alpha1-SNAPSHOT</version>
   </parent>
-  <artifactId>exo.platform.commons.comet</artifactId>
+  <artifactId>commons-comet</artifactId>
   <packaging>pom</packaging>
-  <name>eXo Commons Comet</name>
+  <name>eXo Commons - Comet</name>
   <properties>
     <exo.product.name>exo.platform.commons.comet</exo.product.name>
     <exo.product.specification>2.1</exo.product.specification>

@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform.commons</groupId>
-    <artifactId>exo.platform.commons</artifactId>
+    <artifactId>commons</artifactId>
     <version>4.0.0.Alpha1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <groupId>org.exoplatform.commons</groupId> 
-  <artifactId>exo.platform.commons.webui</artifactId> 
+  <artifactId>commons-webui-component</artifactId> 
   <packaging>jar</packaging>
-  <name>eXo Commons Platform WebUI</name>
+  <name>eXo Commons - Platform WebUI</name>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.portal</groupId>
