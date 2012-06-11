@@ -28,6 +28,7 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.ResourceBundleService;
+import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
 
 /**
@@ -143,20 +144,24 @@ public class TimeConvertUtils {
     if (locale == null) {
       locale = getLocale();
     }
-    try {
-      ResourceBundle res = null;
-      try {
-        res = WebuiRequestContext.getCurrentInstance().getApplicationResourceBundle();
-      } catch (Exception e) {
-        ResourceBundleService bundleService = (ResourceBundleService) ExoContainerContext.getCurrentContainer()
-                                              .getComponentInstanceOfType(ResourceBundleService.class);
-        res = bundleService.getResourceBundle("locale.commons.Commons", locale);
-      }
-      return res.getString(key);
-    } catch (Exception e) {
+    ResourceBundle res = null;
+    RequestContext ctx = WebuiRequestContext.getCurrentInstance();
+    if (ctx != null) {
+      res = ctx.getApplicationResourceBundle();
+    }
+    // if null, try another way
+    ResourceBundleService bundleService = (ResourceBundleService) ExoContainerContext.getCurrentContainer()
+                                                                .getComponentInstanceOfType(ResourceBundleService.class);
+    if (res == null && bundleService != null) {
+      res = bundleService.getResourceBundle("locale.commons.Commons", locale);
+    }
+    // still null
+    if (res == null) {
       log.warn("Can not resource bundle by key: " + key);
       return key.substring(key.lastIndexOf(".") + 1).toLowerCase();
     }
+
+    return res.getString(key);
   }
   
   private static String getMessage(String message, String[] args) {
@@ -177,11 +182,17 @@ public class TimeConvertUtils {
    * @return {@link Locale} 
    */
   public static Locale getLocale() {
-    try {
-      return WebuiRequestContext.getCurrentInstance().getLocale();
-    } catch (Exception e) {
+    RequestContext ctx = WebuiRequestContext.getCurrentInstance();
+    if (ctx == null) {
       return Locale.ENGLISH;
     }
+
+    Locale locale = ctx.getLocale();
+    if (locale == null) {
+      return Locale.ENGLISH;
+    }
+
+    return locale;
   }
 
   /**

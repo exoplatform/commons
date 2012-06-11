@@ -93,7 +93,7 @@ public class EXoContinuationCometdServlet
             log.debug("EXoContinuationCometdServlet - -->AbstractBayeux=" + bayeux);
          return bayeux;
       }
-      catch (Exception e)
+      catch (NumberFormatException e)
       {
          log.error("Error new Bayeux creation ", e);
          return null;

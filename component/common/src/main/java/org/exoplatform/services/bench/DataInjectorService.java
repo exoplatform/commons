@@ -104,7 +104,9 @@ public class DataInjectorService implements ResourceContainer {
       beginPrintInfo(params, Actions.EXECUTE);
       Object response = injector.execute(params);
       return Response.ok(response, MediaType.APPLICATION_JSON).cacheControl(cc).build();
-    } catch (Exception e) {
+    } catch (Exception e) {   
+      //injector.execute() throws Exception(). It's a public abstract method, we shouldn't modify it
+      //So we have to catch Exception
       errorPrintInfo(injector, Actions.EXECUTE, e);
       return Response.serverError().entity(String.format("%1$s executed failed due to %2$s", injector.getName(), e.getMessage())).build();
     }
@@ -122,7 +124,9 @@ public class DataInjectorService implements ResourceContainer {
     try {
       beginPrintInfo(params, Actions.INJECT);
       injector.inject(params);
-    } catch (Exception e) {
+    } catch (Exception e) {   
+      //injector.inject() throws Exception(). It's a public abstract method, we shouldn't modify it
+      //So we have to catch Exception
       errorPrintInfo(injector, Actions.INJECT, e);
       return Response.serverError().entity(String.format("%1$s injected failed due to %2$s", injector.getName(), e.getMessage())).build();
     }
@@ -142,7 +146,9 @@ public class DataInjectorService implements ResourceContainer {
     try {
       beginPrintInfo(params, Actions.REJECT);
       injector.reject(params);
-    } catch (Exception e) {
+    } catch (Exception e) {   
+      //injector.inject() throws Exception(). It's a public abstract method, we shouldn't modify it
+      //So we have to catch Exception
       errorPrintInfo(injector, Actions.REJECT, e);
       return Response.serverError().entity(String.format("%1$s rejected failed due to %2$s", injector.getName(), e.getMessage())).build();
     }

@@ -85,7 +85,7 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
       addUIFormInput(new UIFormStringInput(FIELD_INPUT, null, null));
       UIDocumentSelector documentSelector = addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
       documentSelector.setShowUpload(false);
-    } catch (Exception e) {
+    } catch (Exception e) { //UIComponent.addChild() throws Exception()
       log.error("An exception happens when init UISaveAttachment", e);
     }
   }
@@ -157,7 +157,7 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
         Node desNode = (Node) desSession.getItem(selectedFolder);
         try {
           desSession.checkPermission(desNode.getPath(), PermissionType.ADD_NODE);
-        } catch (Exception e) {
+        } catch (RepositoryException e) {
           event.getRequestContext()
                .getUIApplication()
                .addMessage(new ApplicationMessage("UISaveAttachment.msg.save-file-not-allow", null, ApplicationMessage.WARNING));

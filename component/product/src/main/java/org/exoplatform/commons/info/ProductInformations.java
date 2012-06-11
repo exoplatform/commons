@@ -115,6 +115,8 @@ public class ProductInformations implements Startable {
     } catch (IOException exception) {
       throw new RuntimeException("Couldn't parse the file " + filePath, exception);
     } catch (Exception exception) {
+      //ConfigurationManager.getInputStream() throws Exception(). 
+      //It's from another project and we cannot modify it. So we have to catch Exception
       throw new RuntimeException("Error occured while reading the file " + filePath, exception);
     }
 

@@ -16,21 +16,23 @@ package org.mortbay.cometd.continuation;
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-import dojox.cometd.Channel;
-import dojox.cometd.SecurityPolicy;
-import dojox.cometd.Client;
-import dojox.cometd.Message;
-
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.log.ExoLogger;
-import org.mortbay.cometd.ClientImpl;
-
-import javax.servlet.ServletContext;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import javax.servlet.ServletContext;
+
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.mortbay.cometd.ClientImpl;
+
+import dojox.cometd.Channel;
+import dojox.cometd.Client;
+import dojox.cometd.Message;
+import dojox.cometd.SecurityPolicy;
 
 /**
  * Created by The eXo Platform SAS.
@@ -152,7 +154,7 @@ public class EXoContinuationBayeux
       {
          random = SecureRandom.getInstance("SHA1PRNG");
       }
-      catch (Exception e)
+      catch (NoSuchAlgorithmException e)
       {
          context.log("Could not get secure random for ID generation", e);
          random = new Random();

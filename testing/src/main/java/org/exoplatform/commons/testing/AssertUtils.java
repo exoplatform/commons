@@ -144,7 +144,7 @@ public class AssertUtils {
   public static void assertException(Closure code) {
     try {
       code.dothis();
-    } catch (Exception e) {
+    } catch (Exception e) { //we want to catch all exceptions here
       return;// Exception correctly thrown
     }
     throw new AssertionFailedError("An exception should have been thrown.");
@@ -159,7 +159,7 @@ public class AssertUtils {
   public static void assertException(Class<? extends Exception> exceptionType, Closure code) {
     try {
       code.dothis();
-    } catch (Exception e) {
+    } catch (Exception e) {  //we want to catch all exceptions here
       Assert.assertEquals("Wrong exception type", exceptionType, e.getClass());
       return;// Exception correctly thrown
     }

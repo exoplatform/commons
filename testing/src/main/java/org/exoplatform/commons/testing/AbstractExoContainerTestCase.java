@@ -86,16 +86,12 @@ public abstract class AbstractExoContainerTestCase {
       builder.withRoot(rootConf);
     }
 
-    try {
-      Set<String> portalConfs = configs.get(ContainerScope.PORTAL);
-      for (String portalConf : portalConfs) {
-        builder.withPortal(portalConf);
-      }
-
-      builder.build();
-    } catch (Exception e) {
-      e.printStackTrace();
+    Set<String> portalConfs = configs.get(ContainerScope.PORTAL);
+    for (String portalConf : portalConfs) {
+      builder.withPortal(portalConf);
     }
+
+    builder.build();
   }
 
   /**

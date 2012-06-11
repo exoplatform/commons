@@ -79,7 +79,7 @@ public abstract class AbstractWebuiTestCase extends TestCase {
   private MockResourceBundle getAppRes() {
     try {
       return (MockResourceBundle) webuiApplication.getResourceBundle(null);
-    } catch (Exception e) {
+    } catch (Exception e) {  //we want to catch all exceptions here to know a testcase is false or not.
       fail(e.getMessage());
     }
     return null;

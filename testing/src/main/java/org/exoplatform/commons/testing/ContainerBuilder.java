@@ -135,16 +135,36 @@ public class ContainerBuilder
       {
          return _build();
       }
-      catch (Exception e)
+      catch (SecurityException e) 
       {
-    	  e.printStackTrace();
+         AssertionFailedError err = new AssertionFailedError();
+         err.initCause(e);
+         throw err;
+      } 
+      catch (IllegalArgumentException e) 
+      {
+         AssertionFailedError err = new AssertionFailedError();
+         err.initCause(e);
+         throw err;
+      } 
+      catch (NoSuchFieldException e) 
+      {
+         AssertionFailedError err = new AssertionFailedError();
+         err.initCause(e);
+         throw err;
+      } 
+      catch (IllegalAccessException e) 
+      {
          AssertionFailedError err = new AssertionFailedError();
          err.initCause(e);
          throw err;
       }
    }
 
-   private RootContainer _build() throws Exception
+  private RootContainer _build() throws SecurityException,
+                                NoSuchFieldException,
+                                IllegalArgumentException,
+                                IllegalAccessException
    {
       //
       if (rootConfigURLs.size() == 0)

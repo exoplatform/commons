@@ -77,7 +77,7 @@ public class UIAddAttachment extends UIContainer implements UIPopupComponent {
   public UIAddAttachment() {
     try {
       addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
-    } catch (Exception e) {
+    } catch (Exception e) {  //UIComponent.addChild() throws Exception()
       log.error("An exception happens when init UIAddAttachment", e);
     }
   }

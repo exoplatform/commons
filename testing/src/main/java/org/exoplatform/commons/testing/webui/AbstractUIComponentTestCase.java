@@ -41,7 +41,7 @@ public abstract class AbstractUIComponentTestCase<T extends UIComponent> extends
   public void doSetUp() {  
     try {
       initComponent();
-    } catch (Exception e) {
+    } catch (Exception e) { //we want to catch all exceptions here to know a testcase is false or not.
       fail("failed to initialize UIComponent: " + e.getMessage());
     }
   }

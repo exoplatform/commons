@@ -192,7 +192,7 @@ public class UIExtensionManagerImpl implements UIExtensionManager {
               }
             }
           }
-        } catch (Exception e) {
+        } catch (Exception e) {  //filter.accept() throws Exception()
           LOG.error("An execption occurs while applying the filter", e);
           onDeny(checkOnly, filter, context);
           if (type != null) {
@@ -212,7 +212,7 @@ public class UIExtensionManagerImpl implements UIExtensionManager {
     if (!checkOnly) {
       try {
         filter.onDeny(context);
-      } catch (Exception e) {
+      } catch (Exception e) {  //we want to catch all exceptions here
         LOG.error("An execption occurs while calling the method onDeny of the filter", e);
       }
     }    

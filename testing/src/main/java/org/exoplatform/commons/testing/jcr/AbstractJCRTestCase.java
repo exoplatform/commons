@@ -22,6 +22,7 @@ import static org.testng.AssertJUnit.fail;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Calendar;
@@ -37,6 +38,8 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * @author <a href="mailto:patrice.lamarque@exoplatform.com">Patrice
@@ -45,6 +48,8 @@ import org.exoplatform.services.jcr.core.ManageableRepository;
  */
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr/jcr-configuration.xml") })
 public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
+  
+  private static final Log LOG = ExoLogger.getLogger(AbstractJCRTestCase.class);
 
   private String tempDir;
 
@@ -103,8 +108,10 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       if (!exists) {
         fail("no node exists at " + path);
       }
-    } catch (Exception e) {
-      throw new RuntimeException("failed to assert node exists", e);
+    } catch (RepositoryException e) {
+      LOG.error("failed to assert node exists", e);
+    } catch (RepositoryConfigurationException e) {
+      LOG.error("failed to assert node exists", e);
     } finally {
       if (session != null) {
         session.logout();
@@ -125,8 +132,10 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       if (exists) {
         fail("node exists at " + path);
       }
-    } catch (Exception e) {
-      throw new RuntimeException("failed to assert node exists", e);
+    } catch (RepositoryException e) {
+      LOG.error("failed to assert node exists", e);
+    } catch (RepositoryConfigurationException e) {
+      LOG.error("failed to assert node exists", e);
     } finally {
       if (session != null) {
         session.logout();
@@ -145,8 +154,12 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
     try {
       session = getSession();
       return session.getRootNode().getNode(path);
-    } catch (Exception e) {
-      throw new RuntimeException("failed to load node exists", e);
+    } catch (RepositoryException e) {
+      LOG.error("failed to load node exists", e);
+      return null;
+    } catch (RepositoryConfigurationException e) {
+      LOG.error("failed to load node exists", e);
+      return null;
     } finally {
       if (session != null) {
         session.logout();
@@ -158,16 +171,11 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
    * Get a session on the test workspace
    * 
    * @return a new system session
+   * @throws RepositoryConfigurationException 
    * @throws Exception
    */
-  protected Session getSession() throws Exception {
-    try {
-      Session session = getRepo().getSystemSession(getWorkspace());
-      return session;
-    } catch (Exception e) {
-      throw new RuntimeException("failed to initiate JCR session on " + getWorkspace(), e);
-    }
-
+  protected Session getSession() throws RepositoryException, RepositoryConfigurationException {
+      return getRepo().getSystemSession(getWorkspace());
   }
 
   /**
@@ -205,8 +213,12 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       }
       session.save();
       return parent;
-    } catch (Exception e) {
-      throw new RuntimeException("failed to add node" + path, e);
+    } catch (RepositoryException e) {
+      LOG.error("failed to add node" + path, e);
+      return null;
+    } catch (RepositoryConfigurationException e) {
+      LOG.error("failed to add node" + path, e);
+      return null;
     } finally {
       if (session != null) {
         session.logout();
@@ -243,8 +255,12 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       }
       session.save();
       return parent;
-    } catch (Exception e) {
-      throw new RuntimeException("failed to add node" + path, e);
+    } catch (RepositoryException e) {
+      LOG.error("failed to add node" + path, e);
+      return null;
+    } catch (RepositoryConfigurationException e) {
+      LOG.error("failed to add node" + path, e);
+      return null;
     }
   }
 
@@ -261,8 +277,10 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       Node target = parent.getNode(path);
       target.remove();
       session.save();
-    } catch (Exception e) {
-      throw new RuntimeException("failed to remove node" + path, e);
+    } catch (RepositoryException e) {
+      LOG.error("failed to remove node" + path, e);
+    } catch (RepositoryConfigurationException e) {
+      LOG.error("failed to remove node" + path, e);
     } finally {
       if (session != null) {
         session.logout();
@@ -280,7 +298,7 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
     try {
       assertTrue("Node misses property " + property, node.hasProperty(property));
     } catch (RepositoryException e) {
-      throw new RuntimeException(e);
+      LOG.error(e);
     }
   }
 
@@ -303,8 +321,10 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       }
       reader.close();
       assertTrue("property " + property + " was empty", buff.length() > 0);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (RepositoryException e) {
+      LOG.error("Repository error: ", e);
+    } catch (IOException e) {
+      LOG.error("IOException when using the reader: ", e);
     }
 
   }
@@ -312,16 +332,16 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
   protected void assertPropertyEquals(String expected, Node node, String property) {
     try {
       assertEquals(expected, node.getProperty(property).getString());
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (RepositoryException e) {
+      LOG.error("Repository error: ", e);
     }
   }
 
   protected void assertPropertyEquals(boolean expected, Node node, String property) {
     try {
       assertEquals(expected, node.getProperty(property).getBoolean());
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (RepositoryException e) {
+      LOG.error("Repository error: ", e);
     }
   }
 

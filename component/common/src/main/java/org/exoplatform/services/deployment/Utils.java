@@ -112,7 +112,7 @@ public class Utils {
           } catch (ItemNotFoundException item) {
             currentNode.getSession().refresh(false);
             log.error("Can not found versionable node" + item, item);
-          } catch (Exception e) {
+          } catch (RepositoryException e) {
             currentNode.getSession().refresh(false);
             log.error("Import version history failed " + e, e);
           }

@@ -142,7 +142,7 @@ public class UpgradeProductService implements Startable {
         log.info("'" + upgradeProductPlugin.getName()
             + "' upgrade plugin execution will be ignored because shouldProceedToUpgrade = false");
       }
-    } catch (Exception exception) {
+    } catch (MissingProductInformationException exception) {
       log.error("The plugin " + upgradeProductPlugin.getName() + " generated an error.", exception);
     }
   }

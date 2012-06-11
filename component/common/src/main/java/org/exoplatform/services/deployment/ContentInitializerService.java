@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 import org.exoplatform.services.jcr.RepositoryService;
@@ -78,6 +79,8 @@ public class ContentInitializerService implements Startable{
             logData.append("deploy " + deploymentPlugin.getName()
                 + " deployment plugin succesful at " + date.toString() + "\n");
           } catch (Exception e) {
+            //deploymentPlugin.deploy() throws Exception(). It's a public abstract method, we shouldn't modify it
+            //So we have to catch Exception
             LOG.error("deploy " + deploymentPlugin.getName() + " deployment plugin failure at "
                 + date.toString() + " by " + e.getMessage() + "\n");
             logData.append("deploy " + deploymentPlugin.getName()
@@ -94,7 +97,7 @@ public class ContentInitializerService implements Startable{
         contentInitializerServiceLogContent.setProperty("jcr:lastModified", date.getTime());
         session.save();
       }
-    } catch (Exception e) {
+    } catch (RepositoryException e) {
       LOG.error("An unexpected problem occurs when deploy contents", e);
     } finally {
       sessionProvider.close();

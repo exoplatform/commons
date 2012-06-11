@@ -16,11 +16,14 @@
  */
 package org.exoplatform.webui.ext;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+
+import javax.activation.UnsupportedDataTypeException;
 
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -176,7 +179,27 @@ public class UIExtension implements Comparable<UIExtension> {
           }
           currentClass = currentClass.getSuperclass();
         }
-      } catch (Exception e) {
+      } catch (SecurityException e) {
+        // disable the extension to ensure that it won't be used
+        this.enable = false;
+        LOG.error("The internal filters of the component cannot be initialized", e);
+      } catch (IllegalArgumentException e) {
+        // disable the extension to ensure that it won't be used
+        this.enable = false;
+        LOG.error("The internal filters of the component cannot be initialized", e);
+      } catch (IllegalAccessException e) {
+        // disable the extension to ensure that it won't be used
+        this.enable = false;
+        LOG.error("The internal filters of the component cannot be initialized", e);
+      } catch (InvocationTargetException e) {
+        // disable the extension to ensure that it won't be used
+        this.enable = false;
+        LOG.error("The internal filters of the component cannot be initialized", e);
+      } catch (InstantiationException e) {
+        // disable the extension to ensure that it won't be used
+        this.enable = false;
+        LOG.error("The internal filters of the component cannot be initialized", e);
+      } catch (UnsupportedDataTypeException e) {
         // disable the extension to ensure that it won't be used
         this.enable = false;
         LOG.error("The internal filters of the component cannot be initialized", e);
@@ -191,8 +214,9 @@ public class UIExtension implements Comparable<UIExtension> {
    * Checks the return type of the method that has been annotated with @UIExtensionFilters
    * it must be a list of objects of type UIExtensionFilter
    * @param m the method to check
+   * @throws UnsupportedDataTypeException 
    */
-  private void checkMethodReturnType(Method m) {
+  private void checkMethodReturnType(Method m) throws UnsupportedDataTypeException {
     // Check the return type
     final Type returnType = m.getGenericReturnType();
     if (returnType instanceof ParameterizedType) {
@@ -208,7 +232,7 @@ public class UIExtension implements Comparable<UIExtension> {
         }
       }
     }
-    throw new RuntimeException("The expected type is a list of objects of type UIExtensionFilter");
+    throw new UnsupportedDataTypeException("The expected type is a list of objects of type UIExtensionFilter");
   }
   
   /**

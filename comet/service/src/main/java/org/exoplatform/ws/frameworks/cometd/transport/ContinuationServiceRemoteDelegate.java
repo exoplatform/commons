@@ -16,23 +16,28 @@
  */
 package org.exoplatform.ws.frameworks.cometd.transport;
 
-import org.exoplatform.common.http.HTTPStatus;
-import org.exoplatform.common.http.client.HTTPConnection;
-import org.exoplatform.common.http.client.HTTPResponse;
-import org.exoplatform.common.http.client.NVPair;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancer;
-import org.exoplatform.ws.frameworks.json.impl.JsonGeneratorImpl;
-import org.exoplatform.ws.frameworks.json.value.JsonValue;
-
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
+
+import org.exoplatform.common.http.HTTPStatus;
+import org.exoplatform.common.http.client.HTTPConnection;
+import org.exoplatform.common.http.client.HTTPResponse;
+import org.exoplatform.common.http.client.ModuleException;
+import org.exoplatform.common.http.client.NVPair;
+import org.exoplatform.common.http.client.ProtocolNotSuppException;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancer;
+import org.exoplatform.ws.frameworks.json.impl.JsonException;
+import org.exoplatform.ws.frameworks.json.impl.JsonGeneratorImpl;
+import org.exoplatform.ws.frameworks.json.value.JsonValue;
 
 /**
  * Created by The eXo Platform SAS.
@@ -86,12 +91,24 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
          if (log.isDebugEnabled())
             log.debug("Check user " + exoID + " subscription to channel " + channel);
          return new Boolean(bol);
-      }
-      catch (Exception e)
+      } 
+      catch (MalformedURLException e) 
       {
-         log.error("Check user subscription error ", e);
-         return null;
+         log.error("Malformed URL: ", e);
+      } 
+      catch (ProtocolNotSuppException e) 
+      {
+         log.error("Protocol is not supported: ", e);
+      } 
+      catch (IOException e) 
+      {
+         log.error("IO exception: ", e);
+      } 
+      catch (ModuleException e) 
+      {
+         log.error("error when getting response: ", e);
       }
+      return null;
    }
 
    /**
@@ -122,10 +139,26 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
                log.debug("Send private message : " + message + " to client " + exoID + " by cahnnel " + channel
                   + " fail!");
          }
-      }
-      catch (Exception e)
+      } 
+      catch (MalformedURLException e) 
       {
-         log.error("Send message error ", e);
+         log.error("Malformed URL: ", e);
+      } 
+      catch (ProtocolNotSuppException e) 
+      {
+         log.error("Protocol is not supported: ", e);
+      } 
+      catch (JsonException e) 
+      {
+         log.error("error when create JSON object: ", e);
+      } 
+      catch (IOException e) 
+      {
+         log.error("IO exception: ", e);
+      } 
+      catch (ModuleException e) 
+      {
+         log.error("error when getting response: ", e);
       }
    }
 
@@ -161,10 +194,26 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
                }
             }
          }
-      }
-      catch (Exception e)
+      } 
+      catch (MalformedURLException e) 
       {
-         log.error("Send message error ", e);
+         log.error("Malformed URL: ", e);
+      } 
+      catch (ProtocolNotSuppException e) 
+      {
+         log.error("Protocol is not supported: ", e);
+      } 
+      catch (JsonException e) 
+      {
+         log.error("error when create JSON object: ", e);
+      } 
+      catch (IOException e) 
+      {
+         log.error("IO exception: ", e);
+      } 
+      catch (ModuleException e) 
+      {
+         log.error("error when getting response: ", e);
       }
    }
 
@@ -190,9 +239,21 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
          }
          return urls;
       }
-      catch (Exception e)
+      catch (MalformedURLException e) 
       {
-         log.error("get comet url by channel error ",e);
+         log.error("Malformed URL: ", e);
+      } 
+      catch (ProtocolNotSuppException e) 
+      {
+         log.error("Protocol is not supported: ", e);
+      } 
+      catch (IOException e) 
+      {
+         log.error("IO exception: ", e);
+      } 
+      catch (ModuleException e) 
+      {
+         log.error("error when getting response: ", e);
       }
       return null;
    }

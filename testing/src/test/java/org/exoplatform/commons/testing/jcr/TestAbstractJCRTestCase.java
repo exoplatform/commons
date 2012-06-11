@@ -97,12 +97,8 @@ public class TestAbstractJCRTestCase extends AbstractJCRTestCase {
     root.refresh(false);
     assertNotNull(root.getNode("addnode/with/no/ancestors"));
 
-    AssertUtils.assertException(RuntimeException.class, new Closure() {
-      public void dothis() {
-        addNode("/absolute/path/not/allowed");
-      }
-    });
-
+    assertNull(addNode("/absolute/path/not/allowed"));
+    
     session.logout();
   }
 
@@ -124,11 +120,7 @@ public class TestAbstractJCRTestCase extends AbstractJCRTestCase {
     root.refresh(false);
     assertNotNull(root.getNode("addfile3/with/no/ancestors"));
 
-    AssertUtils.assertException(RuntimeException.class, new Closure() {
-      public void dothis() {
-        addFile("/absolute2/addfile/not/allowed");
-      }
-    });
+    assertNull(addFile("/absolute2/addfile/not/allowed"));
 
     session.logout();
   }
