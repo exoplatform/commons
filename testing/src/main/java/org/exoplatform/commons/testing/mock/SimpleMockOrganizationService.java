@@ -554,7 +554,9 @@ public class SimpleMockOrganizationService implements OrganizationService {
       if (!(obj instanceof Membership))
         return false;
       Membership other = (Membership) obj;
-      return (user.equals(other.getUserName()) && group.equals(other.getGroupId()) && membershipType.equals(other.getMembershipType()));
+      return (user.equals(other.getUserName()) 
+          && group.equals(other.getGroupId()) 
+          && membershipType.equals(other.getMembershipType()));
     }
 
     public int hashCode() {
