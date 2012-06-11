@@ -51,7 +51,8 @@ public class UIExtensionManagerImpl implements UIExtensionManager {
   /**
    * All the registered extensions
    */
-  private final ConcurrentMap<String, Map<String, UIExtension>> extensions = new ConcurrentHashMap<String, Map<String, UIExtension>>(); 
+  private final ConcurrentMap<String, Map<String, UIExtension>> extensions = 
+                                                    new ConcurrentHashMap<String, Map<String, UIExtension>>();
   
   /**
    * {@inheritDoc}

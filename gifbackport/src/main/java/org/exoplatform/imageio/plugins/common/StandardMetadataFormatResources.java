@@ -108,16 +108,18 @@ public class StandardMetadataFormatResources extends ListResourceBundle {
         { "ImageOrientation", "The desired orientation of the image in terms of flips and counter-clockwise rotations" },
 
         { "HorizontalPixelSize",
-  "The width of a pixel, in millimeters, as it should be rendered on media" },
+          "The width of a pixel, in millimeters, as it should be rendered on media" },
 
         { "VerticalPixelSize",
-  "The height of a pixel, in millimeters, as it should be rendered on media" },
+          "The height of a pixel, in millimeters, as it should be rendered on media" },
 
         { "HorizontalPhysicalPixelSpacing",
-          "The horizontal distance in the subject of the image, in millimeters, represented by one pixel at the center of the image" },
+          "The horizontal distance in the subject of the image, in millimeters, " +
+          "represented by one pixel at the center of the image" },
 
         { "VerticalPhysicalPixelSpacing",
-          "The vertical distance in the subject of the image, in millimeters, represented by one pixel at the center of the image" },
+          "The vertical distance in the subject of the image, in millimeters, " +
+          "represented by one pixel at the center of the image" },
 
         { "HorizontalPosition",
           "The horizontal position, in millimeters, where the image should be rendered on media " },

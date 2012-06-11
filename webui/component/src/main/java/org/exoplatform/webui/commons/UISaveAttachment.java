@@ -195,7 +195,7 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
   public Session getUserSession(String workspace) throws Exception {
     ManageableRepository repository = getCurrentRepository();
     SessionProviderService sessionProviderService = (SessionProviderService) PortalContainer.getInstance()
-                                                                                            .getComponentInstanceOfType(SessionProviderService.class);
+                                                            .getComponentInstanceOfType(SessionProviderService.class);
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     return sessionProvider.getSession(workspace, repository);
   }

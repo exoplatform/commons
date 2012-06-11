@@ -40,7 +40,8 @@ import org.exoplatform.webui.application.WebuiRequestContext;
 public class TimeConvertUtils {
   private static Log      log = ExoLogger.getLogger(TimeConvertUtils.class);
   
-  public static String[] strs                 = new String[] { "SECOND", "MINUTE", "HOUR", "DAY", "WEEK", "MONTH", "YEAR", "DECADE" };
+  public static String[] strs                 = new String[] { "SECOND", "MINUTE", "HOUR", "DAY",
+                                                               "WEEK", "MONTH", "YEAR", "DECADE"};
 
   public static int      DAY                  = 3;
 
@@ -65,7 +66,8 @@ public class TimeConvertUtils {
   private static float   YEAR_OF_DECADE       = 10.0f;
 
   private static Float[] timeLength           = new Float[] { MINISECOND_OF_MINUTE, MINUTE_OF_HOUR, HOUR_OF_DAY,
-                                                              DAY_OF_WEEK, WEEK_OF_MONTH, MONTH_OF_YEAR, YEAR_OF_DECADE, YEAR_OF_DECADE };
+                                                              DAY_OF_WEEK, WEEK_OF_MONTH, MONTH_OF_YEAR, 
+                                                              YEAR_OF_DECADE, YEAR_OF_DECADE };
   private static String  JUSTNOW              = "JUSTNOW";
 
   private static String  SPACE                = " ";
@@ -119,7 +121,9 @@ public class TimeConvertUtils {
       return getResourceBundle(RESOURCE_KEY + JUSTNOW, locale);
     int i = ArrayUtils.indexOf(strs, values[1].replace(STR_S, STR_EMPTY));
     if (limit == 0 || i < limit) {
-      return getMessage(getResourceBundle(RESOURCE_KEY + values[1].replace(UNDERSCORE, STR_EMPTY), locale), new String[]{values[0]});
+      return getMessage(getResourceBundle(RESOURCE_KEY + values[1].replace(UNDERSCORE, STR_EMPTY),
+                                          locale),
+                        new String[] { values[0] });
     }
           
     if (locale != null) {

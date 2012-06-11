@@ -49,7 +49,10 @@ public interface UIExtensionManager {
    * otherwise
    * @throws Exception if an error occurs
    */
-  public UIComponent addUIExtension(String extensionType, String extensionName, Map<String, Object> context, UIContainer parent) throws Exception;
+  public UIComponent addUIExtension(String extensionType,
+                                    String extensionName,
+                                    Map<String, Object> context,
+                                    UIContainer parent) throws Exception;
 
   /**
    * It checks if the extension can be added (all filters that are mandatory) according 

@@ -49,7 +49,13 @@ package org.exoplatform.services.bench;
 
 public class LoremIpsum4J {
 
-  public static final String LOREM_IPSUM = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+  public static final String LOREM_IPSUM = new StringBuilder("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ")
+                                                 .append("sed diam nonumy eirmod tempor invidunt ut labore ")
+                                                 .append("et dolore magna aliquyam erat, sed diam voluptua.")
+                                                 .append("At vero eos et accusam et justo duo dolores et ea rebum.")
+                                                 .append("Stet clita kasd gubergren, ")
+                                                 .append("no sea takimata sanctus est Lorem ipsum dolor sit amet.")
+                                                 .toString();
 
   private String[]           loremIpsumWords;
 

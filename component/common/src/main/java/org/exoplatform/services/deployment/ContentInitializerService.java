@@ -49,7 +49,9 @@ public class ContentInitializerService implements Startable{
   private static String CONTENT_INIT = "ContentInitializerService";
   private static String EXO_SERVICES = "eXoServices";
 
-  public ContentInitializerService(RepositoryService repositoryService, NodeHierarchyCreator nodeHierarchyCreator, OrganizationService organizationService) {
+  public ContentInitializerService(RepositoryService repositoryService,
+                                   NodeHierarchyCreator nodeHierarchyCreator,
+                                   OrganizationService organizationService) {
     this.repositoryService = repositoryService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
   }

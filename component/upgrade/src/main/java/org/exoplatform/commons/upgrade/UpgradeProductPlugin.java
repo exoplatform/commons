@@ -100,12 +100,13 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
   }
 
   /**
-   * Proceed to the transparent upgrade, this method will be called if the Product version has changed, which means, it will be called once the Product Version stored in the JCR and the one declared in ProductInfo are different
+   * Proceed to the transparent upgrade, this method will be called if the
+   * Product version has changed, which means, it will be called once the
+   * Product Version stored in the JCR and the one declared in ProductInfo are
+   * different
    * 
-   * @param oldVersion
-   *          the old version that is stored in the JCR
-   * @param newVersion
-   *          the new version read from ProductInfo Service
+   * @param oldVersion the old version that is stored in the JCR
+   * @param newVersion the new version read from ProductInfo Service
    */
   public abstract void processUpgrade(String oldVersion, String newVersion);
 

@@ -108,7 +108,11 @@ public class DataInjectorService implements ResourceContainer {
       //injector.execute() throws Exception(). It's a public abstract method, we shouldn't modify it
       //So we have to catch Exception
       errorPrintInfo(injector, Actions.EXECUTE, e);
-      return Response.serverError().entity(String.format("%1$s executed failed due to %2$s", injector.getName(), e.getMessage())).build();
+      return Response.serverError()
+                     .entity(String.format("%1$s executed failed due to %2$s",
+                                           injector.getName(),
+                                           e.getMessage()))
+                     .build();
     }
   }
   
@@ -128,10 +132,17 @@ public class DataInjectorService implements ResourceContainer {
       //injector.inject() throws Exception(). It's a public abstract method, we shouldn't modify it
       //So we have to catch Exception
       errorPrintInfo(injector, Actions.INJECT, e);
-      return Response.serverError().entity(String.format("%1$s injected failed due to %2$s", injector.getName(), e.getMessage())).build();
+      return Response.serverError()
+                     .entity(String.format("%1$s injected failed due to %2$s",
+                                           injector.getName(),
+                                           e.getMessage()))
+                     .build();
     }
     endPrintInfo(Actions.INJECT);
-    return Response.ok(String.format("%s injected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
+    return Response.ok(String.format("%s injected successfully!!!", injector.getName()),
+                       MediaType.TEXT_PLAIN)
+                   .cacheControl(cc)
+                   .build();
   }
   
   @GET
@@ -150,10 +161,17 @@ public class DataInjectorService implements ResourceContainer {
       //injector.inject() throws Exception(). It's a public abstract method, we shouldn't modify it
       //So we have to catch Exception
       errorPrintInfo(injector, Actions.REJECT, e);
-      return Response.serverError().entity(String.format("%1$s rejected failed due to %2$s", injector.getName(), e.getMessage())).build();
+      return Response.serverError()
+                     .entity(String.format("%1$s rejected failed due to %2$s",
+                                           injector.getName(),
+                                           e.getMessage()))
+                     .build();
     }
     endPrintInfo(Actions.REJECT);
-    return Response.ok(String.format("%s rejected successfully!!!", injector.getName()), MediaType.TEXT_PLAIN).cacheControl(cc).build();
+    return Response.ok(String.format("%s rejected successfully!!!", injector.getName()),
+                       MediaType.TEXT_PLAIN)
+                   .cacheControl(cc)
+                   .build();
   }
 
   private void beginPrintInfo(HashMap<String, String> params, Actions action) {

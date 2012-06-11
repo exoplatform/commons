@@ -45,7 +45,10 @@ public class UIExtensionManagerTest extends TestCase {
   private static boolean OK; 
   
   public void setUp() throws Exception {
-    StandaloneContainer.setConfigurationURL(Thread.currentThread().getContextClassLoader().getResource("conf/standalone/test-extension-configuration.xml").toString());
+    StandaloneContainer.setConfigurationURL(Thread.currentThread()
+                                                  .getContextClassLoader()
+                                                  .getResource("conf/standalone/test-extension-configuration.xml")
+                                                  .toString());
     StandaloneContainer container = StandaloneContainer.getInstance();
     manager = (UIExtensionManagerImpl) container.getComponentInstanceOfType(UIExtensionManager.class);
   }
@@ -188,11 +191,18 @@ public class UIExtensionManagerTest extends TestCase {
     testAccept("Extension multiException-null", context, false, false);
   }
   
-  private void testAccept(String extensionName, Map<String, Object> context, boolean checkOnly, boolean expected) throws Exception {
+  private void testAccept(String extensionName,
+                          Map<String, Object> context,
+                          boolean checkOnly,
+                          boolean expected) throws Exception {
     testAccept(extensionName, context, checkOnly, expected, null);
   }
   
-  private void testAccept(String extensionName, Map<String, Object> context, boolean checkOnly, boolean expected, Boolean bOKValue) throws Exception {
+  private void testAccept(String extensionName,
+                          Map<String, Object> context,
+                          boolean checkOnly,
+                          boolean expected,
+                          Boolean bOKValue) throws Exception {
     String extensionType = MyOwner.class.getName();
     UIExtension extension = manager.getUIExtension(extensionType, extensionName);
     OK = false;

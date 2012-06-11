@@ -140,7 +140,10 @@ public class UIExtension implements Comparable<UIExtension> {
   public Class<? extends UIComponent> getComponent() {
     if (componentClass == null) {
       try {
-        this.componentClass = Class.forName(component, false, Thread.currentThread().getContextClassLoader()).asSubclass(UIComponent.class);
+        this.componentClass = Class.forName(component,
+                                            false,
+                                            Thread.currentThread().getContextClassLoader())
+                                   .asSubclass(UIComponent.class);
       } catch (ClassNotFoundException e) {
         throw new IllegalArgumentException("The class of the extension component cannot be found", e);
       }
@@ -226,7 +229,8 @@ public class UIExtension implements Comparable<UIExtension> {
       if (typeEquals(rawType, List.class)) {
         // The raw type is a List
         final Type[] actualTypeArguments = pReturnType.getActualTypeArguments();
-        if (actualTypeArguments != null && actualTypeArguments.length == 1 && typeEquals(actualTypeArguments[0], UIExtensionFilter.class)) {
+        if (actualTypeArguments != null && actualTypeArguments.length == 1
+            && typeEquals(actualTypeArguments[0], UIExtensionFilter.class)) {
           // The type argument is UIExtensionFilter, the return type is valid
           return;
         }
