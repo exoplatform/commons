@@ -16,9 +16,12 @@ import org.exoplatform.commons.info.ProductInformations;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 public abstract class UpgradeProductPlugin extends BaseComponentPlugin implements Comparable<UpgradeProductPlugin> {
 
+  private static final Log LOG = ExoLogger.getLogger(UpgradeProductPlugin.class);
   private static final String PRODUCT_GROUP_ID = "product.group.id";
   private static final String UPGRADE_PLUGIN_EXECUTION_ORDER = "plugin.execution.order";
   private static final String UPGRADE_PLUGIN_ENABLE = "commons.upgrade.{$0}.enable";
@@ -32,7 +35,10 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
 
   public UpgradeProductPlugin(InitParams initParams) {
     if (!initParams.containsKey(PRODUCT_GROUP_ID)) {
-      throw new RuntimeException("Couldn't find the init value param: " + PRODUCT_GROUP_ID);
+      if(LOG.isErrorEnabled()){
+        LOG.error("Couldn't find the init value param: " + PRODUCT_GROUP_ID);
+      }
+      return;
     }
     productGroupId = initParams.getValueParam(PRODUCT_GROUP_ID).getValue();
     if (!initParams.containsKey(UPGRADE_PLUGIN_EXECUTION_ORDER)) {

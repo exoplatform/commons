@@ -29,6 +29,9 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Stack;
 
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
 /**
  * Generic implementation of version comparison.
  * 
@@ -56,7 +59,7 @@ import java.util.Stack;
  *
  * @see <a href="https://cwiki.apache.org/confluence/display/MAVENOLD/Versioning">"Versioning" on Maven Wiki</a>
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
- * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
+ * @author <a href="mailto:hboutemy@apache.org">Herv<E9> Boutemy</a>
  */
 public class ComparableVersion
     implements Comparable<ComparableVersion>
@@ -86,6 +89,8 @@ public class ComparableVersion
     private static class IntegerItem
         implements Item
     {
+      private static final Log LOG = ExoLogger.getLogger(IntegerItem.class);
+      
       private static final BigInteger BigInteger_ZERO = new BigInteger( "0" );
 
         private final BigInteger value;
@@ -106,7 +111,6 @@ public class ComparableVersion
         {
             return INTEGER_ITEM;
         }
-
         public boolean isNull()
         {
             return BigInteger_ZERO.equals( value );
@@ -131,7 +135,8 @@ public class ComparableVersion
                     return 1; // 1.1 > 1-1
 
                 default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+                    LOG.error("invalid item: " + item.getClass());
+                    return Integer.MIN_VALUE;
             }
         }
 
@@ -147,6 +152,8 @@ public class ComparableVersion
     private static class StringItem
         implements Item
     {
+        private static final Log LOG = ExoLogger.getLogger(StringItem.class);
+        
         private static final String[] QUALIFIERS = { "snapshot", "alpha", "beta", "milestone", "rc", "", "sp" };
 
         private static final List<String> _QUALIFIERS = Arrays.asList( QUALIFIERS );
@@ -236,7 +243,8 @@ public class ComparableVersion
                     return -1; // 1.any < 1-1
 
                 default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+                    LOG.error("invalid item: " + item.getClass());
+                    return Integer.MIN_VALUE;
             }
         }
 
@@ -254,6 +262,8 @@ public class ComparableVersion
         extends ArrayList<Item>
         implements Item
     {
+        private static final Log LOG = ExoLogger.getLogger(ListItem.class);  
+      
         public int getType()
         {
             return LIST_ITEM;
@@ -320,7 +330,8 @@ public class ComparableVersion
                     return 0;
 
                 default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+                  LOG.error("invalid item: " + item.getClass());
+                  return Integer.MIN_VALUE;
             }
         }
 

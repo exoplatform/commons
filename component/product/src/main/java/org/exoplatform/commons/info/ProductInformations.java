@@ -105,19 +105,30 @@ public class ProductInformations implements Startable {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     if (!initParams.containsKey(PRODUCT_VERSIONS_DECLARATION_FILE)) {
-      throw new RuntimeException("Couldn't find the init value param: " + PRODUCT_VERSIONS_DECLARATION_FILE);
+      if (log.isErrorEnabled()) {
+        log.error("Couldn't find the init value param: " + PRODUCT_VERSIONS_DECLARATION_FILE);
+      }
+      return;
     }
     String filePath = initParams.getValueParam(PRODUCT_VERSIONS_DECLARATION_FILE).getValue();
     try {
-      log.info("Read products versions from " + filePath);
+      if (log.isInfoEnabled()) {
+        log.info("Read products versions from " + filePath);
+      }
       InputStream inputStream = cmanager.getInputStream(filePath);
       productInformationProperties.load(inputStream);
     } catch (IOException exception) {
-      throw new RuntimeException("Couldn't parse the file " + filePath, exception);
+      if (log.isErrorEnabled()) {
+        log.error("Couldn't parse the file " + filePath, exception);
+      }
+      return;
     } catch (Exception exception) {
       //ConfigurationManager.getInputStream() throws Exception(). 
       //It's from another project and we cannot modify it. So we have to catch Exception
-      throw new RuntimeException("Error occured while reading the file " + filePath, exception);
+      if (log.isErrorEnabled()) {
+        log.error("Error occured while reading the file " + filePath, exception);
+      }
+      return;
     }
 
     // The workspace name where products informations are stored
@@ -127,7 +138,10 @@ public class ProductInformations implements Startable {
 
     applicationDataRootNodePath = nodeHierarchyCreator.getJcrPath(EXO_APPLICATIONS_DATA_NODE_ALIAS);
     if (applicationDataRootNodePath == null) {
-      throw new RuntimeException(EXO_APPLICATIONS_DATA_NODE_ALIAS + " wasn't found as 'NodeHierarchyCreator' alias");
+      if (log.isErrorEnabled()) {
+        log.error(EXO_APPLICATIONS_DATA_NODE_ALIAS + " wasn't found as 'NodeHierarchyCreator' alias");
+      }
+      return;
     }
     if (applicationDataRootNodePath.indexOf("/") == 0) {
       applicationDataRootNodePath = applicationDataRootNodePath.replaceFirst("/", "");
@@ -241,11 +255,15 @@ public class ProductInformations implements Startable {
     if (workspaceName == null || workspaceName.equals("")) {
       try {
         workspaceName = repositoryService.getDefaultRepository().getConfiguration().getDefaultWorkspaceName();
-        log.info("Workspace wasn't specified, use '" + workspaceName + "' as default workspace of this repository.");
+        if (log.isInfoEnabled()){
+          log.info("Workspace wasn't specified, use '" + workspaceName + "' as default workspace of this repository.");
+        }
       } catch (RepositoryException exception) {
-        throw new RuntimeException("Error occured while getting default workspace name.", exception);
+        log.error("Error occured while getting default workspace name.", exception);
+        return;
       } catch (RepositoryConfigurationException exception) {
-        throw new RuntimeException("Error occured while getting default workspace name.", exception);
+        log.error("Error occured while getting default workspace name.", exception);
+        return;
       }
     }
     Session session = null;
@@ -304,14 +322,17 @@ public class ProductInformations implements Startable {
         previousProductInformationProperties = (Properties)productInformationProperties.clone();
       }
     } catch (LoginException exception) {
-      throw new RuntimeException("Can't load product informations from the JCR: Error when getting JCR session.", exception);
+      log.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
+      return;
     } catch (NoSuchWorkspaceException exception) {
-      throw new RuntimeException("Can't load product informations from the JCR: Error when getting JCR session.", exception);
+      log.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
+      return;
     } catch (RepositoryException exception) {
-      throw new RuntimeException("Can't load product informations from the JCR!", exception);
+      log.error("Can't load product informations from the JCR!", exception);
+      return;
     } catch (IOException exception) {
-      throw new RuntimeException("Can't load product informations from the JCR: the data stored in the JCR couldn't be parsed.",
-          exception);
+      log.error("Can't load product informations from the JCR: the data stored in the JCR couldn't be parsed.", exception);
+      return;
     } finally {
       if (session != null) {
         session.logout();

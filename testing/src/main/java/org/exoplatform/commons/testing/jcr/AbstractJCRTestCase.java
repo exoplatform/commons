@@ -298,7 +298,7 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
     try {
       assertTrue("Node misses property " + property, node.hasProperty(property));
     } catch (RepositoryException e) {
-      LOG.error(e);
+      LOG.error("Repository Exception: ", e);
     }
   }
 

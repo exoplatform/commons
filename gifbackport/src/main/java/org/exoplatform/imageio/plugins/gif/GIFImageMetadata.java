@@ -28,9 +28,13 @@ package org.exoplatform.imageio.plugins.gif;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.imageio.metadata.IIOInvalidTreeException;
-import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.metadata.IIOMetadataFormatImpl;
+import javax.imageio.metadata.IIOMetadataNode;
+
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.w3c.dom.Node;
 
 /**
@@ -41,6 +45,8 @@ public class GIFImageMetadata extends GIFMetadata {
     // package scope
     static final String
         nativeMetadataFormatName = "javax_imageio_gif_image_1.0";
+    
+    private static final Log LOG = ExoLogger.getLogger(GIFImageMetadata.class);
 
     static final String[] disposalMethodNames = {
         "none",
@@ -387,7 +393,8 @@ public class GIFImageMetadata extends GIFMetadata {
             try {
                 s = new String(comment, "ISO-8859-1");
             } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Encoding ISO-8859-1 unknown!");
+              LOG.error("Encoding ISO-8859-1 unknown!", e);
+              return null;
             }
 
             node = new IIOMetadataNode("TextEntry");
