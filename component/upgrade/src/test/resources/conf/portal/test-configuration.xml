@@ -1,24 +1,85 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+	xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+
+	<component>
+		<key>org.exoplatform.services.jcr.ext.distribution.DataDistributionManager</key>
+		<type>org.exoplatform.services.jcr.ext.distribution.impl.DataDistributionManagerImpl</type>
+	</component>
+
+	<component>
+		<key>org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator</key>
+		<type>org.exoplatform.services.jcr.ext.hierarchy.impl.NodeHierarchyCreatorImpl</type>
+	</component>
+
 	<component>
 		<type>org.exoplatform.commons.info.ProductInformations</type>
 		<init-params>
 			<value-param>
 				<name>product.versions.declaration.file</name>
-				<value>classpath:/conf/product_new.properties</value>
+				<value>classpath:/conf/data/product_new.properties</value>
 			</value-param>
 		</init-params>
 	</component>
+
+	<!-- Register UpgradeProductService -->
 	<component>
 		<type>org.exoplatform.commons.upgrade.UpgradeProductService</type>
 		<init-params>
 			<!-- Proceed to the upgrade if it's first time you run this service -->
 			<value-param>
 				<name>proceedUpgradeWhenFirstRun</name>
-				<value>${commons.upgrade.proceedIfFirstRun}</value>
+				<value>true</value>
 			</value-param>
 		</init-params>
 	</component>
+
+	<!-- Add upgrade plugins to UpgradeProductService: UpgradeProductTest -->
+
+	<!-- Upgrade plugin for Portal: Only upgrade if previous version is 0 -->
+	<external-component-plugins>
+		<target-component>org.exoplatform.commons.upgrade.UpgradeProductService</target-component>
+		<component-plugin>
+			<name>testUpgradePortal</name>
+			<set-method>addUpgradePlugin</set-method>
+			<type>org.exoplatform.commons.upgrade.UpgradeProductTest$UpgradePluginFromVersionZERO</type>
+			<description></description>
+			<init-params>
+				<value-param>
+					<name>product.group.id</name>
+					<value>org.exoplatform.portal</value>
+				</value-param>
+				<value-param>
+					<name>plugin.execution.order</name>
+					<value>1</value>
+				</value-param>
+			</init-params>
+		</component-plugin>
+	</external-component-plugins>
+
+	<!-- Upgrade plugin for ECMS: Only upgrade if previous version > ZERO -->
+	<external-component-plugins>
+		<target-component>org.exoplatform.commons.upgrade.UpgradeProductService</target-component>
+		<component-plugin>
+			<name>testUpgradeECMS</name>
+			<set-method>addUpgradePlugin</set-method>
+			<type>org.exoplatform.commons.upgrade.UpgradeProductTest$UpgradePluginFromVersionX</type>
+			<description></description>
+			<init-params>
+				<value-param>
+					<name>product.group.id</name>
+					<value>org.exoplatform.ecms</value>
+				</value-param>
+				<value-param>
+					<name>plugin.execution.order</name>
+					<value>2</value>
+				</value-param>
+			</init-params>
+		</component-plugin>
+	</external-component-plugins>
+
+	<!-- Node to upgrade in process by plugins -->
 	<external-component-plugins>
 		<target-component>org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator</target-component>
 		<component-plugin>
@@ -29,26 +90,28 @@
 				<object-param>
 					<name>cms.configuration</name>
 					<description>configuration for the cms path</description>
-					<object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
+					<object
+						type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
 						<field name="repository">
 							<string>repository</string>
 						</field>
 						<field name="workspaces">
 							<collection type="java.util.ArrayList">
 								<value>
-									<string>collaboration</string>
+									<string>portal-test</string>
 								</value>
 							</collection>
 						</field>
 						<field name="jcrPaths">
 							<collection type="java.util.ArrayList">
 								<value>
-									<object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">
+									<object
+										type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">
 										<field name="alias">
-											<string>exoApplicationDataNode</string>
+											<string>upgradeProductTest</string>
 										</field>
 										<field name="path">
-											<string>/Application Data</string>
+											<string>/Application Data/Commons Test</string>
 										</field>
 										<field name="mixinTypes">
 											<collection type="java.util.ArrayList">
@@ -60,7 +123,8 @@
 										<field name="permissions">
 											<collection type="java.util.ArrayList">
 												<value>
-													<object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">
+													<object
+														type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">
 														<field name="identity">
 															<string>any</string>
 														</field>
@@ -89,6 +153,8 @@
 			</init-params>
 		</component-plugin>
 	</external-component-plugins>
+
+	<!-- ProductInformations node data -->
 	<external-component-plugins>
 		<target-component>org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator</target-component>
 		<component-plugin>
@@ -99,21 +165,23 @@
 				<object-param>
 					<name>cms.configuration</name>
 					<description>configuration for the cms path</description>
-					<object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
+					<object
+						type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
 						<field name="repository">
 							<string>repository</string>
 						</field>
 						<field name="workspaces">
 							<collection type="java.util.ArrayList">
 								<value>
-									<string>collaboration</string>
+									<string>portal-test</string>
 								</value>
 							</collection>
 						</field>
 						<field name="jcrPaths">
 							<collection type="java.util.ArrayList">
 								<value>
-									<object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">
+									<object
+										type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">
 										<field name="alias">
 											<string>exoApplicationDataNode</string>
 										</field>
@@ -130,7 +198,8 @@
 										<field name="permissions">
 											<collection type="java.util.ArrayList">
 												<value>
-													<object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">
+													<object
+														type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">
 														<field name="identity">
 															<string>any</string>
 														</field>
