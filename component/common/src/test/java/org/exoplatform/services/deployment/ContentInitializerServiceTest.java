@@ -94,8 +94,6 @@ public class ContentInitializerServiceTest extends TestCase {
 
     // verify call method
     verify(contentMock).addPlugin(deploymentPluginActual);
-    verify(contentInitializerServiceActual).addPlugin(deploymentPluginActual);
-
     assertEquals(listDeploymentPluginActual.size(), 1);
  
   }
@@ -116,16 +114,13 @@ public class ContentInitializerServiceTest extends TestCase {
     } catch (Exception e) {
     }
     //
-    try {
-      
-      contentInitializerServiceMock.addNode("ContentInitializerServiceLog", "nt:file");
-      Node nodeChild = contentInitializerServiceMock.getNode("ContentInitializerServiceLog");
-      
-      assertEquals(contentInitializerServiceLogMock, nodeChild);
-      assertEquals(contentInitializerServiceLogContentMock,
-                   (contentInitializerServiceLogMock.addNode("jcr:content", "nt:resource")));
-    } catch (Exception e) {
-    }
+        try {
+            assertEquals(contentInitializerServiceLogMock,
+                         (contentInitializerServiceMock.addNode("ContentInitializerServiceLog", "nt:file")));
+            assertEquals(contentInitializerServiceLogContentMock,
+                         (contentInitializerServiceLogMock.addNode("jcr:content", "nt:resource")));
+          } catch (Exception e) {
+          }
 
     ContentInitializerService contentMock = mock(ContentInitializerService.class);
     contentMock.start();
