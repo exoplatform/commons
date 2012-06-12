@@ -85,7 +85,6 @@ public abstract class AbstractExoContainerTestCase {
     for (String rootConf : rootConfs) {
       builder.withRoot(rootConf);
     }
-
     Set<String> portalConfs = configs.get(ContainerScope.PORTAL);
     for (String portalConf : portalConfs) {
       builder.withPortal(portalConf);
