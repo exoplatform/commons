@@ -92,8 +92,9 @@ DocumentSelector.prototype.renderDetails = function(documentItem) {
   }
 };
 
-DocumentSelector.prototype.renderDrives = function(tableContainer, documentItem) {
+DocumentSelector.prototype.renderDrives = function(tableContainer, documentItem) {	
  var me = eXo.commons.DocumentSelector;
+ me.submitSelectedFolder(documentItem);
  var driveType = documentItem.driveType;
  var url = this.getDrivesURL;
  url += "?" + this.driveTypeParam + "=" + driveType;
@@ -160,6 +161,11 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
   // To avoid the problem ajax caching on IE (issue: COMMONS-109)
   url += "&dummy=" + new Date().getTime();
   var data = me.request(url);
+  
+  //Set current selected folder:
+  var currentFolder = data.getElementsByTagName("Folder")[0];
+  me.getAndSubmitSelectedFolder(currentFolder);
+  
   var folderContainer = data.getElementsByTagName("Folders")[0];
   var folderList = folderContainer.getElementsByTagName("Folder");
   var fileContainer = data.getElementsByTagName("Files")[0];
@@ -272,6 +278,19 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
   }
 };
 
+DocumentSelector.prototype.getAndSubmitSelectedFolder = function(detailNodeXML) {
+  var me = eXo.commons.DocumentSelector;
+  var documentItem = new DocumentItem();
+  documentItem.driveType = detailNodeXML.getAttribute("driveType");
+  documentItem.driveName = detailNodeXML.getAttribute("driveName");
+  documentItem.workspaceName = detailNodeXML.getAttribute("workspaceName");
+  documentItem.currentFolder = detailNodeXML.getAttribute("currentFolder");
+  documentItem.jcrPath = detailNodeXML.getAttribute("path");
+  documentItem.canAddChild = detailNodeXML.getAttribute("canAddChild");
+  documentItem.titlePath = detailNodeXML.getAttribute("titlePath");
+  me.submitSelectedFolder(documentItem);
+}
+
 DocumentSelector.prototype.selectUploadedFile = function(fileName){
   var domUtil = eXo.core.DOMUtil;
   var rightWS = domUtil.findFirstDescendantByClass(this.uiComponent, "div",
@@ -316,14 +335,15 @@ DocumentSelector.prototype.submitSelectedFile = function(tableCell){
 
 DocumentSelector.prototype.submitSelectedFolder = function(documentItem){
   var me = eXo.commons.DocumentSelector;
-  var workspaceName = documentItem.workspaceName;
-  var jcrPath = documentItem.jcrPath;
+  var workspaceName = (documentItem.workspaceName != null && documentItem.workspaceName != undefined) ? documentItem.workspaceName : null;
+  var jcrPath = (documentItem.jcrPath != null && documentItem.jcrPath != undefined) ? documentItem.jcrPath : null;
+  var dataId = (workspaceName != null && jcrPath != null) ? workspaceName + encodeURI(jcrPath) : "";
   if (me.selectFolderLink) {
     var link = me.selectFolderLink.href;
     var endParamIndex = link.lastIndexOf("')");
     if (endParamIndex > 0)
       link = link.substring(0, endParamIndex) + "&" + me.dataId + "="
-          + workspaceName + encodeURI(jcrPath) + "')";
+          + dataId + "')";
     window.location = link;
   }
 };
@@ -341,7 +361,7 @@ DocumentSelector.prototype.browseFolder = function(tableCell){
   documentItem.canAddChild = detailNode.getAttribute("canAddChild");
   documentItem.titlePath = detailNode.getAttribute("titlePath");
   me.renderDetails(documentItem);
-  me.submitSelectedFolder(documentItem);
+  //Set selected folder at renderDetailsFolder moment: related to COMMONS-159
 };
 
 DocumentSelector.prototype.remove = function(tableCell) {
