@@ -152,7 +152,7 @@ public class UtilsTest extends BaseCommonsTestCase {
     //import version history data
     Map<String, String> mapHistoryValue = Utils.getMapImportHistory(new BufferedInputStream(
                                                                         new FileInputStream(zippedVersionHistory)));
-    Utils.processImportHistory(sandbox, new BufferedInputStream(new FileInputStream(zippedVersionHistory)), mapHistoryValue);
+    Utils.processImportHistory(sandbox, new BufferedInputStream(new TempFileInputStream(zippedVersionHistory)), mapHistoryValue);
     
     /*****************
      * Assertion     *
@@ -247,7 +247,7 @@ public class UtilsTest extends BaseCommonsTestCase {
     propertiesBOS.flush();
     zipService.addInputStream("mapping.properties", propertiesBIS);
     zipFile = getExportedFile("data", ".zip");
-    in = new BufferedInputStream(new TempFileInputStream(zipFile));
+    in = new BufferedInputStream(new FileInputStream(zipFile));
     out = new BufferedOutputStream(new FileOutputStream(zipFile));
     out.flush();
     zipService.createZip(out);
