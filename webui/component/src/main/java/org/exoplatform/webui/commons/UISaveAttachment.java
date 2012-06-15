@@ -64,7 +64,7 @@ import org.exoplatform.webui.form.UIFormStringInput;
 )
 public class UISaveAttachment extends UIForm implements UIPopupComponent {
   
-  protected static Log log = ExoLogger.getLogger(UISaveAttachment.class);
+  private static final Log LOG = ExoLogger.getLogger(UISaveAttachment.class);
   
   protected static final String UIDOCUMENTSELECTOR = "UIDocumentSelector";
 
@@ -86,7 +86,7 @@ public class UISaveAttachment extends UIForm implements UIPopupComponent {
       UIDocumentSelector documentSelector = addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
       documentSelector.setShowUpload(false);
     } catch (Exception e) { //UIComponent.addChild() throws Exception()
-      log.error("An exception happens when init UISaveAttachment", e);
+      LOG.error("An exception happens when init UISaveAttachment", e);
     }
   }
   

@@ -87,7 +87,7 @@ public class ProductInformations implements Startable {
    */
   public static final String PRODUCT_VERSION_DECLARATION_NODE_NAME = "productVersionDeclarationNode";
 
-  private static final Log log = ExoLogger.getLogger(ProductInformations.class);
+  private static final Log LOG = ExoLogger.getLogger(ProductInformations.class);
 
   private Properties productInformationProperties = new Properties();
   private Properties previousProductInformationProperties = new Properties();
@@ -105,28 +105,28 @@ public class ProductInformations implements Startable {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     if (!initParams.containsKey(PRODUCT_VERSIONS_DECLARATION_FILE)) {
-      if (log.isErrorEnabled()) {
-        log.error("Couldn't find the init value param: " + PRODUCT_VERSIONS_DECLARATION_FILE);
+      if (LOG.isErrorEnabled()) {
+        LOG.error("Couldn't find the init value param: " + PRODUCT_VERSIONS_DECLARATION_FILE);
       }
       return;
     }
     String filePath = initParams.getValueParam(PRODUCT_VERSIONS_DECLARATION_FILE).getValue();
     try {
-      if (log.isInfoEnabled()) {
-        log.info("Read products versions from " + filePath);
+      if (LOG.isInfoEnabled()) {
+        LOG.info("Read products versions from " + filePath);
       }
       InputStream inputStream = cmanager.getInputStream(filePath);
       productInformationProperties.load(inputStream);
     } catch (IOException exception) {
-      if (log.isErrorEnabled()) {
-        log.error("Couldn't parse the file " + filePath, exception);
+      if (LOG.isErrorEnabled()) {
+        LOG.error("Couldn't parse the file " + filePath, exception);
       }
       return;
     } catch (Exception exception) {
       //ConfigurationManager.getInputStream() throws Exception(). 
       //It's from another project and we cannot modify it. So we have to catch Exception
-      if (log.isErrorEnabled()) {
-        log.error("Error occured while reading the file " + filePath, exception);
+      if (LOG.isErrorEnabled()) {
+        LOG.error("Error occured while reading the file " + filePath, exception);
       }
       return;
     }
@@ -138,8 +138,8 @@ public class ProductInformations implements Startable {
 
     applicationDataRootNodePath = nodeHierarchyCreator.getJcrPath(EXO_APPLICATIONS_DATA_NODE_ALIAS);
     if (applicationDataRootNodePath == null) {
-      if (log.isErrorEnabled()) {
-        log.error(EXO_APPLICATIONS_DATA_NODE_ALIAS + " wasn't found as 'NodeHierarchyCreator' alias");
+      if (LOG.isErrorEnabled()) {
+        LOG.error(EXO_APPLICATIONS_DATA_NODE_ALIAS + " wasn't found as 'NodeHierarchyCreator' alias");
       }
       return;
     }
@@ -249,20 +249,20 @@ public class ProductInformations implements Startable {
    * the first server start up, then store the declared one.
    */
   public void start() {
-    if (log.isDebugEnabled()) {
-      log.debug("start method begin");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("start method begin");
     }
     if (workspaceName == null || workspaceName.equals("")) {
       try {
         workspaceName = repositoryService.getDefaultRepository().getConfiguration().getDefaultWorkspaceName();
-        if (log.isInfoEnabled()){
-          log.info("Workspace wasn't specified, use '" + workspaceName + "' as default workspace of this repository.");
+        if (LOG.isInfoEnabled()){
+          LOG.info("Workspace wasn't specified, use '" + workspaceName + "' as default workspace of this repository.");
         }
       } catch (RepositoryException exception) {
-        log.error("Error occured while getting default workspace name.", exception);
+        LOG.error("Error occured while getting default workspace name.", exception);
         return;
       } catch (RepositoryConfigurationException exception) {
-        log.error("Error occured while getting default workspace name.", exception);
+        LOG.error("Error occured while getting default workspace name.", exception);
         return;
       }
     }
@@ -276,8 +276,8 @@ public class ProductInformations implements Startable {
       if (session.getRootNode().hasNode(applicationDataRootNodePath)) {
         applicationDataNode = session.getRootNode().getNode(applicationDataRootNodePath);
       } else {
-        if (log.isDebugEnabled()) {
-          log.debug("'Application Data' doesn't exist, creating it ... ");
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("'Application Data' doesn't exist, creating it ... ");
         }
         applicationDataNode = session.getRootNode().addNode(applicationDataRootNodePath, "nt:unstructured");
         applicationDataNode.addMixin("exo:hiddenable");
@@ -303,8 +303,8 @@ public class ProductInformations implements Startable {
         previousProductInformationProperties = new Properties();
         previousProductInformationProperties.load(new ByteArrayInputStream(previousVersionData.getBytes()));
       } else {// This is the first time that this Service starts up
-        if (log.isDebugEnabled()) {
-          log.debug("Product server first run: setup product Version Declaration Node");
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Product server first run: setup product Version Declaration Node");
         }
         firstRun = true;
         Node UpgradeProductServiceNode = applicationDataNode.addNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME, "nt:unstructured");
@@ -322,24 +322,24 @@ public class ProductInformations implements Startable {
         previousProductInformationProperties = (Properties)productInformationProperties.clone();
       }
     } catch (LoginException exception) {
-      log.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
+      LOG.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
       return;
     } catch (NoSuchWorkspaceException exception) {
-      log.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
+      LOG.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
       return;
     } catch (RepositoryException exception) {
-      log.error("Can't load product informations from the JCR!", exception);
+      LOG.error("Can't load product informations from the JCR!", exception);
       return;
     } catch (IOException exception) {
-      log.error("Can't load product informations from the JCR: the data stored in the JCR couldn't be parsed.", exception);
+      LOG.error("Can't load product informations from the JCR: the data stored in the JCR couldn't be parsed.", exception);
       return;
     } finally {
       if (session != null) {
         session.logout();
       }
     }
-    if (log.isDebugEnabled()) {
-      log.debug("start method end");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("start method end");
     }
   }
 
@@ -369,13 +369,13 @@ public class ProductInformations implements Startable {
       productVersionDeclarationNodeContent.setProperty("jcr:lastModified", new Date().getTime());
       productVersionDeclarationNode.getSession().save();
     } catch (LoginException exception) {
-      log.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
+      LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
     } catch (NoSuchWorkspaceException exception) {
-      log.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
+      LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
     } catch (RepositoryException exception) {
-      log.error("Can't store informations in the JCR!", exception);
+      LOG.error("Can't store informations in the JCR!", exception);
     } catch (MissingProductInformationException exception) {
-      log.error("Can't read current product version!", exception);
+      LOG.error("Can't read current product version!", exception);
     } finally {
       if (session != null) {
         session.logout();

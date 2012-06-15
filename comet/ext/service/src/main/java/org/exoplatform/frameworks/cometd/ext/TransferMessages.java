@@ -22,10 +22,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.exoplatform.services.log.Log;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceDelegate;
 import org.exoplatform.ws.frameworks.cometd.transport.DelegateMessage;
@@ -40,10 +38,6 @@ import org.exoplatform.ws.frameworks.cometd.transport.DelegateMessage;
 public class TransferMessages
    implements ResourceContainer
 {
-   /**
-    * Class logger.
-    */
-   private final Log log = ExoLogger.getLogger("ws.CometdTestSendMessage");
 
    @POST
    @Path("/ext/sendprivatemessage/")

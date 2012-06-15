@@ -57,7 +57,7 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
   private RepositoryService repositoryService;
 
   /** The log. */
-  private Log log = ExoLogger.getLogger(this.getClass());
+  private static final Log LOG = ExoLogger.getLogger(XMLDeploymentPlugin.class);
 
   /**
    * Instantiates a new xML deployment plugin.
@@ -117,7 +117,7 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
           Node node = iter.nextNode();
           if (node.hasProperty("publication:liveRevision")
               && node.hasProperty("publication:currentState")) {
-            log.info("\"" + node.getName() + "\" publication lifecycle has been cleaned up");
+            LOG.info("\"" + node.getName() + "\" publication lifecycle has been cleaned up");
             node.setProperty("publication:liveRevision", "");
             node.setProperty("publication:currentState", "published");
           }
@@ -135,8 +135,8 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
       }
 
       session.save();
-      if (log.isInfoEnabled()) {
-        log.info(deploymentDescriptor.getSourcePath() + " is deployed succesfully into "
+      if (LOG.isInfoEnabled()) {
+        LOG.info(deploymentDescriptor.getSourcePath() + " is deployed succesfully into "
             + deploymentDescriptor.getTarget().getNodePath());
       }
     }

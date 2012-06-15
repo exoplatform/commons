@@ -38,7 +38,7 @@ public class LoadBalancerImpl implements LoadBalancer, Startable
    /**
     * Class logger.
     */
-   private final Log log = ExoLogger.getLogger("ws.LoadBalancerImpl");
+   private static final Log LOG = ExoLogger.getLogger(LoadBalancerImpl.class);
    
    private LoadBalancerConf loadBalancerConf;
 
@@ -154,8 +154,8 @@ public class LoadBalancerImpl implements LoadBalancer, Startable
                return node.getUrl();
             }
          }
-         if (log.isDebugEnabled())
-            log.debug("Overflow new client cannot connect!");
+         if (LOG.isDebugEnabled())
+            LOG.debug("Overflow new client cannot connect!");
          return null;
       }
    }

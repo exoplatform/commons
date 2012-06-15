@@ -38,7 +38,7 @@ import org.exoplatform.webui.application.WebuiRequestContext;
  * Jul 5, 2011  
  */
 public class TimeConvertUtils {
-  private static Log      log = ExoLogger.getLogger(TimeConvertUtils.class);
+  private static final Log      LOG = ExoLogger.getLogger(TimeConvertUtils.class);
   
   public static String[] strs                 = new String[] { "SECOND", "MINUTE", "HOUR", "DAY",
                                                                "WEEK", "MONTH", "YEAR", "DECADE"};
@@ -161,7 +161,7 @@ public class TimeConvertUtils {
     }
     // still null
     if (res == null) {
-      log.warn("Can not resource bundle by key: " + key);
+      LOG.warn("Can not resource bundle by key: " + key);
       return key.substring(key.lastIndexOf(".") + 1).toLowerCase();
     }
 

@@ -48,7 +48,7 @@ import org.exoplatform.services.log.Log;
  */
 public class I18NImpl {
 
-  private static final Log log = ExoLogger.getLogger(I18NImpl.class);
+  private static final Log LOG = ExoLogger.getLogger(I18NImpl.class);
 
   /**
    * Returns the message string with the specified key from the "properties"
@@ -60,9 +60,9 @@ public class I18NImpl {
       InputStream stream = Class.forName(className).getResourceAsStream(resource_name);
       bundle = new PropertyResourceBundle(stream);
     } catch (ClassNotFoundException e) {
-      log.error("ClassNotFoundException: ", e);
+      LOG.error("ClassNotFoundException: ", e);
     } catch (IOException e) {
-      log.error("IOException: ", e);
+      LOG.error("IOException: ", e);
     }
 
     return (String) bundle.handleGetObject(key);

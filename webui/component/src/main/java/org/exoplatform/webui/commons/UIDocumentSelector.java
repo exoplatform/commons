@@ -19,8 +19,6 @@ package org.exoplatform.webui.commons;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -45,8 +43,6 @@ import org.exoplatform.webui.event.EventListener;
  )
 public class UIDocumentSelector extends UIContainer {
   
-  protected static final Log    logger                = ExoLogger.getLogger(UIDocumentSelector.class);    
-
   protected static final String UPLOAD_AREA            = "UPLOAD_AREA";
   
   protected static final String SELECT_FILE            = "SelectFile";

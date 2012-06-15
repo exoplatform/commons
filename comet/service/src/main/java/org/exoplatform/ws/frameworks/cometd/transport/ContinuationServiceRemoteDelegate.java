@@ -51,7 +51,7 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
    /**
     * Class logger.
     */
-   private final Log log = ExoLogger.getLogger("ws.ContinuationServiceRemoteDelegate");
+   private static final Log LOG = ExoLogger.getLogger(ContinuationServiceRemoteDelegate.class);
 
    private final LoadBalancer loadBalancer;
 
@@ -88,25 +88,25 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
          HTTPConnection connection = new HTTPConnection(url);
          HTTPResponse response = connection.Get(url.getFile());
          String bol = new String(response.getData());
-         if (log.isDebugEnabled())
-            log.debug("Check user " + exoID + " subscription to channel " + channel);
+         if (LOG.isDebugEnabled())
+            LOG.debug("Check user " + exoID + " subscription to channel " + channel);
          return new Boolean(bol);
       } 
       catch (MalformedURLException e) 
       {
-         log.error("Malformed URL: ", e);
+         LOG.error("Malformed URL: ", e);
       } 
       catch (ProtocolNotSuppException e) 
       {
-         log.error("Protocol is not supported: ", e);
+         LOG.error("Protocol is not supported: ", e);
       } 
       catch (IOException e) 
       {
-         log.error("IO exception: ", e);
+         LOG.error("IO exception: ", e);
       } 
       catch (ModuleException e) 
       {
-         log.error("error when getting response: ", e);
+         LOG.error("error when getting response: ", e);
       }
       return null;
    }
@@ -129,36 +129,36 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
          HTTPResponse response = connection.Post(url.getFile(), json.toString(), pairs);
          if (response.getStatusCode() == HTTPStatus.OK)
          {
-            if (log.isDebugEnabled())
-               log.debug("Send private message : " + message + " to client " + exoID + " by cahnnel " + channel
+            if (LOG.isDebugEnabled())
+               LOG.debug("Send private message : " + message + " to client " + exoID + " by cahnnel " + channel
                   + " success");
          }
          else
          {
-            if (log.isDebugEnabled())
-               log.debug("Send private message : " + message + " to client " + exoID + " by cahnnel " + channel
+            if (LOG.isDebugEnabled())
+               LOG.debug("Send private message : " + message + " to client " + exoID + " by cahnnel " + channel
                   + " fail!");
          }
       } 
       catch (MalformedURLException e) 
       {
-         log.error("Malformed URL: ", e);
+         LOG.error("Malformed URL: ", e);
       } 
       catch (ProtocolNotSuppException e) 
       {
-         log.error("Protocol is not supported: ", e);
+         LOG.error("Protocol is not supported: ", e);
       } 
       catch (JsonException e) 
       {
-         log.error("error when create JSON object: ", e);
+         LOG.error("error when create JSON object: ", e);
       } 
       catch (IOException e) 
       {
-         log.error("IO exception: ", e);
+         LOG.error("IO exception: ", e);
       } 
       catch (ModuleException e) 
       {
-         log.error("error when getting response: ", e);
+         LOG.error("error when getting response: ", e);
       }
    }
 
@@ -184,36 +184,36 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
                HTTPResponse response = connection.Post(url.getFile(), json.toString(), pairs);
                if (response.getStatusCode() == HTTPStatus.OK)
                {
-                  if (log.isDebugEnabled())
-                     log.debug("Send public message : " + message + " to channel " + channel + " success");
+                  if (LOG.isDebugEnabled())
+                     LOG.debug("Send public message : " + message + " to channel " + channel + " success");
                }
                else
                {
-                  if (log.isDebugEnabled())
-                     log.debug("Send public message : " + message + " to channel " + channel + " fail!");
+                  if (LOG.isDebugEnabled())
+                     LOG.debug("Send public message : " + message + " to channel " + channel + " fail!");
                }
             }
          }
       } 
       catch (MalformedURLException e) 
       {
-         log.error("Malformed URL: ", e);
+         LOG.error("Malformed URL: ", e);
       } 
       catch (ProtocolNotSuppException e) 
       {
-         log.error("Protocol is not supported: ", e);
+         LOG.error("Protocol is not supported: ", e);
       } 
       catch (JsonException e) 
       {
-         log.error("error when create JSON object: ", e);
+         LOG.error("error when create JSON object: ", e);
       } 
       catch (IOException e) 
       {
-         log.error("IO exception: ", e);
+         LOG.error("IO exception: ", e);
       } 
       catch (ModuleException e) 
       {
-         log.error("error when getting response: ", e);
+         LOG.error("error when getting response: ", e);
       }
    }
 
@@ -241,19 +241,19 @@ public class ContinuationServiceRemoteDelegate implements ContinuationServiceDel
       }
       catch (MalformedURLException e) 
       {
-         log.error("Malformed URL: ", e);
+         LOG.error("Malformed URL: ", e);
       } 
       catch (ProtocolNotSuppException e) 
       {
-         log.error("Protocol is not supported: ", e);
+         LOG.error("Protocol is not supported: ", e);
       } 
       catch (IOException e) 
       {
-         log.error("IO exception: ", e);
+         LOG.error("IO exception: ", e);
       } 
       catch (ModuleException e) 
       {
-         log.error("error when getting response: ", e);
+         LOG.error("error when getting response: ", e);
       }
       return null;
    }

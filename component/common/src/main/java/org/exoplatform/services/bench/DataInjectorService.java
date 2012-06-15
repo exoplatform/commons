@@ -46,7 +46,7 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Path("/bench")
 public class DataInjectorService implements ResourceContainer {
   
-  private static Log         log             = ExoLogger.getLogger(DataInjectorService.class);
+  private static final Log         LOG             = ExoLogger.getLogger(DataInjectorService.class);
   
   private enum Actions {
     INJECT, REJECT, EXECUTE
@@ -175,7 +175,7 @@ public class DataInjectorService implements ResourceContainer {
   }
 
   private void beginPrintInfo(HashMap<String, String> params, Actions action) {
-    log.info(String.format("Start to %s............... ", action.toString().toLowerCase()));
+    LOG.info(String.format("Start to %s............... ", action.toString().toLowerCase()));
     StringBuilder sb = new StringBuilder();
     sb.append("PARAMS: \n");
     Iterator<String> keys = params.keySet().iterator();
@@ -183,16 +183,16 @@ public class DataInjectorService implements ResourceContainer {
       String key = keys.next();
       sb.append(String.format("%1$10s    :    %2$10s \n", key, params.get(key)));
     }
-    log.info(sb.toString());
+    LOG.info(sb.toString());
   }
 
   private void endPrintInfo(Actions action) {
-    log.info(String.format("%sing data has been done successfully!", action.toString().toLowerCase()));
+    LOG.info(String.format("%sing data has been done successfully!", action.toString().toLowerCase()));
   }
 
   private void errorPrintInfo(DataInjector injector, Actions action, Exception ex) {
-    if (log.isWarnEnabled())
-      log.warn(String.format("%s %sed failed", injector.getName(), action.toString().toLowerCase()), ex);
+    if (LOG.isWarnEnabled())
+      LOG.warn(String.format("%s %sed failed", injector.getName(), action.toString().toLowerCase()), ex);
   }
 
 }

@@ -46,7 +46,7 @@ public class EXoContinuationCometdServlet
    /**
     * Logger.
     */
-   private static Log log = ExoLogger.getLogger("ws.EXoContinuationCometdServlet");
+   private static final Log LOG = ExoLogger.getLogger(EXoContinuationCometdServlet.class);
 
    /**
     * The portal container
@@ -70,7 +70,7 @@ public class EXoContinuationCometdServlet
             }
             catch (ServletException e)
             {
-               log.error("Cannot initialize Bayeux", e);
+               LOG.error("Cannot initialize Bayeux", e);
             }
          }
       };
@@ -84,18 +84,18 @@ public class EXoContinuationCometdServlet
    {
       try
       {
-         if (log.isDebugEnabled())
-            log.debug("EXoContinuationCometdServlet - Current Container-ExoContainer: " + container);
+         if (LOG.isDebugEnabled())
+            LOG.debug("EXoContinuationCometdServlet - Current Container-ExoContainer: " + container);
          EXoContinuationBayeux bayeux =
                   (EXoContinuationBayeux) container.getComponentInstanceOfType(AbstractBayeux.class);
          bayeux.setTimeout(Long.parseLong(getInitParameter("timeout")));
-         if (log.isDebugEnabled())
-            log.debug("EXoContinuationCometdServlet - -->AbstractBayeux=" + bayeux);
+         if (LOG.isDebugEnabled())
+            LOG.debug("EXoContinuationCometdServlet - -->AbstractBayeux=" + bayeux);
          return bayeux;
       }
       catch (NumberFormatException e)
       {
-         log.error("Error new Bayeux creation ", e);
+         LOG.error("Error new Bayeux creation ", e);
          return null;
       }
    }

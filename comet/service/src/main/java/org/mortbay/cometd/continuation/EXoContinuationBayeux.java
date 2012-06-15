@@ -73,7 +73,7 @@ public class EXoContinuationBayeux
    /**
     * Logger.
     */
-   private static Log log = ExoLogger.getLogger("ws.EXoContinuationBayeux");
+   private static final Log LOG = ExoLogger.getLogger(EXoContinuationBayeux.class);
 
    /**
     * Default constructor.
@@ -160,8 +160,8 @@ public class EXoContinuationBayeux
          random = new Random();
       }
       random.setSeed(random.nextLong() ^ hashCode() ^ (context.hashCode() << 32) ^ Runtime.getRuntime().freeMemory());
-      if (log.isDebugEnabled())
-         log.debug("Initialized");
+      if (LOG.isDebugEnabled())
+         LOG.debug("Initialized");
    }
 
    /**
@@ -196,13 +196,13 @@ public class EXoContinuationBayeux
       if (ch != null)
       {
          ch.publish(fromClient, data, msgId);
-         if (log.isDebugEnabled())
-            log.debug("Send broadcast message " + data.toString() + " on channel " + channel);
+         if (LOG.isDebugEnabled())
+            LOG.debug("Send broadcast message " + data.toString() + " on channel " + channel);
       }
       else
       {
-         if (log.isDebugEnabled())
-            log.debug("Message " + data.toString() + " not send. Channel " + channel + " not exist!");
+         if (LOG.isDebugEnabled())
+            LOG.debug("Message " + data.toString() + " not send. Channel " + channel + " not exist!");
       }
    }
 
@@ -230,13 +230,13 @@ public class EXoContinuationBayeux
       if (toClient != null)
       {
          toClient.deliver(fromClient, channel, data, id);
-         if (log.isDebugEnabled())
-            log.debug("Send message " + data.toString() + " on channel " + channel + " to client " + eXoId);
+         if (LOG.isDebugEnabled())
+            LOG.debug("Send message " + data.toString() + " on channel " + channel + " to client " + eXoId);
       }
       else
       {
-         if (log.isDebugEnabled())
-            log.debug("Message " + data.toString() + " not send on channel " + channel + " client " + eXoId
+         if (LOG.isDebugEnabled())
+            LOG.debug("Message " + data.toString() + " not send on channel " + channel + " client " + eXoId
                      + " not exist!");
       }
    }
@@ -256,11 +256,6 @@ public class EXoContinuationBayeux
    public static class EXoSecurityPolicy
       implements SecurityPolicy
    {
-
-      /**
-       * 
-       */
-      private static Log log = ExoLogger.getLogger("ws.EXoContinuationBayeux.EXoSecurityPolicy");
 
       /**
        * 

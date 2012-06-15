@@ -58,7 +58,7 @@ import org.exoplatform.webui.event.EventListener;
 )
 public class UIAddAttachment extends UIContainer implements UIPopupComponent {
   
-  protected static Log          log                = ExoLogger.getLogger(UIAddAttachment.class);
+  private static final Log      LOG                = ExoLogger.getLogger(UIAddAttachment.class);
 
   protected static final String UIDOCUMENTSELECTOR = "UIDocumentSelector";
 
@@ -71,14 +71,14 @@ public class UIAddAttachment extends UIContainer implements UIPopupComponent {
   public static final String    SELECTEDFILE       = "selectedFile";
 
   public static final String    ISATTACHFILE       = "isAttachFile";
-  
-  private EventUIComponent                targetAttachEvent;
+
+  private EventUIComponent      targetAttachEvent;
   
   public UIAddAttachment() {
     try {
       addChild(UIDocumentSelector.class, null, UIDOCUMENTSELECTOR);
     } catch (Exception e) {  //UIComponent.addChild() throws Exception()
-      log.error("An exception happens when init UIAddAttachment", e);
+      LOG.error("An exception happens when init UIAddAttachment", e);
     }
   }
   

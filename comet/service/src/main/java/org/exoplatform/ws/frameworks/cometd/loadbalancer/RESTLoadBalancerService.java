@@ -41,7 +41,7 @@ public class RESTLoadBalancerService
    /**
     * Class logger.
     */
-   private final Log log = ExoLogger.getLogger("ws.RESTLoadBalancerService");
+   private static final Log LOG = ExoLogger.getLogger(RESTLoadBalancerService.class);
 
    /**
     * 
@@ -68,14 +68,14 @@ public class RESTLoadBalancerService
       String url = balancer.connection(exoid);
       if (!(url.equals("") || url.length() == 0))
       {
-         if (log.isDebugEnabled())
-            log.debug("Client with exoid " + exoid + " get URL " + url + " for cometd connection");
+         if (LOG.isDebugEnabled())
+            LOG.debug("Client with exoid " + exoid + " get URL " + url + " for cometd connection");
          return Response.ok(url).build();
       }
       else
       {
-         if (log.isDebugEnabled())
-            log.debug("All nodes are owerflow client with exoid " + exoid + " can't connect to cometd!");
+         if (LOG.isDebugEnabled())
+            LOG.debug("All nodes are owerflow client with exoid " + exoid + " can't connect to cometd!");
          return Response.status(Status.FORBIDDEN).entity("Owerflow!").type(MediaType.TEXT_PLAIN).build();
       }
    }

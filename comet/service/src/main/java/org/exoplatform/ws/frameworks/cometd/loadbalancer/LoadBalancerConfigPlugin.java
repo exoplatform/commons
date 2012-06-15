@@ -19,8 +19,6 @@ package org.exoplatform.ws.frameworks.cometd.loadbalancer;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ObjectParameter;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancerImpl.LoadBalancerConf;
 
 /**
@@ -30,11 +28,6 @@ import org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancerImpl.LoadBa
 */
 public class LoadBalancerConfigPlugin extends BaseComponentPlugin
 {
-   /**
-     * Class logger.
-     */
-   private final Log log = ExoLogger.getLogger("ws.LoadBalancerConfigPlugin");
-   
    /**
     * 
     */

@@ -43,7 +43,7 @@ import org.exoplatform.services.log.Log;
  * @author benjaminmestrallet
  */
 public class Utils {
-  private final static Log   log          = ExoLogger.getLogger("org.exoplatform.services.cms.impl.Utils");
+  private final static Log   LOG          = ExoLogger.getLogger(Utils.class);
   
   public static final String MAPPING_FILE = "mapping.properties";
 
@@ -111,10 +111,10 @@ public class Utils {
             currentNode.getSession().save();
           } catch (ItemNotFoundException item) {
             currentNode.getSession().refresh(false);
-            log.error("Can not found versionable node" + item, item);
+            LOG.error("Can not found versionable node" + item, item);
           } catch (RepositoryException e) {
             currentNode.getSession().refresh(false);
-            log.error("Import version history failed " + e, e);
+            LOG.error("Import version history failed " + e, e);
           }
           zipInputStream.closeEntry();
           entry = zipInputStream.getNextEntry();

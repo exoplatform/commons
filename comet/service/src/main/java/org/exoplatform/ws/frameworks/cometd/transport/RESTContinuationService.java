@@ -44,7 +44,7 @@ public class RESTContinuationService
    /**
     * Class logger.
     */
-   private final Log log = ExoLogger.getLogger("ws.RestServiceForCometdTransport");
+   private static final Log LOG = ExoLogger.getLogger(RESTContinuationService.class);
 
    private final ContinuationService continuation;
 
@@ -63,8 +63,8 @@ public class RESTContinuationService
    public Response getToken(@PathParam("exoID") String exoID)
    {
       String token = continuation.getUserToken(exoID);
-      if (log.isDebugEnabled())
-         log.debug("Client with exoId " + exoID + " get token " + token);
+      if (LOG.isDebugEnabled())
+         LOG.debug("Client with exoId " + exoID + " get token " + token);
       return Response.ok(token, MediaType.TEXT_PLAIN).header("Content-Length", Integer.toString(token.length()))
                .build();
    }
@@ -80,8 +80,8 @@ public class RESTContinuationService
    public Response isSubscribed(@PathParam("exoID") String exoID, @QueryParam("channel") String channel)
    {
       Boolean b = continuation.isSubscribe(exoID, channel);
-      if (log.isDebugEnabled())
-         log.debug("Is subcribed client " + exoID + " on channel " + channel + " " + b);
+      if (LOG.isDebugEnabled())
+         LOG.debug("Is subcribed client " + exoID + " on channel " + channel + " " + b);
       return Response.ok(b.toString(), MediaType.TEXT_PLAIN).build();
    }
 
@@ -95,8 +95,8 @@ public class RESTContinuationService
    public Response hasChannel(@QueryParam("channel") String channel)
    {
       Boolean b = continuation.hasChannel(channel);
-      if (log.isDebugEnabled())
-         log.debug("Has channel " + channel + " " + b);
+      if (LOG.isDebugEnabled())
+         LOG.debug("Has channel " + channel + " " + b);
       return Response.ok(b.toString(), MediaType.TEXT_PLAIN).header("Content-Length",
                Integer.toString(b.toString().length())).build();
    }
@@ -111,8 +111,8 @@ public class RESTContinuationService
    public Response sendMessage(DelegateMessage data)
    {
       continuation.sendMessage(data.getExoId(), data.getChannel(), data.getMessage(), data.getId());
-      if (log.isDebugEnabled())
-         log.debug("Send private message " + data.getMessage() + " on channel " + data.getChannel() + " to client "
+      if (LOG.isDebugEnabled())
+         LOG.debug("Send private message " + data.getMessage() + " on channel " + data.getChannel() + " to client "
                   + data.getExoId());
       return Response.ok().build();
    }
@@ -127,8 +127,8 @@ public class RESTContinuationService
    public Response sendBroadcastMessage(DelegateMessage data)
    {
       continuation.sendBroadcastMessage(data.getChannel(), data.getMessage(), data.getId());
-      if (log.isDebugEnabled())
-         log.debug("Send broadcast message " + data.getMessage() + " on channel " + data.getChannel());
+      if (LOG.isDebugEnabled())
+         LOG.debug("Send broadcast message " + data.getMessage() + " on channel " + data.getChannel());
       return Response.ok().build();
    }
 
