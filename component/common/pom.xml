@@ -35,19 +35,13 @@
     </dependency>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
-      <artifactId>exo.platform.commons.testing</artifactId>
+      <artifactId>commons-testing</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.commons</groupId>
-      <artifactId>exo.platform.commons.testing</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

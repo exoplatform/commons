@@ -12,7 +12,7 @@
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
-      <artifactId>exo.platform.commons.component.product</artifactId>
+      <artifactId>commons-component-product</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -47,7 +47,7 @@
     </dependency>    
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
-      <artifactId>exo.platform.commons.testing</artifactId>
+      <artifactId>commons-testing</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
