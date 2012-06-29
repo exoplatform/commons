@@ -1,4 +1,7 @@
 <% 
+ //portal's problem, workaround for uicomponent.event()
+  _ctx.getRequestContext().getJavascriptManager().loadScriptResource(ResourceScope.SHARED, "base");
+  
   String cancel = uicomponent.event(uicomponent.CANCEL);
   String saveFile = uicomponent.event(uicomponent.SAVEFILE);
 %>

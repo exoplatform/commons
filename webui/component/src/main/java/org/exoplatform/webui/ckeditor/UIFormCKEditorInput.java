@@ -18,6 +18,8 @@ package org.exoplatform.webui.ckeditor;
 
 import java.io.Writer;
 
+import org.gatein.portal.controller.resource.ResourceScope;
+import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.form.UIFormInputBase;
 
@@ -68,15 +70,19 @@ public class UIFormCKEditorInput extends UIFormInputBase<String>{
   @Override
   public void processRender(WebuiRequestContext context) throws Exception {
     Writer writer = context.getWriter();
-    String ckBasePath = CKConfigListener.CK_CONTEXT_PATH;
-    context.getJavascriptManager().addJavascript("window.CKEDITOR_BASEPATH='" + ckBasePath + "/ckeditor/';");
+    
+    JavascriptManager jsManager = context.getJavascriptManager();
+    jsManager.loadScriptResource(ResourceScope.SHARED, "commons.editor");    
+    
+    String ckBasePath = CKConfigListener.CK_CONTEXT_PATH;    
+    jsManager.addJavascript("window.CKEDITOR_BASEPATH='" + ckBasePath + "/ckeditor/';");    
     writer.write("<textarea id='" + name + "' name='" + name + "'>" + (value_ != null ? value_ : "") + "</textarea>");
     
     if (this.editorConfig != null && !this.editorConfig.isEmpty()) {
       String config = TagHelper.jsEncode(this.editorConfig);
-      context.getJavascriptManager().addJavascript("EXOCKEDITOR.makeCKEditor('" + name + "', " + config + ");");
+      jsManager.addJavascript("EXOCKEDITOR.makeCKEditor('" + name + "', " + config + ");");
     } else {
-      context.getJavascriptManager().addJavascript("EXOCKEDITOR.makeCKEditor('" + name + "');");    
+      jsManager.addJavascript("EXOCKEDITOR.makeCKEditor('" + name + "');");    
     }
   }
 

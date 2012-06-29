@@ -1,11 +1,14 @@
 <%
-  def rcontext = _ctx.getRequestContext();
+  def rcontext = _ctx.getRequestContext();  
   String restContext = uicomponent.getRestContext();
   String selectFileLink =uicomponent.event(uicomponent.SELECT_FILE);
   String selectFolderLink =uicomponent.event(uicomponent.SELECT_FOLDER);
 
   def jsManager = rcontext.getJavascriptManager();
+  //portal's problem, workaround for uicomponent.event()
+  jsManager.loadScriptResource(ResourceScope.SHARED, "base");
   
+  jsManager.loadScriptResource(ResourceScope.SHARED, "commons.document");    
   jsManager.addJavascript("eXo.commons.DocumentSelector.getDrives = '" + uicomponent.GET_DRIVES + "';");
   jsManager.addJavascript("eXo.commons.DocumentSelector.getFoldersAndFiles = '" + uicomponent.GET_FOLDERS_AND_FILES + "';");
   jsManager.addJavascript("eXo.commons.DocumentSelector.deleteFolderOrFile = '" + uicomponent.DELETE_FOLDER_OR_FILE + "';");

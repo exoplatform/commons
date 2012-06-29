@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.testing.webui;
 
+import org.exoplatform.web.application.AbstractApplicationMessage;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.core.UIApplication;
 import org.exoplatform.webui.core.UIComponent;
@@ -56,19 +57,19 @@ public abstract class AbstractUIComponentTestCase<T extends UIComponent> extends
   protected void assertApplicationMessage(String key) {
     UIApplication app = component.getAncestorOfType(UIApplication.class);
     boolean found = false;
-    for (ApplicationMessage message : app.getUIPopupMessages().getWarnings()) {
+    for (AbstractApplicationMessage message : app.getUIPopupMessages().getWarnings()) {
       if(key.equals(message.getMessageKey())) {
         found = true;
       }
     }
     
-    for (ApplicationMessage message : app.getUIPopupMessages().getInfos()) {
+    for (AbstractApplicationMessage message : app.getUIPopupMessages().getInfos()) {
       if(key.equals(message.getMessageKey())) {
         found = true;
       }
     }
     
-    for (ApplicationMessage message : app.getUIPopupMessages().getErrors()) {
+    for (AbstractApplicationMessage message : app.getUIPopupMessages().getErrors()) {
       if(key.equals(message.getMessageKey())) {
         found = true;
       }
