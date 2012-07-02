@@ -4,16 +4,20 @@
   xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_2_1 http://www.gatein.org/xml/ns/gatein_resources_1_2_1"
   xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_2_1">
 
-  <scripts>
+  <module>
     <name>cometd</name>
-    <module>
+    <script>
       <name>eXo.core.Cometd</name>
       <path>/javascript/eXo/core/Cometd.js</path>
-    </module>
-    <depends>
-      <scripts>base</scripts>
-    </depends>
-  </scripts>
-
+    </script>
+    <script>
+      <name>eXo.core.JSON</name>
+      <path>/javascript/eXo/core/JSON.js</path>
+    </script>
+    <!-- need Browser.js -->
+    <depends>    	
+      <module>base</module>      
+    </depends>    
+  </module>
 
 </gatein-resources>
