@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_2_1 http://www.gatein.org/xml/ns/gatein_resources_1_2_1"
-  xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_2_1">
+	xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_2_1 http://www.gatein.org/xml/ns/gatein_resources_1_2_1"
+	xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_2_1">
 
-  <module>
-    <name>cometd</name>
-    <script>
-      <name>eXo.core.Cometd</name>
-      <path>/javascript/eXo/core/Cometd.js</path>
-    </script>
-    <script>
-      <name>eXo.core.JSON</name>
-      <path>/javascript/eXo/core/JSON.js</path>
-    </script>
-    <!-- need Browser.js -->
-    <depends>    	
-      <module>base</module>      
-    </depends>    
-  </module>
+	<module>
+		<name>cometd</name>
+		<script>
+			<name>eXo.core.JSON</name>
+			<path>/javascript/eXo/core/JSON.js</path>
+		</script>
+		<script>
+			<name>eXo.core.Cometd</name>
+			<path>/javascript/eXo/core/Cometd.js</path>
+		</script>
+		<!-- need Browser.js -->
+		<depends>
+			<module>base</module>
+		</depends>
+	</module>
 
 </gatein-resources>
