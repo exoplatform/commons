@@ -24,6 +24,8 @@
 		</script>
 		<depends>
 			<module>jquery</module>
+		</depends>
+		<depends>
 			<!-- need Browser.js -->
 			<module>base</module>
 		</depends>
