@@ -1,4 +1,6 @@
 <%  
+    import org.gatein.portal.controller.resource.ResourceScope;
+
 	def rcontext = _ctx.getRequestContext();
 	String uploadId = uicomponent.getUploadId();
 	String refreshUpload = uicomponent.getRefreshUploadAction();

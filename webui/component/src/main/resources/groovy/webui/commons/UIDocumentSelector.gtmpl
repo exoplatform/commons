@@ -1,4 +1,5 @@
 <%
+  import org.gatein.portal.controller.resource.ResourceScope;
   def rcontext = _ctx.getRequestContext();  
   String restContext = uicomponent.getRestContext();
   String selectFileLink =uicomponent.event(uicomponent.SELECT_FILE);

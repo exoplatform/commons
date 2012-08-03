@@ -1,4 +1,6 @@
 <% 
+  import org.gatein.portal.controller.resource.ResourceScope;
+
  //portal's problem, workaround for uicomponent.event()
   _ctx.getRequestContext().getJavascriptManager().loadScriptResource(ResourceScope.SHARED, "base");
   
