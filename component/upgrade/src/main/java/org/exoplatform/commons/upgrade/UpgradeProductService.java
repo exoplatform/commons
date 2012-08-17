@@ -2,6 +2,7 @@ package org.exoplatform.commons.upgrade;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Iterator;
 
 import org.exoplatform.commons.info.MissingProductInformationException;
 import org.exoplatform.commons.info.ProductInformations;
@@ -95,10 +96,13 @@ public class UpgradeProductService implements Startable {
           String upgradePluginNames[] = pluginsOrder.split(",");
           for (int i = 0; i < upgradePluginNames.length; i++) {
             if (upgradePlugins.size() > 0) {
-              for (UpgradeProductPlugin upgradeProductPlugin : upgradePlugins) {
+              Iterator<UpgradeProductPlugin> iterator= upgradePlugins.iterator();
+              while(iterator.hasNext())
+              {
+                UpgradeProductPlugin upgradeProductPlugin= iterator.next();
                 if (upgradeProductPlugin.getName().equals(upgradePluginNames[i])) {
                   doUpgrade(upgradeProductPlugin, i);
-                  upgradePlugins.remove(upgradeProductPlugin);
+                  iterator.remove();
                   break;
                 }
               }
