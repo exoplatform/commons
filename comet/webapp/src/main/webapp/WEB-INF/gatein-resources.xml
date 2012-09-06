@@ -5,18 +5,19 @@
 	xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_2_1">
 
 	<module>
-		<name>cometd</name>
+		<name>commons.cometd</name>		
 		<script>
-			<name>eXo.core.JSON</name>
-			<path>/javascript/eXo/core/JSON.js</path>
+			<name>eXo.commons.JSON</name>
+			<path>/javascript/eXo/commons/JSON.js</path>
 		</script>
 		<script>
-			<name>eXo.core.Cometd</name>
-			<path>/javascript/eXo/core/Cometd.js</path>
+			<name>eXo.commons.Cometd</name>
+			<path>/javascript/eXo/commons/Cometd.js</path>
 		</script>
 		<!-- need Browser.js -->
 		<depends>
 			<module>base</module>
+			<as>gtnbase</as>
 		</depends>
 	</module>
 

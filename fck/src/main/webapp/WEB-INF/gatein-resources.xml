@@ -13,7 +13,7 @@
     -->
 
 	<module>
-		<name>FCKEditor</name>
+		<name>commons.fck</name>
 		<script>
 			<name>commons.FCKEditor</name>
 			<path>/fckeditor/fckeditor.js</path>

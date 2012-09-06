@@ -5,9 +5,12 @@
 	String uploadId = uicomponent.getUploadId();
 	String refreshUpload = uicomponent.getRefreshUploadAction();
 	boolean isAutoUpload = uicomponent.isAutoUpload();
-	def jsManager = rcontext.getJavascriptManager();
-  	jsManager.loadScriptResource(ResourceScope.SHARED, "commons.document");
-	jsManager.addJavascript("eXo.commons.UIDSUpload.initUploadEntry('"+uploadId+"',"+isAutoUpload+");");
+	
+	def requireJS = rcontext.getJavascriptManager().getRequireJS();	
+  	requireJS.require("SHARED/commons.document","document");  
+  	requireJs.require("SHARED/jquery", "jQuery");	
+  	requireJS.addScripts("document.UIDSUpload.initUploadEntry('" +uploadId+ "'," +isAutoUpload+ ");");
+  	requireJS.addScripts("jQuery('#deleteFF').click(function(){document.UIDSUpload.abortUpload("+uploadId+");});");  	
 %>
 <div class="UIDSUploadInput" id="$uploadId" upload_failed="<%= _ctx.appRes("UIFormUploadInput.msg.upload_failed"); %>">
 	<div class="LimitMessage" style="display: none;"><%= _ctx.appRes("UIFormUploadInput.msg.limit"); %></div>
@@ -18,7 +21,7 @@
 	<div id="<%=uploadId;%>ProgressIframe" class="ProgressIframe" style="display: none;"></div>			
 	<div class="ProgressBarFrame" style="display: none;">
 		
-		<div class="DeleteFileFrame" onclick="eXo.commons.UIDSUpload.abortUpload($uploadId);">&nbsp;
+		<div id="deleteFF" class="DeleteFileFrame">&nbsp;
 		</div>
 		<div class="ProgressBarLabel">0%</div>
 	</div>

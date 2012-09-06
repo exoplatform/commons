@@ -23,11 +23,13 @@
 			<path>/javascript/eXo/commons/UIDSUpload.js</path>
 		</script>
 		<depends>
-			<module>jquery</module>
+			<module>jquery</module>	
+			<as>jQuery</as>	
 		</depends>
 		<depends>
 			<!-- need Browser.js -->
 			<module>base</module>
+			<as>gtnbase</as>
 		</depends>
 	</module>
 

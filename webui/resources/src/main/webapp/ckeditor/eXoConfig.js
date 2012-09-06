@@ -60,3 +60,7 @@ CKEDITOR.editorConfig = function( config ){
 		   ['-','Link','Unlink','insertPortalLink.btn','insertGadget.btn','content.btn', 'Image'],	
 	] ;
 };
+
+eXo.commons.ExoEditorConfig = CKEDITOR;
+
+_module.config = eXo.commons.ExoEditorConfig;
