@@ -466,9 +466,17 @@ function LongPollTransport() {
 		request.process();	
 
 	}
-	return instance;
+	return instance;	
 }
-eXo.commons.Cometd = new Cometd();
+
+Array.prototype.each = function (iterator, context) {
+	iterator = iterator.bind(context);
+	   for (var i = 0; i < this.length; i++) {
+	iterator(this[i]) ;
+	}
+};
+
+//eXo.commons.Cometd = new Cometd();
 eXo.portal.LongPollTransport = LongPollTransport.prototype.constructor;
 
-_module = eXo.commons.Cometd;
+_module = new Cometd();

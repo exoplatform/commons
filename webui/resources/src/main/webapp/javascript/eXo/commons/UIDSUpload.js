@@ -18,7 +18,12 @@
  * site: http://www.fsf.org.
  */
 
-if(!eXo.commons) eXo.commons = {};
+if (!eXo) 
+  eXo = {};
+
+if (!eXo.commons) 
+  eXo.commons = {};
+
 function UIDSUpload() {
   this.listUpload = new Array();
   this.isAutoUpload = true;
