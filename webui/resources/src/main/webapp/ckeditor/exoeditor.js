@@ -5,7 +5,7 @@ function EXOCKEDITOR() {
 EXOCKEDITOR.prototype.loadScript = function (url, callback){
   var script = document.createElement("script")
   script.type = "text/javascript";
-  if (script.readyState){ //IE
+  if (script.readyState){ // IE
     script.onreadystatechange = function(){
       if (script.readyState == "loaded" || script.readyState == "complete"){
         script.onreadystatechange = null;
@@ -13,7 +13,7 @@ EXOCKEDITOR.prototype.loadScript = function (url, callback){
       }
     };
 
-  } else { //Others
+  } else { // Others
     script.onload = function(){
       callback();
     };
@@ -42,12 +42,19 @@ EXOCKEDITOR.prototype.makeCKEditor = function(textAreaId, config) {
 };
 ﻿EXOCKEDITOR = new EXOCKEDITOR();
 
-//function updateck() {
-//    for ( instance in CKEDITOR.instances ) {
-//      if (document.getElementById(instance)==null) { clearInterval(intckeditor); }
-//      document.getElementById(instance).value = CKEDITOR.instances[instance].getData();
-//    }
-//  }
+// function updateck() {
+// for ( instance in CKEDITOR.instances ) {
+// if (document.getElementById(instance)==null) { clearInterval(intckeditor); }
+// document.getElementById(instance).value =
+// CKEDITOR.instances[instance].getData();
+// }
+// }
 
-// This code is mandatory to update CKEditor instances as they don't sync natively in Ajax Popup with Chrome and Safari Browser
-//var intckeditor = setInterval("updateck()", 1000);
+// This code is mandatory to update CKEditor instances as they don't sync
+// natively in Ajax Popup with Chrome and Safari Browser
+// var intckeditor = setInterval("updateck()", 1000);
+
+
+eXo.commons.ExoEditor = ﻿EXOCKEDITOR;
+
+_module.﻿EXOCKEDITOR = eXo.commons.ExoEditor;

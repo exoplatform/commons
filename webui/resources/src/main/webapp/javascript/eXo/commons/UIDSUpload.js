@@ -18,12 +18,19 @@
  * site: http://www.fsf.org.
  */
 
-if(!eXo.commons) eXo.commons = {};
+if (!eXo) 
+  eXo = {};
+
+if (!eXo.commons) 
+  eXo.commons = {};
+
 function UIDSUpload() {
   this.listUpload = new Array();
   this.isAutoUpload = true;
  
   // this.listLimitMB = new Array();
+  var Browser = gtnbase.Browser;
+  
 };
 /**
  * 
@@ -43,7 +50,7 @@ UIDSUpload.prototype.createUploadEntry = function(uploadId, isAutoUpload) {
   var me = eXo.commons.UIDSUpload;
   var iframe = document.getElementById(uploadId+'uploadFrame');
   var idoc = iframe.contentWindow.document ;
-  if (eXo.core.Browser.gecko) {
+  if (Browser.gecko) {
     idoc.open();
     idoc.close();
     me.createUploadEntryForFF(idoc, uploadId, isAutoUpload);
@@ -369,3 +376,4 @@ UIDSUpload.prototype.validate = function(name) {
 }
 
 eXo.commons.UIDSUpload = new UIDSUpload();
+_module.UIDSUpload = eXo.commons.UIDSUpload;

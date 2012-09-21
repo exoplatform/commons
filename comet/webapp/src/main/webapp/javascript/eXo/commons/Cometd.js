@@ -1,5 +1,6 @@
 /*
 The package :
+
 Cometd
 
 strongly inspired from the Dojo cometd implementation
@@ -14,6 +15,7 @@ at the handshake, so the transport should not do it, and be set after.
  *  @description Re-written.
  *
  */
+if(!eXo.commons) eXo.commons = {};
 function Cometd() {
 	this._connected = false;
 	this._polling = false;
@@ -25,9 +27,10 @@ function Cometd() {
 	this.exoId = null;
 	this.exoToken = null;
 
-  var Browser = eXo.core.Browser;
+  //var Browser = gtnbase.Browser;
+  //var JSON = _module.JSON;
 
-  this.clientId = Browser.getCookie('cometdClientID') || false;
+  this.clientId = gtnbase.Browser.getCookie('cometdClientID') || false;
 	this.messageId = 0;
 	this.batch=0;
 
@@ -289,7 +292,7 @@ function LongPollTransport() {
 			exoToken: this._cometd.exoToken
 		};
 	
-		var query = 'message=' + eXo.core.JSON.stringify(message);
+		var query = 'message=' + JSON.stringify(message);
 
 		var request = new eXo.portal.AjaxRequest('POST', this._cometd.url, query);
 		request.onSuccess = function(request){
@@ -319,7 +322,7 @@ function LongPollTransport() {
 			}
 
 			if( this._cometd.advice && this._cometd.advice['interval'] && this._cometd.advice.interval>0 ){
-				setTimeout(function(){ eXo.core.Cometd.init(); }, this._cometd._retryInterval);
+				setTimeout(function(){ _module.init(); }, this._cometd._retryInterval);
 			}else{
 				this._cometd.init(this.url,this._props);
 			}
@@ -332,7 +335,7 @@ function LongPollTransport() {
 		}
 
 		this._cometd.clientId = data.clientId;
-		eXo.core.Browser.setCookie('cometdClientID', this._cometd.clientId, 1);
+		gtnbase.Browser.setCookie('cometdClientID', this._cometd.clientId, 1);
 
 		this.initTunnel();
 	
@@ -345,7 +348,7 @@ function LongPollTransport() {
 			connectionType: this._connectionType,
 			id:	this._cometd.messageId++
 		};
-		this.openTunnelWith({message: eXo.core.JSON.stringify(message)});
+		this.openTunnelWith({message: JSON.stringify(message)});
 	}
 
 	instance.openTunnelWith = function(content, url){
@@ -419,7 +422,7 @@ function LongPollTransport() {
 			this._cometd.init(this._cometd.url,this._cometd._props);
 		}else if(this._cometd._connected){
 			this.openTunnelWith({
-				message: eXo.core.JSON.stringify([
+				message: JSON.stringify([
 					{
 						channel:	'/meta/connect',
 						connectionType: this._connectionType,
@@ -438,7 +441,7 @@ function LongPollTransport() {
 				messages[i].id = ''+this._cometd.messageId++;
 			}
 
-			var query = 'message=' + eXo.core.JSON.stringify(messages);
+			var query = 'message=' + JSON.stringify(messages);
 
 			var request = new eXo.portal.AjaxRequest('POST', this._cometd.url, query);
 			request.onSuccess = function(request){
@@ -452,7 +455,7 @@ function LongPollTransport() {
 	}
 
 	instance.disconnect = function(){
-		var query = 'message=' + eXo.core.JSON.stringify([
+		var query = 'message=' + JSON.stringify([
 			{
 				channel:	'/meta/disconnect',
 				clientId:	this._cometd.clientId,
@@ -463,7 +466,17 @@ function LongPollTransport() {
 		request.process();	
 
 	}
-	return instance;
+	return instance;	
 }
-eXo.core.Cometd = new Cometd();
+
+Array.prototype.each = function (iterator, context) {
+	iterator = iterator.bind(context);
+	   for (var i = 0; i < this.length; i++) {
+	iterator(this[i]) ;
+	}
+};
+
+//eXo.commons.Cometd = new Cometd();
 eXo.portal.LongPollTransport = LongPollTransport.prototype.constructor;
+
+_module = new Cometd();

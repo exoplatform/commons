@@ -1,43 +1,50 @@
 <%
   import org.gatein.portal.controller.resource.ResourceScope;
+  import org.exoplatform.web.application.RequireJS;
+  
   def rcontext = _ctx.getRequestContext();  
   String restContext = uicomponent.getRestContext();
   String selectFileLink =uicomponent.event(uicomponent.SELECT_FILE);
   String selectFolderLink =uicomponent.event(uicomponent.SELECT_FOLDER);
 
   def jsManager = rcontext.getJavascriptManager();
-  //portal's problem, workaround for uicomponent.event()
-  jsManager.loadScriptResource(ResourceScope.SHARED, "base");
+  def requireJs = jsManager.getRequireJS();
   
-  jsManager.loadScriptResource(ResourceScope.SHARED, "commons.document");    
-  jsManager.addJavascript("eXo.commons.DocumentSelector.getDrives = '" + uicomponent.GET_DRIVES + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.getFoldersAndFiles = '" + uicomponent.GET_FOLDERS_AND_FILES + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.deleteFolderOrFile = '" + uicomponent.DELETE_FOLDER_OR_FILE + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.createFolder = '" + uicomponent.CREATE_FOLDER + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.isFolderOnlyParam = '" + uicomponent.PARAM_IS_FOLDER_ONLY + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.folderNameParam = '" + uicomponent.PARAM_FOLDER_NAME + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.driveTypeParam = '" + uicomponent.PARAM_DRIVE_TYPE + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.driveNameParam = '" + uicomponent.PARAM_DRIVE_NAME + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.workspaceNameParam = '" + uicomponent.PARAM_WORKSPACE_NAME + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.currentFolderParam = '" + uicomponent.PARAM_CURRENT_FOLDER + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.itemPathParam = '" + uicomponent.PARAM_ITEM_PATH + "';");  
-  jsManager.addJavascript("eXo.commons.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
-  jsManager.addJavascript("eXo.commons.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
+  //portal's problem, workaround for uicomponent.event() --> loaded programmatically
+  //jsManager.loadScriptResource(ResourceScope.SHARED, "base");
+ 
+  requireJs.require("SHARED/commons.document", "document");    
+  requireJs.require("SHARED/jquery", "jQuery");
+  
+  requireJs.addScripts("document.DocumentSelector.getDrives = '" + uicomponent.GET_DRIVES + "';");
+  requireJs.addScripts("document.DocumentSelector.getFoldersAndFiles = '" + uicomponent.GET_FOLDERS_AND_FILES + "';");
+  requireJs.addScripts("document.DocumentSelector.deleteFolderOrFile = '" + uicomponent.DELETE_FOLDER_OR_FILE + "';");
+  requireJs.addScripts("document.DocumentSelector.createFolder = '" + uicomponent.CREATE_FOLDER + "';");
+  requireJs.addScripts("document.DocumentSelector.isFolderOnlyParam = '" + uicomponent.PARAM_IS_FOLDER_ONLY + "';");
+  requireJs.addScripts("document.DocumentSelector.folderNameParam = '" + uicomponent.PARAM_FOLDER_NAME + "';");
+  requireJs.addScripts("document.DocumentSelector.driveTypeParam = '" + uicomponent.PARAM_DRIVE_TYPE + "';");
+  requireJs.addScripts("document.DocumentSelector.driveNameParam = '" + uicomponent.PARAM_DRIVE_NAME + "';");
+  requireJs.addScripts("document.DocumentSelector.workspaceNameParam = '" + uicomponent.PARAM_WORKSPACE_NAME + "';");
+  requireJs.addScripts("document.DocumentSelector.currentFolderParam = '" + uicomponent.PARAM_CURRENT_FOLDER + "';");
+  requireJs.addScripts("document.DocumentSelector.itemPathParam = '" + uicomponent.PARAM_ITEM_PATH + "';");  
+  requireJs.addScripts("document.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
+  requireJs.addScripts("document.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
+  requireJS.addScripts("jQuery('#selectDrive').change(function() {document.DocumentSelector.changeDrive(this);});");
+  requireJS.addScripts("jQuery('#createNew').click(function() {document.DocumentSelector.newFolder(this);});");
 %>
 <div class="UIDocumentSelector" id="$uicomponent.id">
   <a style="display:none;" href="$selectFileLink" class="SelectFile"></a>
   <a style="display:none;" href="$selectFolderLink" class="SelectFolder"></a>
    <center>
    <%= _ctx.appRes(uicomponent.id + '.label.select-drive')%>
-    <select onchange="eXo.commons.DocumentSelector.changeDrive(this);">
+    <select id="selectDrive" >
       <option value="general"><%= _ctx.appRes(uicomponent.id + '.label.general-drives')%></option>
       <option value="group"><%= _ctx.appRes(uicomponent.id + '.label.group-drives')%></option>
       <option value="personal" selected="selected"><%= _ctx.appRes(uicomponent.id + '.label.personal-drives')%></option>
     </select>
   </center>
   <%      
-        String newFolderLink = "<a class=\"NewFolder\" href=\"javascript:void(0);\" value=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder') + "\"" +  
-                  " onclick=\"eXo.commons.DocumentSelector.newFolder(this)\"" + 
+        String newFolderLink = "<a id=\"createNew\" class=\"NewFolder\" href=\"javascript:void(0);\" value=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder') + "\"" +        			                  
                   " msg_new_folder_not_allow=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder-not-allow') + "\"" +
                   " msg_select_drive=\"" + _ctx.appRes(uicomponent.id + '.label.require-drive') + "\"" +
                   " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +

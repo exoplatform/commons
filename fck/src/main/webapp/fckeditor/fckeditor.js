@@ -333,3 +333,7 @@ function FCKeditor_IsCompatibleBrowser()
 
 	return false ;
 }
+
+commons.FCKEditor = new FCKEditor();
+
+_module.FCKEditor = commons.FCKEditor;

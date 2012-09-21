@@ -12,7 +12,8 @@
 	</portal-skin>
 
 	<module>
-		<name>commons.document</name>
+		<name>commons-document</name>
+		<as>doc</as>
 		<script>
 			<name>eXo.commons.DocumentSelector</name>
 			<path>/javascript/eXo/commons/DocumentSelector.js</path>
@@ -23,16 +24,19 @@
 			<path>/javascript/eXo/commons/UIDSUpload.js</path>
 		</script>
 		<depends>
-			<module>jquery</module>
+			<module>jquery</module>	
+			<as>jQuery</as>	
 		</depends>
 		<depends>
 			<!-- need Browser.js -->
 			<module>base</module>
+			<as>gtnbase</as>
 		</depends>
 	</module>
 
 	<module>
-		<name>commons.editor</name>
+		<name>commons-editor</name>
+		<as>ckeditor</as>
 		<script>
 			<name>eXo.commons.ExoEditor</name>
 			<path>/ckeditor/exoeditor.js</path>

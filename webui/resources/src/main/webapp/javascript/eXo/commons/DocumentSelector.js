@@ -585,3 +585,4 @@ String.prototype.trunc = function(n, useWordBoundary){
 };
 
 eXo.commons.DocumentSelector = new DocumentSelector();
+_module.DocumentSelector = eXo.commons.DocumentSelector; 

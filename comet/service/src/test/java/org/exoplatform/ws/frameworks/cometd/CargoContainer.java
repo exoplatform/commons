@@ -93,7 +93,7 @@ public class CargoContainer
 
          Installer installer =
                   new ZipURLInstaller(new java.net.URL(
-                           "http://www.apache.org/dist/tomcat/tomcat-6/v6.0.18/bin/apache-tomcat-6.0.18.zip"), home);
+                           "http://www.apache.org/dist/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.zip"), home);
          installer.install();
          // Installer installer =
          // new ZipURLInstaller(new java.net.URL(
