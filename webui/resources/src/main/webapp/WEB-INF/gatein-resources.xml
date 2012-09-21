@@ -12,7 +12,8 @@
 	</portal-skin>
 
 	<module>
-		<name>commons.document</name>
+		<name>commons-document</name>
+		<as>doc</as>
 		<script>
 			<name>eXo.commons.DocumentSelector</name>
 			<path>/javascript/eXo/commons/DocumentSelector.js</path>
@@ -34,7 +35,8 @@
 	</module>
 
 	<module>
-		<name>commons.editor</name>
+		<name>commons-editor</name>
+		<as>ckeditor</as>
 		<script>
 			<name>eXo.commons.ExoEditor</name>
 			<path>/ckeditor/exoeditor.js</path>

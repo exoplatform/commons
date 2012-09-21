@@ -5,7 +5,8 @@
 	xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_2_1">
 
 	<module>
-		<name>commons.cometd</name>		
+		<name>commons-cometd</name>		
+		<as>cometd</as>
 		<script>
 			<name>eXo.commons.JSON</name>
 			<path>/javascript/eXo/commons/JSON.js</path>
