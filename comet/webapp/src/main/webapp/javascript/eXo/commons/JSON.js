@@ -98,7 +98,7 @@
     toJSON, toString
 */
 
-//if (!eXo.commons.JSON) {
+//if (!JSON) {
 
     JSON = function () {
 
@@ -289,6 +289,5 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
             }
         };
     }();
-    //eXo.commons.JSON = JSON;
-    _module.JSON = JSON;
+    //eXo.commons.JSON = JSON;    
 //}

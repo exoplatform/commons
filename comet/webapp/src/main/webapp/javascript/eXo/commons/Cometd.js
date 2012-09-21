@@ -27,10 +27,10 @@ function Cometd() {
 	this.exoId = null;
 	this.exoToken = null;
 
-  var Browser = gtnbase.Browser;
-  var JSON = eXo.commons.JSON;
+  //var Browser = gtnbase.Browser;
+  //var JSON = _module.JSON;
 
-  this.clientId = Browser.getCookie('cometdClientID') || false;
+  this.clientId = gtnbase.Browser.getCookie('cometdClientID') || false;
 	this.messageId = 0;
 	this.batch=0;
 
@@ -322,7 +322,7 @@ function LongPollTransport() {
 			}
 
 			if( this._cometd.advice && this._cometd.advice['interval'] && this._cometd.advice.interval>0 ){
-				setTimeout(function(){ eXo.core.Cometd.init(); }, this._cometd._retryInterval);
+				setTimeout(function(){ _module.init(); }, this._cometd._retryInterval);
 			}else{
 				this._cometd.init(this.url,this._props);
 			}
@@ -335,7 +335,7 @@ function LongPollTransport() {
 		}
 
 		this._cometd.clientId = data.clientId;
-		eXo.core.Browser.setCookie('cometdClientID', this._cometd.clientId, 1);
+		gtnbase.Browser.setCookie('cometdClientID', this._cometd.clientId, 1);
 
 		this.initTunnel();
 	
