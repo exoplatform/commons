@@ -39,7 +39,7 @@ import org.quartz.JobExecutionException;
  */
 public abstract class MultiTenancyJob implements Job {
 
-  private static Log         log_  = ExoLogger.getLogger("cs.ks.job.multitenancy");
+  private static Log         LOG  = ExoLogger.getLogger(MultiTenancyJob.class);
 
   public static final String COLON = ":".intern();
 
@@ -56,7 +56,7 @@ public abstract class MultiTenancyJob implements Job {
         Constructor constructor = getTask().getConstructor(this.getClass(), JobExecutionContext.class, String.class);
         executor.execute((Runnable) constructor.newInstance(this, context, repositoryEntry.getName()));
       } catch (Exception e) {
-        log_.error("Exception when looking for multi-tenancy task", e);
+        LOG.error("Exception when looking for multi-tenancy task", e);
       }
     }
     executor.shutdown();
@@ -88,7 +88,7 @@ public abstract class MultiTenancyJob implements Job {
       try {
         repoService.setCurrentRepositoryName(repoName);
       } catch (RepositoryConfigurationException e) {
-        log_.error("Repository is error", e);
+        LOG.error("Repository is error", e);
       }
     }
   }
