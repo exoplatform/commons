@@ -13,7 +13,7 @@
   //portal's problem, workaround for uicomponent.event() --> loaded programmatically
   //jsManager.loadScriptResource(ResourceScope.SHARED, "base");
  
-  requireJs.require("SHARED/commons.document", "document");    
+  requireJs.require("SHARED/commons-document", "document");    
   requireJs.require("SHARED/jquery", "jQuery");
   
   requireJs.addScripts("document.DocumentSelector.getDrives = '" + uicomponent.GET_DRIVES + "';");
@@ -29,8 +29,8 @@
   requireJs.addScripts("document.DocumentSelector.itemPathParam = '" + uicomponent.PARAM_ITEM_PATH + "';");  
   requireJs.addScripts("document.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
   requireJs.addScripts("document.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
-  requireJS.addScripts("jQuery('#selectDrive').change(function() {document.DocumentSelector.changeDrive(this);});");
-  requireJS.addScripts("jQuery('#createNew').click(function() {document.DocumentSelector.newFolder(this);});");
+  requireJs.addScripts("jQuery('#selectDrive').change(function() {document.DocumentSelector.changeDrive(this);});");
+  requireJs.addScripts("jQuery('#createNew').click(function() {document.DocumentSelector.newFolder(this);});");
 %>
 <div class="UIDocumentSelector" id="$uicomponent.id">
   <a style="display:none;" href="$selectFileLink" class="SelectFile"></a>

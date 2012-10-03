@@ -7,8 +7,8 @@
 	boolean isAutoUpload = uicomponent.isAutoUpload();
 	
 	def requireJS = rcontext.getJavascriptManager().getRequireJS();	
-  	requireJS.require("SHARED/commons.document","document");  
-  	requireJs.require("SHARED/jquery", "jQuery");	
+  	requireJS.require("SHARED/commons-document","document");  
+  	requireJS.require("SHARED/jquery", "jQuery");	
   	requireJS.addScripts("document.UIDSUpload.initUploadEntry('" +uploadId+ "'," +isAutoUpload+ ");");
   	requireJS.addScripts("jQuery('#deleteFF').click(function(){document.UIDSUpload.abortUpload("+uploadId+");});");  	
 %>

@@ -18,12 +18,6 @@
  * site: http://www.fsf.org.
  */
 
-if (!eXo) 
-  eXo = {};
-
-if (!eXo.commons) 
-  eXo.commons = {};
-
 function UIDSUpload() {
   this.listUpload = new Array();
   this.isAutoUpload = true;
@@ -47,10 +41,10 @@ UIDSUpload.prototype.initUploadEntry = function(uploadId, isAutoUpload) {
 
 
 UIDSUpload.prototype.createUploadEntry = function(uploadId, isAutoUpload) {
-  var me = eXo.commons.UIDSUpload;
+  var me = _module.UIDSUpload;
   var iframe = document.getElementById(uploadId+'uploadFrame');
   var idoc = iframe.contentWindow.document ;
-  if (Browser.gecko) {
+  if (gtnbase.Browser.gecko) {
     idoc.open();
     idoc.close();
     me.createUploadEntryForFF(idoc, uploadId, isAutoUpload);
@@ -151,8 +145,8 @@ UIDSUpload.prototype.getStyleSheetContent = function(){
  *          elementId identifier of upload bar frame
  */
 UIDSUpload.prototype.refeshProgress = function(elementId) {
-  var me = eXo.commons.UIDSUpload;
-  var documentSelector = eXo.commons.DocumentSelector;
+  var me = _module.UIDSUpload;
+  var documentSelector = _module.DocumentSelector;
   var list =  me.listUpload;
   var selectedItem = documentSelector.selectedItem;
   if(!selectedItem) return;
@@ -214,8 +208,8 @@ UIDSUpload.prototype.refeshProgress = function(elementId) {
  *          uploadId identifier of uploaded file
  */
 UIDSUpload.prototype.saveUploaded = function(uploadId, fileName) {
-  var me = eXo.commons.UIDSUpload;
-  var selectedItem = eXo.commons.DocumentSelector.selectedItem;
+  var me = _module.UIDSUpload;
+  var selectedItem = _module.DocumentSelector.selectedItem;
   var url = me.restContext + "/control?" ;  
   url += "action=save" + "&workspaceName=" + selectedItem.workspaceName
   + "&driveName=" + selectedItem.driveName + "&currentFolder="
@@ -234,7 +228,7 @@ UIDSUpload.prototype.saveUploaded = function(uploadId, fileName) {
  *          fileName uploaded file name
  */
 UIDSUpload.prototype.showUploaded = function(id) {
-  eXo.commons.UIDSUpload.listUpload.remove(id);
+  _module.UIDSUpload.listUpload.remove(id);
   var container = parent.document.getElementById(id);
   var element = document.getElementById(id+"ProgressIframe");
   element.innerHTML =  "<span></span>";
@@ -263,7 +257,7 @@ alert(id);
  *          id upload identifier
  */
 UIDSUpload.prototype.abortUpload = function(id) {
-  var me = eXo.commons.UIDSUpload;
+  var me = _module.UIDSUpload;
   me.listUpload.remove(id);
   var url = me.restContext + "/control?" ;
   url += "uploadId=" +id+"&action=abort" ;
@@ -309,8 +303,8 @@ UIDSUpload.prototype.abortUpload = function(id) {
  */
 UIDSUpload.prototype.upload = function(clickEle, id) {
   //var DOMUtil = eXo.core.DOMUtil;
-  var me = eXo.commons.UIDSUpload;
-  var selectedItem = eXo.commons.DocumentSelector.selectedItem;
+  var me = _module.UIDSUpload;
+  var selectedItem = _module.DocumentSelector.selectedItem;
   var container = parent.document.getElementById(id);
   var uploadIFrame = parent.document.getElementById(id+"UploadIframe");
   var uploadFrame = parent.document.getElementById(id+"uploadFrame");
@@ -375,5 +369,27 @@ UIDSUpload.prototype.validate = function(name) {
   }
 }
 
-eXo.commons.UIDSUpload = new UIDSUpload();
-_module.UIDSUpload = eXo.commons.UIDSUpload;
+/*-------Array utils------*/
+Array.prototype.remove = function (element) {
+  var result = false ;
+  var array = [] ;
+  for (var i = 0; i < this.length; i++) {
+    if (this[i] == element) {
+      result = true ;
+    } else {
+      array.push(this[i]) ;
+    }
+  }
+  this.length = 0;
+  for (var i = 0; i < array.length; i++) {
+    this.push(array[i]) ;
+  }
+  array = null ;
+  return result ;
+} ;
+
+/*--------------------------*/
+
+_module.UIDSUpload = new UIDSUpload();
+if(!window.eXo.commons) window.eXo.commons={}
+window.eXo.commons.UIDSUpload = _module.UIDSUpload;

@@ -1,10 +1,3 @@
-
-if (!eXo) 
-  eXo = {};
-
-if (!eXo.commons) 
-  eXo.commons = {};
-
 function DocumentSelector(){
   this.defaultDriveType = "personal";
   this.getDrives = "";
@@ -38,7 +31,7 @@ function DocumentItem(){
 };
 
 DocumentSelector.prototype.init = function(uicomponentId, restContext){
-  var me = eXo.commons.DocumentSelector;
+  var me = _module.DocumentSelector;
   this.uiComponent = document.getElementById(uicomponentId);
   this.selectFileLink = jQuery("a.SelectFile:first",this.uiComponent);
   this.selectFolderLink = jQuery("a.SelectFolder:first",this.uiComponent);  
@@ -85,7 +78,7 @@ DocumentSelector.prototype.renderDetails = function(documentItem) {
 };
 
 DocumentSelector.prototype.renderDrives = function(tableContainer, documentItem) {
- var me = eXo.commons.DocumentSelector;
+ var me = _module.DocumentSelector;
  var driveType = documentItem.driveType;
  var url = this.getDrivesURL;
  url += "?" + this.driveTypeParam + "=" + driveType;
@@ -103,7 +96,8 @@ var folderList = jQuery("Folder",folderContainer);
    //} else {
      //tdNoContent.setAttribute("colspan", 3);
    //}   
-   var tdNoContent = tableContainer.append('<td></td>').append('<td><td>');
+   jQuery("tbody", tableContainer).append('<tr><td></td></tr>');
+   var tdNoContent = jQuery("td:first",jQuery("tr:last", tableContainer));
    tdNoContent.html("There is no drive");
    tdNoContent.addClass("Item TRNoContent");
    return;
@@ -127,7 +121,7 @@ var folderList = jQuery("Folder",folderContainer);
    newRow.className = clazz + " Cell";
    var cellZero = newRow.insertCell(0);
    cellZero.onclick = function() {
-     eXo.commons.DocumentSelector.browseFolder(this);
+     _module.DocumentSelector.browseFolder(this);
    }
    */
    var cellZero_innerHTML = '<a class="Item Drive_'+ nodeType+ '" name="' + name
@@ -143,7 +137,7 @@ var folderList = jQuery("Folder",folderContainer);
    var cellZero = jQuery("td",newRow).eq(0);
    cellZero.html(cellZero_innerHTML);
    cellZero.click(function() {
-     eXo.commons.DocumentSelector.browseFolder(this);
+     _module.DocumentSelector.browseFolder(this);
    });
 
    //newRow.insertCell(1);
@@ -155,7 +149,7 @@ var folderList = jQuery("Folder",folderContainer);
 };
 
 DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documentItem) {
-  var me = eXo.commons.DocumentSelector;
+  var me = _module.DocumentSelector;
   var driveType = documentItem.driveType;
   var driveName = documentItem.driveName;
   var workSpaceName = documentItem.workspaceName;
@@ -187,7 +181,9 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
     //} else {
       //tdNoContent.setAttribute("colspan", 3);
     //}    
-   var tdNoContent = tableContainer.append('<td></td>').append('<td><td>');
+   jQuery("tbody", tableContainer).append('<tr><td></td></tr>');
+   var tdNoContent = jQuery("td:first",jQuery("tr:last", tableContainer));
+
    tdNoContent.html("There is no folder or file");
    tdNoContent.addClass("Item TRNoContent");
     return;
@@ -219,7 +215,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
       
       var cellZero = newRow.insertCell(0);
       cellZero.onclick = function() {
-        eXo.commons.DocumentSelector.browseFolder(this);
+        _module.DocumentSelector.browseFolder(this);
       }
      */     
       var cellZero_innerHTML = '<a class="Item IconDefault ' + clazzItem + '" name="'
@@ -236,7 +232,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
       var cellZero = jQuery("td",newRow).eq(0);
       cellZero.html(cellZero_innerHTML);
       cellZero.click(function() {
-   	   eXo.commons.DocumentSelector.browseFolder(this);
+   	   _module.DocumentSelector.browseFolder(this);
       });
 
       //newRow.insertCell(1);
@@ -279,7 +275,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
       var cellZero = newRow.insertCell(0);
       cellZero.tabIndex = "1";
       cellZero.onclick = function() {
-        eXo.commons.DocumentSelector.submitSelectedFile(this);
+        _module.DocumentSelector.submitSelectedFile(this);
       }
 */
       var cellZero_innerHTML = '<a class="Item ' + clazzItem + '" jcrPath="'
@@ -293,7 +289,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
       var cellZero = jQuery("td",newRow).eq(0);
       cellZero.html(cellZero_innerHTML);
       cellZero.click(function() {
-   	   eXo.commons.DocumentSelector.submitSelectedFile(this) ;
+   	   _module.DocumentSelector.submitSelectedFile(this) ;
       });
       //newRow.insertCell(1).innerHTML = '<div class="Item">' + fileList[j]
           //.getAttribute("dateCreated") + '</div>';
@@ -333,7 +329,7 @@ DocumentSelector.prototype.selectUploadedFile = function(fileName){
 
 
 DocumentSelector.prototype.submitSelectedFile = function(tableCell){
-  var me = eXo.commons.DocumentSelector;   
+  var me = _module.DocumentSelector;   
   var detailNode = jQuery("a:first-child",tableCell);
   var nodePath = detailNode.attr("jcrPath");
   var fileName = detailNode.attr("title");
@@ -358,7 +354,7 @@ DocumentSelector.prototype.submitSelectedFile = function(tableCell){
 };
 
 DocumentSelector.prototype.submitSelectedFolder = function(documentItem){
-  var me = eXo.commons.DocumentSelector;
+  var me = _module.DocumentSelector;
   var workspaceName = documentItem.workspaceName;
   var jcrPath = documentItem.jcrPath;
   if (me.selectFolderLink) {
@@ -372,7 +368,7 @@ DocumentSelector.prototype.submitSelectedFolder = function(documentItem){
 };
 
 DocumentSelector.prototype.browseFolder = function(tableCell){
-  var me = eXo.commons.DocumentSelector;
+  var me = _module.DocumentSelector;
   var detailNode = jQuery("a:first-child",tableCell);
   var documentItem = new DocumentItem();
   documentItem.driveType = detailNode.attr("driveType");
@@ -387,7 +383,7 @@ DocumentSelector.prototype.browseFolder = function(tableCell){
 };
 
 DocumentSelector.prototype.remove = function(tableCell) {
-  var me = eXo.commons.DocumentSelector;
+  var me = _module.DocumentSelector;
   var detailNode = jQuery("a:first-child",tableCell);
   var name = detailNode.attr("name");
   var r = confirm("Are you sure you want remove " + name + " ?");
@@ -408,7 +404,7 @@ DocumentSelector.prototype.remove = function(tableCell) {
 };
 
 DocumentSelector.prototype.newFolder = function(inputFolderName){
-  var me = eXo.commons.DocumentSelector;   
+  var me = _module.DocumentSelector;   
   var msg_new_folder_not_allow = inputFolderName.getAttribute("msg_new_folder_not_allow");
   var msg_select_folder = inputFolderName.getAttribute("msg_select_drive");
   var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
@@ -448,7 +444,7 @@ DocumentSelector.prototype.actionBreadcrumbs = function(element) {
   documentItem.workspaceName = element.getAttribute("workspaceName");
   documentItem.currentFolder = element.getAttribute("currentFolder");
   documentItem.titlePath = element.getAttribute("titlePath");
-  eXo.commons.DocumentSelector.renderDetails(documentItem);
+  _module.DocumentSelector.renderDetails(documentItem);
 }
 
 DocumentSelector.prototype.renderBreadcrumbs = function(documentItem, fileName) {
@@ -584,5 +580,7 @@ String.prototype.trunc = function(n, useWordBoundary){
   return toLong ? s_ + '...' : s_;
 };
 
-eXo.commons.DocumentSelector = new DocumentSelector();
-_module.DocumentSelector = eXo.commons.DocumentSelector; 
+_module.DocumentSelector = new DocumentSelector();
+
+if(!window.eXo.commons) window.eXo.commons={}
+window.eXo.commons.DocumentSelector = _module.DocumentSelector;
