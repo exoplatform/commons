@@ -17,6 +17,8 @@
 package org.exoplatform.services.deployment;
 
 import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 /**
@@ -29,6 +31,15 @@ public abstract class DeploymentPlugin implements ComponentPlugin {
 
   private String name;
   private String desc;
+  
+  protected InitParams initParams;
+  
+  public DeploymentPlugin() {
+  }
+  
+  public DeploymentPlugin(InitParams initParams) {
+    this.initParams = initParams;
+  }
 
   /**
    * This method used to deploy data from sourcePath to target that describe in
@@ -58,4 +69,20 @@ public abstract class DeploymentPlugin implements ComponentPlugin {
    */
   public void setDescription(String s) { this.desc = s; }
 
+  /**
+   * indicates if this plugin will override old data every time server startups 
+   */
+  public boolean isOverride() {
+    ValueParam overrideParam = initParams.getValueParam("override");
+    return (overrideParam != null && Boolean.parseBoolean(overrideParam.getValue()));
+  }
+  
+  /**
+   * gets name of site in which data is deployed by this plugin
+   * @return
+   */
+  public String getSiteName() {
+    ValueParam siteName = initParams.getValueParam("siteName");
+    return (siteName == null) ? null : siteName.getValue();
+  }
 }
