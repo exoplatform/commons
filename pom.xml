@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.exoplatform</groupId>
-    <artifactId>exo.parent</artifactId>
-    <version>7.1</version>
+    <artifactId>maven-parent-pom</artifactId>
+    <version>9-SNAPSHOT</version>
     <relativePath/>
   </parent>
   <groupId>org.exoplatform.commons</groupId>
@@ -18,6 +18,21 @@
     <url>http://fisheye.exoplatform.org/browse/projects/commons</url>
   </scm>
   <properties>
+    <!-- **************************************** -->
+    <!-- GitHub Settings                             -->
+    <!-- **************************************** -->
+    <github.repository>commons</github.repository>
+    <!-- **************************************** -->
+    <!-- Jira Settings                            -->
+    <!-- **************************************** -->
+    <jira.project.key>COMMONS</jira.project.key>
+    <!-- **************************************** -->
+    <!-- Jenkins Settings                         -->
+    <!-- **************************************** -->
+    <jenkins.job.name>commons-master-ci</jenkins.job.name>
+    <!-- **************************************** -->
+    <!-- Dependencies versions                    -->
+    <!-- **************************************** -->
     <org.exoplatform.kernel.version>2.3.9-GA-SNAPSHOT</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>2.4.9-GA-SNAPSHOT</org.exoplatform.core.version>
     <org.exoplatform.ws.version>2.2.9-GA-SNAPSHOT</org.exoplatform.ws.version>
@@ -31,11 +46,6 @@
     <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
     <org.slf4j.slf4j-simple.version>1.5.6</org.slf4j.slf4j-simple.version>
     <org.hsqldb.version>2.0.0</org.hsqldb.version>
-    
-    <!-- TO BE REMOVED AFTER eXo Parent POM upgrade -->
-    <version.release.plugin>2.2.1</version.release.plugin>
-    <version.buildnumber.plugin>1.1</version.buildnumber.plugin>
-  
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -125,39 +135,4 @@
     <module>fck</module>
     <module>extension</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>          
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <dependencies>
-              <dependency>
-                <groupId>org.apache.apache.resources</groupId>
-                <artifactId>apache-source-release-assembly-descriptor</artifactId>
-                <version>1.0.2</version>
-              </dependency>
-            </dependencies>
-            <executions>
-              <execution>
-                <id>source-release-assembly</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-                  <descriptorRefs>
-                    <descriptorRef>source-release</descriptorRef>
-                  </descriptorRefs>
-                  <tarLongFileFormat>gnu</tarLongFileFormat>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

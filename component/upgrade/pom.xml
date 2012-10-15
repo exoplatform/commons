@@ -8,7 +8,6 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>commons-component-upgrade</artifactId>
   <name>eXo Commons - Transparent Upgrade Framework</name>
-  <url>http://www.exoplatform.org</url>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
