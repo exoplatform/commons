@@ -19,10 +19,6 @@
   </scm>
   <properties>
     <!-- **************************************** -->
-    <!-- GitHub Settings                             -->
-    <!-- **************************************** -->
-    <github.repository>commons</github.repository>
-    <!-- **************************************** -->
     <!-- Jira Settings                            -->
     <!-- **************************************** -->
     <jira.project.key>COMMONS</jira.project.key>
