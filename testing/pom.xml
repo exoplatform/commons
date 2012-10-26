@@ -11,9 +11,9 @@
   <name>eXo Commons - Testing</name>
   <dependencies>
     <dependency>
-      <groupId>org.exoplatform.portal</groupId>
+      <groupId>org.gatein.portal</groupId>
       <artifactId>exo.portal.component.test.core</artifactId>
-      <version>${org.exoplatform.portal.version}</version>
+      <version>${org.gatein.portal.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.jcr</groupId>
@@ -30,11 +30,11 @@
       <artifactId>picocontainer</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.portal</groupId>
+      <groupId>org.gatein.portal</groupId>
       <artifactId>exo.portal.component.resources</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.portal</groupId>
+      <groupId>org.gatein.portal</groupId>
       <artifactId>exo.portal.component.web.api</artifactId>
     </dependency>
     <dependency>
@@ -61,7 +61,7 @@
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.portal</groupId>
+      <groupId>org.gatein.portal</groupId>
       <artifactId>exo.portal.webui.core</artifactId>
     </dependency>
     <dependency>

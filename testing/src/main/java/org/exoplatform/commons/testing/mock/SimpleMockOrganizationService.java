@@ -382,6 +382,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
 
   static class SimpleUser implements User {
     String name = null;
+    String displayName = null;
 
     public SimpleUser(String name) {
       this.name = name;
@@ -474,6 +475,14 @@ public class SimpleMockOrganizationService implements OrganizationService {
 
     public void setUserName(String s) {
 
+    }
+
+    public String getDisplayName() {      
+      return null;
+    }
+
+    public void setDisplayName(String displayName) {
+   
     }
   }
 
