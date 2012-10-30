@@ -16,7 +16,6 @@
  */
 package org.exoplatform.job;
 
-import java.lang.reflect.Constructor;
 import java.util.Date;
 
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
@@ -27,7 +26,9 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
-import org.quartz.SimpleTrigger;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.JobExecutionContextImpl;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.TriggerFiredBundle;
 /**
  * Created by The eXo Platform SAS
@@ -39,7 +40,6 @@ public class MultiTenancyJobTest extends BaseCommonsTestCase{
 
  private MultiTenancyJobImpl impl; 
  private TriggerFiredBundle firedBundle; 
- private String repoName = "repository";
  private JobExecutionContext context;
   
   @Override
@@ -47,7 +47,7 @@ public class MultiTenancyJobTest extends BaseCommonsTestCase{
     super.setUp();
     impl = new MultiTenancyJobImpl();    
     
-    JobDetail jobDetail = new JobDetail();
+    JobDetail jobDetail = new JobDetailImpl();
     context = createContext(jobDetail);
   }
   
@@ -81,12 +81,12 @@ public class MultiTenancyJobTest extends BaseCommonsTestCase{
   
   
   private JobExecutionContext createContext(JobDetail jobDetail) {
-    firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTrigger(), null, false, new Date(), new Date(), new Date(), new Date());
+    firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTriggerImpl(), null, false, new Date(), new Date(), new Date(), new Date());
     return new StubJobExecutionContext();
   }
 
   @SuppressWarnings("serial")
-  private final class StubJobExecutionContext extends JobExecutionContext {
+  private final class StubJobExecutionContext extends JobExecutionContextImpl {
 
     private StubJobExecutionContext() {
       super(createNiceMock(Scheduler.class), firedBundle, createNiceMock(Job.class));

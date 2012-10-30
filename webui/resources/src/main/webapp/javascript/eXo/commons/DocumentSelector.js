@@ -1,3 +1,4 @@
+(function(jQuery,gtnbase){
 function DocumentSelector(){
   this.defaultDriveType = "personal";
   this.getDrives = "";
@@ -580,7 +581,10 @@ String.prototype.trunc = function(n, useWordBoundary){
   return toLong ? s_ + '...' : s_;
 };
 
-_module.DocumentSelector = new DocumentSelector();
+//_module.DocumentSelector = new DocumentSelector();
 
 if(!window.eXo.commons) window.eXo.commons={}
-window.eXo.commons.DocumentSelector = _module.DocumentSelector;
+//window.eXo.commons.DocumentSelector = _module.DocumentSelector;
+
+return {"DocumentSelector":new DocumentSelector()};
+})(jQuery,gtnbase)
