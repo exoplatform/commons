@@ -15,12 +15,8 @@
 		<name>commons-document</name>
 		<as>doc</as>
 		<script>
-			<path>/javascript/eXo/commons/DocumentSelector.js</path>
+			<path>/javascript/eXo/commons/commons-Document.js</path>
 		</script>
-		<!-- UIDSUpload depends DocumentSelector -->
-		<!--script>
-			<path>/javascript/eXo/commons/UIDSUpload.js</path>
-		</script-->
 		<depends>
 			<module>jquery</module>	
 			<as>jQuery</as>	
@@ -36,12 +32,9 @@
 		<name>commons-editor</name>
 		<as>ckeditor</as>
 		<script>
-			<path>/ckeditor/exoeditor.js</path>
-		</script>
-<!-- 		<script>
-			<path>/ckeditor/eXoConfig.js</path>
-		</script>
- -->	</module>
+			<path>/ckeditor/commons-Editor.js</path>
+		</script> 		
+ 	</module>
 
 </gatein-resources>
 

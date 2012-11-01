@@ -14,12 +14,9 @@
 
 	<module>
 		<name>commons-fck</name>
-		<as>fck</as>
+		<as>fck</as>		
 		<script>
-			<path>/fckeditor/fckeditor.js</path>
-		</script>
-		<script>
-			<path>/fckeditor/fckconfig.js</path>
+			<path>/fckeditor/commons-fck.js</path>
 		</script>
 	</module>
 </gatein-resources>

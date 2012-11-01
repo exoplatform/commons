@@ -133,7 +133,7 @@ UIDSUpload.prototype.getStyleSheetContent = function(){
   styleText += ".FileHidden { opacity: 0; overflow: hidden; position: absolute; height: 32px; top: 0px; left: 0px; width: 100%; -moz-opacity:0 ; filter:alpha(opacity: 0); z-index: 1;} ";  
   styleText += ".BrowseLink { position: relative; font-family: Arial, Helvetica, sans-serif; text-align: left; top:5px;padding: 3px 10px 3px 11px;";
   styleText += "     text-decoration: none;";
-  styleText += "    background: url('/ecmexplorer/skin/icons/24x24/DefaultSkin/UploadFile.png') no-repeat 2px center;}";
+  styleText += "    background: url('/CommonsResources/skin/DefaultSkin/commons/DocumentSelector/images/UploadFile.png') no-repeat 2px center;}";
   styleText += ".UIDSUploadForm a:hover {text-decoration: underline;}";
   return styleText;
 }
