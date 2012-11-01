@@ -20,23 +20,25 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import org.exoplatform.commons.testing.AssertUtils;
-import org.exoplatform.commons.testing.Closure;
+//import org.exoplatform.commons.testing.AssertUtils;
+//import org.exoplatform.commons.testing.Closure;
 import org.exoplatform.commons.testing.jcr.AbstractJCRTestCase;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
-import org.testng.annotations.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import static org.testng.AssertJUnit.*;
+import static org.junit.Assert.*;
 
 /**
  * @version $Revision$
  */
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/jcr/jcr-configuration.xml") })
 public class TestAbstractJCRTestCase extends AbstractJCRTestCase {
-
+  
+  
   @Test
   public void testGetSession() throws Exception {
     Session session = getSession();
