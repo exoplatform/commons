@@ -42,27 +42,29 @@
     <!-- **************************************** -->
     <!-- Dependencies versions                    -->
     <!-- **************************************** -->
+    <!-- eXo deps -->
     <org.exoplatform.kernel.version>2.3.9-GA-SNAPSHOT</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>2.4.9-GA-SNAPSHOT</org.exoplatform.core.version>
     <org.exoplatform.ws.version>2.2.9-GA-SNAPSHOT</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.14.9-GA-SNAPSHOT</org.exoplatform.jcr.version>
     <org.exoplatform.portal.version>3.4.0.Final</org.exoplatform.portal.version>
-    <picocontainer.version>1.1</picocontainer.version>
+    <org.exoplatform.tool.version>1.2.2-GA</org.exoplatform.tool.version>
+    <!-- 3rd parties deps -->
+    <commons-lang.version>2.6</commons-lang.version>
+    <javax.activation.version>1.1.1</javax.activation.version>
+    <javax.annotation.version>1.0</javax.annotation.version>
     <javax.jcr.version>1.0</javax.jcr.version>
-    <junit.version>4.10</junit.version>
-    <mockito.version>1.8.1</mockito.version>
     <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
-    <org.slf4j.slf4j-simple.version>1.5.6</org.slf4j.slf4j-simple.version>
+    <javax.ws.rs.version>1.0</javax.ws.rs.version>
+    <junit.version>4.10</junit.version>
+    <org.codehaus.cargo.version>0.9</org.codehaus.cargo.version>
     <org.hsqldb.version>2.0.0</org.hsqldb.version>
+    <mockito.version>1.8.1</mockito.version>
     <org.mortbay.jetty.version>0.9.20080221</org.mortbay.jetty.version>
     <org.mortbay.jetty.cometd-bayeux.version>6.1.11</org.mortbay.jetty.cometd-bayeux.version>
-    <org.codehaus.cargo.version>0.9</org.codehaus.cargo.version>
-    <org.exoplatform.tool.version>1.2.2-GA</org.exoplatform.tool.version>
+    <org.slf4j.slf4j-simple.version>1.5.6</org.slf4j.slf4j-simple.version>
+    <picocontainer.version>1.1</picocontainer.version>
     <quartz.version>1.5.2</quartz.version>
-    <javax.annotation.version>1.0</javax.annotation.version>
-    <commons-lang.version>2.6</commons-lang.version>
-    <javax.ws.rs.version>1.0</javax.ws.rs.version>
-    <javax.activation.version>1.1.1</javax.activation.version>
   </properties>
   <dependencyManagement>
     <dependencies>
