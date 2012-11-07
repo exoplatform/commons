@@ -13,7 +13,6 @@
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
-      <scope>compile</scope>
     </dependency>
     <!-- mvn unused but build failed when remove -->
     <dependency>
@@ -23,12 +22,10 @@
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
