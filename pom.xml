@@ -14,13 +14,9 @@
   <name>eXo Commons</name>
   <modules>
     <module>comet</module>
-    <module>component/common</module>
-    <module>component/product</module>
-    <module>component/upgrade</module>
+    <module>component</module>
     <module>testing</module>
-    <module>webui/ext</module>
-    <module>webui/component</module>
-    <module>webui/resources</module>
+    <module>webui</module>
     <module>gifbackport</module>
     <module>fck</module>
     <module>extension</module>

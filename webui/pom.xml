@@ -2,16 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>commons-webui</artifactId>
+    <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
     <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
   </parent>
   <groupId>org.exoplatform.commons</groupId>
-  <artifactId>commons-webui-resources</artifactId>
-  <packaging>war</packaging>
-  <name>eXo Commons - Platform Resources</name>
-  <dependencies></dependencies>
-  <build>
-    <finalName>CommonsResources</finalName>
-  </build>
+  <artifactId>commons-webui</artifactId>
+  <packaging>pom</packaging>
+  <name>eXo Commons - WebUI</name>
+  <modules>
+    <module>component</module>
+    <module>ext</module>
+    <module>resources</module>
+  </modules>
 </project>

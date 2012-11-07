@@ -12,9 +12,7 @@
   <modules>
     <module>service</module>
     <module>webapp</module>
-    <module>ext/service</module>
-    <module>ext/webapp-rest</module>
-    <module>ext/webapp-cometd</module>
+    <module>ext</module>
   </modules>
   <dependencyManagement></dependencyManagement>
 </project>
