@@ -19,12 +19,4 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-  <build>
-    <resources>
-      <resource>
-        <targetPath>META-INF</targetPath>
-        <directory>src/main/resources/META-INF</directory>
-      </resource>
-    </resources>
-  </build>
 </project>
