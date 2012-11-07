@@ -73,7 +73,7 @@
       <groupId>org.exoplatform.portal</groupId>
       <artifactId>exo.portal.webui.portlet</artifactId>
     </dependency>
-    <!-- mvn analyze unused but buid failed when remove -->
+    <!-- This dependency for compilation but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>

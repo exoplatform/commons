@@ -17,7 +17,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
-    <!-- mvn analyze unused but buid failed when remove -->
+    <!-- This dependency for compilation but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-component-product</artifactId>

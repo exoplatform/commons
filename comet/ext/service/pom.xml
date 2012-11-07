@@ -14,7 +14,7 @@
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
     </dependency>
-    <!-- mvn unused but build failed when remove -->
+    <!-- This dependency for compilation but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-comet-service</artifactId>
