@@ -8,7 +8,7 @@
   </parent>
   <artifactId>commons-extension-webapp</artifactId>
   <packaging>war</packaging>
-  <name>eXo Platform - Commons Extension Webapp</name>
+  <name>eXo Commons - Commons Extension Webapp</name>
   <build>
     <finalName>commons-extension</finalName>
   </build>

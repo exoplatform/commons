@@ -8,7 +8,7 @@
   </parent>
   <artifactId>commons-component</artifactId>
   <packaging>pom</packaging>
-  <name>eXo Platform - Commons Component</name>
+  <name>eXo Commons - Commons Component</name>
   <modules>
     <module>common</module>
     <module>product</module>

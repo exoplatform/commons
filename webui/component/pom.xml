@@ -9,7 +9,7 @@
   <groupId>org.exoplatform.commons</groupId>
   <artifactId>commons-webui-component</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons - Platform WebUI</name>
+  <name>eXo Commons - Commons WebUI</name>
   <dependencies>
     <dependency>
       <groupId>commons-lang</groupId>

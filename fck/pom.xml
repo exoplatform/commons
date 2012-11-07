@@ -8,7 +8,7 @@
   </parent>
   <artifactId>commons-fck</artifactId>
   <packaging>war</packaging>
-  <name>eXo Platform - Web FCK</name>
+  <name>eXo Commons - Web FCK</name>
   <build>
     <finalName>fck</finalName>
   </build>
