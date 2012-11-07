@@ -16,6 +16,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
     <!-- This dependency for compilation but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>

@@ -34,6 +34,7 @@
     <dependency>
       <groupId>org.exoplatform.tool</groupId>
       <artifactId>exo.tool.framework.junit</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
