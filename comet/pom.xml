@@ -14,5 +14,4 @@
     <module>webapp</module>
     <module>ext</module>
   </modules>
-  <dependencyManagement></dependencyManagement>
 </project>

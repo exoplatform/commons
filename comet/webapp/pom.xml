@@ -9,8 +9,6 @@
   <artifactId>commons-comet-webapp</artifactId>
   <packaging>war</packaging>
   <name>eXo Commons - Comet WebApp</name>
-  <description></description>
-  <dependencies></dependencies>
   <build>
     <finalName>cometd</finalName>
   </build>

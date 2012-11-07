@@ -9,7 +9,6 @@
   <artifactId>commons-comet-service</artifactId>
   <packaging>jar</packaging>
   <name>eXo Commons - Comet Services</name>
-  <description></description>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

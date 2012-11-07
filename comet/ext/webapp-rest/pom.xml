@@ -10,7 +10,6 @@
   <packaging>war</packaging>
   <name>eXo Commons - Comet Ext REST WebApp (test only)</name>
   <description>ext REST web application for test</description>
-  <dependencies></dependencies>
   <build>
     <finalName>rest</finalName>
     <plugins>

@@ -10,7 +10,6 @@
   <artifactId>commons-webui-resources</artifactId>
   <packaging>war</packaging>
   <name>eXo Commons - Commons Resources</name>
-  <dependencies></dependencies>
   <build>
     <finalName>CommonsResources</finalName>
   </build>

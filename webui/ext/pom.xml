@@ -9,7 +9,6 @@
   <artifactId>commons-webui-ext</artifactId>
   <packaging>jar</packaging>
   <name>eXo Commons - WebUI Extension</name>
-  <description></description>
   <dependencies>
     <dependency>
       <groupId>javax.activation</groupId>
