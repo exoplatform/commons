@@ -11,29 +11,24 @@
   <packaging>war</packaging>
   <name>eXo Commons - Comet Ext REST WebApp (test only)</name>
   <description>ext REST web application for test</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.exoplatform.ws</groupId>
-      <artifactId>exo.ws.frameworks.servlet</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <finalName>rest</finalName>
-    <plugins>
-      <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <!-- This is broken in maven-war-plugin 2.0, works in 2.0.1 -->
-          <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-          <archive>
-            <manifest>
-              <addClasspath>false</addClasspath>
-              <classpathPrefix>lib/</classpathPrefix>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<dependencies>
+	</dependencies>
+	<build>
+		<finalName>rest</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<!-- This is broken in maven-war-plugin 2.0, works in 2.0.1 -->
+					<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+					<archive>
+						<manifest>
+							<addClasspath>false</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
