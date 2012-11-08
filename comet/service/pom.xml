@@ -38,11 +38,13 @@
       <artifactId>cargo-core-api-util</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- This dependency is used for tests execution but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>
       <groupId>org.codehaus.cargo</groupId>
       <artifactId>cargo-core-container-jetty</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- This dependency is used for tests execution but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>
       <groupId>org.codehaus.cargo</groupId>
       <artifactId>cargo-core-container-tomcat</artifactId>
