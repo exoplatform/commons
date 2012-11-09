@@ -6,10 +6,10 @@
     <groupId>org.exoplatform.commons</groupId>
     <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
   </parent>
-  <artifactId>commons-extension</artifactId>
-  <packaging>pom</packaging>
-  <name>eXo Commons - Commons Extension</name>
-  <modules>
-    <module>webapp</module>
-  </modules>
+  <artifactId>commons-extension-webapp</artifactId>
+  <packaging>war</packaging>
+  <name>eXo Commons - Commons Extension Webapp</name>
+  <build>
+    <finalName>commons-extension</finalName>
+  </build>
 </project>
