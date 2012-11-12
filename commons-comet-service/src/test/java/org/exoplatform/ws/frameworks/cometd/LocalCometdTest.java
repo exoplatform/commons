@@ -16,8 +16,6 @@
  */
 package org.exoplatform.ws.frameworks.cometd;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,25 +23,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
+
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import junit.framework.TestCase;
-
-import org.exoplatform.services.log.Log;
 import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.exoplatform.common.http.client.CookieModule;
 import org.exoplatform.common.http.client.HTTPConnection;
 import org.exoplatform.common.http.client.HTTPResponse;
 import org.exoplatform.common.http.client.NVPair;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.ws.frameworks.cometd.transport.DelegateMessage;
-import org.exoplatform.ws.frameworks.json.JsonHandler;
-import org.exoplatform.ws.frameworks.json.JsonParser;
-import org.exoplatform.ws.frameworks.json.impl.BeanBuilder;
-import org.exoplatform.ws.frameworks.json.impl.JsonDefaultHandler;
-import org.exoplatform.ws.frameworks.json.impl.JsonGeneratorImpl;
-import org.exoplatform.ws.frameworks.json.impl.JsonParserImpl;
-import org.exoplatform.ws.frameworks.json.value.JsonValue;
+import org.exoplatform.services.log.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -109,7 +98,7 @@ public class LocalCometdTest
       super.setUp();
       Document document =
                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-                        "src/test/java/conf/cometd-test-conf.xml");
+                        getClass().getResourceAsStream("/conf/cometd-test-conf.xml"));
       Node cont = document.getElementsByTagName("container").item(0);
       NamedNodeMap map = cont.getAttributes();
       startContainer = Boolean.parseBoolean(map.getNamedItem("containerStart").getTextContent());
