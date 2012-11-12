@@ -9,7 +9,4 @@
   <artifactId>commons-fck</artifactId>
   <packaging>war</packaging>
   <name>eXo Commons - Web FCK</name>
-  <build>
-    <finalName>fck</finalName>
-  </build>
 </project>
