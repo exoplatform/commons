@@ -131,11 +131,6 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.portal</groupId>
-        <artifactId>exo.portal.component.web.api</artifactId>
-        <version>${org.exoplatform.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.portal</groupId>
         <artifactId>exo.portal.component.web.controller</artifactId>
         <version>${org.exoplatform.portal.version}</version>
       </dependency>
@@ -177,11 +172,6 @@
       <dependency>
         <groupId>org.exoplatform.ws</groupId>
         <artifactId>exo.ws.frameworks.json</artifactId>
-        <version>${org.exoplatform.ws.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.ws</groupId>
-        <artifactId>exo.ws.frameworks.servlet</artifactId>
         <version>${org.exoplatform.ws.version}</version>
       </dependency>
       <dependency>
