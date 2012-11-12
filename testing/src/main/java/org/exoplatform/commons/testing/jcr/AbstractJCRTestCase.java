@@ -16,9 +16,9 @@
  */
 package org.exoplatform.commons.testing.jcr;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertTrue;
-import static org.testng.AssertJUnit.fail;
+//import static org.testng.AssertJUnit.assertEquals;
+//import static org.testng.AssertJUnit.assertTrue;
+//import static org.testng.AssertJUnit.fail;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -40,6 +40,11 @@ import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+
 
 /**
  * @author <a href="mailto:patrice.lamarque@exoplatform.com">Patrice
@@ -51,14 +56,19 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
   
   private static final Log LOG = ExoLogger.getLogger(AbstractJCRTestCase.class);
 
-  private String tempDir;
+  private static String tempDir;
 
+  @Before
+  public void setUp(){    
+  }
+  
   public void beforeContainerStart() {
     initTempDir();
   }
+    
 
   public void initTempDir() {
-    tempDir = "target/temp" + System.nanoTime() + getClass().getCanonicalName();
+    tempDir = "target/temp" + System.nanoTime() + AbstractJCRTestCase.class.getCanonicalName();
     System.setProperty("test.tmpdir", tempDir);
   }
 
@@ -107,6 +117,7 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       boolean exists = session.getRootNode().hasNode(path);
       if (!exists) {
         fail("no node exists at " + path);
+        
       }
     } catch (RepositoryException e) {
       LOG.error("failed to assert node exists", e);
@@ -214,10 +225,12 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       session.save();
       return parent;
     } catch (RepositoryException e) {
-      LOG.error("failed to add node" + path, e);
+      if (LOG.isDebugEnabled())
+        LOG.error("failed to add node" + path, e);
       return null;
     } catch (RepositoryConfigurationException e) {
-      LOG.error("failed to add node" + path, e);
+      if (LOG.isDebugEnabled())
+        LOG.error("failed to add node" + path, e);
       return null;
     } finally {
       if (session != null) {
@@ -256,10 +269,12 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
       session.save();
       return parent;
     } catch (RepositoryException e) {
-      LOG.error("failed to add node" + path, e);
+      if (LOG.isDebugEnabled())
+        LOG.error("failed to add node" + path, e);
       return null;
     } catch (RepositoryConfigurationException e) {
-      LOG.error("failed to add node" + path, e);
+      if (LOG.isDebugEnabled())
+        LOG.error("failed to add node" + path, e);
       return null;
     }
   }

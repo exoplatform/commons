@@ -26,7 +26,7 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-import org.testng.annotations.BeforeClass;
+import org.junit.Before;
 
 /**
  * A base test class that allows to load an exo container with a selected set of
@@ -43,14 +43,19 @@ import org.testng.annotations.BeforeClass;
  *         Lamarque</a>
  * @version $Revision$
  */
-public abstract class AbstractExoContainerTestCase {
+public abstract class AbstractExoContainerTestCase{
 
-  @BeforeClass
-  public void startContainer() {
-    beforeContainerStart();
-    initExoContainer();
-    afterContainerStart();
-  }
+  private static boolean isInit = false;
+  
+  @Before
+  public final void startContainer(){    
+    if (!isInit){          
+      beforeContainerStart();
+      initExoContainer();
+      afterContainerStart();
+      isInit = true;
+    }        
+  }   
 
   protected void afterContainerStart() {
   }
@@ -59,7 +64,6 @@ public abstract class AbstractExoContainerTestCase {
   }
 
   private void initExoContainer() {
-
     Set<String> rootConfigPaths = new HashSet<String>();
     rootConfigPaths.add("conf/test-root-configuration.xml");
 

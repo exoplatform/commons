@@ -79,7 +79,7 @@ public class ContentInitializerService implements Startable{
           try {
             deploymentPlugin.deploy(sessionProvider);
             logData.append("deploy " + deploymentPlugin.getName()
-                + " deployment plugin succesful at " + date.toString() + "\n");
+                + " deployment plugin successful at " + date.toString() + "\n");
           } catch (Exception e) {
             //deploymentPlugin.deploy() throws Exception(). It's a public abstract method, we shouldn't modify it
             //So we have to catch Exception

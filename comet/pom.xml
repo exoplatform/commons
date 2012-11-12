@@ -9,10 +9,6 @@
   <artifactId>commons-comet</artifactId>
   <packaging>pom</packaging>
   <name>eXo Commons - Comet</name>
-  <properties>
-    <exo.product.name>exo.platform.commons.comet</exo.product.name>
-    <exo.product.specification>2.1</exo.product.specification>
-  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>

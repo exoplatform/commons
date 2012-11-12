@@ -50,6 +50,7 @@ public class MultiTenancyTaskTest extends BaseCommonsTestCase{
      impl = new MultiTenancyJobImpl();    
      
      JobDetail jobDetail = new JobDetailImpl();
+     ((JobDetailImpl) jobDetail).setGroup(container.getName());
      context = createContext(jobDetail);
    }
 
