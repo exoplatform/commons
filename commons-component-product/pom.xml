@@ -55,6 +55,7 @@
   </dependencies>
   <build>
     <testResources>
+      <!-- We filter resources in this module -->
       <testResource>
         <filtering>true</filtering>
         <directory>src/test/resources</directory>
