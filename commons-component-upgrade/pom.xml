@@ -13,21 +13,10 @@
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
     </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
     <!-- This dependency is used for main classes compilation but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-component-product</artifactId>
-    </dependency>
-    <!-- This dependency is used for main classes compilation but is erroneously reported as useless by mvn dependency:analyze -->
-    <dependency>
-      <groupId>org.exoplatform.commons</groupId>
-      <artifactId>commons-testing</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.jcr</groupId>
@@ -45,6 +34,21 @@
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
     </dependency>
+    <dependency>
+      <groupId>picocontainer</groupId>
+      <artifactId>picocontainer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- This dependency is used for main classes compilation but is erroneously reported as useless by mvn dependency:analyze -->
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- This dependency is used for tests execution but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -56,10 +60,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>picocontainer</groupId>
-      <artifactId>picocontainer</artifactId>
     </dependency>
   </dependencies>
 </project>
