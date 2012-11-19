@@ -6,14 +6,6 @@
 
 	<portal-skin>
 		<skin-name>Default</skin-name>
-		<skin-module>Platform-bootstrap</skin-module>
-		<css-path>/skin/bootstrap/less/bootstrap.css</css-path>
-		<css-priority>4</css-priority>
-		<overwrite>true</overwrite>
-	</portal-skin>
-
-	<portal-skin>
-		<skin-name>Default</skin-name>
 		<skin-module>DocumentSelector</skin-module>
 		<css-path>/skin/DefaultSkin/commons/Stylesheet.css</css-path>
 		<css-priority>5</css-priority>
@@ -32,8 +24,8 @@
 			<path>/javascript/eXo/commons/UIDSUpload.js</path>
 		</script>
 		<depends>
-			<module>jquery</module>
-			<as>jQuery</as>
+			<module>jquery</module>	
+			<as>jQuery</as>	
 		</depends>
 		<depends>
 			<!-- need Browser.js -->
