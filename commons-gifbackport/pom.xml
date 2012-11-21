@@ -6,7 +6,6 @@
     <groupId>org.exoplatform.commons</groupId>
     <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
   </parent>
-  <groupId>org.exoplatform.platform</groupId>
   <artifactId>commons-gifbackport</artifactId>
   <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
   <packaging>jar</packaging>
