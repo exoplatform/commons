@@ -6,7 +6,6 @@
     <groupId>org.exoplatform.commons</groupId>
     <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
   </parent>
-  <groupId>org.exoplatform.commons</groupId>
   <artifactId>commons-webui-component</artifactId>
   <packaging>jar</packaging>
   <name>eXo Commons - Commons WebUI</name>
