@@ -21,32 +21,22 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.exoplatform.services.log.Log;
 import org.codehaus.cargo.container.ContainerType;
-import org.codehaus.cargo.container.EmbeddedLocalContainer;
 import org.codehaus.cargo.container.InstalledLocalContainer;
-import org.codehaus.cargo.container.LocalContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
-import org.codehaus.cargo.container.configuration.ExistingLocalConfiguration;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
-import org.codehaus.cargo.container.configuration.StandaloneLocalConfiguration;
 import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.installer.Installer;
 import org.codehaus.cargo.container.installer.ZipURLInstaller;
-import org.codehaus.cargo.container.jetty.Jetty6xEmbeddedLocalContainer;
-import org.codehaus.cargo.container.jetty.Jetty6xEmbeddedStandaloneLocalConfiguration;
-import org.codehaus.cargo.container.jetty.internal.Jetty6xStandaloneLocalConfigurationCapability;
 import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
-import org.codehaus.cargo.util.FileHandler;
 import org.codehaus.cargo.util.log.LogLevel;
 import org.codehaus.cargo.util.log.SimpleLogger;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS.
@@ -56,10 +46,10 @@ import org.exoplatform.services.log.ExoLogger;
  */
 public class CargoContainer
 {
-   /**
-    * Class logger.
-    */
-   private final Log log = ExoLogger.getLogger("ws.CargoContainer");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(CargoContainer.class);
 
    // private static InstalledLocalContainer container;
    protected static final String TEST_PATH =
@@ -150,7 +140,7 @@ public class CargoContainer
          File inputFile = new File(TEST_PATH + "/src/test/resources/tomcat/exo-configuration.xml");
          File outputFile = new File(container.getHome() + "/exo-configuration.xml");
 
-         System.out.println("CargoContainer.cargoContainerStart()" + container.getHome());
+         LOG.info("CargoContainer.cargoContainerStart()" + container.getHome());
          
          FileReader in = new FileReader(inputFile);
          FileWriter out = new FileWriter(outputFile);
@@ -162,12 +152,12 @@ public class CargoContainer
          in.close();
          out.close();
          container.start();
-         System.out.println("CargoContainer.containerStart() : " + container.getState().isStarted());
+         LOG.info("CargoContainer.containerStart() : " + container.getState().isStarted());
          return container;
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+         LOG.error(e);
          return null;
       }
    }

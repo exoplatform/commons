@@ -22,12 +22,12 @@ import java.net.URL;
 
 import javax.ws.rs.core.MediaType;
 
-import org.exoplatform.services.log.Log;
 import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.common.http.client.HTTPConnection;
 import org.exoplatform.common.http.client.HTTPResponse;
 import org.exoplatform.common.http.client.NVPair;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.ws.frameworks.cometd.transport.DelegateMessage;
 import org.exoplatform.ws.frameworks.json.JsonHandler;
 import org.exoplatform.ws.frameworks.json.JsonParser;
@@ -45,10 +45,10 @@ import org.exoplatform.ws.frameworks.json.value.JsonValue;
  */
 public class TestTools
 {
-   /**
-    * Class logger.
-    */
-   private final Log log = ExoLogger.getLogger("ws.TestTools");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(TestTools.class);
 
    public static String getBaseURLCometdServer(String u)
    {
@@ -65,7 +65,7 @@ public class TestTools
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
       return null;
    }
@@ -74,7 +74,7 @@ public class TestTools
    {
       try
       {
-         System.out.println("TestTools.getUserToken()" + u);
+        LOG.info("TestTools.getUserToken()" + u);
          URL url = new URL(u);// + "/rest/ext/gettoken/" + id + "/");
          HTTPConnection connection = new HTTPConnection(url);
          HTTPResponse response = connection.Get(url.getFile());
@@ -83,7 +83,7 @@ public class TestTools
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
       return null;
    }
@@ -103,7 +103,7 @@ public class TestTools
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
    }
 
@@ -122,7 +122,7 @@ public class TestTools
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
    }
 
@@ -130,8 +130,6 @@ public class TestTools
    {
       try
       {
-         //       System.out.println("RemoteCometdTest.stringToCMessage()" +
-         //       incomString);
          String tmpJ = incomString.trim();
          String jsonString = tmpJ.substring(1, tmpJ.length() - 1);
          JsonHandler jsonHandler = new JsonDefaultHandler();
@@ -139,13 +137,11 @@ public class TestTools
          InputStream inputStream = new ByteArrayInputStream(jsonString.getBytes());
          jsonParser.parse(inputStream, jsonHandler);
          JsonValue jsonValue = jsonHandler.getJsonObject();
-         // System.out.println("RemoteeCometdTest.stringToCMessage()" +
-         // jsonValue.toString());
          return (CMessage) new BeanBuilder().createObject(CMessage.class, jsonValue);
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
       return null;
    }
@@ -166,7 +162,7 @@ public class TestTools
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
       return null;
    }
@@ -185,7 +181,7 @@ public class TestTools
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
       return false;
    }

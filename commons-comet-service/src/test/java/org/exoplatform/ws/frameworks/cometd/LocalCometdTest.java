@@ -47,10 +47,10 @@ import org.w3c.dom.NodeList;
 public class LocalCometdTest
    extends TestCase
 {
-   /**
-    * Class logger.
-    */
-   private final Log log = ExoLogger.getLogger("ws.LocalCometdTest");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(LocalCometdTest.class);
 
    private String baseCometdURI; // =
 
@@ -151,7 +151,7 @@ public class LocalCometdTest
          pairs[2] = new NVPair("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
          pairs[3] = new NVPair("Content-Length", Integer.toString(initData.length()));
          url = new URL(baseCometdURI);
-         System.out.println("LocalCometdTest.cometdConnect()" + url);
+         LOG.info("LocalCometdTest.cometdConnect()" + url);
          connection = new HTTPConnection(url);
          connection.removeModule(CookieModule.class); // remove module because it
          // remove the cookie from
@@ -166,14 +166,14 @@ public class LocalCometdTest
                   "message={\"channel\":\"/meta/handshake\",\"id\":1,\"exoId\":\"" + eXoId + "\",\"exoToken\":\""
                            + userToken + "\"}";
          
-         System.out.println("LocalCometdTest.cometdConnect()" + dataHandshake);
+         LOG.info("LocalCometdTest.cometdConnect()" + dataHandshake);
          
          pairs[3] = new NVPair("Content-Length", Integer.toString(dataHandshake.length()));
          pairs[4] = new NVPair("Cookie", bayeuxCookie);
          response = connection.Post(url.getFile(), dataHandshake.getBytes(), pairs);
          String string = new String(response.getData());
          
-         System.out.println("LocalCometdTest.cometdConnect()" + string);
+         LOG.info("LocalCometdTest.cometdConnect()" + string);
          
          CMessage incomMessage = TestTools.stringToCMessage(string);
          assertNotNull(incomMessage);
@@ -213,7 +213,7 @@ public class LocalCometdTest
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
       return null;
    }
@@ -233,8 +233,8 @@ public class LocalCometdTest
             tender.start();
             Thread.sleep(sleepConnect);
          }
-         System.out.println("-----------------------LocalCometdTest-----------------------------------");
-         System.out.println("Conected " + con + " clients");
+         LOG.info("-----------------------LocalCometdTest-----------------------------------");
+         LOG.info("Conected " + con + " clients");
         
          for (int j = 0; j < repeat; j++)
          {
@@ -259,16 +259,16 @@ public class LocalCometdTest
                Thread.sleep(sleepSend);
             }
          }
-         System.out.println("Send " + messages + " messages");
-         System.out.println("Wait " + timeout + " ms....");
+         LOG.info("Send " + messages + " messages");
+         LOG.info("Wait " + timeout + " ms....");
          countDownLatch.await();
          int t = totalB + totalI;
-         System.out.println("Total get : " + t + " mesagess. " + totalB + " broadcast from them");
-         System.out.println("------------------------------------------------------------------------");
+         LOG.info("Total get : " + t + " mesagess. " + totalB + " broadcast from them");
+         LOG.info("------------------------------------------------------------------------");
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+        LOG.error(e);
       }
    }
 
@@ -324,14 +324,14 @@ public class LocalCometdTest
                            totalB++;
                         }
                         assertEquals(msg, message.getData());
-                        System.out.println("CClient.run()" + message.getData());
+                        LOG.info("CClient.run()" + message.getData());
                         b++;
                      }
                      if (individuals.containsKey(msgid))
                      {
                         String msg = individuals.get(msgid);
                         assertEquals(msg, message.getData());
-                        System.out.println("CClient.run()" + message.getData());
+                        LOG.info("CClient.run()" + message.getData());
                         totalI++;
                         i++;
                      }
@@ -342,7 +342,7 @@ public class LocalCometdTest
          }
          catch (Exception e)
          {
-            e.printStackTrace();
+           LOG.error(e);
          }
       }
    }

@@ -32,6 +32,8 @@ import org.exoplatform.common.http.client.CookieModule;
 import org.exoplatform.common.http.client.HTTPConnection;
 import org.exoplatform.common.http.client.HTTPResponse;
 import org.exoplatform.common.http.client.NVPair;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -46,9 +48,10 @@ import org.w3c.dom.NodeList;
 public class TransportCometdTest
    extends TestCase
 {
-   /**
-    * Class logger.
-    */
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(TransportCometdTest.class);
 
    private String baseURI;
 
@@ -148,7 +151,6 @@ public class TransportCometdTest
          // remove the cookie from
          // Headers
          HTTPResponse response = connection.Post(url.getFile(), initData.getBytes(), pairs);
-         // System.out.println("RemoteCometdTest.cometdConnect()" + new
          // String(response.getData()));
          String bayeuxCookie = response.getHeader("Set-Cookie").split(";")[0];
          assertNotNull(bayeuxCookie);
@@ -162,7 +164,6 @@ public class TransportCometdTest
          pairs[4] = new NVPair("Cookie", bayeuxCookie);
          response = connection.Post(url.getFile(), dataHandshake.getBytes(), pairs);
          String string = new String(response.getData());
-         // System.out.println("RemoteCometdTest.cometdConnect()" + string);
          CMessage incomMessage = TestTools.stringToCMessage(string);
          assertNotNull(incomMessage);
          timeout = incomMessage.getAdvice().getTimeout();
@@ -177,7 +178,6 @@ public class TransportCometdTest
                            + connectionType + "\",\"id\":2}";
          pairs[3] = new NVPair("Content-Length", Integer.toString(dataConnect.length()));
          response = connection.Post(url.getFile(), dataConnect.getBytes(), pairs);
-         // System.out.println("RemoteCometdTest.cometdConnect()" + new
          // String(response.getData()));
          incomMessage = TestTools.stringToCMessage(new String(response.getData()));
          assertTrue(incomMessage.getSuccessful());
@@ -197,16 +197,13 @@ public class TransportCometdTest
          dataSub = dataSub + "]";
          pairs[3] = new NVPair("Content-Length", Integer.toString(dataSub.length()));
          response = connection.Post(url.getFile(), dataSub.getBytes(), pairs);
-         // System.out.println("RemoteCometdTest.cometdConnect()" + new
-         // String(response.getData()));
          incomMessage = TestTools.stringToCMessage(new String(response.getData()));
          assertTrue(incomMessage.getSuccessful());
          return clientId;
       }
-      catch (Exception e)
-      {
-         e.printStackTrace();
-      }
+ catch (Exception e) {
+      LOG.error(e);
+    }
       return null;
    }
 
@@ -244,8 +241,8 @@ public class TransportCometdTest
             tender.start();
             Thread.sleep(sleepConnect);
          }
-         System.out.println("-----------------------TransportCometdTest-----------------------------------");
-         System.out.println("Connected " + con + " clients.");
+         LOG.info("-----------------------TransportCometdTest-----------------------------------");
+         LOG.info("Connected " + con + " clients.");
          for (int j = 0; j < repeat; j++)
          {
             for (int i = 0; i < con; i++)
@@ -269,16 +266,16 @@ public class TransportCometdTest
                Thread.sleep(sleepSend);
             }
          }
-         System.out.println("Send " + messages + " messages");
-         System.out.println("Wait " + timeout + " ms....");
+         LOG.info("Send " + messages + " messages");
+         LOG.info("Wait " + timeout + " ms....");
          countDownLatch.await();
          int t = totalB + totalI;
-         System.out.println("Total get : " + t + " mesagess. " + totalB + " broadcast from them");
-         System.out.println("------------------------------------------------------------------------");
+         LOG.info("Total get : " + t + " mesagess. " + totalB + " broadcast from them");
+         LOG.info("------------------------------------------------------------------------");
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+         LOG.error(e);
       }
    }
 
@@ -331,7 +328,7 @@ public class TransportCometdTest
                         synchronized (totalB)
                         {
                            totalB++;
-                           System.out.println("CClient.run() broadcast " + message.getData() + " " + totalB);
+                           LOG.info("CClient.run() broadcast " + message.getData() + " " + totalB);
                            b++;
                         }
                         assertEquals(msg, message.getData());
@@ -343,7 +340,7 @@ public class TransportCometdTest
                         synchronized (totalI)
                         {
                            totalI++;
-                           System.out.println("CClient.run() individual " + message.getData() + " " + totalI);
+                           LOG.info("CClient.run() individual " + message.getData() + " " + totalI);
                         }
                         i++;
                      }
@@ -355,7 +352,7 @@ public class TransportCometdTest
          }
          catch (Exception e)
          {
-            e.printStackTrace();
+            LOG.error(e);
          }
       }
    }

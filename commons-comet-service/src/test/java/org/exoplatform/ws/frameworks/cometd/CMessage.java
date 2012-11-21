@@ -27,10 +27,10 @@ import org.exoplatform.services.log.ExoLogger;
  */
 public class CMessage
 {
-   /**
-    * Class logger.
-    */
-   private final Log log = ExoLogger.getLogger("ws.CometdServIncomMessage");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(CMessage.class);
 
    private String channel;
 

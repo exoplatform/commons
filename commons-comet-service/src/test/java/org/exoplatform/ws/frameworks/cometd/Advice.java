@@ -27,10 +27,10 @@ import org.exoplatform.services.log.ExoLogger;
  */
 public class Advice
 {
-   /**
-    * Class logger.
-    */
-   private final Log log = ExoLogger.getLogger("ws.Advice");
+  /**
+   * Logger.
+   */
+  private static final Log LOG = ExoLogger.getLogger(Advice.class);
 
    private String reconnect;
 
