@@ -77,9 +77,21 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-comet-ext-webapp-cometd</artifactId>
+        <version>${project.version}</version>
+        <classifier>classes</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-comet-ext-webapp-rest</artifactId>
         <version>${project.version}</version>
         <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-comet-ext-webapp-rest</artifactId>
+        <version>${project.version}</version>
+        <classifier>classes</classifier>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -91,6 +103,12 @@
         <artifactId>commons-comet-webapp</artifactId>
         <version>${project.version}</version>
         <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-comet-webapp</artifactId>
+        <version>${project.version}</version>
+        <classifier>classes</classifier>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -115,9 +133,21 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-extension-webapp</artifactId>
+        <version>${project.version}</version>
+        <classifier>classes</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-fck</artifactId>
         <version>${project.version}</version>
         <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-fck</artifactId>
+        <version>${project.version}</version>
+        <classifier>classes</classifier>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -144,6 +174,12 @@
         <artifactId>commons-webui-resources</artifactId>
         <version>${project.version}</version>
         <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-webui-resources</artifactId>
+        <version>${project.version}</version>
+        <classifier>classes</classifier>
       </dependency>
       <!-- To be replaced by an import of core parent POM -->
       <dependency>
