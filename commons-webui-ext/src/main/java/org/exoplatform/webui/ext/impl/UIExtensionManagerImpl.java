@@ -194,7 +194,7 @@ public class UIExtensionManagerImpl implements UIExtensionManager {
             }
           }
         } catch (Exception e) {  //filter.accept() throws Exception()
-          LOG.error("An execption occurs while applying the filter", e);
+          LOG.error("An exeception occurs while applying the filter", e);
           onDeny(checkOnly, filter, context);
           if (type != null) {
             if (type.checkOtherFiltersOnlyIfOK()) {
