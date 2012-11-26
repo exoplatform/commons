@@ -13,7 +13,7 @@
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <modules>
-    <module>api</module>
+    <module>commons-api</module>
     <module>commons-comet-ext-service</module>
     <module>commons-comet-ext-webapp-cometd</module>
     <module>commons-comet-ext-webapp-rest</module>
