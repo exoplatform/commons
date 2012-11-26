@@ -112,6 +112,7 @@
     </dependencies>
   </dependencyManagement>
   <modules>
+    <module>api</module>
     <module>comet</module>
     <module>component/common</module>
     <module>component/product</module>
