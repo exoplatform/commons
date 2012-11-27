@@ -9,7 +9,7 @@
   <artifactId>commons-extension-webapp</artifactId>
   <packaging>war</packaging>
   <name>eXo Commons - Commons Extension Webapp</name>
-    <dependencies>
+  <dependencies>
     <dependency>
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.ext</artifactId>
