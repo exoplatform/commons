@@ -36,7 +36,7 @@
     <url>http://fisheye.exoplatform.org/browse/projects/commons</url>
   </scm>
   <properties>
-<!-- **************************************** -->
+    <!-- **************************************** -->
     <!-- Jira Settings                            -->
     <!-- **************************************** -->
     <jira.project.key>COMMONS</jira.project.key>
@@ -46,21 +46,6 @@
     <jenkins.job.name>commons-master-ci</jenkins.job.name>
     <!-- **************************************** -->
     <!-- Dependencies versions                    -->
-<<<<<<< HEAD
-    <!-- **************************************** -->    
-    <org.exoplatform.kernel.version>2.4.0-CR2</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>2.5.0-CR2</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>2.3.0-CR2</org.exoplatform.ws.version>
-    <org.exoplatform.jcr.version>1.15.0-CR2</org.exoplatform.jcr.version>
-    <org.gatein.portal.version>3.5.0.Beta02</org.gatein.portal.version>
-    <picocontainer.version>1.1</picocontainer.version>
-    <javax.jcr.api.version>1.0</javax.jcr.api.version>
-    <junit.version>4.10</junit.version>
-    <mockito.version>1.8.1</mockito.version>
-    <javax.servlet.servlet-api.version>2.5</javax.servlet.servlet-api.version>
-    <org.slf4j.slf4j-simple.version>1.6.1</org.slf4j.slf4j-simple.version>
-    <org.hsqldb.version>2.0.0</org.hsqldb.version>
-=======
     <!-- **************************************** -->
     <!-- eXo deps -->
     <org.exoplatform.kernel.version>2.3.10-GA-SNAPSHOT</org.exoplatform.kernel.version>
@@ -68,7 +53,6 @@
     <org.exoplatform.ws.version>2.2.10-GA-SNAPSHOT</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.14.10-GA-SNAPSHOT</org.exoplatform.jcr.version>
     <org.exoplatform.portal.version>3.4.0.Final</org.exoplatform.portal.version>
->>>>>>> origin/feature/kill-exobuild
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -93,16 +77,6 @@
         <type>war</type>
       </dependency>
       <dependency>
-<<<<<<< HEAD
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.component.resources</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.component.web.api</artifactId>
-        <version>${org.gatein.portal.version}</version>
-=======
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-comet-ext-webapp-cometd</artifactId>
         <version>${project.version}</version>
@@ -185,7 +159,6 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-testing</artifactId>
         <version>${project.version}</version>
->>>>>>> origin/feature/kill-exobuild
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -274,9 +247,9 @@
         <version>${org.exoplatform.portal.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.gatein.portal</groupId>
+        <groupId>org.exoplatform.portal</groupId>
         <artifactId>exo.portal.webui.core</artifactId>
-        <version>${org.gatein.portal.version}</version>
+        <version>${org.exoplatform.portal.version}</version>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.portal</groupId>

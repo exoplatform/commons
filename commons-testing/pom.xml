@@ -11,14 +11,6 @@
   <name>eXo Commons - Testing</name>
   <dependencies>
     <dependency>
-<<<<<<< HEAD:testing/pom.xml
-      <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.component.test.core</artifactId>
-      <version>${org.gatein.portal.version}</version>
-    </dependency>
-    <dependency>
-=======
->>>>>>> origin/feature/kill-exobuild:commons-testing/pom.xml
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
     </dependency>
@@ -39,26 +31,12 @@
       <artifactId>exo.kernel.commons</artifactId>
     </dependency>
     <dependency>
-<<<<<<< HEAD:testing/pom.xml
-      <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.component.resources</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.component.web.api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>provided</scope>
-=======
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.portal</groupId>
       <artifactId>exo.portal.component.portal</artifactId>
->>>>>>> origin/feature/kill-exobuild:commons-testing/pom.xml
     </dependency>
     <dependency>
       <groupId>org.exoplatform.portal</groupId>
@@ -73,13 +51,8 @@
       <artifactId>exo.portal.component.web.controller</artifactId>
     </dependency>
     <dependency>
-<<<<<<< HEAD:testing/pom.xml
-      <groupId>org.gatein.portal</groupId>
-      <artifactId>exo.portal.webui.core</artifactId>
-=======
       <groupId>org.exoplatform.portal</groupId>
       <artifactId>exo.portal.webui.framework</artifactId>
->>>>>>> origin/feature/kill-exobuild:commons-testing/pom.xml
     </dependency>
     <dependency>
       <groupId>org.exoplatform.tool</groupId>
