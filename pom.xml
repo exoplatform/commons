@@ -126,6 +126,11 @@
         <artifactId>commons-component-upgrade</artifactId>
         <version>${project.version}</version>
       </dependency>
+	<dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-extension-webapp</artifactId>
@@ -282,7 +287,11 @@
         <artifactId>exo.ws.rest.core</artifactId>
         <version>${org.exoplatform.ws.version}</version>
       </dependency>
-
+      <dependency>      
+        <groupId>${project.groupId}</groupId>
+        <artifactId>commons-component-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
