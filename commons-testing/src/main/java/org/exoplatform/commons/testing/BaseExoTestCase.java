@@ -37,7 +37,7 @@ public abstract class BaseExoTestCase extends AbstractKernelTest {
   }
   
   @Override
-  protected void beforeRunBare() throws Exception {
+  protected void beforeRunBare() {
    if (ownBootstrap == null) {
      super.beforeRunBare();
    }

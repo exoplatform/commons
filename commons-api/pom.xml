@@ -6,7 +6,7 @@
     <groupId>org.exoplatform.commons</groupId>
     <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
   </parent>
-  <artifactId>commons-api</artifactId>  
+  <artifactId>commons-api</artifactId>
   <packaging>jar</packaging>
   <name>eXo Commons - API</name>
   <dependencies>

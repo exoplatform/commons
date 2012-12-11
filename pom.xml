@@ -53,16 +53,38 @@
     <org.exoplatform.ws.version>2.3.0-GA</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.15.0-GA</org.exoplatform.jcr.version>
     <org.gatein.portal.version>3.5.0.Final</org.gatein.portal.version>
+    <org.quartz-scheduler.version>2.1.6</org.quartz-scheduler.version>
+    <org.apache.lucene.version>3.5.0</org.apache.lucene.version>
+    <org.easymock.version>2.0</org.easymock.version>
+    <org.apache.tika.version>1.1</org.apache.tika.version>
+    <org.hibernate.version>4.1.6.Final</org.hibernate.version>
   </properties>
   <dependencyManagement>
     <dependencies>
-      <!-- Import versions of external dependencies to use -->
       <dependency>
-        <groupId>org.exoplatform</groupId>
-        <artifactId>maven-depmgt-pom</artifactId>
-        <version>1-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>commons-component-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>${org.apache.lucene.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>${org.apache.tika.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>${org.easymock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-api</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <!-- Our own project modules -->
       <dependency>
@@ -220,6 +242,22 @@
         <artifactId>exo.kernel.container</artifactId>
         <version>${org.exoplatform.kernel.version}</version>
       </dependency>
+      <!-- To be replaced by an import of WS parent POM -->
+      <dependency>
+        <groupId>org.exoplatform.ws</groupId>
+        <artifactId>exo.ws.commons</artifactId>
+        <version>${org.exoplatform.ws.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.ws</groupId>
+        <artifactId>exo.ws.frameworks.json</artifactId>
+        <version>${org.exoplatform.ws.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.ws</groupId>
+        <artifactId>exo.ws.rest.core</artifactId>
+        <version>${org.exoplatform.ws.version}</version>
+      </dependency>
       <!-- To be replaced by an import of GateIn Portal parent POM -->
       <dependency>
         <groupId>org.gatein.portal</groupId>
@@ -266,26 +304,23 @@
         <artifactId>exo.portal.webui.portlet</artifactId>
         <version>${org.gatein.portal.version}</version>
       </dependency>
-      <!-- To be replaced by an import of WS parent POM -->
       <dependency>
-        <groupId>org.exoplatform.ws</groupId>
-        <artifactId>exo.ws.commons</artifactId>
-        <version>${org.exoplatform.ws.version}</version>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${org.hibernate.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.exoplatform.ws</groupId>
-        <artifactId>exo.ws.frameworks.json</artifactId>
-        <version>${org.exoplatform.ws.version}</version>
+        <groupId>org.quartz-scheduler</groupId>
+        <artifactId>quartz</artifactId>
+        <version>${org.quartz-scheduler.version}</version>
       </dependency>
+      <!-- Import versions of external dependencies to use -->
       <dependency>
-        <groupId>org.exoplatform.ws</groupId>
-        <artifactId>exo.ws.rest.core</artifactId>
-        <version>${org.exoplatform.ws.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>commons-component-common</artifactId>
-        <version>${project.version}</version>
+        <groupId>org.exoplatform</groupId>
+        <artifactId>maven-depmgt-pom</artifactId>
+        <version>1-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
