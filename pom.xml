@@ -4,7 +4,7 @@
   <parent>
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
-    <version>9-SNAPSHOT</version>
+    <version>9-alpha-3</version>
     <relativePath></relativePath>
   </parent>
   <groupId>org.exoplatform.commons</groupId>
@@ -56,17 +56,20 @@
   </properties>
   <dependencyManagement>
     <dependencies>
+      <!-- Import versions of external dependencies to use -->
       <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>commons-component-common</artifactId>
-        <version>${project.version}</version>
+        <groupId>org.exoplatform</groupId>
+        <artifactId>maven-depmgt-pom</artifactId>
+        <version>1-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
+      <!-- Our own project modules -->
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- Our own project modules -->
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-comet-ext-service</artifactId>
@@ -283,14 +286,6 @@
         <groupId>org.gatein.portal</groupId>
         <artifactId>exo.portal.webui.portlet</artifactId>
         <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <!-- Import versions of external dependencies to use -->
-      <dependency>
-        <groupId>org.exoplatform</groupId>
-        <artifactId>maven-depmgt-pom</artifactId>
-        <version>1-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
