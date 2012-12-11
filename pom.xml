@@ -56,11 +56,6 @@
   </properties>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>commons-component-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
       <!-- Import versions of external dependencies to use -->
       <dependency>
         <groupId>org.exoplatform</groupId>
