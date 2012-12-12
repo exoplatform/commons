@@ -67,6 +67,14 @@
           <artifactId>commons-logging</artifactId>
           <groupId>commons-logging</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>xstream</artifactId>
+          <groupId>xstream</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jmock</artifactId>
+          <groupId>jmock</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
