@@ -27,5 +27,11 @@
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
     </dependency>
+    <dependency>
+      <!-- To replace the excluded old version -->
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

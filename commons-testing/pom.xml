@@ -14,6 +14,11 @@
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
     </dependency>
+    <!-- Required by exo.kernel.container for tests purpose -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -63,9 +68,10 @@
       <artifactId>mockito-all</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>provided</scope>
+      <!-- To replace the excluded old version -->
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <!-- This dependency is used for tests execution but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>

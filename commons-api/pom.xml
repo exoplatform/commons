@@ -14,5 +14,11 @@
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
     </dependency>
+    <dependency>
+      <!-- To replace the excluded old version -->
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>
