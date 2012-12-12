@@ -66,18 +66,18 @@
       <groupId>quartz</groupId>
       <artifactId>quartz</artifactId>
     </dependency>
-	<dependency>
-		<groupId>org.chromattic</groupId>
-		<artifactId>chromattic.core</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.exoplatform.portal</groupId>
-		<artifactId>exo.portal.component.common</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.chromattic</groupId>
-		<artifactId>chromattic.apt</artifactId>
-	</dependency>
+    <dependency>
+      <groupId>org.chromattic</groupId>
+      <artifactId>chromattic.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.portal</groupId>
+      <artifactId>exo.portal.component.common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.chromattic</groupId>
+      <artifactId>chromattic.apt</artifactId>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -108,21 +108,21 @@
     </dependency>
   </dependencies>
   <build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*.properties</include>
-					<include>**/*.xml</include>
-					<include>**/*.gtmpl</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.gtmpl</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>

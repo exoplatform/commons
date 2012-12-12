@@ -56,14 +56,6 @@
   </properties>
   <dependencyManagement>
     <dependencies>
-      <!-- Import versions of external dependencies to use -->
-      <dependency>
-        <groupId>org.exoplatform</groupId>
-        <artifactId>maven-depmgt-pom</artifactId>
-        <version>1</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-api</artifactId>
@@ -225,6 +217,11 @@
         <artifactId>exo.kernel.container</artifactId>
         <version>${org.exoplatform.kernel.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.exoplatform.portal</groupId>
+        <artifactId>exo.portal.component.common</artifactId>
+        <version>${org.gatein.portal.version}</version>
+      </dependency>
       <!-- To be replaced by an import of GateIn Portal parent POM -->
       <dependency>
         <groupId>org.exoplatform.portal</groupId>
@@ -287,12 +284,15 @@
         <artifactId>exo.ws.rest.core</artifactId>
         <version>${org.exoplatform.ws.version}</version>
       </dependency>
-	<dependency>
-		<groupId>org.exoplatform.portal</groupId>
-		<artifactId>exo.portal.component.common</artifactId>
- 		 <version>${org.gatein.portal.version}</version>
-	</dependency>
-  </dependencies>
+      <!-- Import versions of external dependencies to use -->
+      <dependency>
+        <groupId>org.exoplatform</groupId>
+        <artifactId>maven-depmgt-pom</artifactId>
+        <version>1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
   </dependencyManagement>
   <build>
     <pluginManagement>
