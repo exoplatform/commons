@@ -15,5 +15,9 @@
       <artifactId>exo.kernel.component.common</artifactId>
       <version>${org.exoplatform.kernel.version}</version>
     </dependency>
+    <dependency>
+			<groupId>org.exoplatform.jcr</groupId>
+			<artifactId>exo.jcr.component.core</artifactId>
+		</dependency>
   </dependencies>
 </project>

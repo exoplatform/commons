@@ -292,7 +292,12 @@
         <artifactId>exo.ws.rest.core</artifactId>
         <version>${org.exoplatform.ws.version}</version>
       </dependency>
-    </dependencies>
+	<dependency>
+		<groupId>org.exoplatform.portal</groupId>
+		<artifactId>exo.portal.component.common</artifactId>
+ 		 <version>${org.gatein.portal.version}</version>
+	</dependency>
+  </dependencies>
   </dependencyManagement>
   <build>
     <pluginManagement>
