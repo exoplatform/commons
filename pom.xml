@@ -57,25 +57,39 @@
     <org.exoplatform.core.version>2.4.10-GA-SNAPSHOT</org.exoplatform.core.version>
     <org.exoplatform.ws.version>2.2.10-GA-SNAPSHOT</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.14.10-GA-SNAPSHOT</org.exoplatform.jcr.version>
-    <org.gatein.portal.version>3.4.0.Final</org.gatein.portal.version>    
-      <org.exoplatform.social.version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</org.exoplatform.social.version>
+    <org.gatein.portal.version>3.4.0.Final</org.gatein.portal.version>
+    <org.exoplatform.social.version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</org.exoplatform.social.version>
     <org.codehaus.jackson.version>1.9.7</org.codehaus.jackson.version>
     <org.juzu.version>0.5.1</org.juzu.version>
     <org.apache.solr.version>3.6.0</org.apache.solr.version>
     <org.exoplatform.ks.version>2.2.10</org.exoplatform.ks.version>
     <elasticsearch.version>0.19.10</elasticsearch.version>
     <org.exoplatform.commons.search.solr.lucene.version>3.6.0</org.exoplatform.commons.search.solr.lucene.version>
-    <org.exoplatform.commons.search.elastic.lucene.version>3.6.1</org.exoplatform.commons.search.elastic.lucene.version>            
+    <org.exoplatform.commons.search.elastic.lucene.version>3.6.1</org.exoplatform.commons.search.elastic.lucene.version>
   </properties>
   <dependencyManagement>
     <dependencies>
-      <!-- Import versions of external dependencies to use -->
       <dependency>
-        <groupId>org.exoplatform</groupId>
-        <artifactId>maven-depmgt-pom</artifactId>
-        <version>1</version>
-        <type>pom</type>
-        <scope>import</scope>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-solrj</artifactId>
+        <version>${org.apache.solr.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-core-asl</artifactId>
+        <version>${org.codehaus.jackson.version}</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>${org.codehaus.jackson.version}</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.elasticsearch</groupId>
+        <artifactId>elasticsearch</artifactId>
+        <version>${elasticsearch.version}</version>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -433,6 +447,12 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- for unified search -->
+      <dependency>
+        <groupId>org.exoplatform.portal</groupId>
+        <artifactId>exo.portal.component.scripting</artifactId>
+        <version>${org.gatein.portal.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.exoplatform.portal</groupId>
         <artifactId>exo.portal.component.test.core</artifactId>
@@ -475,6 +495,11 @@
         <artifactId>exo.portal.webui.portlet</artifactId>
         <version>${org.gatein.portal.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.exoplatform.social</groupId>
+        <artifactId>social-component-core</artifactId>
+        <version>${org.exoplatform.social.version}</version>
+      </dependency>
       <!-- To be replaced by an import of WS parent POM -->
       <dependency>
         <groupId>org.exoplatform.ws</groupId>
@@ -498,50 +523,19 @@
           </exclusion>
         </exclusions>
       </dependency>
-
-<!-- for unified search -->
-	<dependency>
-      <groupId>org.exoplatform.portal</groupId>
-      <artifactId>exo.portal.component.scripting</artifactId>
-      <version>${org.gatein.portal.version}</version>
-    </dependency>
-<dependency>
-      <groupId>org.exoplatform.social</groupId>
-      <artifactId>social-component-core</artifactId>
-      <version>${org.exoplatform.social.version}</version>     
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-core-asl</artifactId>
-      <version>${org.codehaus.jackson.version}</version>
-      <type>jar</type>
-    </dependency>    
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <version>${org.codehaus.jackson.version}</version>
-      <type>jar</type>
-    </dependency>    
-
-    <dependency>
-      <groupId>org.juzu</groupId>
-      <artifactId>juzu-plugins-less</artifactId>
-      <version>${org.juzu.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-solrj</artifactId>
-      <version>${org.apache.solr.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-      <version>${elasticsearch.version}</version>
-    </dependency>     
-
+      <dependency>
+        <groupId>org.juzu</groupId>
+        <artifactId>juzu-plugins-less</artifactId>
+        <version>${org.juzu.version}</version>
+      </dependency>
+      <!-- Import versions of external dependencies to use -->
+      <dependency>
+        <groupId>org.exoplatform</groupId>
+        <artifactId>maven-depmgt-pom</artifactId>
+        <version>1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
