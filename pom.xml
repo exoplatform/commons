@@ -346,6 +346,16 @@
             <artifactId>exo.tool.framework.junit</artifactId>
             <groupId>org.exoplatform.tool</groupId>
           </exclusion>
+          <exclusion>
+            <!-- To be fixed in the original project -->
+            <artifactId>commons-logging-api</artifactId>
+            <groupId>commons-logging</groupId>
+          </exclusion>
+          <exclusion>
+            <!-- To be fixed in the original project -->
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
