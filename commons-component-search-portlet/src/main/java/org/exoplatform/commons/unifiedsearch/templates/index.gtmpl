@@ -1,0 +1,119 @@
+<style>
+    .selected {
+        font-weight: bold;
+    }
+    .type {
+        margin-bottom: 40px;
+        display: none;
+    }
+    .details, .excerpt {
+        margin-left: 20px;
+        margin-bottom: 10px;
+        font-size: x-small !important ;
+        color: grey; 
+    }
+    .clickable {
+        cursor: pointer;
+    }
+    .collapsed:after {
+        content: "+";
+    }
+    .expanded:after {
+        content: "-";
+    }
+</style>
+
+<div id="searchPortlet">
+  <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
+    <div style="font-size: small;">SQL:</div>
+    <div style="margin: 10px;">
+      <textarea rows="4" cols="50" id="txtSql">SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '%query%') ORDER BY jcr:score() DESC</textarea>            
+    </div>  
+  </div>
+
+  <div id="searchForm" style="padding-top: 5px;">
+    <label id="lbSearch" class="clickable" style="padding-left: 5px;">Search</label>
+    <input type="text" id="txtQuery"/>
+    <input type="button" id="btnSearch" value="Go"/>
+
+    <hr/>
+    <div id="entryTypes" style="display: none"></div>        
+    <div id="result" style="background: white; padding-bottom: 10px; display: none;"></div>
+  </div>
+</div>
+
+<script>
+  $("#txtQuery").focus();
+
+  $("#btnSearch").click(function(){
+      var query = $("#txtQuery").val();
+      var sql = $("#txtSql").val().replace("%query%", query);
+    
+      var searchFor = $("#sqlExec").is(":visible")?sql:query;
+      console.log(searchFor);
+      //return false;
+    
+      $("body").css("cursor", "wait");
+      $.getJSON("/rest/search?q=" + searchFor, function(entryMap){
+          var entryTypes = "| ";
+          var result = "<hr/><h3>Results:</h3>";
+          $.each(entryMap, function(type, entries){
+              entryTypes = entryTypes + "<span class='clickable entryType'>" + type + " (" + $(entries).size() + ")" + "</span>" + " | ";
+              result = result + "<div class='type' id='" + type + "'>";
+              $.each(entries, function(i, entry){
+                  result = result + entry.html;
+              });
+              result = result + "</div>"; //type div
+          });
+          $("#entryTypes").html(entryTypes);
+          $("#result").html(result);
+          $("#entryTypes").show();
+          $("#result").show();
+          $(".entryType").first().click();                        
+          $("body").css("cursor", "auto");
+      });                                        
+  });
+  
+  $(".expanded, .collapsed").live("click", function(){
+      $(this).toggleClass("expanded collapsed");
+      var $details = $(this).parents("div.entry").find("div.details");
+      var $excerpt = $(this).parents("div.entry").find("div.excerpt");
+      if($details.is(":hidden")){
+          $.getJSON("/rest/search/props?node=" + $(this).next("a").attr("href").replace("/rest/jcr/", ""), function(props){
+              var details = "";
+              $.each(props, function(key, value){
+                  details = details + "<div>" + key + " = " + value + "</div>";
+              });
+              $details.html(details);
+              $excerpt.hide();
+              $details.show();
+          });
+      } else {
+          $excerpt.show();
+          $details.hide();
+      }      
+
+  })
+  
+  $(".entryType").live("click", function(){
+      $(".selected").toggleClass("selected");
+      $(this).toggleClass("selected");
+      
+      var type=$(this).text();
+      type = type.substring(0, type.indexOf(" ("));
+      type = type.replace(/(:|\\.)/g,'\\\\$1');
+      $(".type").hide();
+      $("#"+type).show();
+  })
+        
+  $("#txtQuery").keyup(function(event){
+      if(event.keyCode == 13){
+          $("#btnSearch").click();
+      }
+  });
+  
+  $("#lbSearch").click(function(){
+    $("#sqlExec").toggle();
+  });          
+</script>
+

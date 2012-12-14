@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>commons</artifactId>
+    <groupId>org.exoplatform.commons</groupId>
+    <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>commons-component-search-service</artifactId>
+  <name>eXo Commons - Search - Service</name>
+  <packaging>jar</packaging>
+
+  <properties>
+    <org.codehaus.jackson.version>1.9.7</org.codehaus.jackson.version>
+    <org.exoplatform.social.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.social.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-api</artifactId>
+    </dependency>    
+    <dependency>
+      <groupId>org.exoplatform.ws</groupId>
+      <artifactId>exo.ws.rest.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.jcr</groupId>
+      <artifactId>exo.jcr.component.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.portal</groupId>
+      <artifactId>exo.portal.component.scripting</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.social</groupId>
+      <artifactId>social-component-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+    </dependency>    
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+    </dependency>    
+  </dependencies>
+
+</project>

@@ -1,0 +1,86 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>commons</artifactId>
+    <groupId>org.exoplatform.commons</groupId>
+    <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>commons-component-search-solr-driver</artifactId>
+  <name>eXo Commons - Search - Solr driver</name>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-core</artifactId>
+      <version>${org.apache.solr.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-cell</artifactId>
+      <version>${org.apache.solr.version}</version>
+      <scope>test</scope>
+    </dependency>
+	<dependency>
+		<groupId>org.apache.lucene</groupId>
+		<artifactId>lucene-core</artifactId>
+		<version>${org.exoplatform.commons.search.solr.lucene.version}</version>
+		<scope>test</scope>
+	</dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.2.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.2.1</version>
+      <scope>test</scope>
+    </dependency>
+  
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-component-search-sample</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.core</groupId>
+      <artifactId>exo.core.component.organization.api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ks</groupId>
+      <artifactId>exo.ks.eXoApplication.forum.service</artifactId>
+      <version>${org.exoplatform.ks.version}</version>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.6.4</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

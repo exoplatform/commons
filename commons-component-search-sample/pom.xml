@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>commons</artifactId>
+    <groupId>org.exoplatform.commons</groupId>
+    <version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>commons-component-search-sample</artifactId>
+  <name>eXo Commons - Search - Sample</name>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.exoplatform.core</groupId>
+      <artifactId>exo.core.component.organization.api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ks</groupId>
+      <artifactId>exo.ks.eXoApplication.forum.service</artifactId>
+      <version>${org.exoplatform.ks.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+</project>
