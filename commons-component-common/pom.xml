@@ -27,6 +27,14 @@
       <artifactId>jsr311-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.chromattic</groupId>
+      <artifactId>chromattic.apt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.chromattic</groupId>
+      <artifactId>chromattic.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-api</artifactId>
     </dependency>
@@ -55,28 +63,48 @@
       <artifactId>exo.kernel.container</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.exoplatform.portal</groupId>
+      <artifactId>exo.portal.component.common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.exoplatform.ws</groupId>
       <artifactId>exo.ws.rest.core</artifactId>
     </dependency>
     <dependency>
       <groupId>picocontainer</groupId>
       <artifactId>picocontainer</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>xstream</artifactId>
+          <groupId>xstream</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jmock</artifactId>
+          <groupId>jmock</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>quartz</groupId>
       <artifactId>quartz</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- To be fixed in the original project -->
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.chromattic</groupId>
-      <artifactId>chromattic.core</artifactId>
+      <!-- To replace the excluded old version -->
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.portal</groupId>
-      <artifactId>exo.portal.component.common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.chromattic</groupId>
-      <artifactId>chromattic.apt</artifactId>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

@@ -39,6 +39,12 @@
       <artifactId>exo.portal.webui.framework</artifactId>
     </dependency>
     <dependency>
+      <!-- To replace the excluded old version -->
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
