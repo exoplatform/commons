@@ -19,7 +19,6 @@ package org.exoplatform.commons.search.driver.jcr;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +39,16 @@ import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -53,6 +62,8 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
+import org.exoplatform.services.rest.resource.ResourceContainer;
 
 /**
  * Created by The eXo Platform SAS
@@ -60,44 +71,35 @@ import org.exoplatform.services.jcr.core.ManageableRepository;
  *          canhpv@exoplatform.com
  * Nov 21, 2012  
  */
-public class JcrSearchService extends SearchService {
-  private Map<String, List<String>> searchScope; //e.g: {repository:[collaboration, knowledge, social], ...}
+@Path("/search/jcr")
+@Produces(MediaType.APPLICATION_JSON)
+public class JcrSearchService extends SearchService implements ResourceContainer {
+  private static Map<String, List<String>> searchScope; //e.g: {repository:[collaboration, knowledge, social], ...}
   private static OneToManyBidirectionalMap<Map<String, String>> typeMap;
   
-  public JcrSearchService() {
-    searchScope = new HashMap<String, List<String>>();
-    searchScope.put("repository", Arrays.asList("collaboration","knowledge","social")); //TODO: do this in config file
-    
-    typeMap = new OneToManyBidirectionalMap<Map<String, String>>(); //TODO: do this in config file
-    
-    Map<String, Map<String, String>> PEOPLE_JCR_TYPES = new HashMap<String, Map<String, String>>(){{
-      put("soc:profiledefinition", new HashMap<String, String>(){{
-        put("userId", "void-username");
-      }});
+  private static final CacheControl cacheControl;
+  static {
+    RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
+    cacheControl = new CacheControl();
+    cacheControl.setNoCache(true);
+    cacheControl.setNoStore(true);
+  }
       
-      put("exo:contact", new HashMap<String, String>(){{
-        put("userId", "exo:id");
-      }});
-    }};
+  public JcrSearchService() {
+    searchScope = new JsonMap<String, List<String>>("{\"repository\":[\"collaboration\",\"knowledge\",\"social\"]}");    
+    typeMap = new OneToManyBidirectionalMap<Map<String, String>>(
+        "{\"people\":{" +
+            "\"exo:contact\":{" +
+              "\"userId\":\"exo:id\"" +
+            "}," +
+            "\"soc:profiledefinition\":{" +
+            " \"userId\":\"void-username\"" +
+            "}" +
+          "}" +
+        "}");
 
     SearchService.registerEntryType("people", People.class);
     SearchService.registerEntryType("content", Content.class);
-
-    typeMap.put("people", PEOPLE_JCR_TYPES);
-    //typeMap.put("content", null);
-    
-    //typeMap.put("people", Arrays.asList("exo:contact"));
-    /*typeMap.put("space", Arrays.asList("soc:spacedefinition"));
-    typeMap.put("activity", Arrays.asList("soc:activity"));
-    typeMap.put("question", Arrays.asList("exo:faqQuestion", "exo:answer", "exo:comment"));
-    typeMap.put("event", Arrays.asList("exo:calendarEvent", "exo:eventAttachment"));
-    typeMap.put("discussion", Arrays.asList("exo:post", "exo:privateMessage", "exo:topic", "exo:poll", "exo:forumAttachment"));
-    typeMap.put("wiki", Arrays.asList("wiki:template", "wiki:helppage", "exo:wikihome", "wiki:page", "wiki:attachment"));
-    typeMap.put("page", Arrays.asList("exo:article"));
-    typeMap.put("file", Arrays.asList("nt:file", "nt:resource"));
-    typeMap.put("content", Arrays.asList("exo:webContent")); //for testing on PLF
-    typeMap.put("people", Arrays.asList("soc:profiledefinition")); //for testing on PLF
-     */  
   }
   
   // temporary implementation for testing
@@ -163,7 +165,7 @@ public class JcrSearchService extends SearchService {
     return results;
   }
   
-  private String queryToSql(String query){
+  private static String queryToSql(String query){
     List<String> types = new ArrayList<String>();
     
     // Handle the case "mary type:[user, topic]"
@@ -203,6 +205,7 @@ public class JcrSearchService extends SearchService {
     return sql.replace("${query}", query) + (types.isEmpty()?"":" AND (" + sb.toString() + ")");
   }
 
+  @Override
   public Map<String, String> getEntryDetail(SearchEntryId entryId) {
     Map<String, String> details = new HashMap<String, String>();
     
@@ -229,6 +232,45 @@ public class JcrSearchService extends SearchService {
     return details;
   }
   
+  //for testing
+  @GET
+  @Path("/typemap")
+  public static Response getTypeMap() {
+    return Response.ok(typeMap.toString(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  }
+
+  @GET
+  @Path("/typemap={json}")  
+  @Consumes(MediaType.APPLICATION_JSON)
+  public static Response setTypeMap(@PathParam("json") String json) {
+    try {
+      typeMap = new OneToManyBidirectionalMap<Map<String,String>>(json);
+      return Response.ok(typeMap.toString(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
+  }
+
+  @GET
+  @Path("/typemap/{entryType}={jcrTypes}")  
+  @Consumes(MediaType.APPLICATION_JSON)
+  public static Response mapJcrTypes(@PathParam("entryType") String entryType, @PathParam("jcrTypes") String jcrTypes_json){
+    Map<String, Map<String, String>>  jcrTypesMap = new JsonMap<String, Map<String,String>>(jcrTypes_json);
+    typeMap.put(entryType, jcrTypesMap);  
+    return Response.ok(typeMap.toString(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  }
+  
+  @GET
+  @Path("/props")
+  public static Response jcrNodeProperties(@QueryParam("node") String nodePath) {
+    try {
+      return Response.ok(getJcrNodeProperties(nodePath), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
+  }
+
   public static Map<String, Object> getJcrNodeProperties(String nodePath) throws Exception {
     int firstSlash = nodePath.indexOf("/");
     int secondSlash = nodePath.indexOf("/", firstSlash+1);
@@ -297,6 +339,41 @@ public class JcrSearchService extends SearchService {
   
 }
 
+
+class JsonMap<KeyType, ValueType> extends HashMap<KeyType, ValueType>{
+  public JsonMap(){
+    super();
+  }
+  
+  public JsonMap(String json){
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      Map<KeyType, ValueType> map = mapper.readValue(json, new TypeReference<Map<KeyType, ValueType>>(){});
+      this.clear();
+      this.putAll(map);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  
+  @Override
+  public String toString() {
+    ObjectMapper mapper = new ObjectMapper();
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    String json = "";
+    try {
+      mapper.writeValue(bos, this);
+      json = bos.toString();
+      bos.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return json;
+  }
+
+}
+
+
 class OneToManyBidirectionalMap<ValueType> {
   private Map<String, Map<String, ValueType>> map;
   private Map<String, String> keyMap;
@@ -306,9 +383,14 @@ class OneToManyBidirectionalMap<ValueType> {
     keyMap = new HashMap<String, String>();
   }
   
-  public OneToManyBidirectionalMap(String json) throws Exception{
+  public OneToManyBidirectionalMap(String json) {
     ObjectMapper mapper = new ObjectMapper();
+    try {
     map = mapper.readValue(json, new TypeReference<Map<String, Map<String, ValueType>>>(){});
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
     keyMap = new HashMap<String, String>();
     //update keyMap
     Iterator<Entry<String, Map<String, ValueType>>> iter = map.entrySet().iterator();

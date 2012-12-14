@@ -54,7 +54,7 @@ public class SimpleEntry extends SearchEntry{
 
   public String getHtml() {    
     String html = ""; //TODO: move to a template file
-    html = html + "<div class='entry'>";
+    html = html + "<div class='SimpleEntry'>";
     html = html + "  <div><span class='clickable collapsed'>[</span>] <a target='_blank' href='${url}'>${title}</a></div>";
     html = html + "  <div class='excerpt'>${excerpt}</div>";
     html = html + "  <div class='details' style='display: none;'>${details}</div>";

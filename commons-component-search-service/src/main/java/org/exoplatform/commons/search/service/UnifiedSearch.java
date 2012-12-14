@@ -33,21 +33,13 @@ public class UnifiedSearch implements ResourceContainer {
   }
   
   @GET
-  public Response search(@QueryParam("q") String query) {
+  public Response search(@QueryParam("q") String query, @QueryParam("categorized") boolean categorized) {
     try {
+      if(categorized) {
       return Response.ok(searchService.categorizedSearch(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
-    }
+      } else {
+        return Response.ok(searchService.search(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
-  
-  //for testing with jcr only
-  @GET
-  @Path("/props")
-  public Response jcrNodeProperties(@QueryParam("node") String nodePath) {
-    try {
-      return Response.ok(JcrSearchService.getJcrNodeProperties(nodePath), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
       e.printStackTrace();
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();

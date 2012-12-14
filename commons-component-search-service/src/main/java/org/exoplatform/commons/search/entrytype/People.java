@@ -91,7 +91,11 @@ public class People extends SimpleEntry {
   @Override
   public String getHtml() {    
     String html = ""; //TODO: move to a template file
-    html = html + "<div class='entry'>";
+    html = html + "<div class='super' style='display: none;'>"; //super's html, for debuging
+    html = html + super.getHtml();
+    html = html + "</div>";
+    
+    html = html + "<div class='PeopleEntry'>";
     html = html + " <div style='padding-top: 5px; height: 60px;'>";
     html = html + "  <div style='float: left; padding-top: 3px;'>";
     html = html + "    <img width='40' height='40' title='${fullName}' src='${avatarUrl}' alt='${fullName}'>";

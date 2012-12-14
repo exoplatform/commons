@@ -6,6 +6,9 @@
         margin-bottom: 40px;
         display: none;
     }
+    .entry {
+        margin-left: 5px;
+    }
     .details, .excerpt {
         margin-left: 20px;
         margin-bottom: 10px;
@@ -35,6 +38,7 @@
     <label id="lbSearch" class="clickable" style="padding-left: 5px;">Search</label>
     <input type="text" id="txtQuery"/>
     <input type="button" id="btnSearch" value="Go"/>
+    <span style="margin-left: 10px;">Categorized result<input type="checkbox" id="categorized" name="categorized" checked></span>
 
     <hr/>
     <div id="entryTypes" style="display: none"></div>        
@@ -53,15 +57,20 @@
       console.log(searchFor);
       //return false;
     
+      $("#entryTypes").html("");
+      $("#result").html("");
+
       $("body").css("cursor", "wait");
-      $.getJSON("/rest/search?q=" + searchFor, function(entryMap){
+
+      if($("#categorized").is(":checked")) {
+          $.getJSON("/rest/search?categorized=true&q=" + searchFor, function(entryMap){
           var entryTypes = "| ";
           var result = "<hr/><h3>Results:</h3>";
           $.each(entryMap, function(type, entries){
               entryTypes = entryTypes + "<span class='clickable entryType'>" + type + " (" + $(entries).size() + ")" + "</span>" + " | ";
               result = result + "<div class='type' id='" + type + "'>";
               $.each(entries, function(i, entry){
-                  result = result + entry.html;
+                      result = result + "<div class='entry'>" + entry.html + "</div>";
               });
               result = result + "</div>"; //type div
           });
@@ -72,6 +81,19 @@
           $(".entryType").first().click();                        
           $("body").css("cursor", "auto");
       });                                        
+      } else {
+          $.getJSON("/rest/search?q=" + searchFor, function(entries){
+              var result = "<h3>Results:</h3>";
+              $.each(entries, function(i, entry){
+                  result = result + "<div class='entry'>" + entry.html + "</div>";
+              });
+
+              $("#result").html(result);
+              $("#result").show();
+              $("body").css("cursor", "auto");
+          }); 
+      }
+
   });
   
   $(".expanded, .collapsed").live("click", function(){
@@ -79,7 +101,7 @@
       var $details = $(this).parents("div.entry").find("div.details");
       var $excerpt = $(this).parents("div.entry").find("div.excerpt");
       if($details.is(":hidden")){
-          $.getJSON("/rest/search/props?node=" + $(this).next("a").attr("href").replace("/rest/jcr/", ""), function(props){
+          $.getJSON("/rest/search/jcr/props?node=" + $(this).next("a").attr("href").replace("/rest/jcr/", ""), function(props){
               var details = "";
               $.each(props, function(key, value){
                   details = details + "<div>" + key + " = " + value + "</div>";
