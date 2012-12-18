@@ -20,6 +20,7 @@ package org.exoplatform.commons.search.driver.elastic;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,6 @@ public class ElasticTest extends BaseTest  {
 
   @Override
   protected void setUp() throws Exception {
-    FileUtils.deleteDirectory(new File("data")); // cleanup local Elastic node's generated data (if exist)
     Node node = nodeBuilder().node();
     client = node.client();
     //client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));    
@@ -67,7 +67,13 @@ public class ElasticTest extends BaseTest  {
   protected void tearDown() throws Exception {
     super.tearDown();
     client.close();
-    FileUtils.deleteDirectory(new File("data")); // cleanup local Elastic node's generated data
+    // cleanup local Elastic node's generated data
+    try {
+      FileUtils.deleteDirectory(new File("data"));
+    } catch (IOException e) {
+      Thread.sleep(3000);
+      FileUtils.deleteDirectory(new File("data"));
+    }
   }
 
   public void testUpdate(){

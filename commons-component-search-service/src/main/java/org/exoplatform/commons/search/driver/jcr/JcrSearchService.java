@@ -17,13 +17,13 @@
  
 package org.exoplatform.commons.search.driver.jcr;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,10 +39,8 @@ import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
@@ -50,14 +48,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.exoplatform.commons.search.SearchEntry;
 import org.exoplatform.commons.search.SearchEntryId;
 import org.exoplatform.commons.search.SearchService;
 import org.exoplatform.commons.search.SimpleEntry;
-import org.exoplatform.commons.search.entrytype.Content;
-import org.exoplatform.commons.search.entrytype.People;
+import org.exoplatform.commons.search.util.JsonMap;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
@@ -75,7 +70,6 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Produces(MediaType.APPLICATION_JSON)
 public class JcrSearchService extends SearchService implements ResourceContainer {
   private static Map<String, List<String>> searchScope; //e.g: {repository:[collaboration, knowledge, social], ...}
-  private static OneToManyBidirectionalMap<Map<String, String>> typeMap;
   
   private static final CacheControl cacheControl;
   static {
@@ -85,27 +79,23 @@ public class JcrSearchService extends SearchService implements ResourceContainer
     cacheControl.setNoStore(true);
   }
       
-  public JcrSearchService() {
-    searchScope = new JsonMap<String, List<String>>("{\"repository\":[\"collaboration\",\"knowledge\",\"social\"]}");    
-    typeMap = new OneToManyBidirectionalMap<Map<String, String>>(
-        "{\"people\":{" +
-            "\"exo:contact\":{" +
-              "\"userId\":\"exo:id\"" +
-            "}," +
-            "\"soc:profiledefinition\":{" +
-            " \"userId\":\"void-username\"" +
-            "}" +
-          "}" +
-        "}");
-
-    SearchService.registerEntryType("people", People.class);
-    SearchService.registerEntryType("content", Content.class);
+  public static Map<String, List<String>> getSearchScope() {
+    return searchScope;
   }
-  
+
+  public static void setSearchScope(Map<String, List<String>> searchScope) {
+    JcrSearchService.searchScope = searchScope;
+  }
+
+  public static void setSearchScope(String json) {
+    JcrSearchService.searchScope = new JsonMap<String, List<String>>(json);
+  }
+
   // temporary implementation for testing
   @Override
   public List<SearchEntry> search(String query) {
-    List<SearchEntry> results = new ArrayList<SearchEntry>();    
+    List<SearchEntry> results = new ArrayList<SearchEntry>();
+    Map<String, String> jcrTypes = getJcrTypes();
     try {
       RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
       for(RepositoryEntry repositoryEntry:repositoryService.getConfig().getRepositoryConfigurations()){
@@ -133,7 +123,7 @@ public class JcrSearchService extends SearchService implements ResourceContainer
             
             String collection = repository.getConfiguration().getName() + "/" + session.getWorkspace().getName();
             String jcrType = row.getValue("jcr:primaryType").getString();
-            String type = typeMap.getKey(jcrType);
+            String type = jcrTypes.get(jcrType);
             String name = path;
 
             SimpleEntry entry = new SimpleEntry();
@@ -188,15 +178,14 @@ public class JcrSearchService extends SearchService implements ResourceContainer
     if(query.isEmpty()) query = "*";
 
     String sql = "SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '${query}')";
-    
+
     StringBuilder sb = new StringBuilder();
     String delimiter = "";
     for(String type:types){
-      Map<String, Map<String, String>> jcrTypes = typeMap.get(type);
-      Iterator<String> iter = jcrTypes.keySet().iterator();
-      while(iter.hasNext()) {
+      Iterator<String> jcrTypes = getJcrTypes(type).iterator();
+      while(jcrTypes.hasNext()) {
         sb.append(delimiter);
-        sb.append("jcr:primaryType='" + iter.next() + "'");
+        sb.append("jcr:primaryType='" + jcrTypes.next() + "'");
         delimiter=" OR ";        
       }
     }
@@ -205,61 +194,62 @@ public class JcrSearchService extends SearchService implements ResourceContainer
     return sql.replace("${query}", query) + (types.isEmpty()?"":" AND (" + sb.toString() + ")");
   }
 
+  @SuppressWarnings("unchecked")
+  private static Collection<String> getJcrTypes(String entryType){
+    Map<String, Object> entryProps = registry.get(entryType).getProperties();
+    if(entryProps.isEmpty()) return new HashSet<String>();
+ 
+    Map<String, String> firstProp = (Map<String, String>) entryProps.entrySet().iterator().next().getValue();
+    return firstProp.keySet();
+  }
+  
+  @SuppressWarnings("unchecked")
+  private static Map<String, String> getJcrTypes(){
+    Map<String, String> jcrTypeMap = new HashMap<String, String>();
+    Iterator<String> entryTypes = registry.keySet().iterator();
+    String entryType;
+    while(entryTypes.hasNext()){
+      entryType = entryTypes.next();
+      Map<String, Object> entryProps = registry.get(entryType).getProperties();
+      if(null==entryProps || entryProps.isEmpty()) continue;
+      Map<String, String> firstProp = (Map<String, String>) entryProps.entrySet().iterator().next().getValue();
+      Iterator<String> jcrTypes = firstProp.keySet().iterator();
+      while(jcrTypes.hasNext()){
+        jcrTypeMap.put(jcrTypes.next(), entryType);
+      }
+      //if(firstProp.containsKey(jcrType)) return entryType;
+    }
+    return jcrTypeMap;
+  }
+  
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public Map<String, String> getEntryDetail(SearchEntryId entryId) {
     Map<String, String> details = new HashMap<String, String>();
+    if(!SearchService.isRegistered(entryId.getType())) return details;
     
     try {
-      Map<String, Object> props = getJcrNodeProperties(entryId.getCollection() + entryId.getName());
-      String nodeType = (String) props.get("jcr:primaryType");
-      if(!typeMap.containsKey(entryId.getType())) return details;
-      Map<String, Map<String, String>> searchType = typeMap.get(entryId.getType());
-      if(!searchType.containsKey(nodeType)) return details;
-      Map<String, String> registeredFields = searchType.get(nodeType);
-      Iterator<Entry<String, String>> iter = registeredFields.entrySet().iterator();
+      Map<String, Object> jcrProps = getJcrNodeProperties(entryId.getCollection() + entryId.getName());
+      String nodeType = (String) jcrProps.get("jcr:primaryType");
       
-      while(iter.hasNext()){
-        Entry<String, String> entry = iter.next();
-        String registeredField = entry.getKey();
-        String jcrField = entry.getValue();
-        Object value = props.get(jcrField);
-        details.put(registeredField, (String)(value instanceof List<?> ? ((List)value).get(0) : value));
+      Map<String, Object> entryProps = registry.get(entryId.getType()).getProperties();
+      if(entryProps.isEmpty()) return details;
+      
+      Iterator<String> detailFieldNames = entryProps.keySet().iterator();
+      while(detailFieldNames.hasNext()){
+        String detailFieldName = detailFieldNames.next();
+        String jcrType = ((Map<String, String>)entryProps.get(detailFieldName)).get(nodeType);
+        Object detailFieldValue = jcrProps.get(jcrType); 
+        details.put(detailFieldName, (String)(detailFieldValue instanceof List<?> ? ((List)detailFieldValue).get(0) : detailFieldValue));
       }
+      
     } catch (Exception e) {
       e.printStackTrace();
     }
     
     return details;
   }
-  
-  //for testing
-  @GET
-  @Path("/typemap")
-  public static Response getTypeMap() {
-    return Response.ok(typeMap.toString(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-  }
-
-  @GET
-  @Path("/typemap={json}")  
-  @Consumes(MediaType.APPLICATION_JSON)
-  public static Response setTypeMap(@PathParam("json") String json) {
-    try {
-      typeMap = new OneToManyBidirectionalMap<Map<String,String>>(json);
-      return Response.ok(typeMap.toString(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-    } catch (Exception e) {
-      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
-    }
-  }
-
-  @GET
-  @Path("/typemap/{entryType}={jcrTypes}")  
-  @Consumes(MediaType.APPLICATION_JSON)
-  public static Response mapJcrTypes(@PathParam("entryType") String entryType, @PathParam("jcrTypes") String jcrTypes_json){
-    Map<String, Map<String, String>>  jcrTypesMap = new JsonMap<String, Map<String,String>>(jcrTypes_json);
-    typeMap.put(entryType, jcrTypesMap);  
-    return Response.ok(typeMap.toString(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-  }
-  
+    
   @GET
   @Path("/props")
   public static Response jcrNodeProperties(@QueryParam("node") String nodePath) {
@@ -339,107 +329,3 @@ public class JcrSearchService extends SearchService implements ResourceContainer
   
 }
 
-
-class JsonMap<KeyType, ValueType> extends HashMap<KeyType, ValueType>{
-  public JsonMap(){
-    super();
-  }
-  
-  public JsonMap(String json){
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      Map<KeyType, ValueType> map = mapper.readValue(json, new TypeReference<Map<KeyType, ValueType>>(){});
-      this.clear();
-      this.putAll(map);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-  
-  @Override
-  public String toString() {
-    ObjectMapper mapper = new ObjectMapper();
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    String json = "";
-    try {
-      mapper.writeValue(bos, this);
-      json = bos.toString();
-      bos.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return json;
-  }
-
-}
-
-
-class OneToManyBidirectionalMap<ValueType> {
-  private Map<String, Map<String, ValueType>> map;
-  private Map<String, String> keyMap;
-  
-  public OneToManyBidirectionalMap(){
-    map = new HashMap<String, Map<String, ValueType>>();
-    keyMap = new HashMap<String, String>();
-  }
-  
-  public OneToManyBidirectionalMap(String json) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-    map = mapper.readValue(json, new TypeReference<Map<String, Map<String, ValueType>>>(){});
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    
-    keyMap = new HashMap<String, String>();
-    //update keyMap
-    Iterator<Entry<String, Map<String, ValueType>>> iter = map.entrySet().iterator();
-    while(iter.hasNext()){
-      Entry<String, Map<String, ValueType>> entry = iter.next();
-      updateKeyMap(entry.getValue(), entry.getKey());
-    }
-  }
-
-  public void put(String key, Map<String, ValueType> values){
-    map.put(key, values);
-    updateKeyMap(values, key);
-  }
-  
-  public Map<String, ValueType> get(String key){
-    return map.get(key);
-  }
-  
-  public boolean containsKey(String key){
-    return map.containsKey(key);
-  }
-  
-  public String getKey(String valueKey){
-    return keyMap.get(valueKey);
-  } 
-  
-  public Map<String, Map<String, ValueType>> getMap(){
-    return map;
-  }
-  
-  @Override
-  public String toString() {
-    ObjectMapper mapper = new ObjectMapper();
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    String json = "";
-    try {
-      mapper.writeValue(bos, map);
-      json = bos.toString();
-      bos.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return json;
-  }
-  
-  private void updateKeyMap(Map<String, ValueType> values, String key){
-    Iterator<String> valueKeys = values.keySet().iterator();
-    while(valueKeys.hasNext()){
-      keyMap.put(valueKeys.next(), key);
-    }    
-  }
-}

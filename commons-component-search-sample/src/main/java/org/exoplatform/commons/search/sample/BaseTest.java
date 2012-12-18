@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.exoplatform.commons.search.IndexingService;
 import org.exoplatform.commons.search.SearchEntry;
+import org.exoplatform.commons.search.SearchEntryType;
 import org.exoplatform.commons.search.SearchService;
 import org.exoplatform.forum.service.Topic;
 import org.exoplatform.services.log.ExoLogger;
@@ -70,7 +71,8 @@ public abstract class BaseTest extends TestCase  {
     Iterator<String> iter = result.keySet().iterator();
     while(iter.hasNext()){
       String entryType = iter.next();
-      System.out.println("\n" + entryType.toUpperCase() + ":");
+      if(SearchService.isRegistered(entryType)) entryType = SearchService.getRegistry().get(entryType).getDisplayName();
+      System.out.println("\n" + entryType + ":");
       Collection<SearchEntry> entries = result.get(entryType);
       Iterator<SearchEntry> entriesIter = entries.iterator();
       while(entriesIter.hasNext()){
@@ -91,11 +93,11 @@ public abstract class BaseTest extends TestCase  {
   
   @Override
   protected void setUp() throws Exception {
-    super.setUp();
-    
-    SearchService.registerEntryType("user", UserSearchEntry.class);
-    SearchService.registerEntryType("topic", TopicSearchEntry.class);
-    
+    super.setUp();    
+    SearchService.setRegistry("{\"user\":{\"name\":\"user\",\"displayName\":\"User\",\"properties\":{\"userId\":{\"exo:contact\":\"exo:id\",\"soc:profiledefinition\":\"void-username\"},\"userName\":{\"exo:contact\":\"exo:name\",\"soc:profiledefinition\":\"void-fullName\"}},\"handler\":\"org.exoplatform.commons.search.sample.UserSearchEntry\"}}");
+    //SearchService.registerEntryType(new SearchEntryType("user", "User", null, UserSearchEntry.class));
+    SearchService.registerEntryType(new SearchEntryType("topic", "Forum topic", null, TopicSearchEntry.class));
+
     // users
     indexingService.add(new UserSearchEntry(createUser("john", "John", "Smith", "john@exoplatform.com")));
     indexingService.add(new UserSearchEntry(createUser("mary", "Mary", "Williams", "mary@exoplatform.com")));

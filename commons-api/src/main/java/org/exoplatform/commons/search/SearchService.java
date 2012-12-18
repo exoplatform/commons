@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+
 /**
  * Created by The eXo Platform SAS
  * Author : Tung Vu Minh
@@ -29,22 +32,41 @@ import java.util.Map;
  * Nov 21, 2012  
  */
 public abstract class SearchService {
-  private static Map<String, Class<? extends SearchEntry>> registry = new HashMap<String, Class<? extends SearchEntry>>();
+  protected static Map<String, SearchEntryType> registry = new HashMap<String, SearchEntryType>();
   
+  public static Map<String, SearchEntryType> getRegistry() {
+    return registry;
+  }
+
+  public static void setRegistry(Map<String, SearchEntryType> registry) {
+    SearchService.registry = registry;
+  }
+
+  public static void setRegistry(String json) {
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      Map<String, SearchEntryType> reg = mapper.readValue(json, new TypeReference<Map<String, SearchEntryType>>(){});
+      SearchService.registry = reg;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   public abstract Collection<SearchEntry> search(String query);
   
   public abstract Map<String, String> getEntryDetail(SearchEntryId entryId);
   
   // associate an entry type with a SearchEntry class (as the handler, e.g for it to be displayed on result page with its unique style)
-  public static void registerEntryType(String entryType, Class<? extends SearchEntry> searchEntryClass) {
+  public static void registerEntryType(SearchEntryType searchEntryType) {
+    Class<? extends SearchEntry> clazz = searchEntryType.getHandler();
     try {
-      searchEntryClass.getConstructor(SearchEntry.class); //check if the class has a copy constructor of SearchEntry (to be used for casting)
-      registry.put(entryType, searchEntryClass);
+      clazz.getConstructor(SearchEntry.class); //check if the class has a copy constructor of SearchEntry (to be used for casting)
+      registry.put(searchEntryType.getName(), searchEntryType);
     } catch (NoSuchMethodException e) {
-      System.out.format("[UNIFIED SEARCH] The class %s must define a copy constructor of SearchEntry (to be used for casting)\n", searchEntryClass.getSimpleName());
+      System.out.format("[UNIFIED SEARCH] The class %s must define a copy constructor of SearchEntry (to be used for casting)\n", clazz.getSimpleName());
       e.printStackTrace();
     } catch (Exception e) {
-      System.out.format("[UNIFIED SEARCH] Cannot register '%s' as '%s'\n", entryType, searchEntryClass.getSimpleName());
+      System.out.format("[UNIFIED SEARCH] Cannot register '%s' as '%s'\n", searchEntryType.getName(), clazz.getSimpleName());
       e.printStackTrace();
     }
   }
@@ -55,7 +77,7 @@ public abstract class SearchService {
   
   public static SearchEntry convert(SearchEntry entry, String type) {
     try {
-      return registry.get(type).getConstructor(SearchEntry.class).newInstance(entry);
+      return registry.get(type).getHandler().getConstructor(SearchEntry.class).newInstance(entry);
     } catch (Exception e) {
       e.printStackTrace();
       return entry;
@@ -73,6 +95,7 @@ public abstract class SearchService {
     while(iter.hasNext()){
       SearchEntry entry = iter.next();
       String entryType = entry.getId().getType(); //categorize search entries by their type
+      if(isRegistered(entryType)) entryType = registry.get(entryType).getDisplayName();
       try {
         // put the entry to an existing category or a new category if it doesn't exist      
         Collection<SearchEntry> seList;

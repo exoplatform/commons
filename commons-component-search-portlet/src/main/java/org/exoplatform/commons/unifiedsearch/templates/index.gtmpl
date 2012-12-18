@@ -68,7 +68,7 @@
           var result = "<hr/><h3>Results:</h3>";
           $.each(entryMap, function(type, entries){
               entryTypes = entryTypes + "<span class='clickable entryType'>" + type + " (" + $(entries).size() + ")" + "</span>" + " | ";
-              result = result + "<div class='type' id='" + type + "'>";
+              result = result + "<div class='type' id='" + type.replace(/\\s/g, "_") + "'>";
               $.each(entries, function(i, entry){
                       result = result + "<div class='entry'>" + entry.html + "</div>";
               });
@@ -123,7 +123,7 @@
       
       var type=$(this).text();
       type = type.substring(0, type.indexOf(" ("));
-      type = type.replace(/(:|\\.)/g,'\\\\$1');
+      type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_");
       $(".type").hide();
       $("#"+type).show();
   })
