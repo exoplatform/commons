@@ -3,15 +3,21 @@
     "name": "people",
     "properties": {
       "userId": {
-        "exo:contact": "exo:id",
         "soc:profiledefinition": "void-username"
-      },
-      "userName": {
-        "exo:contact": "exo:name",
-        "soc:profiledefinition": "void-fullName"
       }
     },
     "displayName": "People",
     "handler": "org.exoplatform.commons.search.entrytype.People"
+  },
+  
+  "space": {
+    "name": "space",
+    "properties": {
+      "spaceUrl": {
+        "soc:spacedefinition": "soc:url"
+      }
+    },
+    "displayName": "Spaces",
+    "handler": "org.exoplatform.commons.search.entrytype.Space"
   }
 }

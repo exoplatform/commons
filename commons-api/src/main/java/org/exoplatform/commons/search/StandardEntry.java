@@ -59,4 +59,11 @@ public class StandardEntry extends SimpleEntry{
   public void setLastUpdateAuthor(String lastUpdateAuthor) {
     content.put(LAST_UPDATE_AUTHOR, lastUpdateAuthor);
   }
+  
+  public StandardEntry(){
+  }
+  
+  public StandardEntry(SearchEntry entry) {
+    super(entry);
+  }
 }

@@ -51,6 +51,15 @@ public class SimpleEntry extends SearchEntry{
   public void setUrl(String url) {
     content.put(URL, url);
   }
+  
+  // need for jackson
+  public SimpleEntry() {
+  }
+  
+  public SimpleEntry(SearchEntry entry) {
+    this.setId(entry.getId());
+    this.setContent(entry.getContent());
+  }
 
   public String getHtml() {    
     String html = ""; //TODO: move to a template file

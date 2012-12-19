@@ -47,8 +47,7 @@ public class TopicSearchEntry extends StandardEntry {
   }
 
   public TopicSearchEntry(SearchEntry entry) {
-    this.setId(entry.getId());
-    this.setContent(entry.getContent());
+    super(entry);
   }
 
   @Override

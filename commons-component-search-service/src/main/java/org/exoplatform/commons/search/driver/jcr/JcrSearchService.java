@@ -177,7 +177,8 @@ public class JcrSearchService extends SearchService implements ResourceContainer
     query = query.trim();
     if(query.isEmpty()) query = "*";
 
-    String sql = "SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '${query}')";
+    //TODO: define a list of fields should be ignored like exo:lastModifier
+    String sql = "SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '${query}') AND NOT CONTAINS(exo:lastModifier, '${query}')";
 
     StringBuilder sb = new StringBuilder();
     String delimiter = "";
@@ -191,16 +192,20 @@ public class JcrSearchService extends SearchService implements ResourceContainer
     }
     
     //TODO: if types is not specified, limit search to all registered types only
-    return sql.replace("${query}", query) + (types.isEmpty()?"":" AND (" + sb.toString() + ")");
+    return sql.replace("${query}", query) + (types.isEmpty()||sb.toString().isEmpty()?"":" AND (" + sb.toString() + ")");
   }
 
   @SuppressWarnings("unchecked")
   private static Collection<String> getJcrTypes(String entryType){
-    Map<String, Object> entryProps = registry.get(entryType).getProperties();
-    if(entryProps.isEmpty()) return new HashSet<String>();
- 
-    Map<String, String> firstProp = (Map<String, String>) entryProps.entrySet().iterator().next().getValue();
-    return firstProp.keySet();
+    try {
+      Map<String, Object> entryProps = registry.get(entryType).getProperties();
+      Map<String, String> firstProp = (Map<String, String>) entryProps.entrySet().iterator().next().getValue();
+      return firstProp.keySet();
+    } catch (Exception e) {
+      System.out.format("[UNIFIED SEARCH]: cannot get jcr types associated with '%s'\n", entryType);
+      e.printStackTrace();
+      return new HashSet<String>();
+    }
   }
   
   @SuppressWarnings("unchecked")
@@ -217,7 +222,6 @@ public class JcrSearchService extends SearchService implements ResourceContainer
       while(jcrTypes.hasNext()){
         jcrTypeMap.put(jcrTypes.next(), entryType);
       }
-      //if(firstProp.containsKey(jcrType)) return entryType;
     }
     return jcrTypeMap;
   }

@@ -79,6 +79,7 @@ public abstract class SearchService {
     try {
       return registry.get(type).getHandler().getConstructor(SearchEntry.class).newInstance(entry);
     } catch (Exception e) {
+      System.out.format("[UNIFIED SEARCH]: cannot convert search entry '%s' to %s\n", entry, type);
       e.printStackTrace();
       return entry;
     }

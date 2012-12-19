@@ -25,62 +25,52 @@ import org.exoplatform.commons.search.SearchService;
 import org.exoplatform.commons.search.SimpleEntry;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.groovyscript.GroovyTemplate;
-import org.exoplatform.social.core.identity.model.Identity;
-import org.exoplatform.social.core.identity.model.Profile;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.manager.IdentityManager;
-
+import org.exoplatform.social.core.space.spi.SpaceService;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tung Vu Minh
- *          tungvm@exoplatform.com
- * Nov 21, 2012  
- */
-public class People extends SimpleEntry {
-  private static final String TEMPLATE_FILE = "/template/search-entry/people.gtmpl";
-  
-  public People(SearchEntry entry) {
+* Created by The eXo Platform SAS
+* Author : Tung Vu Minh
+*          tungvm@exoplatform.com
+* Nov 21, 2012  
+*/
+public class Space extends SimpleEntry {
+  private static final String TEMPLATE_FILE = "/template/search-entry/space.gtmpl";
+
+  public Space(SearchEntry entry) {
     super(entry);
   }
   
   @Override
-  public String getHtml() {    
+  public String getHtml() {
     try {
       SearchService searchService = (SearchService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SearchService.class);
       Map<String, String> details = searchService.getEntryDetail(this.getId());
-      String username = details.get("userId");
+      String spaceUrl = details.get("spaceUrl");
 
-      IdentityManager identityManager = (IdentityManager)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(IdentityManager.class);
-      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
-      Profile profile = identity.getProfile();
-
-      String fullName = profile.getFullName();
-      String email = profile.getEmail();
-      
-      String position = profile.getPosition();
-      if(null == position) position = "";
-      String avatarUrl = profile.getAvatarUrl();      
-      if(null == avatarUrl) avatarUrl = "/social-resources/skin/ShareImages/Avatar.gif";
+      SpaceService spaceSvc = (SpaceService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SpaceService.class);
+      org.exoplatform.social.core.space.model.Space space = spaceSvc.getSpaceByUrl(spaceUrl);
 
       Map<String, String> binding = new HashMap<String, String>();
+      binding.put("spaceUrl", spaceUrl);
+      binding.put("displayName", space.getDisplayName());
+      binding.put("description", space.getDescription());
+      binding.put("shortName", space.getDisplayName());
+      String avatarUrl = space.getAvatarUrl();
+      if(null==avatarUrl) avatarUrl = "/social-resources/skin/ShareImages/SpaceImages/SpaceLogoDefault_61x61.gif";
+      binding.put("avatarUrl", avatarUrl);
+      binding.put("members", String.valueOf(space.getMembers().length));
+      binding.put("visibility", space.getVisibility());
+
       // super's content, for debugging
       binding.put("url", this.getUrl());
       binding.put("title", this.getTitle());
       binding.put("excerpt", this.getExcerpt());
       binding.put("details", details.toString());
-      
-      binding.put("fullName", fullName);
-      binding.put("position", position);
-      binding.put("email", email);
-      binding.put("avatarUrl", avatarUrl);
-      binding.put("profileUrl", profile.getUrl());
-      
+
       return new GroovyTemplate(new InputStreamReader(this.getClass().getResourceAsStream(TEMPLATE_FILE))).render(binding);
     } catch (Exception e) {
       e.printStackTrace();
       return super.getHtml();
-    } 
+    }
   }
-
 }

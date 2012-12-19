@@ -100,6 +100,9 @@
       $(this).toggleClass("expanded collapsed");
       var $details = $(this).parents("div.entry").find("div.details");
       var $excerpt = $(this).parents("div.entry").find("div.excerpt");
+
+      console.log($details.text());
+      
       if($details.is(":hidden")){
           $.getJSON("/rest/search/jcr/props?node=" + $(this).next("a").attr("href").replace("/rest/jcr/", ""), function(props){
               var details = "";

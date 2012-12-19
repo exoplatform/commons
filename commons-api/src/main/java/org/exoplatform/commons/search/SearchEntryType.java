@@ -56,6 +56,7 @@ public class SearchEntryType {
       this.handler = (Class<? extends SearchEntry>) Class.forName(handler_className);
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
+      this.handler = SimpleEntry.class;
     }    
   }
   
