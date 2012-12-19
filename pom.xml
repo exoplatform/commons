@@ -4,7 +4,7 @@
   <parent>
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
-    <version>9-alpha-3</version>
+    <version>9-SNAPSHOT</version>
     <relativePath></relativePath>
   </parent>
   <groupId>org.exoplatform.commons</groupId>
@@ -77,7 +77,7 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-comet-ext-webapp-cometd</artifactId>
         <version>${project.version}</version>
-        <classifier>classes</classifier>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -89,7 +89,7 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-comet-ext-webapp-rest</artifactId>
         <version>${project.version}</version>
-        <classifier>classes</classifier>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -106,7 +106,7 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-comet-webapp</artifactId>
         <version>${project.version}</version>
-        <classifier>classes</classifier>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -133,7 +133,7 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-extension-webapp</artifactId>
         <version>${project.version}</version>
-        <classifier>classes</classifier>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -145,7 +145,7 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-fck</artifactId>
         <version>${project.version}</version>
-        <classifier>classes</classifier>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -177,7 +177,7 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-webui-resources</artifactId>
         <version>${project.version}</version>
-        <classifier>classes</classifier>
+        <type>pom</type>
       </dependency>
       <!-- To be replaced by an import of core parent POM -->
       <dependency>
