@@ -5,11 +5,11 @@ import java.util.Map;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.exoplatform.commons.search.util.JsonMap;
 
-public class SearchEntryType {
+public class SearchType {
   private String name;
   private String displayName;
   private Map<String, Object> properties;
-  private Class<? extends SearchEntry> handler;
+  private Class<? extends Search> handler;
   
   public String getName() {
     return name;
@@ -29,18 +29,18 @@ public class SearchEntryType {
   public void setProperties(Map<String, Object> properties) {
     this.properties = properties;
   }
-  public Class<? extends SearchEntry> getHandler() {
+  public Class<? extends Search> getHandler() {
     return handler;
   }
-  public void setHandler(Class<? extends SearchEntry> handler) {
+  public void setHandler(Class<? extends Search> handler) {
     this.handler = handler;
   }
   
   // need for jackson
-  public SearchEntryType() {
+  public SearchType() {
   }
   
-  public SearchEntryType(String name, String displayName, Map<String, Object> properties, Class<? extends SearchEntry> handler) {
+  public SearchType(String name, String displayName, Map<String, Object> properties, Class<? extends Search> handler) {
     this.name = name;
     this.displayName = displayName;
     this.properties = properties;
@@ -48,22 +48,22 @@ public class SearchEntryType {
   }
 
   @SuppressWarnings("unchecked")
-  public SearchEntryType(String name, String displayName, String properties_json, String handler_className){
+  public SearchType(String name, String displayName, String properties_json, String handler_className){
     this.name = name;
     this.displayName = displayName;
     this.properties = new JsonMap<String, Object>(properties_json);
     try {
-      this.handler = (Class<? extends SearchEntry>) Class.forName(handler_className);
+      this.handler = (Class<? extends Search>) Class.forName(handler_className);
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
-      this.handler = SimpleEntry.class;
+      this.handler = null;
     }    
   }
   
-  public SearchEntryType(String json){
+  public SearchType(String json){
     ObjectMapper mapper = new ObjectMapper();
     try {
-      SearchEntryType entryType = mapper.readValue(json, SearchEntryType.class);
+      SearchType entryType = mapper.readValue(json, SearchType.class);
       this.name = entryType.name;
       this.displayName = entryType.displayName;
       this.properties = entryType.properties;

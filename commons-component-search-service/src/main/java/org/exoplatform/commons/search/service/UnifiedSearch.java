@@ -13,19 +13,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.exoplatform.commons.search.SearchEntryId;
-import org.exoplatform.commons.search.SearchEntryType;
 import org.exoplatform.commons.search.SearchService;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchService;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
 public class UnifiedSearch implements ResourceContainer {
-  private SearchService searchService;
-  
   private static final CacheControl cacheControl;
   static {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -35,7 +30,7 @@ public class UnifiedSearch implements ResourceContainer {
   }
 
   public UnifiedSearch(){
-    searchService = (SearchService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SearchService.class);
+    //searchService = (SearchService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SearchService.class);
     //SearchService.setRegistry("{\"people\":{\"name\":\"people\",\"displayName\":\"People\",\"properties\":{\"userId\":{\"exo:contact\":\"exo:id\",\"soc:profiledefinition\":\"void-username\"},\"userName\":{\"exo:contact\":\"exo:name\",\"soc:profiledefinition\":\"void-fullName\"}},\"handler\":\"org.exoplatform.commons.search.entrytype.People\"}}");
     //SearchService.registerEntryType(new SearchEntryType("people", "People", "{\"userId\": {\"exo:contact\": \"exo:id\", \"soc:profiledefinition\": \"void-username\"}, \"userName\": {\"exo:contact\": \"exo:name\", \"soc:profiledefinition\": \"void-fullName\"}}", "org.exoplatform.commons.search.entrytype.People"));
     //SearchService.registerEntryType(new SearchEntryType("content", "Content", null, Content.class));    
@@ -49,21 +44,10 @@ public class UnifiedSearch implements ResourceContainer {
   public Response search(@QueryParam("q") String query, @QueryParam("categorized") boolean categorized) {
     try {
       if(categorized) {
-        return Response.ok(searchService.categorizedSearch(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+        return Response.ok(SearchService.categorizedSearch(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
       } else {
-        return Response.ok(searchService.search(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+        return Response.ok(SearchService.search(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
-    }
-  }
-
-  @GET
-  @Path("/detail")
-  public Response detail(@QueryParam("collection") String collection, @QueryParam("type") String type, @QueryParam("name") String name) {
-    try {
-      return Response.ok(searchService.getEntryDetail(new SearchEntryId(collection, type, name)), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
       e.printStackTrace();
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
@@ -93,7 +77,7 @@ public class UnifiedSearch implements ResourceContainer {
   @Path("/register/{entryType}")  
   @Consumes(MediaType.APPLICATION_JSON)
   public static Response mapJcrTypes(@PathParam("entryType") String entryType_json){
-    SearchService.registerEntryType(new SearchEntryType(entryType_json));
+    //SearchService.registerSearchType(new SearchType(entryType_json));
     return Response.ok(SearchService.getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
 

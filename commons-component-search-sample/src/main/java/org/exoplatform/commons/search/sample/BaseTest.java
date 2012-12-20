@@ -25,8 +25,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.exoplatform.commons.search.IndexingService;
-import org.exoplatform.commons.search.SearchEntry;
-import org.exoplatform.commons.search.SearchEntryType;
+import org.exoplatform.commons.search.SearchResult;
 import org.exoplatform.commons.search.SearchService;
 import org.exoplatform.forum.service.Topic;
 import org.exoplatform.services.log.ExoLogger;
@@ -43,7 +42,6 @@ import org.exoplatform.services.organization.impl.UserImpl;
 public abstract class BaseTest extends TestCase  {
   private final static Log LOG = ExoLogger.getLogger(BaseTest.class);
   protected IndexingService indexingService;
-  protected SearchService searchService;
   
   protected User createUser(String userName, String firstName, String lastName, String email){
     UserImpl user = new UserImpl(userName);
@@ -66,15 +64,15 @@ public abstract class BaseTest extends TestCase  {
   
   protected void categorizedSearch(String queryString){
     System.out.println("\n====================================\nSearching for '" + queryString + "' (categorized)...\nResults:");
-    Map<String, Collection<SearchEntry>> result = searchService.categorizedSearch(queryString);
+    Map<String, Collection<SearchResult>> result = SearchService.categorizedSearch(queryString);
     
     Iterator<String> iter = result.keySet().iterator();
     while(iter.hasNext()){
       String entryType = iter.next();
       if(SearchService.isRegistered(entryType)) entryType = SearchService.getRegistry().get(entryType).getDisplayName();
       System.out.println("\n" + entryType + ":");
-      Collection<SearchEntry> entries = result.get(entryType);
-      Iterator<SearchEntry> entriesIter = entries.iterator();
+      Collection<SearchResult> entries = result.get(entryType);
+      Iterator<SearchResult> entriesIter = entries.iterator();
       while(entriesIter.hasNext()){
         System.out.println(" * " + entriesIter.next());
       }
@@ -84,8 +82,8 @@ public abstract class BaseTest extends TestCase  {
 
   protected void search(String queryString){
     System.out.println("\n====================================\nSearching for '" + queryString + "' (uncategorized) ...\nResults:");
-    Collection<SearchEntry> result = searchService.search(queryString);
-    Iterator<SearchEntry> entriesIter = result.iterator();
+    Collection<SearchResult> result = SearchService.search(queryString);
+    Iterator<SearchResult> entriesIter = result.iterator();
     while(entriesIter.hasNext()){
       System.out.println(" * " + entriesIter.next());
     }    
@@ -94,9 +92,6 @@ public abstract class BaseTest extends TestCase  {
   @Override
   protected void setUp() throws Exception {
     super.setUp();    
-    SearchService.setRegistry("{\"user\":{\"name\":\"user\",\"displayName\":\"User\",\"properties\":{\"userId\":{\"exo:contact\":\"exo:id\",\"soc:profiledefinition\":\"void-username\"},\"userName\":{\"exo:contact\":\"exo:name\",\"soc:profiledefinition\":\"void-fullName\"}},\"handler\":\"org.exoplatform.commons.search.sample.UserSearchEntry\"}}");
-    //SearchService.registerEntryType(new SearchEntryType("user", "User", null, UserSearchEntry.class));
-    SearchService.registerEntryType(new SearchEntryType("topic", "Forum topic", null, TopicSearchEntry.class));
 
     // users
     indexingService.add(new UserSearchEntry(createUser("john", "John", "Smith", "john@exoplatform.com")));

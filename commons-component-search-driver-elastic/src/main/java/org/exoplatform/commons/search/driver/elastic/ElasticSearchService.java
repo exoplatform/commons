@@ -18,8 +18,8 @@
 package org.exoplatform.commons.search.driver.elastic;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +29,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.exoplatform.commons.search.SearchEntry;
-import org.exoplatform.commons.search.SearchEntryId;
-import org.exoplatform.commons.search.SearchService;
+import org.exoplatform.commons.search.SearchResult;
 
 /**
  * Created by The eXo Platform SAS
@@ -38,17 +37,20 @@ import org.exoplatform.commons.search.SearchService;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public class ElasticSearchService extends SearchService {
+public class ElasticSearchService {
   //private final static Log LOG = ExoLogger.getLogger(ElasticSearchService.class);
-  private Client client;
+  private static Client client;
   
-  public ElasticSearchService(Client client){
-    this.client = client;
-  }  
+  public static Client getClient() {
+    return client;
+  }
 
-  @Override
-  public List<SearchEntry> search(String query) {
-    List<SearchEntry> result = new ArrayList<SearchEntry>();
+  public static void setClient(Client client) {
+    ElasticSearchService.client = client;
+  }
+
+  public static Collection<SearchResult> search(String query) {
+    Collection<SearchResult> results = new ArrayList<SearchResult>();
     
     SearchRequestBuilder searchRequestBuilder = client.prepareSearch();
     List<String> types = new ArrayList<String>();
@@ -79,21 +81,12 @@ public class ElasticSearchService extends SearchService {
     SearchHit[] hits = searchResponse.getHits().hits();
 
     for(SearchHit hit:hits){
-      String entryType = hit.getType();
-      SearchEntry entry = new SearchEntry(hit.getIndex(), entryType, hit.getId(), hit.getSource());
-      if(SearchService.isRegistered(entryType)){
-        entry = SearchService.convert(entry, entryType);
-      }
-      result.add(entry);
+      SearchResult result = new SearchResult();
+      result.setType(hit.getType());
+      result.setHtml(new SearchEntry(hit.getIndex(), hit.getType(), hit.getId(), hit.getSource()).toString());
+      results.add(result);
     }
 
-    return result;
+    return results;
   }
-
-  @Override
-  public Map<String, String> getEntryDetail(SearchEntryId entryId) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 }

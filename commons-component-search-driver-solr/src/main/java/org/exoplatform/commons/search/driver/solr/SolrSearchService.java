@@ -17,8 +17,7 @@
 package org.exoplatform.commons.search.driver.solr;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -27,8 +26,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.exoplatform.commons.search.SearchEntry;
-import org.exoplatform.commons.search.SearchEntryId;
-import org.exoplatform.commons.search.SearchService;
+import org.exoplatform.commons.search.SearchResult;
 
 /**
  * Created by The eXo Platform SAS
@@ -36,17 +34,20 @@ import org.exoplatform.commons.search.SearchService;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public class SolrSearchService extends SearchService {
+public class SolrSearchService {
   //private final static Log LOG = ExoLogger.getLogger(ElasticSearchService.class);
-  private SolrServer server;
+  private static SolrServer server;
   
-  public SolrSearchService(SolrServer server){
-    this.server = server;
-  }  
+  public static SolrServer getServer() {
+    return server;
+  }
 
-  @Override
-  public List<SearchEntry> search(String query) {
-    List<SearchEntry> result = new ArrayList<SearchEntry>();
+  public static void setServer(SolrServer server) {
+    SolrSearchService.server = server;
+  }
+
+  public static Collection<SearchResult> search(String query) {
+    Collection<SearchResult> results = new ArrayList<SearchResult>();
     
     SolrQuery params = new SolrQuery();
     params.set("qt", "/select");
@@ -63,17 +64,13 @@ public class SolrSearchService extends SearchService {
       String id = (String) doc.getFieldValue("id");
       String[] sa = id.split("/");
       if(3 == sa.length) {
-        result.add(new SearchEntry(sa[0], sa[1], sa[2], SolrUtils.fromDynamicFields(doc.getFieldValueMap())));
+        SearchResult result = new SearchResult();
+        result.setType(sa[1]);
+        result.setHtml(new SearchEntry(sa[0], sa[1], sa[2], SolrUtils.fromDynamicFields(doc.getFieldValueMap())).toString());
+        results.add(result);
       }
     }
-    return result;
+    return results;
   }
-
-  @Override
-  public Map<String, String> getEntryDetail(SearchEntryId entryId) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 }
 

@@ -31,6 +31,8 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.exoplatform.commons.search.SearchEntry;
 import org.exoplatform.commons.search.SearchEntryId;
+import org.exoplatform.commons.search.SearchService;
+import org.exoplatform.commons.search.SearchType;
 import org.exoplatform.commons.search.sample.BaseTest;
 import org.exoplatform.commons.search.sample.UserSearchEntry;
 import org.exoplatform.services.log.ExoLogger;
@@ -56,10 +58,11 @@ public class ElasticTest extends BaseTest  {
   protected void setUp() throws Exception {
     Node node = nodeBuilder().node();
     client = node.client();
-    //client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));    
-    
+    //client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));        
     indexingService = new ElasticIndexingService(client);
-    searchService = new ElasticSearchService(client);
+    ElasticSearchService.setClient(client);
+    SearchService.registerSearchType(new SearchType("user", "User", null, ElasticGenericSearch.class));
+    SearchService.registerSearchType(new SearchType("topic", "Forum topic", null, ElasticGenericSearch.class));
     super.setUp();
   }
 

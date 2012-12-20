@@ -1,4 +1,11 @@
 {
+  "jcrNode": {
+    "name": "jcrNode",
+    "properties": {},
+    "displayName": "JCR node",
+    "handler": "org.exoplatform.commons.search.driver.jcr.JcrNodeSearch"
+  },
+
   "people": {
     "name": "people",
     "properties": {
@@ -7,7 +14,7 @@
       }
     },
     "displayName": "People",
-    "handler": "org.exoplatform.commons.search.entrytype.People"
+    "handler": "org.exoplatform.commons.search.driver.jcr.JcrPeopleSearch"
   },
   
   "space": {
@@ -18,6 +25,6 @@
       }
     },
     "displayName": "Spaces",
-    "handler": "org.exoplatform.commons.search.entrytype.Space"
+    "handler": "org.exoplatform.commons.search.driver.jcr.JcrSpaceSearch"
   }
 }

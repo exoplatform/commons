@@ -19,8 +19,8 @@ package org.exoplatform.commons.search;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -31,82 +31,70 @@ import org.codehaus.jackson.type.TypeReference;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public abstract class SearchService {
-  protected static Map<String, SearchEntryType> registry = new HashMap<String, SearchEntryType>();
+public class SearchService {
+  private static Map<String, SearchType> registry = new HashMap<String, SearchType>();
   
-  public static Map<String, SearchEntryType> getRegistry() {
+  public static Map<String, SearchType> getRegistry() {
     return registry;
   }
 
-  public static void setRegistry(Map<String, SearchEntryType> registry) {
+  public static void setRegistry(Map<String, SearchType> registry) {
     SearchService.registry = registry;
   }
 
   public static void setRegistry(String json) {
     ObjectMapper mapper = new ObjectMapper();
     try {
-      Map<String, SearchEntryType> reg = mapper.readValue(json, new TypeReference<Map<String, SearchEntryType>>(){});
+      Map<String, SearchType> reg = mapper.readValue(json, new TypeReference<Map<String, SearchType>>(){});
       SearchService.registry = reg;
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
+  
+  public static void registerSearchType(SearchType searchType) {
+    registry.put(searchType.getName(), searchType);
+  }
+  
+  public static boolean isRegistered(String searchTypeName) {
+    return registry.containsKey(searchTypeName);
+  }
 
-  public abstract Collection<SearchEntry> search(String query);
-  
-  public abstract Map<String, String> getEntryDetail(SearchEntryId entryId);
-  
-  // associate an entry type with a SearchEntry class (as the handler, e.g for it to be displayed on result page with its unique style)
-  public static void registerEntryType(SearchEntryType searchEntryType) {
-    Class<? extends SearchEntry> clazz = searchEntryType.getHandler();
+  public static Collection<SearchResult> search(String query) {
+    Collection<SearchResult> results = new ArrayList<SearchResult>();
     try {
-      clazz.getConstructor(SearchEntry.class); //check if the class has a copy constructor of SearchEntry (to be used for casting)
-      registry.put(searchEntryType.getName(), searchEntryType);
-    } catch (NoSuchMethodException e) {
-      System.out.format("[UNIFIED SEARCH] The class %s must define a copy constructor of SearchEntry (to be used for casting)\n", clazz.getSimpleName());
-      e.printStackTrace();
+      for(Entry<String, SearchType> entry:registry.entrySet()){
+        SearchType searchType = entry.getValue();
+        Class<? extends Search> clazz = searchType.getHandler();
+        System.out.println("[UNIFIED SEARCH]: clazz = " + clazz.getSimpleName());
+        results.addAll(clazz.newInstance().search(query));
+      }
     } catch (Exception e) {
-      System.out.format("[UNIFIED SEARCH] Cannot register '%s' as '%s'\n", searchEntryType.getName(), clazz.getSimpleName());
       e.printStackTrace();
     }
+    return results;
   }
-  
-  public static boolean isRegistered(String entryType) {
-    return registry.containsKey(entryType);
-  }
-  
-  public static SearchEntry convert(SearchEntry entry, String type) {
-    try {
-      return registry.get(type).getHandler().getConstructor(SearchEntry.class).newInstance(entry);
-    } catch (Exception e) {
-      System.out.format("[UNIFIED SEARCH]: cannot convert search entry '%s' to %s\n", entry, type);
-      e.printStackTrace();
-      return entry;
-    }
-  }
-  
-  public Map<String, Collection<SearchEntry>> categorizedSearch(String query) {
+ 
+  public static Map<String, Collection<SearchResult>> categorizedSearch(String query) {
     return categorize(search(query));
   }
-  
-  public Map<String, Collection<SearchEntry>> categorize(Collection<SearchEntry> entries){
-    Map<String, Collection<SearchEntry>> categoryMap = new HashMap<String, Collection<SearchEntry>>();
+
+  public static Map<String, Collection<SearchResult>> categorize(Collection<SearchResult> results){
+    Map<String, Collection<SearchResult>> categoryMap = new HashMap<String, Collection<SearchResult>>();
     
-    Iterator<SearchEntry> iter = entries.iterator();
-    while(iter.hasNext()){
-      SearchEntry entry = iter.next();
-      String entryType = entry.getId().getType(); //categorize search entries by their type
-      if(isRegistered(entryType)) entryType = registry.get(entryType).getDisplayName();
+    for(SearchResult result:results) {
+      String resultType = result.getType(); //categorize search results by their type
+      if(SearchService.isRegistered(resultType)) resultType = SearchService.getRegistry().get(resultType).getDisplayName();
       try {
         // put the entry to an existing category or a new category if it doesn't exist      
-        Collection<SearchEntry> seList;
-        if(categoryMap.containsKey(entryType)){
-          seList = categoryMap.get(entryType);
+        Collection<SearchResult> categoryResultList;
+        if(categoryMap.containsKey(resultType)){
+          categoryResultList = categoryMap.get(resultType);
         } else {
-          seList = new ArrayList<SearchEntry>();
-          categoryMap.put(entryType, seList);
+          categoryResultList = new ArrayList<SearchResult>();
+          categoryMap.put(resultType, categoryResultList);
         }
-        seList.add(entry);
+        categoryResultList.add(result);
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -114,5 +102,5 @@ public abstract class SearchService {
     
     return categoryMap;
   }
-
+  
 }

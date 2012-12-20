@@ -20,12 +20,8 @@ package org.exoplatform.commons.search.driver.jcr;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
@@ -48,10 +44,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.exoplatform.commons.search.SearchEntry;
-import org.exoplatform.commons.search.SearchEntryId;
-import org.exoplatform.commons.search.SearchService;
-import org.exoplatform.commons.search.SimpleEntry;
 import org.exoplatform.commons.search.util.JsonMap;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -68,9 +60,9 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
  */
 @Path("/search/jcr")
 @Produces(MediaType.APPLICATION_JSON)
-public class JcrSearchService extends SearchService implements ResourceContainer {
+public class JcrSearchService implements ResourceContainer {
   private static Map<String, List<String>> searchScope; //e.g: {repository:[collaboration, knowledge, social], ...}
-  
+
   private static final CacheControl cacheControl;
   static {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -78,7 +70,7 @@ public class JcrSearchService extends SearchService implements ResourceContainer
     cacheControl.setNoCache(true);
     cacheControl.setNoStore(true);
   }
-      
+
   public static Map<String, List<String>> getSearchScope() {
     return searchScope;
   }
@@ -90,12 +82,9 @@ public class JcrSearchService extends SearchService implements ResourceContainer
   public static void setSearchScope(String json) {
     JcrSearchService.searchScope = new JsonMap<String, List<String>>(json);
   }
-
-  // temporary implementation for testing
-  @Override
-  public List<SearchEntry> search(String query) {
-    List<SearchEntry> results = new ArrayList<SearchEntry>();
-    Map<String, String> jcrTypes = getJcrTypes();
+  
+  public static Collection<JcrSearchResult> search(String from, String where) {
+    Collection<JcrSearchResult> results = new ArrayList<JcrSearchResult>();
     try {
       RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
       for(RepositoryEntry repositoryEntry:repositoryService.getConfig().getRepositoryConfigurations()){
@@ -104,46 +93,33 @@ public class JcrSearchService extends SearchService implements ResourceContainer
         List<String> searchableWorkspaces = searchScope.get(repoName);
         
         ManageableRepository repository = repositoryService.getRepository(repoName);
-        List<SearchEntry> result = new ArrayList<SearchEntry>();    
+        List<JcrSearchResult> result = new ArrayList<JcrSearchResult>();    
         
         for(String workspaceName:repository.getWorkspaceNames()){
           if(!searchableWorkspaces.contains(workspaceName)) continue; //ignore workspaces which are not in the search scope
           
           Session session = repository.login(workspaceName);
           QueryManager queryManager = session.getWorkspace().getQueryManager();
-          query = query.startsWith("SELECT")?query:queryToSql(query);
-          System.out.println("[UNIFIED SEARCH] query = " + query);
-          Query jcrQuery = queryManager.createQuery(query, Query.SQL); //sql mode is for testing only
+          
+          String sql = "SELECT rep:excerpt(), jcr:primaryType FROM ${from} WHERE ${where}".replace("${from}", from).replace("${where}", where);
+          System.out.println("[UNIFIED SEARCH] query = " + sql);
+          Query jcrQuery = queryManager.createQuery(sql, Query.SQL);
           QueryResult queryResult = jcrQuery.execute();
           
           RowIterator rit = queryResult.getRows();
           while(rit.hasNext()){
             Row row = rit.nextRow();
-            String path = row.getValue("jcr:path").getString();
-            
-            String collection = repository.getConfiguration().getName() + "/" + session.getWorkspace().getName();
-            String jcrType = row.getValue("jcr:primaryType").getString();
-            String type = jcrTypes.get(jcrType);
-            String name = path;
+            JcrSearchResult resultItem = new JcrSearchResult();
 
-            SimpleEntry entry = new SimpleEntry();
-            entry.setId(new SearchEntryId(collection, null!=type?type:jcrType, name));
-            
-            if(jcrType.equals("nt:resource")){
-              path = path.substring(0, path.lastIndexOf("/jcr:content"));
-            }
-
-            entry.setTitle(collection + path + " (score = " + row.getValue("jcr:score").getLong() + ")");
+            resultItem.setRepository(repository.getConfiguration().getName());
+            resultItem.setWorkspace(session.getWorkspace().getName());
+            resultItem.setPath(row.getValue("jcr:path").getString());
+            resultItem.setPrimaryType(row.getValue("jcr:primaryType").getString());
             Value excerpt = row.getValue("rep:excerpt()");
-            entry.setExcerpt(null!=excerpt?excerpt.getString():"");
-            entry.setUrl("/rest/jcr/" + collection + path); // webdav url
+            resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
+            resultItem.setScore(row.getValue("jcr:score").getLong());
             
-            if(SearchService.isRegistered(type)){
-              result.add(SearchService.convert(entry, type));
-            } else {
-              result.add(entry);
-            }
-            
+            result.add(resultItem);
           }
         }
 
@@ -154,131 +130,8 @@ public class JcrSearchService extends SearchService implements ResourceContainer
     }
     return results;
   }
-  
-  private static String queryToSql(String query){
-    List<String> types = new ArrayList<String>();
-    
-    // Handle the case "mary type:[user, topic]"
-    Matcher matcher = Pattern.compile("type:\\[(.+?)\\]").matcher(query);
-    while(matcher.find()){
-      for(String type:matcher.group(1).split(",")){
-        types.add(type.trim());
-      }
-    }
-    query = matcher.replaceAll("");
-    
-    // Handle the case "mary type:user"
-    matcher = Pattern.compile("type:(\\w+)").matcher(query);
-    while(matcher.find()){
-       types.add(matcher.group(1).trim());
-    }
-    query = matcher.replaceAll("");
-            
-    query = query.trim();
-    if(query.isEmpty()) query = "*";
 
-    //TODO: define a list of fields should be ignored like exo:lastModifier
-    String sql = "SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '${query}') AND NOT CONTAINS(exo:lastModifier, '${query}')";
-
-    StringBuilder sb = new StringBuilder();
-    String delimiter = "";
-    for(String type:types){
-      Iterator<String> jcrTypes = getJcrTypes(type).iterator();
-      while(jcrTypes.hasNext()) {
-        sb.append(delimiter);
-        sb.append("jcr:primaryType='" + jcrTypes.next() + "'");
-        delimiter=" OR ";        
-      }
-    }
-    
-    //TODO: if types is not specified, limit search to all registered types only
-    return sql.replace("${query}", query) + (types.isEmpty()||sb.toString().isEmpty()?"":" AND (" + sb.toString() + ")");
-  }
-
-  @SuppressWarnings("unchecked")
-  private static Collection<String> getJcrTypes(String entryType){
-    try {
-      Map<String, Object> entryProps = registry.get(entryType).getProperties();
-      Map<String, String> firstProp = (Map<String, String>) entryProps.entrySet().iterator().next().getValue();
-      return firstProp.keySet();
-    } catch (Exception e) {
-      System.out.format("[UNIFIED SEARCH]: cannot get jcr types associated with '%s'\n", entryType);
-      e.printStackTrace();
-      return new HashSet<String>();
-    }
-  }
-  
-  @SuppressWarnings("unchecked")
-  private static Map<String, String> getJcrTypes(){
-    Map<String, String> jcrTypeMap = new HashMap<String, String>();
-    Iterator<String> entryTypes = registry.keySet().iterator();
-    String entryType;
-    while(entryTypes.hasNext()){
-      entryType = entryTypes.next();
-      Map<String, Object> entryProps = registry.get(entryType).getProperties();
-      if(null==entryProps || entryProps.isEmpty()) continue;
-      Map<String, String> firstProp = (Map<String, String>) entryProps.entrySet().iterator().next().getValue();
-      Iterator<String> jcrTypes = firstProp.keySet().iterator();
-      while(jcrTypes.hasNext()){
-        jcrTypeMap.put(jcrTypes.next(), entryType);
-      }
-    }
-    return jcrTypeMap;
-  }
-  
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  @Override
-  public Map<String, String> getEntryDetail(SearchEntryId entryId) {
-    Map<String, String> details = new HashMap<String, String>();
-    if(!SearchService.isRegistered(entryId.getType())) return details;
-    
-    try {
-      Map<String, Object> jcrProps = getJcrNodeProperties(entryId.getCollection() + entryId.getName());
-      String nodeType = (String) jcrProps.get("jcr:primaryType");
-      
-      Map<String, Object> entryProps = registry.get(entryId.getType()).getProperties();
-      if(entryProps.isEmpty()) return details;
-      
-      Iterator<String> detailFieldNames = entryProps.keySet().iterator();
-      while(detailFieldNames.hasNext()){
-        String detailFieldName = detailFieldNames.next();
-        String jcrType = ((Map<String, String>)entryProps.get(detailFieldName)).get(nodeType);
-        Object detailFieldValue = jcrProps.get(jcrType); 
-        details.put(detailFieldName, (String)(detailFieldValue instanceof List<?> ? ((List)detailFieldValue).get(0) : detailFieldValue));
-      }
-      
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    
-    return details;
-  }
-    
-  @GET
-  @Path("/props")
-  public static Response jcrNodeProperties(@QueryParam("node") String nodePath) {
-    try {
-      return Response.ok(getJcrNodeProperties(nodePath), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
-    }
-  }
-
-  public static Map<String, Object> getJcrNodeProperties(String nodePath) throws Exception {
-    int firstSlash = nodePath.indexOf("/");
-    int secondSlash = nodePath.indexOf("/", firstSlash+1);
-    String repositoryName = nodePath.substring(0, firstSlash);
-    String workspaceName = nodePath.substring(firstSlash+1, secondSlash);
-
-    RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
-    ManageableRepository repository = repositoryService.getRepository(repositoryName);
-    Session session = repository.login(workspaceName);
-    Node node = session.getRootNode().getNode(nodePath.substring(secondSlash+1));
-    return getProperties(node);
-  }
-
-  private static Map<String, Object> getProperties(Node node) throws Exception{
+  public static Map<String, Object> getNodeProperties(Node node) throws Exception{
     Map<String, Object> props = new HashMap<String, Object>();
 
     PropertyIterator propertyIterator = node.getProperties();
@@ -331,5 +184,41 @@ public class JcrSearchService extends SearchService implements ResourceContainer
     return props;
   }
   
+  // for testing
+  @GET
+  @Path("/search")
+  public Response searchRest(@QueryParam("q") String query) {
+    try {
+      return Response.ok(new JcrNodeSearch().search(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
+  }
+
+  @GET
+  @Path("/props")
+  public static Response jcrNodeProperties(@QueryParam("node") String nodePath) {
+    try {
+      return Response.ok(getJcrNodeProperties(nodePath), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
+  }
+
+  private static Map<String, Object> getJcrNodeProperties(String nodePath) throws Exception {
+    int firstSlash = nodePath.indexOf("/");
+    int secondSlash = nodePath.indexOf("/", firstSlash+1);
+    String repositoryName = nodePath.substring(0, firstSlash);
+    String workspaceName = nodePath.substring(firstSlash+1, secondSlash);
+
+    RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
+    ManageableRepository repository = repositoryService.getRepository(repositoryName);
+    Session session = repository.login(workspaceName);
+    Node node = session.getRootNode().getNode(nodePath.substring(secondSlash+1));
+    return JcrSearchService.getNodeProperties(node);
+  }
+
 }
 

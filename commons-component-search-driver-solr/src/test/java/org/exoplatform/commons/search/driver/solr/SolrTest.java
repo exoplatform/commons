@@ -23,6 +23,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
+import org.exoplatform.commons.search.SearchService;
+import org.exoplatform.commons.search.SearchType;
 import org.exoplatform.commons.search.sample.BaseTest;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -47,7 +49,9 @@ public class SolrTest extends BaseTest  {
     //server = new HttpSolrServer("http://localhost:8983/solr");
     
     indexingService = new SolrIndexingService(server);
-    searchService = new SolrSearchService(server);
+    SolrSearchService.setServer(server);
+    SearchService.registerSearchType(new SearchType("user", "User", null, SolrGenericSearch.class));
+    SearchService.registerSearchType(new SearchType("topic", "Forum topic", null, SolrGenericSearch.class));
     super.setUp();
   }
 
@@ -58,7 +62,7 @@ public class SolrTest extends BaseTest  {
   }
 
   public void testSearch() throws Exception {
-    search("\"anthony cena\" mary");
+    categorizedSearch("\"anthony cena\" mary");
     search("creationAuthor_t:john"); //TODO: hide the underscore
   }
 }
