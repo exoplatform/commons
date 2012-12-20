@@ -53,8 +53,8 @@
       var query = $("#txtQuery").val();
       var sql = $("#txtSql").val().replace("%query%", query);
     
-      var searchFor = $("#sqlExec").is(":visible")?sql:query;
-      console.log(searchFor);
+      var restUrl = $("#sqlExec").is(":visible") ? "/rest/search/jcr/search?q="+sql : "/rest/search?q="+query;
+      console.log(restUrl);
       //return false;
     
       $("#entryTypes").html("");
@@ -63,7 +63,7 @@
       $("body").css("cursor", "wait");
 
       if($("#categorized").is(":checked")) {
-          $.getJSON("/rest/search?categorized=true&q=" + searchFor, function(entryMap){
+          $.getJSON(restUrl + "&categorized=true", function(entryMap){
           var entryTypes = "| ";
           var result = "<hr/><h3>Results:</h3>";
           $.each(entryMap, function(type, entries){
@@ -82,7 +82,7 @@
           $("body").css("cursor", "auto");
       });                                        
       } else {
-          $.getJSON("/rest/search?q=" + searchFor, function(entries){
+          $.getJSON(restUrl, function(entries){
               var result = "<h3>Results:</h3>";
               $.each(entries, function(i, entry){
                   result = result + "<div class='entry'>" + entry.html + "</div>";

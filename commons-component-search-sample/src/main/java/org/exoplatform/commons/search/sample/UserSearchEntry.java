@@ -16,7 +16,6 @@
  */
 package org.exoplatform.commons.search.sample;
 
-import org.exoplatform.commons.search.SearchEntry;
 import org.exoplatform.commons.search.SearchEntryId;
 import org.exoplatform.commons.search.SimpleEntry;
 import org.exoplatform.services.organization.User;
@@ -35,11 +34,6 @@ public class UserSearchEntry extends SimpleEntry {
     this.setId(getEntryId(user.getUserName()));
     this.setTitle(user.getFullName());
     this.setExcerpt(user.getUserName()+ " (" + user.getEmail() + ")");
-  }
-
-  public UserSearchEntry(SearchEntry entry) {
-    this.setId(entry.getId());
-    this.setContent(entry.getContent());
   }
 
   public static SearchEntryId getEntryId(String userName) {

@@ -60,10 +60,4 @@ public class StandardEntry extends SimpleEntry{
     content.put(LAST_UPDATE_AUTHOR, lastUpdateAuthor);
   }
   
-  public StandardEntry(){
-  }
-  
-  public StandardEntry(SearchEntry entry) {
-    super(entry);
-  }
 }

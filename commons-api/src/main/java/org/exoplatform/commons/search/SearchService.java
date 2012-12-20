@@ -19,8 +19,11 @@ package org.exoplatform.commons.search;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -52,10 +55,14 @@ public class SearchService {
     }
   }
   
-  public static void registerSearchType(SearchType searchType) {
+  public static void register(SearchType searchType) {
     registry.put(searchType.getName(), searchType);
   }
-  
+
+  public static void unregister(String searchTypeName) {
+    registry.remove(searchTypeName);
+  }
+
   public static boolean isRegistered(String searchTypeName) {
     return registry.containsKey(searchTypeName);
   }
@@ -63,11 +70,33 @@ public class SearchService {
   public static Collection<SearchResult> search(String query) {
     Collection<SearchResult> results = new ArrayList<SearchResult>();
     try {
+      List<String> types = new ArrayList<String>();
+      
+      // Handle the case "mary type:[user, topic]"
+      Matcher matcher = Pattern.compile("type:\\[(.+?)\\]").matcher(query);
+      while(matcher.find()){
+        for(String type:matcher.group(1).split(",")){
+          types.add(type.trim());
+        }
+      }
+      query = matcher.replaceAll("");
+      
+      // Handle the case "mary type:user"
+      matcher = Pattern.compile("type:(\\w+)").matcher(query);
+      while(matcher.find()){
+         types.add(matcher.group(1).trim());
+      }
+      query = matcher.replaceAll("");
+              
+      query = query.trim();
+      if(query.isEmpty()) query = "*"; //TODO: handle this in each handler
+
       for(Entry<String, SearchType> entry:registry.entrySet()){
         SearchType searchType = entry.getValue();
-        Class<? extends Search> clazz = searchType.getHandler();
-        System.out.println("[UNIFIED SEARCH]: clazz = " + clazz.getSimpleName());
-        results.addAll(clazz.newInstance().search(query));
+        if(!types.isEmpty() && !types.contains(searchType.getName())) continue; // search requested types only
+        Class<? extends Search> handler = searchType.getHandler();
+        System.out.println("[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
+        results.addAll(handler.newInstance().search(query));
       }
     } catch (Exception e) {
       e.printStackTrace();

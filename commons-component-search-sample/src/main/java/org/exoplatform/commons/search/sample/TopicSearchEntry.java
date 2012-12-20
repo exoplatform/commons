@@ -18,7 +18,6 @@ package org.exoplatform.commons.search.sample;
 
 import java.util.Date;
 
-import org.exoplatform.commons.search.SearchEntry;
 import org.exoplatform.commons.search.SearchEntryId;
 import org.exoplatform.commons.search.StandardEntry;
 import org.exoplatform.forum.service.Topic;
@@ -44,10 +43,6 @@ public class TopicSearchEntry extends StandardEntry {
 
     this.getContent().put("category", categoryName);
     this.getContent().put("forum", forumName);
-  }
-
-  public TopicSearchEntry(SearchEntry entry) {
-    super(entry);
   }
 
   @Override

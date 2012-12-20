@@ -44,6 +44,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.exoplatform.commons.search.SearchService;
 import org.exoplatform.commons.search.util.JsonMap;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -90,6 +91,7 @@ public class JcrSearchService implements ResourceContainer {
       for(RepositoryEntry repositoryEntry:repositoryService.getConfig().getRepositoryConfigurations()){
         String repoName = repositoryEntry.getName();
         if(!searchScope.containsKey(repoName)) continue; //ignore repositories which are not in the search scope
+        System.out.format("[UNIFIED SEARCH]: searching repository '%s'...\n", repoName);
         List<String> searchableWorkspaces = searchScope.get(repoName);
         
         ManageableRepository repository = repositoryService.getRepository(repoName);
@@ -97,7 +99,8 @@ public class JcrSearchService implements ResourceContainer {
         
         for(String workspaceName:repository.getWorkspaceNames()){
           if(!searchableWorkspaces.contains(workspaceName)) continue; //ignore workspaces which are not in the search scope
-          
+          System.out.format("[UNIFIED SEARCH]: searching workspace '%s'...\n", workspaceName);
+
           Session session = repository.login(workspaceName);
           QueryManager queryManager = session.getWorkspace().getQueryManager();
           
@@ -187,9 +190,13 @@ public class JcrSearchService implements ResourceContainer {
   // for testing
   @GET
   @Path("/search")
-  public Response searchRest(@QueryParam("q") String query) {
+  public Response search(@QueryParam("q") String query, @QueryParam("categorized") boolean categorized) {
     try {
-      return Response.ok(new JcrNodeSearch().search(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      if(categorized) {
+        return Response.ok(SearchService.categorize(new JcrNodeSearch().search(query)), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      } else {
+        return Response.ok(new JcrNodeSearch().search(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      }
     } catch (Exception e) {
       e.printStackTrace();
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();

@@ -51,33 +51,4 @@ public class SimpleEntry extends SearchEntry{
   public void setUrl(String url) {
     content.put(URL, url);
   }
-  
-  // need for jackson
-  public SimpleEntry() {
-  }
-  
-  public SimpleEntry(SearchEntry entry) {
-    this.setId(entry.getId());
-    this.setContent(entry.getContent());
-  }
-
-  public String getHtml() {    
-    String html = ""; //TODO: move to a template file
-    html = html + "<div class='SimpleEntry'>";
-    html = html + "  <div><span class='clickable collapsed'>[</span>] <a target='_blank' href='${url}'>${title}</a></div>";
-    html = html + "  <div class='excerpt'>${excerpt}</div>";
-    html = html + "  <div class='details' style='display: none;'>${details}</div>";
-    html = html + "</div>"; //entry div
-    
-    try {
-      html = html.replace("${url}", this.getUrl());
-      html = html.replace("${title}", this.getTitle());
-      html = html.replace("${excerpt}", this.getExcerpt());
-      html = html.replace("${details}", "details");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return html; //TODO: return as much info as possible
-  }  
-
 }

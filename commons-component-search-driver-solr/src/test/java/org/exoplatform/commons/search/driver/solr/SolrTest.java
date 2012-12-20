@@ -50,8 +50,8 @@ public class SolrTest extends BaseTest  {
     
     indexingService = new SolrIndexingService(server);
     SolrSearchService.setServer(server);
-    SearchService.registerSearchType(new SearchType("user", "User", null, SolrGenericSearch.class));
-    SearchService.registerSearchType(new SearchType("topic", "Forum topic", null, SolrGenericSearch.class));
+    SearchService.register(new SearchType("user", "User", null, SolrGenericSearch.class));
+    SearchService.register(new SearchType("topic", "Forum topic", null, SolrGenericSearch.class));
     super.setUp();
   }
 

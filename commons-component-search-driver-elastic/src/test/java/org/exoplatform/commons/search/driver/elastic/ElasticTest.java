@@ -61,8 +61,8 @@ public class ElasticTest extends BaseTest  {
     //client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));        
     indexingService = new ElasticIndexingService(client);
     ElasticSearchService.setClient(client);
-    SearchService.registerSearchType(new SearchType("user", "User", null, ElasticGenericSearch.class));
-    SearchService.registerSearchType(new SearchType("topic", "Forum topic", null, ElasticGenericSearch.class));
+    SearchService.register(new SearchType("user", "User", null, ElasticGenericSearch.class));
+    SearchService.register(new SearchType("topic", "Forum topic", null, ElasticGenericSearch.class));
     super.setUp();
   }
 
