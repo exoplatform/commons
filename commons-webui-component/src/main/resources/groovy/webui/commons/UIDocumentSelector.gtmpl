@@ -32,7 +32,7 @@
   requireJs.addScripts("jQuery('#selectDrive').change(function() {document.DocumentSelector.changeDrive(this);});");
   requireJs.addScripts("jQuery('#createNew').click(function() {document.DocumentSelector.newFolder(this);});");
 %>
-<div class="UIDocumentSelector" id="$uicomponent.id" style="border: 1px solid blue">
+<div class="uiDocumentSelector" id="$uicomponent.id" style="border: 1px solid blue">
   <a style="display:none;" href="$selectFileLink" class="SelectFile"></a>
   <a style="display:none;" href="$selectFolderLink" class="SelectFolder"></a>
 
@@ -71,7 +71,7 @@
                   " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\">&nbsp;</a>";
      %>
 	<div class="clearfix">
-    <div class="actions">
+    <div class="actions pull-right">
       $newFolderLink
       
       <% if (uicomponent.isShowUpload) {      
@@ -79,7 +79,7 @@
        }
        %>
 	  </div>
-    <ul class="breadcrumb" id="BreadcumbsContainer"></ul>  
+    <ul class="breadcrumb pull-left" id="BreadcumbsContainer"></ul>  
 	</div>
 	<ul class="listContainer" id="ListRecords">
 	  <li class="listItem">
