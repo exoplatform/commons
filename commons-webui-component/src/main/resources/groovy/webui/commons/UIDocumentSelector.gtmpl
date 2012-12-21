@@ -32,17 +32,37 @@
   requireJs.addScripts("jQuery('#selectDrive').change(function() {document.DocumentSelector.changeDrive(this);});");
   requireJs.addScripts("jQuery('#createNew').click(function() {document.DocumentSelector.newFolder(this);});");
 %>
-<div class="UIDocumentSelector" id="$uicomponent.id">
+<div class="UIDocumentSelector" id="$uicomponent.id" style="border: 1px solid blue">
   <a style="display:none;" href="$selectFileLink" class="SelectFile"></a>
   <a style="display:none;" href="$selectFolderLink" class="SelectFolder"></a>
-   <center>
+
    <%= _ctx.appRes(uicomponent.id + '.label.select-drive')%>
     <select id="selectDrive" >
       <option value="general"><%= _ctx.appRes(uicomponent.id + '.label.general-drives')%></option>
       <option value="group"><%= _ctx.appRes(uicomponent.id + '.label.group-drives')%></option>
       <option value="personal" selected="selected"><%= _ctx.appRes(uicomponent.id + '.label.personal-drives')%></option>
     </select>
-  </center>
+    <br/>
+    
+    <div class="btn-group uiDropdownWithIcon">
+			<div data-toggle="dropdown" class="btn dropdown-toggle">
+				<i class="uiIconGeneralDriver"></i>
+				<span>General Drives</span>
+				<span class="spiter"></span> <span class="caret"></span>
+			</div>
+			<ul role="menu" class="dropdown-menu">
+				<li>
+					<i class="uiIconGroupsDriver"></i>
+					<a href="#">Groups Drives</a>
+				</li>
+				<li>
+					<i class="uiIconPersonalDriver"></i>
+					<a href="#">Personal Drives</a>
+				</li>
+			</ul>
+		</div>
+    
+    
   <%      
         String newFolderLink = "<a id=\"createNew\" class=\"NewFolder\" href=\"javascript:void(0);\" value=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder') + "\"" +        			                  
                   " msg_new_folder_not_allow=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder-not-allow') + "\"" +
@@ -50,21 +70,21 @@
                   " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +
                   " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\">&nbsp;</a>";
      %>
-    <div class="ClearFix Breadcumbs">
-    <div class="ActionBar">
-      $newFolderLink
-      
-      <% if (uicomponent.isShowUpload) {      
-           uicomponent.renderChild(uicomponent.UPLOAD_AREA);  
-       }
-       %>
-	  </div>
-    <div class="BreadcumbsContainer" id="BreadcumbsContainer"></div>  
+    <div class="clearfix">
+	    <div class="ActionBar">
+	      $newFolderLink
+	      
+	      <% if (uicomponent.isShowUpload) {      
+	           uicomponent.renderChild(uicomponent.UPLOAD_AREA);  
+	       }
+	       %>
+		  </div>
+	    <ul class="breadcrumb" id="BreadcumbsContainer"></ul>  
     </div>
   <div class="ListContainer">
     <div class="ClearFix">      
       <div class="RightWorkspace" id="RightWorkspace">
-        <div class=ListView>
+        <div class="ListView">
           <table cellspacing="0" style="table-layout: fixed; width: 100%;" id="ListRecords">
             <!--<thead>
               <tr>

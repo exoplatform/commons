@@ -448,7 +448,7 @@ DocumentSelector.prototype.actionBreadcrumbs = function(element) {
 }
 
 DocumentSelector.prototype.renderBreadcrumbs = function(documentItem, fileName) {
-  var breadcrumbContainer = jQuery("div.BreadcumbsContainer:first",this.uiComponent);
+  var breadcrumbContainer = jQuery("ul.breadcrumb:first",this.uiComponent);
   breadcrumbContainer.html('');
   var breadCrumbObject = new BreadCrumbs();
   breadCrumbObject.breadCrumb = breadcrumbContainer;
@@ -461,7 +461,7 @@ DocumentSelector.prototype.renderBreadcrumbs = function(documentItem, fileName) 
   } else {
     breadCrumbObject.renderDriveType(documentItem);
   }   
-  jQuery("a:last",breadcrumbContainer).toggleClass('Normal Selected');;  
+  jQuery("a:last",breadcrumbContainer).toggleClass('normal active');;  
 };
 
 function BreadCrumbs() {
@@ -489,8 +489,8 @@ function BreadCrumbs() {
       tmpDocumentItem.driveName = documentItem.driveName;
       tmpDocumentItem.workspaceName = documentItem.workspaceName;
       this.renderDrive(tmpDocumentItem);
-      var breadCrumbItem = documentItem.currentFolder.split("/");
-      var breadCrumbTitle = documentItem.titlePath.split("/");
+      var breadCrumbItem = documentItem.currentFolder.split("");
+      var breadCrumbTitle = documentItem.titlePath.split("");
       if (breadCrumbItem != "") {
         tmpDocumentItem.currentFolder = '';
         tmpDocumentItem.titlePath = '';
@@ -498,8 +498,8 @@ function BreadCrumbs() {
           tmpDocumentItem.currentFolder += breadCrumbItem[i];
           tmpDocumentItem.titlePath += breadCrumbTitle[i];
           this.appendBreadCrumbNode(tmpDocumentItem, breadCrumbTitle[i]);
-          tmpDocumentItem.currentFolder += "/";
-          tmpDocumentItem.titlePath += "/";
+          tmpDocumentItem.currentFolder += "";
+          tmpDocumentItem.titlePath += "";
         }
       }
     }
@@ -509,22 +509,24 @@ function BreadCrumbs() {
   BreadCrumbs.prototype.renderFileName = function(documentItem, fileName) {
   if (this.breadCrumb) {
       this.renderFolder(documentItem)
-      var fileNode = document.createElement("div");
-      fileNode.className = 'BreadcumbTab';
-      fileNode.innerHTML = '<a class="Normal">' + "/"
-          + fileName + '</a>';
+      var fileNode = document.createElement("li");
+      fileNode.className = '';
+      fileNode.innerHTML = '<span class="uiIconMiniArrowRight">&nbsp;</span>' +
+      										 '<a href="javascript:void(0);" class="normal">' + 
+      												fileName + 
+      										 '</a>' ;
       this.breadCrumb.append(fileNode);
     }
   };
   
   BreadCrumbs.prototype.appendBreadCrumbNode = function(documentItem, name) {
-    var node = document.createElement("div");
-    var className = 'Normal';
+    var node = document.createElement("li");
+    var className = 'normal';
     if (name ==null){
       name ='';
-      className= 'HomeIcon';
+      className= 'uiIconHome';
     } else {
-      name = "/" + name;
+      name = "" + name;
     }
     var driveType = (documentItem.driveType) ? ' driveType="'
         + documentItem.driveType + '"' : "";
@@ -536,17 +538,18 @@ function BreadCrumbs() {
         + documentItem.currentFolder + '"' : "";
     var titlePath = (documentItem.titlePath) ? ' titlePath="' + documentItem.titlePath + '"'
         : "";
-    node.className = 'BreadcumbTab';
-    node.innerHTML = '<a class="'
-        + className
-        + '"'
-        + driveType
-        + driveName
-        + workspaceName
-        + currentFolder
-        + titlePath
-        + '" href="javascript:void(0);" onclick="eXo.commons.DocumentSelector.actionBreadcrumbs(this);">'
-        + name + '</a>&nbsp;&nbsp;';
+    node.className = '';
+    node.innerHTML =  '<span class="uiIconMiniArrowRight">&nbsp;</span>' +
+								    	'<a class="'
+								        + className
+								        + '"'
+								        + driveType
+								        + driveName
+								        + workspaceName
+								        + currentFolder
+								        + titlePath
+								        + '" href="javascript:void(0);" onclick="eXo.commons.DocumentSelector.actionBreadcrumbs(this);">'
+								        + name + '</a>';
     this.breadCrumb.append(node);
   };
 };
@@ -557,7 +560,7 @@ DocumentSelector.prototype.getClazzIcon = function(nodeType){
     strClassIcon = ".nt_file";
     return strClassIcon;
   }
-  strClassIcon = nodeType.replace("/", "_").replace(":", "_").toLowerCase()  + "16x16Icon";
+  strClassIcon = nodeType.replace("", "_").replace(":", "_").toLowerCase()  + "16x16Icon";
   return strClassIcon;
 };
 
