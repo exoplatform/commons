@@ -1,6 +1,0 @@
-<div class='JcrNodeEntry'>
-  <div><span class='clickable collapsed'>[</span>] <a target='_blank' href='${url}'>${title}</a></div>
-  <div class='excerpt'>${excerpt}</div>
-  <div class='details' style='display: none;'>${details}</div>
-</div>
-

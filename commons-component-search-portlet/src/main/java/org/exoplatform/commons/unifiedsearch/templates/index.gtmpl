@@ -6,24 +6,45 @@
         margin-bottom: 40px;
         display: none;
     }
-    .entry {
-        margin-left: 5px;
-    }
-    .details, .excerpt {
-        margin-left: 20px;
-        margin-bottom: 10px;
-        font-size: x-small !important ;
-        color: grey; 
-    }
     .clickable {
         cursor: pointer;
     }
-    .collapsed:after {
-        content: "+";
+
+    /*Search result*/
+
+    .SearchResult {
+      margin-left: 5px;
+      padding-top: 5px;
+      height: 60px;
     }
-    .expanded:after {
-        content: "-";
+
+    .SearchResult .Avatar {
+      float: left;
+      padding-top: 3px;
     }
+
+    .SearchResult .Avatar img {
+      width: 40px;
+      height: 40px; 
+    }
+
+    .SearchResult .Content {
+      padding-left: 10px;
+      overflow: hidden;
+    }
+
+    .SearchResult .Content .Title {
+      font-weight: bold;
+    }
+
+    .SearchResult .Content .Excerpt {
+      font-size: x-small; height: 14px;
+    }
+
+    .SearchResult .Content .Detail {
+      font-size: small; color: grey;
+    }
+
 </style>
 
 <div id="searchPortlet">
@@ -41,13 +62,33 @@
     <span style="margin-left: 10px;">Categorized result<input type="checkbox" id="categorized" name="categorized" checked></span>
 
     <hr/>
-    <div id="entryTypes" style="display: none"></div>        
+    <div id="resultTypes" style="display: none"></div>        
     <div id="result" style="background: white; padding-bottom: 10px; display: none;"></div>
   </div>
 </div>
 
 <script>
   $("#txtQuery").focus();
+
+  function renderSearchResult(result) {
+    var template = " \
+      <div class='SearchResult %{type}'> \
+        <div class='Avatar clickable'> \
+          <img title='%{title}' src='%{avatar}' alt='[+]'> \
+        </div> \
+        <div class='Content'> \
+          <div class='Title'><a href='%{url}'>%{title}</a></div> \
+          <div class='Excerpt'>%{excerpt}</div> \
+          <div class='Detail'>%{detail}</div> \
+        </div> \
+      </div> \
+    ";
+
+    var html = template.replace(/%{type}/g, result.type).replace(/%{url}/g, result.url);
+    html = html.replace(/%{title}/g, result.title).replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail).replace(/%{avatar}/g, result.avatar);
+    console.log(html);
+    return html;
+  }
 
   $("#btnSearch").click(function(){
       var query = $("#txtQuery").val();
@@ -56,36 +97,37 @@
       var restUrl = $("#sqlExec").is(":visible") ? "/rest/search/jcr/search?q="+sql : "/rest/search?q="+query;
       console.log(restUrl);
       //return false;
-    
-      $("#entryTypes").html("");
+
+      $("#resultTypes").html("");
       $("#result").html("");
 
       $("body").css("cursor", "wait");
 
       if($("#categorized").is(":checked")) {
           $.getJSON(restUrl + "&categorized=true", function(entryMap){
-          var entryTypes = "| ";
-          var result = "<hr/><h3>Results:</h3>";
-          $.each(entryMap, function(type, entries){
-              entryTypes = entryTypes + "<span class='clickable entryType'>" + type + " (" + $(entries).size() + ")" + "</span>" + " | ";
-              result = result + "<div class='type' id='" + type.replace(/\\s/g, "_") + "'>";
-              $.each(entries, function(i, entry){
-                      result = result + "<div class='entry'>" + entry.html + "</div>";
+              var resultTypes = "| ";
+              var result = "<hr/><h3>Results:</h3>";
+              $.each(entryMap, function(type, entries){
+                  resultTypes = resultTypes + "<span class='clickable resultType'>" + type + " (" + $(entries).size() + ")" + "</span>" + " | ";
+                  result = result + "<div class='type' id='" + type.replace(/\\s/g, "_") + "'>";
+
+                  $.each(entries, function(i, entry){
+                      result = result + renderSearchResult(entry);
+                  });
+                  result = result + "</div>"; //type div
               });
-              result = result + "</div>"; //type div
-          });
-          $("#entryTypes").html(entryTypes);
-          $("#result").html(result);
-          $("#entryTypes").show();
-          $("#result").show();
-          $(".entryType").first().click();                        
-          $("body").css("cursor", "auto");
-      });                                        
+              $("#resultTypes").html(resultTypes);
+              $("#result").html(result);
+              $("#resultTypes").show();
+              $("#result").show();
+              $(".resultType").first().click();                        
+              $("body").css("cursor", "auto");
+          });                                        
       } else {
           $.getJSON(restUrl, function(entries){
               var result = "<h3>Results:</h3>";
               $.each(entries, function(i, entry){
-                  result = result + "<div class='entry'>" + entry.html + "</div>";
+                  result = result + renderSearchResult(entry);
               });
 
               $("#result").html(result);
@@ -96,31 +138,23 @@
 
   });
   
-  $(".expanded, .collapsed").live("click", function(){
-      $(this).toggleClass("expanded collapsed");
-      var $details = $(this).parents("div.entry").find("div.details");
-      var $excerpt = $(this).parents("div.entry").find("div.excerpt");
-
-      console.log($details.text());
-      
-      if($details.is(":hidden")){
-          $.getJSON("/rest/search/jcr/props?node=" + $(this).next("a").attr("href").replace("/rest/jcr/", ""), function(props){
-              var details = "";
-              $.each(props, function(key, value){
-                  details = details + "<div>" + key + " = " + value + "</div>";
-              });
-              $details.html(details);
-              $excerpt.hide();
-              $details.show();
-          });
-      } else {
-          $excerpt.show();
-          $details.hide();
-      }      
-
-  })
+  $(".SearchResult .Avatar img").live("click", function(){
+    var url = $(this).parents("div.SearchResult").find(".Content > .Title > a").attr("href");
+    
+     //get jcr node properties
+    if(0 == url.indexOf("/rest/jcr/")) {
+      $.getJSON("/rest/search/jcr/props?node=" + url.replace("/rest/jcr/", ""), function(props){
+        var sProps = "";
+        $.each(props, function(key, value){
+            sProps = sProps + key + " = " + value + "\\n";
+        });
+        console.log(props);
+        alert(sProps);
+      });
+    }
+  });
   
-  $(".entryType").live("click", function(){
+  $(".resultType").live("click", function(){
       $(".selected").toggleClass("selected");
       $(this).toggleClass("selected");
       

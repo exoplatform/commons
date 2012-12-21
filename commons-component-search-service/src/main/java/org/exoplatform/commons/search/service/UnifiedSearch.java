@@ -1,6 +1,7 @@
 package org.exoplatform.commons.search.service;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -31,9 +32,17 @@ public class UnifiedSearch implements ResourceContainer {
   }
 
   public UnifiedSearch(){
-    // TODO: move all config to portlet war
-    JcrSearchService.setSearchScope(getTextFromFile("/json/jcr-search-scope.json")); 
-    SearchService.setRegistry(getTextFromFile("/json/registry.json"));
+    // TODO: move all config to portlet war or PLF's configuration.properties
+    try {
+      Properties props = new Properties();
+      props.load(this.getClass().getResourceAsStream("/conf/configuration.properties"));
+      SearchService.setRegistry(props.getProperty("registry"));
+      JcrSearchService.setSearchScope(props.getProperty("jcr-search-scope"));
+      JcrSearchService.IGNORED_TYPES = props.getProperty("jcr-ignored-types").split(",");
+      JcrSearchService.IGNORED_FIELDS = props.getProperty("jcr-ignored-fields").split(",");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
   
   @GET
@@ -85,8 +94,4 @@ public class UnifiedSearch implements ResourceContainer {
     return Response.ok(SearchService.getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
 
-  private String getTextFromFile(String filePath){
-    InputStream is = this.getClass().getResourceAsStream(filePath);
-    return new java.util.Scanner(is).useDelimiter("\\A").next();
-  }
 }

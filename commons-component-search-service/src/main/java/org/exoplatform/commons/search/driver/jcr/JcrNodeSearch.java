@@ -1,11 +1,8 @@
 package org.exoplatform.commons.search.driver.jcr;
 
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.jcr.Session;
 import javax.jcr.Value;
@@ -18,13 +15,11 @@ import javax.jcr.query.RowIterator;
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 
 public class JcrNodeSearch implements Search {
-  private static final String TEMPLATE_FILE = "/template/search-entry/jcr-node.gtmpl";
       
   @Override
   public Collection<SearchResult> search(String query) {
@@ -46,8 +41,7 @@ public class JcrNodeSearch implements Search {
           
           Session session = repository.login(workspaceName);
           QueryManager queryManager = session.getWorkspace().getQueryManager();
-          String sql = "SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '${query}') AND NOT CONTAINS(exo:lastModifier, '${query}')";
-          query = query.startsWith("SELECT")?query:sql.replace("${query}", query); //sql mode is for testing only
+          query = query.startsWith("SELECT")?query:JcrSearchService.buildSql("nt:base", "CONTAINS(*, '" + query + "')", "", query); //sql mode is for testing only
           System.out.println("[UNIFIED SEARCH] query = " + query);
           Query jcrQuery = queryManager.createQuery(query, Query.SQL);
           QueryResult queryResult = jcrQuery.execute();
@@ -63,17 +57,12 @@ public class JcrNodeSearch implements Search {
               path = path.substring(0, path.lastIndexOf("/jcr:content"));
             }
 
-            SearchResult resultItem = new SearchResult();
-            resultItem.setType(jcrType);
-            
-            Map<String, String> binding = new HashMap<String, String>();
-            binding.put("url", "/rest/jcr/" + collection + path);
-            binding.put("title", collection + path + " (score = " + row.getValue("jcr:score").getLong() + ")");
+            SearchResult resultItem = new SearchResult(jcrType, "/rest/jcr/" + collection + path);
+            resultItem.setTitle(collection + path + " (score = " + row.getValue("jcr:score").getLong() + ")");
             Value excerpt = row.getValue("rep:excerpt()");
-            binding.put("excerpt", null!=excerpt?excerpt.getString():"");
-            binding.put("details", "details");
+            resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
+            resultItem.setDetail("");
 
-            resultItem.setHtml(new GroovyTemplate(new InputStreamReader(JcrPeopleSearch.class.getResourceAsStream(TEMPLATE_FILE))).render(binding));
             result.add(resultItem);
           }
         }

@@ -35,8 +35,10 @@ import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
@@ -62,6 +64,10 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Path("/search/jcr")
 @Produces(MediaType.APPLICATION_JSON)
 public class JcrSearchService implements ResourceContainer {
+  public static final String BASE_SQL = "SELECT rep:excerpt(), jcr:primaryType FROM ${from} WHERE ${where} ${option}";
+  public static String[] IGNORED_TYPES;
+  public static String[] IGNORED_FIELDS;
+  
   private static Map<String, List<String>> searchScope; //e.g: {repository:[collaboration, knowledge, social], ...}
 
   private static final CacheControl cacheControl;
@@ -84,7 +90,7 @@ public class JcrSearchService implements ResourceContainer {
     JcrSearchService.searchScope = new JsonMap<String, List<String>>(json);
   }
   
-  public static Collection<JcrSearchResult> search(String from, String where) {
+  public static Collection<JcrSearchResult> search(String sql) {
     Collection<JcrSearchResult> results = new ArrayList<JcrSearchResult>();
     try {
       RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
@@ -104,7 +110,6 @@ public class JcrSearchService implements ResourceContainer {
           Session session = repository.login(workspaceName);
           QueryManager queryManager = session.getWorkspace().getQueryManager();
           
-          String sql = "SELECT rep:excerpt(), jcr:primaryType FROM ${from} WHERE ${where}".replace("${from}", from).replace("${where}", where);
           System.out.println("[UNIFIED SEARCH] query = " + sql);
           Query jcrQuery = queryManager.createQuery(sql, Query.SQL);
           QueryResult queryResult = jcrQuery.execute();
@@ -189,6 +194,54 @@ public class JcrSearchService implements ResourceContainer {
   
   // for testing
   @GET
+  @Path("/ignored-types")
+  public static Response getIgnoredTypes() {
+    try {
+      return Response.ok(IGNORED_TYPES, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
+  }
+
+  @GET
+  @Path("/ignored-types={ignoredTypes}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public static Response setIgnoredTypes(@PathParam("ignoredTypes") String ignoredTypes) {
+    try {
+      IGNORED_TYPES = ignoredTypes.split(",");
+      return Response.ok(IGNORED_TYPES, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
+  }
+
+  @GET
+  @Path("/ignored-fields")
+  public static Response getIgnoredFields() {
+    try {
+      return Response.ok(IGNORED_FIELDS, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
+  }
+
+  @GET
+  @Path("/ignored-fields={ignoredFields}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public static Response setIgnoredFields(@PathParam("ignoredFields") String ignoredFields) {
+    try {
+      IGNORED_FIELDS = ignoredFields.split(",");
+      return Response.ok(IGNORED_FIELDS, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
+  }
+
+  @GET
   @Path("/search")
   public Response search(@QueryParam("q") String query, @QueryParam("categorized") boolean categorized) {
     try {
@@ -225,6 +278,23 @@ public class JcrSearchService implements ResourceContainer {
     Session session = repository.login(workspaceName);
     Node node = session.getRootNode().getNode(nodePath.substring(secondSlash+1));
     return JcrSearchService.getNodeProperties(node);
+  }
+
+  public static String buildSql(String from, String where, String option, String query){
+    where = where + (where.isEmpty()?"":" AND NOT ") + repeat("CONTAINS(%s, '"+ query + "')", IGNORED_FIELDS);
+    where = where + " AND NOT " + repeat("jcr:primaryType='%s'", IGNORED_TYPES);
+    return BASE_SQL.replace("${from}", from).replace("${where}", where).replace("${option}", option);
+  }
+  
+  private static String repeat(String format, String[] strArr){
+    StringBuilder sb=new StringBuilder();
+    String delimiter = "";
+    for(String str:strArr) {
+      sb.append(delimiter).append(String.format(format, str));
+      delimiter = " OR ";
+    }
+    
+    return String.format("(%s)", sb);
   }
 
 }
