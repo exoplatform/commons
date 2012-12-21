@@ -48,6 +48,7 @@
     <!-- Dependencies versions                    -->
     <!-- **************************************** -->
     <!-- eXo deps -->
+    <org.exoplatform.platform-ui.version>1.0.0-SNAPSHOT</org.exoplatform.platform-ui.version>
     <org.exoplatform.kernel.version>2.3.10-GA-SNAPSHOT</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>2.4.10-GA-SNAPSHOT</org.exoplatform.core.version>
     <org.exoplatform.ws.version>2.2.10-GA-SNAPSHOT</org.exoplatform.ws.version>
@@ -381,6 +382,11 @@
         </exclusions>
       </dependency>
       <!-- To be replaced by an import of GateIn Portal parent POM -->
+      <dependency>
+        <groupId>org.exoplatform.platform-ui</groupId>
+        <artifactId>platform-ui-web-eXoResources</artifactId>
+        <version>${org.exoplatform.platform-ui.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.exoplatform.portal</groupId>
         <artifactId>exo.portal.component.portal</artifactId>
