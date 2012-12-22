@@ -187,8 +187,7 @@ public class UIDocumentSelector extends UIContainer {
       UIDropDownControl uiDropDown = event.getSource();
       String selectedDriveType = event.getRequestContext().getRequestParameter(OBJECTID);
       JavascriptManager jm = event.getRequestContext().getJavascriptManager();
-      jm.getRequireJS().require("SHARED/commons-document", "document").addScripts("document.DocumentSelector.changeDrive();");
-      
+      jm.getRequireJS().require("SHARED/commons-document", "document").addScripts("document.DocumentSelector.changeDrive('" + selectedDriveType + "');");
       uiDropDown.setValue(selectedDriveType);
       ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
    }

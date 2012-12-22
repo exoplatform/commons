@@ -41,14 +41,30 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext){
   this.createFolderURL = restContext + this.createFolder;
   var documentItem = new DocumentItem();
   documentItem.driveType = this.defaultDriveType;
+  me.resetDropDownBox();
   me.renderDetails(documentItem);
 };
 
-DocumentSelector.prototype.changeDrive = function() {
-  var dropDownBox = jQuery('#DriveTypeDropDown');
-  var btn = dropDownBox.find('div.btn');
+DocumentSelector.prototype.resetDropDownBox = function() {
+	var dropDownBox = jQuery('#DriveTypeDropDown'); 
+	var btn = dropDownBox.find('div.btn');
+	jQuery(btn).removeClass('btn-primary');
+	var options = jQuery(dropDownBox).find('ul>li');
+	jQuery.each(options, function(idx, el) {
+	    var hiddenVal = jQuery(btn).find('span').text();
+	    var elVal = jQuery(el).find('a').text();
+	    if( jQuery.trim(elVal) === jQuery.trim(hiddenVal) ) {
+	      jQuery(el).hide();
+	    } else {
+	      jQuery(el).show();
+	    }
+	});
+}
+
+DocumentSelector.prototype.changeDrive = function(selectedDrive) {
+  _module.DocumentSelector.resetDropDownBox();
   var documentItem = new DocumentItem();
-  documentItem.driveType = jQuery.trim(jQuery(btn).find('span').text());
+  documentItem.driveType = selectedDrive;
   eXo.commons.DocumentSelector.renderDetails(documentItem);
 };
 

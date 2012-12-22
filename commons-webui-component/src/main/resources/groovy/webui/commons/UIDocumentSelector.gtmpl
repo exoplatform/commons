@@ -31,8 +31,6 @@
   requireJs.addScripts("document.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
   requireJs.addScripts("document.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
   requireJs.addScripts("jQuery('#createNew').click(function() {document.DocumentSelector.newFolder(this);});");
-  
-	
 %>
 <div class="uiDocumentSelector" id="$uicomponent.id" style="border: 1px solid blue">
   <a style="display:none;" href="$selectFileLink" class="selectFile"></a>
@@ -61,23 +59,5 @@
     <ul class="breadcrumb pull-left" id="BreadcumbsContainer"></ul>  
 	</div>
 	<ul class="listContainer" id="ListRecords">
-	  <li class="listItem">
-	  	<a href="#">
-	  		<i class="uiIconFolder"></i>
-	  		Mobile Test
-	  	</a>
-	  </li>   
-	  <li class="listItem">
-	  	<a href="#">
-	  		<i class="uiIconFolder"></i>
-	  		Mobile Test
-	  	</a>
-	  </li>
-	  <li class="listItem">
-	  	<a href="#">
-	  		<i class="uiIconFolder"></i>
-	  		Mobile Test
-	  	</a>
-	  </li>            
 	</ul>
 </div>
