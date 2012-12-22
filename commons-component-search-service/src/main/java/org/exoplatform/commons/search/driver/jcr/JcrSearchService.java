@@ -52,6 +52,7 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
@@ -90,7 +91,7 @@ public class JcrSearchService implements ResourceContainer {
     JcrSearchService.searchScope = new JsonMap<String, List<String>>(json);
   }
   
-  public static Collection<JcrSearchResult> search(String sql) {
+  public static Collection<JcrSearchResult> search(String sql, int offset, int limit) {
     Collection<JcrSearchResult> results = new ArrayList<JcrSearchResult>();
     try {
       RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
@@ -111,7 +112,9 @@ public class JcrSearchService implements ResourceContainer {
           QueryManager queryManager = session.getWorkspace().getQueryManager();
           
           System.out.println("[UNIFIED SEARCH] query = " + sql);
-          Query jcrQuery = queryManager.createQuery(sql, Query.SQL);
+          QueryImpl jcrQuery = (QueryImpl) queryManager.createQuery(sql, Query.SQL);
+          jcrQuery.setOffset(offset);
+          jcrQuery.setLimit(limit);
           QueryResult queryResult = jcrQuery.execute();
           
           RowIterator rit = queryResult.getRows();

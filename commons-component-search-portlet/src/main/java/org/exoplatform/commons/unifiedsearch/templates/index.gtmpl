@@ -1,178 +1,273 @@
-<style>
-    .selected {
+    <style>
+      .Selected {
         font-weight: bold;
-    }
-    .type {
+      }
+
+      .Clickable {
+        cursor: pointer;
+      }
+
+      .SearchResultType {
         margin-bottom: 40px;
         display: none;
-    }
-    .clickable {
-        cursor: pointer;
-    }
-
-    /*Search result*/
-
-    .SearchResult {
-      margin-left: 5px;
-      padding-top: 5px;
-      height: 60px;
-    }
-
-    .SearchResult .Avatar {
-      float: left;
-      padding-top: 3px;
-    }
-
-    .SearchResult .Avatar img {
-      width: 40px;
-      height: 40px; 
-    }
-
-    .SearchResult .Content {
-      padding-left: 10px;
-      overflow: hidden;
-    }
-
-    .SearchResult .Content .Title {
-      font-weight: bold;
-    }
-
-    .SearchResult .Content .Excerpt {
-      font-size: x-small; height: 14px;
-    }
-
-    .SearchResult .Content .Detail {
-      font-size: small; color: grey;
-    }
-
-</style>
-
-<div id="searchPortlet">
-  <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
-    <div style="font-size: small;">SQL:</div>
-    <div style="margin: 10px;">
-      <textarea rows="4" cols="50" id="txtSql">SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '%query%') ORDER BY jcr:score() DESC</textarea>            
-    </div>  
-  </div>
-
-  <div id="searchForm" style="padding-top: 5px;">
-    <label id="lbSearch" class="clickable" style="padding-left: 5px;">Search</label>
-    <input type="text" id="txtQuery"/>
-    <input type="button" id="btnSearch" value="Go"/>
-    <span style="margin-left: 10px;">Categorized result<input type="checkbox" id="categorized" name="categorized" checked></span>
-
-    <hr/>
-    <div id="resultTypes" style="display: none"></div>        
-    <div id="result" style="background: white; padding-bottom: 10px; display: none;"></div>
-  </div>
-</div>
-
-<script>
-  $("#txtQuery").focus();
-
-  function renderSearchResult(result) {
-    var template = " \
-      <div class='SearchResult %{type}'> \
-        <div class='Avatar clickable'> \
-          <img title='%{title}' src='%{avatar}' alt='[+]'> \
-        </div> \
-        <div class='Content'> \
-          <div class='Title'><a href='%{url}'>%{title}</a></div> \
-          <div class='Excerpt'>%{excerpt}</div> \
-          <div class='Detail'>%{detail}</div> \
-        </div> \
-      </div> \
-    ";
-
-    var html = template.replace(/%{type}/g, result.type).replace(/%{url}/g, result.url);
-    html = html.replace(/%{title}/g, result.title).replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail).replace(/%{avatar}/g, result.avatar);
-    console.log(html);
-    return html;
-  }
-
-  $("#btnSearch").click(function(){
-      var query = $("#txtQuery").val();
-      var sql = $("#txtSql").val().replace("%query%", query);
-    
-      var restUrl = $("#sqlExec").is(":visible") ? "/rest/search/jcr/search?q="+sql : "/rest/search?q="+query;
-      console.log(restUrl);
-      //return false;
-
-      $("#resultTypes").html("");
-      $("#result").html("");
-
-      $("body").css("cursor", "wait");
-
-      if($("#categorized").is(":checked")) {
-          $.getJSON(restUrl + "&categorized=true", function(entryMap){
-              var resultTypes = "| ";
-              var result = "<hr/><h3>Results:</h3>";
-              $.each(entryMap, function(type, entries){
-                  resultTypes = resultTypes + "<span class='clickable resultType'>" + type + " (" + $(entries).size() + ")" + "</span>" + " | ";
-                  result = result + "<div class='type' id='" + type.replace(/\\s/g, "_") + "'>";
-
-                  $.each(entries, function(i, entry){
-                      result = result + renderSearchResult(entry);
-                  });
-                  result = result + "</div>"; //type div
-              });
-              $("#resultTypes").html(resultTypes);
-              $("#result").html(result);
-              $("#resultTypes").show();
-              $("#result").show();
-              $(".resultType").first().click();                        
-              $("body").css("cursor", "auto");
-          });                                        
-      } else {
-          $.getJSON(restUrl, function(entries){
-              var result = "<h3>Results:</h3>";
-              $.each(entries, function(i, entry){
-                  result = result + renderSearchResult(entry);
-              });
-
-              $("#result").html(result);
-              $("#result").show();
-              $("body").css("cursor", "auto");
-          }); 
       }
 
-  });
-  
-  $(".SearchResult .Avatar img").live("click", function(){
-    var url = $(this).parents("div.SearchResult").find(".Content > .Title > a").attr("href");
-    
-     //get jcr node properties
-    if(0 == url.indexOf("/rest/jcr/")) {
-      $.getJSON("/rest/search/jcr/props?node=" + url.replace("/rest/jcr/", ""), function(props){
-        var sProps = "";
-        $.each(props, function(key, value){
-            sProps = sProps + key + " = " + value + "\\n";
+
+      .SearchResult {
+        margin-left: 5px;
+        padding-top: 5px;
+        height: 60px;
+      }
+
+      .SearchResult .Avatar {
+        float: left;
+        padding-top: 3px;
+      }
+
+      .SearchResult .Avatar img {
+        width: 48px;
+        height: 48px;
+      }
+
+      .SearchResult .Content {
+        padding-left: 10px;
+        overflow: hidden;
+      }
+
+      .SearchResult .Content .Title {
+        font-weight: bold;
+      }
+
+      .SearchResult .Content .Excerpt {
+        font-size: x-small; height: 19px;
+      }
+
+      .SearchResult .Content .Detail {
+        font-size: small; color: grey;
+      }
+
+
+      #filterForm {
+        float: left;
+        border-style: solid;
+        border-width: 1px;
+        margin-right: 10px;
+        padding-bottom: 10px;
+        height: auto;
+        width: auto;
+      }
+
+      #filterFormTitle {
+        text-align: center;
+        background: none repeat scroll 0% 0% lightGrey;
+        border-bottom: 1px solid;
+        margin-bottom: 10px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+      }
+
+      #filterForm ul {
+        list-style: none outside none;
+        padding-left: 20px;
+        margin-top: 2px;
+        margin-bottom: 16px;
+      }
+
+
+      #resultPage {
+        overflow: auto;
+      }
+    </style>
+    <div id="searchPortlet">
+      <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
+        <div style="font-size: small;">SQL:</div>
+        <div style="margin: 10px;">
+          <textarea rows="4" cols="50" id="txtSql">SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '%query%') ORDER BY jcr:score() DESC</textarea>
+        </div>
+      </div>
+
+      <div id="searchForm" style="padding-top: 5px;">
+        <label id="lbSearch" class="Clickable" style="padding-left: 5px;">Search</label>
+        <input type="text" id="txtQuery"/>
+        <input type="button" id="btnSearch" value="Go"/>
+        <span style="margin-left: 10px;">Categorized result<input type="checkbox" id="categorized" name="categorized" checked></span>
+      </div>
+
+      <hr/>
+
+      <div id="filterForm">
+        <div id="filterFormTitle">Filter By</div>
+        <div style="padding-right: 10px;">
+          <input type="checkbox" name="site" value="all">All Sites
+          <ul id="lstSites">
+            <li><input type="checkbox" value="acme" name="site">ACME</li>
+            <li><input type="checkbox" value="intranet" name="site">Intranet</li>
+          </ul>
+
+          <input type="checkbox" name="contentType" value="all">All Content Types
+          <ul id="lstContentTypes"></ul>
+        </div>
+      </div>
+
+      <div id="resultPage">
+        <div id="resultTypes" style="display: none; margin-bottom: 15px;"></div>
+        <div id="resultHeader" style="margin-bottom: 10px;">
+          <span style="font-weight: bold; font-size: large;">Results:</span>
+          <span style="float: right;">
+            Sort By:
+            <select id="lstSortBy">
+              <option value="relevancy">Relevancy</option>
+              <option value="date">Date</option>
+              <option value="title">Title</option>
+            </select>
+          </span>
+        </div>
+        <div id="result" style="display: none;"></div>
+      </div>
+
+    </div>
+
+    <script>
+      // Load content types
+      $.getJSON("/rest/search/registry", function(registry){
+        var contentTypes = [];
+        $.each(registry, function(key, searchType){
+          contentTypes.push("<li><input type='checkbox' name='contentType' value='" + searchType.name + "'>" + searchType.displayName + "</li>");
         });
-        console.log(props);
-        alert(sProps);
-      });
-    }
-  });
-  
-  $(".resultType").live("click", function(){
-      $(".selected").toggleClass("selected");
-      $(this).toggleClass("selected");
-      
-      var type=$(this).text();
-      type = type.substring(0, type.indexOf(" ("));
-      type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_");
-      $(".type").hide();
-      $("#"+type).show();
-  })
-        
-  $("#txtQuery").keyup(function(event){
-      if(event.keyCode == 13){
-          $("#btnSearch").click();
-      }
-  });
-  
-  $("#lbSearch").click(function(){
-    $("#sqlExec").toggle();
-  });          
-</script>
+        $("#lstContentTypes").html(contentTypes.join(""));
 
+        $(":checkbox[name='contentType']").attr('checked', true);
+        $("#txtQuery").focus();
+      });
+
+
+      function renderSearchResult(result) {
+        var template = " \
+          <div class='SearchResult %{type}'> \
+            <div class='Avatar Clickable'> \
+              <img title='%{title}' src='%{avatar}' alt='[+]'> \
+            </div> \
+            <div class='Content'> \
+              <div class='Title'><a href='%{url}'>%{title}</a></div> \
+              <div class='Excerpt'>%{excerpt}</div> \
+              <div class='Detail'>%{detail}</div> \
+            </div> \
+          </div> \
+        ";
+
+        var html = template.replace(/%{type}/g, result.type).replace(/%{url}/g, result.url);
+        html = html.replace(/%{title}/g, result.title).replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail).replace(/%{avatar}/g, result.avatar);
+        console.log(html);
+        return html;
+      }
+
+      function getSelectedTypes(){
+        if($(":checkbox[name='contentType'][value='all']").is(":checked")) return "all";
+        var selectedTypes = [];
+        $.each($(":checkbox[name='contentType']:checked"), function(){
+          selectedTypes.push(this.value);
+        });
+        return selectedTypes.join(",");
+      }
+
+
+      $("#btnSearch").click(function(){
+        var query = $("#txtQuery").val();
+        var sql = $("#txtSql").val().replace("%query%", query);
+
+        var restUrl = $("#sqlExec").is(":visible") ? "/rest/search/jcr/search?q="+sql : "/rest/search?q="+query;
+        console.log(restUrl);
+        //return false;
+
+        $("#resultTypes").html("");
+        $("#result").html("");
+
+        $("body").css("cursor", "wait");
+
+        if($("#categorized").is(":checked")) {
+          $.getJSON(restUrl + "&categorized=true", function(entryMap){
+            var resultTypes = "| ";
+            var result = "";
+            $.each(entryMap, function(type, entries){
+              resultTypes = resultTypes + "<span class='Clickable ResultType'>" + type + " (" + $(entries).size() + ")" + "</span>" + " | ";
+              result = result + "<div class='SearchResultType' id='" + type.replace(/\\s/g, "_") + "'>";
+
+              $.each(entries, function(i, entry){
+                result = result + renderSearchResult(entry);
+              });
+              result = result + "</div>"; //type div
+            });
+            $("#resultTypes").html(resultTypes+"<hr/>");
+            $("#result").html(result);
+            $("#resultTypes").show();
+            $("#result").show();
+            $(".ResultType").first().click();
+            $("body").css("cursor", "auto");
+          });
+        } else {
+          $.getJSON(restUrl, function(entries){
+            var result = "";
+            $.each(entries, function(i, entry){
+              result = result + renderSearchResult(entry);
+            });
+            $("#resultTypes").hide();
+            $("#result").html(result);
+            $("#result").show();
+            $("body").css("cursor", "auto");
+          });
+        }
+
+      });
+
+      $(".SearchResult .Avatar img").live("click", function(){
+        var url = $(this).parents("div.SearchResult").find(".Content > .Title > a").attr("href");
+
+        //get jcr node properties
+        if(0 == url.indexOf("/rest/jcr/")) {
+          $.getJSON("/rest/search/jcr/props?node=" + url.replace("/rest/jcr/", ""), function(props){
+            var sProps = "";
+            $.each(props, function(key, value){
+              sProps = sProps + key + " = " + value + "\\n";
+            });
+            console.log(props);
+            alert(sProps);
+          });
+        }
+      });
+
+      $(".ResultType").live("click", function(){
+        $(".Selected").toggleClass("Selected");
+        $(this).toggleClass("Selected");
+
+        var type=$(this).text();
+        type = type.substring(0, type.indexOf(" ("));
+      type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_");
+        $(".SearchResultType").hide();
+        $("#"+type).show();
+      })
+
+      $("#txtQuery").keyup(function(event){
+        if(event.keyCode == 13){
+          $("#btnSearch").click();
+        }
+      });
+
+      $("#lbSearch").click(function(){
+        $("#sqlExec").toggle();
+      });
+
+
+      $(":checkbox[name='contentType']").live("click", function(){
+        if("all"==this.value){
+          if($(this).is(":checked")) {
+            $(":checkbox[name='contentType']").attr('checked', true);
+          } else {
+            $(":checkbox[name='contentType']").attr('checked', false);
+          }
+        } else {
+          $(":checkbox[name='contentType'][value='all']").attr('checked', false);
+        }
+      });
+
+
+    </script>

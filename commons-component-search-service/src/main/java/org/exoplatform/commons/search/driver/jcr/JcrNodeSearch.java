@@ -62,6 +62,7 @@ public class JcrNodeSearch implements Search {
             Value excerpt = row.getValue("rep:excerpt()");
             resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
             resultItem.setDetail("");
+            resultItem.setAvatar("/eXoWCMResources/skin/DefaultSkin/skinIcons/48x48/icons/NodeTypes/default.gif");
 
             result.add(resultItem);
           }
