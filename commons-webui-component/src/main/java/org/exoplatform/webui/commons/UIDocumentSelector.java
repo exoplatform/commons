@@ -16,14 +16,22 @@
  */
 package org.exoplatform.webui.commons;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
+import org.exoplatform.webui.config.annotation.ComponentConfigs;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.UIContainer;
+import org.exoplatform.webui.core.UIDropDownControl;
 import org.exoplatform.webui.core.lifecycle.Lifecycle;
+import org.exoplatform.webui.core.model.SelectItemOption;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
 
@@ -33,6 +41,7 @@ import org.exoplatform.webui.event.EventListener;
  *          hieu.lai@exoplatform.com
  * 8 Apr 2011  
  */
+@ComponentConfigs({
 @ComponentConfig(
   lifecycle = Lifecycle.class,
   template = "classpath:groovy/webui/commons/UIDocumentSelector.gtmpl",
@@ -40,7 +49,16 @@ import org.exoplatform.webui.event.EventListener;
     @EventConfig(listeners = UIDocumentSelector.SelectFileActionListener.class),
     @EventConfig(listeners = UIDocumentSelector.SelectFolderActionListener.class)
   }  
+ ),
+ @ComponentConfig(
+   type = UIDropDownControl.class, 
+   id = "DriveTypeDropDown", 
+   template = "system:/groovy/webui/core/UIDropDownControl.gtmpl",
+   events = {
+     @EventConfig(listeners = UIDocumentSelector.ChangeOptionActionListener.class)
+   }
  )
+})
 public class UIDocumentSelector extends UIContainer {
   
   protected static final String UPLOAD_AREA            = "UPLOAD_AREA";
@@ -81,8 +99,26 @@ public class UIDocumentSelector extends UIContainer {
   
   private boolean               isShowUpload          = true;
   
+  private static final String GENERAL_DRIVE = "general";
+  private static final String GROUP_DRIVE = "group";
+  private static final String PERSONAL_DRIVE = "personal";
+  
   public UIDocumentSelector() throws Exception {
     super();
+    
+    ResourceBundle resourceBundle = WebuiRequestContext.getCurrentInstance().getApplicationResourceBundle();
+    List<SelectItemOption<String>> driveTypes = new ArrayList<SelectItemOption<String>>(3);
+    driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.general-drives"), GENERAL_DRIVE));
+    driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.group-drives"), GROUP_DRIVE));
+    driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.personal-drives"), PERSONAL_DRIVE));
+    
+    UIDropDownControl uiDropDownControl = addChild(UIDropDownControl.class, "DriveTypeDropDown", null);
+    uiDropDownControl.setOptions(driveTypes);
+    
+    uiDropDownControl.setValue(PERSONAL_DRIVE);
+    
+    addChild(uiDropDownControl);
+    
     addChild(UIUploadArea.class, null, UPLOAD_AREA);
   }
 
@@ -144,4 +180,17 @@ public class UIDocumentSelector extends UIContainer {
       ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
     }
   }
+  
+  public static class ChangeOptionActionListener extends EventListener<UIDropDownControl> {
+
+    public void execute(Event<UIDropDownControl> event) throws Exception {
+      UIDropDownControl uiDropDown = event.getSource();
+      String selectedDriveType = event.getRequestContext().getRequestParameter(OBJECTID);
+      JavascriptManager jm = event.getRequestContext().getJavascriptManager();
+      jm.getRequireJS().require("SHARED/commons-document", "document").addScripts("document.DocumentSelector.changeDrive();");
+      
+      uiDropDown.setValue(selectedDriveType);
+      ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
+   }
+ }
 }

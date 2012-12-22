@@ -33,8 +33,8 @@ function DocumentItem(){
 DocumentSelector.prototype.init = function(uicomponentId, restContext){
   var me = _module.DocumentSelector;
   this.uiComponent = document.getElementById(uicomponentId);
-  this.selectFileLink = jQuery("a.SelectFile:first",this.uiComponent);
-  this.selectFolderLink = jQuery("a.SelectFolder:first",this.uiComponent);  
+  this.selectFileLink = jQuery("a.selectFile:first",this.uiComponent);
+  this.selectFolderLink = jQuery("a.selectFolder:first",this.uiComponent);  
   this.getDrivesURL = restContext + this.getDrives;
   this.getFoldersAndFilesURL = restContext + this.getFoldersAndFiles;
   this.deleteFolderOrFileURL = restContext + this.deleteFolderOrFile;
@@ -44,21 +44,21 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext){
   me.renderDetails(documentItem);
 };
 
-DocumentSelector.prototype.changeDrive = function(selectBox){
+DocumentSelector.prototype.changeDrive = function() {
+  var dropDownBox = jQuery('#DriveTypeDropDown');
+  var btn = dropDownBox.find('div.btn');
   var documentItem = new DocumentItem();
-  documentItem.driveType = selectBox.value;
+  documentItem.driveType = jQuery.trim(jQuery(btn).find('span').text());
   eXo.commons.DocumentSelector.renderDetails(documentItem);
 };
 
 DocumentSelector.prototype.renderDetails = function(documentItem) {
   var me = eXo.commons.DocumentSelector;
   // Clear old data
-  var rightWS = jQuery("div.RightWorkspace:first", this.uiComponent);
-  var actionBar = jQuery("div.ActionBar:first", this.uiComponent);
-  var tblRWS = jQuery("table:first", this.uiComponent);  
-  //remove all children:tr except for the first in tblRWS
-  jQuery("tr:gt(0)",tblRWS).remove();
+  var actionBar = jQuery("div.actions:first", this.uiComponent);
   
+  // reset
+  jQuery('#ListRecords>li').remove();
   me.selectedItem = documentItem;
   if (!me.selectedItem || !me.selectedItem.driveName) { 
     actionBar.hide();
@@ -70,85 +70,73 @@ DocumentSelector.prototype.renderDetails = function(documentItem) {
     me.selectedItem.titlePath ='';
   }
   me.renderBreadcrumbs(documentItem, null);
+  
   if (!documentItem.driveName) {
-    me.renderDrives(tblRWS, documentItem);
+    me.renderDrives(documentItem);
   } else {    
-    me.renderDetailsFolder(tblRWS, documentItem);
+    me.renderDetailsFolder(documentItem);
   }
 };
 
-DocumentSelector.prototype.renderDrives = function(tableContainer, documentItem) {
+DocumentSelector.prototype.renderDrives = function(documentItem) {
+
  var me = _module.DocumentSelector;
  var driveType = documentItem.driveType;
  var url = this.getDrivesURL;
  url += "?" + this.driveTypeParam + "=" + driveType;
  var data = me.request(url);
- var folderContainer = jQuery("Folders:first",data);
-var folderList = jQuery("Folder",folderContainer);
- if (!folderList || folderList.length <= 0) {   
-/*
-   var tdNoContent = tableContainer.insertRow(1).insertCell(0);
-   tdNoContent.innerHTML = "There is no drive";
-   tdNoContent.className = "Item TRNoContent";
-*/
-   //if (me.allowDeleteItem == true) {
-     //tdNoContent.setAttribute("colspan", 4);
-   //} else {
-     //tdNoContent.setAttribute("colspan", 3);
-   //}   
-   jQuery("tbody", tableContainer).append('<tr><td></td></tr>');
-   var tdNoContent = jQuery("td:first",jQuery("tr:last", tableContainer));
-   tdNoContent.html("There is no drive");
-   tdNoContent.addClass("Item TRNoContent");
-   return;
+ 
+ var folderContainer = jQuery("Folders:first", data);
+ var folderList = jQuery("Folder", folderContainer);
+
+ var listRecords = jQuery('#ListRecords');
+
+ // reset
+ //listRecords.remove();
+
+ if (!folderList || folderList.length <= 0) { 
+    var item = jQuery('<li/>', {
+                              'class' : 'listItem'
+                            });
+    item.html("There is no drive");
+    item.addClass("Item TRNoContent");
+    listRecords.append(item);
+    return;
  }
- var clazz = 'EventItem';
- var k = 0;
+
  for ( var i = 0; i < folderList.length; i++) {
-   k = i + 1;
-   //if (clazz == 'EventItem') {
-     //clazz = 'OddItem';
-   //} else if (clazz == 'OddItem') {
-     //clazz = 'EventItem';
-   //}
    var name = folderList[i].getAttribute("name");
    var driveName = folderList[i].getAttribute("name");
    var nodeType = folderList[i].getAttribute("nodeType");
    var workspaceName = folderList[i].getAttribute("workspaceName");
    var canAddChild = folderList[i].getAttribute("canAddChild");
-  /*
-   var newRow = tableContainer.insertRow(i + 1);
-   newRow.className = clazz + " Cell";
-   var cellZero = newRow.insertCell(0);
-   cellZero.onclick = function() {
-     _module.DocumentSelector.browseFolder(this);
-   }
-   */
-   var cellZero_innerHTML = '<a class="Item Drive_'+ nodeType+ '" name="' + name
-        + '" driveType="' + driveType+ '" driveName="' + driveName
-        + '" workspaceName="' + workspaceName + '" canAddChild="' + canAddChild
-        + '" onclick="javascript:void(0);">' + name
-        + '</a>';
-      
-   jQuery("tr",tableContainer).eq(i).after('<tr></tr>');
-   var newRow = jQuery("tr",tableContainer).eq(i+1);
-   newRow.addClass(clazz + " Cell");
-   newRow.append('<td></td>');
-   var cellZero = jQuery("td",newRow).eq(0);
-   cellZero.html(cellZero_innerHTML);
-   cellZero.click(function() {
-     _module.DocumentSelector.browseFolder(this);
-   });
+   var uiIconFolder = me.getClazzIcon(folderList[i].getAttribute("nodeType"))
+   var iconEl = jQuery('<i/>', {
+                              'class' : uiIconFolder
+                            });
 
-   //newRow.insertCell(1);
-   //newRow.insertCell(2);
-   //if (me.allowDeleteItem == true) {
-     //newRow.insertCell(3);
-   //}     
+   var link = jQuery('<a/>',{
+      'class' : 'Item Drive_'+ nodeType,
+      'driveType' : driveType,
+      'driveName' : driveName,
+      'workspaceName' : workspaceName,
+      'name' : name,
+      'canAddChild' : canAddChild,
+      'href' : 'javascript:void(0);',
+      'text' : name
+    }).on('click', function() {
+      _module.DocumentSelector.browseFolder(this);
+    }).append(iconEl);
+    
+    var item = jQuery('<li/>', {
+                              'class' : 'listItem'
+                            }).append(link);
+
+    listRecords.append(item);
  }
 };
 
-DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documentItem) {
+DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
   var me = _module.DocumentSelector;
   var driveType = documentItem.driveType;
   var driveName = documentItem.driveName;
@@ -169,90 +157,61 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
   var fileContainer = data.getElementsByTagName("Files")[0];
   var fileList = fileContainer.getElementsByTagName("File");
 
+  var listRecords = jQuery('#ListRecords');
+
   if ((!fileList || fileList.length <= 0)
       && (!folderList || folderList.length <= 0)) {
-/*
-    var tdNoContent = tableContainer.insertRow(1).insertCell(0);
-    tdNoContent.innerHTML = "There is no folder or file";
-    tdNoContent.className = "Item TRNoContent";
-*/
-    //if (me.allowDeleteItem == true) {
-      //tdNoContent.setAttribute("colspan", 4);
-    //} else {
-      //tdNoContent.setAttribute("colspan", 3);
-    //}    
-   jQuery("tbody", tableContainer).append('<tr><td></td></tr>');
-   var tdNoContent = jQuery("td:first",jQuery("tr:last", tableContainer));
-
-   tdNoContent.html("There is no folder or file");
-   tdNoContent.addClass("Item TRNoContent");
+	  var item = jQuery('<li/>', {
+	                      'class' : 'listItem'
+	                    });
+    item.html("There is no folder or file");
+    item.addClass("Item TRNoContent");
+    listRecords.append(item);
     return;
-  } else {
-    var listItem = '';
-    var clazz = 'EventItem';
-    var k = 0;
-    for ( var i = 0; i < folderList.length; i++) {
-      k = i + 1;
-      //if (clazz == 'EventItem') {
-        //clazz = 'OddItem';
-      //} else if (clazz == 'OddItem') {
-        //clazz = 'EventItem';
-      //}
-      var clazzItem = me.getClazzIcon(folderList[i].getAttribute("nodeType"));
-      var jcrPath = folderList[i].getAttribute("path");
-      var nodeType = folderList[i].getAttribute("folderType");
-      var name = folderList[i].getAttribute("name");
-      var title = folderList[i].getAttribute("title");
-      var titlePath = folderList[i].getAttribute("titlePath");
-      
-      var childFolder = folderList[i].getAttribute("currentFolder");
-      var canRemove = folderList[i].getAttribute("canRemove");
-      var canAddChild = folderList[i].getAttribute("canAddChild");
+  }
+	  
+	for ( var i = 0; i < folderList.length; i++) { // render folders
+	  var folderIcon = me.getClazzIcon(folderList[i].getAttribute("nodeType"));
+	  var jcrPath = folderList[i].getAttribute("path");
+	  var nodeType = folderList[i].getAttribute("folderType");
+	  var name = folderList[i].getAttribute("name");
+	  var title = folderList[i].getAttribute("title");
+	  var titlePath = folderList[i].getAttribute("titlePath");
+	  
+	  var childFolder = folderList[i].getAttribute("currentFolder");
+	  var canRemove = folderList[i].getAttribute("canRemove");
+	  var canAddChild = folderList[i].getAttribute("canAddChild");
+    var workspaceName = folderList[i].getAttribute("workspaceName");
+    
+    var iconEl = jQuery('<i/>', {
+                              'class' : folderIcon
+                            });
 
-      /*
-      var newRow = tableContainer.insertRow(i + 1);
-      newRow.className = clazz + " Cell";
-      
-      var cellZero = newRow.insertCell(0);
-      cellZero.onclick = function() {
-        _module.DocumentSelector.browseFolder(this);
-      }
-     */     
-      var cellZero_innerHTML = '<a class="Item IconDefault ' + clazzItem + '" name="'
-          + name + '" title="'+ title  + '" driveType="' + driveType + '" driveName="'
-          + driveName + '"workSpaceName="' + workSpaceName + '" canAddChild="' + canAddChild
-          + '" currentFolder="' + childFolder + '" titlePath="'+ titlePath  + '" jcrPath="' + jcrPath
-          + '" onclick="javascript:void(0);">' + title
-          + '</a>';
-      
-      jQuery("tr",tableContainer).eq(i).after('<tr></tr>');
-      var newRow = jQuery("tr",tableContainer).eq(i+1);
-      newRow.addClass(clazz + " Cell");
-      newRow.append('<td></td>');
-      var cellZero = jQuery("td",newRow).eq(0);
-      cellZero.html(cellZero_innerHTML);
-      cellZero.click(function() {
-   	   _module.DocumentSelector.browseFolder(this);
-      });
+    var link = jQuery('<a/>',{
+      'class' : 'Item',
+      'name' : name,
+      'title' : title,
+      'driveType' : driveType,
+      'driveName' : driveName,
+      'workspaceName' : workspaceName,
+      'currentFolder' : childFolder,
+      'canAddChild' : canAddChild,
+      'titlePath' : titlePath,
+      'jcrPath' : jcrPath,
+      'href' : 'javascript:void(0);',
+      'text' : title
+     }).on('click', function() {
+      _module.DocumentSelector.browseFolder(this);
+     }).append(iconEl);
+    
+     var item = jQuery('<li/>', {
+                              'class' : 'listItem'
+                            }).append(link);
 
-      //newRow.insertCell(1);
-      //newRow.insertCell(2);
-      //if (me.allowDeleteItem == true) {
-        //var cellThird = newRow.insertCell(3);
-        //cellThird.onclick = function() {
-          //eXo.commons.DocumentSelector.remove(this);
-        //}
-        //cellThird.innerHTML = '<a class="Item" name="' + name + '"driveName="'
-            //+ driveName + '"workSpaceName="' + workSpaceName + '"itemPath="'
-            //+ childFolder + '" onclick="javascript:void(0);">Remove</a>';
-      //}
-    }
-    for ( var j = 0; j < fileList.length; j++) {
-      //if (clazz == 'EventItem') {
-        //clazz = 'OddItem';
-      //} else if (clazz == 'OddItem') {
-        //clazz = 'EventItem';
-      //}
+     listRecords.append(item);
+    } // end for
+    
+    for ( var j = 0; j < fileList.length; j++) { // render files
       var jcrPath = fileList[j].getAttribute("path");
       var nodeType = fileList[j].getAttribute("nodeType");
       var nodeTypeIcon = nodeType.replace(":", "_") + "48x48Icon Folder";
@@ -268,71 +227,37 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
         size = (Math.round(size / (1024 * 1024) * 100)) / 100;
         size += '&nbsp;MB';
       }
-      var clazzItem = me.getClazzIcon(fileList[j].getAttribute("nodeType"));
-/*
-      var newRow = tableContainer.insertRow(k + j + 1);
-      newRow.className = clazz + " Cell";
-      var cellZero = newRow.insertCell(0);
-      cellZero.tabIndex = "1";
-      cellZero.onclick = function() {
-        _module.DocumentSelector.submitSelectedFile(this);
-      }
-*/
-      var cellZero_innerHTML = '<a class="Item ' + clazzItem + '" jcrPath="'
-          + jcrPath + '" name="'+ node+'" title ="'+ title +'" onclick="javascript:void(0);">'
-          + title + '</a>';     
-
-      jQuery("tr",tableContainer).eq(k+j).after('<tr></tr>');
-      var newRow = jQuery("tr",tableContainer).eq(k+j+1);
-      newRow.addClass(clazz + " Cell");
-      newRow.append('<td></td>');
-      var cellZero = jQuery("td",newRow).eq(0);
-      cellZero.html(cellZero_innerHTML);
-      cellZero.click(function() {
-   	   _module.DocumentSelector.submitSelectedFile(this) ;
-      });
-      //newRow.insertCell(1).innerHTML = '<div class="Item">' + fileList[j]
-          //.getAttribute("dateCreated") + '</div>';
-      //newRow.insertCell(2).innerHTML = '<div class="Item">' + size + '</div>';
-      //if (me.allowDeleteItem == true) {
-        //var cellThird = newRow.insertCell(3);
-        //cellThird.onclick = function() {
-          //eXo.commons.DocumentSelector.remove(this);
-        //}
-        //cellThird.innerHTML = '<a class="Item"  name="' + node
-            //+ '" driveName="' + driveName + '"workSpaceName="'
-            //+ workSpaceName + '"itemPath="' + currentFolder + '/' + node
-            //+ '" onclick="javascript:void(0);">Remove</a>';
-      //}
+      
+      var fileIcon = me.getClazzIcon(fileList[j].getAttribute("nodeType"));
+    
+    
+	    var iconEl = jQuery('<i/>', {
+	                              'class' : fileIcon
+	                            });
+	
+	    var link = jQuery('<a/>',{
+	      'class' : 'Item',
+	      'name' : node,
+	      'title' : title,
+	      'jcrPath' : jcrPath,
+	      'href' : 'javascript:void(0);',
+	      'text' : title
+	     }).on('click', function() {
+	      _module.DocumentSelector.submitSelectedFile(this);
+	     }).append(iconEl);
+	    
+	     var item = jQuery('<li/>', {
+	                              'class' : 'listItem'
+	                            }).append(link);
+	
+	     listRecords.append(item);
     }
-  }
 };
 
-DocumentSelector.prototype.selectUploadedFile = function(fileName){
-  var rightWS = jQuery("div.RightWorkspace:first", this.uiComponent);
-  var tblRWS = jQuery("table:first", rightWS);  
-  /*
-  var items = jQuery("a.Item", tblRWS);
-  for ( var j = 0; j < items.length; j++) {
-    var item = items[j];
-    var itemName = item.attr("name");
-    if (itemName && itemName == fileName) {
-      item.parentNode.onclick();
-      item.parentNode.focus();
-    }
-  }  
-  */
-  var selectedItem = jQuery('a.Item[name="'+fileName+'"]', tblRWS).parent();
-  selectedItem.click();
-  selectedItem.focus();  
-};
-
-
-DocumentSelector.prototype.submitSelectedFile = function(tableCell){
+DocumentSelector.prototype.submitSelectedFile = function(item){
   var me = _module.DocumentSelector;   
-  var detailNode = jQuery("a:first-child",tableCell);
-  var nodePath = detailNode.attr("jcrPath");
-  var fileName = detailNode.attr("title");
+  var nodePath = jQuery(item).attr("jcrPath");
+  var fileName = jQuery(item).attr("title");
     
   if (me.selectFileLink) {
     var link = me.selectFileLink.attr("href");
@@ -342,12 +267,12 @@ DocumentSelector.prototype.submitSelectedFile = function(tableCell){
     window.location = link;
   }
   if (me.selectFile) {
-    if (me.selectFile.hasClass("Selected")) {
-      me.selectFile.removeClass("Selected");
+    if (me.selectFile.hasClass("selected")) {
+      me.selectFile.removeClass("selected");
     }
   }
-  me.selectFile = jQuery(tableCell).parent();
-  me.selectFile.addClass("Selected");
+  me.selectFile = jQuery(item).parent();
+  me.selectFile.addClass("selected");
   if (me.selectedItem) {
     me.renderBreadcrumbs(me.selectedItem, fileName);
   }
@@ -367,17 +292,16 @@ DocumentSelector.prototype.submitSelectedFolder = function(documentItem){
   }
 };
 
-DocumentSelector.prototype.browseFolder = function(tableCell){
+DocumentSelector.prototype.browseFolder = function(link){
   var me = _module.DocumentSelector;
-  var detailNode = jQuery("a:first-child",tableCell);
   var documentItem = new DocumentItem();
-  documentItem.driveType = detailNode.attr("driveType");
-  documentItem.driveName = detailNode.attr("driveName");
-  documentItem.workspaceName = detailNode.attr("workspaceName");
-  documentItem.currentFolder = detailNode.attr("currentFolder");
-  documentItem.jcrPath = detailNode.attr("jcrPath");
-  documentItem.canAddChild = detailNode.attr("canAddChild");
-  documentItem.titlePath = detailNode.attr("titlePath");
+  documentItem.driveType = jQuery(link).attr("driveType");
+  documentItem.driveName = jQuery(link).attr("driveName");
+  documentItem.workspaceName = jQuery(link).attr("workspaceName");
+  documentItem.currentFolder = jQuery(link).attr("currentFolder");
+  documentItem.jcrPath = jQuery(link).attr("jcrPath");
+  documentItem.canAddChild = jQuery(link).attr("canAddChild");
+  documentItem.titlePath = jQuery(link).attr("titlePath");
   me.renderDetails(documentItem);
   me.submitSelectedFolder(documentItem);
 };
@@ -489,17 +413,18 @@ function BreadCrumbs() {
       tmpDocumentItem.driveName = documentItem.driveName;
       tmpDocumentItem.workspaceName = documentItem.workspaceName;
       this.renderDrive(tmpDocumentItem);
-      var breadCrumbItem = documentItem.currentFolder.split("");
-      var breadCrumbTitle = documentItem.titlePath.split("");
+      var breadCrumbItem = documentItem.currentFolder.split("/");
+      var breadCrumbTitle = documentItem.titlePath.split("/");
       if (breadCrumbItem != "") {
         tmpDocumentItem.currentFolder = '';
         tmpDocumentItem.titlePath = '';
+        
         for ( var i = 0; i < breadCrumbItem.length; i++) {
           tmpDocumentItem.currentFolder += breadCrumbItem[i];
           tmpDocumentItem.titlePath += breadCrumbTitle[i];
           this.appendBreadCrumbNode(tmpDocumentItem, breadCrumbTitle[i]);
-          tmpDocumentItem.currentFolder += "";
-          tmpDocumentItem.titlePath += "";
+          tmpDocumentItem.currentFolder += "/";
+          tmpDocumentItem.titlePath += "/";
         }
       }
     }
@@ -520,7 +445,11 @@ function BreadCrumbs() {
   };
   
   BreadCrumbs.prototype.appendBreadCrumbNode = function(documentItem, name) {
-    var node = document.createElement("li");
+    //if (name == null) return;
+    
+    
+    var appendedNode = jQuery('<li/>');
+    
     var className = 'normal';
     if (name ==null){
       name ='';
@@ -528,29 +457,32 @@ function BreadCrumbs() {
     } else {
       name = "" + name;
     }
-    var driveType = (documentItem.driveType) ? ' driveType="'
-        + documentItem.driveType + '"' : "";
-    var driveName = (documentItem.driveName) ? ' driveName="'
-        + documentItem.driveName + '"' : "";
-    var workspaceName = (documentItem.workspaceName) ? ' workspaceName="'
-        + documentItem.workspaceName + '"' : "";
-    var currentFolder = (documentItem.currentFolder) ? ' currentFolder="'
-        + documentItem.currentFolder + '"' : "";
-    var titlePath = (documentItem.titlePath) ? ' titlePath="' + documentItem.titlePath + '"'
-        : "";
-    node.className = '';
-    node.innerHTML =  '<span class="uiIconMiniArrowRight">&nbsp;</span>' +
-								    	'<a class="'
-								        + className
-								        + '"'
-								        + driveType
-								        + driveName
-								        + workspaceName
-								        + currentFolder
-								        + titlePath
-								        + '" href="javascript:void(0);" onclick="eXo.commons.DocumentSelector.actionBreadcrumbs(this);">'
-								        + name + '</a>';
-    this.breadCrumb.append(node);
+    
+    var anchorEl = jQuery('<a/>',{
+      'class' : className,
+      'driveType' : documentItem.driveType,
+      'driveName' : documentItem.driveName,
+      'workspaceName' : documentItem.workspaceName,
+      'currentFolder' : documentItem.currentFolder,
+      'titlePath' : (documentItem.titlePath) ?  documentItem.titlePath : "",
+      'href' : 'javascript:void(0);',
+      'text' : name
+    }).on('click', function() {
+      eXo.commons.DocumentSelector.actionBreadcrumbs(this);
+    });
+    
+    if ( (name.length > 0) && ((appendedNode.find('span.uiIconMiniArrowRight')).length == 0) ) {
+        var iconEl = jQuery('<span/>', {
+          'class' : 'uiIconMiniArrowRight'
+        });
+        
+        appendedNode.append(iconEl);
+        appendedNode.append(anchorEl);
+        this.breadCrumb.append(appendedNode);
+    } else {
+        this.breadCrumb.append(anchorEl);
+    }
+    
   };
 };
 
