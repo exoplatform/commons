@@ -1,16 +1,3 @@
-.uiDocumentSelector .listContainer {
-	background: #f8f8f8;
-	border: 1px solid #d9d9d9;
-	padding: 10px;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.uiDocumentSelector .listContainer li {
-	display: block; 
-	padding: 3px 0;
-}
 
 
 .UISaveAttachment #FileNameInput {
