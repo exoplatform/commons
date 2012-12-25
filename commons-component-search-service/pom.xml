@@ -4,7 +4,7 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>4.0.0.Alpha1-SNAPSHOT</version>
+    <version>4.0.0.Alpha1-com-unified-search-SNAPSHOT</version>
   </parent>
   <artifactId>commons-component-search-service</artifactId>
   <packaging>jar</packaging>
@@ -12,6 +12,7 @@
   <properties>
     <org.codehaus.jackson.version>1.9.7</org.codehaus.jackson.version>
     <org.exoplatform.social.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.social.version>
+    <org.exoplatform.forum.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.forum.version>
   </properties>
   <dependencies>
     <dependency>
@@ -33,6 +34,11 @@
     <dependency>
       <groupId>org.exoplatform.social</groupId>
       <artifactId>social-component-core</artifactId>
+    </dependency>
+  <dependency>
+      <groupId>org.exoplatform.forum</groupId>
+      <artifactId>forum-forum-service</artifactId>
+      <version>${org.exoplatform.forum.version}</version>    	
     </dependency>
   </dependencies>
 </project>
