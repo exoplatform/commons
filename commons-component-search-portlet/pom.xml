@@ -18,7 +18,8 @@
     </dependency>
     <dependency>
       <groupId>org.juzu</groupId>
-      <artifactId>juzu-builder</artifactId>
+      <artifactId>juzu-bom-core</artifactId>
+      <version>${org.juzu.version}</version>
     </dependency>
     <dependency>
       <groupId>org.juzu</groupId>
@@ -62,7 +63,7 @@
         <dependencies>
           <dependency>
             <groupId>org.juzu</groupId>
-            <artifactId>juzu-builder</artifactId>
+            <artifactId>juzu-bom-core</artifactId>
             <version>${org.juzu.version}</version>
           </dependency>
         </dependencies>
