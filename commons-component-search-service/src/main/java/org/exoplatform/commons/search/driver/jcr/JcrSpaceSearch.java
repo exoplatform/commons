@@ -14,7 +14,9 @@ public class JcrSpaceSearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     try {
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search(JcrSearchService.buildSql("soc:spacedefinition", "CONTAINS(*, '" + query + "')", "", query));
+      int offset = 0;
+      int limit = 0;
+      Collection<JcrSearchResult> jcrResults = JcrSearchService.search(JcrSearchService.buildSql("soc:spacedefinition", "CONTAINS(*, '" + query + "')", "", query), offset, limit);
       SpaceService spaceSvc = (SpaceService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SpaceService.class);
 
       for(JcrSearchResult jcrResult: jcrResults) {

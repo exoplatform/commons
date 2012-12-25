@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.exoplatform.commons.search.util.QueryParser;
 
 /**
  * Created by The eXo Platform SAS
@@ -70,25 +71,9 @@ public class SearchService {
   public static Collection<SearchResult> search(String query) {
     Collection<SearchResult> results = new ArrayList<SearchResult>();
     try {
-      List<String> types = new ArrayList<String>();
-      
-      // Handle the case "mary type:[user, topic]"
-      Matcher matcher = Pattern.compile("type:\\[(.+?)\\]").matcher(query);
-      while(matcher.find()){
-        for(String type:matcher.group(1).split(",")){
-          types.add(type.trim());
-        }
-      }
-      query = matcher.replaceAll("");
-      
-      // Handle the case "mary type:user"
-      matcher = Pattern.compile("type:(\\w+)").matcher(query);
-      while(matcher.find()){
-         types.add(matcher.group(1).trim());
-      }
-      query = matcher.replaceAll("");
-              
-      query = query.trim();
+      QueryParser parser = new QueryParser(query).parseFor("type");
+      List<String> types = parser.getResult();
+      query = parser.getQuery();
       if(query.isEmpty()) query = "*"; //TODO: handle this in each handler
 
       for(Entry<String, SearchType> entry:registry.entrySet()){
