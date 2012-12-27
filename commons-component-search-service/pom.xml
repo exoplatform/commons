@@ -41,10 +41,5 @@
       <artifactId>forum-forum-service</artifactId>
       <version>${org.exoplatform.forum.version}</version>    	
     </dependency>
-  <dependency>
-      <groupId>org.exoplatform.forum</groupId>
-      <artifactId>forum-forum-service</artifactId>
-      <version>${org.exoplatform.forum.version}</version>    	
-    </dependency>
   </dependencies>
 </project>
