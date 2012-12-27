@@ -46,6 +46,15 @@
 			<path>/ckeditor/eXoConfig.js</path>
 		</script>
 	</module>
+	
+	<module>
+		<name>commons-space-switcher</name>
+		<as>space-switcher</as>
+		<script>
+			<name>eXo.commons.UISpaceSwitcher</name>
+			<path>/javascript/eXo/commons/UISpaceSwitcher.js</path>
+		</script>
+	</module>
 
 </gatein-resources>
 

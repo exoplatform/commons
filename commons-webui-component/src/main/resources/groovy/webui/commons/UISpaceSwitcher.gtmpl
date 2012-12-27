@@ -1,0 +1,27 @@
+<%
+  import java.util.List;
+  import org.exoplatform.wiki.commons.Utils;
+
+  String baseRestUrl = uicomponent.getBaseRestUrl();
+  String defaultValueForTextSearch = _ctx.appRes("UISpaceSwitcher.msg.filter-spaces");
+  
+  String selectSpaceAction = URLEncoder.encode(uicomponent.event(uicomponent.SELECT_SPACE_ACTION), "utf-8");
+  
+  def rcontext = _ctx.getRequestContext() ;
+  def requireJs = rcontext.getJavascriptManager().getRequireJS();
+  requireJs.require("SHARED/commons-space-switcher", "spaceSwitcher");
+  requireJs.addScripts("spaceSwitcher.UISpaceSwitcher.init('" + uicomponent.id  + "','" + baseRestUrl + "','" + defaultValueForTextSearch + "','" + selectSpaceAction + "');");
+  
+  String currentSpaceName = uicomponent.getCurrentSpaceName();
+%>
+
+<div class="$uicomponent.id" id="$uicomponent.id">
+  <div class="SpaceChooser" onclick="eXo.wiki.UISpaceSwitcher.openComboBox(event, this);">$currentSpaceName</div>
+  <div class="SpaceChooserPopup" style="display:none">
+    <div class="title"><%= _ctx.appRes(uicomponent.id + ".title.select-location"); %></div>
+    <div class="PortalSpace"></div>
+    <div class="UserSpace"></div>
+    <div class="SpaceSearch"><input type="text" class="SpaceSearchText LostFocus" value="Filter spaces"/></div>
+    <div class="SpaceList"></div>
+  </div>
+</div>
