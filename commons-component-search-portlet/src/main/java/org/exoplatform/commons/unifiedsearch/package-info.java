@@ -16,18 +16,13 @@
  */
 
 @Application
-@Portlet 
+@Portlet
 @Assets(
-        scripts = {
-          @Script(id = "jquery", src = "jquery-1.7.1.min.js", location = AssetLocation.CLASSPATH)
-          },
-          stylesheets = @Stylesheet(src = "bootstrap.css", location = AssetLocation.CLASSPATH)
-      )
-package org.exoplatform.commons.unifiedsearch;
+        scripts =  @Script(id = "jquery", src = "jquery-1.7.1.min.js", location = AssetLocation.CLASSPATH)
+) package org.exoplatform.commons.unifiedsearch;
 
 import juzu.Application;
-import juzu.plugin.portlet.Portlet;
 import juzu.asset.AssetLocation;
 import juzu.plugin.asset.Assets;
 import juzu.plugin.asset.Script;
-import juzu.plugin.asset.Stylesheet;
+import juzu.plugin.portlet.Portlet;

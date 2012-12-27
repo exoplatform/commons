@@ -7,7 +7,8 @@
     <version>4.0.0.Alpha1-com-unified-search-SNAPSHOT</version>
   </parent>
   <artifactId>commons-component-search-portlet</artifactId>
-  <packaging>war</packaging>
+  <!-- we don't put war due to juzu packaging with assembly -->
+  <packaging>jar</packaging>
   <name>eXo Commons - Search - Portlet</name>
   <description>Commons search portlet</description>
   <dependencies>
@@ -18,24 +19,29 @@
     </dependency>
     <dependency>
       <groupId>org.juzu</groupId>
+      <artifactId>juzu-core</artifactId>
+      <version>${org.juzu.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.juzu</groupId>
       <artifactId>juzu-bom-core</artifactId>
       <version>${org.juzu.version}</version>
     </dependency>
     <dependency>
       <groupId>org.juzu</groupId>
-      <artifactId>juzu-plugins-less</artifactId>
+      <artifactId>juzu-plugins-portlet</artifactId>
+      <version>${org.juzu.version}</version>
     </dependency>
     <dependency>
       <groupId>org.juzu</groupId>
-      <artifactId>juzu-plugins-portlet</artifactId>
+      <artifactId>juzu-plugins-less</artifactId>
+      <version>${org.juzu.version}</version>
     </dependency>
   </dependencies>
   <build>
-    <finalName>unified-search</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
         <configuration>
           <compilerArguments>
             <sourcepath>${project.basedir}/src/main/java</sourcepath>
@@ -44,22 +50,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <execution>
-            <id>gatein</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <finalName>${project.build.finalName}</finalName>
-              <descriptorRefs>
-                <descriptorRef>gatein</descriptorRef>
-              </descriptorRefs>
-            </configuration>
-          </execution>
-        </executions>
         <dependencies>
           <dependency>
             <groupId>org.juzu</groupId>
@@ -69,8 +59,21 @@
         </dependencies>
         <configuration>
           <attach>true</attach>
-          <appendAssemblyId>false</appendAssemblyId>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <appendAssemblyId>false</appendAssemblyId>
+              <descriptors>
+                <descriptor>${project.basedir}/src/main/assemblies/plf-spring.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
