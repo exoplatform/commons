@@ -48,9 +48,9 @@ import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.commons.search.SearchService;
 import org.exoplatform.commons.search.util.JsonMap;
+import org.exoplatform.commons.search.util.QueryParser;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
@@ -65,12 +65,9 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Path("/search/jcr")
 @Produces(MediaType.APPLICATION_JSON)
 public class JcrSearchService implements ResourceContainer {
-  public static final String BASE_SQL = "SELECT rep:excerpt(), jcr:primaryType FROM ${from} WHERE ${where} ${option}";
   public static String[] IGNORED_TYPES;
   public static String[] IGNORED_FIELDS;
   
-  private static Map<String, List<String>> searchScope; //e.g: {repository:[collaboration, knowledge, social], ...}
-
   private static final CacheControl cacheControl;
   static {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -78,64 +75,57 @@ public class JcrSearchService implements ResourceContainer {
     cacheControl.setNoCache(true);
     cacheControl.setNoStore(true);
   }
+  
+  public static Collection<JcrSearchResult> search(String query) {
+    QueryParser parser = new QueryParser(query);
+    
+    parser = parser.parseFor("repository");
+    String repositoryName = parser.getResults().isEmpty() ? "repository" : parser.getResults().get(0);
+    parser = parser.parseFor("workspace");
+    String workspaceName = parser.getResults().isEmpty() ? "collaboration" : parser.getResults().get(0);
 
-  public static Map<String, List<String>> getSearchScope() {
-    return searchScope;
-  }
-
-  public static void setSearchScope(Map<String, List<String>> searchScope) {
-    JcrSearchService.searchScope = searchScope;
-  }
-
-  public static void setSearchScope(String json) {
-    JcrSearchService.searchScope = new JsonMap<String, List<String>>(json);
+    parser = parser.parseFor("offset"); 
+    int offset = parser.getResults().isEmpty() ? 0 : Integer.parseInt(parser.getResults().get(0));
+    parser = parser.parseFor("limit");
+    int limit = parser.getResults().isEmpty() ? 0 : Integer.parseInt(parser.getResults().get(0));
+    
+    return search(repositoryName, workspaceName, buildSql(parser.getQuery()), offset, limit);
   }
   
-  public static Collection<JcrSearchResult> search(String sql, int offset, int limit) {
+  private static Collection<JcrSearchResult> search(String repositoryName, String workspaceName, String sql, int offset, int limit) {
+    System.out.format("[UNIFIED SEARCH] JcrSearchService.search()\nrepository = %s\nworkspace = %s\nsql = %s\noffset = %s\nlimit = %s\n", repositoryName, workspaceName, sql, offset, limit);
     Collection<JcrSearchResult> results = new ArrayList<JcrSearchResult>();
     try {
       RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
-      for(RepositoryEntry repositoryEntry:repositoryService.getConfig().getRepositoryConfigurations()){
-        String repoName = repositoryEntry.getName();
-        if(!searchScope.containsKey(repoName)) continue; //ignore repositories which are not in the search scope
-        System.out.format("[UNIFIED SEARCH]: searching repository '%s'...\n", repoName);
-        List<String> searchableWorkspaces = searchScope.get(repoName);
         
-        ManageableRepository repository = repositoryService.getRepository(repoName);
-        List<JcrSearchResult> result = new ArrayList<JcrSearchResult>();    
+      ManageableRepository repository = repositoryService.getRepository(repositoryName);
+      List<JcrSearchResult> result = new ArrayList<JcrSearchResult>();    
+      
+      Session session = repository.login(workspaceName);
+      QueryManager queryManager = session.getWorkspace().getQueryManager();
+      
+      QueryImpl jcrQuery = (QueryImpl) queryManager.createQuery(sql, Query.SQL);
+      jcrQuery.setOffset(offset);
+      jcrQuery.setLimit(limit);
+      QueryResult queryResult = jcrQuery.execute();
+      
+      RowIterator rit = queryResult.getRows();
+      while(rit.hasNext()){
+        Row row = rit.nextRow();
+        JcrSearchResult resultItem = new JcrSearchResult();
+
+        resultItem.setRepository(repository.getConfiguration().getName());
+        resultItem.setWorkspace(session.getWorkspace().getName());
+        resultItem.setPath(row.getValue("jcr:path").getString());
+        resultItem.setPrimaryType(row.getValue("jcr:primaryType").getString());
+        Value excerpt = row.getValue("rep:excerpt()");
+        resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
+        resultItem.setScore(row.getValue("jcr:score").getLong());
         
-        for(String workspaceName:repository.getWorkspaceNames()){
-          if(!searchableWorkspaces.contains(workspaceName)) continue; //ignore workspaces which are not in the search scope
-          System.out.format("[UNIFIED SEARCH]: searching workspace '%s'...\n", workspaceName);
+        result.add(resultItem);
+      }
 
-          Session session = repository.login(workspaceName);
-          QueryManager queryManager = session.getWorkspace().getQueryManager();
-          
-          System.out.println("[UNIFIED SEARCH] query = " + sql);
-          QueryImpl jcrQuery = (QueryImpl) queryManager.createQuery(sql, Query.SQL);
-          jcrQuery.setOffset(offset);
-          jcrQuery.setLimit(limit);
-          QueryResult queryResult = jcrQuery.execute();
-          
-          RowIterator rit = queryResult.getRows();
-          while(rit.hasNext()){
-            Row row = rit.nextRow();
-            JcrSearchResult resultItem = new JcrSearchResult();
-
-            resultItem.setRepository(repository.getConfiguration().getName());
-            resultItem.setWorkspace(session.getWorkspace().getName());
-            resultItem.setPath(row.getValue("jcr:path").getString());
-            resultItem.setPrimaryType(row.getValue("jcr:primaryType").getString());
-            Value excerpt = row.getValue("rep:excerpt()");
-            resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
-            resultItem.setScore(row.getValue("jcr:score").getLong());
-            
-            result.add(resultItem);
-          }
-        }
-
-        results.addAll(result);
-      }      
+      results.addAll(result);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -195,10 +185,9 @@ public class JcrSearchService implements ResourceContainer {
     return props;
   }
   
-  // for testing
   @GET
   @Path("/ignored-types")
-  public static Response getIgnoredTypes() {
+  public static Response ignoredTypes() {
     try {
       return Response.ok(IGNORED_TYPES, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
@@ -210,7 +199,7 @@ public class JcrSearchService implements ResourceContainer {
   @GET
   @Path("/ignored-types={ignoredTypes}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public static Response setIgnoredTypes(@PathParam("ignoredTypes") String ignoredTypes) {
+  public static Response ignoredTypes(@PathParam("ignoredTypes") String ignoredTypes) {
     try {
       IGNORED_TYPES = ignoredTypes.split(",");
       return Response.ok(IGNORED_TYPES, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
@@ -222,7 +211,7 @@ public class JcrSearchService implements ResourceContainer {
 
   @GET
   @Path("/ignored-fields")
-  public static Response getIgnoredFields() {
+  public static Response ignoredFields() {
     try {
       return Response.ok(IGNORED_FIELDS, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
@@ -234,7 +223,7 @@ public class JcrSearchService implements ResourceContainer {
   @GET
   @Path("/ignored-fields={ignoredFields}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public static Response setIgnoredFields(@PathParam("ignoredFields") String ignoredFields) {
+  public static Response ignoredFields(@PathParam("ignoredFields") String ignoredFields) {
     try {
       IGNORED_FIELDS = ignoredFields.split(",");
       return Response.ok(IGNORED_FIELDS, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
@@ -246,7 +235,7 @@ public class JcrSearchService implements ResourceContainer {
 
   @GET
   @Path("/search")
-  public Response search(@QueryParam("q") String query, @QueryParam("categorized") boolean categorized) {
+  public static Response search(@QueryParam("q") String query, @QueryParam("categorized") boolean categorized) {
     try {
       if(categorized) {
         return Response.ok(SearchService.categorize(new JcrNodeSearch().search(query)), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
@@ -261,7 +250,7 @@ public class JcrSearchService implements ResourceContainer {
 
   @GET
   @Path("/props")
-  public static Response jcrNodeProperties(@QueryParam("node") String nodePath) {
+  public static Response props(@QueryParam("node") String nodePath) {
     try {
       return Response.ok(getJcrNodeProperties(nodePath), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
@@ -270,7 +259,7 @@ public class JcrSearchService implements ResourceContainer {
     }
   }
 
-  private static Map<String, Object> getJcrNodeProperties(String nodePath) throws Exception {
+  public static Map<String, Object> getJcrNodeProperties(String nodePath) throws Exception {
     int firstSlash = nodePath.indexOf("/");
     int secondSlash = nodePath.indexOf("/", firstSlash+1);
     String repositoryName = nodePath.substring(0, firstSlash);
@@ -283,10 +272,32 @@ public class JcrSearchService implements ResourceContainer {
     return JcrSearchService.getNodeProperties(node);
   }
 
-  public static String buildSql(String from, String where, String option, String query){
-    where = where + (where.isEmpty()?"":" AND NOT ") + repeat("CONTAINS(%s, '"+ query + "')", IGNORED_FIELDS);
-    where = where + " AND NOT " + repeat("jcr:primaryType='%s'", IGNORED_TYPES);
-    return BASE_SQL.replace("${from}", from).replace("${where}", where).replace("${option}", option);
+  private static String buildSql(String query){
+    QueryParser parser = new QueryParser(query); 
+
+    parser = parser.parseFor("from");
+    String from = parser.getResults().isEmpty() ? "nt:base" : parser.getResults().get(0);
+
+    parser = parser.parseFor("nodetypes"); //for testing
+    String[] nodetypes = new String[parser.getResults().size()];
+    parser.getResults().toArray(nodetypes);
+    
+    parser = parser.parseFor("where");
+    String where = parser.getResults().isEmpty() ? "CONTAINS(*,'${query}')" : parser.getResults().get(0);
+    if(0!=IGNORED_FIELDS.length) where = where + (where.isEmpty()?"":" AND NOT ") + repeat("CONTAINS(%s,'${query}')", IGNORED_FIELDS);
+    if(0!=nodetypes.length) where = where + " AND " + repeat("jcr:primaryType='%s'", nodetypes);
+    if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + repeat("jcr:primaryType='%s'", IGNORED_TYPES);
+
+    parser = parser.parseFor("orderby");
+    String orderby = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
+    parser = parser.parseFor("ordertype");
+    String ordertype = parser.getResults().isEmpty() ? "desc" : parser.getResults().get(0);
+    String option = "ORDER BY " + orderby + " " + ordertype;
+
+    query = parser.getQuery();
+    
+    String sql = "SELECT rep:excerpt(), jcr:primaryType FROM ${from} WHERE ${where} ${option}";
+    return sql.replace("${from}", from).replace("${where}", where).replace("${option}", option).replaceAll("\\$\\{query\\}", query);
   }
   
   private static String repeat(String format, String[] strArr){

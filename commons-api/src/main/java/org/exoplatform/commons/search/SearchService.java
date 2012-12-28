@@ -17,13 +17,12 @@
 package org.exoplatform.commons.search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -70,17 +69,23 @@ public class SearchService {
 
   public static Collection<SearchResult> search(String query) {
     Collection<SearchResult> results = new ArrayList<SearchResult>();
+    List<String> types;
     try {
-      QueryParser parser = new QueryParser(query).parseFor("type");
-      List<String> types = parser.getResult();
-      query = parser.getQuery();
-      if(query.isEmpty()) query = "*"; //TODO: handle this in each handler
-
+      // sql mode (for testing)
+      if(query.startsWith("SELECT")) {
+        types = Arrays.asList("jcrNode");
+      } else {
+        QueryParser parser = new QueryParser(query).parseFor("type");
+        types = parser.getResults();
+        query = parser.getQuery();
+        if(query.isEmpty()) query = "*"; //TODO: handle this in each handler
+      }
+      
       for(Entry<String, SearchType> entry:registry.entrySet()){
         SearchType searchType = entry.getValue();
-        if(!types.isEmpty() && !types.contains(searchType.getName())) continue; // search requested types only
+        if(!types.isEmpty() && !types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only
         Class<? extends Search> handler = searchType.getHandler();
-        System.out.println("[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
+        System.out.println("\n[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
         results.addAll(handler.newInstance().search(query));
       }
     } catch (Exception e) {

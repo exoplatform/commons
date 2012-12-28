@@ -37,7 +37,6 @@ public class UnifiedSearch implements ResourceContainer {
       Properties props = new Properties();
       props.load(this.getClass().getResourceAsStream("/conf/configuration.properties"));
       SearchService.setRegistry(props.getProperty("registry"));
-      JcrSearchService.setSearchScope(props.getProperty("jcr-search-scope"));
       JcrSearchService.IGNORED_TYPES = props.getProperty("jcr-ignored-types").split(",");
       JcrSearchService.IGNORED_FIELDS = props.getProperty("jcr-ignored-fields").split(",");
     } catch (IOException e) {

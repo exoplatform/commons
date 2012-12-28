@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class QueryParser {
   private String query;
-  private List<String> result;
+  private List<String> results;
 
   public QueryParser(String query) {
     this.query = query;
@@ -22,24 +22,24 @@ public class QueryParser {
     this.query = query;
   }
 
-  public List<String> getResult() {
-    return result;
+  public List<String> getResults() {
+    return results;
   }
 
   public QueryParser parseFor(String type) {
     List<String> list = new ArrayList<String>();
-    Matcher matcher = Pattern.compile(type + ":([\\S]+)").matcher(query);
+    Matcher matcher = Pattern.compile("\\b" + type + "\\s*=\\s*([\\S]+)").matcher(query);
     while (matcher.find()) {
       String founds = matcher.group(1);
-      list.addAll(Arrays.asList(founds.split("[,;]")));
+      list.addAll(Arrays.asList(founds.split("[;]")));
     }
     query = matcher.replaceAll("").trim();
-    result = list;
+    results = list;
     return this;
   }
 
   @Override
   public String toString() {
-    return String.format("(\"%s\", %s)", query, result);
+    return String.format("(\"%s\", %s)", query, results);
   }
 }

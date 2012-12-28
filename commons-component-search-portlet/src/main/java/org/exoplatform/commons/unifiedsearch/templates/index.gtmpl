@@ -90,7 +90,6 @@
         <label id="lbSearch" class="Clickable" style="padding-left: 5px;">Search</label>
         <input type="text" id="txtQuery"/>
         <input type="button" id="btnSearch" value="Go"/>
-        <span style="margin-left: 10px;">Categorized result<input type="checkbox" id="categorized" name="categorized" checked></span>
       </div>
 
       <hr/>
@@ -111,8 +110,8 @@
 
       <div id="resultPage">
         <div id="resultTypes" style="display: none; margin-bottom: 15px;"></div>
-        <div id="resultHeader" style="margin-bottom: 10px;">
-          <span style="font-weight: bold; font-size: large;">Results:</span>
+        <div style="margin-bottom: 10px;">
+          <span id="resultHeader"></span>
           <span style="float: right;">
             Sort By:
             <select id="lstSortBy">
@@ -123,11 +122,14 @@
           </span>
         </div>
         <div id="result" style="display: none;"></div>
+        <div id="showMore" style="display: none; text-align: center; margin-bottom: 20px;"><input type="button" id="btnShowMore" value="Show More Results"/></div>
       </div>
 
     </div>
 
     <script>
+      var LIMIT = 10;
+
       // Load content types
       $.getJSON("/rest/search/registry", function(registry){
         var contentTypes = [];
@@ -167,15 +169,26 @@
         $.each($(":checkbox[name='contentType']:checked"), function(){
           selectedTypes.push(this.value);
         });
-        return selectedTypes.join(",");
+        return selectedTypes.join(";");
       }
 
+      function getTypeByDisplayName(typeDisplayName) {
+        return $("#lstContentTypes li:contains('" + typeDisplayName + "') input:checkbox").attr("value");
+      }
+
+      function getViewingType() {
+        return $(".ResultType.Selected");
+      }
 
       $("#btnSearch").click(function(){
         var query = $("#txtQuery").val();
-        var sql = $("#txtSql").val().replace("%query%", query);
+        query = query + " type=" + getSelectedTypes();
+        query = query + " offset=" + 0;
+        query = query + " limit=" + LIMIT;
+        //alert(query);
 
-        var restUrl = $("#sqlExec").is(":visible") ? "/rest/search/jcr/search?q="+sql : "/rest/search?q="+query;
+        var restUrl = $("#sqlExec").is(":visible") ? "/rest/search/jcr/search?q="+$("#txtSql").val() : "/rest/search?q="+query;
+        restUrl = restUrl + "&categorized=true"
         console.log(restUrl);
         //return false;
 
@@ -184,40 +197,95 @@
 
         $("body").css("cursor", "wait");
 
-        if($("#categorized").is(":checked")) {
-          $.getJSON(restUrl + "&categorized=true", function(entryMap){
-            var resultTypes = "| ";
-            var result = "";
-            $.each(entryMap, function(type, entries){
-              resultTypes = resultTypes + "<span class='Clickable ResultType'>" + type + " (" + $(entries).size() + ")" + "</span>" + " | ";
-              result = result + "<div class='SearchResultType' id='" + type.replace(/\\s/g, "_") + "'>";
+        $.getJSON(restUrl, function(entryMap){
+          var resultTypes = "| ";
+          var result = "";
 
-              $.each(entries, function(i, entry){
-                result = result + renderSearchResult(entry);
-              });
-              result = result + "</div>"; //type div
-            });
-            $("#resultTypes").html(resultTypes+"<hr/>");
-            $("#result").html(result);
-            $("#resultTypes").show();
-            $("#result").show();
-            $(".ResultType").first().click();
-            $("body").css("cursor", "auto");
-          });
-        } else {
-          $.getJSON(restUrl, function(entries){
-            var result = "";
+          $.each(entryMap, function(type, entries){
+            resultTypes = resultTypes + "<span class='Clickable ResultType' offset=0 numEntries=" + $(entries).size() + ">" + type + "</span>" + " | ";
+            result = result + "<div class='SearchResultType' id='" + getTypeByDisplayName(type) + "-type'>";
+
             $.each(entries, function(i, entry){
               result = result + renderSearchResult(entry);
             });
-            $("#resultTypes").hide();
-            $("#result").html(result);
-            $("#result").show();
-            $("body").css("cursor", "auto");
+            result = result + "</div>"; //type div
           });
-        }
+
+          if(""==result) {
+            $("#resultHeader").html("No result for <strong>" + $("#txtQuery").val() + "<strong>");
+            $("#showMore").hide();
+            $("body").css("cursor", "auto");
+            return;
+          }
+
+          $("#resultTypes").html(resultTypes+"<hr/>");
+          $("#resultTypes").show();
+
+          $("#result").html(result);
+          $("#result").show();
+          $("body").css("cursor", "auto");
+
+          $(".ResultType").first().click();
+        });
 
       });
+
+
+      $("#btnShowMore").click(function(){
+        var $viewingType = getViewingType();
+        var type = getTypeByDisplayName($viewingType.text());
+        var offset = parseInt($viewingType.attr("offset")) + LIMIT;
+
+        var query = $("#txtQuery").val();
+        query = query + " type=" + type;
+        query = query + " offset=" + offset;
+        query = query + " limit=" + LIMIT;
+
+        var restUrl = "/rest/search?q="+query;
+
+        $("#"+type+"-type").html("");
+        $("body").css("cursor", "wait");
+
+        $.getJSON(restUrl, function(entries){
+          var result = "";
+
+          $.each(entries, function(i, entry){
+            result = result + renderSearchResult(entry);
+          });
+
+          var resultHeader = (0==entries.length) ? "No more result" : "Results " + (offset+1) + " to " + (offset+entries.length);
+          resultHeader = resultHeader + " for <strong>" + $("#txtQuery").val() + "<strong>";
+          $("#resultHeader").html(resultHeader);
+          if(entries.length==LIMIT) $("#showMore").show(); else $("#showMore").hide();
+
+          $("#"+type+"-type").html(result);
+          $("#"+type+"-type").show();
+          $("body").css("cursor", "auto");
+
+          $viewingType.attr("offset", offset);
+          $viewingType.attr("numEntries", entries.length);
+        });
+      });
+
+
+      $(".ResultType").live("click", function(){
+        $(".Selected").toggleClass("Selected");
+        $(this).toggleClass("Selected");
+
+        var offset = parseInt($(this).attr("offset"));
+        var numEntries = parseInt($(this).attr("numEntries"));
+
+        var resultHeader = (0==numEntries) ? "No more result" : "Results " + (offset+1) + " to " + (offset+numEntries);
+        resultHeader = resultHeader + " for <strong>" + $("#txtQuery").val() + "<strong>";
+        $("#resultHeader").html(resultHeader);
+        if(numEntries==LIMIT) $("#showMore").show(); else $("#showMore").hide();
+
+        //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
+        var type=getTypeByDisplayName($(this).text());
+        $(".SearchResultType").hide(); //hide all other types
+        $("#"+type+"-type").show();
+      });
+
 
       $(".SearchResult .Avatar img").live("click", function(){
         var url = $(this).parents("div.SearchResult").find(".Content > .Title > a").attr("href");
@@ -235,27 +303,6 @@
         }
       });
 
-      $(".ResultType").live("click", function(){
-        $(".Selected").toggleClass("Selected");
-        $(this).toggleClass("Selected");
-
-        var type=$(this).text();
-        type = type.substring(0, type.indexOf(" ("));
-      type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_");
-        $(".SearchResultType").hide();
-        $("#"+type).show();
-      })
-
-      $("#txtQuery").keyup(function(event){
-        if(event.keyCode == 13){
-          $("#btnSearch").click();
-        }
-      });
-
-      $("#lbSearch").click(function(){
-        $("#sqlExec").toggle();
-      });
-
 
       $(":checkbox[name='contentType']").live("click", function(){
         if("all"==this.value){
@@ -269,5 +316,16 @@
         }
       });
 
+
+      $("#txtQuery").keyup(function(event){
+        if(event.keyCode == 13){
+          $("#btnSearch").click();
+        }
+      });
+
+
+      $("#lbSearch").click(function(){
+        $("#sqlExec").toggle();
+      });
 
     </script>

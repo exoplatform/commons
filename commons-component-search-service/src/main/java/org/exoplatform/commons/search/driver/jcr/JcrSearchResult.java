@@ -63,6 +63,7 @@ public class JcrSearchResult {
     ManageableRepository repository = repositoryService.getRepository(repositoryName);
     Session session = repository.login(workspaceName);
     Node node = session.getRootNode().getNode(path.substring(1));
+    session.logout();
     return JcrSearchService.getNodeProperties(node);
   }
 

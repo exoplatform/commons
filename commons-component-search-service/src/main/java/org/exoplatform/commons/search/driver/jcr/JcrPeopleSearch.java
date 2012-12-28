@@ -17,9 +17,7 @@ public class JcrPeopleSearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     try {
-      int offset = 0;
-      int limit = 0;
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search(JcrSearchService.buildSql("soc:profiledefinition", "CONTAINS(*, '" + query + "')", "", query), offset, limit);
+      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:profiledefinition where=CONTAINS(*,'${query}') " + query);
       IdentityManager identityManager = (IdentityManager)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(IdentityManager.class);
       
       for(JcrSearchResult jcrResult: jcrResults) {
