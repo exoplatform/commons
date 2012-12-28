@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
 import org.exoplatform.container.ExoContainerContext;
@@ -62,8 +63,8 @@ public class JcrForumSearch implements Search {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEEE, MMMMMMMM d, yyyy K:mm a");
         buf.append(topic.getLastPostDate()!=null?sdf.format(topic.getLastPostDate()):"");        
         
-        result.setDetail(buf.toString());
-        String avatar = topic.getIcon();
+        result.setDetail(buf.toString());        
+        String    avatar = "/forum/skin/DefaultSkin/webui/skinIcons/24x24/icons/HotThreadNewPost.gif";
         result.setAvatar(avatar);
         searchResults.add(result);
       }      
