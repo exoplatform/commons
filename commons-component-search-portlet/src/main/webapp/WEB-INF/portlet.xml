@@ -12,6 +12,10 @@
        <name>juzu.run_mode</name>
        <value>dev</value>
      </init-param>
+     <init-param>
+       <name>juzu.inject</name>
+       <value>spring</value>
+     </init-param>
      <supports>
        <mime-type>text/html</mime-type>
      </supports>

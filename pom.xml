@@ -58,9 +58,9 @@
     <org.exoplatform.ws.version>2.2.10-GA-SNAPSHOT</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.14.10-GA-SNAPSHOT</org.exoplatform.jcr.version>
     <org.gatein.portal.version>3.4.0.Final</org.gatein.portal.version>
-    <org.exoplatform.social.version>4.0.0.Alpha1-kill-exobuild-SNAPSHOT</org.exoplatform.social.version>
+    <org.exoplatform.social.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.social.version>
     <org.codehaus.jackson.version>1.9.7</org.codehaus.jackson.version>
-    <org.juzu.version>0.5.1</org.juzu.version>
+    <org.juzu.version>0.6.0-beta5</org.juzu.version>
     <org.apache.solr.version>3.6.0</org.apache.solr.version>
     <org.exoplatform.ks.version>2.2.10</org.exoplatform.ks.version>
     <elasticsearch.version>0.19.10</elasticsearch.version>
@@ -148,6 +148,25 @@
         <artifactId>commons-component-common</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-component-search-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-component-search-portlet</artifactId>
+        <version>${project.version}</version>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-component-search-portlet</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+      </dependency>
+
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-component-product</artifactId>
@@ -522,6 +541,21 @@
             <groupId>javax.servlet</groupId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.juzu</groupId>
+        <artifactId>juzu-core</artifactId>
+        <version>${org.juzu.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.juzu</groupId>
+        <artifactId>juzu-bom-core</artifactId>
+        <version>${org.juzu.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.juzu</groupId>
+        <artifactId>juzu-plugins-portlet</artifactId>
+        <version>${org.juzu.version}</version>
       </dependency>
       <dependency>
         <groupId>org.juzu</groupId>

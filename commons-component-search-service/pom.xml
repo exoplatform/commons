@@ -9,10 +9,6 @@
   <artifactId>commons-component-search-service</artifactId>
   <packaging>jar</packaging>
   <name>eXo Commons - Search - Service</name>
-  <properties>
-    <org.codehaus.jackson.version>1.9.7</org.codehaus.jackson.version>
-    <org.exoplatform.social.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.social.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
@@ -33,6 +29,14 @@
     <dependency>
       <groupId>org.exoplatform.social</groupId>
       <artifactId>social-component-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.forum</groupId>
+      <artifactId>forum-forum-service</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>org.exoplatform.wiki</groupId>
+    	<artifactId>wiki-service</artifactId>
     </dependency>
   </dependencies>
 </project>
