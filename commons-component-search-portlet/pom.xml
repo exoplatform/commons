@@ -52,9 +52,9 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <dependencies>
           <dependency>
-            <groupId>org.juzu</groupId>
-            <artifactId>juzu-bom-core</artifactId>
-            <version>${org.juzu.version}</version>
+            <groupId>org.exoplatform.commons</groupId>
+            <artifactId>commons-juzu-packaging</artifactId>
+            <version>${project.version}</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -68,9 +68,9 @@
             <phase>package</phase>
             <configuration>
               <appendAssemblyId>false</appendAssemblyId>
-              <descriptors>
-                <descriptor>${project.basedir}/src/main/assemblies/plf-spring.xml</descriptor>
-              </descriptors>
+              <descriptorRefs>
+                <descriptorRef>platform-spring</descriptorRef>
+              </descriptorRefs>
             </configuration>
           </execution>
         </executions>
