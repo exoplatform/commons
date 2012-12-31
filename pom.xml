@@ -25,6 +25,7 @@
     <module>commons-extension-webapp</module>
     <module>commons-fck</module>
     <module>commons-gifbackport</module>
+    <module>commons-juzu-packaging</module>
     <module>commons-testing</module>
     <module>commons-webui-component</module>
     <module>commons-webui-ext</module>
@@ -158,6 +159,11 @@
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-gifbackport</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-juzu-packaging</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
