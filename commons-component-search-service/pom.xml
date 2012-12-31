@@ -33,10 +33,12 @@
     <dependency>
       <groupId>org.exoplatform.forum</groupId>
       <artifactId>forum-forum-service</artifactId>
+      <version>${org.exoplatform.forum.version}</version> <!-- SHOULD NOT BE SPECIFIED -->
     </dependency>
     <dependency>
     	<groupId>org.exoplatform.wiki</groupId>
     	<artifactId>wiki-service</artifactId>
+      <version>${org.exoplatform.wiki.version}</version> <!-- SHOULD NOT BE SPECIFIED -->
     </dependency>
   </dependencies>
 </project>
