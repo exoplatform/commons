@@ -8,5 +8,14 @@
       <empty-folder-name>Folder's name can not be empty.</empty-folder-name>
     </label>
   </UIDocumentSelector>
+  <UISpaceSwitcher>
+    <msg>
+      <filter-spaces>Filter spaces</filter-spaces>
+      <no-space>No space.</no-space>
+    </msg>
+    <title>
+      <my-space>My Space</my-space>
+    </title>
+  </UISpaceSwitcher>
 </bundle>
 

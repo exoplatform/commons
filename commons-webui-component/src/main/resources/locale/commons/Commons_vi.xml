@@ -27,5 +27,14 @@
       <YEARS>năm trước</YEARS>
     </type>
   </TimeConvert>
+  <UISpaceSwitcher>
+    <msg>
+      <filter-spaces>Tìm kiếm space</filter-spaces>
+      <no-space>Không có space nào</no-space>
+    </msg>
+    <title>
+      <my-space>Space của tôi</my-space>
+    </title>
+  </UISpaceSwitcher>
 </bundle>
 

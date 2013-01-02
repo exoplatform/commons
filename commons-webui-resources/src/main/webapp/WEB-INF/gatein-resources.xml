@@ -49,11 +49,15 @@
 	
 	<module>
 		<name>commons-space-switcher</name>
-		<as>space-switcher</as>
+		<as>spaceSwitcher</as>
 		<script>
 			<name>eXo.commons.UISpaceSwitcher</name>
 			<path>/javascript/eXo/commons/UISpaceSwitcher.js</path>
 		</script>
+		<depends>
+			<module>jquery</module>	
+			<as>jQuery</as>	
+		</depends>
 	</module>
 
 </gatein-resources>

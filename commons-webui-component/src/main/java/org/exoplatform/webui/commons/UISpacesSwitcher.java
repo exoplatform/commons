@@ -16,9 +16,18 @@
  */
 package org.exoplatform.webui.commons;
 
+import java.util.ResourceBundle;
+
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.xml.PortalContainerInfo;
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.webui.util.Util;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.web.application.Parameter;
+import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -66,6 +75,43 @@ public class UISpacesSwitcher extends UIContainer {
   
   public String getCurrentSpaceName() {
     return currentSpaceName;
+  }
+  
+  public String getMySpaceLabel() {
+    ResourceBundle bundle = RequestContext.getCurrentInstance().getApplicationResourceBundle();
+    return bundle.getString("UISpaceSwitcher.title.my-space");
+  }
+  
+  public String getUsername() {
+    try {
+      ConversationState conversationState = ConversationState.getCurrent();
+      return conversationState.getIdentity().getUserId();
+    }catch(Exception e){
+      return "system" ;
+    }    
+  }
+  
+  public String getPortalSpaceId() {
+    PortalRequestContext portalRequestContext = Util.getPortalRequestContext();
+    String portalOwner = portalRequestContext.getPortalOwner();
+    String portalName = getPortalName();
+    StringBuilder spaceId = new StringBuilder();
+    spaceId.append("/");
+    spaceId.append(portalName);
+    spaceId.append("/");
+    spaceId.append(portalOwner);
+    return spaceId.toString();
+  }
+  
+  private String getPortalName() {
+    ExoContainer container = ExoContainerContext.getCurrentContainer() ; 
+    PortalContainerInfo containerInfo = (PortalContainerInfo)container.getComponentInstanceOfType(PortalContainerInfo.class);
+    return containerInfo.getContainerName();
+  }
+  
+  public String getPortalSpaceName() {
+    PortalRequestContext portalRequestContext = Util.getPortalRequestContext();
+    return portalRequestContext.getPortalOwner();
   }
   
   protected String getBaseRestUrl() {
