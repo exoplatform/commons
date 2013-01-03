@@ -30,8 +30,8 @@ public class JcrNodeSearch implements Search {
     Collection<SearchResult> results = new ArrayList<SearchResult>();
     try {
       QueryParser parser = new QueryParser(query); 
-      parser = parser.parseFor("orderby");
-      String orderby = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
+      parser = parser.parseFor("sortBy");
+      String sortBy = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
       
       Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=nt:base where=CONTAINS(*,'${query}') " + query);
       for(JcrSearchResult jcrResult: jcrResults) {
@@ -40,8 +40,8 @@ public class JcrNodeSearch implements Search {
         String score = String.valueOf(jcrResult.getScore());
         result.setTitle(nodeUrl + " (score = " + score + ")");
         result.setExcerpt(jcrResult.getExcerpt());
-        String orderbyValue = orderby.equals("jcr:score()") ? score : (String)jcrResult.getProperty(orderby);
-        result.setDetail(orderby + " = " + orderbyValue);
+        String sortByValue = sortBy.equals("jcr:score()") ? score : (String)jcrResult.getProperty(sortBy);
+        result.setDetail(sortBy + " = " + sortByValue);
         result.setAvatar("/eXoWCMResources/skin/DefaultSkin/skinIcons/48x48/icons/NodeTypes/default.gif");
 
         results.add(result);
@@ -56,10 +56,10 @@ public class JcrNodeSearch implements Search {
   private static Collection<SearchResult> sqlExec(String sql) {
     System.out.format("[UNIFIED SEARCH] JcrSearchService.search()\nsql = %s\n", sql);
     Collection<SearchResult> results = new ArrayList<SearchResult>();
-    String orderby = "jcr:score()";
+    String sortBy = "jcr:score()";
     Matcher matcher = Pattern.compile("ORDER BY\\s+([\\S]+)").matcher(sql);
     if(matcher.find()) {
-      orderby = matcher.group(1);
+      sortBy = matcher.group(1);
     }
 
     try {
@@ -95,8 +95,8 @@ public class JcrNodeSearch implements Search {
             resultItem.setTitle(collection + path + " (score = " + score + ")");
             Value excerpt = row.getValue("rep:excerpt()");
             resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
-            String orderbyValue = orderby.equals("jcr:score()") ? score : "&lt;Click the icon to see all properties of this node&gt;";
-            resultItem.setDetail(orderby + " = " + orderbyValue);
+            String sortByValue = sortBy.equals("jcr:score()") ? score : "&lt;Click the icon to see all properties of this node&gt;";
+            resultItem.setDetail(sortBy + " = " + sortByValue);
             resultItem.setAvatar("/eXoWCMResources/skin/DefaultSkin/skinIcons/48x48/icons/NodeTypes/default.gif");
 
             result.add(resultItem);

@@ -278,21 +278,21 @@ public class JcrSearchService implements ResourceContainer {
     parser = parser.parseFor("from");
     String from = parser.getResults().isEmpty() ? "nt:base" : parser.getResults().get(0);
 
-    parser = parser.parseFor("nodetypes"); //for testing
-    String[] nodetypes = new String[parser.getResults().size()];
-    parser.getResults().toArray(nodetypes);
+    parser = parser.parseFor("nodeTypes"); //for testing
+    String[] nodeTypes = new String[parser.getResults().size()];
+    parser.getResults().toArray(nodeTypes);
     
     parser = parser.parseFor("where");
     String where = parser.getResults().isEmpty() ? "CONTAINS(*,'${query}')" : parser.getResults().get(0);
     if(0!=IGNORED_FIELDS.length) where = where + (where.isEmpty()?"":" AND NOT ") + repeat("CONTAINS(%s,'${query}')", IGNORED_FIELDS);
-    if(0!=nodetypes.length) where = where + " AND " + repeat("jcr:primaryType='%s'", nodetypes);
+    if(0!=nodeTypes.length) where = where + " AND " + repeat("jcr:primaryType='%s'", nodeTypes);
     if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + repeat("jcr:primaryType='%s'", IGNORED_TYPES);
 
-    parser = parser.parseFor("orderby");
-    String orderby = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
-    parser = parser.parseFor("ordertype");
-    String ordertype = parser.getResults().isEmpty() ? "desc" : parser.getResults().get(0);
-    String option = "ORDER BY " + orderby + " " + ordertype;
+    parser = parser.parseFor("sortBy");
+    String sortBy = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
+    parser = parser.parseFor("sortType");
+    String sortType = parser.getResults().isEmpty() ? "desc" : parser.getResults().get(0);
+    String option = "ORDER BY " + sortBy + " " + sortType;
 
     query = parser.getQuery();
     
