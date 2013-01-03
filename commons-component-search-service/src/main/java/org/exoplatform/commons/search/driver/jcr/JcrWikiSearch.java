@@ -3,13 +3,11 @@ package org.exoplatform.commons.search.driver.jcr;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.wiki.mow.api.Page;
 import org.exoplatform.wiki.mow.api.Wiki;
@@ -27,9 +25,7 @@ public class JcrWikiSearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     try {
-      int offset = 0;
-      int limit = 0;      
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search(JcrSearchService.buildSql("wiki:page", "CONTAINS(*, '" + query + "')", "", query), offset, limit);
+      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=wiki:page where=CONTAINS(*,'${query}') " + query);
       
       WikiService wikiService = (WikiService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(WikiService.class);
       for (JcrSearchResult jcrResult: jcrResults){

@@ -23,9 +23,7 @@ public class JcrForumSearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     try {
-      int offset = 0;
-      int limit = 0;      
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search(JcrSearchService.buildSql("exo:topic", "CONTAINS(*, '" + query + "')", "", query), offset, limit);
+      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=knowledge from=exo:topic where=CONTAINS(*,'${query}') " + query);      
       
       ForumService forumService = (ForumService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ForumService.class);
       for (JcrSearchResult jcrResult: jcrResults){
