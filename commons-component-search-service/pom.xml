@@ -38,5 +38,10 @@
     	<groupId>org.exoplatform.wiki</groupId>
     	<artifactId>wiki-service</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>org.exoplatform.calendar</groupId>
+    	<artifactId>calendar-service</artifactId>
+    </dependency>
+    
   </dependencies>
 </project>
