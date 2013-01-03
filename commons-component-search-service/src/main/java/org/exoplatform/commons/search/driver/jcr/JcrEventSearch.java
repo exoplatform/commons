@@ -45,7 +45,7 @@ public class JcrEventSearch implements Search{
     try {
       int offset = 0;
       int limit = 0;      
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search(JcrSearchService.buildSql("exo:calendarEvent", "CONTAINS(*, '" + query + "')", "", query), offset, limit);
+      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=exo:calendarEvent where=CONTAINS(*,'${query}') " + query);
       
       CalendarService calendarService = (CalendarService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(CalendarService.class);
       for (JcrSearchResult jcrResult: jcrResults){                

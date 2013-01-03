@@ -209,9 +209,7 @@
 
         var restUrl = "/rest/search?q="+query;
 
-        $("#"+type+"-type").html("");
         $("body").css("cursor", "wait");
-        $("#showMore").hide();
 
         $.getJSON(restUrl, function(entries){
           var result = "";
@@ -242,15 +240,9 @@
         if(query.indexOf(" type=")==-1) query = query + " type=" + getSelectedTypes();
         query = query + " offset=" + 0;
         query = query + " limit=" + LIMIT;
-        //alert(query);
 
         var restUrl = $("#sqlExec").is(":visible") ? "/rest/search/jcr/search?q="+$("#txtSql").val() : "/rest/search?q="+query;
         restUrl = restUrl + "&categorized=true"
-        console.log(restUrl);
-        //return false;
-
-        $("#resultTypes").html("");
-        $("#result").html("");
 
         $("body").css("cursor", "wait");
 
@@ -269,6 +261,8 @@
           });
 
           if(""==result) {
+            $("#resultTypes").html("");
+            $("#result").html("");
             $("#resultHeader").html("No result for <strong>" + $("#txtQuery").val() + "<strong>");
             $("#showMore").hide();
             $("body").css("cursor", "auto");
@@ -302,7 +296,6 @@
 
         //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
         var type=getTypeByDisplayName($(this).text());
-        $("#lstSortBy").html("");
         var sortableFields = REGISTRY[type].properties.sortableFields;
         var sortBy = ["<option value='jcr:score()'>Relevancy</option>"];
         if(sortableFields != undefined) {
