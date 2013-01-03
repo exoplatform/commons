@@ -61,9 +61,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.ks</groupId>
-      <artifactId>exo.ks.eXoApplication.forum.service</artifactId>
-      <version>${org.exoplatform.ks.version}</version>
+      <groupId>org.exoplatform.forum</groupId>
+      <artifactId>forum-forum-service</artifactId>
+      <version>${org.exoplatform.forum.version}</version> <!-- SHOULD NOT BE SPECIFIED -->
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -74,7 +74,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>1.6.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
