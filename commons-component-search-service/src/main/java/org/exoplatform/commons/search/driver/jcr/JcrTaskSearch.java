@@ -33,39 +33,40 @@ import org.exoplatform.container.ExoContainerContext;
  *          canhpv@exoplatform.com
  * Jan 3, 2013  
  */
-public class JcrEventSearch implements Search{
+public class JcrTaskSearch implements Search{
 
   @Override
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=exo:calendarEvent where=\"exo:eventType=\'Event\'\" " + query);
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=exo:calendarEvent where=\"exo:eventType=\'Task\' \" " + query);
 
     CalendarService calendarService = (CalendarService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(CalendarService.class);
     for (JcrSearchResult jcrResult: jcrResults){                
       try {
-        String eventId = (String)jcrResult.getProperty("exo:id");        
+        String taskId = (String)jcrResult.getProperty("exo:id");        
         String calendarId = (String) jcrResult.getProperty("exo:calendarId");
         
-        CalendarEvent calEvent = calendarService.getGroupEvent(eventId);                
+        CalendarEvent calTask = calendarService.getGroupEvent(taskId);                
         Calendar calendar = calendarService.getGroupCalendar(calendarId);
 
-        SearchResult result = new SearchResult("event",calendar.getPrivateUrl());
-        result.setTitle(calEvent.getSummary());
-        result.setExcerpt(calEvent.getDescription()!=null?calEvent.getDescription():calEvent.getSummary());
+        SearchResult result = new SearchResult("task",calendar.getPublicUrl());
+        result.setTitle(calTask.getSummary());
+        result.setExcerpt(calTask.getDescription()!=null?calTask.getDescription():calTask.getSummary());
         StringBuffer buf = new StringBuffer();
-        buf.append(calEvent.getEventCategoryName());
+        buf.append(calTask.getEventCategoryName());
         buf.append(" - ");
         SimpleDateFormat sdf = new SimpleDateFormat("EEEEE, MMMMMMMM d, yyyy K:mm a");
-        buf.append(sdf.format(calEvent.getFromDateTime()));        
+        buf.append(sdf.format(calTask.getFromDateTime()));        
         buf.append(" - ");
-        buf.append(calEvent.getLocation()!=null?calEvent.getLocation():calendar.getName());
+        buf.append(calTask.getLocation()!=null?calTask.getLocation():calendar.getName());
 
         result.setDetail(buf.toString());        
-        String    avatar = "/csResources/gadgets/events/skin/Events.png";
+        String    avatar = "/csResources/gadgets/tasks/skin/Tasks.png";
         result.setAvatar(avatar);
         searchResults.add(result);
       } catch (Exception e) {
-        e.printStackTrace();
+        //e.printStackTrace();
+        continue;
       } 
     }
     return searchResults;

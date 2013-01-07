@@ -75,8 +75,7 @@ public class JcrWikiSearch implements Search {
     }
   }  
 
-  public String getWikiNameById(String wikiId, Wiki wiki) throws Exception {
-    System.out.println();
+  public String getWikiNameById(String wikiId, Wiki wiki) throws Exception {    
     if (wiki instanceof PortalWiki) {
       String displayName = wiki.getName();
       int slashIndex = displayName.lastIndexOf('/');
