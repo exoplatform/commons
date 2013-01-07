@@ -1,6 +1,7 @@
 package org.exoplatform.commons.search.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import javax.ws.rs.Consumes;
@@ -34,9 +35,11 @@ public class UnifiedSearch implements ResourceContainer {
   public UnifiedSearch(){
     // TODO: move all config to portlet war or PLF's configuration.properties
     try {
+      InputStream registryJson = this.getClass().getResourceAsStream("/conf/registry.json");
+      if(null!=registryJson) SearchService.setRegistry(new java.util.Scanner(registryJson).useDelimiter("\\A").next());
+      
       Properties props = new Properties();
-      props.load(this.getClass().getResourceAsStream("/conf/configuration.properties"));
-      SearchService.setRegistry(props.getProperty("registry"));
+      props.load(this.getClass().getResourceAsStream("/conf/configuration.properties"));      
       JcrSearchService.IGNORED_TYPES = props.getProperty("jcr-ignored-types").split(",");
       JcrSearchService.IGNORED_FIELDS = props.getProperty("jcr-ignored-fields").split(",");
     } catch (IOException e) {

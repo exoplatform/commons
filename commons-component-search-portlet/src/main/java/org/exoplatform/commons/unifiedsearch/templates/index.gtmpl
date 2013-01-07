@@ -80,16 +80,15 @@
 
 
       #sortType {
-        background-repeat: no-repeat;
         padding-right: 15px;
       }
 
       #sortType.Asc {
-        background: url("/eXoResources/skin/DefaultSkin/skinIcons/16x16/icons/NavigationIcons/BlueUpArrow.gif");
+        background: url("/eXoResources/skin/DefaultSkin/skinIcons/16x16/icons/NavigationIcons/BlueUpArrow.gif") no-repeat;
       }
 
       #sortType.Desc {
-        background: url("/eXoResources/skin/DefaultSkin/skinIcons/16x16/icons/NavigationIcons/BlueDownArrow.gif");
+        background: url("/eXoResources/skin/DefaultSkin/skinIcons/16x16/icons/NavigationIcons/BlueDownArrow.gif") no-repeat;
       }
 
       .Ellipsis {
@@ -135,7 +134,7 @@
         <div style="margin-bottom: 10px;">
           <span id="resultHeader"></span>
           <span style="float: right;">
-            Sort By: <select id="lstSortBy"><option value='jcr:score()'>Relevancy</option></select><span id="sortType" class="Desc Clickable"></span>
+            Sort By: <select id="lstSortBy"><option value='jcr:score()'>Relevancy</option></select><span id="sortType" class="Desc Clickable">&nbsp;</span>
           </span>
         </div>
         <div id="result" style="display: none;"></div>
@@ -225,7 +224,7 @@
           });
 
           var resultHeader = (0==entries.length) ? "No more result" : "Results " + (offset+1) + " to " + (offset+entries.length);
-          resultHeader = resultHeader + " for <strong>" + $("#txtQuery").val() + "<strong>";
+          resultHeader = resultHeader + " for <strong>" + (isSqlMode()?$("#txtSql").val().replace(/%query%/g, $("#txtQuery").val()):$("#txtQuery").val()) + "<strong>";
           $("#resultHeader").html(resultHeader);
           if(entries.length==LIMIT) $("#showMore").show(); else $("#showMore").hide();
 
@@ -302,17 +301,17 @@
         var numEntries = parseInt($(this).attr("numEntries"));
 
         var resultHeader = (0==numEntries) ? "No more result" : "Results " + (offset+1) + " to " + (offset+numEntries);
-        resultHeader = resultHeader + " for <strong>" + $("#txtQuery").val() + "<strong>";
+        resultHeader = resultHeader + " for <strong>" + (isSqlMode()?$("#txtSql").val().replace(/%query%/g, $("#txtQuery").val()):$("#txtQuery").val()) + "<strong>";
         $("#resultHeader").html(resultHeader);
         if(numEntries==LIMIT) $("#showMore").show(); else $("#showMore").hide();
 
         var type=getTypeByDisplayName($(this).attr("type"));
         //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
         type = type.replace(/(:|\\.)/g,'\\\\$1'); //for jcr nodetype
-        var sortableFields = REGISTRY[type] ? REGISTRY[type].properties.sortableFields : undefined;
+        var sortFields = REGISTRY[type] ? REGISTRY[type].properties.sortFields : undefined;
         var sortBy = ["<option value='jcr:score()'>Relevancy</option>"];
-        if(sortableFields != undefined) {
-          $.each(sortableFields, function(i, field){
+        if(sortFields != undefined) {
+          $.each(sortFields, function(i, field){
             sortBy.push("<option value='" + field.name + "'>" + field.displayName + "</option>")
           });
         }

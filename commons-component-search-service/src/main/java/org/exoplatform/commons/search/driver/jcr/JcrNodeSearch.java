@@ -100,7 +100,8 @@ public class JcrNodeSearch implements Search {
             resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
             String sortByValue = sortBy.equals("jcr:score()") ? score : "&lt;Click the icon to see all properties of this node&gt;";
             resultItem.setDetail(sortBy + " = " + sortByValue);
-            resultItem.setAvatar((String) SearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar"));
+            String avatar = (String) SearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar");
+            if(null!=avatar) resultItem.setAvatar(avatar.replaceAll("__SLASH__", "/"));
 
             result.add(resultItem);
           }
