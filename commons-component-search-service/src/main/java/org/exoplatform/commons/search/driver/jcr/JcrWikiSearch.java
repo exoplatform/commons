@@ -24,7 +24,7 @@ import org.exoplatform.wiki.service.WikiService;
 public class JcrWikiSearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=wiki:page where=CONTAINS(*,'${query}') " + query);
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=wiki:page " + query);
 
     WikiService wikiService = (WikiService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(WikiService.class);
     for (JcrSearchResult jcrResult: jcrResults){

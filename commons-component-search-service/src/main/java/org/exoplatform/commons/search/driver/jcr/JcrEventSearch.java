@@ -38,7 +38,7 @@ public class JcrEventSearch implements Search{
   @Override
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=exo:calendarEvent where=CONTAINS(*,'${query}') " + query);
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=exo:calendarEvent " + query);
 
     CalendarService calendarService = (CalendarService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(CalendarService.class);
     for (JcrSearchResult jcrResult: jcrResults){                

@@ -21,7 +21,7 @@ import org.exoplatform.forum.service.Utils;
 public class JcrForumSearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=knowledge from=exo:topic where=CONTAINS(*,'${query}') " + query);      
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=knowledge from=exo:topic " + query);      
 
     ForumService forumService = (ForumService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ForumService.class);
     for (JcrSearchResult jcrResult: jcrResults){

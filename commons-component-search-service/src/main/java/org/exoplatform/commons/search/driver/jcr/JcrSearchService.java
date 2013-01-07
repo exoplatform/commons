@@ -18,6 +18,7 @@
 package org.exoplatform.commons.search.driver.jcr;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.exoplatform.commons.search.SearchService;
+import org.exoplatform.commons.search.SearchType;
 import org.exoplatform.commons.search.util.QueryParser;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -255,44 +258,45 @@ public class JcrSearchService implements ResourceContainer {
     return JcrSearchService.getNodeProperties(node);
   }
 
+  @SuppressWarnings("unchecked")
   private static String buildSql(String query){
     QueryParser parser = new QueryParser(query); 
+
+    parser = parser.pick("type");
+    String type = parser.getResults().isEmpty() ? "" : parser.getResults().get(0);
+    SearchType searchType = SearchService.getRegistry().get(type);
 
     parser = parser.pick("from");
     String from = parser.getResults().isEmpty() ? "nt:base" : parser.getResults().get(0);
 
     parser = parser.pick("nodeTypes"); //for testing
-    String[] nodeTypes = new String[parser.getResults().size()];
-    parser.getResults().toArray(nodeTypes);
+    List<String> nodeTypes = parser.getResults();
     
-    parser = parser.pick("where");
-    String where = parser.getResults().isEmpty() ? "CONTAINS(*,'${query}')" : parser.getResults().get(0);
-    //if(0!=IGNORED_FIELDS.length) where = where + (where.isEmpty()?"":" AND NOT ") + repeat("CONTAINS(%s,'${query}')", IGNORED_FIELDS);
-    if(0!=nodeTypes.length) where = where + " AND " + repeat("jcr:primaryType='%s'", nodeTypes);
-    if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + repeat("jcr:primaryType='%s'", IGNORED_TYPES);
-
     parser = parser.pick("sortBy");
     String sortBy = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
     parser = parser.pick("sortType");
-    String sortType = parser.getResults().isEmpty() ? "desc" : parser.getResults().get(0);
+    String sortType = parser.getResults().isEmpty() ? "DESC" : parser.getResults().get(0);
     String option = "ORDER BY " + sortBy + " " + sortType;
+
+
+    parser = parser.pick("where");
+    String where = parser.getResults().isEmpty() ? "" : parser.getResults().get(0)+" AND ";
 
     query = parser.getQuery();
     
+    List<String> terms = QueryParser.parse(query);
+    where = where + String.format("(%s)", QueryParser.repeat("CONTAINS(*,'%s')", terms, " OR "));
+    if(null!=searchType) {
+      Collection<String> likeFields = (Collection<String>) searchType.getProperties().get("likeFields");
+      if(!likeFields.isEmpty()) where = where + " OR " + String.format("(%s)", QueryParser.repeat("%s LIKE '%%"+query+"%%'" , likeFields, " OR "));
+    }
+    if(0!=IGNORED_FIELDS.length) where = where + " AND NOT " + String.format("(%s)", QueryParser.repeat("CONTAINS(%s,'" + query + "')", Arrays.asList(IGNORED_FIELDS), " OR "));
+    if(!nodeTypes.isEmpty()) where = where + " AND " + String.format("(%s)", QueryParser.repeat("jcr:primaryType='%s'", nodeTypes, " OR "));
+    if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + String.format("(%s)", QueryParser.repeat("jcr:primaryType='%s'", Arrays.asList(IGNORED_TYPES), " OR "));
+
     String sql = "SELECT rep:excerpt(), jcr:primaryType FROM ${from} WHERE ${where} ${option}";
-    return sql.replace("${from}", from).replace("${where}", where).replace("${option}", option).replaceAll("\\$\\{query\\}", query);
+    return sql.replace("${from}", from).replace("${where}", where).replace("${option}", option);
   }
   
-  private static String repeat(String format, String[] strArr){
-    StringBuilder sb=new StringBuilder();
-    String delimiter = "";
-    for(String str:strArr) {
-      sb.append(delimiter).append(String.format(format, str));
-      delimiter = " OR ";
-    }
-    
-    return String.format("(%s)", sb);
-  }
-
 }
 

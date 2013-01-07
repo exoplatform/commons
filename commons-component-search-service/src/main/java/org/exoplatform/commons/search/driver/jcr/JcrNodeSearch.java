@@ -34,7 +34,7 @@ public class JcrNodeSearch implements Search {
     parser = parser.pick("sortBy");
     String sortBy = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
 
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=nt:base where=CONTAINS(*,'${query}') " + query);
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=nt:base " + query);
     for(JcrSearchResult jcrResult: jcrResults) {
       try {
         String nodeUrl = jcrResult.getRepository() + "/" + jcrResult.getWorkspace() + jcrResult.getPath();
@@ -44,7 +44,8 @@ public class JcrNodeSearch implements Search {
         result.setExcerpt(jcrResult.getExcerpt());
         String sortByValue = sortBy.equals("jcr:score()") ? score : (String)jcrResult.getProperty(sortBy);
         result.setDetail(sortBy + " = " + sortByValue);
-        result.setAvatar((String) SearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar"));
+        String avatar = (String) SearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar");
+        if(null!=avatar) result.setAvatar(avatar.replaceAll("__SLASH__", "/"));
         
         results.add(result);
       } catch (Exception e) {

@@ -13,7 +13,7 @@ public class JcrSpaceSearch implements Search {
 
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:spacedefinition where=CONTAINS(*,'${query}') " + query);
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:spacedefinition " + query);
     SpaceService spaceSvc = (SpaceService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SpaceService.class);
 
     for(JcrSearchResult jcrResult: jcrResults) {

@@ -2,6 +2,7 @@ package org.exoplatform.commons.search.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +28,7 @@ public class QueryParser {
   }
 
   public QueryParser pick(String param) {
-    List<String> list = new ArrayList<String>();
+    List<String> paramValues = new ArrayList<String>();
 
     String[] rhsPatterns = {"\"([^\"]+)\"", "([\\S]+)"};
     
@@ -35,25 +36,35 @@ public class QueryParser {
       Matcher matcher = Pattern.compile("\\b" + param + "\\s*=\\s*" + pattern).matcher(query);
       while (matcher.find()) {
         String founds = matcher.group(1);
-        list.addAll(Arrays.asList(founds.split(";\\s*")));
+        paramValues.addAll(Arrays.asList(founds.split(";\\s*")));
       }
       query = matcher.replaceAll("").trim();
     }
     
-    results = list;
+    results = paramValues;
     return this;
   }
 
   public static List<String> parse(String input) {
-    List<String> list = new ArrayList<String>();
+    List<String> terms = new ArrayList<String>();
     Matcher matcher = Pattern.compile("\"([^\"]+)\"").matcher(input);
     while (matcher.find()) {
       String founds = matcher.group(1);
-      list.add(founds);
+      terms.add(founds);
     }
     String remain = matcher.replaceAll("").trim();
-    list.addAll(Arrays.asList(remain.split("\\s+")));
-    return list;
+    if(!remain.isEmpty()) terms.addAll(Arrays.asList(remain.split("\\s+")));
+    return terms;
+  }
+
+  public static String repeat(String format, Collection<String> strArr, String delimiter){
+    StringBuilder sb=new StringBuilder();
+    String delim = "";
+    for(String str:strArr) {
+      sb.append(delim).append(String.format(format, str));
+      delim = delimiter;
+    }
+    return sb.toString();
   }
 
   @Override

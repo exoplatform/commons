@@ -19,7 +19,7 @@ import org.exoplatform.social.core.manager.ActivityManager;
 public class JcrActivitySearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:activity where=CONTAINS(*,'${query}') " + query);
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:activity " + query);
 
     ActivityManager activityManager = (ActivityManager) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ActivityManager.class);
     for (JcrSearchResult jcrResult: jcrResults){       

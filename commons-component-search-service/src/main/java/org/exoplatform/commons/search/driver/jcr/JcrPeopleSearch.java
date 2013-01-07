@@ -13,10 +13,11 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.manager.IdentityManager;
 
 public class JcrPeopleSearch implements Search {
-
+  private static final String SEARCH_TYPE_NAME = "people";
+  
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:profiledefinition where=CONTAINS(*,'${query}') " + query);
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("type=" + SEARCH_TYPE_NAME + " repository=repository workspace=social from=soc:profiledefinition " + query);
     IdentityManager identityManager = (IdentityManager)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(IdentityManager.class);
 
     for(JcrSearchResult jcrResult: jcrResults) {
