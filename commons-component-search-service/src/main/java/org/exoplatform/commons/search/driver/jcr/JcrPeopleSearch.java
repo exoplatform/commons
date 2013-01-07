@@ -16,11 +16,11 @@ public class JcrPeopleSearch implements Search {
 
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    try {
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:profiledefinition where=CONTAINS(*,'${query}') " + query);
-      IdentityManager identityManager = (IdentityManager)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(IdentityManager.class);
-      
-      for(JcrSearchResult jcrResult: jcrResults) {
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:profiledefinition where=CONTAINS(*,'${query}') " + query);
+    IdentityManager identityManager = (IdentityManager)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(IdentityManager.class);
+
+    for(JcrSearchResult jcrResult: jcrResults) {
+      try {
         @SuppressWarnings("unchecked")
         String username = ((List<String>)jcrResult.getProperty("void-username")).get(0);
         Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
@@ -35,12 +35,12 @@ public class JcrPeopleSearch implements Search {
         String avatar = profile.getAvatarUrl();      
         if(null == avatar) avatar = "/social-resources/skin/ShareImages/Avatar.gif";
         result.setAvatar(avatar);
-        
+
         searchResults.add(result);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    } 
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+    }
 
     return searchResults;
   }

@@ -19,14 +19,14 @@ import org.exoplatform.social.core.manager.ActivityManager;
 public class JcrActivitySearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    try {
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:activity where=CONTAINS(*,'${query}') " + query);
-      
-      ActivityManager activityManager = (ActivityManager) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ActivityManager.class);
-      for (JcrSearchResult jcrResult: jcrResults){       
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:activity where=CONTAINS(*,'${query}') " + query);
+
+    ActivityManager activityManager = (ActivityManager) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ActivityManager.class);
+    for (JcrSearchResult jcrResult: jcrResults){       
+      try {
         String activityId = (String) jcrResult.getProperty("jcr:uuid");        
         ExoSocialActivity activity = activityManager.getActivity(activityId);                       
-        
+
         SearchResult result = new SearchResult("activity",activity.getStreamUrl());
         result.setTitle(activity.getTitle());
         result.setExcerpt(jcrResult.getExcerpt());
@@ -39,10 +39,10 @@ public class JcrActivitySearch implements Search {
         String    avatar = "/social/gadgets/Activities/style/images/ActivityIcon.gif";
         result.setAvatar(avatar);
         searchResults.add(result);
-      }      
-    } catch (Exception e) {
-      e.printStackTrace();
-    } 
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+    }      
 
     return searchResults;
   }

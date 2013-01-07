@@ -13,11 +13,11 @@ public class JcrSpaceSearch implements Search {
 
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    try {
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:spacedefinition where=CONTAINS(*,'${query}') " + query);
-      SpaceService spaceSvc = (SpaceService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SpaceService.class);
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:spacedefinition where=CONTAINS(*,'${query}') " + query);
+    SpaceService spaceSvc = (SpaceService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SpaceService.class);
 
-      for(JcrSearchResult jcrResult: jcrResults) {
+    for(JcrSearchResult jcrResult: jcrResults) {
+      try {
         String spaceUrl = (String) jcrResult.getProperty("soc:url");        
         Space space = spaceSvc.getSpaceByUrl(spaceUrl);
 
@@ -30,10 +30,10 @@ public class JcrSpaceSearch implements Search {
         result.setAvatar(avatar);
 
         searchResults.add(result);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    } 
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+    }
 
     return searchResults;
   }

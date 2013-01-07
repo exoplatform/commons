@@ -46,8 +46,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.exoplatform.commons.search.SearchService;
-import org.exoplatform.commons.search.util.JsonMap;
 import org.exoplatform.commons.search.util.QueryParser;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -79,14 +77,14 @@ public class JcrSearchService implements ResourceContainer {
   public static Collection<JcrSearchResult> search(String query) {
     QueryParser parser = new QueryParser(query);
     
-    parser = parser.parseFor("repository");
+    parser = parser.pick("repository");
     String repositoryName = parser.getResults().isEmpty() ? "repository" : parser.getResults().get(0);
-    parser = parser.parseFor("workspace");
+    parser = parser.pick("workspace");
     String workspaceName = parser.getResults().isEmpty() ? "collaboration" : parser.getResults().get(0);
 
-    parser = parser.parseFor("offset"); 
+    parser = parser.pick("offset"); 
     int offset = parser.getResults().isEmpty() ? 0 : Integer.parseInt(parser.getResults().get(0));
-    parser = parser.parseFor("limit");
+    parser = parser.pick("limit");
     int limit = parser.getResults().isEmpty() ? 0 : Integer.parseInt(parser.getResults().get(0));
     
     return search(repositoryName, workspaceName, buildSql(parser.getQuery()), offset, limit);
@@ -234,21 +232,6 @@ public class JcrSearchService implements ResourceContainer {
   }
 
   @GET
-  @Path("/search")
-  public static Response search(@QueryParam("q") String query, @QueryParam("categorized") boolean categorized) {
-    try {
-      if(categorized) {
-        return Response.ok(SearchService.categorize(new JcrNodeSearch().search(query)), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-      } else {
-        return Response.ok(new JcrNodeSearch().search(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
-    }
-  }
-
-  @GET
   @Path("/props")
   public static Response props(@QueryParam("node") String nodePath) {
     try {
@@ -275,22 +258,22 @@ public class JcrSearchService implements ResourceContainer {
   private static String buildSql(String query){
     QueryParser parser = new QueryParser(query); 
 
-    parser = parser.parseFor("from");
+    parser = parser.pick("from");
     String from = parser.getResults().isEmpty() ? "nt:base" : parser.getResults().get(0);
 
-    parser = parser.parseFor("nodeTypes"); //for testing
+    parser = parser.pick("nodeTypes"); //for testing
     String[] nodeTypes = new String[parser.getResults().size()];
     parser.getResults().toArray(nodeTypes);
     
-    parser = parser.parseFor("where");
+    parser = parser.pick("where");
     String where = parser.getResults().isEmpty() ? "CONTAINS(*,'${query}')" : parser.getResults().get(0);
-    if(0!=IGNORED_FIELDS.length) where = where + (where.isEmpty()?"":" AND NOT ") + repeat("CONTAINS(%s,'${query}')", IGNORED_FIELDS);
+    //if(0!=IGNORED_FIELDS.length) where = where + (where.isEmpty()?"":" AND NOT ") + repeat("CONTAINS(%s,'${query}')", IGNORED_FIELDS);
     if(0!=nodeTypes.length) where = where + " AND " + repeat("jcr:primaryType='%s'", nodeTypes);
     if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + repeat("jcr:primaryType='%s'", IGNORED_TYPES);
 
-    parser = parser.parseFor("sortBy");
+    parser = parser.pick("sortBy");
     String sortBy = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
-    parser = parser.parseFor("sortType");
+    parser = parser.pick("sortType");
     String sortType = parser.getResults().isEmpty() ? "desc" : parser.getResults().get(0);
     String option = "ORDER BY " + sortBy + " " + sortType;
 

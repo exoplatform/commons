@@ -24,15 +24,15 @@ import org.exoplatform.wiki.service.WikiService;
 public class JcrWikiSearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    try {
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=wiki:page where=CONTAINS(*,'${query}') " + query);
-      
-      WikiService wikiService = (WikiService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(WikiService.class);
-      for (JcrSearchResult jcrResult: jcrResults){
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=wiki:page where=CONTAINS(*,'${query}') " + query);
+
+    WikiService wikiService = (WikiService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(WikiService.class);
+    for (JcrSearchResult jcrResult: jcrResults){
+      try {
         String url = (String) jcrResult.getProperty("url");
         String uuid = (String) jcrResult.getProperty("jcr:uuid");
         //String wikiName = (String)jcrResult.getProperty("exo:name");
-        
+
         Page page = wikiService.getWikiPageByUUID(uuid);
         Page parentPage = page.getParentPage();
         String wikiName =page.getTitle();
@@ -52,19 +52,19 @@ public class JcrWikiSearch implements Search {
         String    avatar = "/wiki/skin/DefaultSkin/webui/background/Page.gif";
         result.setAvatar(avatar);
         searchResults.add(result);
-      }      
-    } catch (Exception e) {
-      e.printStackTrace();
-    } 
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+    }      
 
     return searchResults;
   }
-  
+
   public String getSpaceNameByGroupId(String groupId) throws Exception {
     try {
       Class spaceServiceClass = Class.forName("org.exoplatform.social.core.space.spi.SpaceService");
       Object spaceService = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(spaceServiceClass);
-      
+
       Class spaceClass = Class.forName("org.exoplatform.social.core.space.model.Space");
       Object space = spaceServiceClass.getDeclaredMethod("getSpaceByGroupId", String.class).invoke(spaceService, groupId);
       return String.valueOf(spaceClass.getDeclaredMethod("getDisplayName").invoke(space));
@@ -74,7 +74,7 @@ public class JcrWikiSearch implements Search {
       return "";
     }
   }  
-  
+
   public String getWikiNameById(String wikiId, Wiki wiki) throws Exception {
     System.out.println();
     if (wiki instanceof PortalWiki) {
@@ -85,7 +85,7 @@ public class JcrWikiSearch implements Search {
       }
       return displayName;
     }
-    
+
     if (wiki instanceof UserWiki) {
       String currentUser = org.exoplatform.wiki.utils.Utils.getCurrentUser();
       if (wiki.getOwner().equals(currentUser)) {
@@ -96,7 +96,7 @@ public class JcrWikiSearch implements Search {
       }
       return wiki.getOwner();
     }
-    
+
     //WikiService wikiService = (WikiService) PortalContainer.getComponent(WikiService.class);
     return getSpaceNameByGroupId(wiki.getOwner());
   }  

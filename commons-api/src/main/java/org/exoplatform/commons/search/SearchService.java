@@ -75,7 +75,7 @@ public class SearchService {
       if(query.startsWith("SELECT")) {
         types = Arrays.asList("jcrNode");
       } else {
-        QueryParser parser = new QueryParser(query).parseFor("type");
+        QueryParser parser = new QueryParser(query).pick("type");
         types = parser.getResults();
         query = parser.getQuery();
         if(query.isEmpty()) query = "*"; //TODO: handle this in each handler

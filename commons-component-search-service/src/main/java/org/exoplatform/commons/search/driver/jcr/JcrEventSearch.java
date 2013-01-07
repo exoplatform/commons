@@ -26,10 +26,6 @@ import org.exoplatform.calendar.service.CalendarService;
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.forum.service.Forum;
-import org.exoplatform.forum.service.ForumService;
-import org.exoplatform.forum.service.Topic;
-import org.exoplatform.forum.service.Utils;
 
 /**
  * Created by The eXo Platform SAS
@@ -42,19 +38,17 @@ public class JcrEventSearch implements Search{
   @Override
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    try {
-      int offset = 0;
-      int limit = 0;      
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=exo:calendarEvent where=CONTAINS(*,'${query}') " + query);
-      
-      CalendarService calendarService = (CalendarService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(CalendarService.class);
-      for (JcrSearchResult jcrResult: jcrResults){                
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=exo:calendarEvent where=CONTAINS(*,'${query}') " + query);
+
+    CalendarService calendarService = (CalendarService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(CalendarService.class);
+    for (JcrSearchResult jcrResult: jcrResults){                
+      try {
         String eventId = (String)jcrResult.getProperty("exo:id");        
         String calendarId = (String) jcrResult.getProperty("exo:calendarId");
-        
+
         CalendarEvent calEvent = calendarService.getGroupEvent(eventId);                
         Calendar calendar = calendarService.getGroupCalendar(calendarId);
-        
+
         SearchResult result = new SearchResult("event",calendar.getPrivateUrl());
         result.setTitle(calEvent.getSummary());
         result.setExcerpt(calEvent.getDescription()!=null?calEvent.getDescription():calEvent.getSummary());
@@ -65,16 +59,16 @@ public class JcrEventSearch implements Search{
         buf.append(sdf.format(calEvent.getFromDateTime()));        
         buf.append(" - ");
         buf.append(calEvent.getLocation()!=null?calEvent.getLocation():calendar.getName());
-        
+
         result.setDetail(buf.toString());        
         String    avatar = "/csResources/gadgets/events/skin/Events.png";
         result.setAvatar(avatar);
         searchResults.add(result);
-      }      
-    } catch (Exception e) {
-      e.printStackTrace();
-    } 
-
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+    }      
+    
     return searchResults;
   }
 

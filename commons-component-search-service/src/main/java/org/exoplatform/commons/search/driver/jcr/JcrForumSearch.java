@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
 import org.exoplatform.container.ExoContainerContext;
@@ -22,11 +21,11 @@ import org.exoplatform.forum.service.Utils;
 public class JcrForumSearch implements Search {
   public Collection<SearchResult> search(String query) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    try {
-      Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=knowledge from=exo:topic where=CONTAINS(*,'${query}') " + query);      
-      
-      ForumService forumService = (ForumService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ForumService.class);
-      for (JcrSearchResult jcrResult: jcrResults){
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=knowledge from=exo:topic where=CONTAINS(*,'${query}') " + query);      
+
+    ForumService forumService = (ForumService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ForumService.class);
+    for (JcrSearchResult jcrResult: jcrResults){
+      try {
         String path = jcrResult.getPath();
         Topic topic = forumService.getTopicByPath(path, false);
 
@@ -44,9 +43,9 @@ public class JcrForumSearch implements Search {
             forumId = forumId.substring(0, forumId.indexOf("/"));
           }          
         }
-        
+
         Forum forum = (Forum)forumService.getForum(category, forumId);        
-                       
+
         ///Forum forum = (Forum)forumService.getObjectNameByPath(path.substring(path.indexOf(Utils.CATEGORY), path.lastIndexOf("/")));
         SearchResult result = new SearchResult("forum",topic.getLink());
         result.setTitle(topic.getTopicName());
@@ -60,15 +59,15 @@ public class JcrForumSearch implements Search {
         buf.append(" - ");
         SimpleDateFormat sdf = new SimpleDateFormat("EEEEE, MMMMMMMM d, yyyy K:mm a");
         buf.append(topic.getLastPostDate()!=null?sdf.format(topic.getLastPostDate()):"");        
-        
+
         result.setDetail(buf.toString());        
         String    avatar = "/forum/skin/DefaultSkin/webui/skinIcons/24x24/icons/HotThreadNewPost.gif";
         result.setAvatar(avatar);
         searchResults.add(result);
-      }      
-    } catch (Exception e) {
-      e.printStackTrace();
-    } 
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+    }      
 
     return searchResults;
   }

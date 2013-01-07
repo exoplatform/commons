@@ -26,16 +26,34 @@ public class QueryParser {
     return results;
   }
 
-  public QueryParser parseFor(String type) {
+  public QueryParser pick(String param) {
     List<String> list = new ArrayList<String>();
-    Matcher matcher = Pattern.compile("\\b" + type + "\\s*=\\s*([\\S]+)").matcher(query);
-    while (matcher.find()) {
-      String founds = matcher.group(1);
-      list.addAll(Arrays.asList(founds.split("[;]")));
+
+    String[] rhsPatterns = {"\"([^\"]+)\"", "([\\S]+)"};
+    
+    for(String pattern:rhsPatterns){
+      Matcher matcher = Pattern.compile("\\b" + param + "\\s*=\\s*" + pattern).matcher(query);
+      while (matcher.find()) {
+        String founds = matcher.group(1);
+        list.addAll(Arrays.asList(founds.split(";\\s*")));
+      }
+      query = matcher.replaceAll("").trim();
     }
-    query = matcher.replaceAll("").trim();
+    
     results = list;
     return this;
+  }
+
+  public static List<String> parse(String input) {
+    List<String> list = new ArrayList<String>();
+    Matcher matcher = Pattern.compile("\"([^\"]+)\"").matcher(input);
+    while (matcher.find()) {
+      String founds = matcher.group(1);
+      list.add(founds);
+    }
+    String remain = matcher.replaceAll("").trim();
+    list.addAll(Arrays.asList(remain.split("\\s+")));
+    return list;
   }
 
   @Override

@@ -91,6 +91,14 @@
       #sortType.Desc {
         background: url("/eXoResources/skin/DefaultSkin/skinIcons/16x16/icons/NavigationIcons/BlueDownArrow.gif");
       }
+
+      .Ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+      }
     </style>
     <div id="searchPortlet">
       <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
@@ -161,8 +169,8 @@
               <img title='%{title}' src='%{avatar}' alt='[+]'> \
             </div> \
             <div class='Content'> \
-              <div class='Title'><a href='%{url}'>%{title}</a></div> \
-              <div class='Excerpt'>%{excerpt}</div> \
+              <div class='Title Ellipsis'><a href='%{url}'>%{title}</a></div> \
+              <div class='Excerpt Ellipsis'>%{excerpt}</div> \
               <div class='Detail'>%{detail}</div> \
             </div> \
           </div> \
@@ -184,18 +192,16 @@
       }
 
       function getTypeByDisplayName(typeDisplayName) {
-        return $("#lstContentTypes li:contains('" + typeDisplayName + "') input:checkbox").attr("value");
-      }
-
-      function getViewingType() {
-        return $(".ResultType.Selected");
+        var type = $("#lstContentTypes li:contains('" + typeDisplayName + "') input:checkbox").attr("value");
+        return type ? type : typeDisplayName;
       }
 
       function showMore(offsetIncrement) {
+        if(isSqlMode()) return;
         var query = $("#txtQuery").val();
         if(""==query) return;
 
-        var $viewingType = getViewingType();
+        var $viewingType = $(".ResultType.Selected");
         var type = getTypeByDisplayName($viewingType.text());
         var offset = parseInt($viewingType.attr("offset"))+offsetIncrement;
         var sortBy = $("#lstSortBy").val();
@@ -233,16 +239,21 @@
       }
 
 
+      function isSqlMode() {
+        return $("#sqlExec").is(":visible");
+      }
+
+
       $("#btnSearch").click(function(){
         var query = $("#txtQuery").val();
-        if(""==query) return;
+        var sql = $("#txtSql").val().replace(/%query%/g, query);
+        if(!isSqlMode() && ""==query) return;
 
         if(query.indexOf(" type=")==-1) query = query + " type=" + getSelectedTypes();
         query = query + " offset=" + 0;
         query = query + " limit=" + LIMIT;
 
-        var restUrl = $("#sqlExec").is(":visible") ? "/rest/search/jcr/search?q="+$("#txtSql").val() : "/rest/search?q="+query;
-        restUrl = restUrl + "&categorized=true"
+        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query) + "&categorized=true";
 
         $("body").css("cursor", "wait");
 
@@ -251,7 +262,8 @@
           var result = "";
 
           $.each(entryMap, function(type, entries){
-            resultTypes = resultTypes + "<span class='Clickable ResultType' offset=0 numEntries=" + $(entries).size() + ">" + type + "</span>" + " | ";
+            var displayType = isSqlMode() ? type + " (" + $(entries).size() + ")" : type;
+            resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + type + "' offset=0 numEntries=" + $(entries).size() + ">" + displayType + "</span>" + " | ";
             result = result + "<div class='SearchResultType' id='" + getTypeByDisplayName(type) + "-type'>";
 
             $.each(entries, function(i, entry){
@@ -263,7 +275,7 @@
           if(""==result) {
             $("#resultTypes").html("");
             $("#result").html("");
-            $("#resultHeader").html("No result for <strong>" + $("#txtQuery").val() + "<strong>");
+            $("#resultHeader").html("No result for <strong>" + (isSqlMode()?sql:$("#txtQuery").val()) + "<strong>");
             $("#showMore").hide();
             $("body").css("cursor", "auto");
             return;
@@ -294,9 +306,10 @@
         $("#resultHeader").html(resultHeader);
         if(numEntries==LIMIT) $("#showMore").show(); else $("#showMore").hide();
 
+        var type=getTypeByDisplayName($(this).attr("type"));
         //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
-        var type=getTypeByDisplayName($(this).text());
-        var sortableFields = REGISTRY[type].properties.sortableFields;
+        type = type.replace(/(:|\\.)/g,'\\\\$1'); //for jcr nodetype
+        var sortableFields = REGISTRY[type] ? REGISTRY[type].properties.sortableFields : undefined;
         var sortBy = ["<option value='jcr:score()'>Relevancy</option>"];
         if(sortableFields != undefined) {
           $.each(sortableFields, function(i, field){
