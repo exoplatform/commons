@@ -52,7 +52,7 @@ public class QueryParser {
       String founds = matcher.group(1);
       terms.add(founds);
     }
-    String remain = matcher.replaceAll("").trim();
+    String remain = matcher.replaceAll("").replaceAll("\"", "").trim(); //remove all remaining double quotes
     if(!remain.isEmpty()) terms.addAll(Arrays.asList(remain.split("\\s+")));
     return terms;
   }

@@ -177,9 +177,19 @@
 
         var html = template.replace(/%{type}/g, result.type).replace(/%{url}/g, result.url);
         html = html.replace(/%{title}/g, result.title).replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail).replace(/%{avatar}/g, result.avatar);
-        console.log(html);
         return html;
       }
+
+
+      function clearResultPage(message){
+        $("#resultTypes").html("");
+        $("#result").html("");
+        $("#resultHeader").html(message?message:"");
+        $("#showMore").hide();
+        $("body").css("cursor", "auto");
+        return;
+      }
+
 
       function getSelectedTypes(){
         if($(":checkbox[name='contentType'][value='all']").is(":checked")) return "all";
@@ -198,7 +208,10 @@
       function showMore(offsetIncrement) {
         if(isSqlMode()) return;
         var query = $("#txtQuery").val();
-        if(""==query) return;
+        if(""==query) {
+          clearResultPage();
+          return;
+        }
 
         var $viewingType = $(".ResultType.Selected");
         var type = getTypeByDisplayName($viewingType.text());
@@ -243,10 +256,13 @@
       }
 
 
-      $("#btnSearch").click(function(){
+      function search() {
         var query = $("#txtQuery").val();
         var sql = $("#txtSql").val().replace(/%query%/g, query);
-        if(!isSqlMode() && ""==query) return;
+        if(!isSqlMode() && ""==query) {
+          clearResultPage();
+          return;
+        }
 
         if(query.indexOf(" type=")==-1) query = query + " type=" + getSelectedTypes();
         query = query + " offset=" + 0;
@@ -272,11 +288,7 @@
           });
 
           if(""==result) {
-            $("#resultTypes").html("");
-            $("#result").html("");
-            $("#resultHeader").html("No result for <strong>" + (isSqlMode()?sql:$("#txtQuery").val()) + "<strong>");
-            $("#showMore").hide();
-            $("body").css("cursor", "auto");
+            clearResultPage("No result for <strong>" + (isSqlMode()?sql:$("#txtQuery").val()) + "<strong>");
             return;
           }
 
@@ -289,8 +301,7 @@
 
           $(".ResultType").first().click();
         });
-
-      });
+      }
 
 
       $(".ResultType").live("click", function(){
@@ -348,13 +359,21 @@
         } else {
           $(":checkbox[name='contentType'][value='all']").attr('checked', false);
         }
+
+        if(!isSqlMode()) search();
       });
 
 
+      $("#btnSearch").click(function(){
+        search();
+      });
+
       $("#txtQuery").keyup(function(event){
         if(event.keyCode == 13){
-          $("#btnSearch").click();
+          search();
+          return;
         }
+        search();
       });
 
 

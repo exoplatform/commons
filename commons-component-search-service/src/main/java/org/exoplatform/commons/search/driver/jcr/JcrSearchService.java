@@ -289,14 +289,17 @@ public class JcrSearchService implements ResourceContainer {
     if(!caseSensitive) query = query.toLowerCase();
     
     List<String> terms = QueryParser.parse(query);
-    where = where + String.format("(%s)", QueryParser.repeat("CONTAINS(*,'%s')", terms, " OR "));
-
-    String likeStmt = (!caseSensitive?"LOWER(%s)":"%s") + " LIKE '%%"+query+"%%'";
+    where = where + String.format("(%s)", QueryParser.repeat("CONTAINS(*,'%s')", terms, " OR ")); //for full text search
     
-    if(null!=searchType) {
-      Collection<String> likeFields = (Collection<String>) searchType.getProperties().get("likeFields");
-      if(!likeFields.isEmpty()) where = where + " OR " + String.format("(%s)", QueryParser.repeat(likeStmt, likeFields, " OR "));
+    String likeStmt = (!caseSensitive?"LOWER(%s)":"%s") + " LIKE '%%"+QueryParser.repeat("%s", terms, "%%")+"%%'";
+    
+    if(!(query.startsWith("\"") && query.endsWith("\""))) { //not exact search
+      if(null!=searchType) {
+        Collection<String> likeFields = (Collection<String>) searchType.getProperties().get("likeFields");
+        if(!likeFields.isEmpty()) where = where + " OR " + String.format("(%s)", QueryParser.repeat(likeStmt, likeFields, " OR "));
+      }
     }
+    
     if(0!=IGNORED_FIELDS.length) where = where + " AND NOT " + String.format("(%s)", QueryParser.repeat(likeStmt, Arrays.asList(IGNORED_FIELDS), " OR "));
     if(!nodeTypes.isEmpty()) where = where + " AND " + String.format("(%s)", QueryParser.repeat("jcr:primaryType='%s'", nodeTypes, " OR "));
     if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + String.format("(%s)", QueryParser.repeat("jcr:primaryType='%s'", Arrays.asList(IGNORED_TYPES), " OR "));
