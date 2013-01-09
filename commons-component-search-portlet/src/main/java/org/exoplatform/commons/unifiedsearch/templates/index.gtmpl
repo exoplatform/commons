@@ -107,10 +107,9 @@
         </div>
       </div>
 
-      <div id="searchForm" style="padding-top: 5px;">
-        <label id="lbSearch" class="Clickable" style="padding-left: 5px;">Search</label>
+      <div id="searchForm" style="padding-top: 5px; text-align: center;">
         <input type="text" id="txtQuery"/>
-        <input type="button" id="btnSearch" value="Go"/>
+        <input type="button" id="btnSearch" value="Search"/>
       </div>
 
       <hr/>
@@ -146,6 +145,7 @@
     <script>
       var LIMIT = 10;
       var REGISTRY;
+      var VIEWING_TYPE;
 
       // Load content types
       $.getJSON("/rest/search/registry", function(registry){
@@ -214,7 +214,7 @@
         }
 
         var $viewingType = $(".ResultType.Selected");
-        var type = getTypeByDisplayName($viewingType.text());
+        var type = $viewingType.attr("type");
         var offset = parseInt($viewingType.attr("offset"))+offsetIncrement;
         var sortBy = $("#lstSortBy").val();
         var sortType = $("#sortType").hasClass("Asc") ? "asc" : "desc";
@@ -256,7 +256,7 @@
       }
 
 
-      function search() {
+      function search(callback) {
         var query = $("#txtQuery").val();
         var sql = $("#txtSql").val().replace(/%query%/g, query);
         if(!isSqlMode() && ""==query) {
@@ -277,9 +277,10 @@
           var result = "";
 
           $.each(entryMap, function(type, entries){
+            var searchType = getTypeByDisplayName(type);
             var displayType = isSqlMode() ? type + " (" + $(entries).size() + ")" : type;
-            resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + type + "' offset=0 numEntries=" + $(entries).size() + ">" + displayType + "</span>" + " | ";
-            result = result + "<div class='SearchResultType' id='" + getTypeByDisplayName(type) + "-type'>";
+            resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + searchType + "' offset=0 numEntries=" + $(entries).size() + ">" + displayType + "</span>" + " | ";
+            result = result + "<div class='SearchResultType' id='" + searchType + "-type'>";
 
             $.each(entries, function(i, entry){
               result = result + renderSearchResult(entry);
@@ -299,7 +300,8 @@
           $("#result").show();
           $("body").css("cursor", "auto");
 
-          $(".ResultType").first().click();
+          if(callback) callback();
+          (VIEWING_TYPE && $(".ResultType[type='" + VIEWING_TYPE + "']").get(0) ? $(".ResultType[type='" + VIEWING_TYPE + "']").get(0) : $(".ResultType").first()).click();
         });
       }
 
@@ -316,7 +318,7 @@
         $("#resultHeader").html(resultHeader);
         if(numEntries==LIMIT) $("#showMore").show(); else $("#showMore").hide();
 
-        var type=getTypeByDisplayName($(this).attr("type"));
+        var type=$(this).attr("type");
         //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
         type = type.replace(/(:|\\.)/g,'\\\\$1'); //for jcr nodetype
         var sortFields = REGISTRY[type] ? REGISTRY[type].properties.sortFields : undefined;
@@ -350,17 +352,23 @@
 
 
       $(":checkbox[name='contentType']").live("click", function(){
-        if("all"==this.value){
-          if($(this).is(":checked")) {
+        if("all"==this.value){ //All Content Types checked
+          if($(this).is(":checked")) { // check/uncheck all
             $(":checkbox[name='contentType']").attr('checked', true);
           } else {
             $(":checkbox[name='contentType']").attr('checked', false);
           }
         } else {
-          $(":checkbox[name='contentType'][value='all']").attr('checked', false);
+          $(":checkbox[name='contentType'][value='all']").attr('checked', false); //uncheck All Content Types
         }
 
-        if(!isSqlMode()) search();
+        if(!isSqlMode()) {
+          VIEWING_TYPE = $(".ResultType.Selected").attr("type"); //save the current view before performing search
+          var checkedType = $(this).is(":checked") ? this.value : undefined;
+          search(function(){
+            if(checkedType && $(".ResultType[type='" + checkedType + "']").get(0)) VIEWING_TYPE = checkedType;
+          });
+        }
       });
 
 
@@ -368,17 +376,25 @@
         search();
       });
 
-      $("#txtQuery").keyup(function(event){
-        if(event.keyCode == 13){
-          search();
-          return;
-        }
-        search();
+      $("#txtQuery").focus(function(){
+        VIEWING_TYPE = $(".ResultType.Selected").attr("type"); //save the current view before performing search
       });
 
 
-      $("#lbSearch").click(function(){
-        $("#sqlExec").toggle();
+      $("#txtQuery").keyup(function(e){
+        var keyCode = e.keyCode || e.which,
+            arrow = {up: 38, down: 40 };
+
+        switch (keyCode) {
+          case arrow.up:
+            $("#sqlExec").hide();
+            break;
+          case arrow.down:
+            $("#sqlExec").show();
+            break;
+          default:
+            search();
+        }
       });
 
 
