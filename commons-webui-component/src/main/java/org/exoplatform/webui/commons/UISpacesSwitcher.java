@@ -116,8 +116,16 @@ public class UISpacesSwitcher extends UIContainer {
   
   protected String getBaseRestUrl() {
     StringBuilder sb = new StringBuilder();
-    sb.append("/").append(PortalContainer.getCurrentPortalContainerName()).append("/");
-    sb.append(PortalContainer.getCurrentRestContextName());
+    sb.append("/").append(PortalContainer.getCurrentPortalContainerName());
+    sb.append("/").append(PortalContainer.getCurrentRestContextName());
+    return sb.toString();
+  }
+  
+  protected String getSocialBaseRestUrl() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("/").append(PortalContainer.getCurrentRestContextName());
+    sb.append("/").append("private");
+    sb.append("/").append(PortalContainer.getCurrentPortalContainerName());
     return sb.toString();
   }
   

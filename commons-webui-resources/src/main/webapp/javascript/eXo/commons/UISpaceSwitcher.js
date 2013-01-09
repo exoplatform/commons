@@ -19,7 +19,7 @@
 function UISpaceSwitcher() {
 };
 
-UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, defaultValueForTextSearch, selectSpaceAction) {
+UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBaseRestUrl, defaultValueForTextSearch, selectSpaceAction) {
   var me = eXo.commons.UISpaceSwitcher;
   
   if (!me.dataStorage) {
@@ -35,6 +35,7 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, defaultVal
   storage.accessibleSpaceRestUrl = baseRestUrl + "/wiki/spaces/accessibleSpaces/";
   storage.portalSpaceRestUrl = baseRestUrl + "/wiki/spaces/portalSpaces/";
   storage.mySpaceRestUrl = baseRestUrl + "/wiki/spaces/mySpaces/";
+  storage.recentlyVisitedSpaceRestUrl = socialBaseRestUrl + "/social/spaces/spaceLastVisited/list.json";
   storage.lastSearchKeyword = "";
   storage.defaultValueForTextSearch = defaultValueForTextSearch;
   storage.selectSpaceAction = selectSpaceAction;
@@ -96,12 +97,32 @@ UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySp
 
 UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
   var me = eXo.commons.UISpaceSwitcher;
-  me.requestSpaceList("", uicomponentId);
+  var wikiSpaceSwitcher = document.getElementById(uicomponentId);
+  
+  // Reset search textbox to empty
+  jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0].value = "";
+  
+  // Init data
+  me.getRecentlyVisitedSpace(uicomponentId, 10);
   me.renderPortalSpace(uicomponentId, "PortalSpace");
   me.renderUserSpace(uicomponentId, "UserSpace");
 }
 
-UISpaceSwitcher.prototype.requestSpaceList = function(keyword, uicomponentId) {
+UISpaceSwitcher.prototype.getRecentlyVisitedSpace = function(uicomponentId, numberOfResults) {
+  var me = eXo.commons.UISpaceSwitcher;
+  var storage = me.dataStorage[uicomponentId];
+  jQuery.ajax({
+    async : false,
+    url : storage.recentlyVisitedSpaceRestUrl + "?appId=wiki&limit=" + numberOfResults,
+    type : 'GET',
+    data : '',
+    success : function(data) {
+      me.renderSpacesFromSocialRest(data, uicomponentId, "SpaceList");
+    }
+  });
+};
+
+UISpaceSwitcher.prototype.searchSpaces = function(keyword, uicomponentId) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   jQuery.ajax({
@@ -145,6 +166,33 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
   container.innerHTML = spaceDiv;
 }
 
+UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomponentId, containerClazz) {
+  var me = eXo.commons.UISpaceSwitcher;
+  var storage = me.dataStorage[uicomponentId];
+  storage.dataList = dataList;
+  
+  var wikiSpaceSwitcher = document.getElementById(uicomponentId);
+  var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
+  var spaces = dataList.spaces;
+  var groupSpaces = '';
+
+  for (i = 0; i < spaces.length; i++) {
+    var spaceId = spaces[i].groupId;
+    var name = spaces[i].displayName;
+    groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId);
+  }
+  container.innerHTML = groupSpaces;
+}
+
+UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentId) {
+  var spaceDiv = "<div class='SpaceOption' id='UISpaceSwitcher_" + spaceId 
+      + "' title='" + name 
+      + "' alt='" + name 
+      + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">" 
+      + name + "</div>";
+  return spaceDiv;
+}
+
 UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, containerClazz) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
@@ -159,17 +207,10 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
     var spaceId = spaces[i].spaceId;
     var name = spaces[i].name;
     var type = spaces[i].type;
-    
     if (type == 'user') {
       name = storage.mySpaceLabel;
     }
-    
-    var spaceDiv = "<div class='SpaceOption' id='UISpaceSwitcher_" + spaceId 
-      + "' title='" + name 
-      + "' alt='" + name 
-      + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">" 
-      + name + "</div>";
-    groupSpaces += spaceDiv;
+    groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId);
   }
   container.innerHTML = groupSpaces;
 };
@@ -206,7 +247,7 @@ UISpaceSwitcher.prototype.onTextSearchChange = function(uicomponentId) {
   
   if (textSearch != storage.lastSearchKeyword) {
     storage.lastSearchKeyword = textSearch;
-    me.requestSpaceList(textSearch, uicomponentId);
+    me.searchSpaces(textSearch, uicomponentId);
   }
 };
 
