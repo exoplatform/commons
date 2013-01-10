@@ -7,7 +7,7 @@ import org.exoplatform.commons.search.SearchResult;
 
 public class ElasticGenericSearch implements Search {
   @Override
-  public Collection<SearchResult> search(String query) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     return ElasticSearchService.search(query);
   }
 }

@@ -92,7 +92,7 @@ public class ElasticTest extends BaseTest  {
 
   public void testSearch(){
     // Full text search
-    categorizedSearch("*");
+    search("*");
     search("\"anthony cena\" mary");
     search("creationAuthor:john");
     search("elastic creationAuthor:john");

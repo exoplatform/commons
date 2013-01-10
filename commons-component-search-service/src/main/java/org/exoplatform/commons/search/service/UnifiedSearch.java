@@ -2,6 +2,7 @@ package org.exoplatform.commons.search.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 import javax.ws.rs.Consumes;
@@ -48,13 +49,9 @@ public class UnifiedSearch implements ResourceContainer {
   }
   
   @GET
-  public Response search(@QueryParam("q") String query, @QueryParam("categorized") boolean categorized) {
+  public Response search(@QueryParam("q") String query, @QueryParam("sites") String sites, @QueryParam("types") String types, @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("sort") String sort, @QueryParam("order") String order) {
     try {
-      if(categorized) {
-        return Response.ok(SearchService.categorizedSearch(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-      } else {
-        return Response.ok(SearchService.search(query), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-      }
+      return Response.ok(SearchService.search(query, Arrays.asList(sites.split(",\\s*")), Arrays.asList(types.split(",\\s*")), offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
       e.printStackTrace();
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();

@@ -2,7 +2,9 @@ package org.exoplatform.commons.search.driver.jcr;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +19,6 @@ import javax.jcr.query.RowIterator;
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
 import org.exoplatform.commons.search.SearchService;
-import org.exoplatform.commons.search.util.QueryParser;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
@@ -27,14 +28,24 @@ public class JcrNodeSearch implements Search {
   private static final String SEARCH_TYPE_NAME = "jcrNode";
   
   @Override
-  public Collection<SearchResult> search(String query) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+    Map<String, Object> parameters = new HashMap<String, Object>(); 
+    parameters.put("sites", sites);
+    parameters.put("types", types);
+    parameters.put("offset", offset);
+    parameters.put("limit", limit);
+    parameters.put("sort", sort);
+    parameters.put("order", order);
+    
     if(query.startsWith("SELECT")) return sqlExec(query); // sql mode (for testing)
     Collection<SearchResult> results = new ArrayList<SearchResult>();
-    QueryParser parser = new QueryParser(query); 
-    parser = parser.pick("sortBy");
-    String sortBy = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
-
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=nt:base " + query);
+    parameters.put("type", SEARCH_TYPE_NAME);
+    parameters.put("repository", "repository");
+    parameters.put("workspace", "collaboration");
+    parameters.put("from", "nt:base");
+    
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
+    String sortBy = null==parameters.get("sort") ? "jcr:score()" : (String)parameters.get("sort");
     for(JcrSearchResult jcrResult: jcrResults) {
       try {
         String nodeUrl = jcrResult.getRepository() + "/" + jcrResult.getWorkspace() + jcrResult.getPath();

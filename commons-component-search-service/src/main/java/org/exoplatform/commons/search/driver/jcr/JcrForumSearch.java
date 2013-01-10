@@ -3,6 +3,8 @@ package org.exoplatform.commons.search.driver.jcr;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
@@ -19,10 +21,23 @@ import org.exoplatform.forum.service.Utils;
  * Dec 24, 2012  
  */
 public class JcrForumSearch implements Search {
-  public Collection<SearchResult> search(String query) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=knowledge from=exo:topic " + query);      
-
+    
+    Map<String, Object> parameters = new HashMap<String, Object>(); 
+    parameters.put("sites", sites);
+    parameters.put("types", types);
+    parameters.put("offset", offset);
+    parameters.put("limit", limit);
+    parameters.put("sort", sort);
+    parameters.put("order", order);
+    
+    parameters.put("type", "forum");
+    parameters.put("repository", "repository");
+    parameters.put("workspace", "knowledge");
+    parameters.put("from", "exo:topic");
+    
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
     ForumService forumService = (ForumService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ForumService.class);
     for (JcrSearchResult jcrResult: jcrResults){
       try {

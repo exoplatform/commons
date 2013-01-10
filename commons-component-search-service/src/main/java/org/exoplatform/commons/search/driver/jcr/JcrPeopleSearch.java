@@ -2,7 +2,9 @@ package org.exoplatform.commons.search.driver.jcr;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
@@ -15,9 +17,23 @@ import org.exoplatform.social.core.manager.IdentityManager;
 public class JcrPeopleSearch implements Search {
   private static final String SEARCH_TYPE_NAME = "people";
   
-  public Collection<SearchResult> search(String query) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("type=" + SEARCH_TYPE_NAME + " repository=repository workspace=social from=soc:profiledefinition " + query);
+    
+    Map<String, Object> parameters = new HashMap<String, Object>(); 
+    parameters.put("sites", sites);
+    parameters.put("types", types);
+    parameters.put("offset", offset);
+    parameters.put("limit", limit);
+    parameters.put("sort", sort);
+    parameters.put("order", order);
+    
+    parameters.put("type", SEARCH_TYPE_NAME);
+    parameters.put("repository", "repository");
+    parameters.put("workspace", "social");
+    parameters.put("from", "soc:profiledefinition");
+    
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
     IdentityManager identityManager = (IdentityManager)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(IdentityManager.class);
 
     for(JcrSearchResult jcrResult: jcrResults) {

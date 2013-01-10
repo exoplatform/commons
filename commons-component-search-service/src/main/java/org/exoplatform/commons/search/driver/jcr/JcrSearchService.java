@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
@@ -49,7 +51,6 @@ import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.commons.search.SearchService;
 import org.exoplatform.commons.search.SearchType;
-import org.exoplatform.commons.search.util.QueryParser;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
@@ -77,20 +78,43 @@ public class JcrSearchService implements ResourceContainer {
     cacheControl.setNoStore(true);
   }
   
-  public static Collection<JcrSearchResult> search(String query) {
-    QueryParser parser = new QueryParser(query);
+  @SuppressWarnings("unchecked")
+  public static Collection<JcrSearchResult> search(String query, Map<String, Object> parameters) {
+    String repositoryName = null==parameters.get("repository") ? "repository" : (String) parameters.get("repository");
+    String workspaceName = null==parameters.get("workspace") ? "collaboration" : (String) parameters.get("workspace");
+    int offset = null==parameters.get("offset") ? 0 : (Integer) parameters.get("offset");
+    int limit = null==parameters.get("limit") ? 0 : (Integer) parameters.get("limit");
     
-    parser = parser.pick("repository");
-    String repositoryName = parser.getResults().isEmpty() ? "repository" : parser.getResults().get(0);
-    parser = parser.pick("workspace");
-    String workspaceName = parser.getResults().isEmpty() ? "collaboration" : parser.getResults().get(0);
+    boolean caseSensitive = null==parameters.get("caseSensitive") ? false : (Boolean) parameters.get("caseSensitive");
+    if(!caseSensitive) query = query.toLowerCase();
 
-    parser = parser.pick("offset"); 
-    int offset = parser.getResults().isEmpty() ? 0 : Integer.parseInt(parser.getResults().get(0));
-    parser = parser.pick("limit");
-    int limit = parser.getResults().isEmpty() ? 0 : Integer.parseInt(parser.getResults().get(0));
+    String from = null==parameters.get("from") ? "nt:base" : (String) parameters.get("from");
+    String where = null==parameters.get("where") ? "" : (String) parameters.get("where")+" AND ";
+
+    List<String> terms = parse(query);
+    where = where + String.format("(%s)", repeat("CONTAINS(*,'%s')", terms, " OR ")); //for full text search
     
-    return search(repositoryName, workspaceName, buildSql(parser.getQuery()), offset, limit);
+    String likeStmt = (!caseSensitive?"LOWER(%s)":"%s") + " LIKE '%%"+repeat("%s", terms, "%%")+"%%'";
+    
+    if(!(query.startsWith("\"") && query.endsWith("\""))) { //not exact search
+      SearchType searchType = SearchService.getRegistry().get((String) parameters.get("type"));
+      if(null!=searchType) {
+        Collection<String> likeFields = (Collection<String>) searchType.getProperties().get("likeFields");
+        if(null!=likeFields && !likeFields.isEmpty()) where = where + " OR " + String.format("(%s)", repeat(likeStmt, likeFields, " OR "));
+      }
+    }
+    
+    if(0!=IGNORED_FIELDS.length) where = where + " AND NOT " + String.format("(%s)", repeat(likeStmt, Arrays.asList(IGNORED_FIELDS), " OR "));
+    List<String> nodeTypes = (List<String>) parameters.get("nodeTypes");
+    if(null!= nodeTypes && !nodeTypes.isEmpty()) where = where + " AND " + String.format("(%s)", repeat("jcr:primaryType='%s'", nodeTypes, " OR "));
+    if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + String.format("(%s)", repeat("jcr:primaryType='%s'", Arrays.asList(IGNORED_TYPES), " OR "));
+        
+    String sortBy = null==parameters.get("sort") ? "jcr:score()" : (String) parameters.get("sort");    
+    String sortType = null==parameters.get("order") ? "DESC" : (String) parameters.get("order");
+    String option = "ORDER BY " + sortBy + " " + sortType;
+
+    String sql = String.format("SELECT rep:excerpt(), jcr:primaryType FROM %s WHERE %s %s", from, where, option);   
+    return search(repositoryName, workspaceName, sql, offset, limit);
   }
   
   private static Collection<JcrSearchResult> search(String repositoryName, String workspaceName, String sql, int offset, int limit) {
@@ -257,55 +281,27 @@ public class JcrSearchService implements ResourceContainer {
     Node node = session.getRootNode().getNode(nodePath.substring(secondSlash+1));
     return JcrSearchService.getNodeProperties(node);
   }
-
-  @SuppressWarnings("unchecked")
-  private static String buildSql(String query){
-    QueryParser parser = new QueryParser(query); 
-
-    parser = parser.pick("type");
-    String type = parser.getResults().isEmpty() ? "" : parser.getResults().get(0);
-    SearchType searchType = SearchService.getRegistry().get(type);
-
-    parser = parser.pick("from");
-    String from = parser.getResults().isEmpty() ? "nt:base" : parser.getResults().get(0);
-
-    parser = parser.pick("nodeTypes"); //for testing
-    List<String> nodeTypes = parser.getResults();
-    
-    parser = parser.pick("sortBy");
-    String sortBy = parser.getResults().isEmpty() ? "jcr:score()" : parser.getResults().get(0);
-    parser = parser.pick("sortType");
-    String sortType = parser.getResults().isEmpty() ? "DESC" : parser.getResults().get(0);
-    String option = "ORDER BY " + sortBy + " " + sortType;
-
-    parser = parser.pick("caseSensitive");
-    boolean caseSensitive = parser.getResults().isEmpty() ? false : Boolean.parseBoolean(parser.getResults().get(0));
-    
-
-    parser = parser.pick("where");
-    String where = parser.getResults().isEmpty() ? "" : parser.getResults().get(0)+" AND ";
-
-    query = parser.getQuery();
-    if(!caseSensitive) query = query.toLowerCase();
-    
-    List<String> terms = QueryParser.parse(query);
-    where = where + String.format("(%s)", QueryParser.repeat("CONTAINS(*,'%s')", terms, " OR ")); //for full text search
-    
-    String likeStmt = (!caseSensitive?"LOWER(%s)":"%s") + " LIKE '%%"+QueryParser.repeat("%s", terms, "%%")+"%%'";
-    
-    if(!(query.startsWith("\"") && query.endsWith("\""))) { //not exact search
-      if(null!=searchType) {
-        Collection<String> likeFields = (Collection<String>) searchType.getProperties().get("likeFields");
-        if(!likeFields.isEmpty()) where = where + " OR " + String.format("(%s)", QueryParser.repeat(likeStmt, likeFields, " OR "));
-      }
+ 
+  private static List<String> parse(String input) {
+    List<String> terms = new ArrayList<String>();
+    Matcher matcher = Pattern.compile("\"([^\"]+)\"").matcher(input);
+    while (matcher.find()) {
+      String founds = matcher.group(1);
+      terms.add(founds);
     }
-    
-    if(0!=IGNORED_FIELDS.length) where = where + " AND NOT " + String.format("(%s)", QueryParser.repeat(likeStmt, Arrays.asList(IGNORED_FIELDS), " OR "));
-    if(!nodeTypes.isEmpty()) where = where + " AND " + String.format("(%s)", QueryParser.repeat("jcr:primaryType='%s'", nodeTypes, " OR "));
-    if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + String.format("(%s)", QueryParser.repeat("jcr:primaryType='%s'", Arrays.asList(IGNORED_TYPES), " OR "));
+    String remain = matcher.replaceAll("").replaceAll("\"", "").trim(); //remove all remaining double quotes
+    if(!remain.isEmpty()) terms.addAll(Arrays.asList(remain.split("\\s+")));
+    return terms;
+  }
 
-    String sql = "SELECT rep:excerpt(), jcr:primaryType FROM ${from} WHERE ${where} ${option}";
-    return sql.replace("${from}", from).replace("${where}", where).replace("${option}", option);
+  private static String repeat(String format, Collection<String> strArr, String delimiter){
+    StringBuilder sb=new StringBuilder();
+    String delim = "";
+    for(String str:strArr) {
+      sb.append(delim).append(String.format(format, str));
+      delim = delimiter;
+    }
+    return sb.toString();
   }
   
 }

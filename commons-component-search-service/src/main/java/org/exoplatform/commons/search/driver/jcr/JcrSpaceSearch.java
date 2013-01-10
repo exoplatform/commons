@@ -2,6 +2,8 @@ package org.exoplatform.commons.search.driver.jcr;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
@@ -11,9 +13,23 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 
 public class JcrSpaceSearch implements Search {
 
-  public Collection<SearchResult> search(String query) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:spacedefinition " + query);
+    
+    Map<String, Object> parameters = new HashMap<String, Object>(); 
+    parameters.put("sites", sites);
+    parameters.put("types", types);
+    parameters.put("offset", offset);
+    parameters.put("limit", limit);
+    parameters.put("sort", sort);
+    parameters.put("order", order);
+    
+    parameters.put("type", "space");
+    parameters.put("repository", "repository");
+    parameters.put("workspace", "social");
+    parameters.put("from", "soc:spacedefinition");
+    
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
     SpaceService spaceSvc = (SpaceService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SpaceService.class);
 
     for(JcrSearchResult jcrResult: jcrResults) {

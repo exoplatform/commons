@@ -1,9 +1,12 @@
 package org.exoplatform.commons.search;
 
+import java.io.IOException;
 import java.util.Map;
 
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.exoplatform.commons.search.util.JsonMap;
+import org.codehaus.jackson.type.TypeReference;
 
 public class SearchType {
   private String name;
@@ -51,12 +54,15 @@ public class SearchType {
   public SearchType(String name, String displayName, String properties_json, String handler_className){
     this.name = name;
     this.displayName = displayName;
-    this.properties = new JsonMap<String, Object>(properties_json);
     try {
+      ObjectMapper mapper = new ObjectMapper();
+      this.properties = mapper.readValue(properties_json, new TypeReference<Map<String, Object>>(){});
       this.handler = (Class<? extends Search>) Class.forName(handler_className);
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
       this.handler = null;
+    } catch (Exception e) {
+      e.printStackTrace();
     }    
   }
   

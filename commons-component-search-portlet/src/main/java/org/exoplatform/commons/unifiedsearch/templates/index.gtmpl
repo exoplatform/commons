@@ -197,7 +197,7 @@
         $.each($(":checkbox[name='contentType']:checked"), function(){
           selectedTypes.push(this.value);
         });
-        return selectedTypes.join(";");
+        return selectedTypes.join(",");
       }
 
       function getTypeByDisplayName(typeDisplayName) {
@@ -219,13 +219,7 @@
         var sortBy = $("#lstSortBy").val();
         var sortType = $("#sortType").hasClass("Asc") ? "asc" : "desc";
 
-        query = query + " type=" + type;
-        query = query + " offset=" + offset;
-        query = query + " limit=" + LIMIT;
-        query = query + " sortBy=" + sortBy;
-        query = query + " sortType=" + sortType;
-
-        var restUrl = "/rest/search?q="+query;
+        var restUrl = "/rest/search?q="+query+"&sites=all"+"&types="+type+"&offset="+offset+"&limit="+LIMIT+"&sortBy="+sortBy+"&sortType="+sortType;
 
         $("body").css("cursor", "wait");
 
@@ -264,11 +258,7 @@
           return;
         }
 
-        if(query.indexOf(" type=")==-1) query = query + " type=" + getSelectedTypes();
-        query = query + " offset=" + 0;
-        query = query + " limit=" + LIMIT;
-
-        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query) + "&categorized=true";
+        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites=all"+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sortBy="+"&sortType=desc");
 
         $("body").css("cursor", "wait");
 
@@ -277,7 +267,7 @@
           var result = "";
 
           $.each(entryMap, function(type, entries){
-            var searchType = getTypeByDisplayName(type);
+            var searchType = type;
             var displayType = isSqlMode() ? type + " (" + $(entries).size() + ")" : type;
             resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + searchType + "' offset=0 numEntries=" + $(entries).size() + ">" + displayType + "</span>" + " | ";
             result = result + "<div class='SearchResultType' id='" + searchType + "-type'>";

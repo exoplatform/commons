@@ -62,7 +62,7 @@ public class SolrTest extends BaseTest  {
   }
 
   public void testSearch() throws Exception {
-    categorizedSearch("\"anthony cena\" mary");
+    search("\"anthony cena\" mary");
     search("creationAuthor_t:john"); //TODO: hide the underscore
   }
 }

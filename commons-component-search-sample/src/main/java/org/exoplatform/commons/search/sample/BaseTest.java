@@ -62,31 +62,21 @@ public abstract class BaseTest extends TestCase  {
     return topic;
   }
   
-  protected void categorizedSearch(String queryString){
+  protected void search(String queryString){
     System.out.println("\n====================================\nSearching for '" + queryString + "' (categorized)...\nResults:");
-    Map<String, Collection<SearchResult>> result = SearchService.categorizedSearch(queryString);
+    Map<String, Collection<SearchResult>> result = SearchService.search(queryString, null, null, 0, 0, "", "");
     
     Iterator<String> iter = result.keySet().iterator();
     while(iter.hasNext()){
-      String entryType = iter.next();
-      if(SearchService.isRegistered(entryType)) entryType = SearchService.getRegistry().get(entryType).getDisplayName();
-      System.out.println("\n" + entryType + ":");
-      Collection<SearchResult> entries = result.get(entryType);
+      String searchType = iter.next();
+      System.out.println("\n" + (SearchService.isRegistered(searchType)?SearchService.getRegistry().get(searchType).getName():searchType) + ":");
+      Collection<SearchResult> entries = result.get(searchType);
       Iterator<SearchResult> entriesIter = entries.iterator();
       while(entriesIter.hasNext()){
         System.out.println(" * " + entriesIter.next());
       }
     }
     
-  }
-
-  protected void search(String queryString){
-    System.out.println("\n====================================\nSearching for '" + queryString + "' (uncategorized) ...\nResults:");
-    Collection<SearchResult> result = SearchService.search(queryString);
-    Iterator<SearchResult> entriesIter = result.iterator();
-    while(entriesIter.hasNext()){
-      System.out.println(" * " + entriesIter.next());
-    }    
   }
   
   @Override

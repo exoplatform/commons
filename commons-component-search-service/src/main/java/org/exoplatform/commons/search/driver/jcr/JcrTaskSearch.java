@@ -19,6 +19,8 @@ package org.exoplatform.commons.search.driver.jcr;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.exoplatform.calendar.service.Calendar;
 import org.exoplatform.calendar.service.CalendarEvent;
@@ -36,10 +38,24 @@ import org.exoplatform.container.ExoContainerContext;
 public class JcrTaskSearch implements Search{
 
   @Override
-  public Collection<SearchResult> search(String query) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=collaboration from=exo:calendarEvent where=\"exo:eventType=\'Task\' \" " + query);
-
+    
+    Map<String, Object> parameters = new HashMap<String, Object>(); 
+    parameters.put("sites", sites);
+    parameters.put("types", types);
+    parameters.put("offset", offset);
+    parameters.put("limit", limit);
+    parameters.put("sort", sort);
+    parameters.put("order", order);
+    
+    parameters.put("type", "task");
+    parameters.put("repository", "repository");
+    parameters.put("workspace", "collaboration");
+    parameters.put("from", "exo:calendarEvent");
+    parameters.put("where", "exo:eventType='Task'");
+    
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
     CalendarService calendarService = (CalendarService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(CalendarService.class);
     for (JcrSearchResult jcrResult: jcrResults){                
       try {

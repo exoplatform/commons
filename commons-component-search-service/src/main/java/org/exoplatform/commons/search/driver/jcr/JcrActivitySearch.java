@@ -3,6 +3,8 @@ package org.exoplatform.commons.search.driver.jcr;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
@@ -17,10 +19,23 @@ import org.exoplatform.social.core.manager.ActivityManager;
  * Jan 2, 2013 
  */
 public class JcrActivitySearch implements Search {
-  public Collection<SearchResult> search(String query) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search("repository=repository workspace=social from=soc:activity " + query);
-
+    
+    Map<String, Object> parameters = new HashMap<String, Object>(); 
+    parameters.put("sites", sites);
+    parameters.put("types", types);
+    parameters.put("offset", offset);
+    parameters.put("limit", limit);
+    parameters.put("sort", sort);
+    parameters.put("order", order);
+    
+    parameters.put("type", "activity");
+    parameters.put("repository", "repository");
+    parameters.put("workspace", "social");
+    parameters.put("from", "soc:activity");
+    
+    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
     ActivityManager activityManager = (ActivityManager) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ActivityManager.class);
     for (JcrSearchResult jcrResult: jcrResults){       
       try {

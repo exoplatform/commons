@@ -16,17 +16,14 @@
  */
 package org.exoplatform.commons.search;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.exoplatform.commons.search.util.QueryParser;
 
 /**
  * Created by The eXo Platform SAS
@@ -67,59 +64,25 @@ public class SearchService {
     return registry.containsKey(searchTypeName);
   }
 
-  public static Collection<SearchResult> search(String query) {
-    Collection<SearchResult> results = new ArrayList<SearchResult>();
-    List<String> types;
+  public static Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+    Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
     try {
       // sql mode (for testing)
       if(query.startsWith("SELECT")) {
         types = Arrays.asList("jcrNode");
-      } else {
-        QueryParser parser = new QueryParser(query).pick("type");
-        types = parser.getResults();
-        query = parser.getQuery();
-        if(query.isEmpty()) query = "*"; //TODO: handle this in each handler
       }
       
       for(Entry<String, SearchType> entry:registry.entrySet()){
         SearchType searchType = entry.getValue();
-        if(!types.isEmpty() && !types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only
+        if(null!=types && !types.isEmpty() && !types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only
         Class<? extends Search> handler = searchType.getHandler();
         System.out.println("\n[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
-        results.addAll(handler.newInstance().search(query));
+        results.put(searchType.getName(), handler.newInstance().search(query, sites, types, offset, limit, sort, order));
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
     return results;
-  }
- 
-  public static Map<String, Collection<SearchResult>> categorizedSearch(String query) {
-    return categorize(search(query));
-  }
-
-  public static Map<String, Collection<SearchResult>> categorize(Collection<SearchResult> results){
-    Map<String, Collection<SearchResult>> categoryMap = new HashMap<String, Collection<SearchResult>>();
-    
-    for(SearchResult result:results) {
-      String resultType = result.getType(); //categorize search results by their type
-      if(SearchService.isRegistered(resultType)) resultType = SearchService.getRegistry().get(resultType).getDisplayName();
-      try {
-        // put the entry to an existing category or a new category if it doesn't exist      
-        Collection<SearchResult> categoryResultList;
-        if(categoryMap.containsKey(resultType)){
-          categoryResultList = categoryMap.get(resultType);
-        } else {
-          categoryResultList = new ArrayList<SearchResult>();
-          categoryMap.put(resultType, categoryResultList);
-        }
-        categoryResultList.add(result);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    
-    return categoryMap;
   }
   
 }
