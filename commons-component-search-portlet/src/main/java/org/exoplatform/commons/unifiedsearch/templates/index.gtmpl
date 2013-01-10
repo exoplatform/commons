@@ -200,11 +200,6 @@
         return selectedTypes.join(",");
       }
 
-      function getTypeByDisplayName(typeDisplayName) {
-        var type = $("#lstContentTypes li:contains('" + typeDisplayName + "') input:checkbox").attr("value");
-        return type ? type : typeDisplayName;
-      }
-
       function showMore(offsetIncrement) {
         if(isSqlMode()) return;
         var query = $("#txtQuery").val();
@@ -268,15 +263,16 @@
           var result = "";
 
           $.each(entryMap, function(type, entries){
-            var searchType = type;
-            var displayType = isSqlMode() ? type + " (" + $(entries).size() + ")" : type;
-            resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + searchType + "' offset=0 numEntries=" + $(entries).size() + ">" + displayType + "</span>" + " | ";
-            result = result + "<div class='SearchResultType' id='" + searchType + "-type'>";
+            if(0!=$(entries).size()) {
+              var typeDisplayName = isSqlMode() ? type + " (" + $(entries).size() + ")" : REGISTRY[type].displayName;
+              resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + type + "' offset=0 numEntries=" + $(entries).size() + ">" + typeDisplayName + "</span>" + " | ";
+              result = result + "<div class='SearchResultType' id='" + type + "-type'>";
 
-            $.each(entries, function(i, entry){
-              result = result + renderSearchResult(entry);
-            });
-            result = result + "</div>"; //type div
+              $.each(entries, function(i, entry){
+                result = result + renderSearchResult(entry);
+              });
+              result = result + "</div>"; //type div
+            }
           });
 
           if(""==result) {
