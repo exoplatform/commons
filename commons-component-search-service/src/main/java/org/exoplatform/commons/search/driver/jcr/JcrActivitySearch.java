@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
+import org.exoplatform.commons.search.service.UnifiedSearch;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
@@ -30,7 +31,7 @@ public class JcrActivitySearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", "activity");
+    parameters.put("type", UnifiedSearch.ACTIVITY);
     parameters.put("repository", "repository");
     parameters.put("workspace", "social");
     parameters.put("from", "soc:activity");
@@ -42,7 +43,7 @@ public class JcrActivitySearch implements Search {
         String activityId = (String) jcrResult.getProperty("jcr:uuid");        
         ExoSocialActivity activity = activityManager.getActivity(activityId);                       
 
-        SearchResult result = new SearchResult("activity",activity.getStreamUrl());
+        SearchResult result = new SearchResult(UnifiedSearch.ACTIVITY, activity.getStreamUrl());
         result.setTitle(activity.getTitle());
         result.setExcerpt(jcrResult.getExcerpt());
         StringBuffer buf = new StringBuffer();

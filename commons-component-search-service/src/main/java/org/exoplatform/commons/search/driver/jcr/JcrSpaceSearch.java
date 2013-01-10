@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
+import org.exoplatform.commons.search.service.UnifiedSearch;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
@@ -24,7 +25,7 @@ public class JcrSpaceSearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", "space");
+    parameters.put("type", UnifiedSearch.SPACE);
     parameters.put("repository", "repository");
     parameters.put("workspace", "social");
     parameters.put("from", "soc:spacedefinition");
@@ -37,7 +38,7 @@ public class JcrSpaceSearch implements Search {
         String spaceUrl = (String) jcrResult.getProperty("soc:url");        
         Space space = spaceSvc.getSpaceByUrl(spaceUrl);
 
-        SearchResult result = new SearchResult("space", spaceUrl);
+        SearchResult result = new SearchResult(UnifiedSearch.SPACE, spaceUrl);
         result.setTitle(space.getDisplayName());
         result.setExcerpt(space.getDescription());
         result.setDetail(space.getDisplayName() + " - " + String.valueOf(space.getMembers().length) + " - " + space.getVisibility());

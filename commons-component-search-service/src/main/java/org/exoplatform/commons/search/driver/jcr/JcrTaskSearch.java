@@ -27,6 +27,7 @@ import org.exoplatform.calendar.service.CalendarEvent;
 import org.exoplatform.calendar.service.CalendarService;
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
+import org.exoplatform.commons.search.service.UnifiedSearch;
 import org.exoplatform.container.ExoContainerContext;
 
 /**
@@ -49,7 +50,7 @@ public class JcrTaskSearch implements Search{
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", "task");
+    parameters.put("type", UnifiedSearch.TASK);
     parameters.put("repository", "repository");
     parameters.put("workspace", "collaboration");
     parameters.put("from", "exo:calendarEvent");
@@ -65,7 +66,7 @@ public class JcrTaskSearch implements Search{
         CalendarEvent calTask = calendarService.getGroupEvent(taskId);                
         Calendar calendar = calendarService.getGroupCalendar(calendarId);
 
-        SearchResult result = new SearchResult("task",calendar.getPublicUrl());
+        SearchResult result = new SearchResult(UnifiedSearch.TASK, calendar.getPublicUrl());
         result.setTitle(calTask.getSummary());
         result.setExcerpt(calTask.getDescription()!=null?calTask.getDescription():calTask.getSummary());
         StringBuffer buf = new StringBuffer();

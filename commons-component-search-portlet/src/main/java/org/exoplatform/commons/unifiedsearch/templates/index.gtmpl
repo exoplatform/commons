@@ -219,12 +219,13 @@
         var sortBy = $("#lstSortBy").val();
         var sortType = $("#sortType").hasClass("Asc") ? "asc" : "desc";
 
-        var restUrl = "/rest/search?q="+query+"&sites=all"+"&types="+type+"&offset="+offset+"&limit="+LIMIT+"&sortBy="+sortBy+"&sortType="+sortType;
+        var restUrl = "/rest/search?q="+query+"&sites=all"+"&types="+type+"&offset="+offset+"&limit="+LIMIT+"&sort="+sortBy+"&order="+sortType;
 
         $("body").css("cursor", "wait");
 
-        $.getJSON(restUrl, function(entries){
+        $.getJSON(restUrl, function(entryMap){
           var result = "";
+          var entries = entryMap[type];
 
           $.each(entries, function(i, entry){
             result = result + renderSearchResult(entry);
@@ -258,7 +259,7 @@
           return;
         }
 
-        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites=all"+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sortBy="+"&sortType=desc");
+        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites=all"+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc");
 
         $("body").css("cursor", "wait");
 

@@ -25,6 +25,19 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
 public class UnifiedSearch implements ResourceContainer {
+  // Search types constants
+  public static String FILE="file";
+  public static String DOCUMENT="document";
+  public static String DISCUSSION="forum"; //TODO: Canh to check this
+  public static String TASK="task";
+  public static String EVENT="event";
+  public static String PAGE="page";
+  public static String WIKI="wiki";
+  public static String SPACE="space";
+  public static String PEOPLE="people";
+  public static String QUESTION="question";
+  public static String ACTIVITY="activity";
+  
   private static final CacheControl cacheControl;
   static {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());

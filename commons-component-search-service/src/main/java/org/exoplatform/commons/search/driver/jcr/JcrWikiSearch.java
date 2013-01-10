@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
+import org.exoplatform.commons.search.service.UnifiedSearch;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.wiki.mow.api.Page;
@@ -35,7 +36,7 @@ public class JcrWikiSearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", "task");
+    parameters.put("type", UnifiedSearch.WIKI);
     parameters.put("repository", "repository");
     parameters.put("workspace", "collaboration");
     parameters.put("from", "wiki:page");
@@ -55,7 +56,7 @@ public class JcrWikiSearch implements Search {
           wikiName = parentPage.getTitle();
         }  
         String title = (String)jcrResult.getProperty("title");
-        SearchResult result = new SearchResult("wiki",url);
+        SearchResult result = new SearchResult(UnifiedSearch.WIKI, url);
         result.setTitle(title);
         result.setExcerpt(jcrResult.getExcerpt());
         StringBuffer buf = new StringBuffer();

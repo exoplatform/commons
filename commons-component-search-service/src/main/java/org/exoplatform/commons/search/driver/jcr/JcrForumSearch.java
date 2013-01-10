@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.exoplatform.commons.search.Search;
 import org.exoplatform.commons.search.SearchResult;
+import org.exoplatform.commons.search.service.UnifiedSearch;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.forum.service.Forum;
 import org.exoplatform.forum.service.ForumService;
@@ -32,7 +33,7 @@ public class JcrForumSearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", "forum");
+    parameters.put("type", UnifiedSearch.DISCUSSION);
     parameters.put("repository", "repository");
     parameters.put("workspace", "knowledge");
     parameters.put("from", "exo:topic");
@@ -62,7 +63,7 @@ public class JcrForumSearch implements Search {
         Forum forum = (Forum)forumService.getForum(category, forumId);        
 
         ///Forum forum = (Forum)forumService.getObjectNameByPath(path.substring(path.indexOf(Utils.CATEGORY), path.lastIndexOf("/")));
-        SearchResult result = new SearchResult("forum",topic.getLink());
+        SearchResult result = new SearchResult(UnifiedSearch.DISCUSSION, topic.getLink());
         result.setTitle(topic.getTopicName());
         result.setExcerpt(topic.getDescription());
         StringBuffer buf = new StringBuffer();

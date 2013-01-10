@@ -80,16 +80,26 @@ public class JcrSearchService implements ResourceContainer {
   
   @SuppressWarnings("unchecked")
   public static Collection<JcrSearchResult> search(String query, Map<String, Object> parameters) {
-    String repositoryName = null==parameters.get("repository") ? "repository" : (String) parameters.get("repository");
-    String workspaceName = null==parameters.get("workspace") ? "collaboration" : (String) parameters.get("workspace");
-    int offset = null==parameters.get("offset") ? 0 : (Integer) parameters.get("offset");
-    int limit = null==parameters.get("limit") ? 0 : (Integer) parameters.get("limit");
+    String repositoryName = (String) parameters.get("repository");
+    if(null==repositoryName||repositoryName.isEmpty()) repositoryName = "repository";
     
-    boolean caseSensitive = null==parameters.get("caseSensitive") ? false : (Boolean) parameters.get("caseSensitive");
+    String workspaceName = (String) parameters.get("workspace");
+    if(null==workspaceName||workspaceName.isEmpty()) workspaceName = "collaboration";
+    
+    Integer offset = (Integer) parameters.get("offset");
+    if(null==offset) offset = 0;
+    
+    Integer limit = (Integer) parameters.get("limit");
+    if(null==limit) limit=0;
+    
+    Boolean caseSensitive = (Boolean) parameters.get("caseSensitive");
+    if(null==caseSensitive) caseSensitive=false;
     if(!caseSensitive) query = query.toLowerCase();
 
-    String from = null==parameters.get("from") ? "nt:base" : (String) parameters.get("from");
-    String where = null==parameters.get("where") ? "" : (String) parameters.get("where")+" AND ";
+    String from = (String) parameters.get("from");
+    if(null==from) from = "nt:base";
+    String where = (String) parameters.get("where");
+    where = (null==where) ? "" : where+" AND ";
 
     List<String> terms = parse(query);
     where = where + String.format("(%s)", repeat("CONTAINS(*,'%s')", terms, " OR ")); //for full text search
@@ -109,9 +119,11 @@ public class JcrSearchService implements ResourceContainer {
     if(null!= nodeTypes && !nodeTypes.isEmpty()) where = where + " AND " + String.format("(%s)", repeat("jcr:primaryType='%s'", nodeTypes, " OR "));
     if(0!=IGNORED_TYPES.length) where = where + " AND NOT " + String.format("(%s)", repeat("jcr:primaryType='%s'", Arrays.asList(IGNORED_TYPES), " OR "));
         
-    String sortBy = null==parameters.get("sort") ? "jcr:score()" : (String) parameters.get("sort");    
-    String sortType = null==parameters.get("order") ? "DESC" : (String) parameters.get("order");
-    String option = "ORDER BY " + sortBy + " " + sortType;
+    String sort = (String) parameters.get("sort");
+    if(null==sort||sort.isEmpty()) sort = "jcr:score()";    
+    String order = (String) parameters.get("order");
+    if(null==order||order.isEmpty()) order = "DESC";
+    String option = "ORDER BY " + sort + " " + order;
 
     String sql = String.format("SELECT rep:excerpt(), jcr:primaryType FROM %s WHERE %s %s", from, where, option);   
     return search(repositoryName, workspaceName, sql, offset, limit);
