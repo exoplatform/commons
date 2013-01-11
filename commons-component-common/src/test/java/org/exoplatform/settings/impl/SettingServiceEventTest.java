@@ -16,17 +16,17 @@
  */
 package org.exoplatform.settings.impl;
 
+import org.exoplatform.commons.api.settings.SettingListener;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.EventType;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.api.settings.data.SettingContext;
+import org.exoplatform.commons.api.settings.data.SettingData;
+import org.exoplatform.commons.api.settings.data.SettingKey;
+import org.exoplatform.commons.api.settings.data.SettingScope;
 import org.exoplatform.commons.event.api.EventManager;
-import org.exoplatform.commons.settings.api.SettingService;
-import org.exoplatform.commons.settings.api.SettingValue;
-import org.exoplatform.commons.settings.listener.api.SettingListener;
-import org.exoplatform.commons.settings.model.api.Context;
-import org.exoplatform.commons.settings.model.api.EventType;
-import org.exoplatform.commons.settings.model.api.Scope;
-import org.exoplatform.commons.settings.model.api.SettingContext;
-import org.exoplatform.commons.settings.model.api.SettingData;
-import org.exoplatform.commons.settings.model.api.SettingKey;
-import org.exoplatform.commons.settings.model.api.SettingScope;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.security.ConversationState;

@@ -46,7 +46,7 @@
 	</component>
 
 	<component>
-		<key>org.exoplatform.commons.settings.api.SettingService</key>
+		<key>org.exoplatform.commons.api.settings.SettingService</key>
 		<type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
 	</component>
 	<external-component-plugins>

@@ -16,9 +16,9 @@
  */
 package org.exoplatform.settings.cache.selector;
 
-import org.exoplatform.commons.settings.model.api.SettingContext;
-import org.exoplatform.commons.settings.model.api.SettingKey;
-import org.exoplatform.commons.settings.model.api.SettingScope;
+import org.exoplatform.commons.api.settings.data.SettingContext;
+import org.exoplatform.commons.api.settings.data.SettingKey;
+import org.exoplatform.commons.api.settings.data.SettingScope;
 import org.exoplatform.services.cache.CachedObjectSelector;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.ObjectCacheInfo;

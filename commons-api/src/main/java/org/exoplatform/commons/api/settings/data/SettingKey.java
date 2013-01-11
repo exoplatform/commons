@@ -14,30 +14,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.settings.model.api;
+package org.exoplatform.commons.api.settings.data;
 
-import org.exoplatform.commons.settings.model.api.Context;
-import org.exoplatform.commons.settings.model.api.Scope;
 
 /**
- * Created by The eXo Platform SAS Author : Nguyen Viet Bang
- * bangnv@exoplatform.com Nov 26, 2012
+ * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
+ * Nov 22, 2012
  */
-public class SettingScope extends SettingContext {
+public class SettingKey extends SettingScope {
 
   /**
    * 
    */
-  private static final long serialVersionUID = -8617975143175631988L;
+  private static final long serialVersionUID = 7109224384495691388L;
+  private String key;
 
-  protected Scope  scope;
+  public SettingKey(Context context, Scope scope, String key) {
+    super(context, scope);
+    this.key = key;
+  }
 
-  protected String scopePath;
+  public String getKey() {
+    return key;
+  }
 
-  public SettingScope(Context context, Scope scope) {
-    super(context);
-    this.scope = scope;
-    scopePath = Tools.buildScopePath(context, scope);
+  public void setKey(String key) {
+    this.key = key;
   }
 
   @Override
@@ -51,10 +53,9 @@ public class SettingScope extends SettingContext {
     if (!super.equals(obj)) {
       return false;
     }
-
-    if (obj instanceof SettingScope) {
-      SettingScope dest = (SettingScope) obj;
-      return this.getScopePath().equals(dest.getScopePath());
+    if (obj instanceof SettingKey) {
+      SettingKey that = (SettingKey) obj;
+      return key.equals(that.getKey());
     }
     return false;
   }
@@ -63,15 +64,8 @@ public class SettingScope extends SettingContext {
   public int hashCode() {
     int result = super.repositoryName.hashCode();
     result = 31 * result + scopePath.hashCode();
+    result = 31 * result + key.hashCode();
     return result;
-  }
-
-  public Scope getScope() {
-    return scope;
-  }
-
-  public String getScopePath() {
-    return scopePath;
   }
 
 }

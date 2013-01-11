@@ -1,7 +1,7 @@
-package org.exoplatform.commons.settings.api;
+package org.exoplatform.commons.api.settings;
 
-import org.exoplatform.commons.settings.model.api.Context;
-import org.exoplatform.commons.settings.model.api.Scope;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 
 
 /**
