@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.search;
+package org.exoplatform.commons.search.api.indexing.data;
+
+
 
 /**
  * Created by The eXo Platform SAS
@@ -22,32 +24,32 @@ package org.exoplatform.commons.search;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public class SearchEntryId {
-  protected String collection;
-  protected String type;
-  protected String name;
-    
-  public SearchEntryId(String collection, String type, String name) {
-    this.collection = collection;
-    this.type = type;
-    this.name = name;
+public class SimpleEntry extends SearchEntry{
+  private static final String TITLE = "title";
+  private static final String EXCERPT = "excerpt";
+  private static final String URL = "url";
+  
+  public String getTitle() {
+    return (String)content.get(TITLE);
+  }
+
+  public void setTitle(String title) {
+    content.put(TITLE, title);
+  }
+
+  public String getExcerpt() {
+    return (String)content.get(EXCERPT);
+  }
+
+  public void setExcerpt(String excerpt) {
+    content.put(EXCERPT, excerpt);
   }
   
-  public String getCollection() {
-    return collection;
+  public String getUrl() {
+    return (String)content.get(URL);
   }
 
-  public String getType() {
-    return type;
+  public void setUrl(String url) {
+    content.put(URL, url);
   }
-
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public String toString() {
-    return collection + "/" + type + "/" + name;
-  }
-
 }

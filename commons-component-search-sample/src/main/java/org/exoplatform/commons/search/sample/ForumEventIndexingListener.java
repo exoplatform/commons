@@ -16,7 +16,7 @@
  */
 package org.exoplatform.commons.search.sample;
 
-import org.exoplatform.commons.search.IndexingService;
+import org.exoplatform.commons.search.api.indexing.IndexingService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.forum.service.Category;
 import org.exoplatform.forum.service.Forum;

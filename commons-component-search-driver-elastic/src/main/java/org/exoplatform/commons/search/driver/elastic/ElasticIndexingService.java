@@ -23,9 +23,9 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
-import org.exoplatform.commons.search.IndexingService;
-import org.exoplatform.commons.search.SearchEntry;
-import org.exoplatform.commons.search.SearchEntryId;
+import org.exoplatform.commons.search.api.indexing.IndexingService;
+import org.exoplatform.commons.search.api.indexing.data.SearchEntry;
+import org.exoplatform.commons.search.api.indexing.data.SearchEntryId;
 
 /**
  * Created by The eXo Platform SAS

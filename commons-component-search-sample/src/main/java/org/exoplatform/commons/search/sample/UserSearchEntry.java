@@ -16,8 +16,8 @@
  */
 package org.exoplatform.commons.search.sample;
 
-import org.exoplatform.commons.search.SearchEntryId;
-import org.exoplatform.commons.search.SimpleEntry;
+import org.exoplatform.commons.search.api.indexing.data.SearchEntryId;
+import org.exoplatform.commons.search.api.indexing.data.SimpleEntry;
 import org.exoplatform.services.organization.User;
 
 /**

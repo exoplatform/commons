@@ -25,8 +25,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.exoplatform.commons.search.SearchEntry;
-import org.exoplatform.commons.search.SearchResult;
+import org.exoplatform.commons.search.api.indexing.data.SearchEntry;
+import org.exoplatform.commons.search.api.search.data.SearchResult;
 
 /**
  * Created by The eXo Platform SAS

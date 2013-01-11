@@ -1,12 +1,10 @@
-package org.exoplatform.commons.search;
+package org.exoplatform.commons.search.api.search.data;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.exoplatform.commons.search.api.search.Search;
 
 public class SearchType {
   private String name;

@@ -14,8 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.search;
+package org.exoplatform.commons.search.api.indexing;
 
+import java.util.Map;
+
+import org.exoplatform.commons.search.api.indexing.data.SearchEntry;
+import org.exoplatform.commons.search.api.indexing.data.SearchEntryId;
 
 /**
  * Created by The eXo Platform SAS
@@ -23,32 +27,11 @@ package org.exoplatform.commons.search;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public class SimpleEntry extends SearchEntry{
-  private static final String TITLE = "title";
-  private static final String EXCERPT = "excerpt";
-  private static final String URL = "url";
-  
-  public String getTitle() {
-    return (String)content.get(TITLE);
-  }
+public abstract class IndexingService {
+  protected static final String DATE_INDEXED = "se_dateIndexed";
+  protected static final String LAST_UPDATE = "se_lastUpdate";
 
-  public void setTitle(String title) {
-    content.put(TITLE, title);
-  }
-
-  public String getExcerpt() {
-    return (String)content.get(EXCERPT);
-  }
-
-  public void setExcerpt(String excerpt) {
-    content.put(EXCERPT, excerpt);
-  }
-  
-  public String getUrl() {
-    return (String)content.get(URL);
-  }
-
-  public void setUrl(String url) {
-    content.put(URL, url);
-  }
+  public abstract void add(SearchEntry searchEntry);
+  public abstract void update(SearchEntryId id, Map<String, Object> changes);
+  public abstract void delete(SearchEntryId id);
 }

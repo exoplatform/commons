@@ -20,9 +20,9 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.common.SolrInputDocument;
-import org.exoplatform.commons.search.IndexingService;
-import org.exoplatform.commons.search.SearchEntry;
-import org.exoplatform.commons.search.SearchEntryId;
+import org.exoplatform.commons.search.api.indexing.IndexingService;
+import org.exoplatform.commons.search.api.indexing.data.SearchEntry;
+import org.exoplatform.commons.search.api.indexing.data.SearchEntryId;
 
 /**
  * Created by The eXo Platform SAS
