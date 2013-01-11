@@ -17,15 +17,37 @@
         "displayName": "JCR nodes",
         "handler": "org.exoplatform.commons.search.driver.jcr.JcrNodeSearch"
     },
-    "forum": {
-        "name": "forum",
-        "properties": {},
-        "displayName": "Forums",
+    "discussion": {
+        "name": "discussion",
+        "properties": {
+            "sortFields": [
+                {
+                    "name": "exo:name",
+                    "displayName": "Topic name"
+                },
+                {
+                    "name": "exo:createdDate",
+                    "displayName": "Date created"
+                }
+            ]        
+        },
+        "displayName": "Discussions",
         "handler": "org.exoplatform.commons.search.driver.jcr.JcrForumSearch"
     },
     "event": {
         "name": "event",
-        "properties": {},
+        "properties": {
+        	"sortFields": [
+                {
+                    "name": "exo:summary",
+                    "displayName": "Summary"
+                },
+                {
+                    "name": "exo:lastModifiedDate",
+                    "displayName": "Updated Date"
+                }
+            ]        
+        },
         "displayName": "Events",
         "handler": "org.exoplatform.commons.search.driver.jcr.JcrEventSearch"
     },
@@ -75,16 +97,34 @@
     },
     "activity": {
         "name": "activity",
-        "properties": {},
+        "properties": {
+        	"sortFields": [
+                {
+                    "name": "title",
+                    "displayName": "Title"
+                },
+                {
+                    "name": "soc:lastUpdated",
+                    "displayName": "Updated Date"
+                }
+            ]
+        },
         "displayName": "Activities",
         "handler": "org.exoplatform.commons.search.driver.jcr.JcrActivitySearch"
     },
     "task": {
         "name": "task",
         "properties": {
-            "taskUrl": {
-                "exo:calendarEvent": "exo:link"
-            }
+        	"sortFields": [
+                {
+                    "name": "exo:summary",
+                    "displayName": "Summary"
+                },
+                {
+                    "name": "exo:lastModifiedDate",
+                    "displayName": "Updated Date"
+                }
+            ]
         },
         "displayName": "Tasks",
         "handler": "org.exoplatform.commons.search.driver.jcr.JcrTaskSearch"

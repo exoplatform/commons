@@ -1,12 +1,20 @@
 package org.exoplatform.commons.api.search.data;
 
+/**
+ * Search result returned by SearchService and all of its connectors, for rendering their search results on UI in a unified format
+ *  
+ * Created by The eXo Platform SAS
+ * Author : Tung Vu Minh
+ *          tungvm@exoplatform.com
+ * Nov 21, 2012  
+ */
 public class SearchResult {
-  private String type;
-  private String url;
-  private String title;
-  private String excerpt;
-  private String detail;
-  private String avatar;
+  private String type; //the search type (e.g people, wiki...)
+  private String url;  //url of this result
+  private String title; //title to be displayed on UI
+  private String excerpt; //the excerpt to be displayed on UI
+  private String detail; //details information
+  private String avatar; //an image to be displayed on UI
   
   public String getType() {
     return type;

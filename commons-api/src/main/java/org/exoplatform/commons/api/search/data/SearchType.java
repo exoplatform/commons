@@ -6,11 +6,19 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.exoplatform.commons.api.search.Search;
 
+/**
+ * Define search type handled by SearchService, e.g: people search, wiki search...  
+ *
+ * Created by The eXo Platform SAS
+ * Author : Tung Vu Minh
+ *          tungvm@exoplatform.com
+ * Nov 21, 2012  
+ */
 public class SearchType {
-  private String name;
-  private String displayName;
-  private Map<String, Object> properties;
-  private Class<? extends Search> handler;
+  private String name; //search type name
+  private String displayName; //for use when rendering
+  private Map<String, Object> properties; // optional miscellaneous properties used by the connector or for rendering on UI
+  private Class<? extends Search> handler; //the connector which provide result for this search type
   
   public String getName() {
     return name;
