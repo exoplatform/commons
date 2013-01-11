@@ -118,10 +118,7 @@
         <div id="filterFormTitle">Filter By</div>
         <div style="padding-right: 10px;">
           <input type="checkbox" name="site" value="all">All Sites
-          <ul id="lstSites">
-            <li><input type="checkbox" value="acme" name="site">ACME</li>
-            <li><input type="checkbox" value="intranet" name="site">Intranet</li>
-          </ul>
+          <ul id="lstSites"></ul>
 
           <input type="checkbox" name="contentType" value="all">All Content Types
           <ul id="lstContentTypes"></ul>
@@ -155,10 +152,27 @@
           contentTypes.push("<li><input type='checkbox' name='contentType' value='" + searchType.name + "'>" + searchType.displayName + "</li>");
         });
         $("#lstContentTypes").html(contentTypes.join(""));
-
         $(":checkbox[name='contentType']").attr('checked', true);
+
+        // Load sites
+        $.getJSON("/rest/search/sites", function(sites){
+          var siteNames = [];
+          $.each(sites, function(i, site){
+            siteNames.push("<li><input type='checkbox' name='site' value='" + site + "'>" + site.toProperCase() + "</li>");
+          });
+          $("#lstSites").html(siteNames.join(""));
+          $(":checkbox[name='site']").attr('checked', true);
+        });
+
         $("#txtQuery").focus();
       });
+
+
+
+
+      String.prototype.toProperCase = function () {
+          return this.replace(/\\w\\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+      };
 
 
       function renderSearchResult(result) {
@@ -199,6 +213,17 @@
         });
         return selectedTypes.join(",");
       }
+
+
+      function getSelectedSites(){
+        if($(":checkbox[name='site'][value='all']").is(":checked")) return "all";
+        var selectedSites = [];
+        $.each($(":checkbox[name='site']:checked"), function(){
+          selectedSites.push(this.value);
+        });
+        return selectedSites.join(",");
+      }
+
 
       function showMore(offsetIncrement) {
         if(isSqlMode()) return;
@@ -254,7 +279,7 @@
           return;
         }
 
-        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites=all"+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc");
+        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc");
 
         $("body").css("cursor", "wait");
 
@@ -359,9 +384,28 @@
       });
 
 
+      $(":checkbox[name='site']").live("click", function(){
+        if("all"==this.value){ //All Sites checked
+          if($(this).is(":checked")) { // check/uncheck all
+            $(":checkbox[name='site']").attr('checked', true);
+          } else {
+            $(":checkbox[name='site']").attr('checked', false);
+          }
+        } else {
+          $(":checkbox[name='site'][value='all']").attr('checked', false); //uncheck All Sites
+        }
+
+        if(!isSqlMode()) {
+          VIEWING_TYPE = $(".ResultType.Selected").attr("type"); //save the current view before performing search
+          search();
+        }
+      });
+
+
       $("#btnSearch").click(function(){
         search();
       });
+
 
       $("#txtQuery").focus(function(){
         VIEWING_TYPE = $(".ResultType.Selected").attr("type"); //save the current view before performing search

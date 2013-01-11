@@ -85,7 +85,10 @@ public class JcrSearchService implements ResourceContainer {
     
     String workspaceName = (String) parameters.get("workspace");
     if(null==workspaceName||workspaceName.isEmpty()) workspaceName = "collaboration";
-    
+
+    Collection<String> siteNames = (Collection<String>) parameters.get("sites");
+    if(null==siteNames||siteNames.isEmpty()) siteNames = Arrays.asList("all");
+
     Integer offset = (Integer) parameters.get("offset");
     if(null==offset) offset = 0;
     
@@ -126,10 +129,10 @@ public class JcrSearchService implements ResourceContainer {
     String option = "ORDER BY " + sort + " " + order;
 
     String sql = String.format("SELECT rep:excerpt(), jcr:primaryType FROM %s WHERE %s %s", from, where, option);   
-    return search(repositoryName, workspaceName, sql, offset, limit);
+    return search(repositoryName, workspaceName, siteNames, sql, offset, limit);
   }
   
-  private static Collection<JcrSearchResult> search(String repositoryName, String workspaceName, String sql, int offset, int limit) {
+  private static Collection<JcrSearchResult> search(String repositoryName, String workspaceName, Collection<String> siteNames, String sql, int offset, int limit) {
     System.out.format("[UNIFIED SEARCH] JcrSearchService.search()\nrepository = %s\nworkspace = %s\nsql = %s\noffset = %s\nlimit = %s\n", repositoryName, workspaceName, sql, offset, limit);
     Collection<JcrSearchResult> results = new ArrayList<JcrSearchResult>();
     try {
@@ -149,11 +152,25 @@ public class JcrSearchService implements ResourceContainer {
       RowIterator rit = queryResult.getRows();
       while(rit.hasNext()){
         Row row = rit.nextRow();
+        String path = row.getValue("jcr:path").getString();
+        
+        boolean isSiteContentPath = path.contains("/sites content/live/");
+        boolean isUnderSearchingSites = false;        
+        if(isSiteContentPath) {
+          for(String site:siteNames){
+            if(site.equals("all") || path.contains("/sites content/live/"+site+"/")) {
+              isUnderSearchingSites = true; //the path is under one of the sites being searched for
+              break;
+            }
+          }
+        }        
+        if(isSiteContentPath && !isUnderSearchingSites) continue; //ignore this result
+        
         JcrSearchResult resultItem = new JcrSearchResult();
 
         resultItem.setRepository(repository.getConfiguration().getName());
         resultItem.setWorkspace(session.getWorkspace().getName());
-        resultItem.setPath(row.getValue("jcr:path").getString());
+        resultItem.setPath(path);
         resultItem.setPrimaryType(row.getValue("jcr:primaryType").getString());
         Value excerpt = row.getValue("rep:excerpt()");
         resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");

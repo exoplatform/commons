@@ -69,11 +69,6 @@ public class SearchService {
   public static Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
     try {
-      // sql mode (for testing)
-      if(query.startsWith("SELECT")) {
-        types = Arrays.asList("jcrNode");
-      }
-      
       for(Entry<String, SearchType> entry:registry.entrySet()){
         SearchType searchType = entry.getValue();
         if(null!=types && !types.isEmpty() && !types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only

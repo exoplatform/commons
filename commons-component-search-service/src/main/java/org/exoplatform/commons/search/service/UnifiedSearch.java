@@ -19,6 +19,8 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import org.exoplatform.commons.search.api.search.SearchService;
 import org.exoplatform.commons.search.api.search.data.SearchType;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchService;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
@@ -64,6 +66,8 @@ public class UnifiedSearch implements ResourceContainer {
   @GET
   public Response search(@QueryParam("q") String query, @QueryParam("sites") String sites, @QueryParam("types") String types, @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("sort") String sort, @QueryParam("order") String order) {
     try {
+      // sql mode (for testing)
+      if(query.startsWith("SELECT")) return Response.ok(SearchService.search(query, Arrays.asList("all"), Arrays.asList("jcrNode"), 0, 0, "jcrScore()", "DESC"), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
       return Response.ok(SearchService.search(query, Arrays.asList(sites.split(",\\s*")), Arrays.asList(types.split(",\\s*")), offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
       e.printStackTrace();
@@ -71,7 +75,6 @@ public class UnifiedSearch implements ResourceContainer {
     }
   }
 
-  //for testing
   @GET
   @Path("/registry")
   public static Response getRegistry() {
@@ -106,4 +109,12 @@ public class UnifiedSearch implements ResourceContainer {
     return Response.ok(SearchService.getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
 
+  
+  @GET
+  @Path("/sites")
+  public static Response getAllPortalNames() throws Exception {
+    UserPortalConfigService dataStorage = (UserPortalConfigService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(UserPortalConfigService.class);
+    return Response.ok(dataStorage.getAllPortalNames(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  }
+  
 }
