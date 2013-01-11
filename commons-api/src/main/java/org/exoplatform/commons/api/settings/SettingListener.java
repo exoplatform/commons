@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.settings.listener.api;
+package org.exoplatform.commons.api.settings;
 
-import org.exoplatform.commons.settings.api.SettingService;
-import org.exoplatform.commons.settings.model.api.EventType;
-import org.exoplatform.commons.settings.model.api.SettingData;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.data.EventType;
+import org.exoplatform.commons.api.settings.data.SettingData;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 

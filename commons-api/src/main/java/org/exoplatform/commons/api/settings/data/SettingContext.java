@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.settings.model.api;
+package org.exoplatform.commons.api.settings.data;
 
 import java.io.Serializable;
 
 import javax.jcr.RepositoryException;
 
-
-import org.exoplatform.commons.settings.model.api.Context;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.jcr.RepositoryService;
 

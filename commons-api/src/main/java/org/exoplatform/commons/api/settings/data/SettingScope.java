@@ -14,34 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.settings.model.api;
+package org.exoplatform.commons.api.settings.data;
 
-import org.exoplatform.commons.settings.model.api.Context;
-import org.exoplatform.commons.settings.model.api.Scope;
 
 /**
- * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
- * Nov 22, 2012
+ * Created by The eXo Platform SAS Author : Nguyen Viet Bang
+ * bangnv@exoplatform.com Nov 26, 2012
  */
-public class SettingKey extends SettingScope {
+public class SettingScope extends SettingContext {
 
   /**
    * 
    */
-  private static final long serialVersionUID = 7109224384495691388L;
-  private String key;
+  private static final long serialVersionUID = -8617975143175631988L;
 
-  public SettingKey(Context context, Scope scope, String key) {
-    super(context, scope);
-    this.key = key;
-  }
+  protected Scope  scope;
 
-  public String getKey() {
-    return key;
-  }
+  protected String scopePath;
 
-  public void setKey(String key) {
-    this.key = key;
+  public SettingScope(Context context, Scope scope) {
+    super(context);
+    this.scope = scope;
+    scopePath = Tools.buildScopePath(context, scope);
   }
 
   @Override
@@ -55,9 +49,10 @@ public class SettingKey extends SettingScope {
     if (!super.equals(obj)) {
       return false;
     }
-    if (obj instanceof SettingKey) {
-      SettingKey that = (SettingKey) obj;
-      return key.equals(that.getKey());
+
+    if (obj instanceof SettingScope) {
+      SettingScope dest = (SettingScope) obj;
+      return this.getScopePath().equals(dest.getScopePath());
     }
     return false;
   }
@@ -66,8 +61,15 @@ public class SettingKey extends SettingScope {
   public int hashCode() {
     int result = super.repositoryName.hashCode();
     result = 31 * result + scopePath.hashCode();
-    result = 31 * result + key.hashCode();
     return result;
+  }
+
+  public Scope getScope() {
+    return scope;
+  }
+
+  public String getScopePath() {
+    return scopePath;
   }
 
 }

@@ -16,11 +16,11 @@
  */
 package org.exoplatform.settings.impl;
 
-import org.exoplatform.commons.settings.api.SettingService;
-import org.exoplatform.commons.settings.api.SettingValue;
-import org.exoplatform.commons.settings.model.api.Context;
-import org.exoplatform.commons.settings.model.api.Scope;
-import org.exoplatform.commons.settings.model.api.SettingKey;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.api.settings.data.SettingKey;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
