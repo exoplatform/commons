@@ -14,12 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.search.api.indexing;
-
-import java.util.Map;
-
-import org.exoplatform.commons.search.api.indexing.data.SearchEntry;
-import org.exoplatform.commons.search.api.indexing.data.SearchEntryId;
+package org.exoplatform.commons.api.indexing.data;
 
 /**
  * Created by The eXo Platform SAS
@@ -27,11 +22,32 @@ import org.exoplatform.commons.search.api.indexing.data.SearchEntryId;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public abstract class IndexingService {
-  protected static final String DATE_INDEXED = "se_dateIndexed";
-  protected static final String LAST_UPDATE = "se_lastUpdate";
+public class SearchEntryId {
+  protected String collection;
+  protected String type;
+  protected String name;
+    
+  public SearchEntryId(String collection, String type, String name) {
+    this.collection = collection;
+    this.type = type;
+    this.name = name;
+  }
+  
+  public String getCollection() {
+    return collection;
+  }
 
-  public abstract void add(SearchEntry searchEntry);
-  public abstract void update(SearchEntryId id, Map<String, Object> changes);
-  public abstract void delete(SearchEntryId id);
+  public String getType() {
+    return type;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String toString() {
+    return collection + "/" + type + "/" + name;
+  }
+
 }

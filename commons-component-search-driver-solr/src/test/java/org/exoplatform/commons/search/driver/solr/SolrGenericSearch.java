@@ -2,8 +2,8 @@ package org.exoplatform.commons.search.driver.solr;
 
 import java.util.Collection;
 
-import org.exoplatform.commons.search.api.search.Search;
-import org.exoplatform.commons.search.api.search.data.SearchResult;
+import org.exoplatform.commons.api.search.Search;
+import org.exoplatform.commons.api.search.data.SearchResult;
 
 public class SolrGenericSearch implements Search {
 

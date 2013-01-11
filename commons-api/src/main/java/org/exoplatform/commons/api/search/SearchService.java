@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.search.api.search;
+package org.exoplatform.commons.api.search;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,8 +24,8 @@ import java.util.Map.Entry;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.exoplatform.commons.search.api.search.data.SearchResult;
-import org.exoplatform.commons.search.api.search.data.SearchType;
+import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.commons.api.search.data.SearchType;
 
 /**
  * Created by The eXo Platform SAS

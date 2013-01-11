@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.exoplatform.commons.search.api.search.Search;
-import org.exoplatform.commons.search.api.search.data.SearchResult;
+import org.exoplatform.commons.api.search.Search;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearch;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.forum.service.Forum;

@@ -25,8 +25,8 @@ import java.util.Map;
 import org.exoplatform.calendar.service.Calendar;
 import org.exoplatform.calendar.service.CalendarEvent;
 import org.exoplatform.calendar.service.CalendarService;
-import org.exoplatform.commons.search.api.search.Search;
-import org.exoplatform.commons.search.api.search.data.SearchResult;
+import org.exoplatform.commons.api.search.Search;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearch;
 import org.exoplatform.container.ExoContainerContext;
 

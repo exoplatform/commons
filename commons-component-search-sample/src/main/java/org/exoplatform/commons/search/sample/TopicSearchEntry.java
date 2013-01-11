@@ -18,8 +18,8 @@ package org.exoplatform.commons.search.sample;
 
 import java.util.Date;
 
-import org.exoplatform.commons.search.api.indexing.data.SearchEntryId;
-import org.exoplatform.commons.search.api.indexing.data.StandardEntry;
+import org.exoplatform.commons.api.indexing.data.SearchEntryId;
+import org.exoplatform.commons.api.indexing.data.StandardEntry;
 import org.exoplatform.forum.service.Topic;
 
 /**

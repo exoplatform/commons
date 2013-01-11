@@ -16,9 +16,9 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
-import org.exoplatform.commons.search.api.search.Search;
-import org.exoplatform.commons.search.api.search.data.SearchResult;
-import org.exoplatform.commons.search.api.search.SearchService;
+import org.exoplatform.commons.api.search.Search;
+import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.commons.api.search.SearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;

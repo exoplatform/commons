@@ -1,4 +1,4 @@
-package org.exoplatform.commons.search.api.search.data;
+package org.exoplatform.commons.api.search.data;
 
 public class SearchResult {
   private String type;

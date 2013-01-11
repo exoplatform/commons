@@ -1,10 +1,10 @@
-package org.exoplatform.commons.search.api.search.data;
+package org.exoplatform.commons.api.search.data;
 
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.exoplatform.commons.search.api.search.Search;
+import org.exoplatform.commons.api.search.Search;
 
 public class SearchType {
   private String name;

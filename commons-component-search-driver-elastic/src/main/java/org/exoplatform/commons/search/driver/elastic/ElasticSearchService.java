@@ -28,8 +28,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.exoplatform.commons.search.api.indexing.data.SearchEntry;
-import org.exoplatform.commons.search.api.search.data.SearchResult;
+import org.exoplatform.commons.api.indexing.data.SearchEntry;
+import org.exoplatform.commons.api.search.data.SearchResult;
 
 /**
  * Created by The eXo Platform SAS

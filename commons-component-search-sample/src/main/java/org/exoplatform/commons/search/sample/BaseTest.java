@@ -24,9 +24,9 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.exoplatform.commons.search.api.indexing.IndexingService;
-import org.exoplatform.commons.search.api.search.data.SearchResult;
-import org.exoplatform.commons.search.api.search.SearchService;
+import org.exoplatform.commons.api.indexing.IndexingService;
+import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.commons.api.search.SearchService;
 import org.exoplatform.forum.service.Topic;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;

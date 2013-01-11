@@ -16,8 +16,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.exoplatform.commons.search.api.search.SearchService;
-import org.exoplatform.commons.search.api.search.data.SearchType;
+import org.exoplatform.commons.api.search.SearchService;
+import org.exoplatform.commons.api.search.data.SearchType;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
