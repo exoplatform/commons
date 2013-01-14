@@ -1,1 +1,129 @@
-This is edit mode
+<style>
+  #settingForm div {
+    margin-top: 5px;
+  }
+</style>
+
+
+<div id="settingForm">
+  <h3 style="margin-left: 3px;">Search Settings</h3>
+  <hr>
+  <div style="margin-left: 10px; margin-bottom: 40px;">
+
+    <div>
+      <label>
+        Results per page
+        <select id="resultsPerPage">
+          <option>5</option>
+          <option>10</option>
+          <option>20</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+      </label>
+    </div>
+
+    <div>
+      <label>Search in<input type="text" id="txtSearchIn" value="Everything" readonly/></label>
+      <ul id="lstSearchInOptions" style="border: 1px dotted; border-top:none; overflow-x: hidden;"></ul>
+    </div>
+
+    <div><label><input type="checkbox" id="searchCurrentSiteOnly" style="margin-left: 0px;">Search in current site only</label></div>
+    <div><label><input type="checkbox" id="hideSearchForm" style="margin-left: 0px;">Hide search form</label></div>
+    <div><label><input type="checkbox" id="hideFacetsFilter" style="margin-left: 0px;">Hide facets filter</label></div>
+
+    <input type="button" value="Save Settings" style="margin-top: 15px; margin-left: 20px;" id="btnSaveSetting">
+  </div>
+</div>
+
+<script>
+  var REGISTRY;
+
+  $.getJSON("/rest/search/registry", function(registry){
+    REGISTRY = registry;
+    var searchInOpts=[];
+    searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='all'>Everything</label></li>");
+    $.each(REGISTRY, function(key, searchType){
+      searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='" + searchType.name + "'>" + searchType.displayName + "</label></li>");
+    });
+    $("#lstSearchInOptions").html(searchInOpts.join(""));
+
+    $("#lstSearchInOptions").offset({left:$("#txtSearchIn").offset().left+3, top:$("#txtSearchIn").offset().top+$("#txtSearchIn").height()+8});
+    $("#lstSearchInOptions").width($("#txtSearchIn").width());
+    $(":checkbox[name='searchInOption'][value!='all']").css("margin-left", "25px");
+    $("#lstSearchInOptions").hide();
+
+    $.getJSON("/rest/search/setting", function(setting){
+      $.each($(":checkbox[name='searchInOption']"), function(){
+        if(-1 != $.inArray(this.value, setting.searchTypes)) {
+          $(this).attr('checked', true);
+        }
+      });
+
+      $("#resultsPerPage").val(setting.resultsPerPage);
+      updateTxtSearchIn();
+      $("#searchCurrentSiteOnly").attr('checked', setting.searchCurrentSiteOnly);
+      $("#hideSearchForm").attr('checked', setting.hideSearchForm);
+      $("#hideFacetsFilter").attr('checked', setting.hideFacetsFilter);
+    });
+  });
+
+
+  $("#btnSaveSetting").click(function(){
+    var jqxhr = $.post("/rest/search/setting", {resultsPerPage:$("#resultsPerPage").val(),
+                                                searchTypes:getSelectedTypes(),
+                                                searchCurrentSiteOnly:$("#searchCurrentSiteOnly").is(":checked"),
+                                                hideSearchForm:$("#hideSearchForm").is(":checked"),
+                                                hideFacetsFilter:$("#hideFacetsFilter").is(":checked")
+                                                });
+    jqxhr.complete(function(data) {
+      alert("ok"==data.responseText?"Your setting has been saved.":"Problem occurred when saving your setting: "+data.responseText);
+    });
+  });
+
+
+  $("#txtSearchIn").click(function(e){
+    $("#lstSearchInOptions").toggle();
+  });
+
+
+  $(":checkbox[name='searchInOption']").live("click", function(){
+    if("all"==this.value){ //Everything checked
+      if($(this).is(":checked")) { // check/uncheck all
+        $(":checkbox[name='searchInOption']").attr('checked', true);
+      } else {
+        $(":checkbox[name='searchInOption']").attr('checked', false);
+      }
+    } else {
+      $(":checkbox[name='searchInOption'][value='all']").attr('checked', false); //uncheck All Sites
+    }
+
+    updateTxtSearchIn();
+  });
+
+
+  function updateTxtSearchIn() {
+    var searchIn = [];
+    if($(":checkbox[name='searchInOption'][value='all']").is(":checked")) {
+      $("#txtSearchIn").val("Everything");
+    } else {
+      $.each($(":checkbox[name='searchInOption'][value!='all']:checked"), function(){
+        searchIn.push(REGISTRY[this.value].displayName);
+      });
+      $("#txtSearchIn").val(searchIn.join(", "));
+    }
+  }
+
+
+  function getSelectedTypes() {
+    var searchIn = [];
+    if($(":checkbox[name='searchInOption'][value='all']").is(":checked")) {
+      return "all";
+    } else {
+      $.each($(":checkbox[name='searchInOption'][value!='all']:checked"), function(){
+        searchIn.push(this.value);
+      });
+      return searchIn.join(",");
+    }
+  }
+</script>
