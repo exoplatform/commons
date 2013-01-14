@@ -47,7 +47,7 @@
       }
 
 
-      #filterForm {
+      #facetsFilter {
         float: left;
         border-style: solid;
         border-width: 1px;
@@ -57,7 +57,7 @@
         width: auto;
       }
 
-      #filterFormTitle {
+      #facetsFilterTitle {
         text-align: center;
         background: none repeat scroll 0% 0% lightGrey;
         border-bottom: 1px solid;
@@ -66,7 +66,7 @@
         padding-bottom: 2px;
       }
 
-      #filterForm ul {
+      #facetsFilter ul {
         list-style: none outside none;
         padding-left: 20px;
         margin-top: 2px;
@@ -98,7 +98,9 @@
         -o-text-overflow: ellipsis;
         -ms-text-overflow: ellipsis;
       }
+
     </style>
+
     <div id="searchPortlet">
       <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
         <div style="font-size: small;">SQL:</div>
@@ -110,15 +112,16 @@
       <div id="searchForm" style="padding-top: 5px; text-align: center;">
         <input type="text" id="txtQuery"/>
         <input type="button" id="btnSearch" value="Search"/>
+        <hr/>
       </div>
 
-      <hr/>
-
-      <div id="filterForm">
-        <div id="filterFormTitle">Filter By</div>
+      <div id="facetsFilter">
+        <div id="facetsFilterTitle">Filter By</div>
         <div style="padding-right: 10px;">
-          <input type="checkbox" name="site" value="all">All Sites
-          <ul id="lstSites"></ul>
+          <div id="siteFilter">
+            <input type="checkbox" name="site" value="all">All Sites
+            <ul id="lstSites"></ul>
+          </div>
 
           <input type="checkbox" name="contentType" value="all">All Content Types
           <ul id="lstContentTypes"></ul>
@@ -129,7 +132,7 @@
         <div id="resultTypes" style="display: none; margin-bottom: 15px;"></div>
         <div style="margin-bottom: 10px;">
           <span id="resultHeader"></span>
-          <span style="float: right;">
+          <span id="resultSort" style="float: right; display: none;">
             Sort By: <select id="lstSortBy"><option value='jcr:score()'>Relevancy</option></select><span id="sortType" class="Desc Clickable">&nbsp;</span>
           </span>
         </div>
@@ -140,33 +143,65 @@
     </div>
 
     <script>
-      var LIMIT = 10;
+      var USER_SETTING;
+      var LIMIT;
       var REGISTRY;
       var VIEWING_TYPE;
 
-      // Load content types
-      $.getJSON("/rest/search/registry", function(registry){
-        REGISTRY = registry;
-        var contentTypes = [];
-        $.each(REGISTRY, function(key, searchType){
-          contentTypes.push("<li><input type='checkbox' name='contentType' value='" + searchType.name + "'>" + searchType.displayName + "</li>");
-        });
-        $("#lstContentTypes").html(contentTypes.join(""));
-        $(":checkbox[name='contentType']").attr('checked', true);
+      init();
 
-        // Load sites
-        $.getJSON("/rest/search/sites", function(sites){
-          var siteNames = [];
-          $.each(sites, function(i, site){
-            siteNames.push("<li><input type='checkbox' name='site' value='" + site + "'>" + site.toProperCase() + "</li>");
+
+      function init() {
+        // get user setting
+        $.getJSON("/rest/search/setting", function(setting){
+          USER_SETTING = setting;
+          LIMIT = USER_SETTING.resultsPerPage;
+
+          loadContentFilter();
+          loadSiteFilter();
+
+          if(USER_SETTING.hideFacetsFilter) {
+            $("#facetsFilter").hide();
+          }
+
+          if(USER_SETTING.hideSearchForm) {
+            $("#searchForm").hide();
+          } else {
+            $("#txtQuery").focus();
+          }
+        });
+      }
+
+
+      function loadContentFilter() {
+        $.getJSON("/rest/search/registry", function(registry){
+          REGISTRY = registry;
+          var contentTypes = [];
+          $.each(REGISTRY, function(key, searchType){
+            if(-1 != $.inArray("all", USER_SETTING.searchTypes) || -1 != $.inArray(searchType.name, USER_SETTING.searchTypes)) {
+              contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + searchType.name + "'>" + searchType.displayName + "</label></li>");
+            }
           });
-          $("#lstSites").html(siteNames.join(""));
-          $(":checkbox[name='site']").attr('checked', true);
+          $("#lstContentTypes").html(contentTypes.join(""));
+          $(":checkbox[name='contentType']").attr('checked', true);
         });
+      }
 
-        $("#txtQuery").focus();
-      });
 
+      function loadSiteFilter() {
+        if(USER_SETTING.searchCurrentSiteOnly) {
+          $("#siteFilter").hide();
+        } else {
+          $.getJSON("/rest/search/sites", function(sites){
+            var siteNames = [];
+            $.each(sites, function(i, site){
+              siteNames.push("<li><label><input type='checkbox' name='site' value='" + site + "'>" + site.toProperCase() + "</label></li>");
+            });
+            $("#lstSites").html(siteNames.join(""));
+            $(":checkbox[name='site']").attr('checked', true);
+          });
+        }
+      }
 
 
 
@@ -199,6 +234,7 @@
         $("#resultTypes").html("");
         $("#result").html("");
         $("#resultHeader").html(message?message:"");
+        $("#resultSort").hide();
         $("#showMore").hide();
         $("body").css("cursor", "auto");
         return;
@@ -206,9 +242,9 @@
 
 
       function getSelectedTypes(){
-        if($(":checkbox[name='contentType'][value='all']").is(":checked")) return "all";
+        //if($(":checkbox[name='contentType'][value='all']").is(":checked")) return "all";
         var selectedTypes = [];
-        $.each($(":checkbox[name='contentType']:checked"), function(){
+        $.each($(":checkbox[name='contentType'][value!='all']:checked"), function(){
           selectedTypes.push(this.value);
         });
         return selectedTypes.join(",");
@@ -216,9 +252,10 @@
 
 
       function getSelectedSites(){
-        if($(":checkbox[name='site'][value='all']").is(":checked")) return "all";
+        //if($(":checkbox[name='site'][value='all']").is(":checked")) return "all";
+        if(USER_SETTING.searchCurrentSiteOnly) return parent.eXo.env.portal.portalName;
         var selectedSites = [];
-        $.each($(":checkbox[name='site']:checked"), function(){
+        $.each($(":checkbox[name='site'][value!='all']:checked"), function(){
           selectedSites.push(this.value);
         });
         return selectedSites.join(",");
@@ -239,7 +276,7 @@
         var sortBy = $("#lstSortBy").val();
         var sortType = $("#sortType").hasClass("Asc") ? "asc" : "desc";
 
-        var restUrl = "/rest/search?q="+query+"&sites=all"+"&types="+type+"&offset="+offset+"&limit="+LIMIT+"&sort="+sortBy+"&order="+sortType;
+        var restUrl = "/rest/search?q="+query+"&sites="+getSelectedSites()+"&types="+type+"&offset="+offset+"&limit="+LIMIT+"&sort="+sortBy+"&order="+sortType;
 
         $("body").css("cursor", "wait");
 
@@ -310,6 +347,7 @@
 
           $("#result").html(result);
           $("#result").show();
+          $("#resultSort").show();
           $("body").css("cursor", "auto");
 
           if(callback) callback();
@@ -443,4 +481,6 @@
         $(this).toggleClass("Asc Desc");
         showMore(0);
       });
+
+
     </script>

@@ -3,10 +3,15 @@ package org.exoplatform.commons.search.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -23,6 +28,7 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.security.ConversationState;
 
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
@@ -108,13 +114,41 @@ public class UnifiedSearch implements ResourceContainer {
     SearchService.unregister(searchTypeName);
     return Response.ok(SearchService.getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
-
   
   @GET
   @Path("/sites")
-  public static Response getAllPortalNames() throws Exception {
-    UserPortalConfigService dataStorage = (UserPortalConfigService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(UserPortalConfigService.class);
-    return Response.ok(dataStorage.getAllPortalNames(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  public static Response getAllPortalNames() {
+    try {
+      UserPortalConfigService dataStorage = (UserPortalConfigService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(UserPortalConfigService.class);
+      return Response.ok(dataStorage.getAllPortalNames(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    }
   }
+
+  
+  // temporary for testing, user setting will be stored using "setting" feature
+  private static Map<String, UserSetting> USER_SETTINGS = new HashMap<String, UserSetting>();
+
+  @GET
+  @Path("/setting")
+  public static Response getUserSetting() {
+    UserSetting defaultSetting = new UserSetting(10, Arrays.asList("all"), false, false, false);
+    String userId = ConversationState.getCurrent().getIdentity().getUserId();
+    if(null==userId || userId.isEmpty() || !USER_SETTINGS.containsKey(userId)) return Response.ok(defaultSetting, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    return Response.ok(USER_SETTINGS.get(userId), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  }
+  
+  @POST
+  @Path("/setting")
+  public static Response setUserSetting(@FormParam("resultsPerPage") int resultsPerPage, @FormParam("searchTypes") String searchTypes, @FormParam("searchCurrentSiteOnly") boolean searchCurrentSiteOnly, @FormParam("hideSearchForm") boolean hideSearchForm, @FormParam("hideFacetsFilter") boolean hideFacetsFilter) {
+    String userId = ConversationState.getCurrent().getIdentity().getUserId();
+    if(null!=userId && !userId.isEmpty()) {
+      USER_SETTINGS.put(userId, new UserSetting(resultsPerPage, Arrays.asList(searchTypes.split(",")), searchCurrentSiteOnly, hideSearchForm, hideFacetsFilter));
+      return Response.ok("ok", MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    }
+    return Response.ok("nok: userId = "+userId, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  } 
   
 }
