@@ -18,9 +18,13 @@ package org.exoplatform.commons.unifiedsearch;
 
 
 import javax.inject.Inject;
+import javax.portlet.PortletMode;
 
 import juzu.Path;
 import juzu.View;
+import juzu.bridge.portlet.JuzuPortlet;
+import juzu.impl.request.Request;
+import juzu.request.RequestContext;
 import juzu.template.Template;
 
 /**
@@ -35,9 +39,20 @@ public class Search {
   @Path("index.gtmpl")
   Template index;
   
+  @Inject
+  @Path("edit.gtmpl")
+  Template edit;
+  
   @View
   public void index(){
-    index.render();
-  }
+    RequestContext requestContext = Request.getCurrent().getContext();
     
+    Search_.index().setProperty(JuzuPortlet.PORTLET_MODE, PortletMode.EDIT);
+    PortletMode mode = requestContext.getProperty(JuzuPortlet.PORTLET_MODE);
+    if (PortletMode.EDIT == mode){      
+      edit.render();
+    }else {
+      index.render();
+    }
+  }  
 }

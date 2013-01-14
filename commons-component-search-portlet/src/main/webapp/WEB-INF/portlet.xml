@@ -14,10 +14,11 @@
      </init-param>
      <init-param>
        <name>juzu.inject</name>
-       <value>spring</value>
+       <value>spring</value>       
      </init-param>
      <supports>
        <mime-type>text/html</mime-type>
+       <portlet-mode>edit</portlet-mode>       
      </supports>
      <portlet-info>
        <title>Unified Search</title>
