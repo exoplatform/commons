@@ -48,7 +48,7 @@
 			<init-params>
 				<value-param>
 					<name>product.group.id</name>
-					<value>org.exoplatform.portal</value>
+					<value>org.gatein.portal</value>
 				</value-param>
 				<value-param>
 					<name>plugin.execution.order</name>

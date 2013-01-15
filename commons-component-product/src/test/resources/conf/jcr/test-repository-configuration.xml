@@ -66,14 +66,14 @@
 							<property name="index-dir" value="target/temp/jcrlucenedb/system_portal"/>
 						</properties>
 					</query-handler>
-					<lock-manager>
-						<time-out>15m</time-out><!-- 15min -->
-						<persister class="org.exoplatform.services.jcr.impl.core.lock.FileSystemLockPersister">
-							<properties>
-								<property name="path" value="target/temp/lock/system_portal"/>
-							</properties>
-						</persister>
-					</lock-manager>
+					<lock-manager class="org.exoplatform.services.jcr.impl.core.lock.jbosscache.CacheableLockManagerImpl">
+					    <properties>
+					   <property name="time-out" value="15m" /><!-- 15min -->
+					      <property name="path" value="target/temp/lock/portal-test"/>
+					      <property name="jbosscache-configuration" value="conf/jcr/jcr-jbosscache-lock-config.xml" />
+					    </properties>
+					</lock-manager>					
+					
 				</workspace>
 
 				<!-- ECM Collaboration -->
@@ -117,15 +117,15 @@
 							<property name="spellchecker-class" value="org.exoplatform.services.jcr.impl.core.query.lucene.spell.LuceneSpellChecker"/>
 							<property name="synonymprovider-class" value="org.exoplatform.services.jcr.impl.core.query.lucene.synonym.WordNetSynonyms"/>
 						</properties>
-					</query-handler>
-					<lock-manager>
-						<time-out>15m</time-out>
-						<persister class="org.exoplatform.services.jcr.impl.core.lock.FileSystemLockPersister">
-							<properties>
-								<property name="path" value="target/temp/lock/collaboration_portal"/>
-							</properties>
-						</persister>
+					</query-handler>					
+					<lock-manager class="org.exoplatform.services.jcr.impl.core.lock.jbosscache.CacheableLockManagerImpl">
+					    <properties>
+					   <property name="time-out" value="15m" /><!-- 15min -->
+					      <property name="path" value="target/temp/lock/portal-test"/>
+					      <property name="jbosscache-configuration" value="conf/jcr/jcr-jbosscache-lock-config.xml" />
+					    </properties>
 					</lock-manager>
+					
 				</workspace>
 
 			</workspaces>
