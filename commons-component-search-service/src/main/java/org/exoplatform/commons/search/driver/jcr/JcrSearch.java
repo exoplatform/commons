@@ -49,8 +49,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.exoplatform.commons.search.service.SearchType;
-import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
@@ -91,7 +89,7 @@ public class JcrSearch implements ResourceContainer {
     if(null==workspaceName||workspaceName.isEmpty()) workspaceName = "collaboration";
 
     Collection<String> siteNames = (Collection<String>) parameters.get("sites");
-    if(null==siteNames||siteNames.isEmpty()) siteNames = Arrays.asList("all");
+    if(null==siteNames) siteNames = Arrays.asList("all");
 
     Integer offset = (Integer) parameters.get("offset");
     if(null==offset) offset = 0;
@@ -114,9 +112,8 @@ public class JcrSearch implements ResourceContainer {
     String likeStmt = (!caseSensitive?"LOWER(%s)":"%s") + " LIKE '%%"+repeat("%s", terms, "%%")+"%%'";
     
     if(!(query.startsWith("\"") && query.endsWith("\""))) { //not exact search
-      SearchType searchType = UnifiedSearchService.getRegistry().get((String) parameters.get("type"));
-      if(null!=searchType) {
-        Collection<String> likeFields = (Collection<String>) searchType.getProperties().get("likeFields");
+      if(parameters.containsKey("likeFields")) {
+        Collection<String> likeFields = (Collection<String>) parameters.get("likeFields");
         if(null!=likeFields && !likeFields.isEmpty()) where = where + " OR " + String.format("(%s)", repeat(likeStmt, likeFields, " OR "));
       }
     }

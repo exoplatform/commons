@@ -225,7 +225,7 @@
         ";
 
         var html = template.replace(/%{type}/g, result.type).replace(/%{url}/g, result.url);
-        html = html.replace(/%{title}/g, result.title).replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail).replace(/%{avatar}/g, result.avatar);
+        html = html.replace(/%{title}/g, result.title).replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail).replace(/%{avatar}/g, result.imageUrl);
         return html;
       }
 

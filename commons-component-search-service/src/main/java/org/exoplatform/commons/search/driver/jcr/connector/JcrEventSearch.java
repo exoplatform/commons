@@ -29,7 +29,6 @@ import org.exoplatform.commons.api.search.SearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -44,18 +43,16 @@ public class JcrEventSearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrEventSearch.class);
   
   @Override
-  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
     Map<String, Object> parameters = new HashMap<String, Object>(); 
     parameters.put("sites", sites);
-    parameters.put("types", types);
     parameters.put("offset", offset);
     parameters.put("limit", limit);
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearchService.EVENT);
     parameters.put("repository", "repository");
     parameters.put("workspace", "collaboration");
     parameters.put("from", "exo:calendarEvent");
@@ -71,7 +68,7 @@ public class JcrEventSearch extends SearchServiceConnector {
         CalendarEvent calEvent = calendarService.getGroupEvent(eventId);                
         Calendar calendar = calendarService.getGroupCalendar(calendarId);
 
-        SearchResult result = new SearchResult(UnifiedSearchService.EVENT, calendar.getPrivateUrl());
+        SearchResult result = new SearchResult(calendar.getPrivateUrl());
         result.setTitle(calEvent.getSummary());
         result.setExcerpt(calEvent.getDescription()!=null?calEvent.getDescription():calEvent.getSummary());
         StringBuffer buf = new StringBuffer();

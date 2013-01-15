@@ -3,6 +3,7 @@ package org.exoplatform.commons.search.service;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -32,18 +33,9 @@ import org.exoplatform.services.security.ConversationState;
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
 public class UnifiedSearchService implements ResourceContainer {
-  // Search types constants
-  public static String FILE="file";
-  public static String DOCUMENT="document";
-  public static String DISCUSSION="forum";
-  public static String TASK="task";
-  public static String EVENT="event";
-  public static String PAGE="page";
-  public static String WIKI="wiki";
-  public static String SPACE="space";
-  public static String PEOPLE="people";
-  public static String QUESTION="question";
-  public static String ACTIVITY="activity";
+  // temporary for testing, user setting will be stored using "setting" feature
+  private static Map<String, UserSetting> USER_SETTINGS = new HashMap<String, UserSetting>();
+  private static UserSetting defaultUserSetting = new UserSetting(10, Arrays.asList("all"), false, false, false);
   
   private final static Log LOG = ExoLogger.getLogger(UnifiedSearchService.class);
   
@@ -123,12 +115,24 @@ public class UnifiedSearchService implements ResourceContainer {
   }
   
   @GET
-  public Response search(@QueryParam("q") String query, @QueryParam("sites") String sites, @QueryParam("types") String types, @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("sort") String sort, @QueryParam("order") String order) {
+  public Response search(@QueryParam("q") String sQuery, @QueryParam("sites") String sSites, @QueryParam("types") String sTypes, @QueryParam("offset") String sOffset, @QueryParam("limit") String sLimit, @QueryParam("sort") String sSort, @QueryParam("order") String sOrder) {
+    if(null==sQuery || sQuery.isEmpty()) return Response.ok("", MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+
+    String userId = ConversationState.getCurrent().getIdentity().getUserId();
+    UserSetting userSetting = null==userId || userId.isEmpty() || !USER_SETTINGS.containsKey(userId) ? defaultUserSetting : USER_SETTINGS.get(userId);
+
+    List<String> sites = null==sSites ? Arrays.asList("all") : Arrays.asList(sSites.split(",\\s*"));
+    List<String> types = null==sTypes ? userSetting.getSearchTypes() : Arrays.asList(sTypes.split(",\\s*"));
+    int offset = null==sOffset || sOffset.isEmpty() ? 0 : Integer.parseInt(sOffset);
+    int limit = null==sLimit || sLimit.isEmpty() ? 0 : Integer.parseInt(sLimit);
+    String sort = null==sSort || sSort.isEmpty() ? "jcrScore()" : sSort;
+    String order = null==sOrder || sOrder.isEmpty() ? "DESC" : sOrder;
+    
     try {
       SearchService searchService = (SearchService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SearchService.class);
       // sql mode (for testing)
-      if(query.startsWith("SELECT")) return Response.ok(searchService.search(query, Arrays.asList("all"), Arrays.asList("jcrNode"), 0, 0, "jcrScore()", "DESC"), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-      return Response.ok(searchService.search(query, Arrays.asList(sites.split(",\\s*")), Arrays.asList(types.split(",\\s*")), offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      if(sQuery.startsWith("SELECT")) return Response.ok(searchService.search(sQuery, Arrays.asList("all"), Arrays.asList("jcrNode"), 0, 0, "jcrScore()", "DESC"), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      return Response.ok(searchService.search(sQuery, sites, types, offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
@@ -182,15 +186,11 @@ public class UnifiedSearchService implements ResourceContainer {
   }
 
   
-  // temporary for testing, user setting will be stored using "setting" feature
-  private static Map<String, UserSetting> USER_SETTINGS = new HashMap<String, UserSetting>();
-
   @GET
   @Path("/setting")
   public static Response getUserSetting() {
-    UserSetting defaultSetting = new UserSetting(10, Arrays.asList("all"), false, false, false);
     String userId = ConversationState.getCurrent().getIdentity().getUserId();
-    if(null==userId || userId.isEmpty() || !USER_SETTINGS.containsKey(userId)) return Response.ok(defaultSetting, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    if(null==userId || userId.isEmpty() || !USER_SETTINGS.containsKey(userId)) return Response.ok(defaultUserSetting, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     return Response.ok(USER_SETTINGS.get(userId), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
   

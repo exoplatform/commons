@@ -19,13 +19,14 @@ public class JcrSearchDriver implements SearchService {
   @Override
   public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
+    if(null==types || types.isEmpty()) return results;
     try {
       for(Entry<String, SearchType> entry:UnifiedSearchService.getRegistry().entrySet()){
         SearchType searchType = entry.getValue();
-        if(null!=types && !types.isEmpty() && !types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only
+        if(!types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only
         Class<? extends SearchServiceConnector> handler = searchType.getHandler();
         LOG.debug("\n[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
-        results.put(searchType.getName(), handler.newInstance().search(query, sites, types, offset, limit, sort, order));
+        results.put(searchType.getName(), handler.newInstance().search(query, sites, offset, limit, sort, order));
       }
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);

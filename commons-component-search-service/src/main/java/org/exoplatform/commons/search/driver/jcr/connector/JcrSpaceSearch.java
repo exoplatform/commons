@@ -5,11 +5,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -19,18 +18,16 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 public class JcrSpaceSearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrSpaceSearch.class);
   
-  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
     Map<String, Object> parameters = new HashMap<String, Object>(); 
     parameters.put("sites", sites);
-    parameters.put("types", types);
     parameters.put("offset", offset);
     parameters.put("limit", limit);
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearchService.SPACE);
     parameters.put("repository", "repository");
     parameters.put("workspace", "social");
     parameters.put("from", "soc:spacedefinition");
@@ -43,7 +40,7 @@ public class JcrSpaceSearch extends SearchServiceConnector {
         String spaceUrl = (String) jcrResult.getProperty("soc:url");        
         Space space = spaceSvc.getSpaceByUrl(spaceUrl);
 
-        SearchResult result = new SearchResult(UnifiedSearchService.SPACE, spaceUrl);
+        SearchResult result = new SearchResult(spaceUrl);
         result.setTitle(space.getDisplayName());
         result.setExcerpt(space.getDescription());
         result.setDetail(space.getDisplayName() + " - " + String.valueOf(space.getMembers().length) + " - " + space.getVisibility());

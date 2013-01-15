@@ -10,7 +10,6 @@ import org.exoplatform.commons.api.search.SearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.forum.service.Forum;
 import org.exoplatform.forum.service.ForumService;
@@ -28,18 +27,16 @@ import org.exoplatform.services.log.Log;
 public class JcrForumSearch extends SearchServiceConnector  {
   private final static Log LOG = ExoLogger.getLogger(JcrForumSearch.class);
   
-  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
     Map<String, Object> parameters = new HashMap<String, Object>(); 
     parameters.put("sites", sites);
-    parameters.put("types", types);
     parameters.put("offset", offset);
     parameters.put("limit", limit);
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearchService.DISCUSSION);
     parameters.put("repository", "repository");
     parameters.put("workspace", "knowledge");
     parameters.put("from", "exo:topic");
@@ -69,7 +66,7 @@ public class JcrForumSearch extends SearchServiceConnector  {
         Forum forum = (Forum)forumService.getForum(category, forumId);        
 
         ///Forum forum = (Forum)forumService.getObjectNameByPath(path.substring(path.indexOf(Utils.CATEGORY), path.lastIndexOf("/")));
-        SearchResult result = new SearchResult(UnifiedSearchService.DISCUSSION, topic.getLink());
+        SearchResult result = new SearchResult(topic.getLink());
         result.setTitle(topic.getTopicName());
         result.setExcerpt(topic.getDescription());
         StringBuffer buf = new StringBuffer();

@@ -33,10 +33,9 @@ public class JcrNodeSearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrNodeSearch.class);
   
   @Override
-  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     Map<String, Object> parameters = new HashMap<String, Object>(); 
     parameters.put("sites", sites);
-    parameters.put("types", types);
     parameters.put("offset", offset);
     parameters.put("limit", limit);
     parameters.put("sort", sort);
@@ -54,7 +53,7 @@ public class JcrNodeSearch extends SearchServiceConnector {
     for(JcrSearchResult jcrResult: jcrResults) {
       try {
         String nodeUrl = jcrResult.getRepository() + "/" + jcrResult.getWorkspace() + jcrResult.getPath();
-        SearchResult result = new SearchResult(SEARCH_TYPE_NAME, "/rest/jcr/" + nodeUrl);
+        SearchResult result = new SearchResult("/rest/jcr/" + nodeUrl);
         String score = String.valueOf(jcrResult.getScore());
         result.setTitle(nodeUrl + " (score = " + score + ")");
         result.setExcerpt(jcrResult.getExcerpt());
@@ -110,7 +109,7 @@ public class JcrNodeSearch extends SearchServiceConnector {
             }
 
             String score = String.valueOf(row.getValue("jcr:score").getLong());
-            SearchResult resultItem = new SearchResult(jcrType, "/rest/jcr/" + collection + path);
+            SearchResult resultItem = new SearchResult("/rest/jcr/" + collection + path);
             resultItem.setTitle(collection + path + " (score = " + score + ")");
             Value excerpt = row.getValue("rep:excerpt()");
             resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");

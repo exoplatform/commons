@@ -82,7 +82,6 @@ public class ElasticSearchService {
 
     for(SearchHit hit:hits){
       SearchResult result = new SearchResult();
-      result.setType(hit.getType());
       result.setUrl(new SearchEntry(hit.getIndex(), hit.getType(), hit.getId(), hit.getSource()).toString());
       results.add(result);
     }

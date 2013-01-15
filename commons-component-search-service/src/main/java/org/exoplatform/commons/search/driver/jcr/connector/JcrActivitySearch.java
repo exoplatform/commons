@@ -6,11 +6,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -26,18 +25,16 @@ import org.exoplatform.social.core.manager.ActivityManager;
 public class JcrActivitySearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrActivitySearch.class);
   
-  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
     Map<String, Object> parameters = new HashMap<String, Object>(); 
     parameters.put("sites", sites);
-    parameters.put("types", types);
     parameters.put("offset", offset);
     parameters.put("limit", limit);
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearchService.ACTIVITY);
     parameters.put("repository", "repository");
     parameters.put("workspace", "social");
     parameters.put("from", "soc:activity");
@@ -49,7 +46,7 @@ public class JcrActivitySearch extends SearchServiceConnector {
         String activityId = (String) jcrResult.getProperty("jcr:uuid");        
         ExoSocialActivity activity = activityManager.getActivity(activityId);                       
 
-        SearchResult result = new SearchResult(UnifiedSearchService.ACTIVITY, activity.getStreamUrl());
+        SearchResult result = new SearchResult(activity.getStreamUrl());
         result.setTitle(activity.getTitle());
         result.setExcerpt(jcrResult.getExcerpt());
         StringBuffer buf = new StringBuffer();

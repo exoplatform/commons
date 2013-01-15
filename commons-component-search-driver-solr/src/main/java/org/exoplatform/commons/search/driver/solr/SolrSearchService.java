@@ -68,7 +68,6 @@ public class SolrSearchService {
       String[] sa = id.split("/");
       if(3 == sa.length) {
         SearchResult result = new SearchResult();
-        result.setType(sa[1]);
         result.setUrl(new SearchEntry(sa[0], sa[1], sa[2], SolrUtils.fromDynamicFields(doc.getFieldValueMap())).toString());
         results.add(result);
       }

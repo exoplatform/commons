@@ -1,6 +1,7 @@
 package org.exoplatform.commons.search.driver.jcr.connector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,6 @@ import org.exoplatform.commons.api.search.SearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -22,21 +22,20 @@ import org.exoplatform.social.core.manager.IdentityManager;
 public class JcrPeopleSearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrPeopleSearch.class);
   
-  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+  public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
     Map<String, Object> parameters = new HashMap<String, Object>(); 
     parameters.put("sites", sites);
-    parameters.put("types", types);
     parameters.put("offset", offset);
     parameters.put("limit", limit);
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearchService.PEOPLE);
     parameters.put("repository", "repository");
     parameters.put("workspace", "social");
     parameters.put("from", "soc:profiledefinition");
+    parameters.put("likeFields", Arrays.asList("void-username", "void-fullName"));
     
     Collection<JcrSearchResult> jcrResults = JcrSearch.search(query, parameters);
     IdentityManager identityManager = (IdentityManager)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(IdentityManager.class);
@@ -48,7 +47,7 @@ public class JcrPeopleSearch extends SearchServiceConnector {
         Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
         Profile profile = identity.getProfile();
 
-        SearchResult result = new SearchResult(UnifiedSearchService.PEOPLE, profile.getUrl());
+        SearchResult result = new SearchResult(profile.getUrl());
         result.setTitle(profile.getFullName());
         String position = profile.getPosition();
         if(null == position) position = "";

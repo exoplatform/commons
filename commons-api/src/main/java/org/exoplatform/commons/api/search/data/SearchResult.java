@@ -9,20 +9,12 @@ package org.exoplatform.commons.api.search.data;
  * Nov 21, 2012  
  */
 public class SearchResult {
-  private String type; //the search type (e.g people, wiki...)
   private String url;  //url of this result
   private String title; //title to be displayed on UI
   private String excerpt; //the excerpt to be displayed on UI
   private String detail; //details information
   private String imageUrl; //an image to be displayed on UI
   private long date; //created or modified date
-  
-  public String getType() {
-    return type;
-  }
-  public void setType(String type) {
-    this.type = type;
-  }
   
   public String getUrl() {
     return url;
@@ -69,13 +61,12 @@ public class SearchResult {
   public SearchResult() {
   }
   
-  public SearchResult(String type, String url) {
-    this.type = type;
+  public SearchResult(String url) {
     this.url = url;
   }
   
   @Override
   public String toString() {
-    return String.format("SearchResult {type=%s, url=%s}", type, url);
+    return String.format("SearchResult {url=%s}", url);
   }
 }

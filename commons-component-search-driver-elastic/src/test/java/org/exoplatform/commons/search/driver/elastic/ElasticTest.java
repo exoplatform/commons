@@ -57,7 +57,7 @@ public class ElasticTest extends BaseTest  {
   public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
     try {
-      Collection<SearchResult> result = new ElasticGenericSearch().search(query, sites, types, offset, limit, sort, order);
+      Collection<SearchResult> result = new ElasticGenericSearch().search(query, sites, offset, limit, sort, order);
       results.put("Elastic generic search", result);
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);

@@ -45,7 +45,7 @@ public class SolrTest extends BaseTest  {
   public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
     try {
-      Collection<SearchResult> result = new SolrGenericSearch().search(query, sites, types, offset, limit, sort, order);
+      Collection<SearchResult> result = new SolrGenericSearch().search(query, sites, offset, limit, sort, order);
       results.put("Solr generic search", result);
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
