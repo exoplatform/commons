@@ -28,6 +28,10 @@
   <!-- UNIFIED SEARCH -->
   <component>
     <key>org.exoplatform.commons.api.search.SearchService</key>
+    <type>org.exoplatform.commons.search.driver.jcr.JcrSearchService</type>
+  </component>
+
+  <component>
     <type>org.exoplatform.commons.search.service.UnifiedSearchService</type>
   </component>
 

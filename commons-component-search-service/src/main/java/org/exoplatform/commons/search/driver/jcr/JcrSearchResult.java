@@ -64,7 +64,7 @@ public class JcrSearchResult {
     Session session = repository.login(workspaceName);
     Node node = session.getRootNode().getNode(path.substring(1));
     session.logout();
-    return JcrSearchService.getNodeProperties(node);
+    return JcrSearch.getNodeProperties(node);
   }
 
 }

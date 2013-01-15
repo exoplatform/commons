@@ -1,4 +1,4 @@
-package org.exoplatform.commons.search.driver.jcr;
+package org.exoplatform.commons.search.driver.jcr.connector;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.driver.jcr.JcrSearch;
+import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -36,7 +38,7 @@ public class JcrActivitySearch extends SearchServiceConnector {
     parameters.put("workspace", "social");
     parameters.put("from", "soc:activity");
     
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
+    Collection<JcrSearchResult> jcrResults = JcrSearch.search(query, parameters);
     ActivityManager activityManager = (ActivityManager) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ActivityManager.class);
     for (JcrSearchResult jcrResult: jcrResults){       
       try {

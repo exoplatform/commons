@@ -15,7 +15,7 @@
             "avatar": "__SLASH__eXoWCMResources__SLASH__skin__SLASH__DefaultSkin__SLASH__wcm-nodetypes__SLASH__70x80__SLASH__icons__SLASH__default.png"
         },
         "displayName": "JCR nodes",
-        "handler": "org.exoplatform.commons.search.driver.jcr.JcrNodeSearch"
+        "handler": "org.exoplatform.commons.search.driver.jcr.connector.JcrNodeSearch"
     },
     "discussion": {
         "name": "discussion",
@@ -32,7 +32,7 @@
             ]        
         },
         "displayName": "Discussions",
-        "handler": "org.exoplatform.commons.search.driver.jcr.JcrForumSearch"
+        "handler": "org.exoplatform.commons.search.driver.jcr.connector.JcrForumSearch"
     },
     "event": {
         "name": "event",
@@ -49,13 +49,13 @@
             ]        
         },
         "displayName": "Events",
-        "handler": "org.exoplatform.commons.search.driver.jcr.JcrEventSearch"
+        "handler": "org.exoplatform.commons.search.driver.jcr.connector.JcrEventSearch"
     },
     "space": {
         "name": "space",
         "properties": {},
         "displayName": "Spaces",
-        "handler": "org.exoplatform.commons.search.driver.jcr.JcrSpaceSearch"
+        "handler": "org.exoplatform.commons.search.driver.jcr.connector.JcrSpaceSearch"
     },
     "wiki": {
         "name": "wiki",
@@ -72,7 +72,7 @@
             ]
         },
         "displayName": "Wikis",
-        "handler": "org.exoplatform.commons.search.driver.jcr.JcrWikiSearch"
+        "handler": "org.exoplatform.commons.search.driver.jcr.connector.JcrWikiSearch"
     },
     "people": {
         "name": "people",
@@ -93,7 +93,7 @@
             ]
         },
         "displayName": "People",
-        "handler": "org.exoplatform.commons.search.driver.jcr.JcrPeopleSearch"
+        "handler": "org.exoplatform.commons.search.driver.jcr.connector.JcrPeopleSearch"
     },
     "activity": {
         "name": "activity",
@@ -110,7 +110,7 @@
             ]
         },
         "displayName": "Activities",
-        "handler": "org.exoplatform.commons.search.driver.jcr.JcrActivitySearch"
+        "handler": "org.exoplatform.commons.search.driver.jcr.connector.JcrActivitySearch"
     },
     "task": {
         "name": "task",
@@ -127,6 +127,6 @@
             ]
         },
         "displayName": "Tasks",
-        "handler": "org.exoplatform.commons.search.driver.jcr.JcrTaskSearch"
+        "handler": "org.exoplatform.commons.search.driver.jcr.connector.JcrTaskSearch"
     }
 }

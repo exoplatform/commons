@@ -1,13 +1,9 @@
 package org.exoplatform.commons.search.service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -25,9 +21,6 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.exoplatform.commons.api.search.SearchService;
-import org.exoplatform.commons.api.search.SearchServiceConnector;
-import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.search.driver.jcr.JcrSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
@@ -36,7 +29,7 @@ import org.exoplatform.services.security.ConversationState;
 
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
-public class UnifiedSearchService implements ResourceContainer, SearchService {
+public class UnifiedSearchService implements ResourceContainer {
   // Search types constants
   public static String FILE="file";
   public static String DOCUMENT="document";
@@ -113,24 +106,6 @@ public class UnifiedSearchService implements ResourceContainer, SearchService {
   public static boolean isRegistered(String searchTypeName) {
     return registry.containsKey(searchTypeName);
   }
-
-  @Override
-  public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
-    Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
-    try {
-      for(Entry<String, SearchType> entry:registry.entrySet()){
-        SearchType searchType = entry.getValue();
-        if(null!=types && !types.isEmpty() && !types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only
-        Class<? extends SearchServiceConnector> handler = searchType.getHandler();
-        System.out.println("\n[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
-        results.put(searchType.getName(), handler.newInstance().search(query, sites, types, offset, limit, sort, order));
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return results;
-  }
-
   
   
   public UnifiedSearchService(){
@@ -138,12 +113,7 @@ public class UnifiedSearchService implements ResourceContainer, SearchService {
     try {
       InputStream registryJson = this.getClass().getResourceAsStream("/conf/registry.json");
       if(null!=registryJson) setRegistry(new java.util.Scanner(registryJson).useDelimiter("\\A").next());
-      
-      Properties props = new Properties();
-      props.load(this.getClass().getResourceAsStream("/conf/configuration.properties"));      
-      JcrSearchService.IGNORED_TYPES = props.getProperty("jcr-ignored-types").split(",");
-      JcrSearchService.IGNORED_FIELDS = props.getProperty("jcr-ignored-fields").split(",");
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -151,9 +121,10 @@ public class UnifiedSearchService implements ResourceContainer, SearchService {
   @GET
   public Response search(@QueryParam("q") String query, @QueryParam("sites") String sites, @QueryParam("types") String types, @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("sort") String sort, @QueryParam("order") String order) {
     try {
+      SearchService searchService = (SearchService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SearchService.class);
       // sql mode (for testing)
-      if(query.startsWith("SELECT")) return Response.ok(search(query, Arrays.asList("all"), Arrays.asList("jcrNode"), 0, 0, "jcrScore()", "DESC"), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-      return Response.ok(search(query, Arrays.asList(sites.split(",\\s*")), Arrays.asList(types.split(",\\s*")), offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      if(query.startsWith("SELECT")) return Response.ok(searchService.search(query, Arrays.asList("all"), Arrays.asList("jcrNode"), 0, 0, "jcrScore()", "DESC"), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      return Response.ok(searchService.search(query, Arrays.asList(sites.split(",\\s*")), Arrays.asList(types.split(",\\s*")), offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
       e.printStackTrace();
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();

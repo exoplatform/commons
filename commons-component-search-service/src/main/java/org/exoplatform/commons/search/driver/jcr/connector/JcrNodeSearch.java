@@ -1,4 +1,4 @@
-package org.exoplatform.commons.search.driver.jcr;
+package org.exoplatform.commons.search.driver.jcr.connector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +18,8 @@ import javax.jcr.query.RowIterator;
 
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.driver.jcr.JcrSearch;
+import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -44,7 +46,7 @@ public class JcrNodeSearch extends SearchServiceConnector {
     parameters.put("workspace", "collaboration");
     parameters.put("from", "nt:base");
     
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
+    Collection<JcrSearchResult> jcrResults = JcrSearch.search(query, parameters);
     String sortBy = null==parameters.get("sort") ? "jcr:score()" : (String)parameters.get("sort");
     for(JcrSearchResult jcrResult: jcrResults) {
       try {

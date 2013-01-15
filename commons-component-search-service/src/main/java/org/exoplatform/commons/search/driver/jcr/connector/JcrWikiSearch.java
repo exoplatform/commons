@@ -1,4 +1,4 @@
-package org.exoplatform.commons.search.driver.jcr;
+package org.exoplatform.commons.search.driver.jcr.connector;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,6 +9,8 @@ import java.util.ResourceBundle;
 
 import org.exoplatform.commons.api.search.SearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.commons.search.driver.jcr.JcrSearch;
+import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
@@ -41,7 +43,7 @@ public class JcrWikiSearch extends SearchServiceConnector {
     parameters.put("workspace", "collaboration");
     parameters.put("from", "wiki:page");
     
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
+    Collection<JcrSearchResult> jcrResults = JcrSearch.search(query, parameters);
     WikiService wikiService = (WikiService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(WikiService.class);
     for (JcrSearchResult jcrResult: jcrResults){
       try {

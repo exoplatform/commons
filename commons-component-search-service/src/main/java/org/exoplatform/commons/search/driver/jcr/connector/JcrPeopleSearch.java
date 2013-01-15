@@ -1,4 +1,4 @@
-package org.exoplatform.commons.search.driver.jcr;
+package org.exoplatform.commons.search.driver.jcr.connector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.driver.jcr.JcrSearch;
+import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -32,7 +34,7 @@ public class JcrPeopleSearch extends SearchServiceConnector {
     parameters.put("workspace", "social");
     parameters.put("from", "soc:profiledefinition");
     
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
+    Collection<JcrSearchResult> jcrResults = JcrSearch.search(query, parameters);
     IdentityManager identityManager = (IdentityManager)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(IdentityManager.class);
 
     for(JcrSearchResult jcrResult: jcrResults) {

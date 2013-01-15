@@ -1,4 +1,4 @@
-package org.exoplatform.commons.search.driver.jcr;
+package org.exoplatform.commons.search.driver.jcr.connector;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.driver.jcr.JcrSearch;
+import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.forum.service.Forum;
@@ -38,7 +40,7 @@ public class JcrForumSearch extends SearchServiceConnector  {
     parameters.put("workspace", "knowledge");
     parameters.put("from", "exo:topic");
     
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
+    Collection<JcrSearchResult> jcrResults = JcrSearch.search(query, parameters);
     ForumService forumService = (ForumService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(ForumService.class);
     for (JcrSearchResult jcrResult: jcrResults){
       try {

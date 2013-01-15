@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.search.driver.jcr;
+package org.exoplatform.commons.search.driver.jcr.connector;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import org.exoplatform.calendar.service.CalendarEvent;
 import org.exoplatform.calendar.service.CalendarService;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.driver.jcr.JcrSearch;
+import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 
@@ -36,7 +38,7 @@ import org.exoplatform.container.ExoContainerContext;
  *          canhpv@exoplatform.com
  * Jan 3, 2013  
  */
-public class JcrTaskSearch extends SearchServiceConnector {
+public class JcrEventSearch extends SearchServiceConnector {
 
   @Override
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
@@ -50,40 +52,39 @@ public class JcrTaskSearch extends SearchServiceConnector {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearchService.TASK);
+    parameters.put("type", UnifiedSearchService.EVENT);
     parameters.put("repository", "repository");
     parameters.put("workspace", "collaboration");
     parameters.put("from", "exo:calendarEvent");
-    parameters.put("where", "exo:eventType='Task'");
+    parameters.put("where", "exo:eventType='Event'");
     
-    Collection<JcrSearchResult> jcrResults = JcrSearchService.search(query, parameters);
+    Collection<JcrSearchResult> jcrResults = JcrSearch.search(query, parameters);
     CalendarService calendarService = (CalendarService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(CalendarService.class);
     for (JcrSearchResult jcrResult: jcrResults){                
       try {
-        String taskId = (String)jcrResult.getProperty("exo:id");        
+        String eventId = (String)jcrResult.getProperty("exo:id");        
         String calendarId = (String) jcrResult.getProperty("exo:calendarId");
         
-        CalendarEvent calTask = calendarService.getGroupEvent(taskId);                
+        CalendarEvent calEvent = calendarService.getGroupEvent(eventId);                
         Calendar calendar = calendarService.getGroupCalendar(calendarId);
 
-        SearchResult result = new SearchResult(UnifiedSearchService.TASK, calendar.getPublicUrl());
-        result.setTitle(calTask.getSummary());
-        result.setExcerpt(calTask.getDescription()!=null?calTask.getDescription():calTask.getSummary());
+        SearchResult result = new SearchResult(UnifiedSearchService.EVENT, calendar.getPrivateUrl());
+        result.setTitle(calEvent.getSummary());
+        result.setExcerpt(calEvent.getDescription()!=null?calEvent.getDescription():calEvent.getSummary());
         StringBuffer buf = new StringBuffer();
-        buf.append(calTask.getEventCategoryName());
+        buf.append(calEvent.getEventCategoryName());
         buf.append(" - ");
         SimpleDateFormat sdf = new SimpleDateFormat("EEEEE, MMMMMMMM d, yyyy K:mm a");
-        buf.append(sdf.format(calTask.getFromDateTime()));        
+        buf.append(sdf.format(calEvent.getFromDateTime()));        
         buf.append(" - ");
-        buf.append(calTask.getLocation()!=null?calTask.getLocation():calendar.getName());
+        buf.append(calEvent.getLocation()!=null?calEvent.getLocation():calendar.getName());
 
         result.setDetail(buf.toString());        
-        String    avatar = "/csResources/gadgets/tasks/skin/Tasks.png";
+        String    avatar = "/csResources/gadgets/events/skin/Events.png";
         result.setImageUrl(avatar);
         searchResults.add(result);
       } catch (Exception e) {
-        //e.printStackTrace();
-        continue;
+        e.printStackTrace();
       } 
     }
     return searchResults;
