@@ -12,6 +12,8 @@ import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
 
@@ -22,6 +24,8 @@ import org.exoplatform.social.core.manager.ActivityManager;
  * Jan 2, 2013 
  */
 public class JcrActivitySearch extends SearchServiceConnector {
+  private final static Log LOG = ExoLogger.getLogger(JcrActivitySearch.class);
+  
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -58,7 +62,7 @@ public class JcrActivitySearch extends SearchServiceConnector {
         result.setImageUrl(avatar);
         searchResults.add(result);
       } catch (Exception e) {
-        e.printStackTrace();
+        LOG.error(e.getMessage(), e);
       } 
     }      
 

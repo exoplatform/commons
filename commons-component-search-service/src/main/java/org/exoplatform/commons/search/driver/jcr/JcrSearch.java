@@ -17,14 +17,12 @@
  
 package org.exoplatform.commons.search.driver.jcr;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +55,8 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
@@ -69,25 +69,17 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Path("/search/jcr")
 @Produces(MediaType.APPLICATION_JSON)
 public class JcrSearch implements ResourceContainer {
-  public static String[] IGNORED_TYPES;
-  public static String[] IGNORED_FIELDS;
+  public static String[] IGNORED_TYPES = new String[] {"nt:version", "nt:frozenNode", "nt:unstructured", "nt:folder"};
+  public static String[] IGNORED_FIELDS = new String[] {"exo:lastModifier"};
+  
+  private final static Log LOG = ExoLogger.getLogger(JcrSearch.class);
   
   private static final CacheControl cacheControl;
   static {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
     cacheControl = new CacheControl();
     cacheControl.setNoCache(true);
-    cacheControl.setNoStore(true);
-
-    try {
-      Properties props = new Properties();
-      props.load(JcrSearch.class.getResourceAsStream("/conf/configuration.properties"));      
-      JcrSearch.IGNORED_TYPES = props.getProperty("jcr-ignored-types").split(",");
-      JcrSearch.IGNORED_FIELDS = props.getProperty("jcr-ignored-fields").split(",");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }    
-    
+    cacheControl.setNoStore(true);    
   }
   
   @SuppressWarnings("unchecked")
@@ -145,7 +137,7 @@ public class JcrSearch implements ResourceContainer {
   }
   
   private static Collection<JcrSearchResult> search(String repositoryName, String workspaceName, Collection<String> siteNames, String sql, int offset, int limit) {
-    System.out.format("[UNIFIED SEARCH] JcrSearchService.search()\nrepository = %s\nworkspace = %s\nsql = %s\noffset = %s\nlimit = %s\n", repositoryName, workspaceName, sql, offset, limit);
+    LOG.debug(String.format("[UNIFIED SEARCH] JcrSearchService.search()\nrepository = %s\nworkspace = %s\nsql = %s\noffset = %s\nlimit = %s\n", repositoryName, workspaceName, sql, offset, limit));
     Collection<JcrSearchResult> results = new ArrayList<JcrSearchResult>();
     try {
       RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
@@ -193,7 +185,7 @@ public class JcrSearch implements ResourceContainer {
 
       results.addAll(result);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
     return results;
   }
@@ -224,7 +216,6 @@ public class JcrSearch implements ResourceContainer {
           props.put(property.getName(), value.getString());
         }
       } catch (ValueFormatException vfe) {
-        //vfe.printStackTrace();
         Value[] values = property.getValues(); // as multi-valued
         List<Object> valueList = new ArrayList<Object>();
         for(Value value:values){
@@ -257,7 +248,7 @@ public class JcrSearch implements ResourceContainer {
     try {
       return Response.ok(IGNORED_TYPES, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
     }
   }
@@ -270,7 +261,7 @@ public class JcrSearch implements ResourceContainer {
       IGNORED_TYPES = ignoredTypes.split(",");
       return Response.ok(IGNORED_TYPES, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
     }
   }
@@ -281,7 +272,7 @@ public class JcrSearch implements ResourceContainer {
     try {
       return Response.ok(IGNORED_FIELDS, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
     }
   }
@@ -294,7 +285,7 @@ public class JcrSearch implements ResourceContainer {
       IGNORED_FIELDS = ignoredFields.split(",");
       return Response.ok(IGNORED_FIELDS, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
     }
   }
@@ -305,7 +296,7 @@ public class JcrSearch implements ResourceContainer {
     try {
       return Response.ok(getJcrNodeProperties(nodePath), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
     }
   }

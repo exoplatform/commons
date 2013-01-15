@@ -5,6 +5,8 @@ import java.util.Map;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Define search type handled by SearchService, e.g: people search, wiki search...  
@@ -19,6 +21,8 @@ public class SearchType {
   private String displayName; //for use when rendering
   private Map<String, Object> properties; // optional miscellaneous properties used by the connector or for rendering on UI
   private Class<? extends SearchServiceConnector> handler; //the connector which provide result for this search type
+  
+  private final static Log LOG = ExoLogger.getLogger(SearchType.class);
   
   public String getName() {
     return name;
@@ -65,10 +69,10 @@ public class SearchType {
       this.properties = mapper.readValue(properties_json, new TypeReference<Map<String, Object>>(){});
       this.handler = (Class<? extends SearchServiceConnector>) Class.forName(handler_className);
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
       this.handler = null;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }    
   }
   
@@ -81,7 +85,7 @@ public class SearchType {
       this.properties = entryType.properties;
       this.handler = entryType.handler;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
   }
 }

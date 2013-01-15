@@ -48,7 +48,7 @@ public class SolrTest extends BaseTest  {
       Collection<SearchResult> result = new SolrGenericSearch().search(query, sites, types, offset, limit, sort, order);
       results.put("Solr generic search", result);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
     return results;
   }

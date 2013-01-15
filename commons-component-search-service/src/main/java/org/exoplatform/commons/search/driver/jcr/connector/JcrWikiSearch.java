@@ -13,6 +13,8 @@ import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.wiki.mow.api.Page;
 import org.exoplatform.wiki.mow.api.Wiki;
@@ -27,6 +29,8 @@ import org.exoplatform.wiki.service.WikiService;
  * Dec 24, 2012  
  */
 public class JcrWikiSearch extends SearchServiceConnector {
+  private final static Log LOG = ExoLogger.getLogger(JcrWikiSearch.class);
+  
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -71,7 +75,7 @@ public class JcrWikiSearch extends SearchServiceConnector {
         result.setImageUrl(avatar);
         searchResults.add(result);
       } catch (Exception e) {
-        e.printStackTrace();
+        LOG.error(e.getMessage(), e);
       } 
     }      
 

@@ -10,9 +10,12 @@ import org.exoplatform.commons.api.search.SearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.service.SearchType;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
-public class JcrSearchService implements SearchService {
-
+public class JcrSearchDriver implements SearchService {
+  private final static Log LOG = ExoLogger.getLogger(JcrSearchDriver.class);
+  
   @Override
   public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
@@ -21,11 +24,11 @@ public class JcrSearchService implements SearchService {
         SearchType searchType = entry.getValue();
         if(null!=types && !types.isEmpty() && !types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only
         Class<? extends SearchServiceConnector> handler = searchType.getHandler();
-        System.out.println("\n[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
+        LOG.debug("\n[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
         results.put(searchType.getName(), handler.newInstance().search(query, sites, types, offset, limit, sort, order));
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
     return results;
   }

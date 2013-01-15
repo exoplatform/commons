@@ -63,17 +63,17 @@ public abstract class BaseTest extends TestCase implements SearchService {
   }
   
   protected void search(String queryString){
-    System.out.println("\n====================================\nSearching for '" + queryString + "' (categorized)...\nResults:");
+    LOG.info("\n====================================\nSearching for '" + queryString + "' (categorized)...\nResults:");
     Map<String, Collection<SearchResult>> result = search(queryString, null, null, 0, 0, "", "");
     
     Iterator<String> iter = result.keySet().iterator();
     while(iter.hasNext()){
       String searchType = iter.next();
-      System.out.println("\n" + searchType + ":");
+      LOG.info("\n" + searchType + ":");
       Collection<SearchResult> entries = result.get(searchType);
       Iterator<SearchResult> entriesIter = entries.iterator();
       while(entriesIter.hasNext()){
-        System.out.println(" * " + entriesIter.next());
+        LOG.info(" * " + entriesIter.next());
       }
     }
     

@@ -23,6 +23,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.exoplatform.commons.api.indexing.IndexingService;
 import org.exoplatform.commons.api.indexing.data.SearchEntry;
 import org.exoplatform.commons.api.indexing.data.SearchEntryId;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS
@@ -31,7 +33,7 @@ import org.exoplatform.commons.api.indexing.data.SearchEntryId;
  * Nov 21, 2012  
  */
 public class SolrIndexingService extends IndexingService{
-//  private final static Log LOG = ExoLogger.getLogger(ElasticIndexingService.class);
+  private final static Log LOG = ExoLogger.getLogger(SolrIndexingService.class);
   private SolrServer server;
   
   public SolrIndexingService(SolrServer server){
@@ -50,7 +52,7 @@ public class SolrIndexingService extends IndexingService{
       server.add(doc);
       server.commit();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
   }
 
@@ -63,7 +65,7 @@ public class SolrIndexingService extends IndexingService{
     try {
       server.deleteById(id.toString());
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
   }
   

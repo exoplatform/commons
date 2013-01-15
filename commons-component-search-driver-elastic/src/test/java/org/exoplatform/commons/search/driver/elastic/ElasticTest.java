@@ -60,7 +60,7 @@ public class ElasticTest extends BaseTest  {
       Collection<SearchResult> result = new ElasticGenericSearch().search(query, sites, types, offset, limit, sort, order);
       results.put("Elastic generic search", result);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
     return results;
   }
@@ -91,14 +91,14 @@ public class ElasticTest extends BaseTest  {
   }
 
   public void testUpdate(){
-    System.out.println("Before: " + getEntry(UserSearchEntry.getEntryId("mary")));
+    LOG.info("Before: " + getEntry(UserSearchEntry.getEntryId("mary")));
 
-    System.out.println("Updating lastname --> Jane ...");
+    LOG.info("Updating lastname --> Jane ...");
     Map<String, Object> changes = new HashMap<String, Object>();
     changes.put("lastname", "Jane");
     indexingService.update(UserSearchEntry.getEntryId("mary"), changes);
     
-    System.out.println("After: " + getEntry(UserSearchEntry.getEntryId("mary")));
+    LOG.info("After: " + getEntry(UserSearchEntry.getEntryId("mary")));
   }
 
   public void testSearch(){

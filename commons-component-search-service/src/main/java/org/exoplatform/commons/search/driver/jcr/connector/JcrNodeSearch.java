@@ -16,8 +16,8 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
-import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
@@ -25,9 +25,12 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 public class JcrNodeSearch extends SearchServiceConnector {
   private static final String SEARCH_TYPE_NAME = "jcrNode";
+  private final static Log LOG = ExoLogger.getLogger(JcrNodeSearch.class);
   
   @Override
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
@@ -62,7 +65,7 @@ public class JcrNodeSearch extends SearchServiceConnector {
         
         results.add(result);
       } catch (Exception e) {
-        e.printStackTrace();
+        LOG.error(e.getMessage(), e);
       }
     }
     return results;
@@ -70,7 +73,7 @@ public class JcrNodeSearch extends SearchServiceConnector {
 
 
   private static Collection<SearchResult> sqlExec(String sql) {
-    System.out.format("[UNIFIED SEARCH] JcrNodeSearch.sqlExec()\nsql = %s\n", sql);
+    LOG.debug(String.format("[UNIFIED SEARCH] JcrNodeSearch.sqlExec()\nsql = %s\n", sql));
     Collection<SearchResult> results = new ArrayList<SearchResult>();
     String sortBy = "jcr:score()";
     Matcher matcher = Pattern.compile("ORDER BY\\s+([\\S]+)").matcher(sql);
@@ -82,13 +85,13 @@ public class JcrNodeSearch extends SearchServiceConnector {
       RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
       for(RepositoryEntry repositoryEntry:repositoryService.getConfig().getRepositoryConfigurations()){
         String repoName = repositoryEntry.getName();
-        System.out.format("[UNIFIED SEARCH]: searching repository '%s'...\n", repoName);
+        LOG.debug(String.format("[UNIFIED SEARCH]: searching repository '%s'...\n", repoName));
 
         ManageableRepository repository = repositoryService.getRepository(repoName);
         List<SearchResult> result = new ArrayList<SearchResult>();    
 
         for(String workspaceName:repository.getWorkspaceNames()){
-          System.out.format("[UNIFIED SEARCH]: searching workspace '%s'...\n", workspaceName);
+          LOG.debug(String.format("[UNIFIED SEARCH]: searching workspace '%s'...\n", workspaceName));
 
           Session session = repository.login(workspaceName);
           QueryManager queryManager = session.getWorkspace().getQueryManager();
@@ -123,7 +126,7 @@ public class JcrNodeSearch extends SearchServiceConnector {
         results.addAll(result);
       }      
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
     return results;
   }

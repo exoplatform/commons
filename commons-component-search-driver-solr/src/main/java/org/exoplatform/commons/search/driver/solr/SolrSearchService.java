@@ -27,6 +27,8 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.exoplatform.commons.api.indexing.data.SearchEntry;
 import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS
@@ -35,7 +37,8 @@ import org.exoplatform.commons.api.search.data.SearchResult;
  * Nov 21, 2012  
  */
 public class SolrSearchService {
-  //private final static Log LOG = ExoLogger.getLogger(ElasticSearchService.class);
+  private final static Log LOG = ExoLogger.getLogger(SolrSearchService.class);
+  
   private static SolrServer server;
   
   public static SolrServer getServer() {
@@ -57,7 +60,7 @@ public class SolrSearchService {
     try {
       rsp = server.query(params);
     } catch (SolrServerException e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
     SolrDocumentList docs = rsp.getResults();
     for (SolrDocument doc : docs) {

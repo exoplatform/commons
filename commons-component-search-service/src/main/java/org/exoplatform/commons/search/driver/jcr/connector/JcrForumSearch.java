@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
@@ -16,6 +16,8 @@ import org.exoplatform.forum.service.Forum;
 import org.exoplatform.forum.service.ForumService;
 import org.exoplatform.forum.service.Topic;
 import org.exoplatform.forum.service.Utils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS
@@ -24,6 +26,8 @@ import org.exoplatform.forum.service.Utils;
  * Dec 24, 2012  
  */
 public class JcrForumSearch extends SearchServiceConnector  {
+  private final static Log LOG = ExoLogger.getLogger(JcrForumSearch.class);
+  
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -83,7 +87,7 @@ public class JcrForumSearch extends SearchServiceConnector  {
         result.setImageUrl(avatar);
         searchResults.add(result);
       } catch (Exception e) {
-        e.printStackTrace();
+        LOG.error(e.getMessage(), e);
       } 
     }      
 

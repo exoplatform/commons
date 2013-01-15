@@ -23,6 +23,8 @@ import org.codehaus.jackson.type.TypeReference;
 import org.exoplatform.commons.api.search.SearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
@@ -42,6 +44,8 @@ public class UnifiedSearchService implements ResourceContainer {
   public static String PEOPLE="people";
   public static String QUESTION="question";
   public static String ACTIVITY="activity";
+  
+  private final static Log LOG = ExoLogger.getLogger(UnifiedSearchService.class);
   
   private static final CacheControl cacheControl;
   static {
@@ -79,7 +83,7 @@ public class UnifiedSearchService implements ResourceContainer {
       Map<String, SearchType> reg = mapper.readValue(json, new TypeReference<Map<String, SearchType>>(){});
       UnifiedSearchService.registry = reg;
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
   }
   /**
@@ -114,7 +118,7 @@ public class UnifiedSearchService implements ResourceContainer {
       InputStream registryJson = this.getClass().getResourceAsStream("/conf/registry.json");
       if(null!=registryJson) setRegistry(new java.util.Scanner(registryJson).useDelimiter("\\A").next());
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
     }
   }
   
@@ -126,7 +130,7 @@ public class UnifiedSearchService implements ResourceContainer {
       if(query.startsWith("SELECT")) return Response.ok(searchService.search(query, Arrays.asList("all"), Arrays.asList("jcrNode"), 0, 0, "jcrScore()", "DESC"), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
       return Response.ok(searchService.search(query, Arrays.asList(sites.split(",\\s*")), Arrays.asList(types.split(",\\s*")), offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
     }
   }
@@ -172,7 +176,7 @@ public class UnifiedSearchService implements ResourceContainer {
       UserPortalConfigService dataStorage = (UserPortalConfigService) ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(UserPortalConfigService.class);
       return Response.ok(dataStorage.getAllPortalNames(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage(), e);
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
     }
   }

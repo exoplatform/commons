@@ -6,18 +6,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 
 public class JcrPeopleSearch extends SearchServiceConnector {
+  private final static Log LOG = ExoLogger.getLogger(JcrPeopleSearch.class);
+  
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -56,7 +60,7 @@ public class JcrPeopleSearch extends SearchServiceConnector {
 
         searchResults.add(result);
       } catch (Exception e) {
-        e.printStackTrace();
+        LOG.error(e.getMessage(), e);
       } 
     }
 
