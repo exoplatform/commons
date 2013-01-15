@@ -5,14 +5,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.exoplatform.commons.api.search.Search;
 import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearch;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 
-public class JcrSpaceSearch implements Search {
+public class JcrSpaceSearch extends SearchServiceConnector {
 
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
@@ -25,7 +25,7 @@ public class JcrSpaceSearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearch.SPACE);
+    parameters.put("type", UnifiedSearchService.SPACE);
     parameters.put("repository", "repository");
     parameters.put("workspace", "social");
     parameters.put("from", "soc:spacedefinition");
@@ -38,13 +38,13 @@ public class JcrSpaceSearch implements Search {
         String spaceUrl = (String) jcrResult.getProperty("soc:url");        
         Space space = spaceSvc.getSpaceByUrl(spaceUrl);
 
-        SearchResult result = new SearchResult(UnifiedSearch.SPACE, spaceUrl);
+        SearchResult result = new SearchResult(UnifiedSearchService.SPACE, spaceUrl);
         result.setTitle(space.getDisplayName());
         result.setExcerpt(space.getDescription());
         result.setDetail(space.getDisplayName() + " - " + String.valueOf(space.getMembers().length) + " - " + space.getVisibility());
         String avatar = space.getAvatarUrl();
         if(null==avatar) avatar = "/social-resources/skin/ShareImages/SpaceImages/SpaceLogoDefault_61x61.gif";
-        result.setAvatar(avatar);
+        result.setImageUrl(avatar);
 
         searchResults.add(result);
       } catch (Exception e) {

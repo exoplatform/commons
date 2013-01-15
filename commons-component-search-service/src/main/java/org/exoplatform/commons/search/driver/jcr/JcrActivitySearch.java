@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.exoplatform.commons.api.search.Search;
 import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearch;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
@@ -19,7 +19,7 @@ import org.exoplatform.social.core.manager.ActivityManager;
  *          canhpv@exoplatform.com
  * Jan 2, 2013 
  */
-public class JcrActivitySearch implements Search {
+public class JcrActivitySearch extends SearchServiceConnector {
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -31,7 +31,7 @@ public class JcrActivitySearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearch.ACTIVITY);
+    parameters.put("type", UnifiedSearchService.ACTIVITY);
     parameters.put("repository", "repository");
     parameters.put("workspace", "social");
     parameters.put("from", "soc:activity");
@@ -43,7 +43,7 @@ public class JcrActivitySearch implements Search {
         String activityId = (String) jcrResult.getProperty("jcr:uuid");        
         ExoSocialActivity activity = activityManager.getActivity(activityId);                       
 
-        SearchResult result = new SearchResult(UnifiedSearch.ACTIVITY, activity.getStreamUrl());
+        SearchResult result = new SearchResult(UnifiedSearchService.ACTIVITY, activity.getStreamUrl());
         result.setTitle(activity.getTitle());
         result.setExcerpt(jcrResult.getExcerpt());
         StringBuffer buf = new StringBuffer();
@@ -52,8 +52,8 @@ public class JcrActivitySearch implements Search {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEEE, MMMMMMMM d, yyyy K:mm a");        
         buf.append(sdf.format(activity.getUpdated()));
         result.setDetail(buf.toString());
-        String    avatar = "/social/gadgets/Activities/style/images/ActivityIcon.gif";
-        result.setAvatar(avatar);
+        String avatar = "/social/gadgets/Activities/style/images/ActivityIcon.gif";
+        result.setImageUrl(avatar);
         searchResults.add(result);
       } catch (Exception e) {
         e.printStackTrace();

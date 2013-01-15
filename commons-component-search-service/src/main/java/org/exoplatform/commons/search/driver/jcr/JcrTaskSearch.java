@@ -25,9 +25,9 @@ import java.util.Map;
 import org.exoplatform.calendar.service.Calendar;
 import org.exoplatform.calendar.service.CalendarEvent;
 import org.exoplatform.calendar.service.CalendarService;
-import org.exoplatform.commons.api.search.Search;
 import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearch;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 
 /**
@@ -36,7 +36,7 @@ import org.exoplatform.container.ExoContainerContext;
  *          canhpv@exoplatform.com
  * Jan 3, 2013  
  */
-public class JcrTaskSearch implements Search{
+public class JcrTaskSearch extends SearchServiceConnector {
 
   @Override
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
@@ -50,7 +50,7 @@ public class JcrTaskSearch implements Search{
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearch.TASK);
+    parameters.put("type", UnifiedSearchService.TASK);
     parameters.put("repository", "repository");
     parameters.put("workspace", "collaboration");
     parameters.put("from", "exo:calendarEvent");
@@ -66,7 +66,7 @@ public class JcrTaskSearch implements Search{
         CalendarEvent calTask = calendarService.getGroupEvent(taskId);                
         Calendar calendar = calendarService.getGroupCalendar(calendarId);
 
-        SearchResult result = new SearchResult(UnifiedSearch.TASK, calendar.getPublicUrl());
+        SearchResult result = new SearchResult(UnifiedSearchService.TASK, calendar.getPublicUrl());
         result.setTitle(calTask.getSummary());
         result.setExcerpt(calTask.getDescription()!=null?calTask.getDescription():calTask.getSummary());
         StringBuffer buf = new StringBuffer();
@@ -79,7 +79,7 @@ public class JcrTaskSearch implements Search{
 
         result.setDetail(buf.toString());        
         String    avatar = "/csResources/gadgets/tasks/skin/Tasks.png";
-        result.setAvatar(avatar);
+        result.setImageUrl(avatar);
         searchResults.add(result);
       } catch (Exception e) {
         //e.printStackTrace();

@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.exoplatform.commons.api.search.Search;
 import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearch;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.forum.service.Forum;
 import org.exoplatform.forum.service.ForumService;
@@ -21,7 +21,7 @@ import org.exoplatform.forum.service.Utils;
  *          canhpv@exoplatform.com
  * Dec 24, 2012  
  */
-public class JcrForumSearch implements Search {
+public class JcrForumSearch extends SearchServiceConnector  {
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -33,7 +33,7 @@ public class JcrForumSearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearch.DISCUSSION);
+    parameters.put("type", UnifiedSearchService.DISCUSSION);
     parameters.put("repository", "repository");
     parameters.put("workspace", "knowledge");
     parameters.put("from", "exo:topic");
@@ -63,7 +63,7 @@ public class JcrForumSearch implements Search {
         Forum forum = (Forum)forumService.getForum(category, forumId);        
 
         ///Forum forum = (Forum)forumService.getObjectNameByPath(path.substring(path.indexOf(Utils.CATEGORY), path.lastIndexOf("/")));
-        SearchResult result = new SearchResult(UnifiedSearch.DISCUSSION, topic.getLink());
+        SearchResult result = new SearchResult(UnifiedSearchService.DISCUSSION, topic.getLink());
         result.setTitle(topic.getTopicName());
         result.setExcerpt(topic.getDescription());
         StringBuffer buf = new StringBuffer();
@@ -78,7 +78,7 @@ public class JcrForumSearch implements Search {
 
         result.setDetail(buf.toString());        
         String    avatar = "/forum/skin/DefaultSkin/webui/skinIcons/24x24/icons/HotThreadNewPost.gif";
-        result.setAvatar(avatar);
+        result.setImageUrl(avatar);
         searchResults.add(result);
       } catch (Exception e) {
         e.printStackTrace();

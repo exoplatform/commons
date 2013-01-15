@@ -3,9 +3,10 @@ package org.exoplatform.commons.search.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.ws.rs.Consumes;
@@ -21,8 +22,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.exoplatform.commons.api.search.SearchService;
-import org.exoplatform.commons.api.search.data.SearchType;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
@@ -32,11 +36,11 @@ import org.exoplatform.services.security.ConversationState;
 
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
-public class UnifiedSearch implements ResourceContainer {
+public class UnifiedSearchService implements ResourceContainer, SearchService {
   // Search types constants
   public static String FILE="file";
   public static String DOCUMENT="document";
-  public static String DISCUSSION="forum"; //TODO: Canh to check this
+  public static String DISCUSSION="forum";
   public static String TASK="task";
   public static String EVENT="event";
   public static String PAGE="page";
@@ -54,11 +58,86 @@ public class UnifiedSearch implements ResourceContainer {
     cacheControl.setNoStore(true);
   }
 
-  public UnifiedSearch(){
+  private static Map<String, SearchType> registry = new HashMap<String, SearchType>(); //a map that stores all the search type handled by SearchService 
+  
+  /**
+   * Get all SearchTypes from registry
+   * @return Map<String, SearchType>
+   */
+  public static Map<String, SearchType> getRegistry() {
+    return registry;
+  }
+
+  /**
+   * Set registry 
+   * @param registry
+   */
+  public static void setRegistry(Map<String, SearchType> registry) {
+    UnifiedSearchService.registry = registry;
+  }
+
+  /**
+   * Parser json string to map and push map into registry
+   * @param json must follow to json format
+   */
+  public static void setRegistry(String json) {
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      Map<String, SearchType> reg = mapper.readValue(json, new TypeReference<Map<String, SearchType>>(){});
+      UnifiedSearchService.registry = reg;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  /**
+   * Register a search type
+   * @param searchType
+   */
+  public static void register(SearchType searchType) {
+    registry.put(searchType.getName(), searchType);
+  }
+
+  /**
+   * Remove SearchType from registry
+   * @param searchTypeName
+   */
+  public static void unregister(String searchTypeName) {
+    registry.remove(searchTypeName);
+  }
+
+  /**
+   * Check SearchType is exist or not
+   * @param searchTypeName
+   * @return
+   */
+  public static boolean isRegistered(String searchTypeName) {
+    return registry.containsKey(searchTypeName);
+  }
+
+  @Override
+  public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+    Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
+    try {
+      for(Entry<String, SearchType> entry:registry.entrySet()){
+        SearchType searchType = entry.getValue();
+        if(null!=types && !types.isEmpty() && !types.contains("all") && !types.contains(searchType.getName())) continue; // search requested types only
+        Class<? extends SearchServiceConnector> handler = searchType.getHandler();
+        System.out.println("\n[UNIFIED SEARCH]: handler = " + handler.getSimpleName());
+        results.put(searchType.getName(), handler.newInstance().search(query, sites, types, offset, limit, sort, order));
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return results;
+  }
+
+  
+  
+  public UnifiedSearchService(){
     // TODO: move all config to portlet war or PLF's configuration.properties
     try {
       InputStream registryJson = this.getClass().getResourceAsStream("/conf/registry.json");
-      if(null!=registryJson) SearchService.setRegistry(new java.util.Scanner(registryJson).useDelimiter("\\A").next());
+      if(null!=registryJson) setRegistry(new java.util.Scanner(registryJson).useDelimiter("\\A").next());
       
       Properties props = new Properties();
       props.load(this.getClass().getResourceAsStream("/conf/configuration.properties"));      
@@ -73,8 +152,8 @@ public class UnifiedSearch implements ResourceContainer {
   public Response search(@QueryParam("q") String query, @QueryParam("sites") String sites, @QueryParam("types") String types, @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("sort") String sort, @QueryParam("order") String order) {
     try {
       // sql mode (for testing)
-      if(query.startsWith("SELECT")) return Response.ok(SearchService.search(query, Arrays.asList("all"), Arrays.asList("jcrNode"), 0, 0, "jcrScore()", "DESC"), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-      return Response.ok(SearchService.search(query, Arrays.asList(sites.split(",\\s*")), Arrays.asList(types.split(",\\s*")), offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      if(query.startsWith("SELECT")) return Response.ok(search(query, Arrays.asList("all"), Arrays.asList("jcrNode"), 0, 0, "jcrScore()", "DESC"), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      return Response.ok(search(query, Arrays.asList(sites.split(",\\s*")), Arrays.asList(types.split(",\\s*")), offset, limit, sort, order), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
       e.printStackTrace();
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
@@ -83,17 +162,17 @@ public class UnifiedSearch implements ResourceContainer {
 
   @GET
   @Path("/registry")
-  public static Response getRegistry() {
-    return Response.ok(SearchService.getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  public static Response REST_getRegistry() {
+    return Response.ok(getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
 
   @GET
   @Path("/registry={json}")  
   @Consumes(MediaType.APPLICATION_JSON)
-  public static Response setRegistry(@PathParam("json") String json) {
+  public static Response REST_setRegistry(@PathParam("json") String json) {
     try {
-      SearchService.setRegistry(json);
-      return Response.ok(SearchService.getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+      setRegistry(json);
+      return Response.ok(getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     } catch (Exception e) {
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
     }
@@ -103,16 +182,16 @@ public class UnifiedSearch implements ResourceContainer {
   @Path("/register/{searchType}")  
   @Consumes(MediaType.APPLICATION_JSON)
   public static Response registerSearchType(@PathParam("searchType") String searchType_json){
-    SearchService.register(new SearchType(searchType_json));
-    return Response.ok(SearchService.getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    register(new SearchType(searchType_json));
+    return Response.ok(getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
 
   @GET
   @Path("/unregister/{searchType}")  
   @Consumes(MediaType.APPLICATION_JSON)
   public static Response unregisterSearchType(@PathParam("searchType") String searchTypeName){
-    SearchService.unregister(searchTypeName);
-    return Response.ok(SearchService.getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    unregister(searchTypeName);
+    return Response.ok(getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
   
   @GET

@@ -18,13 +18,18 @@ package org.exoplatform.commons.search.driver.solr;
 
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.exoplatform.commons.api.search.SearchService;
-import org.exoplatform.commons.api.search.data.SearchType;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.sample.BaseTest;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -40,6 +45,17 @@ public class SolrTest extends BaseTest  {
   private static final String SOLR_HOME = "src/test/resources/solr";
   SolrServer server;
 
+  public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+    Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
+    try {
+      Collection<SearchResult> result = new SolrGenericSearch().search(query, sites, types, offset, limit, sort, order);
+      results.put("Solr generic search", result);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return results;
+  }
+
   @Override
   public void setUp() throws Exception {
     System.setProperty("solr.solr.home", SOLR_HOME);
@@ -50,8 +66,8 @@ public class SolrTest extends BaseTest  {
     
     indexingService = new SolrIndexingService(server);
     SolrSearchService.setServer(server);
-    SearchService.register(new SearchType("user", "User", null, SolrGenericSearch.class));
-    SearchService.register(new SearchType("topic", "Forum topic", null, SolrGenericSearch.class));
+//    SearchService.register(new SearchType("user", "User", null, SolrGenericSearch.class));
+//    SearchService.register(new SearchType("topic", "Forum topic", null, SolrGenericSearch.class));
     super.setUp();
   }
 

@@ -14,7 +14,8 @@ public class SearchResult {
   private String title; //title to be displayed on UI
   private String excerpt; //the excerpt to be displayed on UI
   private String detail; //details information
-  private String avatar; //an image to be displayed on UI
+  private String imageUrl; //an image to be displayed on UI
+  private long date; //created or modified date
   
   public String getType() {
     return type;
@@ -51,11 +52,18 @@ public class SearchResult {
     this.detail = detail;
   }
   
-  public String getAvatar() {
-    return avatar;
+  public String getImageUrl() {
+    return imageUrl;
   }
-  public void setAvatar(String avatar) {
-    this.avatar = avatar;
+  public void setImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
+  }
+  
+  public long getDate() {
+    return date;
+  }
+  public void setDate(long date) {
+    this.date = date;
   }
   
   public SearchResult() {
@@ -66,4 +74,8 @@ public class SearchResult {
     this.url = url;
   }
   
+  @Override
+  public String toString() {
+    return String.format("SearchResult {type=%s, url=%s}", type, url);
+  }
 }

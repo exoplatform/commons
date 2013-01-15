@@ -21,6 +21,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,8 +32,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.exoplatform.commons.api.indexing.data.SearchEntry;
 import org.exoplatform.commons.api.indexing.data.SearchEntryId;
-import org.exoplatform.commons.api.search.SearchService;
-import org.exoplatform.commons.api.search.data.SearchType;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.sample.BaseTest;
 import org.exoplatform.commons.search.sample.UserSearchEntry;
 import org.exoplatform.services.log.ExoLogger;
@@ -54,6 +54,17 @@ public class ElasticTest extends BaseTest  {
     return new SearchEntry(res.getIndex(), res.getType(), res.getId(), res.getSource());
   }
 
+  public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
+    Map<String, Collection<SearchResult>> results = new HashMap<String, Collection<SearchResult>>();
+    try {
+      Collection<SearchResult> result = new ElasticGenericSearch().search(query, sites, types, offset, limit, sort, order);
+      results.put("Elastic generic search", result);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return results;
+  }
+
   @Override
   protected void setUp() throws Exception {
     Node node = nodeBuilder().node();
@@ -61,8 +72,8 @@ public class ElasticTest extends BaseTest  {
     //client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));        
     indexingService = new ElasticIndexingService(client);
     ElasticSearchService.setClient(client);
-    SearchService.register(new SearchType("user", "User", null, ElasticGenericSearch.class));
-    SearchService.register(new SearchType("topic", "Forum topic", null, ElasticGenericSearch.class));
+//    SearchService.register(new SearchType("user", "User", null, ElasticGenericSearch.class));
+//    SearchService.register(new SearchType("topic", "Forum topic", null, ElasticGenericSearch.class));
     super.setUp();
   }
 

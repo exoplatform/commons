@@ -26,20 +26,9 @@
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   
   <!-- UNIFIED SEARCH -->
-  <!-- <component>
-    <key>org.exoplatform.commons.search.IndexingService</key>
-    <type>org.exoplatform.commons.search.driver.elastic.ElasticIndexingService</type>
-  </component> -->
-  
   <component>
-    <key>org.exoplatform.commons.search.SearchService</key>
-    <type>org.exoplatform.commons.search.driver.jcr.JcrSearchService</type>
-    <!-- <type>org.exoplatform.commons.search.driver.elastic.ElasticSearchService</type> -->
-    <!-- <type>org.exoplatform.commons.search.driver.solr.SolrSearchService</type> -->
+    <key>org.exoplatform.commons.api.search.SearchService</key>
+    <type>org.exoplatform.commons.search.service.UnifiedSearchService</type>
   </component>
 
-  <component>
-    <type>org.exoplatform.commons.search.service.UnifiedSearch</type>
-  </component>
-       
 </configuration>

@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.exoplatform.commons.api.search.Search;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearch;
+import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.wiki.mow.api.Page;
@@ -24,7 +24,7 @@ import org.exoplatform.wiki.service.WikiService;
  *          canhpv@exoplatform.com
  * Dec 24, 2012  
  */
-public class JcrWikiSearch implements Search {
+public class JcrWikiSearch extends SearchServiceConnector {
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -36,7 +36,7 @@ public class JcrWikiSearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearch.WIKI);
+    parameters.put("type", UnifiedSearchService.WIKI);
     parameters.put("repository", "repository");
     parameters.put("workspace", "collaboration");
     parameters.put("from", "wiki:page");
@@ -56,7 +56,7 @@ public class JcrWikiSearch implements Search {
           wikiName = parentPage.getTitle();
         }  
         String title = (String)jcrResult.getProperty("title");
-        SearchResult result = new SearchResult(UnifiedSearch.WIKI, url);
+        SearchResult result = new SearchResult(UnifiedSearchService.WIKI, url);
         result.setTitle(title);
         result.setExcerpt(jcrResult.getExcerpt());
         StringBuffer buf = new StringBuffer();
@@ -66,7 +66,7 @@ public class JcrWikiSearch implements Search {
         buf.append(page.getUpdatedDate()!=null?sdf.format(page.getUpdatedDate()):sdf.format(page.getCreatedDate()));
         result.setDetail(buf.toString());
         String    avatar = "/wiki/skin/DefaultSkin/webui/background/Page.gif";
-        result.setAvatar(avatar);
+        result.setImageUrl(avatar);
         searchResults.add(result);
       } catch (Exception e) {
         e.printStackTrace();

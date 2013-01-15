@@ -5,14 +5,14 @@ import java.util.Collection;
 import org.exoplatform.commons.api.search.data.SearchResult;
 
 /**
- * This interface is implemented by the SearchService connectors which provide search result for a specific content type
+ * This abstract class is extended by the SearchService connectors which provide search result for a specific content type
  * 
  * Created by The eXo Platform SAS
  * Author : Tung Vu Minh
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public interface Search {
+public abstract class SearchServiceConnector {
   /**
    * The connectors must implement this search method, with the following parameters and return a collection of SearchResult
    * @param query The user-input query to search for
@@ -24,5 +24,5 @@ public interface Search {
    * @param order Sort order (ASC, DESC)
    * @return a collection of SearchResult
    */
-  public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order);
+  public abstract Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order);
 }

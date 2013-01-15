@@ -6,16 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.commons.api.search.Search;
 import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearch;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 
-public class JcrPeopleSearch implements Search {
+public class JcrPeopleSearch extends SearchServiceConnector {
   public Collection<SearchResult> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -27,7 +27,7 @@ public class JcrPeopleSearch implements Search {
     parameters.put("sort", sort);
     parameters.put("order", order);
     
-    parameters.put("type", UnifiedSearch.PEOPLE);
+    parameters.put("type", UnifiedSearchService.PEOPLE);
     parameters.put("repository", "repository");
     parameters.put("workspace", "social");
     parameters.put("from", "soc:profiledefinition");
@@ -42,7 +42,7 @@ public class JcrPeopleSearch implements Search {
         Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
         Profile profile = identity.getProfile();
 
-        SearchResult result = new SearchResult(UnifiedSearch.PEOPLE, profile.getUrl());
+        SearchResult result = new SearchResult(UnifiedSearchService.PEOPLE, profile.getUrl());
         result.setTitle(profile.getFullName());
         String position = profile.getPosition();
         if(null == position) position = "";
@@ -50,7 +50,7 @@ public class JcrPeopleSearch implements Search {
         result.setDetail(profile.getEmail());
         String avatar = profile.getAvatarUrl();      
         if(null == avatar) avatar = "/social-resources/skin/ShareImages/Avatar.gif";
-        result.setAvatar(avatar);
+        result.setImageUrl(avatar);
 
         searchResults.add(result);
       } catch (Exception e) {

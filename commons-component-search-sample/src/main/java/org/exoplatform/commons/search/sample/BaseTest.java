@@ -39,7 +39,7 @@ import org.exoplatform.services.organization.impl.UserImpl;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public abstract class BaseTest extends TestCase  {
+public abstract class BaseTest extends TestCase implements SearchService {
   private final static Log LOG = ExoLogger.getLogger(BaseTest.class);
   protected IndexingService indexingService;
   
@@ -64,12 +64,12 @@ public abstract class BaseTest extends TestCase  {
   
   protected void search(String queryString){
     System.out.println("\n====================================\nSearching for '" + queryString + "' (categorized)...\nResults:");
-    Map<String, Collection<SearchResult>> result = SearchService.search(queryString, null, null, 0, 0, "", "");
+    Map<String, Collection<SearchResult>> result = search(queryString, null, null, 0, 0, "", "");
     
     Iterator<String> iter = result.keySet().iterator();
     while(iter.hasNext()){
       String searchType = iter.next();
-      System.out.println("\n" + (SearchService.isRegistered(searchType)?SearchService.getRegistry().get(searchType).getName():searchType) + ":");
+      System.out.println("\n" + searchType + ":");
       Collection<SearchResult> entries = result.get(searchType);
       Iterator<SearchResult> entriesIter = entries.iterator();
       while(entriesIter.hasNext()){

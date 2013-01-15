@@ -16,15 +16,15 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
-import org.exoplatform.commons.api.search.Search;
 import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.api.search.SearchService;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
+import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 
-public class JcrNodeSearch implements Search {
+public class JcrNodeSearch extends SearchServiceConnector {
   private static final String SEARCH_TYPE_NAME = "jcrNode";
   
   @Override
@@ -55,8 +55,8 @@ public class JcrNodeSearch implements Search {
         result.setExcerpt(jcrResult.getExcerpt());
         String sortByValue = sortBy.equals("jcr:score()") ? score : (String)jcrResult.getProperty(sortBy);
         result.setDetail(sortBy + " = " + sortByValue);
-        String avatar = (String) SearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar");
-        if(null!=avatar) result.setAvatar(avatar.replaceAll("__SLASH__", "/"));
+        String avatar = (String) UnifiedSearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar");
+        if(null!=avatar) result.setImageUrl(avatar.replaceAll("__SLASH__", "/"));
         
         results.add(result);
       } catch (Exception e) {
@@ -111,8 +111,8 @@ public class JcrNodeSearch implements Search {
             resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
             String sortByValue = sortBy.equals("jcr:score()") ? score : "&lt;Click the icon to see all properties of this node&gt;";
             resultItem.setDetail(sortBy + " = " + sortByValue);
-            String avatar = (String) SearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar");
-            if(null!=avatar) resultItem.setAvatar(avatar.replaceAll("__SLASH__", "/"));
+            String avatar = (String) UnifiedSearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar");
+            if(null!=avatar) resultItem.setImageUrl(avatar.replaceAll("__SLASH__", "/"));
 
             result.add(resultItem);
           }

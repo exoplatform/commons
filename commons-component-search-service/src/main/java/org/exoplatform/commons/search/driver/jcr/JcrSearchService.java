@@ -49,8 +49,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.exoplatform.commons.api.search.SearchService;
-import org.exoplatform.commons.api.search.data.SearchType;
+import org.exoplatform.commons.search.service.SearchType;
+import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
@@ -110,7 +110,7 @@ public class JcrSearchService implements ResourceContainer {
     String likeStmt = (!caseSensitive?"LOWER(%s)":"%s") + " LIKE '%%"+repeat("%s", terms, "%%")+"%%'";
     
     if(!(query.startsWith("\"") && query.endsWith("\""))) { //not exact search
-      SearchType searchType = SearchService.getRegistry().get((String) parameters.get("type"));
+      SearchType searchType = UnifiedSearchService.getRegistry().get((String) parameters.get("type"));
       if(null!=searchType) {
         Collection<String> likeFields = (Collection<String>) searchType.getProperties().get("likeFields");
         if(null!=likeFields && !likeFields.isEmpty()) where = where + " OR " + String.format("(%s)", repeat(likeStmt, likeFields, " OR "));
