@@ -40,7 +40,7 @@ public class CacheSettingTest extends BaseCommonsTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    settingCache = getService(CacheService.class).getCacheInstance("settingCache");
+    settingCache = getService(CacheService.class).getCacheInstance(SettingService.class.getSimpleName());
     settingService = getService(CacheSettingServiceImpl.class);
     ConversationState c = new ConversationState(new Identity(session.getUserID()));
     ConversationState.setCurrent(c);  

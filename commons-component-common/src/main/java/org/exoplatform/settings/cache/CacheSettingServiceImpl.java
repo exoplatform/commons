@@ -52,7 +52,7 @@ public class CacheSettingServiceImpl implements SettingService {
 
   public CacheSettingServiceImpl(SettingServiceImpl service, CacheService cacheService) {
 
-    settingCache = cacheService.getCacheInstance("settingCache");
+    settingCache = cacheService.getCacheInstance(SettingService.class.getSimpleName());
 
     Loader<SettingKey, SettingValue, SettingServiceImpl> loader = new Loader<SettingKey, SettingValue, SettingServiceImpl>() {
       @Override
