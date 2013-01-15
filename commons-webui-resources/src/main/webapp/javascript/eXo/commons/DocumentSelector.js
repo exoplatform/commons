@@ -288,9 +288,34 @@ DocumentSelector.prototype.renderDetailsFolder = function(tableContainer,documen
       newRow.append('<td></td>');
       var cellZero = jQuery("td",newRow).eq(0);
       cellZero.html(cellZero_innerHTML);
-      cellZero.click(function() {
-   	   _module.DocumentSelector.submitSelectedFile(this) ;
+
+      var $this = cellZero;
+      var clicked=false;
+      jQuery(cellZero).bind('click', function() {
+        var el=jQuery(this);
+        if (clicked) { // double click
+            clicked=false;
+            clearTimeout(clickedTimeout);
+            
+            _module.DocumentSelector.submitSelectedFile($this);
+            
+            setTimeout(function(){
+						 var selectBtn = jQuery("#UIDocActivitySelector").find("input[name='selectbtn']");
+						 selectBtn.click();
+						}, 300);
+        } else {
+            clicked=true;
+            clickedTimeout=setTimeout(function(){
+              clicked=false;
+              _module.DocumentSelector.submitSelectedFile($this) ;
+            },300);
+        }
+        
+        return false;
       });
+    
+      
+      
       //newRow.insertCell(1).innerHTML = '<div class="Item">' + fileList[j]
           //.getAttribute("dateCreated") + '</div>';
       //newRow.insertCell(2).innerHTML = '<div class="Item">' + size + '</div>';
