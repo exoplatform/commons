@@ -102,6 +102,8 @@ public class TestSimpleMockOrganizationService extends TestCase {
 			public void setOrganizationId(String organizationId) {}
 			public void setPassword(String s) {}
 			public void setUserName(String s) {}
+      public String getDisplayName() {return null;}
+      public void setDisplayName(String displayName) {}
 		});
 		
 		
