@@ -76,7 +76,7 @@ public class ContentInitializerServiceTest extends TestCase {
       public Object answer(InvocationOnMock invocation) {
         Object[] args = invocation.getArguments();
         LOGGER.info("argument add is " + args[0]);
-        LOGGER.info("add for mock");
+        System.out.println("add for mock");
         listDeploymentPluginActual.add((DeploymentPlugin) args[0]);
         return listDeploymentPluginActual;
       }

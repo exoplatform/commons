@@ -90,7 +90,7 @@ public class TestProductInformations extends BasicTestCase {
     assertEquals(productInformations.getBuildNumber(), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.exoplatform.ide"), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.exoplatform.social"), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.portal"), NEW_VERSION);
+    assertEquals(productInformations.getVersion("org.gatein.portal"), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.exoplatform.ecms"), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.exoplatform.ks"), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.exoplatform.cs"), NEW_VERSION);
@@ -101,7 +101,7 @@ public class TestProductInformations extends BasicTestCase {
     assertEquals(productInformations.getPreviousBuildNumber(), OLD_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.exoplatform.ide"), OLD_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.exoplatform.social"), OLD_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.portal"), OLD_VERSION);
+    assertEquals(productInformations.getPreviousVersion("org.gatein.portal"), OLD_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.exoplatform.ecms"), OLD_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.exoplatform.ks"), OLD_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.exoplatform.cs"), OLD_VERSION);

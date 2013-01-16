@@ -119,8 +119,8 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
     ProductInformations prodInfo = (ProductInformations) container.getComponentInstanceOfType(ProductInformations.class);
 
-    String portalVersion = prodInfo.getVersion("org.exoplatform.portal");
-    String portalPrevVersion = prodInfo.getPreviousVersion("org.exoplatform.portal");
+    String portalVersion = prodInfo.getVersion("org.gatein.portal");
+    String portalPrevVersion = prodInfo.getPreviousVersion("org.gatein.portal");
 
     String ecmsVersion = prodInfo.getVersion("org.exoplatform.ecms");
     String ecmsPrevVersion = prodInfo.getPreviousVersion("org.exoplatform.ecms");

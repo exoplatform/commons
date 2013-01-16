@@ -60,13 +60,13 @@ public class MockWebuiApplication extends WebuiApplication {
   }
 
   @Override
-  public ResourceBundle getOwnerResourceBundle(String username, Locale locale) throws Exception {
+  public ResourceBundle getOwnerResourceBundle(String username, Locale locale) {
 
     return null;
   }
 
   @Override
-  public ResourceBundle getResourceBundle(Locale locale) throws Exception {
+  public ResourceBundle getResourceBundle(Locale locale) {
 
     return rb;
   }
