@@ -20,8 +20,8 @@ import org.exoplatform.commons.api.search.SearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
-import org.exoplatform.commons.search.service.UnifiedSearchService;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
@@ -32,13 +32,23 @@ public class JcrNodeSearch extends SearchServiceConnector {
   private static final String SEARCH_TYPE_NAME = "jcrNode";
   private final static Log LOG = ExoLogger.getLogger(JcrNodeSearch.class);
   
+  @SuppressWarnings("serial")
+  private final static Map<String, String> sortFieldsMap = new HashMap<String, String>(){{
+    put("Primary type", "jcr:primaryType");
+    put("Date created", "jcr:created");
+  }};
+  
+  public JcrNodeSearch(InitParams params) {
+    super(params);
+  }
+
   @Override
   public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     Map<String, Object> parameters = new HashMap<String, Object>(); 
     parameters.put("sites", sites);
     parameters.put("offset", offset);
     parameters.put("limit", limit);
-    parameters.put("sort", sort);
+    parameters.put("sort", sortFieldsMap.get(sort));
     parameters.put("order", order);
     
     if(query.startsWith("SELECT")) return sqlExec(query); // sql mode (for testing)
@@ -59,8 +69,7 @@ public class JcrNodeSearch extends SearchServiceConnector {
         result.setExcerpt(jcrResult.getExcerpt());
         String sortByValue = sortBy.equals("jcr:score()") ? score : (String)jcrResult.getProperty(sortBy);
         result.setDetail(sortBy + " = " + sortByValue);
-        String avatar = (String) UnifiedSearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar");
-        if(null!=avatar) result.setImageUrl(avatar.replaceAll("__SLASH__", "/"));
+        result.setImageUrl("/eXoWCMResources/skin/DefaultSkin/wcm-nodetypes/70x80/icons/default.png");
         
         results.add(result);
       } catch (Exception e) {
@@ -115,8 +124,7 @@ public class JcrNodeSearch extends SearchServiceConnector {
             resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
             String sortByValue = sortBy.equals("jcr:score()") ? score : "&lt;Click the icon to see all properties of this node&gt;";
             resultItem.setDetail(sortBy + " = " + sortByValue);
-            String avatar = (String) UnifiedSearchService.getRegistry().get(SEARCH_TYPE_NAME).getProperties().get("avatar");
-            if(null!=avatar) resultItem.setImageUrl(avatar.replaceAll("__SLASH__", "/"));
+            resultItem.setImageUrl("/eXoWCMResources/skin/DefaultSkin/wcm-nodetypes/70x80/icons/default.png");
 
             result.add(resultItem);
           }

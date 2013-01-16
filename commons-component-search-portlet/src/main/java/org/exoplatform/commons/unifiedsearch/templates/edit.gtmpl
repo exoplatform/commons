@@ -43,8 +43,8 @@
     REGISTRY = registry;
     var searchInOpts=[];
     searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='all'>Everything</label></li>");
-    $.each(REGISTRY, function(key, searchType){
-      searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='" + searchType.name + "'>" + searchType.displayName + "</label></li>");
+    $.each(REGISTRY, function(searchType, connector){
+      searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
     });
     $("#lstSearchInOptions").html(searchInOpts.join(""));
 

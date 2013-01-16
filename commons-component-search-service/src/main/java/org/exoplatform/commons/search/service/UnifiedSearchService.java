@@ -1,17 +1,14 @@
 package org.exoplatform.commons.search.service;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
@@ -19,9 +16,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.exoplatform.commons.api.search.SearchService;
+import org.exoplatform.commons.api.search.SearchServiceConnector;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.log.ExoLogger;
@@ -47,72 +43,6 @@ public class UnifiedSearchService implements ResourceContainer {
     cacheControl.setNoStore(true);
   }
 
-  private static Map<String, SearchType> registry = new HashMap<String, SearchType>(); //a map that stores all the search type handled by SearchService 
-  
-  /**
-   * Get all SearchTypes from registry
-   * @return Map<String, SearchType>
-   */
-  public static Map<String, SearchType> getRegistry() {
-    return registry;
-  }
-
-  /**
-   * Set registry 
-   * @param registry
-   */
-  public static void setRegistry(Map<String, SearchType> registry) {
-    UnifiedSearchService.registry = registry;
-  }
-
-  /**
-   * Parser json string to map and push map into registry
-   * @param json must follow to json format
-   */
-  public static void setRegistry(String json) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      Map<String, SearchType> reg = mapper.readValue(json, new TypeReference<Map<String, SearchType>>(){});
-      UnifiedSearchService.registry = reg;
-    } catch (Exception e) {
-      LOG.error(e.getMessage(), e);
-    }
-  }
-  /**
-   * Register a search type
-   * @param searchType
-   */
-  public static void register(SearchType searchType) {
-    registry.put(searchType.getName(), searchType);
-  }
-
-  /**
-   * Remove SearchType from registry
-   * @param searchTypeName
-   */
-  public static void unregister(String searchTypeName) {
-    registry.remove(searchTypeName);
-  }
-
-  /**
-   * Check SearchType is exist or not
-   * @param searchTypeName
-   * @return
-   */
-  public static boolean isRegistered(String searchTypeName) {
-    return registry.containsKey(searchTypeName);
-  }
-  
-  
-  public UnifiedSearchService(){
-    // TODO: move all config to portlet war or PLF's configuration.properties
-    try {
-      InputStream registryJson = this.getClass().getResourceAsStream("/conf/registry.json");
-      if(null!=registryJson) setRegistry(new java.util.Scanner(registryJson).useDelimiter("\\A").next());
-    } catch (Exception e) {
-      LOG.error(e.getMessage(), e);
-    }
-  }
   
   @GET
   public Response search(@QueryParam("q") String sQuery, @QueryParam("sites") String sSites, @QueryParam("types") String sTypes, @QueryParam("offset") String sOffset, @QueryParam("limit") String sLimit, @QueryParam("sort") String sSort, @QueryParam("order") String sOrder) {
@@ -139,39 +69,20 @@ public class UnifiedSearchService implements ResourceContainer {
     }
   }
 
+  
   @GET
   @Path("/registry")
   public static Response REST_getRegistry() {
-    return Response.ok(getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-  }
-
-  @GET
-  @Path("/registry={json}")  
-  @Consumes(MediaType.APPLICATION_JSON)
-  public static Response REST_setRegistry(@PathParam("json") String json) {
-    try {
-      setRegistry(json);
-      return Response.ok(getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-    } catch (Exception e) {
-      return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).cacheControl(cacheControl).build();
+    SearchService searchService = (SearchService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SearchService.class);
+    Map<String, SearchServiceConnector> registry = new HashMap<String, SearchServiceConnector>();
+    
+    for(SearchServiceConnector connector:searchService.getConnectors()) {
+      registry.put(connector.getSearchType(), connector);
     }
+
+    return Response.ok(registry, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
 
-  @GET
-  @Path("/register/{searchType}")  
-  @Consumes(MediaType.APPLICATION_JSON)
-  public static Response registerSearchType(@PathParam("searchType") String searchType_json){
-    register(new SearchType(searchType_json));
-    return Response.ok(getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-  }
-
-  @GET
-  @Path("/unregister/{searchType}")  
-  @Consumes(MediaType.APPLICATION_JSON)
-  public static Response unregisterSearchType(@PathParam("searchType") String searchTypeName){
-    unregister(searchTypeName);
-    return Response.ok(getRegistry(), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-  }
   
   @GET
   @Path("/sites")

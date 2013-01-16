@@ -16,7 +16,9 @@
  */
 package org.exoplatform.commons.api.search;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.commons.api.search.data.SearchResult;
@@ -27,7 +29,17 @@ import org.exoplatform.commons.api.search.data.SearchResult;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public interface SearchService {
+public abstract class SearchService {
+  private List<SearchServiceConnector> connectors = new ArrayList<SearchServiceConnector>();
+    
+  public List<SearchServiceConnector> getConnectors() {
+    return connectors;
+  }
+
+  public void addConnector(SearchServiceConnector connector) {
+    connectors.add(connector);
+  }
+  
   /**
    * This search method aggregates search results from all connectors
    * @param query The user-input query to search for
@@ -39,5 +51,5 @@ public interface SearchService {
    * @param order Sort order (ASC, DESC)
    * @return a map of connector with their search result
    */
-  public Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order);  
+  public abstract Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order);  
 }

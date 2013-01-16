@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
@@ -65,6 +66,23 @@ public class ElasticTest extends BaseTest  {
     return results;
   }
 
+  private void search(String queryString){
+    LOG.info("\n====================================\nSearching for '" + queryString + "' (categorized)...\nResults:");
+    Map<String, Collection<SearchResult>> result = search(queryString, null, null, 0, 0, "", "");
+    
+    Iterator<String> iter = result.keySet().iterator();
+    while(iter.hasNext()){
+      String searchType = iter.next();
+      LOG.info("\n" + searchType + ":");
+      Collection<SearchResult> entries = result.get(searchType);
+      Iterator<SearchResult> entriesIter = entries.iterator();
+      while(entriesIter.hasNext()){
+        LOG.info(" * " + entriesIter.next());
+      }
+    }    
+  }
+
+  
   @Override
   protected void setUp() throws Exception {
     Node node = nodeBuilder().node();

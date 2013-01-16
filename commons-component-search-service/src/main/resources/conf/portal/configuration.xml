@@ -29,6 +29,127 @@
   <component>
     <key>org.exoplatform.commons.api.search.SearchService</key>
     <type>org.exoplatform.commons.search.driver.jcr.JcrSearchDriver</type>
+    <component-plugins>
+      <component-plugin>
+        <name>JcrNodeSearch</name>
+        <set-method>addConnector</set-method>
+        <type>org.exoplatform.commons.search.driver.jcr.connector.JcrNodeSearch</type>
+        <description>JCR nodes search connector</description>
+        <init-params>
+          <properties-param>
+             <name>constructor.params</name>
+             <property name="searchType" value="jcrNode"/>
+             <property name="displayName" value="JCR nodes"/>
+             <property name="sortFields" value="Primary type, Date created"/>
+          </properties-param>
+        </init-params>      
+      </component-plugin>
+
+      <component-plugin>
+        <name>JcrForumSearch</name>
+        <set-method>addConnector</set-method>
+        <type>org.exoplatform.commons.search.driver.jcr.connector.JcrForumSearch</type>
+        <description>Forum search connector</description>
+        <init-params>
+          <properties-param>
+             <name>constructor.params</name>
+             <property name="searchType" value="discussion"/>
+             <property name="displayName" value="Discussions"/>
+             <property name="sortFields" value="Topic name, Date created"/>
+          </properties-param>
+        </init-params>      
+      </component-plugin>
+            
+      <component-plugin>
+        <name>JcrEventSearch</name>
+        <set-method>addConnector</set-method>
+        <type>org.exoplatform.commons.search.driver.jcr.connector.JcrEventSearch</type>
+        <description>Event search connector</description>
+        <init-params>
+          <properties-param>
+             <name>constructor.params</name>
+             <property name="searchType" value="event"/>
+             <property name="displayName" value="Events"/>
+             <property name="sortFields" value="Summary, Updated date"/>
+          </properties-param>
+        </init-params>      
+      </component-plugin>
+      
+      <component-plugin>
+        <name>JcrSpaceSearch</name>
+        <set-method>addConnector</set-method>
+        <type>org.exoplatform.commons.search.driver.jcr.connector.JcrSpaceSearch</type>
+        <description>Space search connector</description>
+        <init-params>
+          <properties-param>
+             <name>constructor.params</name>
+             <property name="searchType" value="space"/>
+             <property name="displayName" value="Spaces"/>
+          </properties-param>
+        </init-params>      
+      </component-plugin>
+      
+      <component-plugin>
+        <name>JcrWikiSearch</name>
+        <set-method>addConnector</set-method>
+        <type>org.exoplatform.commons.search.driver.jcr.connector.JcrWikiSearch</type>
+        <description>Wiki search connector</description>      
+        <init-params>
+          <properties-param>
+             <name>constructor.params</name>
+             <property name="searchType" value="wiki"/>
+             <property name="displayName" value="Wikis"/>
+             <property name="sortFields" value="Title, Updated date"/>
+          </properties-param>
+        </init-params>      
+      </component-plugin>
+
+	    <component-plugin>
+	      <name>JcrPeopleSearch</name>
+	      <set-method>addConnector</set-method>
+	      <type>org.exoplatform.commons.search.driver.jcr.connector.JcrPeopleSearch</type>
+	      <description>People search connector</description>
+	      <init-params>
+	        <properties-param>
+	           <name>constructor.params</name>
+	           <property name="searchType" value="people"/>
+	           <property name="displayName" value="People"/>
+	           <property name="sortFields" value="Name, Created date"/>
+	        </properties-param>
+	      </init-params>      
+	    </component-plugin>
+	    
+      <component-plugin>
+        <name>JcrActivitySearch</name>
+        <set-method>addConnector</set-method>
+        <type>org.exoplatform.commons.search.driver.jcr.connector.JcrActivitySearch</type>
+        <description>Activity search connector</description>
+        <init-params>
+          <properties-param>
+             <name>constructor.params</name>
+             <property name="searchType" value="activity"/>
+             <property name="displayName" value="Activities"/>
+             <property name="sortFields" value="Title, Updated date"/>
+          </properties-param>
+        </init-params>      
+      </component-plugin>
+      
+      <component-plugin>
+        <name>JcrTaskSearch</name>
+        <set-method>addConnector</set-method>
+        <type>org.exoplatform.commons.search.driver.jcr.connector.JcrTaskSearch</type>
+        <description>Task search connector</description>
+        <init-params>
+          <properties-param>
+             <name>constructor.params</name>
+             <property name="searchType" value="task"/>
+             <property name="displayName" value="Tasks"/>
+             <property name="sortFields" value="Summary, Updated date"/>
+          </properties-param>
+        </init-params>      
+      </component-plugin>
+      
+    </component-plugins>
   </component>
 
   <component>

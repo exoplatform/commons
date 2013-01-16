@@ -177,13 +177,17 @@
         $.getJSON("/rest/search/registry", function(registry){
           REGISTRY = registry;
           var contentTypes = [];
-          $.each(REGISTRY, function(key, searchType){
-            if(-1 != $.inArray("all", USER_SETTING.searchTypes) || -1 != $.inArray(searchType.name, USER_SETTING.searchTypes)) {
-              contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + searchType.name + "'>" + searchType.displayName + "</label></li>");
+          $.each(REGISTRY, function(searchType, connector){
+            if(-1 != $.inArray("all", USER_SETTING.searchTypes) || -1 != $.inArray(searchType, USER_SETTING.searchTypes)) {
+              contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
             }
           });
-          $("#lstContentTypes").html(contentTypes.join(""));
-          $(":checkbox[name='contentType']").attr('checked', true);
+          if(0!=contentTypes.length) {
+            $("#lstContentTypes").html(contentTypes.join(""));
+            $(":checkbox[name='contentType']").attr('checked', true);
+          } else {
+            $(":checkbox[name='contentType'][value='all']").attr("checked", false).attr("disabled", "disabled");
+          }
         });
       }
 
@@ -371,11 +375,11 @@
         var type=$(this).attr("type");
         //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
         type = type.replace(/(:|\\.)/g,'\\\\$1'); //for jcr nodetype
-        var sortFields = REGISTRY[type] ? REGISTRY[type].properties.sortFields : undefined;
+        var sortFields = REGISTRY[type] ? REGISTRY[type].sortFields : undefined;
         var sortBy = ["<option value='jcr:score()'>Relevancy</option>"];
         if(sortFields != undefined) {
           $.each(sortFields, function(i, field){
-            sortBy.push("<option value='" + field.name + "'>" + field.displayName + "</option>")
+            sortBy.push("<option value='" + field + "'>" + field + "</option>")
           });
         }
         $("#lstSortBy").html(sortBy.join(""));

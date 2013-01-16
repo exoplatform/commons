@@ -12,6 +12,7 @@ import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.search.driver.jcr.JcrSearch;
 import org.exoplatform.commons.search.driver.jcr.JcrSearchResult;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.application.WebuiRequestContext;
@@ -30,6 +31,16 @@ import org.exoplatform.wiki.service.WikiService;
 public class JcrWikiSearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrWikiSearch.class);
   
+  @SuppressWarnings("serial")
+  private final static Map<String, String> sortFieldsMap = new HashMap<String, String>(){{
+    put("Title", "title");
+    put("Updated date", "updatedDate");
+  }};
+  
+  public JcrWikiSearch(InitParams params) {
+    super(params);
+  }
+
   public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     Collection<SearchResult> searchResults = new ArrayList<SearchResult>();
     
@@ -37,7 +48,7 @@ public class JcrWikiSearch extends SearchServiceConnector {
     parameters.put("sites", sites);
     parameters.put("offset", offset);
     parameters.put("limit", limit);
-    parameters.put("sort", sort);
+    parameters.put("sort", sortFieldsMap.get(sort));
     parameters.put("order", order);
     
     parameters.put("repository", "repository");

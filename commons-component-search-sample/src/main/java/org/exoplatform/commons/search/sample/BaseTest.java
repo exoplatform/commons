@@ -17,16 +17,11 @@
 package org.exoplatform.commons.search.sample;
 
 
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.exoplatform.commons.api.indexing.IndexingService;
-import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.api.search.SearchService;
 import org.exoplatform.forum.service.Topic;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -39,7 +34,7 @@ import org.exoplatform.services.organization.impl.UserImpl;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public abstract class BaseTest extends TestCase implements SearchService {
+public abstract class BaseTest extends TestCase {
   private final static Log LOG = ExoLogger.getLogger(BaseTest.class);
   protected IndexingService indexingService;
   
@@ -60,23 +55,6 @@ public abstract class BaseTest extends TestCase implements SearchService {
     topic.setCreatedDate(new Date());
     topic.setModifiedDate(new Date());
     return topic;
-  }
-  
-  protected void search(String queryString){
-    LOG.info("\n====================================\nSearching for '" + queryString + "'...\nResults:");
-    Map<String, Collection<SearchResult>> result = search(queryString, null, null, 0, 0, "", "");
-    
-    Iterator<String> iter = result.keySet().iterator();
-    while(iter.hasNext()){
-      String searchType = iter.next();
-      LOG.info("\n" + searchType + ":");
-      Collection<SearchResult> entries = result.get(searchType);
-      Iterator<SearchResult> entriesIter = entries.iterator();
-      while(entriesIter.hasNext()){
-        LOG.info(" * " + entriesIter.next());
-      }
-    }
-    
   }
   
   @Override

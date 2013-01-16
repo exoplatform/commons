@@ -1,8 +1,13 @@
 package org.exoplatform.commons.api.search;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.container.component.BaseComponentPlugin;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.PropertiesParam;
 
 /**
  * This abstract class is extended by the SearchService connectors which provide search result for a specific content type
@@ -12,7 +17,47 @@ import org.exoplatform.commons.api.search.data.SearchResult;
  *          tungvm@exoplatform.com
  * Nov 21, 2012  
  */
-public abstract class SearchServiceConnector {
+public abstract class SearchServiceConnector extends BaseComponentPlugin {
+  private String searchType; //search type name
+  private String displayName; //for use when rendering
+  private Collection<String> sortFields = new ArrayList<String>(); //for displaying on UI and passing to search function
+  
+  public String getSearchType() {
+    return searchType;
+  }
+
+  public void setSearchType(String searchType) {
+    this.searchType = searchType;
+  }
+
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
+  }
+
+  public Collection<String> getSortFields() {
+    return sortFields;
+  }
+
+  public void setSortFields(Collection<String> sortFields) {
+    this.sortFields = sortFields;
+  }
+
+  
+  public SearchServiceConnector(){
+  }
+  
+  public SearchServiceConnector(InitParams initParams) {
+    PropertiesParam param = initParams.getPropertiesParam("constructor.params");
+    this.searchType = param.getProperty("searchType");
+    this.displayName = param.getProperty("displayName");
+    String sSortFields = (String) param.getProperty("sortFields");
+    if(null!=sSortFields && !sSortFields.isEmpty()) this.sortFields = Arrays.asList(sSortFields.split(",\\s*"));
+  }
+
   /**
    * The connectors must implement this search method, with the following parameters and return a collection of SearchResult
    * @param query The user-input query to search for
