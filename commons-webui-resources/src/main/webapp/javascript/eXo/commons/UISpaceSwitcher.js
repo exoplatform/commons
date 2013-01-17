@@ -35,7 +35,7 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
   storage.accessibleSpaceRestUrl = baseRestUrl + "/wiki/spaces/accessibleSpaces/";
   storage.portalSpaceRestUrl = baseRestUrl + "/wiki/spaces/portalSpaces/";
   storage.mySpaceRestUrl = baseRestUrl + "/wiki/spaces/mySpaces/";
-  storage.recentlyVisitedSpaceRestUrl = socialBaseRestUrl + "/social/spaces/spaceLastVisited/list.json";
+  storage.recentlyVisitedSpaceRestUrl = socialBaseRestUrl + "/social/spaces/lastVisitedSpace/list.json";
   storage.lastSearchKeyword = "";
   storage.defaultValueForTextSearch = defaultValueForTextSearch;
   storage.selectSpaceAction = selectSpaceAction;
@@ -113,7 +113,7 @@ UISpaceSwitcher.prototype.getRecentlyVisitedSpace = function(uicomponentId, numb
   var storage = me.dataStorage[uicomponentId];
   jQuery.ajax({
     async : false,
-    url : storage.recentlyVisitedSpaceRestUrl + "?appId=wiki&limit=" + numberOfResults,
+    url : storage.recentlyVisitedSpaceRestUrl + "?appId=Wiki&offset=0&limit=" + numberOfResults,
     type : 'GET',
     data : '',
     success : function(data) {
