@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_2_1 http://www.gatein.org/xml/ns/gatein_resources_1_2_1"
-	xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_2_1">
-
+	xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
+	xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
+	
 	<module>
 		<name>commons-cometd</name>		
-		<as>cometd</as>
+		<as>cometd</as>		
 		<script>
-			<name>eXo.commons.JSON</name>
-			<path>/javascript/eXo/commons/JSON.js</path>
-		</script>
-		<script>
-			<name>eXo.commons.Cometd</name>
-			<path>/javascript/eXo/commons/Cometd.js</path>
+			<path>/javascript/eXo/commons/commons-Cometd.js</path>
 		</script>
 		<!-- need Browser.js -->
 		<depends>

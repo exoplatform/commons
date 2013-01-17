@@ -174,7 +174,7 @@
 .UIDocumentSelector .NewFolder {
   float: right;
   padding: 5px 11px;
-  background: url('/ecmexplorer/skin/icons/24x24/DefaultSkin/AddFolder.png') no-repeat 2px center;
+  background: url('images/AddFolder.png') no-repeat 2px center;
   padding: 5px 11px 4px 11px;
   margin-top: 1px;
   margin-left: 2px;
