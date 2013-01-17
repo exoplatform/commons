@@ -54,7 +54,6 @@
     <!-- Dependencies versions                    -->
     <!-- **************************************** -->
     <!-- eXo deps -->
-    
     <org.exoplatform.kernel.version>2.4.0-GA</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>2.5.0-GA</org.exoplatform.core.version>
     <org.exoplatform.ws.version>2.3.0-GA</org.exoplatform.ws.version>
@@ -83,7 +82,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-	  <dependency>
+	<dependency>
         <groupId>org.gatein.portal</groupId>
         <artifactId>exo.portal.webui.portlet</artifactId>
         <version>${org.gatein.portal.version}</version>      
