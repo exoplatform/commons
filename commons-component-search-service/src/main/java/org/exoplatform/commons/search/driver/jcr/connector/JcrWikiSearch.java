@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -32,7 +33,8 @@ public class JcrWikiSearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrWikiSearch.class);
   
   @SuppressWarnings("serial")
-  private final static Map<String, String> sortFieldsMap = new HashMap<String, String>(){{
+  private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
+    put("Relevancy", "jcr:score()");
     put("Title", "title");
     put("Updated date", "updatedDate");
   }};
@@ -128,5 +130,10 @@ public class JcrWikiSearch extends SearchServiceConnector {
 
     //WikiService wikiService = (WikiService) PortalContainer.getComponent(WikiService.class);
     return getSpaceNameByGroupId(wiki.getOwner());
+  }
+
+  @Override
+  public Collection<String> getSortFields() {
+    return sortFieldsMap.keySet();
   }  
 }

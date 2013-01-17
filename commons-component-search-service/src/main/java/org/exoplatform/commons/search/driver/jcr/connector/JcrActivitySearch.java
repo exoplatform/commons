@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.exoplatform.commons.api.search.SearchServiceConnector;
@@ -27,7 +28,8 @@ public class JcrActivitySearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrActivitySearch.class);
 
   @SuppressWarnings("serial")
-  private final static Map<String, String> sortFieldsMap = new HashMap<String, String>(){{
+  private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
+    put("Relevancy", "jcr:score()");
     put("Title", "title");
     put("Updated date", "soc:lastUpdated");
   }};
@@ -75,6 +77,11 @@ public class JcrActivitySearch extends SearchServiceConnector {
     }      
 
     return searchResults;
+  }
+
+  @Override
+  public Collection<String> getSortFields() {
+    return sortFieldsMap.keySet();
   }
 
 }

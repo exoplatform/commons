@@ -1,7 +1,5 @@
 package org.exoplatform.commons.api.search;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.exoplatform.commons.api.search.data.SearchResult;
@@ -20,7 +18,6 @@ import org.exoplatform.container.xml.PropertiesParam;
 public abstract class SearchServiceConnector extends BaseComponentPlugin {
   private String searchType; //search type name
   private String displayName; //for use when rendering
-  private Collection<String> sortFields = new ArrayList<String>(); //for displaying on UI and passing to search function
   
   public String getSearchType() {
     return searchType;
@@ -37,25 +34,16 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
   }
-
-  public Collection<String> getSortFields() {
-    return sortFields;
-  }
-
-  public void setSortFields(Collection<String> sortFields) {
-    this.sortFields = sortFields;
-  }
-
   
-  public SearchServiceConnector(){
-  }
+  public abstract Collection<String> getSortFields(); //for displaying on UI and passing to search function
+  
+  public SearchServiceConnector(){    
+  };
   
   public SearchServiceConnector(InitParams initParams) {
     PropertiesParam param = initParams.getPropertiesParam("constructor.params");
     this.searchType = param.getProperty("searchType");
     this.displayName = param.getProperty("displayName");
-    String sSortFields = (String) param.getProperty("sortFields");
-    if(null!=sSortFields && !sSortFields.isEmpty()) this.sortFields = Arrays.asList(sSortFields.split(",\\s*"));
   }
 
   /**

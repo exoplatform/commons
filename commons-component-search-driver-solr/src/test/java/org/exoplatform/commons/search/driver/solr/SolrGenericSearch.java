@@ -10,4 +10,9 @@ public class SolrGenericSearch extends SearchServiceConnector {
   public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     return SolrSearchService.search(query);
   }
+
+  @Override
+  public Collection<String> getSortFields() {
+    return null;
+  }
 }

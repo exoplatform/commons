@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,8 @@ public class JcrPeopleSearch extends SearchServiceConnector {
   private final static Log LOG = ExoLogger.getLogger(JcrPeopleSearch.class);
 
   @SuppressWarnings("serial")
-  private final static Map<String, String> sortFieldsMap = new HashMap<String, String>(){{
+  private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
+    put("Relevancy", "jcr:score()");
     put("Name", "void-fullName");
     put("Created date", "exo:dateCreated");
   }};
@@ -75,6 +77,11 @@ public class JcrPeopleSearch extends SearchServiceConnector {
     }
 
     return searchResults;
+  }
+
+  @Override
+  public Collection<String> getSortFields() {
+    return sortFieldsMap.keySet();
   }
 
 }
