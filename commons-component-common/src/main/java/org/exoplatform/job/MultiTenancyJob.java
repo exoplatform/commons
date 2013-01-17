@@ -32,6 +32,7 @@ import org.exoplatform.services.log.Log;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.impl.JobDetailImpl;
 
 /**
  * Created by The eXo Platform SAS Author : Lai Trung Hieu
@@ -96,7 +97,7 @@ public abstract class MultiTenancyJob implements Job {
   public static PortalContainer getPortalContainer(JobExecutionContext context) {
     if (context == null)
       return null;
-    String portalName = context.getJobDetail().getGroup();
+    String portalName = ((JobDetailImpl)context.getJobDetail()).getGroup();
     if (portalName == null)
       return null;
     if (portalName.indexOf(COLON) > 0)
