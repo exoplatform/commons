@@ -38,11 +38,11 @@ public class TestActivityTypeUtils extends BaseCommonsTestCase {
 
   @Override
   public void tearDown() throws Exception {
-    super.tearDown();
     if (root.hasNode(ID_TEST)) {
       root.getNode(ID_TEST).remove();
       session.save();
     }
+    super.tearDown();
   }
 
   private void saveNode(Node node) throws Exception {
