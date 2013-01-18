@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  *
  **************************************************************************/
-package org.exoplatform.commons.event.api;
+package org.exoplatform.commons.api.event;
 
 import java.util.List;
 

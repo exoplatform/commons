@@ -16,6 +16,7 @@
  */
 package org.exoplatform.settings.impl;
 
+import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.api.settings.SettingListener;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -26,7 +27,6 @@ import org.exoplatform.commons.api.settings.data.SettingContext;
 import org.exoplatform.commons.api.settings.data.SettingData;
 import org.exoplatform.commons.api.settings.data.SettingKey;
 import org.exoplatform.commons.api.settings.data.SettingScope;
-import org.exoplatform.commons.event.api.EventManager;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.security.ConversationState;
