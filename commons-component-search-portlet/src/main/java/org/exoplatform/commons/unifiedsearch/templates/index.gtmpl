@@ -207,6 +207,8 @@
       var LIMIT;
       var VIEWING_TYPE;
 
+      var SEARCH_TYPES = ["file", "document", "wiki", "page", "discussion", "people", "space", "event", "task", "question", "activity"];
+
       var SEARCH_RESULT_TEMPLATE = " \
         <div class='SearchResult '> \
           <div class='Avatar Clickable'> \
@@ -300,8 +302,9 @@
 
       function loadContentFilter(registry, userSetting) {
         var contentTypes = [];
-        $.each(registry, function(searchType, connector){
-          if(-1 != $.inArray("all", userSetting.searchTypes) || -1 != $.inArray(searchType, userSetting.searchTypes)) {
+        $.each(SEARCH_TYPES, function(i, searchType){
+          var connector = registry[searchType];
+          if(connector && (-1 != $.inArray("all", userSetting.searchTypes) || -1 != $.inArray(searchType, userSetting.searchTypes))) {
             contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
           }
         });
@@ -361,8 +364,9 @@
 
         $.getJSON(restUrl, function(resultMap){
           var rows = [];
-          $.each(resultMap, function(searchType, results){
-            if(0!=$(results).size()) {
+          $.each(SEARCH_TYPES, function(i, searchType){
+            results = resultMap[searchType];
+            if(results && 0!=$(results).size()) {
               var cell = [];
               $.each(results, function(i, result){
                 cell.push(renderSearchResult(result, true));
@@ -392,17 +396,18 @@
 
         $("body").css("cursor", "wait");
 
-        $.getJSON(restUrl, function(entryMap){
+        $.getJSON(restUrl, function(resultMap){
           var resultTypes = "| ";
           var result = "";
 
-          $.each(entryMap, function(type, entries){
-            if(0!=$(entries).size()) {
-              var typeDisplayName = isSqlMode() ? type + " (" + $(entries).size() + ")" : REGISTRY[type].displayName;
-              resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + type + "' offset=0 numEntries=" + $(entries).size() + ">" + typeDisplayName + "</span>" + " | ";
-              result = result + "<div class='SearchResultType' id='" + type + "-type'>";
+          $.each(SEARCH_TYPES, function(i, searchType){
+            results = resultMap[searchType];
+            if(0!=$(results).size()) {
+              var typeDisplayName = isSqlMode() ? searchType + " (" + $(results).size() + ")" : REGISTRY[searchType].displayName;
+              resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + searchType + "' offset=0 numEntries=" + $(results).size() + ">" + typeDisplayName + "</span>" + " | ";
+              result = result + "<div class='SearchResultType' id='" + searchType + "-type'>";
 
-              $.each(entries, function(i, entry){
+              $.each(results, function(i, entry){
                 result = result + renderSearchResult(entry);
               });
               result = result + "</div>"; //type div
@@ -686,7 +691,7 @@
                               top: $container.offset().top+"px",
                               left: $container.offset().left+"px",
                               width: $container.width(),
-                              height: $(window).height()
+                              height: $container.height()
                             });
       });
 
