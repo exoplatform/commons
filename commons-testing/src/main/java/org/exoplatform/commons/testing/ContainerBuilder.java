@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.AssertionFailedError;
 
@@ -33,6 +34,7 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
 
 /**
  * <p>An helper for building a root container and a portal container. I have done several attempt to make easily
@@ -184,10 +186,17 @@ public class ContainerBuilder
       singletonField.setAccessible(true);
       singletonField.set(null, null);
       
-      // needed otherwise, we cannot call this method twice in the same thread
-      Field bootingField = RootContainer.class.getDeclaredField("booting");
-      bootingField.setAccessible(true);
-      bootingField.set(null, false);
+//      // needed otherwise, we cannot call this method twice in the same thread
+//      // since version kernel 2.4.x, org.exoplatform.container.RootContainer.booting field is static final
+//      Field bootingField = RootContainer.class.getDeclaredField("booting");
+//      LOG.info("-----------------" + bootingField.getClass());
+//      bootingField.setAccessible(true);
+//      
+//      Field value = bootingField.getType().getDeclaredField("value");
+//      value.setAccessible(true);
+//      
+//      value.set(bootingField.getType(), 0);
+//      
       RootContainer.setInstance(null);
       
       
@@ -252,7 +261,7 @@ public class ContainerBuilder
 
          //
          root = RootContainer.getInstance();
-
+         
          //
          for (String portalName : portalConfigURLs.keySet())
          {

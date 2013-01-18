@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 
 <gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_2_1 http://www.gatein.org/xml/ns/gatein_resources_1_2_1"
-	xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_2_1">
+	xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
+	xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
 
 	<portal-skin>
 		<skin-name>Default</skin-name>
@@ -15,13 +15,7 @@
 		<name>commons-document</name>
 		<as>doc</as>
 		<script>
-			<name>eXo.commons.DocumentSelector</name>
-			<path>/javascript/eXo/commons/DocumentSelector.js</path>
-		</script>
-		<!-- UIDSUpload depends DocumentSelector -->
-		<script>
-			<name>eXo.commons.UIDSUpload</name>
-			<path>/javascript/eXo/commons/UIDSUpload.js</path>
+			<path>/javascript/eXo/commons/commons-Document.js</path>
 		</script>
 		<depends>
 			<module>jquery</module>	
@@ -38,14 +32,9 @@
 		<name>commons-editor</name>
 		<as>ckeditor</as>
 		<script>
-			<name>eXo.commons.ExoEditor</name>
-			<path>/ckeditor/exoeditor.js</path>
-		</script>
-		<script>
-			<name>eXo.commons.ExoEditorConfig</name>
-			<path>/ckeditor/eXoConfig.js</path>
-		</script>
-	</module>
+			<path>/ckeditor/commons-Editor.js</path>
+		</script> 		
+ 	</module>
 
 </gatein-resources>
 
