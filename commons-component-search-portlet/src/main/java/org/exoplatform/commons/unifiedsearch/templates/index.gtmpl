@@ -1,4 +1,14 @@
     <style>
+      .SearchBox {
+          background: url("/eXoResources/skin/DefaultSkin/skinIcons/16x16/icons/SearchIcon.png") no-repeat scroll 4px center white;
+          border: solid 1px lightgray;
+          border-radius: 12px;
+          height: 18px;
+          padding-left: 20px;
+          width: 120px;
+      }
+
+
       .Selected {
         font-weight: bold;
       }
@@ -7,11 +17,19 @@
         cursor: pointer;
       }
 
+      .Ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+      }
+
+
       .SearchResultType {
         margin-bottom: 40px;
         display: none;
       }
-
 
       .SearchResult {
         margin-left: 5px;
@@ -21,10 +39,11 @@
 
       .SearchResult .Avatar {
         float: left;
-        padding-top: 3px;
+        padding-top: 0px;
       }
 
       .SearchResult .Avatar img {
+        padding-top: 3px;
         width: 48px;
         height: 48px;
       }
@@ -36,9 +55,10 @@
 
       .SearchResult .Content .Title {
         font-weight: bold;
+/*        color: #555555 !important;*/
       }
 
-      .SearchResult .Content .Excerpt {
+      .SearchResult .Content .Excerpt div {
         font-size: x-small; height: 19px;
       }
 
@@ -47,10 +67,29 @@
       }
 
 
+      .QuickSearchResult {
+        margin-left: 0px;
+        padding-top: 0px;
+        height: 30px;
+      }
+
+      .QuickSearchResult .Avatar img {
+        width: 20px;
+        height: 24px;
+      }
+
+      .QuickSearchResult .Content {
+        padding-left: 5px;
+      }
+
+      .QuickSearchResult .Content .Excerpt div {
+        font-size: xx-small; color: grey;
+      }
+
+
       #facetsFilter {
         float: left;
-        border-style: solid;
-        border-width: 1px;
+        border: solid 1px lightgray;
         margin-right: 10px;
         padding-bottom: 10px;
         height: auto;
@@ -60,7 +99,7 @@
       #facetsFilterTitle {
         text-align: center;
         background: none repeat scroll 0% 0% lightGrey;
-        border-bottom: 1px solid;
+        /*border-bottom: 1px solid;*/
         margin-bottom: 10px;
         padding-top: 2px;
         padding-bottom: 2px;
@@ -91,112 +130,198 @@
         background: url("/eXoResources/skin/DefaultSkin/skinIcons/16x16/icons/NavigationIcons/BlueDownArrow.gif") no-repeat;
       }
 
-      .Ellipsis {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        -o-text-overflow: ellipsis;
-        -ms-text-overflow: ellipsis;
+
+      #quickSearchResult {
+        position: absolute;
+        background: white;
+        width: 315px;
+        margin-top: 6px;
+        margin-left: 3px;
+        display:none;
       }
 
+      #quickSearchResult table, #quickSearchResult th, #quickSearchResult td {
+        border: 1px solid lightgray;
+      }
     </style>
 
+
     <div id="searchPortlet">
-      <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
-        <div style="font-size: small;">SQL:</div>
-        <div style="margin: 10px;">
-          <textarea rows="4" cols="50" id="txtSql">SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '%query%') ORDER BY jcr:score() DESC</textarea>
+
+      <div id="quickSearch">
+        <div style="padding-top: 5px;" id="quickSearchForm">
+          <input type="text" id="txtQuickSearchQuery" class="SearchBox">
+        </div>
+        <div id="quickSearchResult">
         </div>
       </div>
 
-      <div id="searchForm" style="padding-top: 5px; text-align: center;">
-        <input type="text" id="txtQuery"/>
-        <input type="button" id="btnSearch" value="Search"/>
-        <hr/>
-      </div>
-
-      <div id="facetsFilter">
-        <div id="facetsFilterTitle">Filter By</div>
-        <div style="padding-right: 10px;">
-          <div id="siteFilter">
-            <input type="checkbox" name="site" value="all">All Sites
-            <ul id="lstSites"></ul>
+      <div id="searchPage" style="display: none;">
+        <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
+          <div style="font-size: small;">SQL:</div>
+          <div style="margin: 10px;">
+            <textarea rows="4" cols="50" id="txtSql">SELECT rep:excerpt(), jcr:primaryType FROM nt:base WHERE CONTAINS(*, '%query%') ORDER BY jcr:score() DESC</textarea>
           </div>
-
-          <input type="checkbox" name="contentType" value="all">All Content Types
-          <ul id="lstContentTypes"></ul>
         </div>
-      </div>
 
-      <div id="resultPage">
-        <div id="resultTypes" style="display: none; margin-bottom: 15px;"></div>
-        <div style="margin-bottom: 10px;">
-          <span id="resultHeader"></span>
-          <span id="resultSort" style="float: right; display: none;">
-            Sort By: <select id="lstSortBy"></select><span id="sortType" class="Desc Clickable">&nbsp;</span>
-          </span>
+        <div id="searchForm" style="padding-top: 5px; text-align: center;">
+          <input type="text" id="txtQuery" class="SearchBox" style="width: 250px;">
+          <input type="button" id="btnSearch" value="Search">
+          <hr style="color: lightgray"/>
         </div>
-        <div id="result" style="display: none;"></div>
-        <div id="showMore" style="display: none; text-align: center; margin-bottom: 20px;"><input type="button" id="btnShowMore" value="Show More Results"/></div>
+
+        <div id="facetsFilter">
+          <div id="facetsFilterTitle">Filter By</div>
+          <div style="padding-right: 10px;">
+            <div id="siteFilter">
+              <input type="checkbox" name="site" value="all">All Sites
+              <ul id="lstSites"></ul>
+            </div>
+
+            <input type="checkbox" name="contentType" value="all">All Content Types
+            <ul id="lstContentTypes"></ul>
+          </div>
+        </div>
+
+        <div id="resultPage" style="margin-right: 20px;">
+          <div id="resultTypes" style="display: none; margin-bottom: 15px;"></div>
+          <div style="margin-bottom: 10px;">
+            <span id="resultHeader"></span>
+            <span id="resultSort" style="float: right; display: none;">
+              Sort By: <select id="lstSortBy"></select><span id="sortType" class="Desc Clickable">&nbsp;</span>
+            </span>
+          </div>
+          <div id="result" style="display: none;"></div>
+          <div id="showMore" style="display: none; text-align: center; margin-bottom: 20px;"><input type="button" id="btnShowMore" value="Show More Results"/></div>
+        </div>
+
       </div>
 
     </div>
 
     <script>
+      //*** Global variables ***
+
+      var REGISTRY;
       var USER_SETTING;
       var LIMIT;
-      var REGISTRY;
       var VIEWING_TYPE;
 
-      init();
+      var SEARCH_RESULT_TEMPLATE = " \
+        <div class='SearchResult '> \
+          <div class='Avatar Clickable'> \
+            <img title='%{title}' src='%{avatar}' alt='[+]'> \
+          </div> \
+          <div class='Content'> \
+            <div class='Title Ellipsis'><a href='%{url}'>%{title}</a></div> \
+            <div class='Excerpt Ellipsis'>%{excerpt}</div> \
+            <div class='Detail'>%{detail}</div> \
+          </div> \
+        </div> \
+      ";
+
+      var QUICKSEARCH_RESULT_TEMPLATE= " \
+        <div class='SearchResult QuickSearchResult'> \
+          <div class='Avatar Clickable'> \
+            <img title='%{title}' src='%{avatar}' alt='[+]'> \
+          </div> \
+          <div class='Content'> \
+            <div class='Title Ellipsis'><a href='%{url}'>%{title}</a></div> \
+            <div class='Excerpt Ellipsis'>%{excerpt}</div> \
+          </div> \
+        </div> \
+      ";
+
+      var QUIKSEARCH_TABLE_TEMPLATE=" \
+            <table style='table-layout: fixed;'> \
+              <col width='30%'> \
+              <col width='70%'> \
+              %{resultRows} \
+              <tr> \
+                <th colspan='2' style='padding: 10px; font-weight: normal;'> \
+                  <span id='seeAll' class='Clickable'>%{message}</span> \
+                </th> \
+              </tr> \
+            </table> \
+          ";
+
+      var QUICKSEARCH_TABLE_ROW_TEMPLATE=" \
+            <tr> \
+              <th> \
+                <div style='margin-top: 8px; color: gray;'>%{type}</div> \
+              </th> \
+              <td style='padding: 2px;'> \
+                <div style='margin-left: 3px;'>%{results}</div> \
+              </td> \
+            </tr> \
+          ";
 
 
-      function init() {
-        // get user setting
-        $.getJSON("/rest/search/setting", function(setting){
-          USER_SETTING = setting;
-          LIMIT = USER_SETTING.resultsPerPage;
+      //*** The entry point ***
+      (function(){
+        getRegistry(function(registry){
+          getUserSetting(function(setting){
+            REGISTRY = registry;
+            USER_SETTING = setting;
+            LIMIT = setting.resultsPerPage;
 
-          loadContentFilter();
-          loadSiteFilter();
+            loadContentFilter(registry, setting);
+            loadSiteFilter(setting);
 
-          if(USER_SETTING.hideFacetsFilter) {
-            $("#facetsFilter").hide();
-          }
+            if(setting.hideFacetsFilter) {
+              $("#facetsFilter").hide();
+            }
 
-          if(USER_SETTING.hideSearchForm) {
-            $("#searchForm").hide();
-          } else {
-            $("#txtQuery").focus();
-          }
-        });
-      }
-
-
-      function loadContentFilter() {
-        $.getJSON("/rest/search/registry", function(registry){
-          REGISTRY = registry;
-          var contentTypes = [];
-          $.each(REGISTRY, function(searchType, connector){
-            if(-1 != $.inArray("all", USER_SETTING.searchTypes) || -1 != $.inArray(searchType, USER_SETTING.searchTypes)) {
-              contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
+            if(setting.hideSearchForm) {
+              $("#searchForm").hide();
+            } else {
+              $("#txtQuery").focus();
             }
           });
-          if(0!=contentTypes.length) {
-            $("#lstContentTypes").html(contentTypes.join(""));
-            $(":checkbox[name='contentType']").attr('checked', true);
-          } else {
-            $(":checkbox[name='contentType'][value='all']").attr("checked", false).attr("disabled", "disabled");
-          }
+        });
+      })();
+
+
+      //*** Utility functions ***
+
+      function getRegistry(callback) {
+        $.getJSON("/rest/search/registry", function(registry){
+          if(callback) callback(registry);
         });
       }
 
 
-      function loadSiteFilter() {
-        if(USER_SETTING.searchCurrentSiteOnly) {
+      function getUserSetting(callback) {
+        $.getJSON("/rest/search/setting", function(setting){
+          if(callback) callback(setting);
+        });
+      }
+
+
+      function loadContentFilter(registry, userSetting) {
+        var contentTypes = [];
+        $.each(registry, function(searchType, connector){
+          if(-1 != $.inArray("all", userSetting.searchTypes) || -1 != $.inArray(searchType, userSetting.searchTypes)) {
+            contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
+          }
+        });
+        if(0!=contentTypes.length) {
+          $("#lstContentTypes").html(contentTypes.join(""));
+          $(":checkbox[name='contentType']").attr('checked', true);
+        } else {
+          $(":checkbox[name='contentType'][value='all']").attr("checked", false).attr("disabled", "disabled");
+        }
+      }
+
+
+      function loadSiteFilter(userSetting) {
+        if(userSetting.searchCurrentSiteOnly) {
           $("#siteFilter").hide();
         } else {
           $.getJSON("/rest/search/sites", function(sites){
+            String.prototype.toProperCase = function () {
+                return this.replace(/\\w\\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+            };
             var siteNames = [];
             $.each(sites, function(i, site){
               siteNames.push("<li><label><input type='checkbox' name='site' value='" + site + "'>" + site.toProperCase() + "</label></li>");
@@ -205,43 +330,6 @@
             $(":checkbox[name='site']").attr('checked', true);
           });
         }
-      }
-
-
-
-      String.prototype.toProperCase = function () {
-          return this.replace(/\\w\\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-      };
-
-
-      function renderSearchResult(result) {
-        var template = " \
-          <div class='SearchResult %{type}'> \
-            <div class='Avatar Clickable'> \
-              <img title='%{title}' src='%{avatar}' alt='[+]'> \
-            </div> \
-            <div class='Content'> \
-              <div class='Title Ellipsis'><a href='%{url}'>%{title}</a></div> \
-              <div class='Excerpt Ellipsis'>%{excerpt}</div> \
-              <div class='Detail'>%{detail}</div> \
-            </div> \
-          </div> \
-        ";
-
-        var html = template.replace(/%{type}/g, result.type).replace(/%{url}/g, result.url);
-        html = html.replace(/%{title}/g, result.title).replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail).replace(/%{avatar}/g, result.imageUrl);
-        return html;
-      }
-
-
-      function clearResultPage(message){
-        $("#resultTypes").html("");
-        $("#result").html("");
-        $("#resultHeader").html(message?message:"");
-        $("#resultSort").hide();
-        $("#showMore").hide();
-        $("body").css("cursor", "auto");
-        return;
       }
 
 
@@ -263,6 +351,100 @@
           selectedSites.push(this.value);
         });
         return selectedSites.join(",");
+      }
+
+
+      function quickSearch() {
+        var query = $("#txtQuickSearchQuery").val();
+        //var restUrl = "/rest/search?q=" + query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc";
+        var restUrl = "/rest/search?q=" + query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+5+"&sort="+"&order=desc";
+
+        $.getJSON(restUrl, function(resultMap){
+          var rows = [];
+          $.each(resultMap, function(searchType, results){
+            if(0!=$(results).size()) {
+              var cell = [];
+              $.each(results, function(i, result){
+                cell.push(renderSearchResult(result, true));
+              });
+              var row = QUICKSEARCH_TABLE_ROW_TEMPLATE.replace(/%{type}/g, REGISTRY[searchType].displayName).replace(/%{results}/g, cell.join(""));
+              rows.push(row);
+            }
+          });
+          var message = rows.length==0 ? "No result for <strong>" + query + "<strong>" : "See All Search Results";
+          $("#quickSearchResult").html(QUIKSEARCH_TABLE_TEMPLATE.replace(/%{resultRows}/, rows.join("")).replace(/%{message}/g, message));
+          var width = Math.min($("#quickSearchResult").width(), $(window).width() - $("#txtQuickSearchQuery").offset().left - 20);
+          $("#quickSearchResult").width(width);
+          $("#quickSearchResult").show();
+        });
+      }
+
+
+      function search(callback) {
+        var query = $("#txtQuery").val();
+        var sql = $("#txtSql").val().replace(/%query%/g, query);
+        if(!isSqlMode() && ""==query) {
+          clearResultPage();
+          return;
+        }
+
+        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc");
+
+        $("body").css("cursor", "wait");
+
+        $.getJSON(restUrl, function(entryMap){
+          var resultTypes = "| ";
+          var result = "";
+
+          $.each(entryMap, function(type, entries){
+            if(0!=$(entries).size()) {
+              var typeDisplayName = isSqlMode() ? type + " (" + $(entries).size() + ")" : REGISTRY[type].displayName;
+              resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + type + "' offset=0 numEntries=" + $(entries).size() + ">" + typeDisplayName + "</span>" + " | ";
+              result = result + "<div class='SearchResultType' id='" + type + "-type'>";
+
+              $.each(entries, function(i, entry){
+                result = result + renderSearchResult(entry);
+              });
+              result = result + "</div>"; //type div
+            }
+          });
+
+          if(""==result) {
+            clearResultPage("No result for <strong>" + (isSqlMode()?sql:$("#txtQuery").val()) + "<strong>");
+            return;
+          }
+
+          $("#resultTypes").html(resultTypes+"<hr style='color: lightgray'/>");
+          $("#resultTypes").show();
+
+          $("#result").html(result);
+          $("#result").show();
+          $("#resultSort").show();
+          $("body").css("cursor", "auto");
+
+          if(callback) callback();
+          (VIEWING_TYPE && $(".ResultType[type='" + VIEWING_TYPE + "']").get(0) ? $(".ResultType[type='" + VIEWING_TYPE + "']").get(0) : $(".ResultType").first()).click();
+        });
+      }
+
+
+      function renderSearchResult(result, isQuickSearch) {
+        var template = isQuickSearch ?  QUICKSEARCH_RESULT_TEMPLATE : SEARCH_RESULT_TEMPLATE;
+        var html = template.replace(/%{url}/g, result.url).replace(/%{title}/g, result.title).replace(/%{avatar}/g, result.imageUrl);
+        //if(!isQuickSearch) html = html.replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail);
+        html = html.replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail);
+        return html;
+      }
+
+
+      function clearResultPage(message){
+        $("#resultTypes").html("");
+        $("#result").html("");
+        $("#resultHeader").html(message?message:"");
+        $("#resultSort").hide();
+        $("#showMore").hide();
+        $("body").css("cursor", "auto");
+        return;
       }
 
 
@@ -312,53 +494,7 @@
       }
 
 
-      function search(callback) {
-        var query = $("#txtQuery").val();
-        var sql = $("#txtSql").val().replace(/%query%/g, query);
-        if(!isSqlMode() && ""==query) {
-          clearResultPage();
-          return;
-        }
-
-        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc");
-
-        $("body").css("cursor", "wait");
-
-        $.getJSON(restUrl, function(entryMap){
-          var resultTypes = "| ";
-          var result = "";
-
-          $.each(entryMap, function(type, entries){
-            if(0!=$(entries).size()) {
-              var typeDisplayName = isSqlMode() ? type + " (" + $(entries).size() + ")" : REGISTRY[type].displayName;
-              resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + type + "' offset=0 numEntries=" + $(entries).size() + ">" + typeDisplayName + "</span>" + " | ";
-              result = result + "<div class='SearchResultType' id='" + type + "-type'>";
-
-              $.each(entries, function(i, entry){
-                result = result + renderSearchResult(entry);
-              });
-              result = result + "</div>"; //type div
-            }
-          });
-
-          if(""==result) {
-            clearResultPage("No result for <strong>" + (isSqlMode()?sql:$("#txtQuery").val()) + "<strong>");
-            return;
-          }
-
-          $("#resultTypes").html(resultTypes+"<hr/>");
-          $("#resultTypes").show();
-
-          $("#result").html(result);
-          $("#result").show();
-          $("#resultSort").show();
-          $("body").css("cursor", "auto");
-
-          if(callback) callback();
-          (VIEWING_TYPE && $(".ResultType[type='" + VIEWING_TYPE + "']").get(0) ? $(".ResultType[type='" + VIEWING_TYPE + "']").get(0) : $(".ResultType").first()).click();
-        });
-      }
-
+      //*** Event handlers - Search page ***
 
       $(".ResultType").live("click", function(){
         $(".Selected").toggleClass("Selected");
@@ -465,7 +601,7 @@
           case arrow.down:
             $("#sqlExec").show();
             break;
-          default:
+          case 13:
             search();
         }
       });
@@ -486,5 +622,72 @@
         showMore(0);
       });
 
+
+      //*** Event handlers - Quick search ***
+
+      $("#seeAll").live("click", function(){
+        $("#quickSearchResult").hide();
+        $("#txtQuery").val($("#txtQuickSearchQuery").val());
+        $("#btnSearch").click();
+        $("#searchPage").show();
+        $("#txtQuery").focus();
+      });
+
+
+      $("#txtQuickSearchQuery").keyup(function(e){
+        if(""==$(this).val()) {
+          $("#quickSearchResult").hide();
+          return;
+        }
+
+        if(13==e.keyCode) {
+          $("#seeAll").click();
+        } else {
+          quickSearch();
+        }
+      });
+
+
+      $("#txtQuickSearchQuery").focus(function(){
+        $("#searchPage").hide();
+        if(""!=$("#txtQuickSearchQuery").val()) {
+          quickSearch();
+        }
+      });
+
+
+      $("#txtQuickSearchQuery").blur(function(){
+        setTimeout(function(){$("#quickSearchResult").hide();}, 200);
+      });
+
+
+      //*** Event handlers - Whole portlet ***
+
+      $("#searchPortlet").keyup(function(e){
+        if(27==e.keyCode) {
+          $("#searchPage").hide();
+          $("#quickSearchResult").hide();
+        }
+      });
+
+
+      $("body").click(function(e) {
+        if($(e.target).is('#searchPortlet, #searchPortlet *')) return;
+        $("#searchPage").hide();
+        $("#quickSearchResult").hide();
+      });
+
+
+      $(function(){
+        var $container = $("#UIPageBody");
+        $("#searchPage").css({position: "absolute",
+                              overflow: "auto",
+                              background: "white",
+                              top: $container.offset().top+"px",
+                              left: $container.offset().left+"px",
+                              width: $container.width(),
+                              height: $(window).height()
+                            });
+      });
 
     </script>
