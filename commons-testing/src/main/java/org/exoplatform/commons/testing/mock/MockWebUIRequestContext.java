@@ -37,7 +37,7 @@ public class MockWebUIRequestContext extends WebuiRequestContext {
   }
 
   @Override
-  public <T> T getRequest() throws Exception {
+  public <T> T getRequest() {
     
     return null;
   }
@@ -53,7 +53,7 @@ public class MockWebUIRequestContext extends WebuiRequestContext {
   }
 
   @Override
-  public <T> T getResponse() throws Exception {
+  public <T> T getResponse() {
     
     return null;
   }

@@ -14,41 +14,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.testing;
+package org.exoplatform.job;
 
-import org.exoplatform.component.test.AbstractKernelTest;
-import org.exoplatform.component.test.KernelBootstrap;
-import org.exoplatform.container.PortalContainer;
+import org.exoplatform.job.MultiTenancyJob;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
  * Created by The eXo Platform SAS
- * Author : thanh_vucong
- *          thanh_vucong@exoplatform.com
- * Nov 12, 2012  
+ * Author : Canh Pham Van
+ *          canhpv@exoplatform.com
+ * Oct 18, 2012  
  */
-public abstract class BaseExoTestCase extends AbstractKernelTest {
+public class MultiTenancyJobImpl extends MultiTenancyJob{
 
-  /** . */
-  public static KernelBootstrap ownBootstrap = null;
-  
   @Override
-  public PortalContainer getContainer() {
-     return ownBootstrap != null ? ownBootstrap.getContainer() : super.getContainer();
+  public Class<? extends MultiTenancyTask> getTask() {
+    return ReminderTask.class;
   }
   
-  @Override
-  protected void beforeRunBare() {
-   if (ownBootstrap == null) {
-     super.beforeRunBare();
-   }
-  }
-  
-  @Override
-  protected void afterRunBare() {
-    if (ownBootstrap == null && super.getContainer() != null) {
-      super.afterRunBare();
+  public class ReminderTask extends MultiTenancyTask{
+
+    public ReminderTask(JobExecutionContext context, String repoName) {
+      super(context, repoName);
     }
+    
   }
   
-
+  @Override
+  public void execute(JobExecutionContext context) throws JobExecutionException {
+    // TODO Auto-generated method stub
+    super.execute(context);
+  }
+  
+  
 }
