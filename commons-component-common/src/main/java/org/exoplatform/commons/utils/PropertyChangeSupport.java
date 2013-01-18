@@ -88,8 +88,66 @@ public class PropertyChangeSupport implements java.io.Serializable {
       changeEvents = results;
     }
   }
+  
+  /**
+   * Removes an existing PropertyChangeEvent.
+   * 
+   * @param propertyName propertyName
+   */
+  public boolean removePropertyChange(String propertyName) {
+    if (hasPropertyName(propertyName)) {
+      synchronized(lock) {
+        PropertyChangeEvent results[] = new PropertyChangeEvent[changeEvents.length -1];
+        int j = 0;
+        for (int i = 0; i < changeEvents.length; i++) {
+          if (changeEvents[i].getPropertyName().equals(propertyName) == false) {
+            results[j++] = changeEvents[i];
+          }
+        }
+        changeEvents = results;
+      }
+      
+      return true;
+    }
+    
+    return false;
+  }
 
+  /**
+   * Gets PropertyChangeEvents
+   * @return
+   */
   public PropertyChangeEvent[] getChangeEvents() {
     return changeEvents;
+  }
+  
+  /**
+   * Gets PropertyChangeEvent by propertyName
+   * @param propertyName
+   * @return
+   */
+  public PropertyChangeEvent getPropertyChange(String propertyName) {
+    for (int i = 0; i < changeEvents.length; i++) {
+      if (changeEvents[i].getPropertyName().equals(propertyName)) {
+        return changeEvents[i];
+      }
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Has any PropertyChangeEvent by propertyName or not
+   * @param propertyName
+   * @return True or False
+   */
+  public boolean hasPropertyName(String propertyName) {
+    for (int i = 0; i < changeEvents.length; i++) {
+      if (changeEvents[i].getPropertyName().equals(propertyName)) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 }
