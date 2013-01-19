@@ -156,7 +156,7 @@
         </div>
       </div>
 
-      <div id="searchPage" style="display: none;">
+      <div id="searchPage" style="display: none; z-index: 1000;">
         <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
           <div style="font-size: small;">SQL:</div>
           <div style="margin: 10px;">

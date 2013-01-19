@@ -187,58 +187,6 @@ public class JcrSearch implements ResourceContainer {
     return results;
   }
 
-  public static Map<String, Object> getNodeProperties(Node node) throws Exception{
-    Map<String, Object> props = new HashMap<String, Object>();
-
-    PropertyIterator propertyIterator = node.getProperties();
-    while (propertyIterator.hasNext()) {
-      Property property = (Property) propertyIterator.nextProperty();
-
-      try {
-        Value value = property.getValue(); // as single-valued
-        switch(value.getType()){
-        case PropertyType.BINARY:
-          props.put(property.getName(), value.getStream());
-          break;
-        case PropertyType.BOOLEAN:
-          props.put(property.getName(), value.getBoolean());
-          break;
-        case PropertyType.DATE:
-          props.put(property.getName(), value.getDate().getTime().toString());
-          break;
-        case PropertyType.LONG:
-          props.put(property.getName(), value.getLong());
-          break;
-        default:
-          props.put(property.getName(), value.getString());
-        }
-      } catch (ValueFormatException vfe) {
-        Value[] values = property.getValues(); // as multi-valued
-        List<Object> valueList = new ArrayList<Object>();
-        for(Value value:values){
-          switch(value.getType()){
-          case PropertyType.BINARY:
-            valueList.add(value.getStream());
-            break;
-          case PropertyType.BOOLEAN:
-            valueList.add(value.getBoolean());
-            break;
-          case PropertyType.DATE:
-            valueList.add(value.getDate().getTime().toString());
-            break;
-          case PropertyType.LONG:
-            valueList.add(value.getLong());
-            break;
-          default:
-            valueList.add(value.getString());
-          }
-        }
-        props.put(property.getName(), valueList);
-      }
-    }
-    return props;
-  }
-  
   @GET
   @Path("/ignored-types")
   public static Response ignoredTypes() {
@@ -308,7 +256,57 @@ public class JcrSearch implements ResourceContainer {
     ManageableRepository repository = repositoryService.getRepository(repositoryName);
     Session session = repository.login(workspaceName);
     Node node = session.getRootNode().getNode(nodePath.substring(secondSlash+1));
-    return JcrSearch.getNodeProperties(node);
+
+    Map<String, Object> props = new HashMap<String, Object>();
+
+    PropertyIterator propertyIterator = node.getProperties();
+    while (propertyIterator.hasNext()) {
+      Property property = (Property) propertyIterator.nextProperty();
+
+      try {
+        Value value = property.getValue(); // as single-valued
+        switch(value.getType()){
+        case PropertyType.BINARY:
+          props.put(property.getName(), value.getStream());
+          break;
+        case PropertyType.BOOLEAN:
+          props.put(property.getName(), value.getBoolean());
+          break;
+        case PropertyType.DATE:
+          props.put(property.getName(), value.getDate().getTime().toString());
+          break;
+        case PropertyType.LONG:
+          props.put(property.getName(), value.getLong());
+          break;
+        default:
+          props.put(property.getName(), value.getString());
+        }
+      } catch (ValueFormatException vfe) {
+        Value[] values = property.getValues(); // as multi-valued
+        List<Object> valueList = new ArrayList<Object>();
+        for(Value value:values){
+          switch(value.getType()){
+          case PropertyType.BINARY:
+            valueList.add(value.getStream());
+            break;
+          case PropertyType.BOOLEAN:
+            valueList.add(value.getBoolean());
+            break;
+          case PropertyType.DATE:
+            valueList.add(value.getDate().getTime().toString());
+            break;
+          case PropertyType.LONG:
+            valueList.add(value.getLong());
+            break;
+          default:
+            valueList.add(value.getString());
+          }
+        }
+        props.put(property.getName(), valueList);
+      }
+    }
+
+    return props;
   }
  
   private static List<String> parse(String input) {

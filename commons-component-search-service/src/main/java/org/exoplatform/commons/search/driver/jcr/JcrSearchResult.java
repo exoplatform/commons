@@ -15,7 +15,7 @@ public class JcrSearchResult {
   private String path;
   private String primaryType;
   private String excerpt;
-  long score;
+  private long score;
   
   public String getRepository() {
     return repositoryName;
@@ -59,12 +59,7 @@ public class JcrSearchResult {
   }
 
   public Map<String, Object> getProperties() throws Exception {
-    RepositoryService repositoryService = (RepositoryService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
-    ManageableRepository repository = repositoryService.getRepository(repositoryName);
-    Session session = repository.login(workspaceName);
-    Node node = session.getRootNode().getNode(path.substring(1));
-    session.logout();
-    return JcrSearch.getNodeProperties(node);
+    return JcrSearch.getJcrNodeProperties(repositoryName + "/" + workspaceName + path);
   }
 
 }
