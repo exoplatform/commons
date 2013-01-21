@@ -1,43 +1,54 @@
 <style>
+  #settingMenu li {
+    list-style-type: disc;
+    margin-bottom: 5px;
+  }
+
+  #settingMenu li a {text-decoration:underline;}
+
   #settingForm div {
     margin-top: 5px;
   }
 </style>
 
-
-<div id="settingForm">
+<div id="settingMenu">
   <h3 style="margin-left: 3px;">Search Settings</h3>
   <hr>
-  <div style="margin-left: 10px; margin-bottom: 40px;">
+  <ul style="margin-left: 25px; margin-bottom: 30px; margin-top: 10px;">
+    <li><a id="lnkSearchPageSetting" href="#">Search Page</a></li>
+    <li><a id="lnkQuickSearchSetting" href="#">Quick Search</a></li>
+  </ul>
+</div>
 
+<div id="settingForm" style="display: none;">
+  <h3 style="margin-left: 3px;" id="settingFormTitle"></h3>
+  <hr>
+  <div style="margin-left: 10px; margin-bottom: 40px;">
     <div>
-      <label>
-        Results per page
-        <select id="resultsPerPage">
-          <option>5</option>
-          <option>10</option>
-          <option>20</option>
-          <option>50</option>
-          <option>100</option>
-        </select>
-      </label>
+      <span></span>
+      <select id="resultsPerPage"></select>
     </div>
 
     <div>
-      <label>Search in<input type="text" id="txtSearchIn" value="Everything" readonly/></label>
-      <ul id="lstSearchInOptions" style="border: 1px dotted; border-top:none; overflow-x: hidden;"></ul>
+      <span>Search in</span><input type="text" id="txtSearchIn" value="Everything" readonly/>
+      <ul id="lstSearchInOptions" style="border: 1px dotted; border-top:none; overflow-x: hidden; padding-bottom: 10px;"></ul>
     </div>
 
     <div><label><input type="checkbox" id="searchCurrentSiteOnly" style="margin-left: 0px;">Search in current site only</label></div>
     <div><label><input type="checkbox" id="hideSearchForm" style="margin-left: 0px;">Hide search form</label></div>
     <div><label><input type="checkbox" id="hideFacetsFilter" style="margin-left: 0px;">Hide facets filter</label></div>
 
-    <input type="button" value="Save Settings" style="margin-top: 15px; margin-left: 20px;" id="btnSaveSetting">
+    <div style="margin-top: 15px; margin-left: 20px;">
+      <input type="button" value="Save" id="btnSave">
+      <input type="button" value="Cancel" id="btnCancel">
+    </div>
+
   </div>
 </div>
 
 <script>
   var REGISTRY;
+  var VIEWING_PAGE;
 
   $.getJSON("/rest/search/registry", function(registry){
     REGISTRY = registry;
@@ -47,13 +58,23 @@
       searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
     });
     $("#lstSearchInOptions").html(searchInOpts.join(""));
+  });
 
-    $("#lstSearchInOptions").offset({left:$("#txtSearchIn").offset().left+3, top:$("#txtSearchIn").offset().top+$("#txtSearchIn").height()+8});
-    $("#lstSearchInOptions").width($("#txtSearchIn").width());
-    $(":checkbox[name='searchInOption'][value!='all']").css("margin-left", "25px");
-    $("#lstSearchInOptions").hide();
 
+  $("#lnkSearchPageSetting").click(function(){
     $.getJSON("/rest/search/setting", function(setting){
+      $("#settingMenu").hide();
+      $("#settingFormTitle").text("Search Page Settings");
+      $("#resultsPerPage").siblings("span").text("Results per page");
+      var options = [5,10,20,50,100];
+      $("#resultsPerPage").html("");
+      for(var i=0; i<options.length; i++) {
+        $("#resultsPerPage").append("<option>"+options[i]+"</option>");
+      }
+      $("#hideSearchForm").closest("div").show();
+      $("#hideFacetsFilter").closest("div").show();
+
+      $(":checkbox[name='searchInOption']").attr('checked', false);
       $.each($(":checkbox[name='searchInOption']"), function(){
         if(-1 != $.inArray(this.value, setting.searchTypes)) {
           $(this).attr('checked', true);
@@ -65,25 +86,82 @@
       $("#searchCurrentSiteOnly").attr('checked', setting.searchCurrentSiteOnly);
       $("#hideSearchForm").attr('checked', setting.hideSearchForm);
       $("#hideFacetsFilter").attr('checked', setting.hideFacetsFilter);
+
+      showSettingForm();
+      VIEWING_PAGE = "search_page";
     });
   });
 
 
-  $("#btnSaveSetting").click(function(){
-    var jqxhr = $.post("/rest/search/setting", {resultsPerPage:$("#resultsPerPage").val(),
-                                                searchTypes:getSelectedTypes(),
-                                                searchCurrentSiteOnly:$("#searchCurrentSiteOnly").is(":checked"),
-                                                hideSearchForm:$("#hideSearchForm").is(":checked"),
-                                                hideFacetsFilter:$("#hideFacetsFilter").is(":checked")
-                                                });
+  $("#lnkQuickSearchSetting").click(function(){
+    $.getJSON("/rest/search/setting/quicksearch", function(setting){
+      $("#settingMenu").hide();
+      $("#settingFormTitle").text("Quick Search Settings");
+      $("#resultsPerPage").siblings("span").text("Results per type");
+      $("#resultsPerPage").html("");
+      for(var i=1; i<=10; i++) {
+        $("#resultsPerPage").append("<option>"+i+"</option>");
+      }
+      $("#hideSearchForm").closest("div").hide();
+      $("#hideFacetsFilter").closest("div").hide();
+
+      $(":checkbox[name='searchInOption']").attr('checked', false);
+      $.each($(":checkbox[name='searchInOption']"), function(){
+        if(-1 != $.inArray(this.value, setting.searchTypes)) {
+          $(this).attr('checked', true);
+        }
+      });
+
+      $("#resultsPerPage").val(setting.resultsPerPage);
+      updateTxtSearchIn();
+      $("#searchCurrentSiteOnly").attr('checked', setting.searchCurrentSiteOnly);
+
+      showSettingForm();
+      VIEWING_PAGE = "quick_search";
+    });
+  });
+
+
+  $("#btnSave").click(function(){
+    var jqxhr;
+
+    if("quick_search"==VIEWING_PAGE) {
+      jqxhr = $.post("/rest/search/setting/quicksearch", {
+        resultsPerPage:$("#resultsPerPage").val(),
+        searchTypes:getSelectedTypes(),
+        searchCurrentSiteOnly:$("#searchCurrentSiteOnly").is(":checked")
+      });
+    } else {
+      jqxhr = $.post("/rest/search/setting", {
+        resultsPerPage:$("#resultsPerPage").val(),
+        searchTypes:getSelectedTypes(),
+        searchCurrentSiteOnly:$("#searchCurrentSiteOnly").is(":checked"),
+        hideSearchForm:$("#hideSearchForm").is(":checked"),
+        hideFacetsFilter:$("#hideFacetsFilter").is(":checked")
+      });
+    }
+
     jqxhr.complete(function(data) {
       alert("ok"==data.responseText?"Your setting has been saved.":"Problem occurred when saving your setting: "+data.responseText);
+      $("#settingForm").hide();
+      $("#settingMenu").show();
     });
   });
 
 
-  $("#txtSearchIn").click(function(e){
+  $("#btnCancel").click(function(){
+    $("#settingMenu").show();
+    $("#settingForm").hide();
+  });
+
+
+  $("#txtSearchIn").click(function(){
     $("#lstSearchInOptions").toggle();
+    if($("#lstSearchInOptions").is(":visible")) {
+      $("#lstSearchInOptions").offset({left:$("#txtSearchIn").offset().left+3, top:$("#txtSearchIn").offset().top+$("#txtSearchIn").height()+8});
+      $("#lstSearchInOptions").width($("#txtSearchIn").width());
+      $(":checkbox[name='searchInOption'][value!='all']").css("margin-left", "25px");
+    }
   });
 
 
@@ -100,6 +178,13 @@
 
     updateTxtSearchIn();
   });
+
+
+  function showSettingForm() {
+    $("#settingForm").show();
+    $("#txtSearchIn").css({position:"absolute", left: $("#resultsPerPage").offset().left});
+    $("#lstSearchInOptions").hide();
+  }
 
 
   function updateTxtSearchIn() {

@@ -54,7 +54,8 @@
       }
 
       .SearchResult .Content .Title {
-        font-weight: bold;
+/*        font-weight: bold;*/
+/*        color: lightgray !important;*/
 /*        color: #555555 !important;*/
       }
 
@@ -152,7 +153,7 @@
         <div style="padding-top: 5px;" id="quickSearchForm">
           <input type="text" id="txtQuickSearchQuery" class="SearchBox">
         </div>
-        <div id="quickSearchResult">
+        <div id="quickSearchResult" style="z-index: 1001;">
         </div>
       </div>
 
@@ -203,8 +204,10 @@
       //*** Global variables ***
 
       var REGISTRY;
-      var USER_SETTING;
+      var SEARCH_SETTING;
+      var QUICKSEARCH_SETTING;
       var LIMIT;
+      var QUICKSEARCH_LIMIT;
       var VIEWING_TYPE;
 
       var SEARCH_TYPES = ["file", "document", "wiki", "page", "discussion", "people", "space", "event", "task", "question", "activity"];
@@ -262,9 +265,9 @@
       //*** The entry point ***
       (function(){
         getRegistry(function(registry){
-          getUserSetting(function(setting){
-            REGISTRY = registry;
-            USER_SETTING = setting;
+          REGISTRY = registry;
+          getSearchSetting(function(setting){
+            SEARCH_SETTING = setting;
             LIMIT = setting.resultsPerPage;
 
             loadContentFilter(registry, setting);
@@ -280,11 +283,33 @@
               $("#txtQuery").focus();
             }
           });
+
+          getQuicksearchSetting(function(setting){
+            QUICKSEARCH_SETTING = setting;
+            QUICKSEARCH_LIMIT = setting.resultsPerPage;
+          });
+
         });
       })();
 
 
       //*** Utility functions ***
+
+      String.prototype.toProperCase = function() {
+        return this.replace(/\\w\\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+      };
+
+
+      String.prototype.highlight = function(words) {
+        var str = this;
+        for(var i=0; i<words.length; i++) {
+          if(""==words[i]) continue;
+          var regex = new RegExp("(" + words[i] + ")", "gi");
+          str = str.replace(regex, "<strong>$1</strong>");
+        }
+        return str;
+      };
+
 
       function getRegistry(callback) {
         $.getJSON("/rest/search/registry", function(registry){
@@ -293,18 +318,25 @@
       }
 
 
-      function getUserSetting(callback) {
+      function getSearchSetting(callback) {
         $.getJSON("/rest/search/setting", function(setting){
           if(callback) callback(setting);
         });
       }
 
 
-      function loadContentFilter(registry, userSetting) {
+      function getQuicksearchSetting(callback) {
+        $.getJSON("/rest/search/setting/quicksearch", function(setting){
+          if(callback) callback(setting);
+        });
+      }
+
+
+      function loadContentFilter(registry, searchSetting) {
         var contentTypes = [];
         $.each(SEARCH_TYPES, function(i, searchType){
           var connector = registry[searchType];
-          if(connector && (-1 != $.inArray("all", userSetting.searchTypes) || -1 != $.inArray(searchType, userSetting.searchTypes))) {
+          if(connector && (-1 != $.inArray("all", searchSetting.searchTypes) || -1 != $.inArray(searchType, searchSetting.searchTypes))) {
             contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
           }
         });
@@ -317,14 +349,11 @@
       }
 
 
-      function loadSiteFilter(userSetting) {
-        if(userSetting.searchCurrentSiteOnly) {
+      function loadSiteFilter(searchSetting) {
+        if(searchSetting.searchCurrentSiteOnly) {
           $("#siteFilter").hide();
         } else {
           $.getJSON("/rest/search/sites", function(sites){
-            String.prototype.toProperCase = function () {
-                return this.replace(/\\w\\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-            };
             var siteNames = [];
             $.each(sites, function(i, site){
               siteNames.push("<li><label><input type='checkbox' name='site' value='" + site + "'>" + site.toProperCase() + "</label></li>");
@@ -348,7 +377,7 @@
 
       function getSelectedSites(){
         //if($(":checkbox[name='site'][value='all']").is(":checked")) return "all";
-        if(USER_SETTING.searchCurrentSiteOnly) return parent.eXo.env.portal.portalName;
+        if(SEARCH_SETTING.searchCurrentSiteOnly) return parent.eXo.env.portal.portalName;
         var selectedSites = [];
         $.each($(":checkbox[name='site'][value!='all']:checked"), function(){
           selectedSites.push(this.value);
@@ -359,8 +388,9 @@
 
       function quickSearch() {
         var query = $("#txtQuickSearchQuery").val();
+        var sites = QUICKSEARCH_SETTING.searchCurrentSiteOnly ? parent.eXo.env.portal.portalName : "all";
         //var restUrl = "/rest/search?q=" + query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc";
-        var restUrl = "/rest/search?q=" + query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+5+"&sort="+"&order=desc";
+        var restUrl = "/rest/search?q=" + query+"&sites="+sites+"&types="+QUICKSEARCH_SETTING.searchTypes.join(",")+"&offset=0"+"&limit="+QUICKSEARCH_LIMIT+"&sort="+"&order=desc";
 
         $.getJSON(restUrl, function(resultMap){
           var rows = [];
@@ -435,9 +465,12 @@
 
       function renderSearchResult(result, isQuickSearch) {
         var template = isQuickSearch ?  QUICKSEARCH_RESULT_TEMPLATE : SEARCH_RESULT_TEMPLATE;
-        var html = template.replace(/%{url}/g, result.url).replace(/%{title}/g, result.title).replace(/%{avatar}/g, result.imageUrl);
+        var query = $("#searchPage").is(":visible") ? $("#txtQuery").val() : $("#txtQuickSearchQuery").val();
+        var terms = query.split(/\\s+/g);
+
+        var html = template.replace(/%{url}/g, result.url).replace(/%{title}/g, result.title.highlight(terms)).replace(/%{avatar}/g, result.imageUrl);
         //if(!isQuickSearch) html = html.replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail);
-        html = html.replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail);
+        html = html.replace(/%{excerpt}/g, result.excerpt.highlight(terms)).replace(/%{detail}/g, result.detail.highlight(terms));
         return html;
       }
 
@@ -633,9 +666,18 @@
       $("#seeAll").live("click", function(){
         $("#quickSearchResult").hide();
         $("#txtQuery").val($("#txtQuickSearchQuery").val());
-        $("#btnSearch").click();
+        var $container = $("#UIPageBody");
+        $("#searchPage").css({position: "absolute",
+                              overflow: "auto",
+                              background: "white",
+                              top: $container.offset().top+"px",
+                              left: $container.offset().left+"px",
+                              width: $container.width(),
+                              height: $container.height()
+                            });
         $("#searchPage").show();
         $("#txtQuery").focus();
+        search();
       });
 
 
@@ -682,17 +724,5 @@
         $("#quickSearchResult").hide();
       });
 
-
-      $(function(){
-        var $container = $("#UIPageBody");
-        $("#searchPage").css({position: "absolute",
-                              overflow: "auto",
-                              background: "white",
-                              top: $container.offset().top+"px",
-                              left: $container.offset().left+"px",
-                              width: $container.width(),
-                              height: $container.height()
-                            });
-      });
 
     </script>

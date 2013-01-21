@@ -30,8 +30,10 @@ import org.exoplatform.services.security.ConversationState;
 @Produces(MediaType.APPLICATION_JSON)
 public class UnifiedSearchService implements ResourceContainer {
   // temporary for testing, user setting will be stored using "setting" feature
-  private static Map<String, UserSetting> USER_SETTINGS = new HashMap<String, UserSetting>();
-  private static UserSetting defaultUserSetting = new UserSetting(10, Arrays.asList("all"), false, false, false);
+  private static Map<String, SearchSetting> SEARCH_SETTINGS = new HashMap<String, SearchSetting>();
+  private static Map<String, SearchSetting> QUICKSEARCH_SETTINGS = new HashMap<String, SearchSetting>();
+  private static SearchSetting defaultSearchSetting = new SearchSetting(10, Arrays.asList("all"), false, false, false);
+  private static SearchSetting defaultQuicksearchSetting = new SearchSetting(5, Arrays.asList("all"), true, true, true);
   
   private final static Log LOG = ExoLogger.getLogger(UnifiedSearchService.class);
   
@@ -49,10 +51,10 @@ public class UnifiedSearchService implements ResourceContainer {
     if(null==sQuery || sQuery.isEmpty()) return Response.ok("", MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
 
     String userId = ConversationState.getCurrent().getIdentity().getUserId();
-    UserSetting userSetting = null==userId || userId.isEmpty() || !USER_SETTINGS.containsKey(userId) ? defaultUserSetting : USER_SETTINGS.get(userId);
+    SearchSetting searchSetting = null==userId || userId.isEmpty() || !SEARCH_SETTINGS.containsKey(userId) ? defaultSearchSetting : SEARCH_SETTINGS.get(userId);
 
     List<String> sites = null==sSites ? Arrays.asList("all") : Arrays.asList(sSites.split(",\\s*"));
-    List<String> types = null==sTypes ? userSetting.getSearchTypes() : Arrays.asList(sTypes.split(",\\s*"));
+    List<String> types = null==sTypes ? searchSetting.getSearchTypes() : Arrays.asList(sTypes.split(",\\s*"));
     int offset = null==sOffset || sOffset.isEmpty() ? 0 : Integer.parseInt(sOffset);
     int limit = null==sLimit || sLimit.isEmpty() ? 0 : Integer.parseInt(sLimit);
     String sort = null==sSort || sSort.isEmpty() ? "jcrScore()" : sSort;
@@ -99,21 +101,41 @@ public class UnifiedSearchService implements ResourceContainer {
   
   @GET
   @Path("/setting")
-  public static Response getUserSetting() {
+  public static Response getSearchSetting() {
     String userId = ConversationState.getCurrent().getIdentity().getUserId();
-    if(null==userId || userId.isEmpty() || !USER_SETTINGS.containsKey(userId)) return Response.ok(defaultUserSetting, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-    return Response.ok(USER_SETTINGS.get(userId), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    if(null==userId || userId.isEmpty() || !SEARCH_SETTINGS.containsKey(userId)) return Response.ok(defaultSearchSetting, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    return Response.ok(SEARCH_SETTINGS.get(userId), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
   
   @POST
   @Path("/setting")
-  public static Response setUserSetting(@FormParam("resultsPerPage") int resultsPerPage, @FormParam("searchTypes") String searchTypes, @FormParam("searchCurrentSiteOnly") boolean searchCurrentSiteOnly, @FormParam("hideSearchForm") boolean hideSearchForm, @FormParam("hideFacetsFilter") boolean hideFacetsFilter) {
+  public static Response setSearchSetting(@FormParam("resultsPerPage") int resultsPerPage, @FormParam("searchTypes") String searchTypes, @FormParam("searchCurrentSiteOnly") boolean searchCurrentSiteOnly, @FormParam("hideSearchForm") boolean hideSearchForm, @FormParam("hideFacetsFilter") boolean hideFacetsFilter) {
     String userId = ConversationState.getCurrent().getIdentity().getUserId();
     if(null!=userId && !userId.isEmpty()) {
-      USER_SETTINGS.put(userId, new UserSetting(resultsPerPage, Arrays.asList(searchTypes.split(",")), searchCurrentSiteOnly, hideSearchForm, hideFacetsFilter));
+      SEARCH_SETTINGS.put(userId, new SearchSetting(resultsPerPage, Arrays.asList(searchTypes.split(",")), searchCurrentSiteOnly, hideSearchForm, hideFacetsFilter));
       return Response.ok("ok", MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
     }
     return Response.ok("nok: userId = "+userId, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   } 
+
+  @GET
+  @Path("/setting/quicksearch")
+  public static Response getQuicksearchSetting() {
+    String userId = ConversationState.getCurrent().getIdentity().getUserId();
+    if(null==userId || userId.isEmpty() || !QUICKSEARCH_SETTINGS.containsKey(userId)) return Response.ok(defaultQuicksearchSetting, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    return Response.ok(QUICKSEARCH_SETTINGS.get(userId), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  }
+  
+  @POST
+  @Path("/setting/quicksearch")
+  public static Response setQuicksearchSetting(@FormParam("resultsPerPage") int resultsPerPage, @FormParam("searchTypes") String searchTypes, @FormParam("searchCurrentSiteOnly") boolean searchCurrentSiteOnly) {
+    String userId = ConversationState.getCurrent().getIdentity().getUserId();
+    if(null!=userId && !userId.isEmpty()) {
+      QUICKSEARCH_SETTINGS.put(userId, new SearchSetting(resultsPerPage, Arrays.asList(searchTypes.split(",")), searchCurrentSiteOnly, true, true));
+      return Response.ok("ok", MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    }
+    return Response.ok("nok: userId = "+userId, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  } 
+  
   
 }

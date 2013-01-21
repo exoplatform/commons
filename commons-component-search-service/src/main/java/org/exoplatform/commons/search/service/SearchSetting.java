@@ -2,7 +2,7 @@ package org.exoplatform.commons.search.service;
 
 import java.util.List;
 
-public class UserSetting {
+public class SearchSetting {
   int resultsPerPage;
   List<String> searchTypes;
   boolean searchCurrentSiteOnly;
@@ -40,7 +40,7 @@ public class UserSetting {
     this.hideFacetsFilter = hideFacetsFilter;
   }
   
-  public UserSetting(int resultsPerPage, List<String> searchTypes, boolean searchCurrentSiteOnly, boolean hideSearchForm, boolean hideFacetsFilter) {
+  public SearchSetting(int resultsPerPage, List<String> searchTypes, boolean searchCurrentSiteOnly, boolean hideSearchForm, boolean hideFacetsFilter) {
     this.resultsPerPage = resultsPerPage;
     this.searchTypes = searchTypes;
     this.searchCurrentSiteOnly = searchCurrentSiteOnly;
