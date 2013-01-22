@@ -17,7 +17,7 @@
  **************************************************************************/
 package org.exoplatform.commons.listener.impl;
 
-import org.exoplatform.commons.api.listener.EventListener;
+import org.exoplatform.commons.api.event.EventListener;
 import org.exoplatform.services.listener.Listener;
 
 /**

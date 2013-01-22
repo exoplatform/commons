@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  *
  **************************************************************************/
-package org.exoplatform.commons.api.listener;
+package org.exoplatform.commons.api.event;
 
 import org.exoplatform.services.listener.Event;
 
