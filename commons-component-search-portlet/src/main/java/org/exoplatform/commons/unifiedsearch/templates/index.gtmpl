@@ -336,13 +336,14 @@
         var contentTypes = [];
         $.each(SEARCH_TYPES, function(i, searchType){
           var connector = registry[searchType];
+          // Show only the types user selected in setting
           if(connector && (-1 != $.inArray("all", searchSetting.searchTypes) || -1 != $.inArray(searchType, searchSetting.searchTypes))) {
             contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
           }
         });
         if(0!=contentTypes.length) {
           $("#lstContentTypes").html(contentTypes.join(""));
-          $(":checkbox[name='contentType']").attr('checked', true);
+          $(":checkbox[name='contentType']").attr('checked', true); //check all types by default
         } else {
           $(":checkbox[name='contentType'][value='all']").attr("checked", false).attr("disabled", "disabled");
         }
@@ -366,7 +367,6 @@
 
 
       function getSelectedTypes(){
-        //if($(":checkbox[name='contentType'][value='all']").is(":checked")) return "all";
         var selectedTypes = [];
         $.each($(":checkbox[name='contentType'][value!='all']:checked"), function(){
           selectedTypes.push(this.value);
@@ -376,7 +376,6 @@
 
 
       function getSelectedSites(){
-        //if($(":checkbox[name='site'][value='all']").is(":checked")) return "all";
         if(SEARCH_SETTING.searchCurrentSiteOnly) return parent.eXo.env.portal.portalName;
         var selectedSites = [];
         $.each($(":checkbox[name='site'][value!='all']:checked"), function(){
@@ -496,7 +495,7 @@
 
         var $viewingType = $(".ResultType.Selected");
         var type = $viewingType.attr("type");
-        var offset = parseInt($viewingType.attr("offset"))+offsetIncrement;
+        var offset = offsetIncrement!=0 ? parseInt($viewingType.attr("offset"))+offsetIncrement : 0; //if sorting then start from begining
         var sortBy = $("#lstSortBy").val();
         var sortType = $("#sortType").hasClass("Asc") ? "asc" : "desc";
 
@@ -512,13 +511,20 @@
             result = result + renderSearchResult(entry);
           });
 
-          var resultHeader = (0==entries.length) ? "No more result" : "Results " + (offset+1) + " to " + (offset+entries.length);
+          var resultHeader = (0==entries.length) ? "No more result" : "Results 1 to " + (offset+entries.length);
           resultHeader = resultHeader + " for <strong>" + (isSqlMode()?$("#txtSql").val().replace(/%query%/g, $("#txtQuery").val()):$("#txtQuery").val()) + "<strong>";
           $("#resultHeader").html(resultHeader);
           if(entries.length==LIMIT) $("#showMore").show(); else $("#showMore").hide();
 
-          $("#"+type+"-type").html(result);
           $("#"+type+"-type").show();
+
+          if(0==offsetIncrement) {
+            $("#"+type+"-type").html(result);
+          } else {
+            $("#"+type+"-type").append(result);
+            $("#searchPage").animate({ scrollTop: $("#resultPage")[0].scrollHeight}, "slow");
+          }
+
           $("body").css("cursor", "auto");
 
           $viewingType.attr("offset", offset);
@@ -541,7 +547,7 @@
         var offset = parseInt($(this).attr("offset"));
         var numEntries = parseInt($(this).attr("numEntries"));
 
-        var resultHeader = (0==numEntries) ? "No more result" : "Results " + (offset+1) + " to " + (offset+numEntries);
+        var resultHeader = (0==numEntries) ? "No more result" : "Results 1 to " + (offset+numEntries);
         resultHeader = resultHeader + " for <strong>" + (isSqlMode()?$("#txtSql").val().replace(/%query%/g, $("#txtQuery").val()):$("#txtQuery").val()) + "<strong>";
         $("#resultHeader").html(resultHeader);
         if(numEntries==LIMIT) $("#showMore").show(); else $("#showMore").hide();
@@ -559,6 +565,10 @@
         $("#lstSortBy").html(sortBy.join(""));
         $(".SearchResultType").hide(); //hide all other types
         $("#"+type+"-type").show();
+
+        var $viewingType = $(".ResultType.Selected");
+        $("#lstSortBy").val($viewingType.attr("sortBy")||"Relevancy").attr("selected",true);
+        $("#sortType").removeClass("Asc Desc").addClass($viewingType.attr("sortType")||"Desc");
       });
 
 
@@ -651,12 +661,14 @@
 
 
       $("#lstSortBy").change(function(){
+        $(".ResultType.Selected").attr("sortBy", $(this).val());
         showMore(0);
       });
 
 
       $("#sortType").live("click", function(){
         $(this).toggleClass("Asc Desc");
+        $(".ResultType.Selected").attr("sortType", $(this).hasClass("Asc") ? "Asc" : "Desc");
         showMore(0);
       });
 
@@ -666,6 +678,12 @@
       $("#seeAll").live("click", function(){
         $("#quickSearchResult").hide();
         $("#txtQuery").val($("#txtQuickSearchQuery").val());
+
+        // Check only types selected in quicksearch settting
+        $.each($(":checkbox[name='contentType']"), function(){
+          $(this).attr('checked', -1!=QUICKSEARCH_SETTING.searchTypes.indexOf(this.value) || -1!=QUICKSEARCH_SETTING.searchTypes.indexOf("all"));
+        });
+
         var $container = $("#UIPageBody");
         $("#searchPage").css({position: "absolute",
                               overflow: "auto",
