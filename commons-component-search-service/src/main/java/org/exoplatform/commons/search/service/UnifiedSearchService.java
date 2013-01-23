@@ -1,6 +1,7 @@
 package org.exoplatform.commons.search.service;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ public class UnifiedSearchService implements ResourceContainer {
   // temporary for testing, user setting will be stored using "setting" feature
   private static Map<String, SearchSetting> SEARCH_SETTINGS = new HashMap<String, SearchSetting>();
   private static Map<String, SearchSetting> QUICKSEARCH_SETTINGS = new HashMap<String, SearchSetting>();
+  private static List<String> ENABLED_SEARCHTYPES = Arrays.asList("file", "document", "wiki", "page", "discussion", "people", "space", "event", "task", "question", "activity");
+  
   private static SearchSetting defaultSearchSetting = new SearchSetting(10, Arrays.asList("all"), false, false, false);
   private static SearchSetting defaultQuicksearchSetting = new SearchSetting(5, Arrays.asList("all"), true, true, true);
   
@@ -45,6 +48,9 @@ public class UnifiedSearchService implements ResourceContainer {
     cacheControl.setNoStore(true);
   }
 
+  public static List<String> getEnabledSearchTypes(){
+    return ENABLED_SEARCHTYPES;
+  }
   
   @GET
   public Response search(@QueryParam("q") String sQuery, @QueryParam("sites") String sSites, @QueryParam("types") String sTypes, @QueryParam("offset") String sOffset, @QueryParam("limit") String sLimit, @QueryParam("sort") String sSort, @QueryParam("order") String sOrder) {
@@ -74,15 +80,26 @@ public class UnifiedSearchService implements ResourceContainer {
   
   @GET
   @Path("/registry")
-  public static Response REST_getRegistry() {
+  public static Response REST_getRegistry(@QueryParam("admin") String isAdminMode) {
     SearchService searchService = (SearchService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SearchService.class);
     Map<String, SearchServiceConnector> registry = new HashMap<String, SearchServiceConnector>();
+    Collection<String> roles = ConversationState.getCurrent().getIdentity().getRoles();  
     
-    for(SearchServiceConnector connector:searchService.getConnectors()) {
-      registry.put(connector.getSearchType(), connector);
-    }
-
-    return Response.ok(registry, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    if(null==isAdminMode || isAdminMode.isEmpty() || false==Boolean.parseBoolean(isAdminMode) || roles.isEmpty() || !roles.contains("administrators")){
+      // Return enabled search types only
+      for(SearchServiceConnector connector:searchService.getConnectors()) {
+        if(ENABLED_SEARCHTYPES.contains(connector.getSearchType())) {
+          registry.put(connector.getSearchType(), connector);
+        }
+      }
+      return Response.ok(registry, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    } else {
+      // Return all search types
+      for(SearchServiceConnector connector:searchService.getConnectors()) {
+          registry.put(connector.getSearchType(), connector);
+      }
+      return Response.ok(Arrays.asList(registry, ENABLED_SEARCHTYPES), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    }    
   }
 
   
@@ -118,6 +135,7 @@ public class UnifiedSearchService implements ResourceContainer {
     return Response.ok("nok: userId = "+userId, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   } 
 
+  
   @GET
   @Path("/setting/quicksearch")
   public static Response getQuicksearchSetting() {
@@ -137,5 +155,17 @@ public class UnifiedSearchService implements ResourceContainer {
     return Response.ok("nok: userId = "+userId, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   } 
   
+    
+  @POST
+  @Path("/enabled-searchtypes")
+  public static Response setEnabledSearchtypes(@FormParam("searchTypes") String searchTypes) {
+    Collection<String> roles = ConversationState.getCurrent().getIdentity().getRoles();    
+    if(!roles.isEmpty() && roles.contains("administrators")) {//only administrators can set this
+      ENABLED_SEARCHTYPES = Arrays.asList(searchTypes.split(",\\s*"));
+      return Response.ok("ok", MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+    }
+    return Response.ok("nok: administrators only", MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  } 
+
   
 }
