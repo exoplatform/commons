@@ -16,6 +16,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
+(function(jQuery){
+ 
 function UISpaceSwitcher() {
 };
 
@@ -174,14 +177,15 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
   var spaces = dataList.spaces;
-  var groupSpaces = '';
-
-  for (i = 0; i < spaces.length; i++) {
-    var spaceId = spaces[i].groupId;
-    var name = spaces[i].displayName;
-    groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId);
+  if (spaces) {
+    var groupSpaces = '';
+    for (i = 0; i < spaces.length; i++) {
+      var spaceId = spaces[i].groupId;
+      var name = spaces[i].displayName;
+      groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId);
+    }
+    container.innerHTML = groupSpaces;
   }
-  container.innerHTML = groupSpaces;
 }
 
 UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentId) {
@@ -251,6 +255,9 @@ UISpaceSwitcher.prototype.onTextSearchChange = function(uicomponentId) {
   }
 };
 
-if(!eXo.commons) eXo.commons = {}
+
+if(!eXo.commons) eXo.commons={};
 eXo.commons.UISpaceSwitcher = new UISpaceSwitcher();
-_module.UISpaceSwitcher = eXo.commons.UISpaceSwitcher;
+return eXo.commons.UISpaceSwitcher;
+
+})(jQuery);

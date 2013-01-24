@@ -13,9 +13,9 @@
   
   def rcontext = _ctx.getRequestContext() ;
   def requireJs = rcontext.getJavascriptManager().getRequireJS();
-  requireJs.require("SHARED/commons-space-switcher", "spaceSwitcher");
-  requireJs.addScripts("spaceSwitcher.UISpaceSwitcher.init('" + uicomponent.id + "','" + baseRestUrl + "','" + socialBaseRestUrl + "','" + defaultValueForTextSearch + "','" + selectSpaceAction + "');");
-  requireJs.addScripts("spaceSwitcher.UISpaceSwitcher.initSpaceInfo('" + uicomponent.id + "','" + username + "','" + mySpaceLabel + "','" + portalSpaceId + "','" + portalSpaceName + "');");
+  requireJs.require("SHARED/UISpaceSwitcher", "UISpaceSwitcher");
+  requireJs.addScripts("UISpaceSwitcher.init('" + uicomponent.id + "','" + baseRestUrl + "','" + socialBaseRestUrl + "','" + defaultValueForTextSearch + "','" + selectSpaceAction + "');");
+  requireJs.addScripts("UISpaceSwitcher.initSpaceInfo('" + uicomponent.id + "','" + username + "','" + mySpaceLabel + "','" + portalSpaceId + "','" + portalSpaceName + "');");
   String currentSpaceName = uicomponent.getCurrentSpaceName();
 %>
 
