@@ -80,26 +80,13 @@ public class UnifiedSearchService implements ResourceContainer {
   
   @GET
   @Path("/registry")
-  public static Response REST_getRegistry(@QueryParam("admin") String isAdminMode) {
+  public static Response REST_getRegistry() {
     SearchService searchService = (SearchService)ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SearchService.class);
     Map<String, SearchServiceConnector> registry = new HashMap<String, SearchServiceConnector>();
-    Collection<String> roles = ConversationState.getCurrent().getIdentity().getRoles();  
-    
-    if(null==isAdminMode || isAdminMode.isEmpty() || false==Boolean.parseBoolean(isAdminMode) || roles.isEmpty() || !roles.contains("administrators")){
-      // Return enabled search types only
-      for(SearchServiceConnector connector:searchService.getConnectors()) {
-        if(ENABLED_SEARCHTYPES.contains(connector.getSearchType())) {
-          registry.put(connector.getSearchType(), connector);
-        }
-      }
-      return Response.ok(registry, MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-    } else {
-      // Return all search types
-      for(SearchServiceConnector connector:searchService.getConnectors()) {
-          registry.put(connector.getSearchType(), connector);
-      }
-      return Response.ok(Arrays.asList(registry, ENABLED_SEARCHTYPES), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
-    }    
+    for(SearchServiceConnector connector:searchService.getConnectors()) {
+        registry.put(connector.getSearchType(), connector);
+    }
+    return Response.ok(Arrays.asList(registry, ENABLED_SEARCHTYPES), MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
   }
 
   

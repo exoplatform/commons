@@ -1,17 +1,17 @@
 <style>
   #settingMenu li {
     list-style-type: disc;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
   }
 
   #settingMenu li a {text-decoration:underline;}
 
   #settingForm div {
-    margin-top: 5px;
+    margin-top: 10px;
   }
 </style>
 
-<div id="settingMenu">
+<div id="settingMenu" style="height: 600px;">
   <h3 style="margin-left: 3px;">Search Settings</h3>
   <hr>
   <ul style="margin-left: 25px; margin-bottom: 30px; margin-top: 10px;">
@@ -20,7 +20,7 @@
   </ul>
 </div>
 
-<div id="settingForm" style="display: none;">
+<div id="settingForm" style="height: 600px; display: none;">
   <h3 style="margin-left: 3px;" id="settingFormTitle"></h3>
   <hr>
   <div style="margin-left: 10px; margin-bottom: 40px;">
@@ -29,7 +29,7 @@
       <select id="resultsPerPage"></select>
     </div>
 
-    <div>
+    <div style="margin-bottom: 25px;">
       <span>Search in</span><input type="text" id="txtSearchIn" value="Everything" readonly/>
       <ul id="lstSearchInOptions" style="border: 1px dotted; border-top:none; overflow-x: hidden; padding-bottom: 10px;"></ul>
     </div>
@@ -38,7 +38,7 @@
     <div><label><input type="checkbox" id="hideSearchForm" style="margin-left: 0px;">Hide search form</label></div>
     <div><label><input type="checkbox" id="hideFacetsFilter" style="margin-left: 0px;">Hide facets filter</label></div>
 
-    <div style="margin-top: 15px; margin-left: 20px;">
+    <div style="margin-top: 20px; margin-left: 20px;">
       <input type="button" value="Save" id="btnSave">
       <input type="button" value="Cancel" id="btnCancel">
     </div>
@@ -47,15 +47,15 @@
 </div>
 
 <script>
-  var REGISTRY;
+  var CONNECTORS;
   var VIEWING_PAGE;
 
   $.getJSON("/rest/search/registry", function(registry){
-    REGISTRY = registry;
+    CONNECTORS = registry[0];
     var searchInOpts=[];
     searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='all'>Everything</label></li>");
-    $.each(REGISTRY, function(searchType, connector){
-      searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
+    $.each(registry[1], function(i, type){
+      searchInOpts.push("<li><label><input type='checkbox' name='searchInOption' value='" + type + "'>" + CONNECTORS[type].displayName + "</label></li>");
     });
     $("#lstSearchInOptions").html(searchInOpts.join(""));
   });
@@ -193,7 +193,7 @@
       $("#txtSearchIn").val("Everything");
     } else {
       $.each($(":checkbox[name='searchInOption'][value!='all']:checked"), function(){
-        searchIn.push(REGISTRY[this.value].displayName);
+        searchIn.push(CONNECTORS[this.value].displayName);
       });
       $("#txtSearchIn").val(searchIn.join(", "));
     }

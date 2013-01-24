@@ -34,7 +34,7 @@
         <name>JcrNodeSearch</name>
         <set-method>addConnector</set-method>
         <type>org.exoplatform.commons.search.driver.jcr.connector.JcrNodeSearch</type>
-        <description>JCR nodes search connector</description>
+        <description>For development and testing only</description>
         <init-params>
           <properties-param>
              <name>constructor.params</name>
@@ -48,7 +48,7 @@
         <name>JcrForumSearch</name>
         <set-method>addConnector</set-method>
         <type>org.exoplatform.commons.search.driver.jcr.connector.JcrForumSearch</type>
-        <description>Forum search connector</description>
+        <description>eXo Forum posts</description>
         <init-params>
           <properties-param>
              <name>constructor.params</name>
@@ -62,7 +62,7 @@
         <name>JcrEventSearch</name>
         <set-method>addConnector</set-method>
         <type>org.exoplatform.commons.search.driver.jcr.connector.JcrEventSearch</type>
-        <description>Event search connector</description>
+        <description>eXo Calendar events</description>
         <init-params>
           <properties-param>
              <name>constructor.params</name>
@@ -76,7 +76,7 @@
         <name>JcrSpaceSearch</name>
         <set-method>addConnector</set-method>
         <type>org.exoplatform.commons.search.driver.jcr.connector.JcrSpaceSearch</type>
-        <description>Space search connector</description>
+        <description>eXo Spaces</description>
         <init-params>
           <properties-param>
              <name>constructor.params</name>
@@ -90,7 +90,7 @@
         <name>JcrWikiSearch</name>
         <set-method>addConnector</set-method>
         <type>org.exoplatform.commons.search.driver.jcr.connector.JcrWikiSearch</type>
-        <description>Wiki search connector</description>      
+        <description>eXo Wiki articles</description>      
         <init-params>
           <properties-param>
              <name>constructor.params</name>
@@ -104,7 +104,7 @@
         <name>JcrPeopleSearch</name>
         <set-method>addConnector</set-method>
         <type>org.exoplatform.commons.search.driver.jcr.connector.JcrPeopleSearch</type>
-        <description>People search connector</description>
+        <description>eXo People</description>
         <init-params>
           <properties-param>
             <name>constructor.params</name>
@@ -118,7 +118,7 @@
         <name>JcrActivitySearch</name>
         <set-method>addConnector</set-method>
         <type>org.exoplatform.commons.search.driver.jcr.connector.JcrActivitySearch</type>
-        <description>Activity search connector</description>
+        <description>eXo Social activities</description>
         <init-params>
           <properties-param>
              <name>constructor.params</name>
@@ -132,7 +132,7 @@
         <name>JcrTaskSearch</name>
         <set-method>addConnector</set-method>
         <type>org.exoplatform.commons.search.driver.jcr.connector.JcrTaskSearch</type>
-        <description>Task search connector</description>
+        <description>eXo Calendar tasks</description>
         <init-params>
           <properties-param>
              <name>constructor.params</name>
@@ -147,6 +147,10 @@
 
   <component>
     <type>org.exoplatform.commons.search.service.UnifiedSearchService</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.search.driver.jcr.JcrSearch</type>
   </component>
 
 </configuration>

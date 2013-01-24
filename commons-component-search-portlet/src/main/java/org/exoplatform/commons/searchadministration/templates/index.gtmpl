@@ -10,7 +10,7 @@
   }
 </style>
 
-<div id="searchAdmin" style="margin-top: -11px; padding-bottom: 30px;">
+<div id="searchAdmin" style="margin-top: -11px; padding-bottom: 30px; background: white;">
   <h3 style="margin-left: 3px; padding-top: 10px; text-align: center; width: 50%;">Search Administration</h3>
   <hr>
   <table style="table-layout: fixed; width: 50%; margin-top: 20px; margin-left: 10px;">
@@ -26,7 +26,7 @@
 </div>
 
 <script>
-  $.getJSON("/rest/search/registry?admin=true", function(registrySetting){
+  $.getJSON("/rest/search/registry", function(registry){
     var row_template = " \
       <tr> \
         <td style='padding-left: 6px;'>%{displayName}</td> \
@@ -38,15 +38,15 @@
       </tr> \
     ";
 
-    var registry = registrySetting[0];
-    var enabled_searchtypes = registrySetting[1];
-    $.each(registry, function(searchType, connector){
+    var connectors = registry[0];
+    var searchTypes = registry[1];
+    $.each(connectors, function(searchType, connector){
       $("#searchAdmin table").append(row_template.replace(/%{id}/g, connector.searchType)
                                                  .replace(/%{displayName}/g, connector.displayName)
                                                  .replace(/%{description}/g, connector.description));
     });
 
-    $.each(enabled_searchtypes, function(i, type){
+    $.each(searchTypes, function(i, type){
       $(".ContentType#"+type).val("Disable");
       $(".ContentType#"+type).next().attr("disabled", false);
     });
@@ -62,13 +62,19 @@
       $(this).next().attr("disabled", true);
     }
 
-    var enabled_types = [];
-    $.each($(".ContentType"), function(){
-      if("Disable"==this.value) enabled_types.push(this.id);
+    var enabledTypes = [];
+//    $.each($(".ContentType"), function(){
+//      if("Disable"==this.value) enabledTypes.push(this.id);
+//    });
+
+    // To maintain the search types order. TODO: use the table for this (by ordering its rows)
+    var order = ["file", "document", "wiki", "page", "discussion", "people", "space", "event", "task", "question", "activity", "jcrNode"];
+    $.each(order, function(i, type){
+      if("Disable"==$(".ContentType#"+type).val()) enabledTypes.push(type);
     });
 
     var jqxhr = $.post("/rest/search/enabled-searchtypes", {
-      searchTypes:enabled_types.join(",")
+      searchTypes:enabledTypes.join(",")
     });
 
     jqxhr.complete(function(data) {
@@ -79,6 +85,5 @@
       }
     });
   });
-
 
 </script>

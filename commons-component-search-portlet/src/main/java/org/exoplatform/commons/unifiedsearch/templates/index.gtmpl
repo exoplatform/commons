@@ -91,7 +91,9 @@
       #facetsFilter {
         float: left;
         border: solid 1px lightgray;
-        margin-right: 10px;
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 5px;
         padding-bottom: 10px;
         height: auto;
         width: auto;
@@ -102,8 +104,8 @@
         background: none repeat scroll 0% 0% lightGrey;
         /*border-bottom: 1px solid;*/
         margin-bottom: 10px;
-        padding-top: 2px;
-        padding-bottom: 2px;
+        padding-top: 4px;
+        padding-bottom: 6px;
       }
 
       #facetsFilter ul {
@@ -144,6 +146,11 @@
       #quickSearchResult table, #quickSearchResult th, #quickSearchResult td {
         border: 1px solid lightgray;
       }
+
+
+      #searchPortlet input:focus, #searchPortlet textarea:focus {
+          outline: none;
+      }
     </style>
 
 
@@ -165,15 +172,15 @@
           </div>
         </div>
 
-        <div id="searchForm" style="padding-top: 5px; text-align: center;">
+        <div id="searchForm" style="padding-top: 10px; text-align: center;">
           <input type="text" id="txtQuery" class="SearchBox" style="width: 250px;">
           <input type="button" id="btnSearch" value="Search">
-          <hr style="color: lightgray"/>
+          <hr style="color: lightgray; margin: 10px 0px 0px;">
         </div>
 
         <div id="facetsFilter">
           <div id="facetsFilterTitle">Filter By</div>
-          <div style="padding-right: 10px;">
+          <div style="padding-right: 5px;">
             <div id="siteFilter">
               <input type="checkbox" name="site" value="all">All Sites
               <ul id="lstSites"></ul>
@@ -184,8 +191,8 @@
           </div>
         </div>
 
-        <div id="resultPage" style="margin-right: 20px;">
-          <div id="resultTypes" style="display: none; margin-bottom: 15px;"></div>
+        <div id="resultPage" style="margin-left: 10px; margin-right: 20px; margin-top: 10px;">
+          <div id="resultTypes" style="display: none; margin-bottom: 15px; padding-top: 4px;"></div>
           <div style="margin-bottom: 10px;">
             <span id="resultHeader"></span>
             <span id="resultSort" style="float: right; display: none;">
@@ -203,14 +210,13 @@
     <script>
       //*** Global variables ***
 
-      var REGISTRY;
+      var CONNECTORS;
+      var SEARCH_TYPES;
       var SEARCH_SETTING;
       var QUICKSEARCH_SETTING;
       var LIMIT;
       var QUICKSEARCH_LIMIT;
       var VIEWING_TYPE;
-
-      var SEARCH_TYPES = ["file", "document", "wiki", "page", "discussion", "people", "space", "event", "task", "question", "activity"];
 
       var SEARCH_RESULT_TEMPLATE = " \
         <div class='SearchResult '> \
@@ -265,12 +271,13 @@
       //*** The entry point ***
       (function(){
         getRegistry(function(registry){
-          REGISTRY = registry;
+          CONNECTORS = registry[0];
+          SEARCH_TYPES = registry[1];
           getSearchSetting(function(setting){
             SEARCH_SETTING = setting;
             LIMIT = setting.resultsPerPage;
 
-            loadContentFilter(registry, setting);
+            loadContentFilter(CONNECTORS, setting);
             loadSiteFilter(setting);
 
             if(setting.hideFacetsFilter) {
@@ -332,10 +339,10 @@
       }
 
 
-      function loadContentFilter(registry, searchSetting) {
+      function loadContentFilter(connectors, searchSetting) {
         var contentTypes = [];
         $.each(SEARCH_TYPES, function(i, searchType){
-          var connector = registry[searchType];
+          var connector = connectors[searchType];
           // Show only the types user selected in setting
           if(connector && (-1 != $.inArray("all", searchSetting.searchTypes) || -1 != $.inArray(searchType, searchSetting.searchTypes))) {
             contentTypes.push("<li><label><input type='checkbox' name='contentType' value='" + connector.searchType + "'>" + connector.displayName + "</label></li>");
@@ -400,7 +407,7 @@
               $.each(results, function(i, result){
                 cell.push(renderSearchResult(result, true));
               });
-              var row = QUICKSEARCH_TABLE_ROW_TEMPLATE.replace(/%{type}/g, REGISTRY[searchType].displayName).replace(/%{results}/g, cell.join(""));
+              var row = QUICKSEARCH_TABLE_ROW_TEMPLATE.replace(/%{type}/g, CONNECTORS[searchType].displayName).replace(/%{results}/g, cell.join(""));
               rows.push(row);
             }
           });
@@ -432,7 +439,7 @@
           $.each(SEARCH_TYPES, function(i, searchType){
             results = resultMap[searchType];
             if(0!=$(results).size()) {
-              var typeDisplayName = isSqlMode() ? searchType + " (" + $(results).size() + ")" : REGISTRY[searchType].displayName;
+              var typeDisplayName = isSqlMode() ? searchType + " (" + $(results).size() + ")" : CONNECTORS[searchType].displayName;
               resultTypes = resultTypes + "<span class='Clickable ResultType' type='" + searchType + "' offset=0 numEntries=" + $(results).size() + ">" + typeDisplayName + "</span>" + " | ";
               result = result + "<div class='SearchResultType' id='" + searchType + "-type'>";
 
@@ -555,7 +562,7 @@
         var type=$(this).attr("type");
         //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
         type = type.replace(/(:|\\.)/g,'\\\\$1'); //for jcr nodetype
-        var sortFields = REGISTRY[type] ? REGISTRY[type].sortFields : undefined;
+        var sortFields = CONNECTORS[type] ? CONNECTORS[type].sortFields : undefined;
         var sortBy = [];
         if(sortFields != undefined) {
           $.each(sortFields, function(i, field){
