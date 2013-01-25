@@ -2,13 +2,6 @@ package org.exoplatform.commons.search.driver.jcr;
 
 import java.util.Map;
 
-import javax.jcr.Node;
-import javax.jcr.Session;
-
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.core.ManageableRepository;
-
 public class JcrSearchResult {
   private String repositoryName;
   private String workspaceName;
@@ -16,6 +9,7 @@ public class JcrSearchResult {
   private String primaryType;
   private String excerpt;
   private long score;
+  private long date;
   
   public String getRepository() {
     return repositoryName;
@@ -53,7 +47,13 @@ public class JcrSearchResult {
   public void setScore(long score) {
     this.score = score;
   }
-  
+  public long getDate() {
+    return date;
+  }
+  public void setDate(long date) {
+    this.date = date;
+  }
+ 
   public Object getProperty(String propertyName) throws Exception {
     return getProperties().get(propertyName);
   }

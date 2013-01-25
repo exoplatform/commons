@@ -129,7 +129,7 @@ public class JcrSearch implements ResourceContainer {
     if(null==order||order.isEmpty()) order = "DESC";
     String option = "ORDER BY " + sort + " " + order;
 
-    String sql = String.format("SELECT rep:excerpt(), jcr:primaryType FROM %s WHERE %s %s", from, where, option);   
+    String sql = String.format("SELECT rep:excerpt(), jcr:primaryType, jcr:created FROM %s WHERE %s %s", from, where, option);   
     return search(repositoryName, workspaceName, siteNames, sql, offset, limit);
   }
   
@@ -176,6 +176,8 @@ public class JcrSearch implements ResourceContainer {
         Value excerpt = row.getValue("rep:excerpt()");
         resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
         resultItem.setScore(row.getValue("jcr:score").getLong());
+        Value date = row.getValue("jcr:created");
+        resultItem.setDate(null!=date?date.getLong():0);
         
         result.add(resultItem);
       }

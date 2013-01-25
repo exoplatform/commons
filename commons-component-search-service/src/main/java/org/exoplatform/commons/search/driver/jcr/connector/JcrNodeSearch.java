@@ -3,6 +3,7 @@ package org.exoplatform.commons.search.driver.jcr.connector;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -71,12 +72,18 @@ public class JcrNodeSearch extends SearchServiceConnector {
         String score = String.valueOf(jcrResult.getScore());
         result.setTitle(nodeUrl + " (score = " + score + ")");
         result.setExcerpt(jcrResult.getExcerpt());
-        String sortByValue = sortBy.equals("jcr:score()") ? score : (String)jcrResult.getProperty(sortBy);
+        String sortByValue = "";
+        if(sort.equals("relevancy")){
+          sortByValue = score;
+        } else if(sort.equals("date")){
+          sortByValue = 0==jcrResult.getDate() ? "&lt;property not exist&gt;" : new Date(jcrResult.getDate()).toString();
+        } else if(sort.equals("title")){
+          sortByValue = jcrResult.getPrimaryType();
+        }        
         result.setDetail(sortBy + " = " + sortByValue);
         result.setImageUrl("/eXoWCMResources/skin/DefaultSkin/wcm-nodetypes/70x80/icons/default.png");
-        String sDate =  (String) jcrResult.getProperty("jcr:created");
-        if(null!=sDate) result.setDate(new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).parse(sDate).getTime());
-        
+        result.setDate(jcrResult.getDate());
+
         results.add(result);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
