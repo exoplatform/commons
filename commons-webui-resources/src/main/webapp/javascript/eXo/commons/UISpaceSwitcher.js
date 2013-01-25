@@ -42,6 +42,9 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
   storage.lastSearchKeyword = "";
   storage.defaultValueForTextSearch = defaultValueForTextSearch;
   storage.selectSpaceAction = selectSpaceAction;
+  storage.isSendRequest = false;
+  storage.TIME_TO_INVALID_CACHE = 60000; // 30s
+  storage.lastTimeReceivedData = 0;
   
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var textField = jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0];
@@ -131,11 +134,13 @@ UISpaceSwitcher.prototype.searchSpaces = function(keyword, uicomponentId) {
   var storage = me.dataStorage[uicomponentId];
   jQuery.ajax({
     async : false,
-    url : storage.accessibleSpaceRestUrl + "?keyword=" + keyword,
+    url : storage.accessibleSpaceRestUrl + "?keyword=",
     type : 'GET',
     data : '',
     success : function(data) {
-      me.renderSpaces(data, uicomponentId, "SpaceList");
+      storage.dataList = data;
+      storage.lastTimeReceivedData = new Date().getTime(); 
+      me.renderSpaces(data, uicomponentId, "SpaceList", keyword);
     }
   });
 };
@@ -172,9 +177,6 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
 
 UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomponentId, containerClazz) {
   var me = eXo.commons.UISpaceSwitcher;
-  var storage = me.dataStorage[uicomponentId];
-  storage.dataList = dataList;
-  
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
   var spaces = dataList.spaces;
@@ -198,11 +200,8 @@ UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentI
   return spaceDiv;
 }
 
-UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, containerClazz) {
+UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, containerClazz, keyword) {
   var me = eXo.commons.UISpaceSwitcher;
-  var storage = me.dataStorage[uicomponentId];
-  storage.dataList = dataList;
-  
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
   var spaces = dataList.jsonList;
@@ -211,11 +210,14 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
   for (i = 0; i < spaces.length; i++) {
     var spaceId = spaces[i].spaceId;
     var name = spaces[i].name;
-    var type = spaces[i].type;
-    if (type == 'user') {
-      name = storage.mySpaceLabel;
+    
+    if (name.indexOf(keyword) != -1) {
+      var type = spaces[i].type;
+      if (type == 'user') {
+        name = storage.mySpaceLabel;
+      }
+      groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId);
     }
-    groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId);
   }
   container.innerHTML = groupSpaces;
 };
@@ -251,10 +253,14 @@ UISpaceSwitcher.prototype.onTextSearchChange = function(uicomponentId) {
   
   if (textSearch != storage.lastSearchKeyword) {
     storage.lastSearchKeyword = textSearch;
-    me.searchSpaces(textSearch, uicomponentId);
+    if (storage.dataList && storage.isSendRequest && (new Date().getTime() - storage.lastTimeReceivedData < storage.TIME_TO_INVALID_CACHE)) {
+      me.renderSpaces(storage.dataList, uicomponentId, "SpaceList", textSearch);
+    } else {
+      me.searchSpaces(textSearch, uicomponentId);
+      storage.isSendRequest = true;
+    }
   }
 };
-
 
 if(!eXo.commons) eXo.commons={};
 eXo.commons.UISpaceSwitcher = new UISpaceSwitcher();
