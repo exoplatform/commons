@@ -29,9 +29,9 @@ public class JcrActivitySearch extends SearchServiceConnector {
 
   @SuppressWarnings("serial")
   private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
-    put("Relevancy", "jcr:score()");
-    put("Title", "title");
-    put("Updated date", "soc:lastUpdated");
+    put("relevancy", "jcr:score()");
+    put("date", "soc:lastUpdated");
+    put("title", "title");
   }};
 
   public JcrActivitySearch(InitParams params) {
@@ -59,7 +59,7 @@ public class JcrActivitySearch extends SearchServiceConnector {
         String activityId = (String) jcrResult.getProperty("jcr:uuid");        
         ExoSocialActivity activity = activityManager.getActivity(activityId);                       
 
-        SearchResult result = new SearchResult(activity.getStreamUrl());
+        SearchResult result = new SearchResult(activity.getStreamUrl(), jcrResult.getScore());
         result.setTitle(activity.getTitle());
         result.setExcerpt(jcrResult.getExcerpt());
         StringBuffer buf = new StringBuffer();
@@ -70,6 +70,7 @@ public class JcrActivitySearch extends SearchServiceConnector {
         result.setDetail(buf.toString());
         String avatar = "/social/gadgets/Activities/style/images/ActivityIcon.gif";
         result.setImageUrl(avatar);
+        result.setDate(activity.getUpdated().getTime());
         searchResults.add(result);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
@@ -77,11 +78,6 @@ public class JcrActivitySearch extends SearchServiceConnector {
     }      
 
     return searchResults;
-  }
-
-  @Override
-  public Collection<String> getSortFields() {
-    return sortFieldsMap.keySet();
   }
 
 }

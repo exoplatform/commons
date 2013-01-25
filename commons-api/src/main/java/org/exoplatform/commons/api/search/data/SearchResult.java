@@ -14,7 +14,8 @@ public class SearchResult {
   private String excerpt; //the excerpt to be displayed on UI
   private String detail; //details information
   private String imageUrl; //an image to be displayed on UI
-  private long date; //created or modified date
+  private long date; //created or modified date, for sorting on UI
+  private long relevancy; //the result's relevancy, for sorting on UI
   
   public String getUrl() {
     return url;
@@ -58,15 +59,31 @@ public class SearchResult {
     this.date = date;
   }
   
+  public long getRelevancy() {
+    return relevancy;
+  }
+  public void setRelevancy(long relevancy) {
+    this.relevancy = relevancy;
+  }
+  
+  
   public SearchResult() {
   }
   
-  public SearchResult(String url) {
+  public SearchResult(String url, long relevancy) {
     this.url = url;
+    this.relevancy = relevancy;
+  }
+  
+  public SearchResult(String url, String title, long date, long relevancy) {
+    this.url = url;
+    this.title = title;
+    this.date = date;
+    this.relevancy = relevancy;
   }
   
   @Override
   public String toString() {
-    return String.format("SearchResult {url=%s}", url);
+    return String.format("SearchResult {url=%s, relevancy=%s}", url, relevancy);
   }
 }

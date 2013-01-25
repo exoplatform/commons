@@ -22,7 +22,7 @@ public class JcrSpaceSearch extends SearchServiceConnector {
   
   @SuppressWarnings("serial")
   private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
-    put("Relevancy", "jcr:score()");
+    put("relevancy", "jcr:score()");
   }};
   
   public JcrSpaceSearch(InitParams params) {
@@ -51,7 +51,7 @@ public class JcrSpaceSearch extends SearchServiceConnector {
         String spaceUrl = (String) jcrResult.getProperty("soc:url");        
         Space space = spaceSvc.getSpaceByUrl(spaceUrl);
 
-        SearchResult result = new SearchResult(spaceUrl);
+        SearchResult result = new SearchResult(spaceUrl, jcrResult.getScore());
         result.setTitle(space.getDisplayName());
         result.setExcerpt(space.getDescription());
         result.setDetail(space.getDisplayName() + " - " + String.valueOf(space.getMembers().length) + " - " + space.getVisibility());
@@ -66,11 +66,6 @@ public class JcrSpaceSearch extends SearchServiceConnector {
     }
 
     return searchResults;
-  }
-
-  @Override
-  public Collection<String> getSortFields() {
-    return sortFieldsMap.keySet();
   }
 
 }

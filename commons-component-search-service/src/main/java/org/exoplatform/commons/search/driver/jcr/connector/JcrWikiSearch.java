@@ -34,9 +34,9 @@ public class JcrWikiSearch extends SearchServiceConnector {
   
   @SuppressWarnings("serial")
   private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
-    put("Relevancy", "jcr:score()");
-    put("Title", "title");
-    put("Updated date", "updatedDate");
+    put("relevancy", "jcr:score()");
+    put("date", "updatedDate");
+    put("title", "title");
   }};
   
   public JcrWikiSearch(InitParams params) {
@@ -72,7 +72,7 @@ public class JcrWikiSearch extends SearchServiceConnector {
           wikiName = parentPage.getTitle();
         }  
         String title = (String)jcrResult.getProperty("title");
-        SearchResult result = new SearchResult(url);
+        SearchResult result = new SearchResult(url, jcrResult.getScore());
         result.setTitle(title);
         result.setExcerpt(jcrResult.getExcerpt());
         StringBuffer buf = new StringBuffer();
@@ -83,6 +83,7 @@ public class JcrWikiSearch extends SearchServiceConnector {
         result.setDetail(buf.toString());
         String    avatar = "/wiki/skin/DefaultSkin/webui/background/Page.gif";
         result.setImageUrl(avatar);
+        result.setDate((page.getUpdatedDate()!=null ? page.getUpdatedDate() : page.getCreatedDate()).getTime());
         searchResults.add(result);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
@@ -132,8 +133,4 @@ public class JcrWikiSearch extends SearchServiceConnector {
     return getSpaceNameByGroupId(wiki.getOwner());
   }
 
-  @Override
-  public Collection<String> getSortFields() {
-    return sortFieldsMap.keySet();
-  }  
 }

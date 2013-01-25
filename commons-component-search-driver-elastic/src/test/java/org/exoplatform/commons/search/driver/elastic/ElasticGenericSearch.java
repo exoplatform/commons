@@ -10,9 +10,4 @@ public class ElasticGenericSearch extends SearchServiceConnector {
   public Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
     return ElasticSearchService.search(query);
   }
-
-  @Override
-  public Collection<String> getSortFields() {
-    return null;
-  }
 }

@@ -1,10 +1,12 @@
 package org.exoplatform.commons.search.driver.jcr.connector;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,9 +37,9 @@ public class JcrNodeSearch extends SearchServiceConnector {
   
   @SuppressWarnings("serial")
   private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
-    put("Relevancy", "jcr:score()");
-    put("Primary type", "jcr:primaryType");
-    put("Created date", "jcr:created");
+    put("relevancy", "jcr:score()");
+    put("date", "jcr:created");
+    put("title", "jcr:primaryType");
   }};
   
   public JcrNodeSearch(InitParams params) {
@@ -65,13 +67,15 @@ public class JcrNodeSearch extends SearchServiceConnector {
     for(JcrSearchResult jcrResult: jcrResults) {
       try {
         String nodeUrl = jcrResult.getRepository() + "/" + jcrResult.getWorkspace() + jcrResult.getPath();
-        SearchResult result = new SearchResult("/rest/jcr/" + nodeUrl);
+        SearchResult result = new SearchResult("/rest/jcr/" + nodeUrl, jcrResult.getScore());
         String score = String.valueOf(jcrResult.getScore());
         result.setTitle(nodeUrl + " (score = " + score + ")");
         result.setExcerpt(jcrResult.getExcerpt());
         String sortByValue = sortBy.equals("jcr:score()") ? score : (String)jcrResult.getProperty(sortBy);
         result.setDetail(sortBy + " = " + sortByValue);
         result.setImageUrl("/eXoWCMResources/skin/DefaultSkin/wcm-nodetypes/70x80/icons/default.png");
+        String sDate =  (String) jcrResult.getProperty("jcr:created");
+        if(null!=sDate) result.setDate(new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).parse(sDate).getTime());
         
         results.add(result);
       } catch (Exception e) {
@@ -119,12 +123,12 @@ public class JcrNodeSearch extends SearchServiceConnector {
               path = path.substring(0, path.lastIndexOf("/jcr:content"));
             }
 
-            String score = String.valueOf(row.getValue("jcr:score").getLong());
-            SearchResult resultItem = new SearchResult("/rest/jcr/" + collection + path);
+            long score = row.getValue("jcr:score").getLong();
+            SearchResult resultItem = new SearchResult("/rest/jcr/" + collection + path, score);
             resultItem.setTitle(collection + path + " (score = " + score + ")");
             Value excerpt = row.getValue("rep:excerpt()");
             resultItem.setExcerpt(null!=excerpt?excerpt.getString():"");
-            String sortByValue = sortBy.equals("jcr:score()") ? score : "&lt;Click the icon to see all properties of this node&gt;";
+            String sortByValue = sortBy.equals("jcr:score()") ? String.valueOf(score) : "&lt;Click the icon to see all properties of this node&gt;";
             resultItem.setDetail(sortBy + " = " + sortByValue);
             resultItem.setImageUrl("/eXoWCMResources/skin/DefaultSkin/wcm-nodetypes/70x80/icons/default.png");
 
@@ -138,11 +142,6 @@ public class JcrNodeSearch extends SearchServiceConnector {
       LOG.error(e.getMessage(), e);
     }
     return results;
-  }
-
-  @Override
-  public Collection<String> getSortFields() {
-    return sortFieldsMap.keySet();
   }
 
 }

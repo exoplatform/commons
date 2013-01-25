@@ -31,9 +31,9 @@ public class JcrForumSearch extends SearchServiceConnector  {
   
   @SuppressWarnings("serial")
   private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
-    put("Relevancy", "jcr:score()");
-    put("Topic name", "exo:name");
-    put("Created date", "exo:dateCreated");
+    put("relevancy", "jcr:score()");
+    put("date", "exo:dateCreated");
+    put("title", "exo:name");
   }};
   
   public JcrForumSearch(InitParams params) {
@@ -79,7 +79,7 @@ public class JcrForumSearch extends SearchServiceConnector  {
         Forum forum = (Forum)forumService.getForum(category, forumId);        
 
         ///Forum forum = (Forum)forumService.getObjectNameByPath(path.substring(path.indexOf(Utils.CATEGORY), path.lastIndexOf("/")));
-        SearchResult result = new SearchResult(topic.getLink());
+        SearchResult result = new SearchResult(topic.getLink(), jcrResult.getScore());
         result.setTitle(topic.getTopicName());
         result.setExcerpt(topic.getDescription());
         StringBuffer buf = new StringBuffer();
@@ -95,6 +95,7 @@ public class JcrForumSearch extends SearchServiceConnector  {
         result.setDetail(buf.toString());        
         String    avatar = "/forum/skin/DefaultSkin/webui/skinIcons/24x24/icons/HotThreadNewPost.gif";
         result.setImageUrl(avatar);
+        result.setDate(topic.getLastPostDate().getTime());
         searchResults.add(result);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
@@ -103,9 +104,5 @@ public class JcrForumSearch extends SearchServiceConnector  {
 
     return searchResults;
   }
-
-  @Override
-  public Collection<String> getSortFields() {
-    return sortFieldsMap.keySet();
-  }
+  
 }

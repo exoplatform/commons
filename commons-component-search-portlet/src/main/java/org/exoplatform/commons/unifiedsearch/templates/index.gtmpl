@@ -562,19 +562,17 @@
         var type=$(this).attr("type");
         //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
         type = type.replace(/(:|\\.)/g,'\\\\$1'); //for jcr nodetype
-        var sortFields = CONNECTORS[type] ? CONNECTORS[type].sortFields : undefined;
         var sortBy = [];
-        if(sortFields != undefined) {
-          $.each(sortFields, function(i, field){
-            sortBy.push("<option value='" + field + "'>" + field + "</option>")
-          });
-        }
+        var sortFields = ["relevancy", "date", "title"];
+        $.each(sortFields, function(i, field){
+          sortBy.push("<option value='" + field + "'>" + field.toProperCase() + "</option>")
+        });
         $("#lstSortBy").html(sortBy.join(""));
         $(".SearchResultType").hide(); //hide all other types
         $("#"+type+"-type").show();
 
         var $viewingType = $(".ResultType.Selected");
-        $("#lstSortBy").val($viewingType.attr("sortBy")||"Relevancy").attr("selected",true);
+        $("#lstSortBy").val($viewingType.attr("sortBy")||"relevancy").attr("selected",true);
         $("#sortType").removeClass("Asc Desc").addClass($viewingType.attr("sortType")||"Desc");
       });
 

@@ -34,9 +34,7 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
   }
-  
-  public abstract Collection<String> getSortFields(); //for displaying on UI and passing to search function
-  
+    
   public SearchServiceConnector(){    
   };
   

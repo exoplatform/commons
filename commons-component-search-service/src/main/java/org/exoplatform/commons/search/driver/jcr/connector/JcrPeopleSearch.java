@@ -1,11 +1,14 @@
 package org.exoplatform.commons.search.driver.jcr.connector;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.exoplatform.commons.api.search.SearchServiceConnector;
@@ -26,9 +29,9 @@ public class JcrPeopleSearch extends SearchServiceConnector {
 
   @SuppressWarnings("serial")
   private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
-    put("Relevancy", "jcr:score()");
-    put("Name", "void-fullName");
-    put("Created date", "exo:dateCreated");
+    put("relevancy", "jcr:score()");
+    put("date", "exo:dateCreated");
+    put("title", "void-fullName");
   }};
   
   public JcrPeopleSearch(InitParams params) {
@@ -60,7 +63,7 @@ public class JcrPeopleSearch extends SearchServiceConnector {
         Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
         Profile profile = identity.getProfile();
 
-        SearchResult result = new SearchResult(profile.getUrl());
+        SearchResult result = new SearchResult(profile.getUrl(), jcrResult.getScore());
         result.setTitle(profile.getFullName());
         String position = profile.getPosition();
         if(null == position) position = "";
@@ -69,7 +72,9 @@ public class JcrPeopleSearch extends SearchServiceConnector {
         String avatar = profile.getAvatarUrl();      
         if(null == avatar) avatar = "/social-resources/skin/ShareImages/Avatar.gif";
         result.setImageUrl(avatar);
-
+        String sDate =  (String) jcrResult.getProperty("exo:dateCreated");
+        if(null!=sDate) result.setDate(new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).parse(sDate).getTime());
+        
         searchResults.add(result);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
@@ -77,11 +82,6 @@ public class JcrPeopleSearch extends SearchServiceConnector {
     }
 
     return searchResults;
-  }
-
-  @Override
-  public Collection<String> getSortFields() {
-    return sortFieldsMap.keySet();
   }
 
 }

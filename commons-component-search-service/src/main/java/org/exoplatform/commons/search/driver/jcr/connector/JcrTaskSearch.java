@@ -46,9 +46,9 @@ public class JcrTaskSearch extends SearchServiceConnector {
   
   @SuppressWarnings("serial")
   private final static Map<String, String> sortFieldsMap = new LinkedHashMap<String, String>(){{
-    put("Relevancy", "jcr:score()");
-    put("Summary", "exo:summary");
-    put("Updated date", "exo:lastModifiedDate");
+    put("relevancy", "jcr:score()");
+    put("date", "exo:lastModifiedDate");
+    put("title", "exo:summary");
   }};
   
   public JcrTaskSearch(InitParams params) {
@@ -81,7 +81,7 @@ public class JcrTaskSearch extends SearchServiceConnector {
         CalendarEvent calTask = calendarService.getGroupEvent(taskId);                
         Calendar calendar = calendarService.getGroupCalendar(calendarId);
 
-        SearchResult result = new SearchResult(calendar.getPublicUrl());
+        SearchResult result = new SearchResult(calendar.getPublicUrl(), jcrResult.getScore());
         result.setTitle(calTask.getSummary());
         result.setExcerpt(calTask.getDescription()!=null?calTask.getDescription():calTask.getSummary());
         StringBuffer buf = new StringBuffer();
@@ -95,6 +95,8 @@ public class JcrTaskSearch extends SearchServiceConnector {
         result.setDetail(buf.toString());        
         String    avatar = "/csResources/gadgets/tasks/skin/Tasks.png";
         result.setImageUrl(avatar);
+        result.setDate(calTask.getFromDateTime().getTime());
+        
         searchResults.add(result);
       } catch (Exception e) {
         LOG.error(e.getMessage(), e);
@@ -102,11 +104,6 @@ public class JcrTaskSearch extends SearchServiceConnector {
       } 
     }
     return searchResults;
-  }
-
-  @Override
-  public Collection<String> getSortFields() {
-    return sortFieldsMap.keySet();
   }
 
 }
