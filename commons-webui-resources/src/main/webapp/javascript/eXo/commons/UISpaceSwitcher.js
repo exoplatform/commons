@@ -74,8 +74,8 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
   // When textField lost focus
   textField.onblur = function() {
     if (textField.value == "") {
-      textField.value = me.defaultValueForTextSearch;
-      textField.className="SpaceSearchText LostFocus"
+      textField.value = storage.defaultValueForTextSearch;
+      textField.className = "SpaceSearchText LostFocus"
     }
   };
   
@@ -100,10 +100,11 @@ UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySp
 
 UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
   var me = eXo.commons.UISpaceSwitcher;
+  var storage = me.dataStorage[uicomponentId];
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   
   // Reset search textbox to empty
-  jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0].value = "";
+  jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0].value = storage.defaultValueForTextSearch;
   
   // Init data
   me.getRecentlyVisitedSpace(uicomponentId, 10);
