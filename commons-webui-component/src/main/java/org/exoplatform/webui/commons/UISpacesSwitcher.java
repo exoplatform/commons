@@ -54,11 +54,21 @@ public class UISpacesSwitcher extends UIContainer {
   
   public static final String SELECT_SPACE_ACTION = "SelectSpace";
   
+  public static final long DEFAULT_INVALIDING_CACHE_TIME = 60000;
+  
   private EventUIComponent eventComponent;
   
   private String currentSpaceName = StringUtils.EMPTY;
   
+  protected long invalidingCacheTime;
+  
   public UISpacesSwitcher() throws Exception {
+    String invalidingCacheTimeProperty = System.getProperty("commons.spaceswitcher.cache.interval");
+    if ((invalidingCacheTimeProperty == null) || invalidingCacheTimeProperty.isEmpty()) {
+      invalidingCacheTime = DEFAULT_INVALIDING_CACHE_TIME;
+    } else {
+      invalidingCacheTime = Long.parseLong(invalidingCacheTimeProperty);
+    }
   }
   
   public void init(EventUIComponent eventComponent) {
