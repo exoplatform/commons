@@ -25,7 +25,7 @@
     <div class="title"><%= _ctx.appRes(uicomponent.id + ".title.select-location"); %></div>
     <div class="PortalSpace"></div>
     <div class="UserSpace"></div>
-    <div class="SpaceSearch"><input type="text" class="SpaceSearchText LostFocus" value="Filter spaces"/></div>
+    <div class="SpaceSearch"><input type="text" class="SpaceSearchText LostFocus"></input></div>
     <div class="SpaceList"></div>
   </div>
 </div>
