@@ -234,14 +234,13 @@ UISpaceSwitcher.prototype.openComboBox = function(event, spaceChooserDiv) {
   var me = eXo.commons.UISpaceSwitcher;
   var wikiSpaceSwitcher = spaceChooserDiv.parentNode;
   var uicomponentId = wikiSpaceSwitcher.id;
-  me.initSpaceData(uicomponentId);
   var spaceChooserPopup = jQuery(wikiSpaceSwitcher).find("div.SpaceChooserPopup")[0];
-
   if (spaceChooserPopup.style.display == "none") {
     spaceChooserPopup.style.display = "block";
   } else {
     spaceChooserPopup.style.display = "none";
   }
+  me.initSpaceData(uicomponentId);
 };
 
 UISpaceSwitcher.prototype.onTextSearchChange = function(uicomponentId) {
