@@ -22,7 +22,7 @@
 function UISpaceSwitcher() {
 };
 
-UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBaseRestUrl, defaultValueForTextSearch, selectSpaceAction) {
+UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBaseRestUrl, defaultValueForTextSearch, selectSpaceAction, invalidingCacheTime) {
   var me = eXo.commons.UISpaceSwitcher;
   
   if (!me.dataStorage) {
@@ -42,9 +42,8 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
   storage.lastSearchKeyword = "";
   storage.defaultValueForTextSearch = defaultValueForTextSearch;
   storage.selectSpaceAction = selectSpaceAction;
-  storage.isSendRequest = false;
-  storage.TIME_TO_INVALID_CACHE = 60000; // 30s
-  storage.lastTimeReceivedData = 0;
+  storage.invalidingCacheTime = invalidingCacheTime;
+  storage.lastTimeSendRequest = 0;
   
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var textField = jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0];
@@ -139,7 +138,6 @@ UISpaceSwitcher.prototype.searchSpaces = function(keyword, uicomponentId) {
     data : '',
     success : function(data) {
       storage.dataList = data;
-      storage.lastTimeReceivedData = new Date().getTime(); 
       me.renderSpaces(data, uicomponentId, "SpaceList", keyword);
     }
   });
@@ -253,11 +251,11 @@ UISpaceSwitcher.prototype.onTextSearchChange = function(uicomponentId) {
   
   if (textSearch != storage.lastSearchKeyword) {
     storage.lastSearchKeyword = textSearch;
-    if (storage.dataList && storage.isSendRequest && (new Date().getTime() - storage.lastTimeReceivedData < storage.TIME_TO_INVALID_CACHE)) {
+    if (storage.dataList && (new Date().getTime() - storage.lastTimeSendRequest < storage.invalidingCacheTime)) {
       me.renderSpaces(storage.dataList, uicomponentId, "SpaceList", textSearch);
     } else {
+      storage.lastTimeSendRequest = new Date().getTime(); 
       me.searchSpaces(textSearch, uicomponentId);
-      storage.isSendRequest = true;
     }
   }
 };
