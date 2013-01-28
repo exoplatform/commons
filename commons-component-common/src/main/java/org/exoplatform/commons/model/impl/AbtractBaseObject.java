@@ -39,7 +39,7 @@ import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.version.VersionException;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.commons.model.api.BaseObject;
+import org.exoplatform.commons.api.event.data.BaseObject;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.impl.core.NodeImpl;
 import org.exoplatform.services.log.ExoLogger;
