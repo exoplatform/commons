@@ -200,7 +200,7 @@
             </span>
           </div>
           <div id="result" style="display: none;"></div>
-          <div id="showMore" style="display: none; text-align: center; margin-bottom: 20px;"><input type="button" id="btnShowMore" value="Show More Results"/></div>
+          <div id="showMore" style="display: none; text-align: center; margin-bottom: 20px; margin-top: 40px;"><input type="button" id="btnShowMore" value="Show More Results"/></div>
         </div>
 
       </div>
@@ -217,6 +217,13 @@
       var LIMIT;
       var QUICKSEARCH_LIMIT;
       var VIEWING_TYPE;
+
+      var RESULT_CACHE, CACHE_OFFSET, SERVER_OFFSET, NUM_RESULTS_RENDERED; //for uncategoried search
+
+      var IS_CATEGORIZED = false;
+
+      var search; //the main search function
+
 
       var SEARCH_RESULT_TEMPLATE = " \
         <div class='SearchResult '> \
@@ -295,6 +302,13 @@
             QUICKSEARCH_SETTING = setting;
             QUICKSEARCH_LIMIT = setting.resultsPerPage;
           });
+
+          var sortBy = [];
+          var sortFields = ["relevancy", "date", "title"];
+          $.each(sortFields, function(i, field){
+            sortBy.push("<option value='" + field + "'>" + field.toProperCase() + "</option>")
+          });
+          $("#lstSortBy").html(sortBy.join(""));
 
         });
       })();
@@ -420,7 +434,7 @@
       }
 
 
-      function search(callback) {
+      function categorizedSearch(callback) {
         var query = $("#txtQuery").val();
         var sql = $("#txtSql").val().replace(/%query%/g, query);
         if(!isSqlMode() && ""==query) {
@@ -562,12 +576,6 @@
         var type=$(this).attr("type");
         //type = type.replace(/(:|\\.)/g,'\\\\$1').replace(/\\s/g, "_"); //for jcr nodetype
         type = type.replace(/(:|\\.)/g,'\\\\$1'); //for jcr nodetype
-        var sortBy = [];
-        var sortFields = ["relevancy", "date", "title"];
-        $.each(sortFields, function(i, field){
-          sortBy.push("<option value='" + field + "'>" + field.toProperCase() + "</option>")
-        });
-        $("#lstSortBy").html(sortBy.join(""));
         $(".SearchResultType").hide(); //hide all other types
         $("#"+type+"-type").show();
 
@@ -660,24 +668,6 @@
       });
 
 
-      $("#btnShowMore").click(function(){
-        showMore(LIMIT);
-      });
-
-
-      $("#lstSortBy").change(function(){
-        $(".ResultType.Selected").attr("sortBy", $(this).val());
-        showMore(0);
-      });
-
-
-      $("#sortType").live("click", function(){
-        $(this).toggleClass("Asc Desc");
-        $(".ResultType.Selected").attr("sortType", $(this).hasClass("Asc") ? "Asc" : "Desc");
-        showMore(0);
-      });
-
-
       //*** Event handlers - Quick search ***
 
       $("#seeAll").live("click", function(){
@@ -747,5 +737,179 @@
         $("#quickSearchResult").hide();
       });
 
+
+
+      /*** Uncategorized search***/
+
+      // Client-side sort functions
+      function byRelevancyASC(a,b) {
+        if (a.relevancy < b.relevancy)
+          return -1;
+        if (a.relevancy > b.relevancy)
+          return 1;
+        return 0;
+      }
+      function byRelevancyDESC(b,a) {
+        if (a.relevancy < b.relevancy)
+          return -1;
+        if (a.relevancy > b.relevancy)
+          return 1;
+        return 0;
+      }
+
+      function byDateASC(a,b) {
+        if (a.date < b.date)
+          return -1;
+        if (a.date > b.date)
+          return 1;
+        return 0;
+      }
+      function byDateDESC(b,a) {
+        if (a.date < b.date)
+          return -1;
+        if (a.date > b.date)
+          return 1;
+        return 0;
+      }
+
+      function byTitleASC(a,b) {
+        if (a.title < b.title)
+          return -1;
+        if (a.title > b.title)
+          return 1;
+        return 0;
+      }
+      function byTitleDESC(b,a) {
+        if (a.title < b.title)
+          return -1;
+        if (a.title > b.title)
+          return 1;
+        return 0;
+      }
+
+
+      function uncategorizedSearch(callback) {
+        SERVER_OFFSET = 0;
+        NUM_RESULTS_RENDERED = 0;
+
+        getFromServer(function(){
+          $("#result").show();
+          $("#resultSort").show();
+          $("#result").html(renderCachedResults());
+        });
+      }
+
+
+      function getFromServer(callback){
+        var query = $("#txtQuery").val();
+        var sql = $("#txtSql").val().replace(/%query%/g, query);
+        if(!isSqlMode() && ""==query) {
+          clearResultPage();
+          return;
+        }
+
+        var sort = $("#lstSortBy").val();
+        var order = $("#sortType").hasClass("Asc") ? "asc" : "desc";
+
+        $("body").css("cursor", "wait");
+
+        var restUrl = "/rest/search?q="+ (isSqlMode() ? sql : query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset="+SERVER_OFFSET+"&limit="+LIMIT+"&sort="+sort+"&order="+order);
+        $.getJSON(restUrl, function(resultMap){
+          RESULT_CACHE = [];
+          $.each(resultMap, function(searchType, results){
+            RESULT_CACHE.push.apply(RESULT_CACHE, results);
+          });
+
+          var sortFuncName = "by" + sort.toProperCase() + order.toUpperCase();
+          RESULT_CACHE = RESULT_CACHE.sort(window[sortFuncName]); //sort the result set
+
+          CACHE_OFFSET = 0; //reset the local offset
+
+          if(callback) callback();
+          if(RESULT_CACHE.length < LIMIT) $("#showMore").hide(); else $("#showMore").show();
+          $("body").css("cursor", "auto");
+        });
+      }
+
+
+      function renderCachedResults() {
+        var html = "";
+        var current = RESULT_CACHE.slice(CACHE_OFFSET, CACHE_OFFSET+LIMIT);
+        $.each(current, function(i, result){
+          html = html + renderSearchResult(result);
+        });
+
+        if(""==html) {
+          clearResultPage("No result for <strong>" + (isSqlMode()?$("#txtSql").val().replace(/%query%/g, $("#txtQuery").val()):$("#txtQuery").val()) + "<strong>");
+          return;
+        }
+        NUM_RESULTS_RENDERED = NUM_RESULTS_RENDERED + current.length;
+        var resultHeader = "Results " + 1 + " to " + NUM_RESULTS_RENDERED + " for <strong>" + (isSqlMode()?$("#txtSql").val().replace(/%query%/g, $("#txtQuery").val()):$("#txtQuery").val()) + "<strong>";
+        $("#resultHeader").html(resultHeader);
+
+        return html;
+      }
+
+
+      if(IS_CATEGORIZED) {
+        search = function(callback) {
+          categorizedSearch(callback);
+        };
+
+        $("#btnShowMore").click(function(){
+          showMore(LIMIT);
+        });
+
+        $("#lstSortBy").change(function(){
+          $(".ResultType.Selected").attr("sortBy", $(this).val());
+          showMore(0);
+        });
+
+        $("#sortType").live("click", function(){
+          $(this).toggleClass("Asc Desc");
+          $(".ResultType.Selected").attr("sortType", $(this).hasClass("Asc") ? "Asc" : "Desc");
+          showMore(0);
+        });
+
+      } else {
+        search = function(callback) {
+          uncategorizedSearch(callback);
+        };
+
+        $("#btnShowMore").click(function(){
+          CACHE_OFFSET = CACHE_OFFSET + LIMIT;
+          var remaining = RESULT_CACHE.slice(CACHE_OFFSET, CACHE_OFFSET+LIMIT);
+
+          if(remaining.length < LIMIT) {
+            SERVER_OFFSET = SERVER_OFFSET + LIMIT;
+            getFromServer(function(){
+              RESULT_CACHE = remaining.concat(RESULT_CACHE);
+              $("#result").append(renderCachedResults());
+              $("#searchPage").animate({ scrollTop: $("#resultPage")[0].scrollHeight}, "slow");
+            });
+            return;
+          }
+          $("#result").append(renderCachedResults());
+          $("#searchPage").animate({ scrollTop: $("#resultPage")[0].scrollHeight}, "slow");
+        });
+
+        $("#lstSortBy").change(function(){
+          SERVER_OFFSET = 0;
+          NUM_RESULTS_RENDERED = 0;
+          getFromServer(function(){
+            $("#result").html(renderCachedResults());
+          });
+        });
+
+        $("#sortType").live("click", function(){
+          $(this).toggleClass("Asc Desc");
+          SERVER_OFFSET = 0;
+          NUM_RESULTS_RENDERED = 0;
+          getFromServer(function(){
+            $("#result").html(renderCachedResults());
+          });
+        });
+
+      }
 
     </script>
