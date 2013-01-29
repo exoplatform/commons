@@ -27,6 +27,14 @@
       <artifactId>jsr311-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.chromattic</groupId>
+      <artifactId>chromattic.apt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.chromattic</groupId>
+      <artifactId>chromattic.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-api</artifactId>
     </dependency>
@@ -53,6 +61,10 @@
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.gatein.portal</groupId>
+      <artifactId>exo.portal.component.common</artifactId>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.ws</groupId>
@@ -128,4 +140,22 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+          <include>**/*.gtmpl</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>
