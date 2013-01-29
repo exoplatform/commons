@@ -767,7 +767,6 @@ function UIDSUpload() {
 	      }
 	      me.saveUploaded(elementId, fileName);
 	      documentSelector.renderDetails(selectedItem);
-	      documentSelector.selectUploadedFile(fileName);
 	      //var refreshUpload = eXo.core.DOMUtil.findFirstDescendantByClass(container, "a", "RefreshUpload") ; 
 	      var refreshUpload = jQuery("a.RefreshUpload:first",container);
 	      if (refreshUpload){

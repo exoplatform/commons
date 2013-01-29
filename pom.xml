@@ -57,6 +57,14 @@
   </properties>
   <dependencyManagement>
     <dependencies>
+      <!-- Import versions of external dependencies to use -->
+      <dependency>
+        <groupId>org.exoplatform</groupId>
+        <artifactId>maven-depmgt-pom</artifactId>
+        <version>2-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <!-- Our own project modules -->
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -502,14 +510,6 @@
         <groupId>org.gatein.portal</groupId>
         <artifactId>exo.portal.webui.portlet</artifactId>
         <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <!-- Import versions of external dependencies to use -->
-      <dependency>
-        <groupId>org.exoplatform</groupId>
-        <artifactId>maven-depmgt-pom</artifactId>
-        <version>2-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
