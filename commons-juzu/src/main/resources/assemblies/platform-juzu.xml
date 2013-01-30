@@ -36,6 +36,13 @@
     <fileSet>
       <directory>${project.basedir}/src/main/webapp</directory>
       <outputDirectory>/</outputDirectory>
+      <excludes>
+	     <exclude>**/less/**</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/${project.build.finalName}/skin/css</directory>
+      <outputDirectory>/skin/css</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
