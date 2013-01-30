@@ -1,11 +1,11 @@
 <style>
-  #searchSetting div {
+  #quickSearchSetting div {
     margin-top: 10px;
   }
 </style>
 
-<div id="searchSetting" style="height: 600px;">
-  <h3 style="margin-left: 3px;">Search Settings</h3>
+<div id="quickSearchSetting" style="height: 600px;">
+  <h3 style="margin-left: 3px;">Quick Search Settings</h3>
   <hr>
   <div style="margin-left: 10px; margin-bottom: 40px;">
     <div>
@@ -19,8 +19,6 @@
     </div>
 
     <div><label><input type="checkbox" id="searchCurrentSiteOnly" style="margin-left: 0px;">Search in current site only</label></div>
-    <div><label><input type="checkbox" id="hideSearchForm" style="margin-left: 0px;">Hide search form</label></div>
-    <div><label><input type="checkbox" id="hideFacetsFilter" style="margin-left: 0px;">Hide facets filter</label></div>
 
     <div style="margin-top: 20px; margin-left: 20px;">
       <input type="button" value="Save Settings" id="btnSave">
@@ -59,12 +57,10 @@
 
 
   $("#btnSave").click(function(){
-    var jqxhr = $.post("/rest/search/setting", {
+    var jqxhr = $.post("/rest/search/setting/quicksearch", {
       resultsPerPage:$("#resultsPerPage").val(),
       searchTypes:getSelectedTypes(),
-      searchCurrentSiteOnly:$("#searchCurrentSiteOnly").is(":checked"),
-      hideSearchForm:$("#hideSearchForm").is(":checked"),
-      hideFacetsFilter:$("#hideFacetsFilter").is(":checked")
+      searchCurrentSiteOnly:$("#searchCurrentSiteOnly").is(":checked")
     });
 
     jqxhr.complete(function(data) {
@@ -99,6 +95,7 @@
 
 
 
+
   $.getJSON("/rest/search/registry", function(registry){
     CONNECTORS = registry[0];
     var searchInOpts=[];
@@ -108,15 +105,12 @@
     });
     $("#lstSearchInOptions").html(searchInOpts.join(""));
 
-    $.getJSON("/rest/search/setting", function(setting){
-      $("#resultsPerPage").siblings("span").text("Results per page");
-      var options = [5,10,20,50,100];
+    $.getJSON("/rest/search/setting/quicksearch", function(setting){
+      $("#resultsPerPage").siblings("span").text("Results per type");
       $("#resultsPerPage").html("");
-      for(var i=0; i<options.length; i++) {
-        $("#resultsPerPage").append("<option>"+options[i]+"</option>");
+      for(var i=1; i<=10; i++) {
+        $("#resultsPerPage").append("<option>"+i+"</option>");
       }
-      $("#hideSearchForm").closest("div").show();
-      $("#hideFacetsFilter").closest("div").show();
 
       $(":checkbox[name='searchInOption']").attr('checked', false);
       $.each($(":checkbox[name='searchInOption']"), function(){
@@ -128,8 +122,6 @@
       $("#resultsPerPage").val(setting.resultsPerPage);
       updateTxtSearchIn();
       $("#searchCurrentSiteOnly").attr('checked', setting.searchCurrentSiteOnly);
-      $("#hideSearchForm").attr('checked', setting.hideSearchForm);
-      $("#hideFacetsFilter").attr('checked', setting.hideFacetsFilter);
 
       $("#txtSearchIn").css({position:"absolute", left: $("#resultsPerPage").offset().left});
       $("#lstSearchInOptions").hide();

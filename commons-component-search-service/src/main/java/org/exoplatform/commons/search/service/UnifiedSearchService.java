@@ -33,7 +33,7 @@ public class UnifiedSearchService implements ResourceContainer {
   // temporary for testing, user setting will be stored using "setting" feature
   private static Map<String, SearchSetting> SEARCH_SETTINGS = new HashMap<String, SearchSetting>();
   private static Map<String, SearchSetting> QUICKSEARCH_SETTINGS = new HashMap<String, SearchSetting>();
-  private static List<String> ENABLED_SEARCHTYPES = Arrays.asList("file", "document", "wiki", "page", "discussion", "people", "space", "event", "task", "question", "activity");
+  private static List<String> ENABLED_SEARCHTYPES = Arrays.asList("file", "document", "wiki", "page", "discussion", "people", "space", "event", "task", "question", "activity", "jcrNode");
   
   private static SearchSetting defaultSearchSetting = new SearchSetting(10, Arrays.asList("all"), false, false, false);
   private static SearchSetting defaultQuicksearchSetting = new SearchSetting(5, Arrays.asList("all"), true, true, true);

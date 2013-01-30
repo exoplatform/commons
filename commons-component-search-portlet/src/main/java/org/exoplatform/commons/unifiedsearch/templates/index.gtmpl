@@ -68,26 +68,6 @@
       }
 
 
-      .QuickSearchResult {
-        margin-left: 0px;
-        padding-top: 0px;
-        height: 30px;
-      }
-
-      .QuickSearchResult .Avatar img {
-        width: 20px;
-        height: 24px;
-      }
-
-      .QuickSearchResult .Content {
-        padding-left: 5px;
-      }
-
-      .QuickSearchResult .Content .Excerpt div {
-        font-size: xx-small; color: grey;
-      }
-
-
       #facetsFilter {
         float: left;
         border: solid 1px lightgray;
@@ -134,20 +114,6 @@
       }
 
 
-      #quickSearchResult {
-        position: absolute;
-        background: white;
-        width: 315px;
-        margin-top: 6px;
-        margin-left: 3px;
-        display:none;
-      }
-
-      #quickSearchResult table, #quickSearchResult th, #quickSearchResult td {
-        border: 1px solid lightgray;
-      }
-
-
       #searchPortlet input:focus, #searchPortlet textarea:focus {
           outline: none;
       }
@@ -156,15 +122,7 @@
 
     <div id="searchPortlet">
 
-      <div id="quickSearch">
-        <div style="padding-top: 5px;" id="quickSearchForm">
-          <input type="text" id="txtQuickSearchQuery" class="SearchBox">
-        </div>
-        <div id="quickSearchResult" style="z-index: 1001;">
-        </div>
-      </div>
-
-      <div id="searchPage" style="display: none; z-index: 1000;">
+      <div id="searchPage">
         <div id="sqlExec" style="margin-bottom: 20px; border: 1px dashed gray; padding-top: 5px; padding-left: 5px; display: none;">
           <div style="font-size: small;">SQL:</div>
           <div style="margin: 10px;">
@@ -209,13 +167,10 @@
 
     <script>
       //*** Global variables ***
-
       var CONNECTORS;
       var SEARCH_TYPES;
       var SEARCH_SETTING;
-      var QUICKSEARCH_SETTING;
       var LIMIT;
-      var QUICKSEARCH_LIMIT;
       var VIEWING_TYPE;
 
       var RESULT_CACHE, CACHE_OFFSET, SERVER_OFFSET, NUM_RESULTS_RENDERED; //for uncategoried search
@@ -223,7 +178,6 @@
       var IS_CATEGORIZED = false;
 
       var search; //the main search function
-
 
       var SEARCH_RESULT_TEMPLATE = " \
         <div class='SearchResult '> \
@@ -237,81 +191,6 @@
           </div> \
         </div> \
       ";
-
-      var QUICKSEARCH_RESULT_TEMPLATE= " \
-        <div class='SearchResult QuickSearchResult'> \
-          <div class='Avatar Clickable'> \
-            <img title='%{title}' src='%{avatar}' alt='[+]'> \
-          </div> \
-          <div class='Content'> \
-            <div class='Title Ellipsis'><a href='%{url}'>%{title}</a></div> \
-            <div class='Excerpt Ellipsis'>%{excerpt}</div> \
-          </div> \
-        </div> \
-      ";
-
-      var QUIKSEARCH_TABLE_TEMPLATE=" \
-            <table style='table-layout: fixed;'> \
-              <col width='30%'> \
-              <col width='70%'> \
-              %{resultRows} \
-              <tr> \
-                <th colspan='2' style='padding: 10px; font-weight: normal;'> \
-                  <span id='seeAll' class='Clickable'>%{message}</span> \
-                </th> \
-              </tr> \
-            </table> \
-          ";
-
-      var QUICKSEARCH_TABLE_ROW_TEMPLATE=" \
-            <tr> \
-              <th> \
-                <div style='margin-top: 8px; color: gray;'>%{type}</div> \
-              </th> \
-              <td style='padding: 2px;'> \
-                <div style='margin-left: 3px;'>%{results}</div> \
-              </td> \
-            </tr> \
-          ";
-
-
-      //*** The entry point ***
-      (function(){
-        getRegistry(function(registry){
-          CONNECTORS = registry[0];
-          SEARCH_TYPES = registry[1];
-          getSearchSetting(function(setting){
-            SEARCH_SETTING = setting;
-            LIMIT = setting.resultsPerPage;
-
-            loadContentFilter(CONNECTORS, setting);
-            loadSiteFilter(setting);
-
-            if(setting.hideFacetsFilter) {
-              $("#facetsFilter").hide();
-            }
-
-            if(setting.hideSearchForm) {
-              $("#searchForm").hide();
-            } else {
-              $("#txtQuery").focus();
-            }
-          });
-
-          getQuicksearchSetting(function(setting){
-            QUICKSEARCH_SETTING = setting;
-            QUICKSEARCH_LIMIT = setting.resultsPerPage;
-          });
-
-          var sortBy = [];
-          var sortFields = ["relevancy", "date", "title"];
-          $.each(sortFields, function(i, field){
-            sortBy.push("<option value='" + field + "'>" + field.toProperCase() + "</option>")
-          });
-          $("#lstSortBy").html(sortBy.join(""));
-
-        });
-      })();
 
 
       //*** Utility functions ***
@@ -332,6 +211,12 @@
       };
 
 
+      function getUrlParam(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\\+/g, ' '));
+      }
+
+
       function getRegistry(callback) {
         $.getJSON("/rest/search/registry", function(registry){
           if(callback) callback(registry);
@@ -341,13 +226,6 @@
 
       function getSearchSetting(callback) {
         $.getJSON("/rest/search/setting", function(setting){
-          if(callback) callback(setting);
-        });
-      }
-
-
-      function getQuicksearchSetting(callback) {
-        $.getJSON("/rest/search/setting/quicksearch", function(setting){
           if(callback) callback(setting);
         });
       }
@@ -364,14 +242,13 @@
         });
         if(0!=contentTypes.length) {
           $("#lstContentTypes").html(contentTypes.join(""));
-          $(":checkbox[name='contentType']").attr('checked', true); //check all types by default
         } else {
           $(":checkbox[name='contentType'][value='all']").attr("checked", false).attr("disabled", "disabled");
         }
       }
 
 
-      function loadSiteFilter(searchSetting) {
+      function loadSiteFilter(searchSetting, callback) {
         if(searchSetting.searchCurrentSiteOnly) {
           $("#siteFilter").hide();
         } else {
@@ -381,7 +258,7 @@
               siteNames.push("<li><label><input type='checkbox' name='site' value='" + site + "'>" + site.toProperCase() + "</label></li>");
             });
             $("#lstSites").html(siteNames.join(""));
-            $(":checkbox[name='site']").attr('checked', true);
+            if(callback) callback();
           });
         }
       }
@@ -397,40 +274,12 @@
 
 
       function getSelectedSites(){
-        if(SEARCH_SETTING.searchCurrentSiteOnly) return parent.eXo.env.portal.portalName;
+        if(SEARCH_SETTING.searchCurrentSiteOnly) return getUrlParam("currentSite") || parent.eXo.env.portal.portalName;
         var selectedSites = [];
         $.each($(":checkbox[name='site'][value!='all']:checked"), function(){
           selectedSites.push(this.value);
         });
         return selectedSites.join(",");
-      }
-
-
-      function quickSearch() {
-        var query = $("#txtQuickSearchQuery").val();
-        var sites = QUICKSEARCH_SETTING.searchCurrentSiteOnly ? parent.eXo.env.portal.portalName : "all";
-        //var restUrl = "/rest/search?q=" + query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc";
-        var restUrl = "/rest/search?q=" + query+"&sites="+sites+"&types="+QUICKSEARCH_SETTING.searchTypes.join(",")+"&offset=0"+"&limit="+QUICKSEARCH_LIMIT+"&sort="+"&order=desc";
-
-        $.getJSON(restUrl, function(resultMap){
-          var rows = [];
-          $.each(SEARCH_TYPES, function(i, searchType){
-            results = resultMap[searchType];
-            if(results && 0!=$(results).size()) {
-              var cell = [];
-              $.each(results, function(i, result){
-                cell.push(renderSearchResult(result, true));
-              });
-              var row = QUICKSEARCH_TABLE_ROW_TEMPLATE.replace(/%{type}/g, CONNECTORS[searchType].displayName).replace(/%{results}/g, cell.join(""));
-              rows.push(row);
-            }
-          });
-          var message = rows.length==0 ? "No result for <strong>" + query + "<strong>" : "See All Search Results";
-          $("#quickSearchResult").html(QUIKSEARCH_TABLE_TEMPLATE.replace(/%{resultRows}/, rows.join("")).replace(/%{message}/g, message));
-          var width = Math.min($("#quickSearchResult").width(), $(window).width() - $("#txtQuickSearchQuery").offset().left - 20);
-          $("#quickSearchResult").width(width);
-          $("#quickSearchResult").show();
-        });
       }
 
 
@@ -442,7 +291,10 @@
           return;
         }
 
-        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+"&order=desc");
+        var sort = $("#lstSortBy").val();
+        var order = $("#sortType").hasClass("Asc") ? "asc" : "desc";
+
+        var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+sort+"&order="+order);
 
         $("body").css("cursor", "wait");
 
@@ -483,13 +335,12 @@
       }
 
 
-      function renderSearchResult(result, isQuickSearch) {
-        var template = isQuickSearch ?  QUICKSEARCH_RESULT_TEMPLATE : SEARCH_RESULT_TEMPLATE;
-        var query = $("#searchPage").is(":visible") ? $("#txtQuery").val() : $("#txtQuickSearchQuery").val();
+      function renderSearchResult(result) {
+        var template = SEARCH_RESULT_TEMPLATE;
+        var query = $("#txtQuery").val();
         var terms = query.split(/\\s+/g);
 
         var html = template.replace(/%{url}/g, result.url).replace(/%{title}/g, result.title.highlight(terms)).replace(/%{avatar}/g, result.imageUrl);
-        //if(!isQuickSearch) html = html.replace(/%{excerpt}/g, result.excerpt).replace(/%{detail}/g, result.detail);
         html = html.replace(/%{excerpt}/g, result.excerpt.highlight(terms)).replace(/%{detail}/g, result.detail.highlight(terms));
         return html;
       }
@@ -668,77 +519,6 @@
       });
 
 
-      //*** Event handlers - Quick search ***
-
-      $("#seeAll").live("click", function(){
-        $("#quickSearchResult").hide();
-        $("#txtQuery").val($("#txtQuickSearchQuery").val());
-
-        // Check only types selected in quicksearch settting
-        $.each($(":checkbox[name='contentType']"), function(){
-          $(this).attr('checked', -1!=QUICKSEARCH_SETTING.searchTypes.indexOf(this.value) || -1!=QUICKSEARCH_SETTING.searchTypes.indexOf("all"));
-        });
-
-        var $container = $("#UIPageBody");
-        $("#searchPage").css({position: "absolute",
-                              overflow: "auto",
-                              background: "white",
-                              top: $container.offset().top+"px",
-                              left: $container.offset().left+"px",
-                              width: $container.width(),
-                              height: $container.height()
-                            });
-        $("#searchPage").show();
-        $("#txtQuery").focus();
-        search();
-      });
-
-
-      $("#txtQuickSearchQuery").keyup(function(e){
-        if(""==$(this).val()) {
-          $("#quickSearchResult").hide();
-          return;
-        }
-
-        if(13==e.keyCode) {
-          $("#seeAll").click();
-        } else {
-          quickSearch();
-        }
-      });
-
-
-      $("#txtQuickSearchQuery").focus(function(){
-        $("#searchPage").hide();
-        if(""!=$("#txtQuickSearchQuery").val()) {
-          quickSearch();
-        }
-      });
-
-
-      $("#txtQuickSearchQuery").blur(function(){
-        setTimeout(function(){$("#quickSearchResult").hide();}, 200);
-      });
-
-
-      //*** Event handlers - Whole portlet ***
-
-      $("#searchPortlet").keyup(function(e){
-        if(27==e.keyCode) {
-          $("#searchPage").hide();
-          $("#quickSearchResult").hide();
-        }
-      });
-
-
-      $("body").click(function(e) {
-        if($(e.target).is('#searchPortlet, #searchPortlet *')) return;
-        $("#searchPage").hide();
-        $("#quickSearchResult").hide();
-      });
-
-
-
       /*** Uncategorized search***/
 
       // Client-side sort functions
@@ -911,5 +691,74 @@
         });
 
       }
+
+
+      //*** The entry point ***
+      (function(){
+        getRegistry(function(registry){
+          CONNECTORS = registry[0];
+          SEARCH_TYPES = registry[1];
+          getSearchSetting(function(setting){
+            SEARCH_SETTING = setting;
+
+            loadContentFilter(CONNECTORS, setting);
+            loadSiteFilter(setting, function(){
+              var sites = getUrlParam("sites");
+              if(sites) {
+                $.each($(":checkbox[name='site']"), function(){
+                  $(this).attr('checked', -1!=sites.indexOf(this.value) || -1!=sites.indexOf("all"));
+                });
+              } else {
+                $(":checkbox[name='site']").attr('checked', true);  //check all sites by default
+              }
+
+              if(query && !setting.searchCurrentSiteOnly) search();
+            });
+
+            if(setting.hideFacetsFilter) {
+              $("#facetsFilter").hide();
+            }
+
+            if(setting.hideSearchForm) {
+              $("#searchForm").hide();
+            } else {
+              $("#txtQuery").focus();
+            }
+
+
+            var query = getUrlParam("q");
+            $("#txtQuery").val(query);
+
+            var types = getUrlParam("types");
+            if(types) {
+              $.each($(":checkbox[name='contentType']"), function(){
+                $(this).attr('checked', -1!=types.indexOf(this.value) || -1!=types.indexOf("all"));
+              });
+            } else {
+              $(":checkbox[name='contentType']").attr('checked', true); //check all types by default
+            }
+
+            $("#lstSortBy").val(getUrlParam("sort")||"relevancy");
+            var order = getUrlParam("order");
+            $("#sortType").removeClass("Asc Desc").addClass(order && order.toUpperCase()=="ASC" ? "Asc" : "Desc");
+
+            var limit = getUrlParam("limit");
+            LIMIT = limit && !isNaN(parseInt(limit)) ? parseInt(limit) : setting.resultsPerPage;
+
+            $("#txtQuery").focus();
+
+            if(query && setting.searchCurrentSiteOnly) search();
+
+          });
+        });
+
+        var sortBy = [];
+        var sortFields = ["relevancy", "date", "title"];
+        $.each(sortFields, function(i, field){
+          sortBy.push("<option value='" + field + "'>" + field.toProperCase() + "</option>")
+        });
+        $("#lstSortBy").html(sortBy.join(""));
+
+      })();
 
     </script>

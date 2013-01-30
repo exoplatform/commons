@@ -27,6 +27,28 @@
    </portlet>
    
    <portlet>
+     <portlet-name>QuicksearchPortlet</portlet-name>
+     <display-name xml:lang="EN">Quick Search</display-name>
+     <portlet-class>org.exoplatform.commons.quicksearch.QuicksearchPortlet</portlet-class>
+     <init-param>
+       <name>juzu.run_mode</name>
+       <value>dev</value>
+     </init-param>
+     <init-param>
+       <name>juzu.inject</name>
+       <value>spring</value>       
+     </init-param>
+     <supports>
+       <mime-type>text/html</mime-type>
+       <portlet-mode>edit</portlet-mode>       
+     </supports>
+     <portlet-info>
+       <title>Quick Search</title>
+       <keywords>Unified Search</keywords>
+     </portlet-info>
+   </portlet>
+
+   <portlet>
      <portlet-name>SearchAdministrationPortlet</portlet-name>
      <display-name xml:lang="EN">Search Administration</display-name>
      <portlet-class>org.exoplatform.commons.searchadministration.SearchadministrationPortlet</portlet-class>
@@ -43,7 +65,7 @@
      </supports>
      <portlet-info>
        <title>Search Administration</title>
-       <keywords>Search Administration</keywords>
+       <keywords>Unified Search</keywords>
      </portlet-info>
    </portlet>   
 </portlet-app>
