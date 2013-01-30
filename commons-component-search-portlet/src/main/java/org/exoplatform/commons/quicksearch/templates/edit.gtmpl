@@ -9,13 +9,13 @@
   <hr>
   <div style="margin-left: 10px; margin-bottom: 40px;">
     <div>
-      <span></span>
+      <span>Results per type</span>
       <select id="resultsPerPage"></select>
     </div>
 
     <div style="margin-bottom: 25px;">
       <span>Search in</span><input type="text" id="txtSearchIn" value="Everything" readonly/>
-      <ul id="lstSearchInOptions" style="border: 1px dotted; border-top:none; overflow-x: hidden; padding-bottom: 10px;"></ul>
+      <ul id="lstSearchInOptions" style="display:none; border: 1px dotted; border-top:none; overflow-x: hidden; padding-bottom: 10px;"></ul>
     </div>
 
     <div><label><input type="checkbox" id="searchCurrentSiteOnly" style="margin-left: 0px;">Search in current site only</label></div>
@@ -94,7 +94,12 @@
   });
 
 
+  $("#resultsPerPage").html("");
+  for(var i=1; i<=10; i++) {
+    $("#resultsPerPage").append("<option>"+i+"</option>");
+  }
 
+  $("#txtSearchIn").css({position:"absolute", left: $("#resultsPerPage").offset().left});
 
   $.getJSON("/rest/search/registry", function(registry){
     CONNECTORS = registry[0];
@@ -106,12 +111,6 @@
     $("#lstSearchInOptions").html(searchInOpts.join(""));
 
     $.getJSON("/rest/search/setting/quicksearch", function(setting){
-      $("#resultsPerPage").siblings("span").text("Results per type");
-      $("#resultsPerPage").html("");
-      for(var i=1; i<=10; i++) {
-        $("#resultsPerPage").append("<option>"+i+"</option>");
-      }
-
       $(":checkbox[name='searchInOption']").attr('checked', false);
       $.each($(":checkbox[name='searchInOption']"), function(){
         if(-1 != $.inArray(this.value, setting.searchTypes)) {
@@ -122,9 +121,6 @@
       $("#resultsPerPage").val(setting.resultsPerPage);
       updateTxtSearchIn();
       $("#searchCurrentSiteOnly").attr('checked', setting.searchCurrentSiteOnly);
-
-      $("#txtSearchIn").css({position:"absolute", left: $("#resultsPerPage").offset().left});
-      $("#lstSearchInOptions").hide();
     });
 
   });

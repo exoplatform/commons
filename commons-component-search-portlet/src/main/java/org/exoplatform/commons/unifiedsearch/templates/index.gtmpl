@@ -211,6 +211,17 @@
       };
 
 
+      function setWaitingStatus(status) {
+        if(status) {
+          $("body").css("cursor", "wait");
+          $("#searchPortlet").css({"pointer-events":"none"});
+        } else {
+          $("body").css("cursor", "auto");
+          $("#searchPortlet").css({"pointer-events":"auto"});
+        }
+      }
+
+
       function getUrlParam(name) {
         var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
         return match && decodeURIComponent(match[1].replace(/\\+/g, ' '));
@@ -296,7 +307,7 @@
 
         var restUrl = "/rest/search?q=" + (isSqlMode()?sql:query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset=0"+"&limit="+LIMIT+"&sort="+sort+"&order="+order);
 
-        $("body").css("cursor", "wait");
+        setWaitingStatus(true);
 
         $.getJSON(restUrl, function(resultMap){
           var resultTypes = "| ";
@@ -327,7 +338,7 @@
           $("#result").html(result);
           $("#result").show();
           $("#resultSort").show();
-          $("body").css("cursor", "auto");
+          setWaitingStatus(false);
 
           if(callback) callback();
           (VIEWING_TYPE && $(".ResultType[type='" + VIEWING_TYPE + "']").get(0) ? $(".ResultType[type='" + VIEWING_TYPE + "']").get(0) : $(".ResultType").first()).click();
@@ -352,7 +363,7 @@
         $("#resultHeader").html(message?message:"");
         $("#resultSort").hide();
         $("#showMore").hide();
-        $("body").css("cursor", "auto");
+        setWaitingStatus(false);
         return;
       }
 
@@ -373,7 +384,7 @@
 
         var restUrl = "/rest/search?q="+query+"&sites="+getSelectedSites()+"&types="+type+"&offset="+offset+"&limit="+LIMIT+"&sort="+sortBy+"&order="+sortType;
 
-        $("body").css("cursor", "wait");
+        setWaitingStatus(true);
 
         $.getJSON(restUrl, function(entryMap){
           var result = "";
@@ -397,7 +408,7 @@
             $("#searchPage").animate({ scrollTop: $("#resultPage")[0].scrollHeight}, "slow");
           }
 
-          $("body").css("cursor", "auto");
+          setWaitingStatus(false);
 
           $viewingType.attr("offset", offset);
           $viewingType.attr("numEntries", entries.length);
@@ -591,7 +602,7 @@
         var sort = $("#lstSortBy").val();
         var order = $("#sortType").hasClass("Asc") ? "asc" : "desc";
 
-        $("body").css("cursor", "wait");
+        setWaitingStatus(true);
 
         var restUrl = "/rest/search?q="+ (isSqlMode() ? sql : query+"&sites="+getSelectedSites()+"&types="+getSelectedTypes()+"&offset="+SERVER_OFFSET+"&limit="+LIMIT+"&sort="+sort+"&order="+order);
         $.getJSON(restUrl, function(resultMap){
@@ -607,7 +618,7 @@
 
           if(callback) callback();
           if(RESULT_CACHE.length < LIMIT) $("#showMore").hide(); else $("#showMore").show();
-          $("body").css("cursor", "auto");
+          setWaitingStatus(false);
         });
       }
 
