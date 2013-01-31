@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.exoplatform.commons</groupId>
   <artifactId>commons</artifactId>
-  <version>4.0.0.Alpha1-SNAPSHOT</version>
+  <version>4.0.0.Alpha1-unified-search-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <modules>
@@ -54,6 +54,7 @@
     <org.exoplatform.ws.version>2.3.0-GA</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.15.0-GA</org.exoplatform.jcr.version>
     <org.gatein.portal.version>3.5.0.Final</org.gatein.portal.version>
+    <org.juzu.version>0.6.0-beta5</org.juzu.version>
   </properties>
   <dependencyManagement>
     <dependencies>
