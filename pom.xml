@@ -30,11 +30,6 @@
     <module>commons-webui-component</module>
     <module>commons-webui-ext</module>
     <module>commons-webui-resources</module>
-    <module>commons-component-search-service</module>
-    <module>commons-component-search-sample</module>
-    <module>commons-component-search-portlet</module>
-    <module>commons-component-search-driver-solr</module>
-    <module>commons-component-search-driver-elastic</module>
   </modules>
   <scm>
     <connection>scm:git:git://github.com/exoplatform/commons.git</connection>
@@ -59,18 +54,6 @@
     <org.exoplatform.ws.version>2.3.0-GA</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.15.0-GA</org.exoplatform.jcr.version>
     <org.gatein.portal.version>3.5.0.Final</org.gatein.portal.version>
-    
-    <org.exoplatform.social.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.social.version>
-    <org.exoplatform.forum.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.forum.version>
-    <org.exoplatform.wiki.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.wiki.version>
-    <org.exoplatform.calendar.version>4.0.0.Alpha1-SNAPSHOT</org.exoplatform.calendar.version>
-    <org.codehaus.jackson.version>1.9.7</org.codehaus.jackson.version>
-    <org.juzu.version>0.6.0-beta5</org.juzu.version>
-    <org.apache.solr.version>3.6.0</org.apache.solr.version>
-    <elasticsearch.version>0.19.10</elasticsearch.version>
-    <org.exoplatform.commons.search.solr.lucene.version>3.6.0</org.exoplatform.commons.search.solr.lucene.version>
-    <org.exoplatform.commons.search.elastic.lucene.version>3.6.1</org.exoplatform.commons.search.elastic.lucene.version>
-
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -102,28 +85,6 @@
         <!--<scope>import</scope>-->
       <!--</dependency>-->
 
-      <dependency>
-        <groupId>org.apache.solr</groupId>
-        <artifactId>solr-solrj</artifactId>
-        <version>${org.apache.solr.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-core-asl</artifactId>
-        <version>${org.codehaus.jackson.version}</version>
-        <type>jar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-mapper-asl</artifactId>
-        <version>${org.codehaus.jackson.version}</version>
-        <type>jar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.elasticsearch</groupId>
-        <artifactId>elasticsearch</artifactId>
-        <version>${elasticsearch.version}</version>
-      </dependency>
       <!-- Our own project modules -->
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -181,25 +142,6 @@
         <artifactId>commons-component-common</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.exoplatform.commons</groupId>
-        <artifactId>commons-component-search-service</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.exoplatform.commons</groupId>
-        <artifactId>commons-component-search-portlet</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.commons</groupId>
-        <artifactId>commons-component-search-portlet</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-      </dependency>
-
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-component-product</artifactId>
@@ -541,33 +483,6 @@
             <groupId>org.exoplatform.tool</groupId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <!-- for unified search -->
-    <dependency>
-      <groupId>org.exoplatform.social</groupId>
-      <artifactId>social-component-core</artifactId>
-      <version>${org.exoplatform.social.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.forum</groupId>
-      <artifactId>forum-forum-service</artifactId>
-      <version>${org.exoplatform.forum.version}</version>    	
-    </dependency>
-    <dependency>
-    	<groupId>org.exoplatform.wiki</groupId>
-    	<artifactId>wiki-service</artifactId>
-    	<version>${org.exoplatform.wiki.version}</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.exoplatform.calendar</groupId>
-    	<artifactId>calendar-service</artifactId>
-    	<version>${org.exoplatform.calendar.version}</version>
-    </dependency>
-
-      <dependency>
-        <groupId>org.exoplatform.portal</groupId>
-        <artifactId>exo.portal.component.scripting</artifactId>
-        <version>${org.gatein.portal.version}</version>
       </dependency>
       <dependency>
         <groupId>org.gatein.portal</groupId>
