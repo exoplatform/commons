@@ -79,7 +79,7 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
       textField.value = storage.defaultValueForTextSearch;
       textField.className = "SpaceSearchText LostFocus";
     }
-    setTimeout("eXo.commons.UISpaceSwitcher.closePopups()", 2000);
+    setTimeout("eXo.commons.UISpaceSwitcher.closePopups()", 200);
   };
 };
 
