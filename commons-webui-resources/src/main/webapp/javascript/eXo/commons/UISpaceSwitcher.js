@@ -98,13 +98,14 @@ UISpaceSwitcher.prototype.closePopups = function() {
   }
 };
 
-UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceName) {
+UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceName, noSpaceLabel) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   storage.mySpaceLabel = mySpaceLabel;
   storage.username = username;
   storage.portalSpaceId = portalSpaceId;
   storage.portalSpaceName = portalSpaceName;
+  storage.noSpaceLabel = noSpaceLabel;
 }
 
 UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
@@ -183,6 +184,7 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
 
 UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomponentId, containerClazz) {
   var me = eXo.commons.UISpaceSwitcher;
+  var storage = me.dataStorage[uicomponentId];
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
   var spaces = dataList.spaces;
@@ -195,7 +197,10 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
     }
     container.innerHTML = groupSpaces;
     me.processContainerHeight(spaces.length, container);
-  }
+  } else {
+    container.innerHTML = "<div class='SpaceOption' style='text-align:center' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    me.processContainerHeight(1, container);
+  }  
 }
 
 UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, container) {
@@ -217,6 +222,7 @@ UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentI
 
 UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, containerClazz, keyword) {
   var me = eXo.commons.UISpaceSwitcher;
+  var storage = me.dataStorage[uicomponentId];
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
   var spaces = dataList.jsonList;
@@ -236,8 +242,14 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
       matchCount = matchCount + 1;
     }
   }
-  container.innerHTML = groupSpaces;
-  me.processContainerHeight(matchCount, container);
+  
+  if (matchCount > 0) {
+    container.innerHTML = groupSpaces;
+    me.processContainerHeight(matchCount, container);
+  } else {
+    container.innerHTML = "<div class='SpaceOption' style='text-align:center' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    me.processContainerHeight(1, container);
+  }
 };
 
 UISpaceSwitcher.prototype.onChooseSpace = function(spaceId, uicomponentId) {
