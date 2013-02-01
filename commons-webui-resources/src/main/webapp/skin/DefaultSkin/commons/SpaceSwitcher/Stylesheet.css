@@ -63,3 +63,8 @@
   text-align:center;
   color: #000000;
 }
+
+.SpaceChooserPopup .SpaceList {
+  overflow: auto;
+  height: 310px;
+}

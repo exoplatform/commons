@@ -79,8 +79,16 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
       textField.value = storage.defaultValueForTextSearch;
       textField.className = "SpaceSearchText LostFocus";
     }
-    setTimeout("eXo.commons.UISpaceSwitcher.closePopups()", 200);
   };
+
+  // hide the popup when clicking outside
+  jQuery(document).mouseup(function (e) {
+    var container = jQuery(wikiSpaceSwitcher);
+    if (!container.is(e.target) && container.has(e.target).length == 0) {
+      var me = eXo.commons.UISpaceSwitcher;
+      me.closePopups();
+    }
+  });
 };
 
 UISpaceSwitcher.prototype.closePopups = function() {
@@ -104,10 +112,9 @@ UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
   var storage = me.dataStorage[uicomponentId];
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   
-  // Reset search textbox to empty
+  // Reset search textbox to default value
   var textField = jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0];
-  textField.value = "";
-  jQuery(textField).focus();
+  textField.value = storage.defaultValueForTextSearch;
   
   // Init data
   me.getRecentlyVisitedSpace(uicomponentId, 10);
@@ -187,6 +194,15 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
       groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId);
     }
     container.innerHTML = groupSpaces;
+    me.processContainerHeight(spaces.length, container);
+  }
+}
+
+UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, container) {
+  if (resultLength > 10) {
+    container.style.height = (31 * 10) + "px";
+  } else {
+    container.style.height = (31 * resultLength) + "px";
   }
 }
 
@@ -205,6 +221,7 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
   var spaces = dataList.jsonList;
   var groupSpaces = '';
+  var matchCount = 0;
 
   for (i = 0; i < spaces.length; i++) {
     var spaceId = spaces[i].spaceId;
@@ -216,9 +233,11 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
         name = storage.mySpaceLabel;
       }
       groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId);
+      matchCount = matchCount + 1;
     }
   }
   container.innerHTML = groupSpaces;
+  me.processContainerHeight(matchCount, container);
 };
 
 UISpaceSwitcher.prototype.onChooseSpace = function(spaceId, uicomponentId) {
