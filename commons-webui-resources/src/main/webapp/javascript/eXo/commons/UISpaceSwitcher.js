@@ -233,7 +233,7 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
     var spaceId = spaces[i].spaceId;
     var name = spaces[i].name;
     
-    if (name.indexOf(keyword) != -1) {
+    if (name.toLowerCase().indexOf(keyword.toLowerCase()) != -1) {
       var type = spaces[i].type;
       if (type == 'user') {
         name = storage.mySpaceLabel;
