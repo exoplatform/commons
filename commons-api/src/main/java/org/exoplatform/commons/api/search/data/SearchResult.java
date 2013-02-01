@@ -66,22 +66,15 @@ public class SearchResult {
     this.relevancy = relevancy;
   }
   
-  
-  public SearchResult() {
-  }
-  
-  public SearchResult(String url, long relevancy) {
-    this.url = url;
-    this.relevancy = relevancy;
-  }
-  
-  public SearchResult(String url, String title, long date, long relevancy) {
+  public SearchResult(String url, String title, String excerpt, String detail, String imageUrl, long date, long relevancy) {
     this.url = url;
     this.title = title;
+    this.excerpt = excerpt;
+    this.detail = detail;
+    this.imageUrl = imageUrl;
     this.date = date;
     this.relevancy = relevancy;
   }
-  
   @Override
   public String toString() {
     return String.format("SearchResult {url=%s, relevancy=%s}", url, relevancy);
