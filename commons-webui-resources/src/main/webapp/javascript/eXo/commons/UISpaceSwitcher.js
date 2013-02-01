@@ -83,11 +83,20 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
 
   // hide the popup when clicking outside
   jQuery(document).mouseup(function (e) {
-    var container = jQuery(wikiSpaceSwitcher);
-    if (!container.is(e.target) && container.has(e.target).length == 0) {
-      var me = eXo.commons.UISpaceSwitcher;
+    var me = eXo.commons.UISpaceSwitcher;
+    var isNeedToClosePopup = true;
+    for(var id in me.dataStorage) {
+      var wikiSpaceSwitcher = document.getElementById(id);
+      var container = jQuery(wikiSpaceSwitcher);
+      if (container.is(e.target) || container.has(e.target).length != 0) {
+        isNeedToClosePopup = false;
+      }
+    }
+    
+    if (isNeedToClosePopup) {
       me.closePopups();
     }
+    e.cancelBubble = true;
   });
 };
 
