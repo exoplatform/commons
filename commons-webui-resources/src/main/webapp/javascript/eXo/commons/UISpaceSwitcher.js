@@ -77,18 +77,17 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
   textField.onblur = function() {
     if (textField.value == "") {
       textField.value = storage.defaultValueForTextSearch;
-      textField.className = "SpaceSearchText LostFocus"
+      textField.className = "SpaceSearchText LostFocus";
     }
+    setTimeout("eXo.commons.UISpaceSwitcher.closePopups()", 2000);
   };
-  
-  // Hide popup when user click outside
-  document.onclick = function() {
-    var wikiSpaceSwitcher = document.getElementById(uicomponentId);
-    var spaceChooserPopups = document.getElementsByClassName('SpaceChooserPopup');
-    for (var i = 0; i < spaceChooserPopups.length; i++) {
-      spaceChooserPopups[i].style.display = "none";
-    }
-  };
+};
+
+UISpaceSwitcher.prototype.closePopups = function() {
+  var spaceChooserPopups = document.getElementsByClassName('SpaceChooserPopup');
+  for (var i = 0; i < spaceChooserPopups.length; i++) {
+    spaceChooserPopups[i].style.display = "none";
+  }
 };
 
 UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceName) {
@@ -106,7 +105,9 @@ UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   
   // Reset search textbox to empty
-  jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0].value = storage.defaultValueForTextSearch;
+  var textField = jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0];
+  textField.value = "";
+  jQuery(textField).focus();
   
   // Init data
   me.getRecentlyVisitedSpace(uicomponentId, 10);
@@ -164,7 +165,7 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
   var storage = me.dataStorage[uicomponentId];
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
-  
+
   var spaceDiv = "<div class='SpaceOption' id='UISpaceSwitcher_" + storage.portalSpaceId 
       + "' title='" + storage.portalSpaceName 
       + "' alt='" + storage.portalSpaceName 
