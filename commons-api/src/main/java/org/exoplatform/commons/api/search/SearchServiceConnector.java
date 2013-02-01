@@ -35,9 +35,6 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
     this.displayName = displayName;
   }
     
-  public SearchServiceConnector(){    
-  };
-  
   public SearchServiceConnector(InitParams initParams) {
     PropertiesParam param = initParams.getPropertiesParam("constructor.params");
     this.searchType = param.getProperty("searchType");
