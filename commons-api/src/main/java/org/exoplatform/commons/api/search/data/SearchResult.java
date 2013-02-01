@@ -66,6 +66,10 @@ public class SearchResult {
     this.relevancy = relevancy;
   }
   
+  //Empty constructor to be removed soon... 
+  public SearchResult() {
+  }
+	
   public SearchResult(String url, String title, String excerpt, String detail, String imageUrl, long date, long relevancy) {
     this.url = url;
     this.title = title;
