@@ -439,6 +439,8 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   var msg_select_folder = inputFolderName.getAttribute("msg_select_drive");
   var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
   var msg_empty_folder_name = inputFolderName.getAttribute("msg_empty_folder_name");
+  var msg_invalid_folder_name = inputFolderName.getAttribute("msg_invalid_folder_name");
+  var folder_name_standard = /^[\w.-]+$/;
   
   if (!me.selectedItem || !me.selectedItem.driveName) {
     alert(msg_select_folder);
@@ -446,11 +448,20 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   }
 
   var folderName = prompt(msg_enter_folder_name, "");
-  if (folderName == null || folderName == "") {
-    alert(msg_empty_folder_name);
+  if (folderName === null) {
     return;
   }
 
+  if ( folderName == "" ) {
+    alert(msg_empty_folder_name);
+    return;
+  }
+  
+  if ( !folder_name_standard.test(folderName) ) {
+    alert(msg_invalid_folder_name);
+    return;
+  }
+  
   var canAddChild = me.selectedItem.canAddChild;
   if (canAddChild == "false") {
     alert(msg_new_folder_not_allow);
