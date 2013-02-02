@@ -94,17 +94,22 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
     }
     
     if (isNeedToClosePopup) {
-      me.closePopups();
+      me.closeAllPopups();
     }
     e.cancelBubble = true;
   });
 };
 
-UISpaceSwitcher.prototype.closePopups = function() {
+UISpaceSwitcher.prototype.closeAllPopups = function() {
   var spaceChooserPopups = document.getElementsByClassName('SpaceChooserPopup');
   for (var i = 0; i < spaceChooserPopups.length; i++) {
     spaceChooserPopups[i].style.display = "none";
   }
+};
+
+UISpaceSwitcher.prototype.closePopup = function(closeTag) {
+  var popup = closeTag.parentNode.parentNode;
+  popup.style.display = "none";
 };
 
 UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceName, noSpaceLabel) {

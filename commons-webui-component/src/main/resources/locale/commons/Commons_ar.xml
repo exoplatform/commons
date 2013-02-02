@@ -15,6 +15,7 @@
     </msg>
     <title>
       <my-space>My Space</my-space>
+      <close>Close</close>
     </title>
   </UISpaceSwitcher>
 </bundle>

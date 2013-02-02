@@ -34,6 +34,7 @@
     </msg>
     <title>
       <my-space>Space của tôi</my-space>
+      <close>Đóng</close>
     </title>
   </UISpaceSwitcher>
 </bundle>
