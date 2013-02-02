@@ -11,9 +11,18 @@
   line-height: 30px; 
   border-bottom: 1px solid #e1e1e1; 
   background: #ececec; 
-  padding: 0px 10px; 
+  padding: 0px 5px 0px 10px; 
   font-weight: bold; 
   color: #444;
+}
+
+.SpaceChooserPopup .title .CloseButton {
+  float: right;
+  margin: 5px 0px 0px 0px;
+  cursor: pointer;
+  width: 23px;
+  height: 17px;
+  background: url('/eXoResources/skin/DefaultSkin/webui/component/UIPopup/UIPopupWindow/background/CloseIcon.gif') no-repeat right top;
 }
 
 .SpaceChooserPopup .SpaceOption {
