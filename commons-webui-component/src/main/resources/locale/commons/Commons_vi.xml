@@ -33,7 +33,8 @@
       <no-space>Không có space nào</no-space>
     </msg>
     <title>
-      <my-space>Space của tôi</my-space>
+      <my-space>Wiki cá nhân</my-space>
+      <close>Đóng</close>
     </title>
   </UISpaceSwitcher>
 </bundle>
