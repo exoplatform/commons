@@ -62,6 +62,14 @@ public class UISpacesSwitcher extends UIContainer {
   
   protected long invalidingCacheTime;
   
+  private boolean isShowPortalSpace = true;
+  
+  private boolean isShowUserSpace = true;
+  
+  private String mySpaceLabel = null;
+  
+  private String portalSpaceLabel = null;
+  
   public UISpacesSwitcher() throws Exception {
     String invalidingCacheTimeProperty = System.getProperty("commons.spaceswitcher.cache.interval");
     if ((invalidingCacheTimeProperty == null) || invalidingCacheTimeProperty.isEmpty()) {
@@ -88,10 +96,34 @@ public class UISpacesSwitcher extends UIContainer {
   }
   
   public String getMySpaceLabel() {
+    if (!StringUtils.isEmpty(mySpaceLabel)) {
+      return mySpaceLabel;
+    }
+    
     ResourceBundle bundle = RequestContext.getCurrentInstance().getApplicationResourceBundle();
     return bundle.getString("UISpaceSwitcher.title.my-space");
   }
   
+  public void setMySpaceLabel(String mySpaceLabel) {
+    this.mySpaceLabel = mySpaceLabel;
+  }
+  
+  public boolean isShowPortalSpace() {
+    return isShowPortalSpace;
+  }
+
+  public void setShowPortalSpace(boolean isShowPortalSpace) {
+    this.isShowPortalSpace = isShowPortalSpace;
+  }
+
+  public boolean isShowUserSpace() {
+    return isShowUserSpace;
+  }
+
+  public void setShowUserSpace(boolean isShowUserSpace) {
+    this.isShowUserSpace = isShowUserSpace;
+  }
+
   public String getUsername() {
     try {
       ConversationState conversationState = ConversationState.getCurrent();
@@ -119,11 +151,25 @@ public class UISpacesSwitcher extends UIContainer {
     return containerInfo.getContainerName();
   }
   
-  public String getPortalSpaceName() {
+  public String getPortalSpaceLabel() {
+    if (!StringUtils.isEmpty(portalSpaceLabel)) {
+      return portalSpaceLabel;
+    }
     PortalRequestContext portalRequestContext = Util.getPortalRequestContext();
-    return portalRequestContext.getPortalOwner();
+    return upperFirstCharacter(portalRequestContext.getPortalOwner());
+  }
+
+  public void setPortalSpaceLabel(String portalSpaceLabel) {
+    this.portalSpaceLabel = portalSpaceLabel;
   }
   
+  private String upperFirstCharacter(String str) {
+    if (StringUtils.isEmpty(str)) {
+      return str;
+    }
+    return str.substring(0, 1).toUpperCase() + str.substring(1);
+  }
+
   protected String getBaseRestUrl() {
     StringBuilder sb = new StringBuilder();
     sb.append("/").append(PortalContainer.getCurrentPortalContainerName());

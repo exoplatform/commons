@@ -112,14 +112,21 @@ UISpaceSwitcher.prototype.closePopup = function(closeTag) {
   popup.style.display = "none";
 };
 
-UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceName, noSpaceLabel) {
+UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceLabel, noSpaceLabel) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   storage.mySpaceLabel = mySpaceLabel;
   storage.username = username;
   storage.portalSpaceId = portalSpaceId;
-  storage.portalSpaceName = portalSpaceName;
+  storage.portalSpaceLabel = portalSpaceLabel;
   storage.noSpaceLabel = noSpaceLabel;
+}
+
+UISpaceSwitcher.prototype.initConfig = function(uicomponentId, isShowPortalSpace, isShowUserSpace) {
+  var me = eXo.commons.UISpaceSwitcher;
+  var storage = me.dataStorage[uicomponentId];
+  storage.isShowPortalSpace = isShowPortalSpace;
+  storage.isShowUserSpace = isShowUserSpace;
 }
 
 UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
@@ -169,6 +176,10 @@ UISpaceSwitcher.prototype.searchSpaces = function(keyword, uicomponentId) {
 UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerClazz) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
+  if (!storage.isShowUserSpace) {
+    return;
+  }
+  
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
   var userSpaceId = "/user/" + storage.username;
@@ -185,14 +196,18 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
 UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerClazz) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
+  if (!storage.isShowPortalSpace) {
+    return;
+  }
+  
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
 
   var spaceDiv = "<div class='SpaceOption' id='UISpaceSwitcher_" + storage.portalSpaceId 
-      + "' title='" + storage.portalSpaceName 
-      + "' alt='" + storage.portalSpaceName 
+      + "' title='" + storage.portalSpaceLabel 
+      + "' alt='" + storage.portalSpaceLabel 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">" 
-      + storage.portalSpaceName + "</div>";
+      + storage.portalSpaceLabel + "</div>";
   container.innerHTML = spaceDiv;
 }
 
