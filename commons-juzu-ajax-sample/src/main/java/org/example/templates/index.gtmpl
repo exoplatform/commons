@@ -1,0 +1,4 @@
+<div>
+  <p class="content">Hello world</p>
+  <p><a class="update" style="color: green" href="#">Click to update</a></p>
+</div>
