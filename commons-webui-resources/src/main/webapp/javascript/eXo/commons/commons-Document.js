@@ -646,7 +646,7 @@ function UIDSUpload() {
 	 *          isAutoUpload auto upload or none
 	 */
 	UIDSUpload.prototype.initUploadEntry = function(uploadId, isAutoUpload) {  
-	  UIDSUpload.isAutoUpload = isAutoUpload;
+		_module.UIDSUpload.isAutoUpload = isAutoUpload;
 	  this.restContext = eXo.env.portal.context+ "/" + eXo.env.portal.rest+ "/managedocument/uploadFile" ;
 	  this.createUploadEntry(uploadId, isAutoUpload);
 	};
@@ -683,9 +683,11 @@ function UIDSUpload() {
 	    // workaround for Chrome
 	    // When submit in iframe with Chrome, the iframe.contentWindow.document
 	    // seems not be reconstructed correctly
-	    idoc.open();
-	    idoc.close();
-	    idoc.documentElement.innerHTML = uploadHTML;      
+		  
+	    if(idoc.open) idoc.open();
+	    if(idoc.close) idoc.close();
+	    var doc = idoc.documentElement || idoc;
+	    doc.innerHTML = uploadHTML;
 	  } else {
 	    idoc.open();
 	    idoc.write(uploadHTML);
@@ -846,7 +848,7 @@ function UIDSUpload() {
 	  
 	  //var uploadIframe = eXo.core.DOMUtil.findDescendantById(container, id+"UploadIframe");
 	  var uploadIframe = jQuery("#"+id+"UploadIframe",container);
-	alert(id);
+
 	  uploadIframe.show();
 	  //var progressIframe = eXo.core.DOMUtil.findDescendantById(container, id+"ProgressIframe");
 	  var progressIframe = jQuery("#"+id+"ProgressIframe",container);
@@ -870,24 +872,23 @@ function UIDSUpload() {
 	UIDSUpload.prototype.abortUpload = function(id) {
 	  var me = _module.UIDSUpload;
 	  me.listUpload.remove(id);
-	  var url = me.restContext + "/control?" ;
-	  url += "uploadId=" +id+"&action=abort" ;
-	// var url = eXo.env.server.context + "/upload?uploadId=" +id+"&action=abort" ;
-
-	  jQuery.ajax({
-		  url: url,
-		  type: "GET",
-		  async: false,
-		  headers: {"Cache-Control" : "max-age=86400"}
-		});
-	  var container = parent.document.getElementById(id);
-	  //var uploadIframe =  eXo.core.DOMUtil.findDescendantById(container, id+"UploadIframe");
-	  var uploadIframe = jQuery("#"+id+"UploadIframe",container);
+	  
+	  var container = jQuery(parent.document.getElementById(id));
+	  var uploadIframe = container.find("#"+id+"UploadIframe");
 	  uploadIframe.show();
-	  me.createUploadEntry(id, UIDSUpload.isAutoUpload);
-	  //var progressIframe = eXo.core.DOMUtil.findDescendantById(container, id+"ProgressIframe");
-	  var progressIframe = jQuery("#"+id+"ProgressIframe",container) ;
-	  progressIframe.hide();
+	  me.createUploadEntry(id, me.isAutoUpload);
+	  var progressIframe = container.find("#"+id+"ProgressIframe") ;
+
+	  progressIframe.hide('fast', function() {
+		  var url_ = _module.UIDSUpload.restContext + "/control?" ;
+		  url_ += "uploadId=" +id+"&action=abort" ;
+		  jQuery.ajax({
+			  url: url_,
+			  type: "GET",
+			  async: false,
+			  headers: {"Cache-Control" : "max-age=86400"}
+		  });
+	  });
 
 	  var tmp = progressIframe.parent();
 	  var temp = tmp.parent();
