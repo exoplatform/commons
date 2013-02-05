@@ -9,7 +9,7 @@
   </component>
   
   <component>
-    <key>org.exoplatform.commons.event.api.EventManager</key>
+    <key>org.exoplatform.commons.api.event.EventManager</key>
 	<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
   </component>
 

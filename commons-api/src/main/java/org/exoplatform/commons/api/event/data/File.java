@@ -15,7 +15,7 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  *
  **************************************************************************/
-package org.exoplatform.commons.model.api;
+package org.exoplatform.commons.api.event.data;
 
 import java.io.InputStream;
 import java.util.Date;

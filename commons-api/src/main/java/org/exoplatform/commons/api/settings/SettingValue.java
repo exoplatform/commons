@@ -1,4 +1,4 @@
-package org.exoplatform.commons.settings.api;
+package org.exoplatform.commons.api.settings;
 
 import java.io.Serializable;
 
