@@ -28,10 +28,10 @@ import javax.jcr.RepositoryException;
 
 import junit.framework.Assert;
 
-import org.exoplatform.commons.event.api.EventManager;
+import org.exoplatform.commons.api.event.EventManager;
+import org.exoplatform.commons.api.event.data.File;
 import org.exoplatform.commons.event.impl.EventType;
 import org.exoplatform.commons.listener.impl.AbstractEventListener;
-import org.exoplatform.commons.model.api.File;
 import org.exoplatform.commons.model.impl.AbstractFile;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.services.listener.Event;
