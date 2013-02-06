@@ -34,7 +34,19 @@
 		<script>
 			<path>/ckeditor/commons-Editor.js</path>
 		</script> 		
- 	</module>
+	</module>
+
+	<module>
+		<name>juzu-ajax</name>
+		<as>jzAjax</as>
+		<script>
+			<path>/juzu/ajax/script.js</path>
+		</script>
+		<depends>
+			<module>jquery</module> 
+			<as>jQuery</as> 
+		</depends>
+	</module>
 
 </gatein-resources>
 

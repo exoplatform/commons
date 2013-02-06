@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.commons.event.api.EventManager;
+import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.services.listener.Asynchronous;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
