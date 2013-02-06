@@ -52,8 +52,6 @@
 	  </depends>
 	</module>
 
-	</module>
-
 	<module>
 		<name>juzu-ajax</name>
 		<as>jzAjax</as>
