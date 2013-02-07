@@ -16,9 +16,8 @@
  */
 package org.exoplatform.commons.api.search;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.exoplatform.commons.api.search.data.SearchResult;
@@ -30,9 +29,9 @@ import org.exoplatform.commons.api.search.data.SearchResult;
  * Nov 21, 2012  
  */
 public abstract class SearchService {
-  private List<SearchServiceConnector> connectors = new ArrayList<SearchServiceConnector>();
+  private LinkedList<SearchServiceConnector> connectors = new LinkedList<SearchServiceConnector>();
     
-  public List<SearchServiceConnector> getConnectors() {
+  public LinkedList<SearchServiceConnector> getConnectors() {
     return connectors;
   }
 
