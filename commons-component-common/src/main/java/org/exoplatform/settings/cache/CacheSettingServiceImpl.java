@@ -16,13 +16,13 @@
  */
 package org.exoplatform.settings.cache;
 
-import org.exoplatform.commons.settings.api.SettingService;
-import org.exoplatform.commons.settings.api.SettingValue;
-import org.exoplatform.commons.settings.model.api.Context;
-import org.exoplatform.commons.settings.model.api.Scope;
-import org.exoplatform.commons.settings.model.api.SettingContext;
-import org.exoplatform.commons.settings.model.api.SettingKey;
-import org.exoplatform.commons.settings.model.api.SettingScope;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.api.settings.data.SettingContext;
+import org.exoplatform.commons.api.settings.data.SettingKey;
+import org.exoplatform.commons.api.settings.data.SettingScope;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.future.FutureExoCache;
@@ -52,7 +52,7 @@ public class CacheSettingServiceImpl implements SettingService {
 
   public CacheSettingServiceImpl(SettingServiceImpl service, CacheService cacheService) {
 
-    settingCache = cacheService.getCacheInstance("settingCache");
+    settingCache = cacheService.getCacheInstance(SettingService.class.getSimpleName());
 
     Loader<SettingKey, SettingValue, SettingServiceImpl> loader = new Loader<SettingKey, SettingValue, SettingServiceImpl>() {
       @Override
