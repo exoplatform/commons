@@ -1,27 +1,27 @@
 package org.exoplatform.settings.impl;
 
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.EventType;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.api.settings.data.SettingContext;
+import org.exoplatform.commons.api.settings.data.SettingData;
+import org.exoplatform.commons.api.settings.data.SettingKey;
+import org.exoplatform.commons.api.settings.data.SettingScope;
+import org.exoplatform.commons.api.settings.data.Tools;
 import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
 import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.commons.chromattic.SessionContext;
 import org.exoplatform.commons.event.impl.EventManagerImpl;
-import org.exoplatform.commons.settings.api.SettingService;
-import org.exoplatform.commons.settings.api.SettingValue;
-import org.exoplatform.commons.settings.model.api.Context;
-import org.exoplatform.commons.settings.model.api.EventType;
-import org.exoplatform.commons.settings.model.api.Scope;
-import org.exoplatform.commons.settings.model.api.SettingContext;
-import org.exoplatform.commons.settings.model.api.SettingData;
-import org.exoplatform.commons.settings.model.api.SettingKey;
-import org.exoplatform.commons.settings.model.api.SettingScope;
-import org.exoplatform.commons.settings.model.api.Tools;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.settings.chromattic.ContextEntity;
-import org.exoplatform.settings.chromattic.SynchronizationTask;
 import org.exoplatform.settings.chromattic.ScopeEntity;
 import org.exoplatform.settings.chromattic.SettingsRoot;
 import org.exoplatform.settings.chromattic.SimpleContextEntity;
 import org.exoplatform.settings.chromattic.SubContextEntity;
+import org.exoplatform.settings.chromattic.SynchronizationTask;
 
 /**
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
