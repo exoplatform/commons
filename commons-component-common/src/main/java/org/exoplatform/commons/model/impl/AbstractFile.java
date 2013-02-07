@@ -27,7 +27,7 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
-import org.exoplatform.commons.model.api.File;
+import org.exoplatform.commons.api.event.data.File;
 
 /**
  * Created by The eXo Platform SARL
