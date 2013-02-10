@@ -1,105 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <groupId>org.exoplatform.commons</groupId>
     <artifactId>commons</artifactId>
-    <version>4.0.0.Alpha1-SNAPSHOT</version>
+    <groupId>org.exoplatform.commons</groupId>
+    <version>4.0.0-relooking-SNAPSHOT</version>
   </parent>
-
   <artifactId>commons-juzu-ajax-sample</artifactId>
   <packaging>jar</packaging>
-
-  <name>PLF Juzu Ajax Sample Application</name>
-
-  <properties>
-    <maven.compiler.target>1.6</maven.compiler.target>
-    <maven.compiler.source>1.6</maven.compiler.source>
-  </properties>
-
+  <name>eXo Commons - Juzu Ajax Sample Application</name>
   <dependencies>
-
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-juzu</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>exo.kernel.container</artifactId>
+          <groupId>org.exoplatform.kernel</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>exo.kernel.component.common</artifactId>
+          <groupId>org.exoplatform.kernel</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>exo.portal.component.portal</artifactId>
+          <groupId>org.gatein.portal</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <!-- Application dependencies-->
     <dependency>
       <groupId>org.juzu</groupId>
       <artifactId>juzu-bom-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.juzu</groupId>
-			<artifactId>juzu-plugins-portlet</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.exoplatform.commons</groupId>
-			<artifactId>commons-juzu</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.exoplatform.kernel</groupId>
-					<artifactId>exo.kernel.container</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.exoplatform.kernel</groupId>
-					<artifactId>exo.kernel.component.common</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.gatein.portal</groupId>
-					<artifactId>exo.portal.component.portal</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
+    </dependency>
+    <dependency>
+      <groupId>org.juzu</groupId>
+      <artifactId>juzu-plugins-portlet</artifactId>
+    </dependency>
   </dependencies>
-
   <build>
     <finalName>juzu-ajax-sample</finalName>
     <plugins>
-
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
         <configuration>
           <compilerArguments>
             <sourcepath>${project.basedir}/src/main/java</sourcepath>
           </compilerArguments>
         </configuration>
       </plugin>
-
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.3</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.juzu</groupId>
-            <artifactId>juzu-bom-core</artifactId>
-            <version>0.6.0-beta14-SNAPSHOT</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <attach>true</attach>
-          <appendAssemblyId>false</appendAssemblyId>
-        </configuration>
         <executions>
           <execution>
-            <id>gatein</id>
+            <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
-            <phase>package</phase>
             <configuration>
-              <finalName>${project.build.finalName}</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
               <descriptorRefs>
-                <descriptorRef>gatein</descriptorRef>
+                <descriptorRef>platform-juzu</descriptorRef>
               </descriptorRefs>
             </configuration>
           </execution>
         </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.exoplatform.commons</groupId>
+            <artifactId>commons-juzu</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <attach>true</attach>
+        </configuration>
       </plugin>
-
     </plugins>
   </build>
-
 </project>
