@@ -5,11 +5,11 @@
     <artifactId>maven-parent-pom</artifactId>
     <groupId>org.exoplatform</groupId>
     <version>9-beta-1</version>
-    <relativePath></relativePath>
+    <relativePath />
   </parent>
   <groupId>org.exoplatform.commons</groupId>
   <artifactId>commons</artifactId>
-  <version>4.0.0.Alpha1-unified-search-SNAPSHOT</version>
+  <version>4.0.0-unified-search-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <modules>
@@ -26,6 +26,7 @@
     <module>commons-fck</module>
     <module>commons-gifbackport</module>
     <module>commons-juzu</module>
+    <module>commons-juzu-ajax-sample</module>
     <module>commons-testing</module>
     <module>commons-webui-component</module>
     <module>commons-webui-ext</module>
@@ -35,6 +36,7 @@
     <connection>scm:git:git://github.com/exoplatform/commons.git</connection>
     <developerConnection>scm:git:git@github.com:exoplatform/commons.git</developerConnection>
     <url>http://fisheye.exoplatform.org/browse/projects/commons</url>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <!-- **************************************** -->
