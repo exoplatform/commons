@@ -440,7 +440,7 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
   var msg_empty_folder_name = inputFolderName.getAttribute("msg_empty_folder_name");
   var msg_invalid_folder_name = inputFolderName.getAttribute("msg_invalid_folder_name");
-  var folder_name_standard = /^[\w.-\s]+$/;
+  var folder_name_standard = /^[\w.\s-]+$/;
   
   if (!me.selectedItem || !me.selectedItem.driveName) {
     alert(msg_select_folder);
