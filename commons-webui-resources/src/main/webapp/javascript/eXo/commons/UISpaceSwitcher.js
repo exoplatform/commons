@@ -257,6 +257,7 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
   var spaces = dataList.jsonList;
   var groupSpaces = '';
   var matchCount = 0;
+  keyword = jQuery.trim(keyword);
 
   for (i = 0; i < spaces.length; i++) {
     var spaceId = spaces[i].spaceId;
