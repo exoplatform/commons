@@ -18,12 +18,19 @@
 
 # Maven 
 target/
+pom.xml.versionsBackup
 
 # IntelliJ project files 
 *.iml
 *.iws
 *.ipr
 .idea/
+
+#bin folder
+bin/
+
+#log file
+*.log
 
 # eclipse project file
 .settings/
@@ -35,4 +42,3 @@ target/
 
 # Misc
 *.swp
-*.versionsBackup
