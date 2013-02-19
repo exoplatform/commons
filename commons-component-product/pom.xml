@@ -60,13 +60,6 @@
       <groupId>org.exoplatform.tool</groupId>
       <artifactId>exo.tool.framework.junit</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- To be fixed in the original project -->
-          <artifactId>servlet-api</artifactId>
-          <groupId>javax.servlet</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- This dependency is used for tests execution but is erroneously reported as useless by mvn dependency:analyze -->
     <dependency>
