@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2010 eXo Platform SAS.
+ * Copyright (C) 2003-2012 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -16,7 +16,6 @@
  */
 package org.exoplatform.webui.commons;
 
-
 /**
  * Created by The eXo Platform SAS
  * Author : Lai Trung Hieu
@@ -25,18 +24,31 @@ package org.exoplatform.webui.commons;
  */
 public class EventUIComponent {
 
-  private String Id;
+  public enum EVENTTYPE {
+    EVENT, URL
+  };
 
-  private String eventName;
+  private String    Id;
+
+  private String    eventName;
+
+  private EVENTTYPE type = EVENTTYPE.EVENT;
 
   public EventUIComponent() {
     super();
   }
-
+  
   public EventUIComponent(String id, String eventName) {
     super();
     Id = id;
     this.eventName = eventName;
+  }
+
+  public EventUIComponent(String id, String eventName, EVENTTYPE type) {
+    super();
+    Id = id;
+    this.eventName = eventName;
+    this.type = type;
   }
 
   public String getId() {
@@ -55,4 +67,11 @@ public class EventUIComponent {
     this.eventName = eventName;
   }
 
+  public EVENTTYPE getType() {
+    return type;
+  }
+
+  public void setType(EVENTTYPE type) {
+    this.type = type;
+  }
 }
