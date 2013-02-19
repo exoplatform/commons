@@ -1,0 +1,38 @@
+<%
+  import java.util.List;
+
+  String baseRestUrl = uicomponent.getBaseRestUrl();
+  String socialBaseRestUrl = uicomponent.getSocialBaseRestUrl();
+  String username = uicomponent.getUsername();
+  String mySpaceLabel = uicomponent.getMySpaceLabel();
+  String portalSpaceId = uicomponent.getPortalSpaceId();
+  String portalSpaceLabel = uicomponent.getPortalSpaceLabel();
+  String defaultValueForTextSearch = _ctx.appRes("UISpaceSwitcher.msg.filter-spaces");
+  String noSpaceLabel = _ctx.appRes("UISpaceSwitcher.msg.no-space");
+  def invalidingCacheTime = uicomponent.invalidingCacheTime;
+  String selectSpaceAction = URLEncoder.encode(uicomponent.event(uicomponent.SELECT_SPACE_ACTION), "utf-8");
+  boolean isShowPortalSpace = uicomponent.isShowPortalSpace();
+  boolean isShowUserSpace = uicomponent.isShowUserSpace();
+  
+  def rcontext = _ctx.getRequestContext() ;
+  def requireJs = rcontext.getJavascriptManager().getRequireJS();
+  requireJs.require("SHARED/UISpaceSwitcher", "UISpaceSwitcher");
+  requireJs.addScripts("UISpaceSwitcher.init('" + uicomponent.id + "','" + baseRestUrl + "','" + socialBaseRestUrl + "','" + defaultValueForTextSearch + "','" + selectSpaceAction + "'," + invalidingCacheTime + ");");
+  requireJs.addScripts("UISpaceSwitcher.initSpaceInfo('" + uicomponent.id + "','" + username + "','" + mySpaceLabel + "','" + portalSpaceId + "','" + portalSpaceLabel + "','" + noSpaceLabel + "');");
+  requireJs.addScripts("UISpaceSwitcher.initConfig('" + uicomponent.id + "'," + isShowPortalSpace + "," + isShowUserSpace + ");");
+  String currentSpaceName = uicomponent.getCurrentSpaceName();
+%>
+
+<div class="$uicomponent.id" id="$uicomponent.id">
+  <div class="SpaceChooser" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">$currentSpaceName</div>
+  <div class="SpaceChooserPopup" style="display:none">
+    <div class="title">
+      <%= _ctx.appRes(uicomponent.id + ".title.select-location"); %>
+      <a class="CloseButton" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></a>
+    </div>
+    <div class="PortalSpace"></div>
+    <div class="UserSpace"></div>
+    <div class="SpaceSearch"><input type="text" class="SpaceSearchText LostFocus"></input></div>
+    <div class="SpaceList"></div>
+  </div>
+</div>
