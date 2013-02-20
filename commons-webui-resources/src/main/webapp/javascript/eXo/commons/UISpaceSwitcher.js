@@ -181,7 +181,7 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
   }
   
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
-  var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
+  var container = jQuery(wikiSpaceSwitcher).find('li.' + containerClazz)[0];
   var userSpaceId = "/user/" + storage.username;
   var userSpaceName = storage.mySpaceLabel;
   
@@ -203,7 +203,7 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
   }
   
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
-  var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
+  var container = jQuery(wikiSpaceSwitcher).find('li.' + containerClazz)[0];
 
   var spaceDiv = "<div class='SpaceOption' id='UISpaceSwitcher_" + storage.portalSpaceId 
       + "' title='" + storage.portalSpaceLabel 
@@ -219,16 +219,17 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
-  var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
+  var container = jQuery(wikiSpaceSwitcher).find('li.' + containerClazz)[0];
   var spaces = dataList.spaces;
   if (spaces) {
-    var groupSpaces = '';
+    var groupSpaces = '<ul>';
     for (i = 0; i < spaces.length; i++) {
       var spaceId = spaces[i].groupId;
       var name = spaces[i].displayName;
       var avatarUrl = spaces[i].avatarUrl;
       groupSpaces += me.createSpaceNode(spaceId, name, uicomponentId, avatarUrl);
     }
+    groupSpaces += "</ul>";
     container.innerHTML = groupSpaces;
     me.processContainerHeight(spaces.length, container);
   } else {
@@ -246,13 +247,13 @@ UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, contai
 }
 
 UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentId, avatarUrl) {
-  var spaceDiv = "<div class='SpaceOption' id='UISpaceSwitcher_" + spaceId 
+  var spaceDiv = "<li class='SpaceOption' id='UISpaceSwitcher_" + spaceId 
       + "' title='" + name 
       + "' alt='" + name 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">" 
         + "<image src='" + avatarUrl + "' width='24px' alt='" + name + "'/>"
         + "<span style='float:none; margin-left:6px;'  >" + name + " </span>"
-      + "</div>";
+      + "</li>";
   return spaceDiv;
 }
 
@@ -260,9 +261,9 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
-  var container = jQuery(wikiSpaceSwitcher).find('div.' + containerClazz)[0];
+  var container = jQuery(wikiSpaceSwitcher).find('li.' + containerClazz)[0];
   var spaces = dataList.jsonList;
-  var groupSpaces = '';
+  var groupSpaces = '<ul>';
   var matchCount = 0;
   keyword = jQuery.trim(keyword);
 
@@ -280,6 +281,7 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
       matchCount = matchCount + 1;
     }
   }
+  groupSpaces += "</ul>";
   
   if (matchCount > 0) {
     container.innerHTML = groupSpaces;
@@ -304,7 +306,7 @@ UISpaceSwitcher.prototype.openComboBox = function(event, spaceChooserDiv) {
   var me = eXo.commons.UISpaceSwitcher;
   var wikiSpaceSwitcher = spaceChooserDiv.parentNode;
   var uicomponentId = wikiSpaceSwitcher.id;
-  var spaceChooserPopup = jQuery(wikiSpaceSwitcher).find("div.SpaceChooserPopup")[0];
+  var spaceChooserPopup = jQuery(wikiSpaceSwitcher).find("ul.SpaceChooserPopup")[0];
   if (spaceChooserPopup.style.display == "none") {
     spaceChooserPopup.style.display = "block";
   } else {
