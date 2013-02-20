@@ -247,7 +247,7 @@ UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, contai
 }
 
 UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentId, avatarUrl) {
-  var spaceDiv = "<li class='SpaceOption' id='UISpaceSwitcher_" + spaceId 
+  var spaceDiv = "<li style='display:block' class='SpaceOption' id='UISpaceSwitcher_" + spaceId 
       + "' title='" + name 
       + "' alt='" + name 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">" 
