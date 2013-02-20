@@ -58,6 +58,7 @@
     <org.exoplatform.ws.version>2.3.0-GA</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.15.0-GA</org.exoplatform.jcr.version>
     <org.gatein.portal.version>3.5.0.Final</org.gatein.portal.version>
+    <org.juzu.version>0.6.0-beta5</org.juzu.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -69,6 +70,26 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+	<dependency>
+        <groupId>org.gatein.portal</groupId>
+        <artifactId>exo.portal.webui.portlet</artifactId>
+        <version>${org.gatein.portal.version}</version>      
+      </dependency>      
+      <!--<dependency> &lt;!&ndash; FIXME : Commons MUST NOT depends on upper projects&ndash;&gt;-->
+        <!--<groupId>org.exoplatform.forum</groupId>-->
+        <!--<artifactId>forum</artifactId>-->
+        <!--<version>${org.exoplatform.forum.version}</version>-->
+        <!--<type>pom</type>-->
+        <!--<scope>import</scope>-->
+      <!--</dependency>-->
+      <!--<dependency> &lt;!&ndash; FIXME : Commons MUST NOT depends on upper projects&ndash;&gt;-->
+        <!--<groupId>org.exoplatform.wiki</groupId>-->
+        <!--<artifactId>wiki</artifactId>-->
+        <!--<version>${org.exoplatform.wiki.version}</version>-->
+        <!--<type>pom</type>-->
+        <!--<scope>import</scope>-->
+      <!--</dependency>-->
+
       <!-- Our own project modules -->
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
@@ -516,10 +537,25 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.webui.portlet</artifactId>
-        <version>${org.gatein.portal.version}</version>
+        <groupId>org.juzu</groupId>
+        <artifactId>juzu-core</artifactId>
+        <version>${org.juzu.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.juzu</groupId>
+        <artifactId>juzu-bom-core</artifactId>
+        <version>${org.juzu.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.juzu</groupId>
+        <artifactId>juzu-plugins-portlet</artifactId>
+        <version>${org.juzu.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.juzu</groupId>
+        <artifactId>juzu-plugins-less</artifactId>
+        <version>${org.juzu.version}</version>
+      </dependency>      
     </dependencies>
   </dependencyManagement>
   <build>
