@@ -46,7 +46,7 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
   storage.lastTimeSendRequest = 0;
   
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
-  var textField = jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0];
+  var textField = jQuery(wikiSpaceSwitcher).find("input.spaceSearchText")[0];
   textField.value = defaultValueForTextSearch;
   
   textField.onkeydown = function() {
@@ -135,13 +135,13 @@ UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   
   // Reset search textbox to default value
-  var textField = jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0];
+  var textField = jQuery(wikiSpaceSwitcher).find("input.spaceSearchText")[0];
   textField.value = storage.defaultValueForTextSearch;
   
   // Init data
   me.getRecentlyVisitedSpace(uicomponentId, 10);
-  me.renderPortalSpace(uicomponentId, "PortalSpace");
-  me.renderUserSpace(uicomponentId, "UserSpace");
+  me.renderPortalSpace(uicomponentId, "portalSpace");
+  me.renderUserSpace(uicomponentId, "userSpace");
 }
 
 UISpaceSwitcher.prototype.getRecentlyVisitedSpace = function(uicomponentId, numberOfResults) {
@@ -153,7 +153,7 @@ UISpaceSwitcher.prototype.getRecentlyVisitedSpace = function(uicomponentId, numb
     type : 'GET',
     data : '',
     success : function(data) {
-      me.renderSpacesFromSocialRest(data, uicomponentId, "SpaceList");
+      me.renderSpacesFromSocialRest(data, uicomponentId, "spaceList");
     }
   });
 };
@@ -168,7 +168,7 @@ UISpaceSwitcher.prototype.searchSpaces = function(keyword, uicomponentId) {
     data : '',
     success : function(data) {
       storage.dataList = data;
-      me.renderSpaces(data, uicomponentId, "SpaceList", keyword);
+      me.renderSpaces(data, uicomponentId, "spaceList", keyword);
     }
   });
 };
@@ -319,12 +319,12 @@ UISpaceSwitcher.prototype.onTextSearchChange = function(uicomponentId) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
-  var textSearch = jQuery(wikiSpaceSwitcher).find("input.SpaceSearchText")[0].value;
+  var textSearch = jQuery(wikiSpaceSwitcher).find("input.spaceSearchText")[0].value;
   
   if (textSearch != storage.lastSearchKeyword) {
     storage.lastSearchKeyword = textSearch;
     if (storage.dataList && (new Date().getTime() - storage.lastTimeSendRequest < storage.invalidingCacheTime)) {
-      me.renderSpaces(storage.dataList, uicomponentId, "SpaceList", textSearch);
+      me.renderSpaces(storage.dataList, uicomponentId, "spaceList", textSearch);
     } else {
       storage.lastTimeSendRequest = new Date().getTime(); 
       me.searchSpaces(textSearch, uicomponentId);
