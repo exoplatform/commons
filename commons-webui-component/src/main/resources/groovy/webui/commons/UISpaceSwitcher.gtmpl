@@ -24,15 +24,15 @@
 %>
 
 <div class="$uicomponent.id" id="$uicomponent.id">
-  <div class="SpaceChooser" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">$currentSpaceName</div>
-  <ul class="SpaceChooserPopup" style="display:none">
+  <div class="spaceChooser" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">$currentSpaceName<i class="uiIconMiniArrowDown uiIconLightGray"></i></div>
+  <ul class="spaceChooserPopup" style="display:none">
     <li style="display:block" class="title">
-      <a class="CloseButton" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></a>
+      <a class="uiIconClose pull-right" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></a>
       <%= _ctx.appRes(uicomponent.id + ".title.select-location"); %>
     </li>
-    <li style="display:block" class="PortalSpace"></li>
-    <li style="display:block" class="UserSpace"></li>
-    <li style="display:block" class="SpaceSearch"><input type="text" class="SpaceSearchText LostFocus"></input></li>
-    <li style="display:block" class="SpaceList"></li>
+    <li style="display:block" class="portalSpace"></li>
+    <li style="display:block" class="userSpace"></li>
+    <li style="display:block" class="spaceSearch"><input type="text" class="spaceSearchText lostFocus"></input></li>
+    <li style="display:block" class="spaceList"></li>
   </ul>
 </div>

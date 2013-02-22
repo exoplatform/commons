@@ -65,7 +65,7 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
     if (textField.value == storage.defaultValueForTextSearch) {
       textField.value = "";
     }
-    textField.className = "SpaceSearchText Focus"
+    textField.className = "spaceSearchText focus"
   };
   
   textField.onclick = function() {
@@ -77,7 +77,7 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
   textField.onblur = function() {
     if (textField.value == "") {
       textField.value = storage.defaultValueForTextSearch;
-      textField.className = "SpaceSearchText LostFocus";
+      textField.className = "spaceSearchText lostFocus";
     }
   };
 
@@ -101,7 +101,7 @@ UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBase
 };
 
 UISpaceSwitcher.prototype.closeAllPopups = function() {
-  var spaceChooserPopups = document.getElementsByClassName('SpaceChooserPopup');
+  var spaceChooserPopups = document.getElementsByClassName('spaceChooserPopup');
   for (var i = 0; i < spaceChooserPopups.length; i++) {
     spaceChooserPopups[i].style.display = "none";
   }
@@ -185,7 +185,7 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
   var userSpaceId = "/user/" + storage.username;
   var userSpaceName = storage.mySpaceLabel;
   
-  var spaceDiv = "<div class='SpaceOption' id='UISpaceSwitcher_" + userSpaceId 
+  var spaceDiv = "<div class='spaceOption' id='UISpaceSwitcher_" + userSpaceId 
       + "' title='" + userSpaceName 
       + "' alt='" + userSpaceName 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + userSpaceId + "', '" + uicomponentId + "')\">" 
@@ -205,7 +205,7 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('li.' + containerClazz)[0];
 
-  var spaceDiv = "<div class='SpaceOption' id='UISpaceSwitcher_" + storage.portalSpaceId 
+  var spaceDiv = "<div class='spaceOption' id='UISpaceSwitcher_" + storage.portalSpaceId 
       + "' title='" + storage.portalSpaceLabel 
       + "' alt='" + storage.portalSpaceLabel 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">" 
@@ -233,7 +233,7 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
     container.innerHTML = groupSpaces;
     me.processContainerHeight(spaces.length, container);
   } else {
-    container.innerHTML = "<div class='SpaceOption' style='text-align:center' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    container.innerHTML = "<div class='spaceOption' style='text-align:center' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     me.processContainerHeight(1, container);
   }  
 }
@@ -247,7 +247,7 @@ UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, contai
 }
 
 UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentId, avatarUrl) {
-  var spaceDiv = "<li style='display:block' class='SpaceOption' id='UISpaceSwitcher_" + spaceId 
+  var spaceDiv = "<li style='display:block' class='spaceOption' id='UISpaceSwitcher_" + spaceId 
       + "' title='" + name 
       + "' alt='" + name 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">" 
@@ -287,7 +287,7 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
     container.innerHTML = groupSpaces;
     me.processContainerHeight(matchCount, container);
   } else {
-    container.innerHTML = "<div class='SpaceOption' style='text-align:center' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    container.innerHTML = "<div class='spaceOption' style='text-align:center' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     me.processContainerHeight(1, container);
   }
 };
@@ -306,7 +306,7 @@ UISpaceSwitcher.prototype.openComboBox = function(event, spaceChooserDiv) {
   var me = eXo.commons.UISpaceSwitcher;
   var wikiSpaceSwitcher = spaceChooserDiv.parentNode;
   var uicomponentId = wikiSpaceSwitcher.id;
-  var spaceChooserPopup = jQuery(wikiSpaceSwitcher).find("ul.SpaceChooserPopup")[0];
+  var spaceChooserPopup = jQuery(wikiSpaceSwitcher).find("ul.spaceChooserPopup")[0];
   if (spaceChooserPopup.style.display == "none") {
     spaceChooserPopup.style.display = "block";
   } else {

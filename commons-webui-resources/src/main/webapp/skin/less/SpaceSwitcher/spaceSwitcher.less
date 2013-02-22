@@ -1,78 +1,70 @@
-.SpaceChooserPopup {
-  background: #fff;
+.spaceChooserPopup {
+  background: white;
   border: 1px solid #ececec;
   left: 0px;
   min-width: 250px;
   position: absolute;
   top: 26px;
+  border-radius: 3px 3px 3px 3px;
+  box-shadow: 1px 1px 3px #B7B7B7;
+  
+  .title {
+	  line-height: 30px; 
+	  border-bottom: 1px solid #e1e1e1; 
+	  background: #ececec; 
+	  padding: 0px 5px 0px 10px; 
+	  font-weight: bold; 
+	  color: #444;
+	  
+	  .uiIconClose {
+		  margin: 5px 0px 0px 0px;
+		  cursor: pointer;
+		}
+	}
+	.spaceOption {
+	  line-height: 20px; 
+	  border-bottom: 1px solid #e1e1e1;  
+	  padding: 3px 10px;
+	  color: #696969;
+	  cursor: pointer;
+	}
+	.spaceOption:hover {
+	  background: #F7F7F7; 
+	  color: black;
+	}
+	.spaceSearch {
+	  line-height: 20px; 
+	  border-bottom: 1px solid #e1e1e1;  
+	  padding: 5px 10px; 
+	  
+	  input {
+		  width: 94%; 
+		  height: 18px; 
+		  padding: 0px 5px; 
+		  border: 1px solid @grayWhiteSmoke;
+		  border-radius: @borderRadiusSmall;
+		}
+	}
+	.focus {
+	  color: #696969;
+	}
+	.lostFocus {
+	  color: #dedede;
+	}
+	.NoSpace {
+	  padding: 5px;
+	  margin-left:auto;
+	  margin-right:auto;
+	  text-align:center;
+	  color: black;
+	}
+	.spaceList {
+	  overflow: hidden;
+	}
 }
 
-.SpaceChooserPopup .title {
-  line-height: 30px; 
-  border-bottom: 1px solid #e1e1e1; 
-  background: #ececec; 
-  padding: 0px 5px 0px 10px; 
-  font-weight: bold; 
-  color: #444;
-}
 
-.SpaceChooserPopup .title .CloseButton {
-  float: right;
-  margin: 5px 0px 0px 0px;
-  cursor: pointer;
-  width: 23px;
-  height: 17px;
-  background: url('/eXoResources/skin/DefaultSkin/webui/component/UIPopup/UIPopupWindow/background/CloseIcon.gif') no-repeat right top;
-}
-
-.SpaceChooserPopup .SpaceOption {
-  line-height: 20px; 
-  border-bottom: 1px solid #e1e1e1;  
-  padding: 3px 10px;
-  color: #696969;
-  cursor: pointer;
-}
-
-.SpaceChooserPopup .SpaceOption:hover {
-  background: #F7F7F7; 
-  color: #000000;
-}
-
-.SpaceChooserPopup .SpaceSearch {
-  line-height: 20px; 
-  border-bottom: 1px solid #e1e1e1;  
-  padding: 5px 10px; 
-}
-
-.SpaceChooserPopup .SpaceSearch input {
-  width: 94%; 
-  height: 18px; 
-  padding: 0px 5px; 
-  border: 1px solid #f0f0f0;
-  border-radius: 3px;
-}
-
-.SpaceChooserPopup .Focus {
-  color: #696969;
-}
-
-.SpaceChooserPopup .LostFocus {
-  color: #dedede;
-}
-
-.SpaceSwitcher {
+.spaceSwitcher {
   line-height: 29px;
   padding: 0 15px;
-}
-
-.SpaceChooserPopup .NoSpace {
-  padding: 5px;
-  margin-left:auto;
-  margin-right:auto;
-  text-align:center;
-  color: #000000;
-}
-
-.SpaceChooserPopup .SpaceList {
-  overflow: hidden;
 }
