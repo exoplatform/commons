@@ -19,6 +19,10 @@
       <artifactId>exo.kernel.component.common</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-webui-component</artifactId>
+    </dependency>
+    <dependency>
       <!-- To replace the excluded old version -->
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>

@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 
 /**
@@ -41,6 +42,7 @@ public abstract class SearchService {
   
   /**
    * This search method aggregates search results from all connectors
+   * @param context Search context
    * @param query The user-input query to search for
    * @param sites Search on these specified sites only (e.g acme, intranet...)
    * @param types Search for these specified content types only (e.g people, discussion, event, task, wiki, activity, social, file, document...)
@@ -50,5 +52,5 @@ public abstract class SearchService {
    * @param order Sort order (ASC, DESC)
    * @return a map of connector with their search result
    */
-  public abstract Map<String, Collection<SearchResult>> search(String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order);  
+  public abstract Map<String, Collection<SearchResult>> search(SearchContext context, String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order);  
 }
