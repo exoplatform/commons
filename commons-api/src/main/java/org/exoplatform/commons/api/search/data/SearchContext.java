@@ -22,7 +22,7 @@ public class SearchContext {
   
   public static enum RouterParams {
    SITE_TYPE("sitetype"),
-   SITE_NAME("sitetype"),
+   SITE_NAME("sitename"),
    HANDLER("handler"),
    PATH("path"),
    LANG("lang");
@@ -49,10 +49,6 @@ public class SearchContext {
   /** */
   private Map<QualifiedName, String> qualifiedName = null;
   
-  public SearchContext() {
-    qualifiedName = new HashedMap();
-  }
-  
   public Router getRouter() {
     return router;
   }
@@ -63,6 +59,7 @@ public class SearchContext {
 
   public SearchContext(Router router) {
     this.router = router;
+    qualifiedName = new HashedMap();
   }
   
   /**
@@ -122,22 +119,22 @@ public class SearchContext {
    */
   public String renderLink() throws Exception {
     //
-    if (qualifiedName.containsKey(RouterParams.LANG) == false) {
+    if (qualifiedName.containsKey(RouterParams.LANG.create()) == false) {
       lang("");
     }
     
     //
-    if (qualifiedName.containsKey(RouterParams.HANDLER) == false) {
+    if (qualifiedName.containsKey(RouterParams.HANDLER.create()) == false) {
       log.warn("Handler of QualifiedName not found!");
     }
     
     //
-    if (qualifiedName.containsKey(RouterParams.SITE_NAME) == false) {
+    if (qualifiedName.containsKey(RouterParams.SITE_NAME.create()) == false) {
       log.warn("SiteName of QualifiedName not found!");
     }
     
     //
-    if (qualifiedName.containsKey(RouterParams.SITE_TYPE) == false) {
+    if (qualifiedName.containsKey(RouterParams.SITE_TYPE.create()) == false) {
       log.warn("SiteType of QualifiedName not found!");
     }
     
