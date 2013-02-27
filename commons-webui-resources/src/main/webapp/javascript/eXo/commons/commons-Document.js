@@ -190,7 +190,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
     listRecords.append(item);
     return;
   }
-	  
+
 	for ( var i = 0; i < folderList.length; i++) { // render folders
 	  var folderIcon = me.getClazzIcon(folderList[i].getAttribute("nodeType"));
 	  var jcrPath = folderList[i].getAttribute("path");
@@ -198,7 +198,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var name = folderList[i].getAttribute("name");
 	  var title = folderList[i].getAttribute("title");
 	  var titlePath = folderList[i].getAttribute("titlePath");
-	  
+
 	  var childFolder = folderList[i].getAttribute("currentFolder");
 	  var canRemove = folderList[i].getAttribute("canRemove");
 	  var canAddChild = folderList[i].getAttribute("canAddChild");
@@ -255,7 +255,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	    var iconEl = jQuery('<i/>', {
 	                              'class' : fileIcon
 	                            });
-	
+
 	    var link = jQuery('<a/>',{
 	      'class' : 'Item',
 	      'name' : node,
@@ -266,11 +266,11 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	     }).on('click', function() {
 	      _module.DocumentSelector.submitSelectedFile(this);
 	     }).append(iconEl);
-	    
+
 	     var item = jQuery('<li/>', {
 	                              'class' : 'listItem'
 	                            }).append(link);
-	
+
 	     listRecords.append(item);
     }
 };
@@ -354,6 +354,8 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   var msg_select_folder = inputFolderName.getAttribute("msg_select_drive");
   var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
   var msg_empty_folder_name = inputFolderName.getAttribute("msg_empty_folder_name");
+  var msg_invalid_folder_name = inputFolderName.getAttribute("msg_invalid_folder_name");
+  var folder_name_standard = /^[\w.\s-]+$/;
   
   if (!me.selectedItem || !me.selectedItem.driveName) {
     alert(msg_select_folder);
@@ -361,11 +363,20 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   }
 
   var folderName = prompt(msg_enter_folder_name, "");
-  if (folderName == null || folderName == "") {
-    alert(msg_empty_folder_name);
+  if (folderName === null) {
     return;
   }
 
+  if ( folderName == "" ) {
+    alert(msg_empty_folder_name);
+    return;
+  }
+  
+  if ( !folder_name_standard.test(folderName) ) {
+    alert(msg_invalid_folder_name);
+    return;
+  }
+  
   var canAddChild = me.selectedItem.canAddChild;
   if (canAddChild == "false") {
     alert(msg_new_folder_not_allow);
@@ -561,7 +572,7 @@ function UIDSUpload() {
 	 *          isAutoUpload auto upload or none
 	 */
 	UIDSUpload.prototype.initUploadEntry = function(uploadId, isAutoUpload) {  
-	  UIDSUpload.isAutoUpload = isAutoUpload;
+		_module.UIDSUpload.isAutoUpload = isAutoUpload;
 	  this.restContext = eXo.env.portal.context+ "/" + eXo.env.portal.rest+ "/managedocument/uploadFile" ;
 	  this.createUploadEntry(uploadId, isAutoUpload);
 	};
@@ -598,9 +609,11 @@ function UIDSUpload() {
 	    // workaround for Chrome
 	    // When submit in iframe with Chrome, the iframe.contentWindow.document
 	    // seems not be reconstructed correctly
-	    idoc.open();
-	    idoc.close();
-	    idoc.documentElement.innerHTML = uploadHTML;      
+		  
+	    if(idoc.open) idoc.open();
+	    if(idoc.close) idoc.close();
+	    var doc = idoc.documentElement || idoc;
+	    doc.innerHTML = uploadHTML;
 	  } else {
 	    idoc.open();
 	    idoc.write(uploadHTML);
@@ -761,7 +774,7 @@ function UIDSUpload() {
 	  
 	  //var uploadIframe = eXo.core.DOMUtil.findDescendantById(container, id+"UploadIframe");
 	  var uploadIframe = jQuery("#"+id+"UploadIframe",container);
-	alert(id);
+
 	  uploadIframe.show();
 	  //var progressIframe = eXo.core.DOMUtil.findDescendantById(container, id+"ProgressIframe");
 	  var progressIframe = jQuery("#"+id+"ProgressIframe",container);
@@ -785,24 +798,23 @@ function UIDSUpload() {
 	UIDSUpload.prototype.abortUpload = function(id) {
 	  var me = _module.UIDSUpload;
 	  me.listUpload.remove(id);
-	  var url = me.restContext + "/control?" ;
-	  url += "uploadId=" +id+"&action=abort" ;
-	// var url = eXo.env.server.context + "/upload?uploadId=" +id+"&action=abort" ;
-
-	  jQuery.ajax({
-		  url: url,
-		  type: "GET",
-		  async: false,
-		  headers: {"Cache-Control" : "max-age=86400"}
-		});
-	  var container = parent.document.getElementById(id);
-	  //var uploadIframe =  eXo.core.DOMUtil.findDescendantById(container, id+"UploadIframe");
-	  var uploadIframe = jQuery("#"+id+"UploadIframe",container);
+	  
+	  var container = jQuery(parent.document.getElementById(id));
+	  var uploadIframe = container.find("#"+id+"UploadIframe");
 	  uploadIframe.show();
-	  me.createUploadEntry(id, UIDSUpload.isAutoUpload);
-	  //var progressIframe = eXo.core.DOMUtil.findDescendantById(container, id+"ProgressIframe");
-	  var progressIframe = jQuery("#"+id+"ProgressIframe",container) ;
-	  progressIframe.hide();
+	  me.createUploadEntry(id, me.isAutoUpload);
+	  var progressIframe = container.find("#"+id+"ProgressIframe") ;
+
+	  progressIframe.hide('fast', function() {
+		  var url_ = _module.UIDSUpload.restContext + "/control?" ;
+		  url_ += "uploadId=" +id+"&action=abort" ;
+		  jQuery.ajax({
+			  url: url_,
+			  type: "GET",
+			  async: false,
+			  headers: {"Cache-Control" : "max-age=86400"}
+		  });
+	  });
 
 	  var tmp = progressIframe.parent();
 	  var temp = tmp.parent();

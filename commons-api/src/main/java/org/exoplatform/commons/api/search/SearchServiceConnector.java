@@ -2,6 +2,7 @@ package org.exoplatform.commons.api.search;
 
 import java.util.Collection;
 
+import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
@@ -43,6 +44,7 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
 
   /**
    * The connectors must implement this search method, with the following parameters and return a collection of SearchResult
+   * @param context Search context
    * @param query The user-input query to search for
    * @param sites Search on these specified sites only (e.g acme, intranet...)
    * @param offset Start offset of the result set
@@ -51,5 +53,5 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
    * @param order Sort order (ASC, DESC)
    * @return a collection of SearchResult
    */
-  public abstract Collection<SearchResult> search(String query, Collection<String> sites, int offset, int limit, String sort, String order);
+  public abstract Collection<SearchResult> search(SearchContext context, String query, Collection<String> sites, int offset, int limit, String sort, String order);
 }
