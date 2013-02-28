@@ -48,8 +48,9 @@
                   " msg_new_folder_not_allow=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder-not-allow') + "\"" +
                   " msg_select_drive=\"" + _ctx.appRes(uicomponent.id + '.label.require-drive') + "\"" +
                   " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +
+                  " msg_invalid_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.invalid-folder-name') + "\"" +
                   " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\">&nbsp;</a>";
-     %>
+     %> 
     <div class="ClearFix Breadcumbs">
     <div class="ActionBar">
       $newFolderLink
