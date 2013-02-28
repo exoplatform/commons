@@ -47,6 +47,9 @@ public class SearchContext {
   private Router router; // Gatein router, provides routing information for building resource URLs
   
   /** */
+  private String siteName;
+  
+  /** */
   private Map<QualifiedName, String> qualifiedName = null;
   
   public Router getRouter() {
@@ -57,8 +60,13 @@ public class SearchContext {
     this.router = router;
   }
 
-  public SearchContext(Router router) {
+  public String getSiteName() {
+    return siteName;
+  }
+
+  public SearchContext(Router router, String siteName) {
     this.router = router;
+    this.siteName = siteName;
     qualifiedName = new HashedMap();
   }
   
