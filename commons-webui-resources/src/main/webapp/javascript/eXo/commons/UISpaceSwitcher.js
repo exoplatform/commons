@@ -23,6 +23,13 @@ function UISpaceSwitcher() {
 };
 
 UISpaceSwitcher.prototype.init = function(uicomponentId, baseRestUrl, socialBaseRestUrl, defaultValueForTextSearch, selectSpaceAction, invalidingCacheTime) {
+  jQuery(window).ready(function(){
+    var me = eXo.commons.UISpaceSwitcher;
+    me.initAfterLoaded(uicomponentId, baseRestUrl, socialBaseRestUrl, defaultValueForTextSearch, selectSpaceAction, invalidingCacheTime);
+  });
+}
+
+UISpaceSwitcher.prototype.initAfterLoaded = function(uicomponentId, baseRestUrl, socialBaseRestUrl, defaultValueForTextSearch, selectSpaceAction, invalidingCacheTime) {
   var me = eXo.commons.UISpaceSwitcher;
   
   if (!me.dataStorage) {
@@ -113,6 +120,13 @@ UISpaceSwitcher.prototype.closePopup = function(closeTag) {
 };
 
 UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceLabel, noSpaceLabel) {
+  jQuery(window).ready(function(){
+    var me = eXo.commons.UISpaceSwitcher;
+    me.initSpaceInfoAfterReady(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceLabel, noSpaceLabel);
+  });
+}
+
+UISpaceSwitcher.prototype.initSpaceInfoAfterReady = function(uicomponentId, username, mySpaceLabel, portalSpaceId, portalSpaceLabel, noSpaceLabel) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   storage.mySpaceLabel = mySpaceLabel;
@@ -123,6 +137,13 @@ UISpaceSwitcher.prototype.initSpaceInfo = function(uicomponentId, username, mySp
 }
 
 UISpaceSwitcher.prototype.initConfig = function(uicomponentId, isShowPortalSpace, isShowUserSpace) {
+  jQuery(window).ready(function(){
+    var me = eXo.commons.UISpaceSwitcher;
+    me.initConfigAfterReady(uicomponentId, isShowPortalSpace, isShowUserSpace);
+  });
+}
+
+UISpaceSwitcher.prototype.initConfigAfterReady = function(uicomponentId, isShowPortalSpace, isShowUserSpace) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   storage.isShowPortalSpace = isShowPortalSpace;
