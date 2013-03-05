@@ -180,6 +180,8 @@ public class ProductInformations implements Startable {
     return previousProductInformationProperties.getProperty(PRODUCT_KEY);
   }
 
+
+
   /**
    * @return This method returns the current product's version.
    */
@@ -457,7 +459,14 @@ public class ProductInformations implements Startable {
     finally {
       productInformationProperties.list(printWriter);
       printWriter.flush();
-      return stringWriter.toString();
+      String info = stringWriter.toString();
+      if(info.contains("...")){
+          String s = info.substring(info.indexOf(PRODUCT_KEY), info.indexOf("...")+3);
+          String cle = PRODUCT_KEY + "=" +
+                  previousProductInformationProperties.getProperty(PRODUCT_KEY);
+          info = info.replace(s, cle);
+        }
+      return info;
     }
   }
 
