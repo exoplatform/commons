@@ -34,10 +34,6 @@
 		<script>
 			<path>/ckeditor/commons-Editor.js</path>
 		</script>
-		<script>
-			<name>eXo.commons.ExoEditorConfig</name>
-			<path>/ckeditor/eXoConfig.js</path>
-		</script>
 	</module>
 	
 	<module>
