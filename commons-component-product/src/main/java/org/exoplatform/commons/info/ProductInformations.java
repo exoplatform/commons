@@ -18,23 +18,6 @@
  */
 package org.exoplatform.commons.info;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.jcr.LoginException;
-import javax.jcr.NoSuchWorkspaceException;
-import javax.jcr.Node;
-import javax.jcr.Property;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.version.Version;
-
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -47,12 +30,35 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.picocontainer.Startable;
 
+import javax.jcr.*;
+import javax.jcr.version.Version;
+import java.io.*;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Set;
+
 /**
  * @author <a href="mailto:anouar.chattouna@exoplatform.com">Anouar
  *         Chattouna</a>
  * @version $Revision$
  */
 public class ProductInformations implements Startable {
+  public static final String ENTERPRISE_EDITION = "ENTERPRISE";
+
+  public static final String EXPRESS_EDITION = "EXPRESS";
+
+  public static final String EDITION = "edition";
+
+  public static final String KEY_GENERATION_DATE = "key generation date";
+
+  public static final String DELAY = "delay";
+
+  public static final String PRODUCT_CODE = "productCode";
+
+  public static final String PRODUCT_KEY = "productKey";
+
+  public static final String NB_USERS = "number of users";
+
   public static final String PRODUCT_GROUP_ID = "product.groupId";
 
   public static final String PRODUCT_REVISION = "product.revision";
@@ -101,7 +107,7 @@ public class ProductInformations implements Startable {
   private SessionProviderService sessionProviderService = null;
 
   public ProductInformations(RepositoryService repositoryService, SessionProviderService sessionProviderService,
-      NodeHierarchyCreator nodeHierarchyCreator, ConfigurationManager cmanager, InitParams initParams) {
+                             NodeHierarchyCreator nodeHierarchyCreator, ConfigurationManager cmanager, InitParams initParams) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     if (!initParams.containsKey(PRODUCT_VERSIONS_DECLARATION_FILE)) {
@@ -123,7 +129,7 @@ public class ProductInformations implements Startable {
       }
       return;
     } catch (Exception exception) {
-      //ConfigurationManager.getInputStream() throws Exception(). 
+      //ConfigurationManager.getInputStream() throws Exception().
       //It's from another project and we cannot modify it. So we have to catch Exception
       if (LOG.isErrorEnabled()) {
         LOG.error("Error occured while reading the file " + filePath, exception);
@@ -147,8 +153,34 @@ public class ProductInformations implements Startable {
       applicationDataRootNodePath = applicationDataRootNodePath.replaceFirst("/", "");
     }
     productVersionDeclarationNodePath = "/" + applicationDataRootNodePath + "/" + UPGRADE_PRODUCT_SERVICE_NODE_NAME + "/"
-        + PRODUCT_VERSION_DECLARATION_NODE_NAME;
+            + PRODUCT_VERSION_DECLARATION_NODE_NAME;
   }
+
+  public String getEdition() throws MissingProductInformationException {
+    return previousProductInformationProperties.getProperty(EDITION);
+  }
+
+  public String getNumberOfUsers() throws MissingProductInformationException {
+    return previousProductInformationProperties.getProperty(NB_USERS);
+  }
+
+  public String getDateOfLicence() throws MissingProductInformationException {
+    return previousProductInformationProperties.getProperty(KEY_GENERATION_DATE);
+  }
+
+  public String getDuration() throws MissingProductInformationException {
+    return previousProductInformationProperties.getProperty(DELAY);
+  }
+
+  public String getProductCode() throws MissingProductInformationException {
+    return previousProductInformationProperties.getProperty(PRODUCT_CODE);
+  }
+
+  public String getProductKey() throws MissingProductInformationException {
+    return previousProductInformationProperties.getProperty(PRODUCT_KEY);
+  }
+
+
 
   /**
    * @return This method returns the current product's version.
@@ -287,19 +319,19 @@ public class ProductInformations implements Startable {
       // "WS_NAME:/exo;services/ProductInformationsService/productVersionDeclarationNode"
       Node productVersionDeclarationNode = null;
       if (applicationDataNode.hasNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME)) {// reads
-                                                                           // from
-                                                                           // the
-                                                                           // JCR
-                                                                           // the
-                                                                           // previous
-                                                                           // version
+        // from
+        // the
+        // JCR
+        // the
+        // previous
+        // version
         productVersionDeclarationNode = applicationDataNode.getNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME + "/"
-            + PRODUCT_VERSION_DECLARATION_NODE_NAME);
+                + PRODUCT_VERSION_DECLARATION_NODE_NAME);
         // get the previous product informations, stored in a JCR property,
         // this will be by example:
         // "WS_NAME:/exo:services/ProductInformationsService/productVersionDeclarationNode/jcr:content/jcr:data"
         String previousVersionData = ((Property) session.getItem(productVersionDeclarationNode.getPath()
-            + "/jcr:content/jcr:data")).getString();
+                + "/jcr:content/jcr:data")).getString();
         previousProductInformationProperties = new Properties();
         previousProductInformationProperties.load(new ByteArrayInputStream(previousVersionData.getBytes()));
       } else {// This is the first time that this Service starts up
@@ -349,6 +381,28 @@ public class ProductInformations implements Startable {
    */
   public void stop() {}
 
+  public void storeUnlockInformation(){
+    Session session = null;
+    try {
+      session = getSession();
+      Node productVersionDeclarationNode = (Node) session.getItem(productVersionDeclarationNodePath);
+      Node productVersionDeclarationNodeContent = productVersionDeclarationNode.getNode("jcr:content");
+      productVersionDeclarationNodeContent.setProperty("jcr:data", getPreviousProductInformationsAsString() );
+      productVersionDeclarationNodeContent.setProperty("jcr:lastModified", new Date().getTime());
+      productVersionDeclarationNode.getSession().save();
+    } catch (LoginException exception) {
+      LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
+    } catch (NoSuchWorkspaceException exception) {
+      LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
+    } catch (RepositoryException exception) {
+      LOG.error("Can't store informations in the JCR!", exception);
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+  }
+
   public void storeProductsInformationsInJCR() {
     Session session = null;
     try {
@@ -386,9 +440,63 @@ public class ProductInformations implements Startable {
   private String getCurrentProductInformationsAsString() {
     StringWriter stringWriter = new StringWriter();
     PrintWriter printWriter = new PrintWriter(stringWriter);
-    productInformationProperties.list(printWriter);
+    try {
+      if(previousProductInformationProperties.containsKey(PRODUCT_KEY))
+        productInformationProperties.setProperty(PRODUCT_KEY,getProductKey());
+      if(previousProductInformationProperties.containsKey(PRODUCT_CODE))
+        productInformationProperties.setProperty(PRODUCT_CODE, getProductCode());
+      if(previousProductInformationProperties.containsKey(EDITION))
+        productInformationProperties.setProperty(EDITION, getEdition());
+      if(previousProductInformationProperties.containsKey(KEY_GENERATION_DATE))
+        productInformationProperties.setProperty(KEY_GENERATION_DATE, getDateOfLicence());
+      if(previousProductInformationProperties.containsKey(DELAY))
+        productInformationProperties.setProperty(DELAY, getDuration());
+      if(previousProductInformationProperties.containsKey(NB_USERS))
+        productInformationProperties.setProperty(NB_USERS, getNumberOfUsers());
+    } catch (MissingProductInformationException e) {
+      LOG.info("it's a locked instance!");
+    }
+    finally {
+      productInformationProperties.list(printWriter);
+      printWriter.flush();
+      String info = stringWriter.toString();
+      if(info.contains("...")){
+          String s = info.substring(info.indexOf(PRODUCT_KEY), info.indexOf("...")+3);
+          String cle = PRODUCT_KEY + "=" +
+                  previousProductInformationProperties.getProperty(PRODUCT_KEY);
+          info = info.replace(s, cle);
+        }
+      return info;
+    }
+  }
+
+  private String getPreviousProductInformationsAsString() {
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter printWriter = new PrintWriter(stringWriter);
+    if(previousProductInformationProperties.containsKey("--")) previousProductInformationProperties.remove("--");
+    previousProductInformationProperties.list(printWriter);
     printWriter.flush();
-    return stringWriter.toString();
+    String info = stringWriter.toString();
+    if(info.contains("...")){
+      String s = info.substring(info.indexOf(PRODUCT_KEY), info.indexOf("...")+3);
+      String cle = PRODUCT_KEY + "=" +
+              previousProductInformationProperties.getProperty(PRODUCT_KEY);
+      info = info.replace(s, cle);
+    }
+    return  info;
+  }
+
+  public void setUnlockInformation(Properties unlockInformation) {
+    previousProductInformationProperties.setProperty(EDITION, (String) unlockInformation.get(EDITION));
+    previousProductInformationProperties.setProperty(NB_USERS, (String) unlockInformation.get(NB_USERS));
+    previousProductInformationProperties.setProperty(PRODUCT_KEY, (String) unlockInformation.get(PRODUCT_KEY));
+    previousProductInformationProperties.setProperty(PRODUCT_CODE, (String) unlockInformation.get(PRODUCT_CODE));
+    previousProductInformationProperties.setProperty(DELAY, (String) unlockInformation.get(DELAY));
+    previousProductInformationProperties.setProperty(KEY_GENERATION_DATE, (String) unlockInformation.get(KEY_GENERATION_DATE));
+  }
+
+  public String getWorkspaceName() {
+    return workspaceName;
   }
 
   private Session getSession() throws RepositoryException, LoginException, NoSuchWorkspaceException {
