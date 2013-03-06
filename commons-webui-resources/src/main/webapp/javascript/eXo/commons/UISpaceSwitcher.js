@@ -210,7 +210,7 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
       + "' title='" + userSpaceName 
       + "' alt='" + userSpaceName 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + userSpaceId + "', '" + uicomponentId + "')\">" 
-        + "<image src='/CommonsResources/skin/DefaultSkin/commons/SpaceSwitcher/images/MyWiki.png' width='24px' alt='" + userSpaceName + "'/>"
+        + "<image src='/CommonsResources/skin/DefaultSkin/commons/SpaceSwitcher/images/MyWiki.png' width='19px' alt='" + userSpaceName + "'/>"
         + "<span style='float:none; margin-left:6px;'  >" + userSpaceName + " </span>"
       + "</div>";
   container.innerHTML = spaceDiv;
@@ -230,7 +230,7 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
       + "' title='" + storage.portalSpaceLabel 
       + "' alt='" + storage.portalSpaceLabel 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">" 
-        + "<image src='/CommonsResources/skin/DefaultSkin/commons/SpaceSwitcher/images/CompanyWiki.png' width='24px' alt='" + storage.portalSpaceLabel + "'/>"
+        + "<image src='/CommonsResources/skin/DefaultSkin/commons/SpaceSwitcher/images/CompanyWiki.png' width='19px' alt='" + storage.portalSpaceLabel + "'/>"
         + "<span style='float:none; margin-left:6px;'  >" + storage.portalSpaceLabel + " </span>"
       + "</div>";
   container.innerHTML = spaceDiv;
@@ -254,16 +254,16 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
     container.innerHTML = groupSpaces;
     me.processContainerHeight(spaces.length, container);
   } else {
-    container.innerHTML = "<div class='spaceOption' style='text-align:center' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    container.innerHTML = "<div class='spaceOption' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     me.processContainerHeight(1, container);
   }  
 }
 
 UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, container) {
   if (resultLength > 10) {
-    container.style.height = (31 * 10) + "px";
+    container.style.height = (36 * 10) + "px";
   } else {
-    container.style.height = (31 * resultLength) + "px";
+    container.style.height = (36 * resultLength) + "px";
   }
 }
 
@@ -272,7 +272,7 @@ UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentI
       + "' title='" + name 
       + "' alt='" + name 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">" 
-        + "<image src='" + avatarUrl + "' width='24px' alt='" + name + "'/>"
+        + "<image src='" + avatarUrl + "' width='19px' alt='" + name + "'/>"
         + "<span style='float:none; margin-left:6px;'  >" + name + " </span>"
       + "</li>";
   return spaceDiv;
@@ -308,7 +308,7 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
     container.innerHTML = groupSpaces;
     me.processContainerHeight(matchCount, container);
   } else {
-    container.innerHTML = "<div class='spaceOption' style='text-align:center' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    container.innerHTML = "<div class='spaceOption' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     me.processContainerHeight(1, container);
   }
 };
