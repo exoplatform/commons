@@ -9,6 +9,7 @@
   String portalSpaceLabel = uicomponent.getPortalSpaceLabel();
   String defaultValueForTextSearch = _ctx.appRes("UISpaceSwitcher.msg.filter-spaces");
   String noSpaceLabel = _ctx.appRes("UISpaceSwitcher.msg.no-space");
+  String spaceLabel = _ctx.appRes("UISpaceSwitcher.title.space");
   def invalidingCacheTime = uicomponent.invalidingCacheTime;
   String selectSpaceAction = URLEncoder.encode(uicomponent.event(uicomponent.SELECT_SPACE_ACTION), "utf-8");
   boolean isShowPortalSpace = uicomponent.isShowPortalSpace();
@@ -18,7 +19,7 @@
   def requireJs = rcontext.getJavascriptManager().getRequireJS();
   requireJs.require("SHARED/UISpaceSwitcher", "UISpaceSwitcher");
   requireJs.addScripts("UISpaceSwitcher.init('" + uicomponent.id + "','" + baseRestUrl + "','" + socialBaseRestUrl + "','" + defaultValueForTextSearch + "','" + selectSpaceAction + "'," + invalidingCacheTime + ");");
-  requireJs.addScripts("UISpaceSwitcher.initSpaceInfo('" + uicomponent.id + "','" + username + "','" + mySpaceLabel + "','" + portalSpaceId + "','" + portalSpaceLabel + "','" + noSpaceLabel + "');");
+  requireJs.addScripts("UISpaceSwitcher.initSpaceInfo('" + uicomponent.id + "','" + username + "','" + mySpaceLabel + "','" + portalSpaceId + "','" + portalSpaceLabel + "','" + noSpaceLabel + "','" + spaceLabel + "');");
   requireJs.addScripts("UISpaceSwitcher.initConfig('" + uicomponent.id + "'," + isShowPortalSpace + "," + isShowUserSpace + ");");
   String currentSpaceName = uicomponent.getCurrentSpaceName();
 %>

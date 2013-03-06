@@ -35,6 +35,7 @@
     <title>
       <my-space>Wiki của tôi</my-space>
       <close>Đóng</close>
+      <space>Space</space>
     </title>
   </UISpaceSwitcher>
 </bundle>

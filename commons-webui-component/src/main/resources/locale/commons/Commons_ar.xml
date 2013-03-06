@@ -16,6 +16,7 @@
     <title>
       <my-space>My Wiki</my-space>
       <close>Close</close>
+      <space>Space</space>
     </title>
   </UISpaceSwitcher>
 </bundle>
