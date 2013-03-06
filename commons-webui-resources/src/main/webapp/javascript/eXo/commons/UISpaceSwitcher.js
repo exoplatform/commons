@@ -309,8 +309,8 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
     container.innerHTML = groupSpaces;
     me.processContainerHeight(matchCount, container);
   } else {
-    container.innerHTML = "<div class='spaceOption' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
-    me.processContainerHeight(1, container);
+    container.innerHTML = "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    me.processContainerHeight(0, container);
   }
 };
 
