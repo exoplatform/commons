@@ -207,7 +207,7 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
   var userSpaceId = "/user/" + storage.username;
   var userSpaceName = storage.mySpaceLabel;
   
-  var spaceDiv = "<div class='spaceOption' id='UISpaceSwitcher_" + userSpaceId 
+  var spaceDiv = "<div class='spaceOption hover' id='UISpaceSwitcher_" + userSpaceId 
       + "' title='" + userSpaceName 
       + "' alt='" + userSpaceName 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + userSpaceId + "', '" + uicomponentId + "')\">" 
@@ -227,7 +227,7 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('li.' + containerClazz)[0];
 
-  var spaceDiv = "<div class='spaceOption' id='UISpaceSwitcher_" + storage.portalSpaceId 
+  var spaceDiv = "<div class='spaceOption hover' id='UISpaceSwitcher_" + storage.portalSpaceId 
       + "' title='" + storage.portalSpaceLabel 
       + "' alt='" + storage.portalSpaceLabel 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">" 
@@ -270,7 +270,7 @@ UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, contai
 }
 
 UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentId, avatarUrl) {
-  var spaceDiv = "<li style='display:block' class='spaceOption' id='UISpaceSwitcher_" + spaceId 
+  var spaceDiv = "<li style='display:block' class='spaceOption hover' id='UISpaceSwitcher_" + spaceId 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">" 
         + "<image src='" + avatarUrl + "' width='19px' alt='" + name + "'/>"
         + "<span style='float:none; margin-left:6px;'  >" + name + " </span>"
