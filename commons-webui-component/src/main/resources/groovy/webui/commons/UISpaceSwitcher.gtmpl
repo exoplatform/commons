@@ -25,7 +25,14 @@
 %>
 
 <div class="$uicomponent.id" id="$uicomponent.id">
-  <div class="spaceChooser" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">$currentSpaceName<i class="uiIconMiniArrowDown uiIconLightGray"></i></div>
+  <div id="DisplayModesDropDown" class="btn-group uiDropdownWithIcon spaceChooser" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">
+	<div data-toggle="dropdown" class="btn dropdown-toggle">
+		<span>$currentSpaceName</span>
+		<span class="spiter"></span> 
+		<span class="caret"></span>
+	</div>
+  </div>
+  
   <ul class="spaceChooserPopup" style="display:none">
     <li style="display:block" class="title">
       <a class="uiIconClose pull-right" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></a>
