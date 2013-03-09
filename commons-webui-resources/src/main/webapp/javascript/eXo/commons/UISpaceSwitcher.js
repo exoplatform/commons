@@ -211,7 +211,7 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
       + "' title='" + userSpaceName 
       + "' alt='" + userSpaceName 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + userSpaceId + "', '" + uicomponentId + "')\">" 
-        + "<image src='/CommonsResources/skin/DefaultSkin/commons/SpaceSwitcher/images/MyWiki.png' width='19px' alt='" + userSpaceName + "'/>"
+        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/MyWiki.png' width='19px' alt='" + userSpaceName + "'/>"
         + "<span style='float:none; margin-left:6px;'  >" + userSpaceName + " </span>"
       + "</div>";
   container.innerHTML = spaceDiv;
@@ -231,7 +231,7 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
       + "' title='" + storage.portalSpaceLabel 
       + "' alt='" + storage.portalSpaceLabel 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">" 
-        + "<image src='/CommonsResources/skin/DefaultSkin/commons/SpaceSwitcher/images/CompanyWiki.png' width='19px' alt='" + storage.portalSpaceLabel + "'/>"
+        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/CompanyWiki.png' width='19px' alt='" + storage.portalSpaceLabel + "'/>"
         + "<span style='float:none; margin-left:6px;'  >" + storage.portalSpaceLabel + " </span>"
       + "</div>";
   container.innerHTML = spaceDiv;

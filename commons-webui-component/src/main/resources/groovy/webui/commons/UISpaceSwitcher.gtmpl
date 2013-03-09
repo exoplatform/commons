@@ -25,7 +25,7 @@
 %>
 
 <div class="$uicomponent.id" id="$uicomponent.id">
-  <div id="DisplayModesDropDown" class="btn-group uiDropdownWithIcon spaceChooser" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">
+  <div id="DisplayModesDropDown" class="btn-group spaceChooser" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">
 	<div data-toggle="dropdown" class="btn dropdown-toggle">
 		<span>$currentSpaceName</span>
 		<span class="spiter"></span> 
@@ -35,7 +35,7 @@
   
   <ul class="spaceChooserPopup" style="display:none">
     <li style="display:block" class="title">
-      <a class="uiIconClose pull-right" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></a>
+      <i class="uiIconClose pull-right" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></i>
       <%= _ctx.appRes(uicomponent.id + ".title.select-location"); %>
     </li>
     <li style="display:block" class="spaceSearch"><input type="text" class="spaceSearchText lostFocus"></input></li>
