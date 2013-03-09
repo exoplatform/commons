@@ -25,7 +25,7 @@
 %>
 
 <div class="$uicomponent.id" id="$uicomponent.id">
-  <div id="DisplayModesDropDown" class="btn-group spaceChooser" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">
+  <div id="DisplayModesDropDown" class="btn-group spaceChooser uiDropdownWithIcon" onclick="eXo.commons.UISpaceSwitcher.openComboBox(event, this);">
 	<div data-toggle="dropdown" class="btn dropdown-toggle">
 		<span>$currentSpaceName</span>
 		<span class="spiter"></span> 
