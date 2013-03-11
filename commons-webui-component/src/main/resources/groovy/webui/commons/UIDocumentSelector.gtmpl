@@ -32,7 +32,7 @@
   requireJs.addScripts("document.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
   requireJs.addScripts("jQuery('#createNew').click(function() {document.DocumentSelector.newFolder(this);});");
 %>
-<div class="uiDocumentSelector" id="$uicomponent.id" style="border: 1px solid blue">
+<div class="uiDocumentSelector" id="$uicomponent.id">
   <a style="display:none;" href="$selectFileLink" class="selectFile"></a>
   <a style="display:none;" href="$selectFolderLink" class="selectFolder"></a>
 	<div class="center">
