@@ -36,3 +36,4 @@ pom.xml.versionsBackup
 
 # Misc
 *.swp
+transaction.log
