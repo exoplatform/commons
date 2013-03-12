@@ -11,16 +11,16 @@
   <name>eXo Commons - API</name>
   <dependencies>
     <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-webui-component</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.commons</groupId>
-      <artifactId>commons-webui-component</artifactId>
     </dependency>
     <dependency>
       <!-- To replace the excluded old version -->
