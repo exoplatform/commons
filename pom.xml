@@ -62,6 +62,11 @@
     <org.exoplatform.platform-ui.version>4.0.0-relooking-SNAPSHOT</org.exoplatform.platform-ui.version>
   </properties>
   <dependencyManagement>
+    <!-- ### NEVER CHANGE THIS ORDER OF DEPMGT ### -->
+    <!-- * From top level to bottom projects -->
+    <!-- * maven-depmgt-pom must be the first -->
+    <!-- * Your own modules -->
+    <!-- * And projects below you -->
     <dependencies>
       <!-- Import versions of external dependencies to use -->
       <dependency>
@@ -199,19 +204,87 @@
         <version>${project.version}</version>
         <type>pom</type>
       </dependency>
-      <!-- Import versions of core modules to use -->
+      <!-- Import versions from platform-ui project -->
       <dependency>
-        <groupId>org.exoplatform.core</groupId>
-        <artifactId>core-parent</artifactId>
-        <version>${org.exoplatform.core.version}</version>
+        <groupId>org.exoplatform.platform-ui</groupId>
+        <artifactId>platform-ui</artifactId>
+        <version>${org.exoplatform.platform-ui.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- CAN'T be replaced by an import of GateIn Portal parent POM -->
+       <!-- due to exclusion inheritance on ehcache-core required by the gadget-server -->
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.component.common</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.component.portal</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.component.resources</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.component.test.core</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.component.web.controller</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.component.web.resources</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.webui.core</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.webui.framework</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.webui.portal</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
+       <dependency>
+         <groupId>org.gatein.portal</groupId>
+         <artifactId>exo.portal.webui.portlet</artifactId>
+         <version>${org.gatein.portal.version}</version>
+       </dependency>
       <!-- Import versions of jcr modules to use -->
       <dependency>
         <groupId>org.exoplatform.jcr</groupId>
         <artifactId>jcr-parent</artifactId>
         <version>${org.exoplatform.jcr.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- Import versions of ws modules to use -->
+      <dependency>
+        <groupId>org.exoplatform.ws</groupId>
+        <artifactId>ws-parent</artifactId>
+        <version>${org.exoplatform.ws.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- Import versions of core modules to use -->
+      <dependency>
+        <groupId>org.exoplatform.core</groupId>
+        <artifactId>core-parent</artifactId>
+        <version>${org.exoplatform.core.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -222,72 +295,6 @@
         <version>${org.exoplatform.kernel.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <!-- To be replaced by an import of GateIn Portal parent POM -->
-      <dependency>
-        <groupId>org.exoplatform.platform-ui</groupId>
-        <artifactId>platform-ui-web-eXoResources</artifactId>
-        <version>${org.exoplatform.platform-ui.version}</version>
-      </dependency>
-      <!-- Import versions of core modules to use -->
-      <dependency>
-        <groupId>org.exoplatform.ws</groupId>
-        <artifactId>ws-parent</artifactId>
-        <version>${org.exoplatform.ws.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <!-- CAN'T be replaced by an import of GateIn Portal parent POM -->
-      <!-- due to exclusion inheritance on ehcache-core required by the gadget-server -->
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.component.common</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.component.portal</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.component.resources</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.component.test.core</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.component.web.controller</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.component.web.resources</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.webui.core</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.webui.framework</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.webui.portal</artifactId>
-        <version>${org.gatein.portal.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gatein.portal</groupId>
-        <artifactId>exo.portal.webui.portlet</artifactId>
-        <version>${org.gatein.portal.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
