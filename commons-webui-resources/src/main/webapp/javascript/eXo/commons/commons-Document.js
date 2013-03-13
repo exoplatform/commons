@@ -485,7 +485,7 @@ function BreadCrumbs() {
     var className = 'normal';
     if (name ==null){
       name ='';
-      className= 'uiIconHome';
+      className= 'uiIconTree uiIconLightGray';
     } else {
       name = "" + name;
     }
