@@ -143,11 +143,10 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
       'workspaceName' : workspaceName,
       'name' : name,
       'canAddChild' : canAddChild,
-      'href' : 'javascript:void(0);',
-      'text' : name
+      'href' : 'javascript:void(0);'      
     }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
-    }).append(iconEl);
+    }).append(iconEl).append(name);
     
     var item = jQuery('<li/>', {
                               'class' : 'listItem'
@@ -219,11 +218,11 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
       'canAddChild' : canAddChild,
       'titlePath' : titlePath,
       'jcrPath' : jcrPath,
-      'href' : 'javascript:void(0);',
-      'text' : title
+      'href' : 'javascript:void(0);'      
      }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
-     }).append(iconEl);
+     }).append(iconEl).append(title);
+
     
      var item = jQuery('<li/>', {
                               'class' : 'listItem'
@@ -261,11 +260,12 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	      'name' : node,
 	      'title' : title,
 	      'jcrPath' : jcrPath,
-	      'href' : 'javascript:void(0);',
-	      'text' : title
+	      'href' : 'javascript:void(0);'
 	     }).on('click', function() {
 	      _module.DocumentSelector.submitSelectedFile(this);
 	     }).append(iconEl);
+	     link.html(link.html() + title);	
+
 
 	     var item = jQuery('<li/>', {
 	                              'class' : 'listItem'
@@ -504,9 +504,15 @@ function BreadCrumbs() {
     });
     
     if ( (name.length > 0) && ((appendedNode.find('span.uiIconMiniArrowRight')).length == 0) ) {
-        var iconEl = jQuery('<span/>', {
-          'class' : 'uiIconMiniArrowRight'
-        });
+	var iconEl = "";
+	if(documentItem.currentFolder && documentItem.currentFolder.length > 0) {
+	  iconEl = jQuery('<span/>', {
+	    'class' : 'uiIconMiniArrowRight'
+	  });
+	} else {
+	  iconEl = jQuery('<span/>', {
+	  });
+	}
         
         appendedNode.append(iconEl);
         appendedNode.append(anchorEl);
