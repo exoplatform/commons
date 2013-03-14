@@ -51,7 +51,7 @@
     <!-- Dependencies versions                    -->
     <!-- **************************************** -->
     <!-- eXo deps -->
-    <org.exoplatform.platform-ui.version>1.0.0-SNAPSHOT</org.exoplatform.platform-ui.version>
+    <org.exoplatform.platform-ui.version>4.0.0-SNAPSHOT</org.exoplatform.platform-ui.version>
     <org.exoplatform.depmgt.version>3</org.exoplatform.depmgt.version>
     <org.exoplatform.kernel.version>2.4.2-GA</org.exoplatform.kernel.version>
     <org.exoplatform.core.version>2.5.2-GA</org.exoplatform.core.version>
