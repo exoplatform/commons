@@ -202,7 +202,6 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var canRemove = folderList[i].getAttribute("canRemove");
 	  var canAddChild = folderList[i].getAttribute("canAddChild");
     var workspaceName = folderList[i].getAttribute("workspaceName");
-    
     var iconEl = jQuery('<i/>', {
                               'class' : folderIcon
                             });
@@ -485,11 +484,10 @@ function BreadCrumbs() {
     var className = 'normal';
     if (name ==null){
       name ='';
-      className= 'uiIconTree uiIconLightGray';
+      className= 'uiIconHome uiIconLightGray';
     } else {
       name = "" + name;
     }
-    
     var anchorEl = jQuery('<a/>',{
       'class' : className,
       'driveType' : documentItem.driveType,
@@ -527,12 +525,20 @@ function BreadCrumbs() {
 DocumentSelector.prototype.getClazzIcon = function(nodeType){
   var strClassIcon = '';
   if (!nodeType) {
-    strClassIcon = ".nt_file";
+    strClassIcon = "uiIcon16x16FileDefault";
     return strClassIcon;
   }
-  strClassIcon = nodeType.replace("", "_").replace(":", "_").toLowerCase()  + "16x16Icon";
+  if(nodeType.indexOf("/") >=0)
+    nodeType = nodeType.substring(0, nodeType.indexOf("/")) + eXo.commons.DocumentSelector.capitaliseFirstLetter(nodeType.substring(nodeType.indexOf("/") + 1));
+  
+  strClassIcon = "uiIcon16x16File" + eXo.commons.DocumentSelector.capitaliseFirstLetter(nodeType.substring(nodeType.lastIndexOf(":") + 1));
   return strClassIcon;
 };
+
+DocumentSelector.prototype.capitaliseFirstLetter = function(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 DocumentSelector.prototype.request = function(url){
   var res;
@@ -941,3 +947,4 @@ window.eXo.commons.UIDSUpload = _module.UIDSUpload;
 return _module;
 
 })(jQuery,gtnbase)
+
