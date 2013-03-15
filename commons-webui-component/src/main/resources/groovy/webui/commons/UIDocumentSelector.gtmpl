@@ -66,7 +66,7 @@
         <a href="#" class="actionIcon" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIFormUploadInput.label.Cancel")%>">
         <i class="uiIconRemove"></i>
         </a>
-        </span>
+      </span>
   <div class="fileNameLabel pull-left"></div>
   <div class="pull-left percent">0%</div>
   <div class="progress  progress-striped">

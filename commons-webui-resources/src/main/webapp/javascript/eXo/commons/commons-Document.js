@@ -202,7 +202,6 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var canRemove = folderList[i].getAttribute("canRemove");
 	  var canAddChild = folderList[i].getAttribute("canAddChild");
     var workspaceName = folderList[i].getAttribute("workspaceName");
-    
     var iconEl = jQuery('<i/>', {
                               'class' : folderIcon
                             });
@@ -485,11 +484,10 @@ function BreadCrumbs() {
     var className = 'normal';
     if (name ==null){
       name ='';
-      className= 'uiIconTree uiIconLightGray';
+      className= 'uiIconHome uiIconLightGray';
     } else {
       name = "" + name;
     }
-    
     var anchorEl = jQuery('<a/>',{
       'class' : className,
       'driveType' : documentItem.driveType,
@@ -527,12 +525,20 @@ function BreadCrumbs() {
 DocumentSelector.prototype.getClazzIcon = function(nodeType){
   var strClassIcon = '';
   if (!nodeType) {
-    strClassIcon = ".nt_file";
+    strClassIcon = "uiIcon16x16FileDefault";
     return strClassIcon;
   }
-  strClassIcon = nodeType.replace("", "_").replace(":", "_").toLowerCase()  + "16x16Icon";
+  if(nodeType.indexOf("/") >=0)
+    nodeType = nodeType.substring(0, nodeType.indexOf("/")) + eXo.commons.DocumentSelector.capitaliseFirstLetter(nodeType.substring(nodeType.indexOf("/") + 1));
+  
+  strClassIcon = "uiIcon16x16File" + eXo.commons.DocumentSelector.capitaliseFirstLetter(nodeType.substring(nodeType.lastIndexOf(":") + 1));
   return strClassIcon;
 };
+
+DocumentSelector.prototype.capitaliseFirstLetter = function(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 DocumentSelector.prototype.request = function(url){
   var res;
@@ -740,7 +746,8 @@ function UIDSUpload() {
 	        alert(container.getAttribute("upload_failed"));
 	      }
  		var progressBarFrame = jQuery("div.progressBarFrame:first");
-		progressBarFrame.hide() ;  
+	      bar.css("width", 0 + "%");
+	      progressBarFrame.hide() ;  
 	      me.saveUploaded(elementId, fileName);
 	      documentSelector.renderDetails(selectedItem);
 	      //var refreshUpload = eXo.core.DOMUtil.findFirstDescendantByClass(container, "a", "RefreshUpload") ; 
@@ -809,16 +816,17 @@ function UIDSUpload() {
 	 */
 	UIDSUpload.prototype.abortUpload = function(id) {
 	  var me = _module.UIDSUpload;
-	  me.listUpload.remove(id);
+	  var idUpload=jQuery("div.uiUploadArea .UIDSUploadInput").attr("id");
+	  me.listUpload.remove(idUpload);
 	  
-	  var container = jQuery(parent.document.getElementById(id));
-	  var uploadIframe = container.find("#"+id+"UploadIframe");
+	  var container = jQuery(parent.document.getElementById(idUpload));
+	  var uploadIframe = container.find("#"+idUpload+"UploadIframe");
 	  uploadIframe.show();
 	  me.createUploadEntry(id, me.isAutoUpload);
-	  var progressIframe = container.find("#"+id+"ProgressIframe") ;
+	  var progressIframe = container.find("#"+idUpload+"ProgressIframe") ;
 	  progressIframe.hide('fast', function() {
 		  var url_ = _module.UIDSUpload.restContext + "/control?" ;
-		  url_ += "uploadId=" +id+"&action=abort" ;
+		  url_ += "uploadId=" +idUpload+"&action=abort" ;
 		  jQuery.ajax({
 			  url: url_,
 			  type: "GET",
@@ -838,7 +846,7 @@ function UIDSUpload() {
 	  var selectFileFrame = jQuery("div.SelectFileFrame:first",container);
 	  selectFileFrame.hide() ;
 	   
-	  var  input = parent.document.getElementById('input' + id);
+	  var  input = parent.document.getElementById('input' + idUpload);
 	  input.value = "false";
 	};
 
@@ -889,7 +897,7 @@ function UIDSUpload() {
 	  
 	
 	  var uploadIframe = jQuery("#"+id+"UploadIframe",container);
-	//  uploadIframe.hide();
+	  uploadIframe.hide();
 	
 	 var progressIframe = jQuery("#"+id+"ProgressIframe",container);
 	 progressIframe.hide();
