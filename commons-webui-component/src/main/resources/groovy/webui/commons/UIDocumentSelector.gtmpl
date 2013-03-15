@@ -61,6 +61,18 @@
 	  </div>
     <ul class="breadcrumb pull-left" id="BreadcumbsContainer"></ul>  
 	</div>
+  <div  style="display: none;" class="center progressBarFrame clearfix">
+      <span class="deleteFileLabel pull-right">
+        <a href="#" class="actionIcon" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIFormUploadInput.label.Cancel")%>">
+        <i class="uiIconRemove"></i>
+        </a>
+        </span>
+  <div class="fileNameLabel pull-left"></div>
+  <div class="pull-left percent">0%</div>
+  <div class="progress  progress-striped">
+     <div class="bar" style="width:0%"></div>
+  </div>
+ </div>
 	<ul class="listContainer" id="ListRecords">
 	</ul>
 </div>

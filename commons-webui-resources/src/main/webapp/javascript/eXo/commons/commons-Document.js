@@ -727,22 +727,28 @@ function UIDSUpload() {
 	    if(nodeList.length > 0) oProgress = nodeList[0];
 	    var percent = oProgress.getAttribute("percent");
 	    var fileName = oProgress.getAttribute("fileName");
-	    //progress Bar Label
-	    var progressBarLabel = jQuery("div.ProgressBarLabel:first",container).html(percent + "%");   
-	    
-	    if(percent == 100) {
+            //progress Bar Label
+	    var progressBarFrame = jQuery("div.progressBarFrame:first");
+  	    var percentVal = jQuery("div.percent",progressBarFrame);
+            percentVal.html(percent+"%");
+	    var bar = jQuery("div.bar:first",progressBarFrame);
+	    bar.css("width", percent + "%");
+	   // var progressBarLabel = jQuery("div.ProgressBarLabel:first",container).html(percent + "%");   
+	     if(percent == 100) {
 	      me.listUpload.remove(elementId);
 	      if (!fileName || fileName=="") {
 	        alert(container.getAttribute("upload_failed"));
 	      }
+ 		var progressBarFrame = jQuery("div.progressBarFrame:first");
+		progressBarFrame.hide() ;  
 	      me.saveUploaded(elementId, fileName);
 	      documentSelector.renderDetails(selectedItem);
 	      //var refreshUpload = eXo.core.DOMUtil.findFirstDescendantByClass(container, "a", "RefreshUpload") ; 
 	      var refreshUpload = jQuery("a.RefreshUpload:first",container);
 	      if (refreshUpload){
 	        eval(refreshUpload.attr("href"));
-	      }      
-	    }
+	      }
+	     }
 	   }
 	};
 
@@ -787,7 +793,7 @@ function UIDSUpload() {
 	  progressIframe.hide();
 	  
 	  //var progressBarFrame = eXo.core.DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
-	  var progressBarFrame = jQuery("div.ProgressBarFrame:first",container) ;
+	  var progressBarFrame = jQuery("div.progressBarFrame:first") ;
 	  progressBarFrame.hide() ;
 	  var tmp = element.parent();
 	  var temp = tmp.parent();
@@ -810,7 +816,6 @@ function UIDSUpload() {
 	  uploadIframe.show();
 	  me.createUploadEntry(id, me.isAutoUpload);
 	  var progressIframe = container.find("#"+id+"ProgressIframe") ;
-
 	  progressIframe.hide('fast', function() {
 		  var url_ = _module.UIDSUpload.restContext + "/control?" ;
 		  url_ += "uploadId=" +id+"&action=abort" ;
@@ -827,7 +832,7 @@ function UIDSUpload() {
 	// var child = eXo.core.DOMUtil.getChildrenByTagName(temp,"label");
 	// child[0].style.visibility = "visible" ;
 	  //var progressBarFrame = eXo.core.DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
-	  var progressBarFrame = jQuery("div.ProgressBarFrame:first",container);
+	  var progressBarFrame = jQuery("div.progressBarFrame:first");
 	  progressBarFrame.hide() ;
 	  //var selectFileFrame = eXo.core.DOMUtil.findFirstDescendantByClass(container, "div", "SelectFileFrame") ;
 	  var selectFileFrame = jQuery("div.SelectFileFrame:first",container);
@@ -870,31 +875,32 @@ function UIDSUpload() {
 	  //var file  = DOMUtil.findDescendantById(form, "file");
 	  var file  = jQuery("#file",form);
 	  if(file.attr("value") == null || file.attr("value") == '') return;  
-
-	  //var progressBarFrame = DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
-	  var progressBarFrame = jQuery("div.ProgressBarFrame:first",container);
+  	  jQuery(".fileNameLabel").html(file.attr("value"));
+ 	 //var progressBarFrame = DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
+	  var progressBarFrame = jQuery("div.progressBarFrame:first");
 	  progressBarFrame.show() ;  
 	  
 	  //var progressBarLabel = DOMUtil.findFirstChildByClass(progressBarFrame, "div", "ProgressBarLabel") ;
-	  var progressBarLabel = jQuery("div.ProgressBarLabel:first-child",progressBarFrame);
+	  var progressBarLabel = jQuery("div.pull-left percent:first-child",progressBarFrame);
 	  progressBarLabel.html("0%") ;
 	  
 	  var  input = parent.document.getElementById('input' + id);
 	  input.value = "true";
 	  
-	  //var uploadIframe = DOMUtil.findDescendantById(container, id+"UploadIframe");
+	
 	  var uploadIframe = jQuery("#"+id+"UploadIframe",container);
-	  uploadIframe.hide();
-	  //var progressIframe = DOMUtil.findDescendantById(container, id+"ProgressIframe");
-	  var progressIframe = jQuery("#"+id+"ProgressIframe",container);
-	  progressIframe.hide();
+	//  uploadIframe.hide();
+	
+	 var progressIframe = jQuery("#"+id+"ProgressIframe",container);
+	 progressIframe.hide();
 
-	  var tmp = progressIframe.parent();
-	  var temp = tmp.parent();
+	var tmp = progressIframe.parent();
+	 var temp = tmp.parent();
 	  
 	  form.submit() ;
 	  
 	  var list = me.listUpload;
+
 	  if(list.length == 0) {
 	    me.listUpload.push(form.id);
 	    setTimeout("eXo.commons.UIDSUpload.refeshProgress('" + id + "');", 1000);
