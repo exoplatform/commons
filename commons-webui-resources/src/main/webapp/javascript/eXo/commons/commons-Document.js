@@ -131,7 +131,7 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
    var nodeType = folderList[i].getAttribute("nodeType");
    var workspaceName = folderList[i].getAttribute("workspaceName");
    var canAddChild = folderList[i].getAttribute("canAddChild");
-   var uiIconFolder = me.getClazzIcon(folderList[i].getAttribute("nodeType"))
+   var uiIconFolder = "uiIcon16x16FolderDefault " + me.getClazzIcon(folderList[i].getAttribute("nodeType"))
    var iconEl = jQuery('<i/>', {
                               'class' : uiIconFolder
                             });
@@ -191,7 +191,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
   }
 
 	for ( var i = 0; i < folderList.length; i++) { // render folders
-	  var folderIcon = me.getClazzIcon(folderList[i].getAttribute("nodeType"));
+	  var folderIcon = "uiIcon16x16FolderDefault " + me.getClazzIcon(folderList[i].getAttribute("nodeType"));
 	  var jcrPath = folderList[i].getAttribute("path");
 	  var nodeType = folderList[i].getAttribute("folderType");
 	  var name = folderList[i].getAttribute("name");
@@ -247,7 +247,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
         size += '&nbsp;MB';
       }
       
-      var fileIcon = me.getClazzIcon(fileList[j].getAttribute("nodeType"));
+      var fileIcon = "uiIcon16x16FileDefault " + me.getClazzIcon(fileList[j].getAttribute("nodeType"));
     
     
 	    var iconEl = jQuery('<i/>', {
@@ -525,20 +525,15 @@ function BreadCrumbs() {
 DocumentSelector.prototype.getClazzIcon = function(nodeType){
   var strClassIcon = '';
   if (!nodeType) {
-    strClassIcon = "uiIcon16x16FileDefault";
+    strClassIcon = "uiIcon16x16Default";
     return strClassIcon;
   }
-  if(nodeType.indexOf("/") >=0)
-    nodeType = nodeType.substring(0, nodeType.indexOf("/")) + eXo.commons.DocumentSelector.capitaliseFirstLetter(nodeType.substring(nodeType.indexOf("/") + 1));
-  
-  strClassIcon = "uiIcon16x16File" + eXo.commons.DocumentSelector.capitaliseFirstLetter(nodeType.substring(nodeType.lastIndexOf(":") + 1));
+  nodeType = nodeType.replace(/\//g,"").replace(/:/g, "_");  
+  strClassIcon = "uiIcon16x16" + nodeType;
   return strClassIcon;
 };
 
-DocumentSelector.prototype.capitaliseFirstLetter = function(string)
-{
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+
 
 DocumentSelector.prototype.request = function(url){
   var res;
