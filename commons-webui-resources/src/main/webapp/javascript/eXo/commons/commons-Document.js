@@ -817,7 +817,7 @@ function UIDSUpload() {
 	  var container = jQuery(parent.document.getElementById(idUpload));
 	  var uploadIframe = container.find("#"+idUpload+"UploadIframe");
 	  uploadIframe.show();
-	  me.createUploadEntry(id, me.isAutoUpload);
+	  me.createUploadEntry(idUpload, me.isAutoUpload);
 	  var progressIframe = container.find("#"+idUpload+"ProgressIframe") ;
 	  progressIframe.hide('fast', function() {
 		  var url_ = _module.UIDSUpload.restContext + "/control?" ;

@@ -10,6 +10,7 @@
   	requireJS.require("SHARED/commons-document","document");  
   	requireJS.require("SHARED/jquery", "jQuery");	
   	requireJS.addScripts("document.UIDSUpload.initUploadEntry('" +uploadId+ "'," +isAutoUpload+ ");");
+    requireJS.addScripts("jQuery('span.deleteFileLabel').click(function(){document.UIDSUpload.abortUpload("+uploadId+");});");
 %>
 
 <div class="UIDSUploadInput" id="$uploadId" upload_failed="<%= _ctx.appRes("UIFormUploadInput.msg.upload_failed"); %>">
