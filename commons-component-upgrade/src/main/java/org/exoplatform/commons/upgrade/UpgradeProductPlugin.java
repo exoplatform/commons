@@ -129,7 +129,7 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
    *          true: if the plugin should be executed when switching product from previousVersion to newVersion
    *          true: if the upgrade isn't necessary
    */
-  public abstract boolean shouldProceedToUpgrade(String previousVersion, String newVersion);
+  public abstract boolean shouldProceedToUpgrade(String newVersion, String previousVersion);
 
   /**
    * {@inheritDoc}
