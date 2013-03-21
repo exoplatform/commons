@@ -19,32 +19,25 @@
 
 package org.exoplatform.commons.juzu.ajax;
 
-import juzu.PropertyMap;
-import juzu.PropertyType;
-import juzu.Response;
-import juzu.asset.Asset;
-import juzu.asset.AssetLocation;
-import juzu.impl.common.JSON;
-import juzu.impl.metadata.Descriptor;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import juzu.impl.plugin.application.descriptor.ApplicationDescriptor;
-import juzu.impl.asset.AssetManager;
-import juzu.impl.asset.AssetMetaData;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import juzu.PropertyMap;
+import juzu.Response;
+import juzu.impl.metadata.Descriptor;
+import juzu.impl.plugin.PluginContext;
 import juzu.impl.plugin.application.ApplicationPlugin;
+import juzu.impl.plugin.controller.ControllerPlugin;
 import juzu.impl.request.Method;
 import juzu.impl.request.Request;
 import juzu.impl.request.RequestFilter;
 import juzu.io.Stream;
 import juzu.io.Streamable;
 import juzu.request.RenderContext;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 public class AjaxPlugin extends ApplicationPlugin implements RequestFilter {
@@ -53,22 +46,22 @@ public class AjaxPlugin extends ApplicationPlugin implements RequestFilter {
   Map<String, Method> table;
 
   @Inject
-  ApplicationDescriptor desc;
+  ControllerPlugin controllerPlugin;
 
   public AjaxPlugin() {
     super("plf4-ajax");
   }
 
   @Override
-  public Descriptor init(ApplicationDescriptor application, JSON config) throws Exception {
-    return config != null ? new Descriptor() : null;
+  public Descriptor init(PluginContext context) throws Exception {
+    return context.getConfig() != null ? new Descriptor() : null;
   }
 
   @PostConstruct
   public void start() throws Exception {
     //
     Map<String, Method> table = new HashMap<String, Method>();
-    for (Method cm : desc.getControllers().getMethods()) {
+    for (Method cm : controllerPlugin.getDescriptor().getMethods()) {
       Ajax ajax = cm.getMethod().getAnnotation(Ajax.class);
       if (ajax != null) {
         table.put(cm.getName(), cm);
