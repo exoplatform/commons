@@ -16,6 +16,7 @@ import org.exoplatform.commons.info.ProductInformations;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -23,6 +24,7 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
 
   private static final Log LOG = ExoLogger.getLogger(UpgradeProductPlugin.class);
   private static final String PRODUCT_GROUP_ID = "product.group.id";
+  private static final String OLD_PRODUCT_GROUP_ID = "old.product.group.id";
   private static final String UPGRADE_PLUGIN_EXECUTION_ORDER = "plugin.execution.order";
   private static final String UPGRADE_PLUGIN_ENABLE = "commons.upgrade.{$0}.enable";
   
@@ -32,6 +34,8 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
    * The plugin's product maven group identifier, by example: org.exoplatform.portal for gatein.
    */
   protected String productGroupId;
+  
+  protected String oldProductGroupId;
 
   public UpgradeProductPlugin(InitParams initParams) {
     if (!initParams.containsKey(PRODUCT_GROUP_ID)) {
@@ -40,7 +44,14 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
       }
       return;
     }
+    
+    //
     productGroupId = initParams.getValueParam(PRODUCT_GROUP_ID).getValue();
+    
+    //
+    ValueParam vp = initParams.getValueParam(OLD_PRODUCT_GROUP_ID);
+    oldProductGroupId = vp != null ? vp.getValue() : productGroupId;
+    
     if (!initParams.containsKey(UPGRADE_PLUGIN_EXECUTION_ORDER)) {
       pluginExecutionOrder = 0;
     }else{
@@ -52,6 +63,15 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
     return productGroupId;
   }
   
+
+  /**
+   * Gets old version what needs to upgrade
+   * @return
+   */
+  public String getOldProductGroupId() {
+    return oldProductGroupId;
+  }
+
   /**
    * Determines if the plugin is enabled, this method will be called when adding the plugin to the upgradePlugins list.
    * See {@link UpgradeProductService#addUpgradePlugin(UpgradeProductPlugin)}

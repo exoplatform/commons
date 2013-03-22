@@ -194,6 +194,39 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     }
 
   }
+  
+  public static class UpgradePluginFromVersionONE extends UpgradeProductPlugin {
+
+    public UpgradePluginFromVersionONE(InitParams initParams) {
+      super(initParams);
+    }
+
+    @Override
+    public void processUpgrade(String oldVersion, String newVersion) {
+      try {
+        Node upgradeNode = getUpgradeProductTestNode();
+        addNodeVersion(upgradeNode, newVersion + "-ONE-SNAPSHOT");
+        upgradeNode.save();
+
+        upgradeNode.addNode("upgradeFromONE");
+        upgradeNode.save();
+        addNodeVersion(upgradeNode, newVersion + "-ONE");
+        upgradeNode.save();
+        upgradeNode.getSession().save();
+      } catch (RepositoryException e) {
+        fail();
+      } catch (RepositoryConfigurationException e) {
+      }
+    }
+
+    @Override
+    public boolean shouldProceedToUpgrade(String newVersion, String previousVersion) {
+      if (previousVersion.equals("0"))
+        return true;
+      return false;
+    }
+
+  }
 
   public static class UpgradePluginFromVersionX extends UpgradeProductPlugin {
 

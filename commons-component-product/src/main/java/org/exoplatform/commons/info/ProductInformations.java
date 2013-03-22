@@ -71,22 +71,7 @@ public class ProductInformations implements Startable {
 
   public static final String WORKING_WORSPACE_NAME = "working.worspace.name";
 
-  /** just a workaround for PLF-4667 we need a solution de get old project groupID
-   * ks --> forum + wiki
-   *  cs --> calendar
-   */
-  private static final String OLD_KS_GROUP_ID = "org.exoplatform.ks";
-
-  private static final String OLD_CS_GROUP_ID = "org.exoplatform.cs";
-
-  private static final String NEW_CS_CALENDAR_LABEL = "calendar";
-
-  private static final String NEW_KS_WIKI_LABEL = "wiki";
-
-  private static final String NEW_KS_FORUM_LABEL = "forum";
-
-
-
+  
   /**
    * Constant that will be used in nodeHierarchyCreator.getJcrPath: it
    * represents the Application data root node Alias
@@ -258,16 +243,8 @@ public class ProductInformations implements Startable {
    *         version.
    */
   public String getPreviousVersion(String productGroupId) throws MissingProductInformationException {
-
-    // --- just a workaround PLF-4667 we need a solution de get old project groupID
     if (!previousProductInformationProperties.containsKey(productGroupId)) {
-        if ( (productGroupId.contains(NEW_KS_FORUM_LABEL)) || (productGroupId.contains(NEW_KS_WIKI_LABEL))){
-            return previousProductInformationProperties.getProperty(OLD_KS_GROUP_ID);
-        } else if (productGroupId.contains(NEW_CS_CALENDAR_LABEL)) {
-            return previousProductInformationProperties.getProperty(OLD_CS_GROUP_ID);
-        } else {
-            throw new MissingProductInformationException(productGroupId);
-        }
+      throw new MissingProductInformationException(productGroupId);
     }
     return previousProductInformationProperties.getProperty(productGroupId);
   }

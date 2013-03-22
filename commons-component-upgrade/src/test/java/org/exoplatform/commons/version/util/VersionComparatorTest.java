@@ -14,6 +14,7 @@ public class VersionComparatorTest extends TestCase {
 
   public void testIsAfter() {
     assertTrue(VersionComparator.isAfter("2.2", "2.1"));
+    assertTrue(VersionComparator.isAfter("4.0.0-relooking-SNAPSHOT", "2.3.10-SNAPSHOT"));
     assertFalse(VersionComparator.isAfter("2.1", "2.2"));
     assertFalse(VersionComparator.isAfter("2.1", "2.1"));
     assertFalse(VersionComparator.isAfter("", "2.1"));

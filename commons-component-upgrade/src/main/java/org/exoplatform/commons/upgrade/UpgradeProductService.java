@@ -137,7 +137,9 @@ public class UpgradeProductService implements Startable {
   private void doUpgrade(UpgradeProductPlugin upgradeProductPlugin, int order) {
     try {
       String currentProductPluginVersion = productInformations.getVersion(upgradeProductPlugin.getProductGroupId());
-      String previousProductPluginVersion = productInformations.getPreviousVersion(upgradeProductPlugin.getProductGroupId());
+      String previousProductPluginVersion = productInformations.getPreviousVersion(upgradeProductPlugin.getOldProductGroupId());
+      
+      //
       if (upgradeProductPlugin.shouldProceedToUpgrade(currentProductPluginVersion, previousProductPluginVersion)) {
         LOG.info("Proceed upgrade plugin: name = " + upgradeProductPlugin.getName() + " from version "
             + previousProductPluginVersion + " to " + currentProductPluginVersion + " with execution order = " + order);
