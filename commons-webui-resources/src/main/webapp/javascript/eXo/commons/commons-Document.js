@@ -678,7 +678,7 @@ function UIDSUpload() {
 	  styleText += "body { margin:0; padding:0}";
 	  styleText += ".UIDSUploadForm {position: relative; }";
 	  styleText += ".FileHidden { opacity: 0; overflow: hidden; position: absolute; height: 32px; top: 0px; left: 0px; width: 100%; -moz-opacity:0 ; filter:alpha(opacity: 0); z-index: 1;} ";  
-	  styleText += ".BrowseLink { position: relative; font-family: Arial, Helvetica, sans-serif; text-align: left; top:0px; padding: 0 10px 5px; text-decoration: none;";
+	  styleText += ".BrowseLink { position: relative; font-family: Arial, Helvetica, sans-serif; text-align: left; top:0px; padding: 0 10px 5px; text-decoration: none; border: 1px solid transparent;";
 	  styleText += "     text-decoration: none;";
 	  styleText += "    background: url('/CommonsResources/skin/less/DocumentSelector/images/fileShareUpload.png') no-repeat 3px center;}";
 	  styleText += ".UIDSUploadForm a:hover {text-decoration: none; background-color: #F9F9F9; border: 1px solid #CFCFCF; border-radius: 3px 3px 3px 3px; box-shadow: 0 1px 2px 0 #FFFFFF; cursor: pointer;}";
