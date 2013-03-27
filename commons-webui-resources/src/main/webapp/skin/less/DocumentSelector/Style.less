@@ -6,16 +6,34 @@
 	}
 }
 
+.uiDocumentSelector [class^="uiIcon"] {
+	margin-right: 8px;	
+}
+
+.uiDocumentSelector .btn .caret {
+	margin-left: 8px;
+	display: inline-block;
+}
+
+.uiDocumentSelector .actions [class^="uiIcon"] {
+    margin-right: 0;
+}
+
+.uiDocumentSelector .actions [class^="uiIcon"]:hover {
+	background-image: url("/eXoResources/skin/images/Icons/uiIconsLightGray.png");
+}
+
 .uiDocumentSelector iframe {
-	.size(25px,30px);
+	.size(26px,30px);
 }
 
 .uiDocumentSelector .listContainer {
 	background: #F8F8F8;
 	border: 1px solid #D9D9D9;
 	list-style: none outside none;
-	margin: 0;
-	padding: 0;
+	margin: 5px 0 0;
+	padding: 5px 0;
+	.border-radius(2px);
 }
 
 .uiDocumentSelector .listContainer li {
@@ -25,4 +43,8 @@
 
 .uiDocumentSelector .listContainer a {
 	color: @textColor;
+}
+
+.uiDocumentSelector .listContainer a:hover {
+	color: @linkColor;
 }

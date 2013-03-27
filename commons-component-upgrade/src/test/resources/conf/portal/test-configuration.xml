@@ -56,6 +56,26 @@
 				</value-param>
 			</init-params>
 		</component-plugin>
+		<component-plugin>
+			<name>testUpgradePortal</name>
+			<set-method>addUpgradePlugin</set-method>
+			<type>org.exoplatform.commons.upgrade.UpgradeProductTest$UpgradePluginFromVersionONE</type>
+			<description></description>
+			<init-params>
+				<value-param>
+					<name>product.group.id</name>
+					<value>org.exoplatform.portal</value>
+				</value-param>
+				<value-param>
+					<name>old.product.group.id</name>
+					<value>org.gatein.portal</value>
+				</value-param>
+				<value-param>
+					<name>plugin.execution.order</name>
+					<value>2</value>
+				</value-param>
+			</init-params>
+		</component-plugin>
 	</external-component-plugins>
 
 	<!-- Upgrade plugin for ECMS: Only upgrade if previous version > ZERO -->

@@ -6,12 +6,13 @@
 	String refreshUpload = uicomponent.getRefreshUploadAction();
 	boolean isAutoUpload = uicomponent.isAutoUpload();
 	
-	def requireJS = rcontext.getJavascriptManager().getRequireJS();	
+	  def requireJS = rcontext.getJavascriptManager().getRequireJS();	
   	requireJS.require("SHARED/commons-document","document");  
   	requireJS.require("SHARED/jquery", "jQuery");	
   	requireJS.addScripts("document.UIDSUpload.initUploadEntry('" +uploadId+ "'," +isAutoUpload+ ");");
-  	requireJS.addScripts("jQuery('#deleteFF').click(function(){document.UIDSUpload.abortUpload("+uploadId+");});");  	
+    requireJS.addScripts("jQuery('span.deleteFileLabel').click(function(){document.UIDSUpload.abortUpload("+uploadId+");});");
 %>
+
 <div class="UIDSUploadInput" id="$uploadId" upload_failed="<%= _ctx.appRes("UIFormUploadInput.msg.upload_failed"); %>">
 	<div class="LimitMessage" style="display: none;"><%= _ctx.appRes("UIFormUploadInput.msg.limit"); %></div>
 	<input type="hidden" id="input$uploadId" name="<%=uicomponent.getName();%>" value="false"/>
@@ -19,11 +20,5 @@
 		<iframe width="100%" allowTransparency="true" scrolling="no" frameborder="0" framespacing="0" id="<%=uploadId;%>uploadFrame"></iframe>
 	</div>
 	<div id="<%=uploadId;%>ProgressIframe" class="ProgressIframe" style="display: none;"></div>			
-	<div class="ProgressBarFrame" style="display: none;">
-		
-		<div id="deleteFF" class="DeleteFileFrame">&nbsp;
-		</div>
-		<div class="ProgressBarLabel">0%</div>
-	</div>
 	<a href="$refreshUpload" class="RefreshUpload" style="display:none"></a>	
 </div>

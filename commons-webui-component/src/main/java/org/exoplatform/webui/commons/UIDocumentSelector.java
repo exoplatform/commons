@@ -53,7 +53,7 @@ import org.exoplatform.webui.event.EventListener;
  @ComponentConfig(
    type = UIDropDownControl.class, 
    id = "DriveTypeDropDown", 
-   template = "system:/groovy/webui/core/UIDropDownControl.gtmpl",
+   template = "classpath:groovy/webui/commons/UIDropDownControl.gtmpl",
    events = {
      @EventConfig(listeners = UIDocumentSelector.ChangeOptionActionListener.class)
    }

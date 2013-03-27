@@ -131,7 +131,7 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
    var nodeType = folderList[i].getAttribute("nodeType");
    var workspaceName = folderList[i].getAttribute("workspaceName");
    var canAddChild = folderList[i].getAttribute("canAddChild");
-   var uiIconFolder = me.getClazzIcon(folderList[i].getAttribute("nodeType"))
+   var uiIconFolder = "uiIcon16x16FolderDefault " + me.getClazzIcon(folderList[i].getAttribute("nodeType"))
    var iconEl = jQuery('<i/>', {
                               'class' : uiIconFolder
                             });
@@ -143,11 +143,10 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
       'workspaceName' : workspaceName,
       'name' : name,
       'canAddChild' : canAddChild,
-      'href' : 'javascript:void(0);',
-      'text' : name
+      'href' : 'javascript:void(0);'      
     }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
-    }).append(iconEl);
+    }).append(iconEl).append(name);
     
     var item = jQuery('<li/>', {
                               'class' : 'listItem'
@@ -192,7 +191,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
   }
 
 	for ( var i = 0; i < folderList.length; i++) { // render folders
-	  var folderIcon = me.getClazzIcon(folderList[i].getAttribute("nodeType"));
+	  var folderIcon = "uiIcon16x16FolderDefault " + me.getClazzIcon(folderList[i].getAttribute("nodeType"));
 	  var jcrPath = folderList[i].getAttribute("path");
 	  var nodeType = folderList[i].getAttribute("folderType");
 	  var name = folderList[i].getAttribute("name");
@@ -203,7 +202,6 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var canRemove = folderList[i].getAttribute("canRemove");
 	  var canAddChild = folderList[i].getAttribute("canAddChild");
     var workspaceName = folderList[i].getAttribute("workspaceName");
-    
     var iconEl = jQuery('<i/>', {
                               'class' : folderIcon
                             });
@@ -219,11 +217,11 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
       'canAddChild' : canAddChild,
       'titlePath' : titlePath,
       'jcrPath' : jcrPath,
-      'href' : 'javascript:void(0);',
-      'text' : title
+      'href' : 'javascript:void(0);'      
      }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
-     }).append(iconEl);
+     }).append(iconEl).append(title);
+
     
      var item = jQuery('<li/>', {
                               'class' : 'listItem'
@@ -249,7 +247,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
         size += '&nbsp;MB';
       }
       
-      var fileIcon = me.getClazzIcon(fileList[j].getAttribute("nodeType"));
+      var fileIcon = "uiIcon16x16FileDefault " + me.getClazzIcon(fileList[j].getAttribute("nodeType"));
     
     
 	    var iconEl = jQuery('<i/>', {
@@ -261,11 +259,12 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	      'name' : node,
 	      'title' : title,
 	      'jcrPath' : jcrPath,
-	      'href' : 'javascript:void(0);',
-	      'text' : title
+	      'href' : 'javascript:void(0);'
 	     }).on('click', function() {
 	      _module.DocumentSelector.submitSelectedFile(this);
 	     }).append(iconEl);
+	     link.html(link.html() + title);	
+
 
 	     var item = jQuery('<li/>', {
 	                              'class' : 'listItem'
@@ -485,11 +484,10 @@ function BreadCrumbs() {
     var className = 'normal';
     if (name ==null){
       name ='';
-      className= 'uiIconHome';
+      className= 'uiIconTree uiIconLightGray';
     } else {
       name = "" + name;
     }
-    
     var anchorEl = jQuery('<a/>',{
       'class' : className,
       'driveType' : documentItem.driveType,
@@ -504,9 +502,15 @@ function BreadCrumbs() {
     });
     
     if ( (name.length > 0) && ((appendedNode.find('span.uiIconMiniArrowRight')).length == 0) ) {
-        var iconEl = jQuery('<span/>', {
-          'class' : 'uiIconMiniArrowRight'
-        });
+	var iconEl = "";
+	if(documentItem.currentFolder && documentItem.currentFolder.length > 0) {
+	  iconEl = jQuery('<span/>', {
+	    'class' : 'uiIconMiniArrowRight'
+	  });
+	} else {
+	  iconEl = jQuery('<span/>', {
+	  });
+	}
         
         appendedNode.append(iconEl);
         appendedNode.append(anchorEl);
@@ -521,12 +525,15 @@ function BreadCrumbs() {
 DocumentSelector.prototype.getClazzIcon = function(nodeType){
   var strClassIcon = '';
   if (!nodeType) {
-    strClassIcon = ".nt_file";
+    strClassIcon = "uiIcon16x16Default";
     return strClassIcon;
   }
-  strClassIcon = nodeType.replace("", "_").replace(":", "_").toLowerCase()  + "16x16Icon";
+  nodeType = nodeType.replace(/\//g,"").replace(/:/g, "_");  
+  strClassIcon = "uiIcon16x16" + nodeType;
   return strClassIcon;
 };
+
+
 
 DocumentSelector.prototype.request = function(url){
   var res;
@@ -671,10 +678,10 @@ function UIDSUpload() {
 	  styleText += "body { margin:0; padding:0}";
 	  styleText += ".UIDSUploadForm {position: relative; }";
 	  styleText += ".FileHidden { opacity: 0; overflow: hidden; position: absolute; height: 32px; top: 0px; left: 0px; width: 100%; -moz-opacity:0 ; filter:alpha(opacity: 0); z-index: 1;} ";  
-	  styleText += ".BrowseLink { position: relative; font-family: Arial, Helvetica, sans-serif; text-align: left; top:5px;padding: 3px 10px 3px 11px;";
+	  styleText += ".BrowseLink { position: relative; font-family: Arial, Helvetica, sans-serif; text-align: left; top:0px; padding: 0 10px 5px; text-decoration: none; border: 1px solid transparent;";
 	  styleText += "     text-decoration: none;";
-	  styleText += "    background: url('/ecmexplorer/skin/icons/24x24/DefaultSkin/UploadFile.png') no-repeat 2px center;}";
-	  styleText += ".UIDSUploadForm a:hover {text-decoration: underline;}";
+	  styleText += "    background: url('/CommonsResources/skin/less/DocumentSelector/images/fileShareUpload.png') no-repeat 3px center;}";
+	  styleText += ".UIDSUploadForm a:hover {text-decoration: none; background-color: #F9F9F9; border: 1px solid #CFCFCF; border-radius: 3px 3px 3px 3px; box-shadow: 0 1px 2px 0 #FFFFFF; cursor: pointer;}";
 	  return styleText;
 	}
 
@@ -721,22 +728,29 @@ function UIDSUpload() {
 	    if(nodeList.length > 0) oProgress = nodeList[0];
 	    var percent = oProgress.getAttribute("percent");
 	    var fileName = oProgress.getAttribute("fileName");
-	    //progress Bar Label
-	    var progressBarLabel = jQuery("div.ProgressBarLabel:first",container).html(percent + "%");   
-	    
-	    if(percent == 100) {
+            //progress Bar Label
+	    var progressBarFrame = jQuery("div.progressBarFrame:first");
+  	    var percentVal = jQuery("div.percent",progressBarFrame);
+            percentVal.html(percent+"%");
+	    var bar = jQuery("div.bar:first",progressBarFrame);
+	    bar.css("width", percent + "%");
+	   // var progressBarLabel = jQuery("div.ProgressBarLabel:first",container).html(percent + "%");   
+	     if(percent == 100) {
 	      me.listUpload.remove(elementId);
 	      if (!fileName || fileName=="") {
 	        alert(container.getAttribute("upload_failed"));
 	      }
+ 		var progressBarFrame = jQuery("div.progressBarFrame:first");
+	      bar.css("width", 0 + "%");
+	      progressBarFrame.hide() ;  
 	      me.saveUploaded(elementId, fileName);
 	      documentSelector.renderDetails(selectedItem);
 	      //var refreshUpload = eXo.core.DOMUtil.findFirstDescendantByClass(container, "a", "RefreshUpload") ; 
 	      var refreshUpload = jQuery("a.RefreshUpload:first",container);
 	      if (refreshUpload){
 	        eval(refreshUpload.attr("href"));
-	      }      
-	    }
+	      }
+	     }
 	   }
 	};
 
@@ -781,7 +795,7 @@ function UIDSUpload() {
 	  progressIframe.hide();
 	  
 	  //var progressBarFrame = eXo.core.DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
-	  var progressBarFrame = jQuery("div.ProgressBarFrame:first",container) ;
+	  var progressBarFrame = jQuery("div.progressBarFrame:first") ;
 	  progressBarFrame.hide() ;
 	  var tmp = element.parent();
 	  var temp = tmp.parent();
@@ -797,17 +811,17 @@ function UIDSUpload() {
 	 */
 	UIDSUpload.prototype.abortUpload = function(id) {
 	  var me = _module.UIDSUpload;
-	  me.listUpload.remove(id);
+	  var idUpload=jQuery("div.uiUploadArea .UIDSUploadInput").attr("id");
+	  me.listUpload.remove(idUpload);
 	  
-	  var container = jQuery(parent.document.getElementById(id));
-	  var uploadIframe = container.find("#"+id+"UploadIframe");
+	  var container = jQuery(parent.document.getElementById(idUpload));
+	  var uploadIframe = container.find("#"+idUpload+"UploadIframe");
 	  uploadIframe.show();
-	  me.createUploadEntry(id, me.isAutoUpload);
-	  var progressIframe = container.find("#"+id+"ProgressIframe") ;
-
+	  me.createUploadEntry(idUpload, me.isAutoUpload);
+	  var progressIframe = container.find("#"+idUpload+"ProgressIframe") ;
 	  progressIframe.hide('fast', function() {
 		  var url_ = _module.UIDSUpload.restContext + "/control?" ;
-		  url_ += "uploadId=" +id+"&action=abort" ;
+		  url_ += "uploadId=" +idUpload+"&action=abort" ;
 		  jQuery.ajax({
 			  url: url_,
 			  type: "GET",
@@ -821,13 +835,13 @@ function UIDSUpload() {
 	// var child = eXo.core.DOMUtil.getChildrenByTagName(temp,"label");
 	// child[0].style.visibility = "visible" ;
 	  //var progressBarFrame = eXo.core.DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
-	  var progressBarFrame = jQuery("div.ProgressBarFrame:first",container);
+	  var progressBarFrame = jQuery("div.progressBarFrame:first");
 	  progressBarFrame.hide() ;
 	  //var selectFileFrame = eXo.core.DOMUtil.findFirstDescendantByClass(container, "div", "SelectFileFrame") ;
 	  var selectFileFrame = jQuery("div.SelectFileFrame:first",container);
 	  selectFileFrame.hide() ;
 	   
-	  var  input = parent.document.getElementById('input' + id);
+	  var  input = parent.document.getElementById('input' + idUpload);
 	  input.value = "false";
 	};
 
@@ -864,31 +878,32 @@ function UIDSUpload() {
 	  //var file  = DOMUtil.findDescendantById(form, "file");
 	  var file  = jQuery("#file",form);
 	  if(file.attr("value") == null || file.attr("value") == '') return;  
-
-	  //var progressBarFrame = DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
-	  var progressBarFrame = jQuery("div.ProgressBarFrame:first",container);
+  	  jQuery(".fileNameLabel").html(file.attr("value"));
+ 	 //var progressBarFrame = DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
+	  var progressBarFrame = jQuery("div.progressBarFrame:first");
 	  progressBarFrame.show() ;  
 	  
 	  //var progressBarLabel = DOMUtil.findFirstChildByClass(progressBarFrame, "div", "ProgressBarLabel") ;
-	  var progressBarLabel = jQuery("div.ProgressBarLabel:first-child",progressBarFrame);
+	  var progressBarLabel = jQuery("div.pull-left percent:first-child",progressBarFrame);
 	  progressBarLabel.html("0%") ;
 	  
 	  var  input = parent.document.getElementById('input' + id);
 	  input.value = "true";
 	  
-	  //var uploadIframe = DOMUtil.findDescendantById(container, id+"UploadIframe");
+	
 	  var uploadIframe = jQuery("#"+id+"UploadIframe",container);
 	  uploadIframe.hide();
-	  //var progressIframe = DOMUtil.findDescendantById(container, id+"ProgressIframe");
-	  var progressIframe = jQuery("#"+id+"ProgressIframe",container);
-	  progressIframe.hide();
+	
+	 var progressIframe = jQuery("#"+id+"ProgressIframe",container);
+	 progressIframe.hide();
 
-	  var tmp = progressIframe.parent();
-	  var temp = tmp.parent();
+	var tmp = progressIframe.parent();
+	 var temp = tmp.parent();
 	  
 	  form.submit() ;
 	  
 	  var list = me.listUpload;
+
 	  if(list.length == 0) {
 	    me.listUpload.push(form.id);
 	    setTimeout("eXo.commons.UIDSUpload.refeshProgress('" + id + "');", 1000);

@@ -32,10 +32,13 @@ import org.picocontainer.Startable;
 
 import javax.jcr.*;
 import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
 import java.io.*;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * @author <a href="mailto:anouar.chattouna@exoplatform.com">Anouar
@@ -71,7 +74,7 @@ public class ProductInformations implements Startable {
 
   public static final String WORKING_WORSPACE_NAME = "working.worspace.name";
 
-
+  
   /**
    * Constant that will be used in nodeHierarchyCreator.getJcrPath: it
    * represents the Application data root node Alias
@@ -411,9 +414,20 @@ public class ProductInformations implements Startable {
 
       // Add a version of product informations node, with the previous
       // informations
-      Version version = productVersionDeclarationNode.checkin();
+          Version version = productVersionDeclarationNode.checkin();
       productVersionDeclarationNode.getSession().save();
-      productVersionDeclarationNode.getVersionHistory().addVersionLabel(version.getName(), getPreviousVersion(), false);
+      VersionHistory versionHistory = productVersionDeclarationNode.getVersionHistory();
+      String  versionLabel = null;
+      if(versionHistory.hasVersionLabel(getPreviousVersion())) {
+
+          versionLabel = getPreviousVersion()+"-"+currentFlag();
+
+      } else {
+
+          versionLabel = getPreviousVersion();
+      }
+      versionHistory.addVersionLabel(version.getName(), versionLabel , false);
+
       productVersionDeclarationNode.checkout();
 
       // Update the content of the product informations node, with the new
@@ -517,6 +531,12 @@ public class ProductInformations implements Startable {
         previousProductInformationProperties.setProperty((String) key, defaultVersion);
       }
     }
+  }
+
+  private static int currentFlag () {
+
+      return Calendar.getInstance(TimeZone.getDefault()).get(Calendar.YEAR);
+
   }
 
 }

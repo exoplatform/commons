@@ -9,8 +9,16 @@
   <artifactId>commons-webui-resources</artifactId>
   <packaging>war</packaging>
   <name>eXo Commons - Commons Resources</name>
-  
-    <build>
+  <dependencies>
+    <!-- We want to be sure to use the right version in the dependency plugin but it's not required in the package -->
+    <dependency>
+      <groupId>org.exoplatform.platform-ui</groupId>
+      <artifactId>platform-ui-web-eXoResources</artifactId>
+      <type>war</type>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
     <plugins>
       <!-- Copy project less files -->
       <plugin>
