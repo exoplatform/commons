@@ -41,7 +41,7 @@
 	</div>
     
   <%      
-        String newFolderLink = "<a id=\"createNew\" class=\"actionIcon pull-right\" href=\"javascript:void(0);\" value=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder') + "\"" +        			                  
+        String newFolderLink = "<a id=\"createNew\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder') + "\" class=\"actionIcon pull-right\" href=\"javascript:void(0);\" value=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder') + "\"" +        			                  
                   " msg_new_folder_not_allow=\"" + _ctx.appRes(uicomponent.id + '.label.new-folder-not-allow') + "\"" +
                   " msg_select_drive=\"" + _ctx.appRes(uicomponent.id + '.label.require-drive') + "\"" +
                   " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +
@@ -52,7 +52,7 @@
 	<div class="clearfix">
     <div class="actions pull-right">
     	$newFolderLink
-      <div class="pull-right">
+      <div class="pull-right" rel="tooltip" data-placement="bottom" data-original-title="<%=_ctx.appRes("UIDSUploadInput.msg.uploadFile")%>">
 	      <% if (uicomponent.isShowUpload) {      
 	           uicomponent.renderChild(uicomponent.UPLOAD_AREA);  
 	       }
