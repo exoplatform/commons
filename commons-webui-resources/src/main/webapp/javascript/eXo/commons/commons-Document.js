@@ -667,7 +667,7 @@ function UIDSUpload() {
 	  uploadHTML += "    <div class='BrowseDiv'>";
 	  uploadHTML += "      <a class='BrowseLink'>";
 	  uploadHTML += "        <input type='file' name='file' size='1' id='file' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
-	  uploadHTML += "     &nbsp;</a>";
+	  uploadHTML += "      </a>";
 	  uploadHTML += "    </div>";
 	  uploadHTML += "  </form>";
 	  return uploadHTML;
@@ -676,12 +676,13 @@ function UIDSUpload() {
 	UIDSUpload.prototype.getStyleSheetContent = function(){
 	  var styleText = "";
 	  styleText += "body { margin:0; padding:0}";
-	  styleText += ".UIDSUploadForm {position: relative; }";
-	  styleText += ".FileHidden { opacity: 0; overflow: hidden; position: absolute; height: 32px; top: 0px; left: 0px; width: 100%; -moz-opacity:0 ; filter:alpha(opacity: 0); z-index: 1;} ";  
-	  styleText += ".BrowseLink { position: relative; font-family: Arial, Helvetica, sans-serif; text-align: left; top:0px; padding: 0 10px 5px; text-decoration: none; border: 1px solid transparent;";
+	  styleText += ".BrowseDiv {position: relative; }";
+	  styleText += ".FileHidden { opacity: 0; overflow: hidden; position: absolute; height: 26px; bottom: 0px; right: 0px; -moz-opacity:0 ; filter:alpha(opacity: 0); cursor: pointer;} ";  
+	  styleText += ".BrowseLink { font-family: Arial, Helvetica, sans-serif; text-decoration: none; border: 1px solid transparent; width: 24px; height: 24px; display: block;";
 	  styleText += "     text-decoration: none;";
 	  styleText += "    background: url('/CommonsResources/skin/less/DocumentSelector/images/fileShareUpload.png') no-repeat 3px center;}";
-	  styleText += ".UIDSUploadForm a:hover {text-decoration: none; background-color: #F9F9F9; border: 1px solid #CFCFCF; border-radius: 3px 3px 3px 3px; box-shadow: 0 1px 2px 0 #FFFFFF; cursor: pointer;}";
+	  styleText += ".BrowseLink:hover { background-color: #F9F9F9; border: 1px solid #CFCFCF; text-decoration: none; border-radius: 3px; box-shadow: 0 1px 2px 0 #FFFFFF; cursor: pointer;";
+	  styleText += "    background: url('/CommonsResources/skin/less/DocumentSelector/images/fileShareUploadBlue.png') no-repeat 3px center;}";
 	  return styleText;
 	}
 
