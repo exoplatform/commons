@@ -24,25 +24,21 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.jcr.RepositoryService;
 
 /**
- * Created by The eXo Platform SAS Author : Nguyen Viet Bang
- * bangnv@exoplatform.com Nov 27, 2012
+ * Class support the saving SettingData in ExoCache Created by The eXo Platform
+ * SAS Author : Nguyen Viet Bang bangnv@exoplatform.com Nov 27, 2012
  */
 public class SettingContext implements Serializable {
-  
-  /**
-   * 
-   */
+
   private static final long serialVersionUID = 437625857263645213L;
 
+  protected String          repositoryName;
+
+  protected Context         context;
+
   /**
-   * 
+   * path of context in jcr
    */
-
-  protected String  repositoryName;
-
-  protected Context context;
-
-  protected String  ContextPath;
+  protected String          ContextPath;
 
   public SettingContext(Context context) {
     super();

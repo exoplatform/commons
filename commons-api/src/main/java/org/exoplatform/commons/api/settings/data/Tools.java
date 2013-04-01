@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.settings.data;
 
 
 /**
+ * This class is useful to build the path of object saved in Jcr.
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
  * Nov 22, 2012
  */

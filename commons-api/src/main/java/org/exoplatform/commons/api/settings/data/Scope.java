@@ -17,10 +17,32 @@
 package org.exoplatform.commons.api.settings.data;
 
 /**
- * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
- * Nov 8, 2012
+ * This class allow a user to be able to save some settings linked to a scope.
+ * Created by The eXo Platform SAS Author : eXoPlatform
+ * bangnv@exoplatform.com Nov 8, 2012
  */
 public enum Scope {
+  
+  /**
+   * WINDOWS : Settings for portlets or gadgets. 
+   * 
+   * PAGE : Settings for a
+   * page. 
+   * 
+   * Space : Settings for a space. 
+   * 
+   * SITE : Settings for one site
+   * in one portal. 
+   * 
+   * PORTAL : Settings for the entire portal (and all these
+   * sites). 
+   * 
+   * APPLICATION : Settings for an application like Forum, Content,
+   * Social, etc. 
+   * 
+   * GLOBAL : Settings for the platform (for all sites and
+   * portals).
+   */
   WINDOWS, PAGE, SPACE, SITE, PORTAL, APPLICATION, GLOBAL;
 
   private String id;

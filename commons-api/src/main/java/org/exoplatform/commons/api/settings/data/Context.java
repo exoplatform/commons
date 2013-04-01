@@ -19,13 +19,22 @@ package org.exoplatform.commons.api.settings.data;
 import org.exoplatform.services.security.ConversationState;
 
 /**
+ * This class allow a user to be able to save some settings linked to a Context.
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
  * Nov 9, 2012
  */
 
 public enum Context {
+
+  /**
+   * USER : Each user should be able to save his own settings. GLOBAL : Settings
+   * should impact all users in the underlying scope.
+   */
   GLOBAL, USER;
 
+  /**
+   * this id represent as a username.
+   */
   private String id;
 
   public Context id(String id) {

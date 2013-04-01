@@ -19,6 +19,7 @@ package org.exoplatform.commons.api.settings.data;
 import org.exoplatform.commons.api.settings.SettingValue;
 
 /**
+ * Class support the saving SettingData in ExoCache
  * Created by The eXo Platform SAS Author : Nguyen Viet Bang
  * bangnv@exoplatform.com Nov 27, 2012
  */

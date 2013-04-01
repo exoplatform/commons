@@ -16,13 +16,10 @@
  */
 package org.exoplatform.commons.api.settings.data;
 
-
 /**
- * Created by The eXo Platform SAS
- * Author : Nguyen Viet Bang
- *          bangnv@exoplatform.com
- * Nov 27, 2012  
+ * All possible value type of event Created by The eXo Platform SAS Author :
+ * Nguyen Viet Bang bangnv@exoplatform.com Nov 27, 2012
  */
 public enum EventType {
-  SETTING_SET,SETTING_REMOVE_CONTEXT,SETTING_REMOVE_SCOPE,SETTING_REMOVE_KEY
+  SETTING_SET, SETTING_REMOVE_CONTEXT, SETTING_REMOVE_SCOPE, SETTING_REMOVE_KEY
 }

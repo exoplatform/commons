@@ -3,6 +3,7 @@ package org.exoplatform.commons.api.settings;
 import java.io.Serializable;
 
 /**
+ * All possible value type stored in JCR 
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
  */
 public class SettingValue<T extends Object> implements Serializable {

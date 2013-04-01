@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.settings.data;
 
 
 /**
+ * Class support the saving SettingData in ExoCache
  * Created by The eXo Platform SAS Author : Nguyen Viet Bang
  * bangnv@exoplatform.com Nov 26, 2012
  */
@@ -28,9 +29,9 @@ public class SettingScope extends SettingContext {
    */
   private static final long serialVersionUID = -8617975143175631988L;
 
-  protected Scope  scope;
+  protected Scope           scope;
 
-  protected String scopePath;
+  protected String          scopePath;
 
   public SettingScope(Context context, Scope scope) {
     super(context);
