@@ -94,9 +94,20 @@ UISpaceSwitcher.prototype.initAfterLoaded = function(uicomponentId, baseRestUrl,
     var isNeedToClosePopup = true;
     for(var id in me.dataStorage) {
       var wikiSpaceSwitcher = document.getElementById(id);
-      var container = jQuery(wikiSpaceSwitcher);
-      if (container.is(e.target) || container.has(e.target).length != 0) {
-        isNeedToClosePopup = false;
+      if (wikiSpaceSwitcher) {
+        var container = jQuery(wikiSpaceSwitcher);
+        if (jQuery.browser.msie) {
+          for (var i = 0; i < container.length; i++) {
+            if (container[i] == e.target) {
+              isNeedToClosePopup = false;
+              break;
+            }
+          }
+        } else {
+          if (container.is(e.target) || container.has(e.target).length != 0) {
+            isNeedToClosePopup = false;
+          }
+        }
       }
     }
     
@@ -108,7 +119,7 @@ UISpaceSwitcher.prototype.initAfterLoaded = function(uicomponentId, baseRestUrl,
 };
 
 UISpaceSwitcher.prototype.closeAllPopups = function() {
-  var spaceChooserPopups = document.getElementsByClassName('spaceChooserPopup');
+  var spaceChooserPopups = jQuery(document).find(".spaceChooserPopup");
   for (var i = 0; i < spaceChooserPopups.length; i++) {
     spaceChooserPopups[i].style.display = "none";
   }
