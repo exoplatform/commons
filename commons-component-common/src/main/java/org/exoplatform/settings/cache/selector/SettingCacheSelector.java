@@ -28,11 +28,19 @@ import org.exoplatform.services.cache.ObjectCacheInfo;
  * Author : Nguyen Viet Bang
  *          bangnv@exoplatform.com
  * Nov 27, 2012  
+ * This class allows to select all setting cache objects which are in a specified Context or Scope.
+ * The callback function of this selector is to remove all selected setting object.
+ * @LevelAPI Platform
  */
+
 public class SettingCacheSelector implements CachedObjectSelector<SettingKey,Object>{
   private SettingContext provider;
   
-
+  /**
+   * Create a selector with a specified context 
+   * @param provider context or scope with which the specified value is to be associated
+   * @LevelAPI Platform
+   */
   public SettingCacheSelector( SettingContext provider) {
     if (provider==null) {
       throw new NullPointerException();
@@ -45,7 +53,14 @@ public class SettingCacheSelector implements CachedObjectSelector<SettingKey,Obj
     }
   }
 
-  @Override
+  /**
+   * This function allows this selector could select right object.
+   * @param key 	the key which is composed by context, scope, key
+   * @param ocinfo	cache info (expire time, cache associated object) 
+   * @return return true if compared key is equals to provider, false if not
+   * @LevelAPI Platform
+   */   
+  @Override  
   public boolean select(SettingKey key, ObjectCacheInfo<? extends Object> ocinfo) {
     if (key!=null) {
       return provider.equals(key);
@@ -53,13 +68,19 @@ public class SettingCacheSelector implements CachedObjectSelector<SettingKey,Obj
     return false;
   }
 
-  @Override
+  /**
+   * Callback function if select function return true. This function will remove this selected setting key from cache.
+   * @param cache	ExoCache 
+   * @param key		setting will be removed
+   * @param cinfo	cache info
+   * @return This function will remove specified setting from cache.
+   * @LevelAPI Platform
+   */
+  @Override  
   public void onSelect(ExoCache<? extends SettingKey, ? extends Object> cache,
                        SettingKey key,
                        ObjectCacheInfo<? extends Object> ocinfo) throws Exception {
     cache.remove(key)    ;
   }
-
-
 
 }

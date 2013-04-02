@@ -19,9 +19,10 @@ package org.exoplatform.commons.api.settings.data;
 import org.exoplatform.commons.api.settings.SettingValue;
 
 /**
- * Class support the saving SettingData in ExoCache
+ * Class support the setting event management, SettingData contains all information of event to listen. 
  * Created by The eXo Platform SAS Author : Nguyen Viet Bang
  * bangnv@exoplatform.com Nov 27, 2012
+ * @LevelAPI Platform
  */
 public class SettingData {
 
@@ -31,15 +32,25 @@ public class SettingData {
 
   SettingValue<?> settingValue;
   
-  
-  
-
+  /**
+   * Create setting data with specified event type and context. The context could be USER/GLOBAL context or a specified scope or a specified setting property.  
+   * @param eventType	event type has been dispatched
+   * @param settingContext setting context data information
+   * @LevelAPI Platform
+   */
   public SettingData(EventType eventType, SettingContext settingContext) {
     super();
     this.eventType = eventType;
     this.settingContext = settingContext;
   }
 
+  /**
+   * Create setting data with specified event type and setting property  
+   * @param eventType	event type has been dispatched
+   * @param settingContext setting property's context
+   * @param settingValue setting property's value
+   * @LevelAPI Platform
+   */
   public SettingData(EventType eventType,
                      SettingContext settingContext,
                      SettingValue<?> settingValue) {
@@ -49,27 +60,56 @@ public class SettingData {
     this.settingValue = settingValue;
   }
 
+  /**
+   * get event type associated to this setting data
+   * @return event type
+   * @LevelAPI Platform
+   */
   public EventType getEventType() {
     return eventType;
   }
 
+  /**
+   * set event type associated to this setting data
+   * @LevelAPI Platform
+   */ 
   public void setEventType(EventType eventType) {
     this.eventType = eventType;
   }
 
+  /**
+   * get setting context associated to this setting data
+   * @return setting context
+   * @LevelAPI Platform
+   */
   public SettingContext getSettingContext() {
     return settingContext;
   }
 
+  /**
+   * set setting context associated to this setting data
+   * @LevelAPI Platform
+   */
   public void setSettingContext(SettingContext settingContext) {
     this.settingContext = settingContext;
   }
 
+  /**
+   * get setting value of setting property associated to this setting data, return null in case of context at level Context and Scope
+   * @return setting value object, null if context at level Context and Scope
+   * @LevelAPI Platform
+   */
   public SettingValue<?> getSettingValue() {
+	  //TODO: return list of setting value in level Context and Scope
     return settingValue;
   }
 
+  /**
+   * set setting value of setting property (SettingKey) associated to this setting data
+   * @LevelAPI Platform
+   */
   public void setSettingValue(SettingValue<?> settingValue) {
+	  //TODO: not set setting value in level Context and Scope	  
     this.settingValue = settingValue;
   }
   

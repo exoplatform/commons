@@ -37,6 +37,10 @@ import org.gatein.common.logging.LoggerFactory;
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
  * Nov 15, 2012
+ * CacheSettingServiceImpl is implemented for application which uses cache. CacheSettingServiceImpl contains also settingService for database. 
+ * In case of saving and removing setting properties, CacheSettingService will effect the change in cache and database. 
+ * Otherwise, it will search setting properties in cache at first and then in database, that allows to improve performance.
+ * @LevelAPI Platform    
  */
 public class CacheSettingServiceImpl implements SettingService {
   /** Logger */
@@ -49,7 +53,12 @@ public class CacheSettingServiceImpl implements SettingService {
   private static final Logger                                            log = LoggerFactory.getLogger(CacheSettingServiceImpl.class);
 
   private final SettingServiceImpl                                       service;
-
+/**
+ * Create cache setting service object with service for database and service for cache
+ * @param service Setting service for database
+ * @param cacheService Cache service
+ * @LevelAPI Platform
+ */
   public CacheSettingServiceImpl(SettingServiceImpl service, CacheService cacheService) {
 
     settingCache = cacheService.getCacheInstance(SettingService.class.getSimpleName());
@@ -66,6 +75,15 @@ public class CacheSettingServiceImpl implements SettingService {
 
   }
 
+  /**
+   *  Set the specified value  with the key which is composed by context, scope, key. 
+   *  The value will be saved in the cache and the database 
+   * @param context context with which the specified value is to be associated
+   * @param scope   scope with which  the specified value is to be associated
+   * @param key     key with which the specified value is to be associated
+   * @param value   value to be associated with the specified key.
+   * @LevelAPI Platform
+   */
   @Override
   public void set(Context context, Scope scope, String key, SettingValue<?> value) {
     SettingKey settingKey = new SettingKey(context, scope, key);
@@ -73,11 +91,24 @@ public class CacheSettingServiceImpl implements SettingService {
     service.set(context, scope, key, value);
   }
 
+  /**
+   * Get setting value associated with composite key(context, scope, key)
+   * This service will search in the cache first and then in the database.
+   * @return Setting value with type of setting property, and null if the cache and the database doesn't contain the value for the composite key
+   * @LevelAPI Platform
+   */
   @Override
   public SettingValue<?> get(Context context, Scope scope, String key) {
     return futureExoCache.get(service, new SettingKey(context, scope, key));
   }
 
+  /** 
+   * Remove all the value associated with the composite key(context,scope,key) in cache and also in database.
+   * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
+   * @param scope  	scope with which  the specified value is to be associated. The scope.id must be not null.
+   * @param key		key with which the specified value is to be associated
+   * @LevelAPI Platform
+   */
   @Override
   public void remove(Context context, Scope scope, String key) {
     SettingKey settingKey = new SettingKey(context, scope, key);
@@ -85,6 +116,11 @@ public class CacheSettingServiceImpl implements SettingService {
     service.remove(context, scope, key);
   }
 
+  /** remove all the value associated with the specified context and specified scope in cache and database also.
+   * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
+   * @param scope  scope with which  the specified value is to be associated. The scope.id must be not null.
+   * @LevelAPI Platform
+   */
   @Override
   public void remove(Context context, Scope scope) {
     SettingScope settingScope = new SettingScope(context, scope);
@@ -95,7 +131,12 @@ public class CacheSettingServiceImpl implements SettingService {
     }
     service.remove(context, scope);
   }
-
+  
+  /** remove all the value associated with the specified context in cache and database also.
+   * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
+   * @LevelAPI Platform
+   */
+  @Override
   public void remove(Context context) {
     SettingContext settingContext = new SettingContext(context);
     try {
@@ -104,7 +145,6 @@ public class CacheSettingServiceImpl implements SettingService {
       LOG.error(e);
     }
     service.remove(context);
-
   }
 
 }
