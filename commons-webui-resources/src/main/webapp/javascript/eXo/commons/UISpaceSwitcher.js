@@ -274,9 +274,9 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
 
 UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, container) {
   if (resultLength > 10) {
-    container.style.height = (36 * 11) + "px";
+    container.style.height = (32 * 11) + "px";
   } else {
-    container.style.height = (36 * (resultLength + 1)) + "px";
+    container.style.height = (32 * (resultLength + 1)) + "px";
   }
 }
 
