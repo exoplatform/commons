@@ -768,7 +768,7 @@ function UIDSUpload() {
 	  url += "action=save" + "&workspaceName=" + selectedItem.workspaceName
 	  + "&driveName=" + selectedItem.driveName + "&currentFolder="
 	  + selectedItem.currentFolder + "&currentPortal=" + eXo.env.portal.portalName + "&language="
-	  + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" +fileName;
+	  + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" + encodeURIComponent(fileName);
 	  var responseText = ajaxAsyncGetRequest(url, false);
 	};
 
