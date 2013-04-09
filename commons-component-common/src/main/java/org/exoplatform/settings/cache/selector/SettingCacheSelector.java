@@ -30,7 +30,7 @@ import org.exoplatform.services.cache.ObjectCacheInfo;
  * Nov 27, 2012  
  * This class allows to select all setting cache objects which are in a specified Context or Scope.
  * The callback function of this selector is to remove all selected setting object.
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
 
 public class SettingCacheSelector implements CachedObjectSelector<SettingKey,Object>{
@@ -39,7 +39,7 @@ public class SettingCacheSelector implements CachedObjectSelector<SettingKey,Obj
   /**
    * Create a selector with a specified context 
    * @param provider context or scope with which the specified value is to be associated
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public SettingCacheSelector( SettingContext provider) {
     if (provider==null) {
@@ -58,7 +58,7 @@ public class SettingCacheSelector implements CachedObjectSelector<SettingKey,Obj
    * @param key 	the key which is composed by context, scope, key
    * @param ocinfo	cache info (expire time, cache associated object) 
    * @return return true if compared key is equals to provider, false if not
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */   
   @Override  
   public boolean select(SettingKey key, ObjectCacheInfo<? extends Object> ocinfo) {
@@ -74,7 +74,7 @@ public class SettingCacheSelector implements CachedObjectSelector<SettingKey,Obj
    * @param key		setting will be removed
    * @param cinfo	cache info
    * @return This function will remove specified setting from cache.
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   @Override  
   public void onSelect(ExoCache<? extends SettingKey, ? extends Object> cache,

@@ -40,7 +40,7 @@ import org.gatein.common.logging.LoggerFactory;
  * CacheSettingServiceImpl is implemented for application which uses cache. CacheSettingServiceImpl contains also settingService for database. 
  * In case of saving and removing setting properties, CacheSettingService will effect the change in cache and database. 
  * Otherwise, it will search setting properties in cache at first and then in database, that allows to improve performance.
- * @LevelAPI Platform    
+ * @LevelAPI Experimental    
  */
 public class CacheSettingServiceImpl implements SettingService {
   /** Logger */
@@ -57,7 +57,7 @@ public class CacheSettingServiceImpl implements SettingService {
  * Create cache setting service object with service for database and service for cache
  * @param service Setting service for database
  * @param cacheService Cache service
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
   public CacheSettingServiceImpl(SettingServiceImpl service, CacheService cacheService) {
 
@@ -82,7 +82,7 @@ public class CacheSettingServiceImpl implements SettingService {
    * @param scope   scope with which  the specified value is to be associated
    * @param key     key with which the specified value is to be associated
    * @param value   value to be associated with the specified key.
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   @Override
   public void set(Context context, Scope scope, String key, SettingValue<?> value) {
@@ -95,7 +95,7 @@ public class CacheSettingServiceImpl implements SettingService {
    * Get setting value associated with composite key(context, scope, key)
    * This service will search in the cache first and then in the database.
    * @return Setting value with type of setting property, and null if the cache and the database doesn't contain the value for the composite key
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   @Override
   public SettingValue<?> get(Context context, Scope scope, String key) {
@@ -119,7 +119,7 @@ public class CacheSettingServiceImpl implements SettingService {
   /** remove all the value associated with the specified context and specified scope in cache and database also.
    * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
    * @param scope  scope with which  the specified value is to be associated. The scope.id must be not null.
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   @Override
   public void remove(Context context, Scope scope) {
@@ -134,7 +134,7 @@ public class CacheSettingServiceImpl implements SettingService {
   
   /** remove all the value associated with the specified context in cache and database also.
    * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   @Override
   public void remove(Context context) {

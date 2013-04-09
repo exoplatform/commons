@@ -25,7 +25,7 @@ import org.exoplatform.settings.chromattic.SynchronizationTask;
 
 /**
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
 public class SettingServiceImpl implements SettingService {
 
@@ -44,7 +44,7 @@ public class SettingServiceImpl implements SettingService {
    * Create setting service object
    * @param eventManager event manager component
    * @throws NullPointerException
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public SettingServiceImpl(EventManagerImpl<SettingServiceImpl, SettingData> eventManager) throws NullPointerException {
     this.eventManager = eventManager;

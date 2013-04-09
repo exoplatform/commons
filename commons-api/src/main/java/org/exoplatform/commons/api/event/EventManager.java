@@ -35,12 +35,14 @@ import org.exoplatform.services.listener.Listener;
  * which should be extended from <code>BaseObject</code>.
  * @param <D> This is a generic object of data. It can be an event type such as NODE_ADDED/PROPERTY_CHANGED/NODE_REMOVED
  * which corresponding with JCR events.
+ * @LevelAPI Experimental
  */
 public interface EventManager<S, D> {
 
     /**
      * This will be used to register a listener to the event system.  
      * @param listener An instance of <code>Listener</code> object.
+     * @LevelAPI Experimental
      */
     public void addEventListener(Listener<S, D> listener);
     
@@ -48,12 +50,14 @@ public interface EventManager<S, D> {
      * This will be used to register a listener to the event system.  
      * @param listener An instance of <code>Listener</code> object.
      * @param eventName Name of event which will be used to group listeners.
+     * @LevelAPI Experimental
      */
     public void addEventListener(String eventName, Listener<S, D> listener);    
 
     /**
      * This will be used to unregister a listener out of the event system.  
      * @param listener An instance of <code>Listener</code> object.
+     * @LevelAPI Experimental
      */
     public void removeEventListener(Listener<S, D> listener);
     
@@ -61,6 +65,7 @@ public interface EventManager<S, D> {
      * This will be used to unregister a listener out of the event system.  
      * @param listener An instance of <code>Listener</code> object.
      * @param eventName The event name which used to group listeners.
+     * @LevelAPI Experimental
      */
     public void removeEventListener(String eventName, Listener<S, D> listener);    
 
@@ -68,6 +73,7 @@ public interface EventManager<S, D> {
      * When an action triggered such as file created/updated then 
      * it will be broadcast to the dedicated listener to dispatch the event.
      * @param event The <code>Event</code> object which keep the information to be processed in the listeners.
+     * @LevelAPI Experimental
      */
     public void broadcastEvent(Event<S, D> event);
 
@@ -78,6 +84,7 @@ public interface EventManager<S, D> {
      * 
      * @param type Type of Object
      * @return List of listeners which registered
+     * @LevelAPI Experimental
      */
     public List<Listener<S, D>> getEventListeners(String type);
 

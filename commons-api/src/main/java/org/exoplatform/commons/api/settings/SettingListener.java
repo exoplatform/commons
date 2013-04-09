@@ -26,39 +26,39 @@ import org.exoplatform.services.listener.Listener;
  * For each call of the SettingService API, it will trigger the event corresponding
  * Created by The eXo Platform SAS Author : Nguyen Viet Bang
  * bangnv@exoplatform.com Nov 27, 2012
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
 public abstract class SettingListener extends Listener<SettingService, SettingData> {
 
   /**
    * Callback function when a new setting property is saved. 
    * @param event event that the setting service dispatch when a new setting properties is saved successfully
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public abstract void onSet(Event<SettingService, SettingData> event);
   /**
    * Callback function when a setting property is removed with a specified composite key(context,scope,key)
    * @param event event that the setting service dispatches when a new setting property is removed successfully
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public abstract void onRemoveKey(Event<SettingService, SettingData> event);
   /**
    * Callback function when all setting properties in a scope are removed
    * @param event event that the setting service dispatches when all setting properties in a scope are removed successfully
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public abstract void onRemoveScope(Event<SettingService, SettingData> event);
   /**
    * Callback function when all setting properties in a context are removed
    * @param event event that the setting service dispatches when all setting properties in a context are removed successfully
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public abstract void onRemoveContext(Event<SettingService, SettingData> event);
 
   /**
    * Callback function when the setting service dispatches an event
    * @param event event that the setting service dispatches
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   @Override
   public void onEvent(Event<SettingService, SettingData> event) throws Exception {

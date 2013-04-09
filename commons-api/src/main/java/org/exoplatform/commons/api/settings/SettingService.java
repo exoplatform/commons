@@ -7,7 +7,7 @@ import org.exoplatform.commons.api.settings.data.Scope;
  * This Service allow to store and remove a value associated with a key in JCR
  * 
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
 public interface SettingService {
 
@@ -19,7 +19,7 @@ public interface SettingService {
    * @param scope scope with which the specified value is to be associated
    * @param key key with which the specified value is to be associated
    * @param value value to be associated with the specified key.
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public void set(Context context, Scope scope, String key, SettingValue<?> value);
 
@@ -29,7 +29,7 @@ public interface SettingService {
    * @param context context with which the specified value is to be associated
    * @param scope scope with which the specified value is to be associated
    * @param key key with which the specified value is to be associated
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public void remove(Context context, Scope scope, String key);
 
@@ -41,7 +41,7 @@ public interface SettingService {
    *          The context type must be USER and context.id must be not null.
    * @param scope scope with which the specified value is to be associated. The
    *          scope.id must be not null.
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public void remove(Context context, Scope scope);
 
@@ -50,7 +50,7 @@ public interface SettingService {
    * @param context context context with which the specified value is to be
    *          associated. The context type must be USER and context.id must be
    *          not null.
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public void remove(Context context);
 
@@ -63,7 +63,7 @@ public interface SettingService {
    * @param scope scope with which the specified value is to be associated. The
    *          scope.id must be not null.
    * @param key key with which the specified value is to be associated
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public SettingValue<?> get(Context context, Scope scope, String key);
 
