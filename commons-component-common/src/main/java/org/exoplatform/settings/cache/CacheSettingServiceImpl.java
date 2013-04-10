@@ -107,7 +107,7 @@ public class CacheSettingServiceImpl implements SettingService {
    * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
    * @param scope  	scope with which  the specified value is to be associated. The scope.id must be not null.
    * @param key		key with which the specified value is to be associated
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   @Override
   public void remove(Context context, Scope scope, String key) {

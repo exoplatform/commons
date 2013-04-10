@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * All possible value type stored in JCR 
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
 public class SettingValue<T extends Object> implements Serializable {
 
@@ -15,7 +15,7 @@ public class SettingValue<T extends Object> implements Serializable {
   /**
    * Create a setting value object with a specify value type
    * @param value
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
 public SettingValue(T value) {
     this.value = value;
@@ -25,7 +25,7 @@ public SettingValue(T value) {
   /**
    * Get value object of setting value
    * @return value in specified type
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public T getValue() {
     return value;
@@ -35,28 +35,28 @@ public SettingValue(T value) {
    * create setting value object of type String
    * @param value String value of setting property will be created
    * @return created SettingValue object of type String
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public static SettingValue<String> create(String value) { return new SettingValue<String>(value); }
   /**
    * create setting value object of type Long
    * @param value Long value of setting property will be created
    * @return created SettingValue object of type Long
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */  
   public static SettingValue<Long> create(Long value) { return new SettingValue<Long>(value); }
   /**
    * create setting value object of type Double
    * @param value Double value of setting property will be created
    * @return created SettingValue object of type Double
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public static SettingValue<Double> create(Double value) { return new SettingValue<Double>(value); }
   /**
    * create setting value object of type Boolean
    * @param value Boolean value of setting property will be created
    * @return created SettingValue object of type Boolean
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */ 
   public static SettingValue<Boolean> create(Boolean value) { return new SettingValue<Boolean>(value); }
 

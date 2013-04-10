@@ -22,7 +22,7 @@ package org.exoplatform.commons.api.settings.data;
  * Use SettingKey to specify context of setting property in action with database, cache or in dispatching setting event.
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
  * Nov 22, 2012
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
 public class SettingKey extends SettingScope {
 
@@ -35,7 +35,7 @@ public class SettingKey extends SettingScope {
    * @param context context with which the specified value is to be associated
    * @param scope scope with which the specified value is to be associated
    * @param key key with which the specified value is to be associated
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public SettingKey(Context context, Scope scope, String key) {
     super(context, scope);
@@ -45,7 +45,7 @@ public class SettingKey extends SettingScope {
   /**
    * get key value of setting-key
    * @return value of key
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public String getKey() {
     return key;
@@ -54,7 +54,7 @@ public class SettingKey extends SettingScope {
   /**
    * set key value to setting-key
    * @param key
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public void setKey(String key) {
     this.key = key;

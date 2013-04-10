@@ -24,8 +24,6 @@ import org.exoplatform.services.listener.Listener;
 
 /**
  * Created by The eXo Platform SARL
- * Author : Dang Van Minh
- *          minh.dang@exoplatform.com
  * Nov 8, 2012
  * 1:47:47 PM  
  */

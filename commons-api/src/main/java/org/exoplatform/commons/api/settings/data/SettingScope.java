@@ -22,7 +22,7 @@ package org.exoplatform.commons.api.settings.data;
  * Use SettingScope to specify context of setting properties in action with database, cache or in dispatching setting event.
  * Created by The eXo Platform SAS Author : Nguyen Viet Bang
  * bangnv@exoplatform.com Nov 26, 2012
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
 public class SettingScope extends SettingContext {
 
@@ -39,7 +39,7 @@ public class SettingScope extends SettingContext {
    * Create setting scope object with composite key [context,scope]
    * @param context context with which the specified value is to be associated
    * @param scope scope with which the specified value is to be associated
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public SettingScope(Context context, Scope scope) {
     super(context);
@@ -75,7 +75,7 @@ public class SettingScope extends SettingContext {
   /**
    * get scope value of setting-scope
    * @return value of key
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public Scope getScope() {
     return scope;
@@ -83,7 +83,7 @@ public class SettingScope extends SettingContext {
   /**
    * get path associated to this setting-scope 
    * @return path to setting data zone of this scope in the database
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public String getScopePath() {
     return scopePath;

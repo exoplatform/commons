@@ -6,7 +6,6 @@ import org.exoplatform.commons.api.settings.data.Scope;
 /**
  * This Service allow to store and remove a value associated with a key in JCR
  * 
- * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
  * @LevelAPI Experimental
  */
 public interface SettingService {
