@@ -22,16 +22,31 @@ import org.exoplatform.commons.api.indexing.data.SearchEntry;
 import org.exoplatform.commons.api.indexing.data.SearchEntryId;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tung Vu Minh
- *          tungvm@exoplatform.com
- * Nov 21, 2012  
+ * The class provides indexing API that connector implements to index it's data 
+ * Nov 21, 2012
+ * @LevelAPI Experimental  
  */
 public abstract class IndexingService {
   protected static final String DATE_INDEXED = "se_dateIndexed";
   protected static final String LAST_UPDATE = "se_lastUpdate";
 
+  /**
+   * Add entry
+   * @param searchEntry
+   * @LevelAPI Experimental
+   */
   public abstract void add(SearchEntry searchEntry);
+  /**
+   * Update entry
+   * @param id Id specifies a entry 
+   * @param changes Entry needs to update
+   * @LevelAPI Experimental
+   */
   public abstract void update(SearchEntryId id, Map<String, Object> changes);
+  /**
+   * Delete entry by id
+   * @param id SearchEntryId
+   * @LevelAPI Experimental
+   */
   public abstract void delete(SearchEntryId id);
 }

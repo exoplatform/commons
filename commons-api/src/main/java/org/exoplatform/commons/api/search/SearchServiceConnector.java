@@ -11,31 +11,53 @@ import org.exoplatform.container.xml.PropertiesParam;
 /**
  * This abstract class is extended by the SearchService connectors which provide search result for a specific content type
  * 
- * Created by The eXo Platform SAS
- * Author : Tung Vu Minh
- *          tungvm@exoplatform.com
- * Nov 21, 2012  
+ * Nov 21, 2012
+ * @LevelAPI Experimental  
  */
 public abstract class SearchServiceConnector extends BaseComponentPlugin {
   private String searchType; //search type name
   private String displayName; //for use when rendering
   
+  /**
+   * Get search type
+   * @return String
+   * @LevelAPI Experimental
+   */
   public String getSearchType() {
     return searchType;
   }
 
+  /**
+   * Set search type
+   * @param searchType
+   * @LevelAPI Experimental
+   */
   public void setSearchType(String searchType) {
     this.searchType = searchType;
   }
 
+  /**
+   * Get display name
+   * @return String
+   * @LevelAPI Experimental
+   */
   public String getDisplayName() {
     return displayName;
   }
 
+  /**
+   * Set display name
+   * @param displayName
+   * @LevelAPI Experimental
+   */
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
   }
-    
+  /**
+   * Constructor is default that other connecters must implement by this way  
+   * @param initParams parameters are initialized from configuration
+   * @LevelAPI Experimental
+   */
   public SearchServiceConnector(InitParams initParams) {
     PropertiesParam param = initParams.getPropertiesParam("constructor.params");
     this.searchType = param.getProperty("searchType");
@@ -52,6 +74,7 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
    * @param sort The field to sort the result set 
    * @param order Sort order (ASC, DESC)
    * @return a collection of SearchResult
+   * @LevelAPI Experimental 
    */
   public abstract Collection<SearchResult> search(SearchContext context, String query, Collection<String> sites, int offset, int limit, String sort, String order);
 }

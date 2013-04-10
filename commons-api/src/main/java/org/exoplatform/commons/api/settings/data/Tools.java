@@ -18,10 +18,19 @@ package org.exoplatform.commons.api.settings.data;
 
 
 /**
+ * This class is useful to build the path of object saved in Jcr.
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
  * Nov 22, 2012
+ * @LevelAPI Platform
  */
 public class Tools {
+  /**
+   * Build the path to a specified scope in database
+   * @param context context with which the path is to be associated
+   * @param scope   scope with which the path is to be associated
+   * @return path to setting data zone of this scope in the database
+   * @LevelAPI Platform
+   */
   public static String buildScopePath(Context context, Scope scope) {
 
     StringBuilder path = new StringBuilder().append(buildContextPath(context));
@@ -31,7 +40,12 @@ public class Tools {
     }
     return path.toString();
   }
-
+  /**
+   * Build path to a specified context in database
+   * @param context context with which the path is to be associated
+   * @return path to setting data zone of specified context in the database
+   * @LevelAPI Platform
+   */
   public static String buildContextPath(Context context) {
     StringBuilder path = new StringBuilder().append("settings/").append(context.name()
                                                                                .toLowerCase());
@@ -40,7 +54,14 @@ public class Tools {
     }
     return path.toString();
   }
-
+  /**
+   * Build path of a specified setting property stored in database
+   * @param context associated context to setting property 
+   * @param scope   associated scope to setting property 
+   * @param key   associated key to setting property 
+   * @return path to a specified setting properties in the database
+   * @LevelAPI Platform
+   */
   public static String buildFullPath(Context context, Scope scope, String key) {
     StringBuilder path = new StringBuilder().append(buildScopePath(context, scope))
                                             .append("/")

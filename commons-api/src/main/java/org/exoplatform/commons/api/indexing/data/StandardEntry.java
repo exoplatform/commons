@@ -17,10 +17,9 @@
 package org.exoplatform.commons.api.indexing.data;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tung Vu Minh
- *          tungvm@exoplatform.com
- * Nov 21, 2012  
+ * The class defines standard entry
+ * Nov 21, 2012
+ * @LevelAPI Experimental  
  */
 public class StandardEntry extends SimpleEntry{
   private static final String CREATION_DATE = "creationDate";
@@ -28,34 +27,74 @@ public class StandardEntry extends SimpleEntry{
   private static final String LAST_UPDATE_DATE = "lastUpdateDate";
   private static final String LAST_UPDATE_AUTHOR = "lastUpdateAuthor";
   
+  /**
+   * Get creation date
+   * @return Long
+   * @LevelAPI Experimental
+   */
   public long getCreationDate() {
     return (Long)content.get(CREATION_DATE);
   }
 
+  /**
+   * Set creation Date
+   * @param creationDate
+   * @LevelAPI Experimental
+   */
   public void setCreationDate(long creationDate) {
     content.put(CREATION_DATE, creationDate);
   }
 
+  /**
+   * Get creation author
+   * @return String
+   * @LevelAPI Experimental
+   */
   public String getCreationAuthor() {
     return (String)content.get(CREATION_AUTHOR);
   }
 
+  /**
+   * Set creation author
+   * @param creationAuthor
+   * @LevelAPI Experimental
+   */
   public void setCreationAuthor(String creationAuthor) {
     content.put(CREATION_AUTHOR, creationAuthor);
   }
 
+  /**
+   * Get last update date
+   * @return long
+   * @LevelAPI Experimental
+   */
   public long getLastUpdateDate() {
     return (Long)content.get(LAST_UPDATE_DATE);
   }
 
+  /**
+   * Set last update date
+   * @param lastUpdateDate
+   * @LevelAPI Experimental
+   */
   public void setLastUpdateDate(long lastUpdateDate) {
     content.put(LAST_UPDATE_DATE, lastUpdateDate);
   }
 
+  /**
+   * Get last update author
+   * @return String
+   * @LevelAPI Experimental
+   */
   public String getLastUpdateAuthor() {
     return (String)content.get(LAST_UPDATE_AUTHOR);
   }
 
+  /**
+   * Set last update author
+   * @param lastUpdateAuthor
+   * @LevelAPI Experimental
+   */
   public void setLastUpdateAuthor(String lastUpdateAuthor) {
     content.put(LAST_UPDATE_AUTHOR, lastUpdateAuthor);
   }

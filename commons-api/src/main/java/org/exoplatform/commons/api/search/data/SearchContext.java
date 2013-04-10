@@ -11,10 +11,8 @@ import org.exoplatform.services.log.Log;
 /**
  * Search context contains context information needed for SearchService and its connectors
  *  
- * Created by The eXo Platform SAS
- * Author : Tung Vu Minh
- *          tungvm@exoplatform.com
- * Feb 22, 2013  
+ * Feb 22, 2013
+ * @LevelAPI Experimental  
  */
 public class SearchContext {
   
@@ -31,13 +29,20 @@ public class SearchContext {
    private String paramName = null;
    
    /**
-    * constructor with paramName
+    * Constructor with paramName
     * @param paramName
+    * @LevelAPI Experimental
     */
    private RouterParams(String paramName) {
      this.paramName = paramName;
    }
    
+   /**
+    * Create qualified name
+    * @LevelAPI Experimental
+    * @return QualifiedName
+    * @LevelAPI Experimental 
+    */
    public QualifiedName create() {
      return QualifiedName.create(PREFIX, paramName);
    }
@@ -52,18 +57,40 @@ public class SearchContext {
   /** */
   private Map<QualifiedName, String> qualifiedName = null;
   
+  /**
+   * Get router
+   * @return Router
+   * @LevelAPI Experimental 
+   */
   public Router getRouter() {
     return router;
   }
 
+  /**
+   * Set router
+   * @param router
+   * @LevelAPI Experimental 
+   */
   public void setRouter(Router router) {
     this.router = router;
   }
 
+  /**
+   * Get site name, e.g. intranet, acme, ..
+   * @return String
+   * @LevelAPI Experimental
+   */
   public String getSiteName() {
     return siteName;
   }
 
+  /**
+   * Contructor to create a context for search service
+   * @param router
+   * @param siteName
+   * @return SearchContext
+   * @LevelAPI Experimental 
+   */
   public SearchContext(Router router, String siteName) {
     this.router = router;
     this.siteName = siteName;
@@ -71,9 +98,10 @@ public class SearchContext {
   }
   
   /**
-   * puts Handler value into QualifiedName map
+   * Puts Handler value into QualifiedName map
    * @param value
-   * @return
+   * @return SearchContext
+   * @LevelAPI Experimental  
    */
   public SearchContext handler(String value) {
     qualifiedName.put(RouterParams.HANDLER.create(), value);
@@ -81,9 +109,10 @@ public class SearchContext {
   }
   
   /**
-   * puts Lang value into QualifiedName map
+   * Puts Lang value into QualifiedName map
    * @param value
-   * @return
+   * @return SearchContext
+   * @LevelAPI Experimental 
    */
   public SearchContext lang(String value) {
     qualifiedName.put(RouterParams.LANG.create(), value);
@@ -91,9 +120,10 @@ public class SearchContext {
   }
   
   /**
-   * puts Path value into QualifiedName map
+   * Puts Path value into QualifiedName map
    * @param value
-   * @return
+   * @return SearchContext
+   * @LevelAPI Experimental
    */
   public SearchContext path(String value) {
     qualifiedName.put(RouterParams.PATH.create(), value);
@@ -101,9 +131,10 @@ public class SearchContext {
   }
   
   /**
-   * puts SiteType value into QualifiedName map
+   * Puts SiteType value into QualifiedName map
    * @param value
-   * @return
+   * @return SearchContext
+   * @LevelAPI Experimental
    */
   public SearchContext siteType(String value) {
     qualifiedName.put(RouterParams.SITE_TYPE.create(), value);
@@ -111,9 +142,10 @@ public class SearchContext {
   }
   
   /**
-   * puts SiteType value into QualifiedName map
+   * Puts SiteType value into QualifiedName map
    * @param value
-   * @return
+   * @return SearchContext
+   * @LevelAPI Experimental
    */
   public SearchContext siteName(String value) {
     qualifiedName.put(RouterParams.SITE_NAME.create(), value);
@@ -121,9 +153,10 @@ public class SearchContext {
   }
   
   /**
-   * render link base on router and Map<QualifiedName, String>
-   * @return
+   * Render link base on router and Map<QualifiedName, String>
+   * @return String
    * @throws Exception
+   * @LevelAPI Experimental
    */
   public String renderLink() throws Exception {
     //

@@ -21,36 +21,65 @@ import java.util.Map;
 
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tung Vu Minh
- *          tungvm@exoplatform.com
- * Nov 21, 2012  
+ * The class defines data structure of entry that is as input for indexing
+ * Nov 21, 2012
+ * @LevelAPI Experimental  
  */
 public class SearchEntry {
   protected SearchEntryId id;
   protected Map<String, Object> content;
 
+  /**
+   * Default constructor 
+   * @LevelAPI Experimental
+   */
   public SearchEntry(){
     this.content = new HashMap<String, Object>();
   }
-  
+  /**
+   * Constructor creates a entry with specified parameters
+   * @param collection
+   * @param type
+   * @param name
+   * @param content
+   * @LevelAPI Experimental
+   */
   public SearchEntry(String collection, String type, String name, Map<String, Object> content){
     this.id = new SearchEntryId(collection, type, name);
     this.content = content;
   }
-  
+  /**
+   * Get entry id
+   * @return SearchEntryId
+   * @LevelAPI Experimental
+   */
   public SearchEntryId getId() {
     return id;
   }
 
+  /**
+   * Set entry id
+   * @param id
+   * @LevelAPI Experimental
+   */
   public void setId(SearchEntryId id) {
     this.id = id;
   }
 
+  /**
+   * Get content
+   * @return map
+   * @LevelAPI Experimental
+   */
   public Map<String, Object> getContent() {
     return content;
   }
 
+  /**
+   * Set content
+   * @param content
+   * @LevelAPI Experimental
+   */
   public void setContent(Map<String, Object> content) {
     this.content = content;
   }
