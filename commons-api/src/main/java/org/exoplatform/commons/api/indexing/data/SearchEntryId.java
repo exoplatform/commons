@@ -17,30 +17,51 @@
 package org.exoplatform.commons.api.indexing.data;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Tung Vu Minh
- *          tungvm@exoplatform.com
+ * The class defines structure of id that specifies a unique entry
  * Nov 21, 2012  
+ * @LevelAPI Experimental
  */
 public class SearchEntryId {
   protected String collection;
   protected String type;
   protected String name;
     
+  /**
+   * Constructor creates entry id
+   * @param collection
+   * @param type
+   * @param name
+   * @LevelAPI Experimental
+   */
   public SearchEntryId(String collection, String type, String name) {
     this.collection = collection;
     this.type = type;
     this.name = name;
   }
   
+  /**
+   * Get collection
+   * @return String
+   * @LevelAPI Experimental
+   */
   public String getCollection() {
     return collection;
   }
 
+  /**
+   * Get type
+   * @return String
+   * @LevelAPI Experimental
+   */
   public String getType() {
     return type;
   }
 
+  /**
+   * Get name
+   * @return String
+   * @LevelAPI Experimental
+   */
   public String getName() {
     return name;
   }

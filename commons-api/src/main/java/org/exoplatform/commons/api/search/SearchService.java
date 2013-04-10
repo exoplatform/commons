@@ -23,19 +23,28 @@ import java.util.Map;
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 
-/**
- * Created by The eXo Platform SAS
- * Author : Tung Vu Minh
- *          tungvm@exoplatform.com
- * Nov 21, 2012  
+/** 
+ * These class defines search API that a driver can implement and provides to add/get connector easily  
+ * Nov 21, 2012
+ * @LevelAPI Experimental 
  */
 public abstract class SearchService {
   private LinkedList<SearchServiceConnector> connectors = new LinkedList<SearchServiceConnector>();
-    
+  
+  /**
+   * Get all connectors currently
+   * @return Collection of connectors
+   * @LevelAPI Experimental 
+   */
   public LinkedList<SearchServiceConnector> getConnectors() {
     return connectors;
   }
 
+  /**
+   * Add a connector that implemented search API
+   * @param connector
+   * @LevelAPI Experimental 
+   */
   public void addConnector(SearchServiceConnector connector) {
     connectors.add(connector);
   }
@@ -51,6 +60,7 @@ public abstract class SearchService {
    * @param sort The field to sort the result set 
    * @param order Sort order (ASC, DESC)
    * @return a map of connector with their search result
+   * @LevelAPI Experimental 
    */
   public abstract Map<String, Collection<SearchResult>> search(SearchContext context, String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order);  
 }
