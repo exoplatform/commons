@@ -26,9 +26,7 @@ import org.exoplatform.services.jcr.RepositoryService;
 /**
  * SettingContext associates setting properties with a specified context (GLOBAL/USER).
  * Use SettingScope to specify context of setting properties in action with database, cache or in dispatching setting event.
- * Created by The eXo Platform
- * SAS Author : Nguyen Viet Bang bangnv@exoplatform.com Nov 27, 2012
- * @LevelAPI Platform
+ * @LevelAPI Experimental
  */
 public class SettingContext implements Serializable {
 
@@ -46,7 +44,7 @@ public class SettingContext implements Serializable {
   /**
    * Create a setting context object with a specified context
    * @param context context with which the specified value is to be associated
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public SettingContext(Context context) {
     super();
@@ -81,7 +79,7 @@ public class SettingContext implements Serializable {
   /**
    * get path associated to this setting-context 
    * @return path to setting data zone of this context in the database
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public String getContextPath() {
     return ContextPath;
@@ -89,7 +87,7 @@ public class SettingContext implements Serializable {
   /**
    * get repository name associated to this setting-context
    * @return repository name
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public String getRepositoryName() {
     return repositoryName;
@@ -97,7 +95,7 @@ public class SettingContext implements Serializable {
   /**
    * get context object associated to this setting-context
    * @return Context object
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   public Context getContext() {
     return context;

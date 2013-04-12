@@ -17,30 +17,29 @@
 package org.exoplatform.commons.api.settings.data;
 
 /**
- * All possible value type of event Created by The eXo Platform SAS Author :
- * Nguyen Viet Bang bangnv@exoplatform.com Nov 27, 2012
- * @LevelAPI Platform
+ * All possible value type of event
+ * @LevelAPI Experimental
  */
 public enum EventType {
 	
   /**
    * Type of dispatched event when a setting property is saved successfully
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   SETTING_SET,
   /**
    * Type of dispatched event when removing all setting properties in a context (GLOBAL/USER context)
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   SETTING_REMOVE_CONTEXT,
   /**
    * Type of dispatched event when removing all setting properties in a specified scope
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   SETTING_REMOVE_SCOPE, 
   /**
    * Type of dispatched event when removing a setting property
-   * @LevelAPI Platform
+   * @LevelAPI Experimental
    */
   SETTING_REMOVE_KEY
 }

@@ -23,13 +23,6 @@ import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Dang Van Minh
- *          minh.dang@exoplatform.com
- * Nov 8, 2012
- * 1:47:47 PM  
- */
-/**
  * This is the central point of the event system where listeners are registered (and/or unregistered) and events fired.
  * @param <S> This is a generic object of source, it can be a File/Folder/Content or something else 
  * which should be extended from <code>BaseObject</code>.

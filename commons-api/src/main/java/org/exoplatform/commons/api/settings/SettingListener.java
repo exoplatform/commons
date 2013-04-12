@@ -23,9 +23,7 @@ import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 
 /**
- * For each call of the SettingService API, it will trigger the event corresponding
- * Created by The eXo Platform SAS Author : Nguyen Viet Bang
- * bangnv@exoplatform.com Nov 27, 2012
+ * For each call of the SettingService API, it will trigger the event corresponding 
  * @LevelAPI Experimental
  */
 public abstract class SettingListener extends Listener<SettingService, SettingData> {
