@@ -24,8 +24,7 @@ import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 
 /** 
- * These class defines search API that a driver can implement and provides to add/get connector easily  
- * Nov 21, 2012
+ * These class defines the Search API that a driver can implement and provides add/get methods on the connector.  
  * @LevelAPI Experimental 
  */
 public abstract class SearchService {

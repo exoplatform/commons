@@ -11,7 +11,6 @@ import org.exoplatform.container.xml.PropertiesParam;
 /**
  * This abstract class is extended by the SearchService connectors which provide search result for a specific content type
  * 
- * Nov 21, 2012
  * @LevelAPI Experimental  
  */
 public abstract class SearchServiceConnector extends BaseComponentPlugin {

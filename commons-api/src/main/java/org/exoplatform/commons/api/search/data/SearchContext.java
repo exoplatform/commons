@@ -11,7 +11,6 @@ import org.exoplatform.services.log.Log;
 /**
  * Search context contains context information needed for SearchService and its connectors
  *  
- * Feb 22, 2013
  * @LevelAPI Experimental  
  */
 public class SearchContext {

@@ -18,7 +18,6 @@ package org.exoplatform.commons.api.indexing.data;
 
 /**
  * The class defines structure of id that specifies a unique entry
- * Nov 21, 2012  
  * @LevelAPI Experimental
  */
 public class SearchEntryId {
