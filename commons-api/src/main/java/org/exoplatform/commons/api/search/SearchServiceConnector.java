@@ -11,7 +11,6 @@ import org.exoplatform.container.xml.PropertiesParam;
 /**
  * This abstract class is extended by all SearchService connectors, it allow to build from configuration the list of the needed connector for the Unified Search.
  * 
- * Nov 21, 2012
  * @LevelAPI Experimental  
  */
 public abstract class SearchServiceConnector extends BaseComponentPlugin {

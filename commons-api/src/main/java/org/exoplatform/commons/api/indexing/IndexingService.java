@@ -23,7 +23,6 @@ import org.exoplatform.commons.api.indexing.data.SearchEntryId;
 
 /**
  * The class provides indexing API that connector implements to index it's data 
- * Nov 21, 2012
  * @LevelAPI Experimental  
  */
 public abstract class IndexingService {

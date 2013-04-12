@@ -20,7 +20,6 @@ package org.exoplatform.commons.api.indexing.data;
 
 /**
  * The class defines a simple entry
- * Nov 21, 2012  
  * @LevelAPI Experimental
  */
 public class SimpleEntry extends SearchEntry{

@@ -18,7 +18,6 @@ package org.exoplatform.commons.api.indexing.data;
 
 /**
  * The class defines standard entry
- * Nov 21, 2012
  * @LevelAPI Experimental  
  */
 public class StandardEntry extends SimpleEntry{

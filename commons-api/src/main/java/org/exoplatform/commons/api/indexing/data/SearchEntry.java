@@ -22,7 +22,6 @@ import java.util.Map;
 
 /**
  * The class defines data structure of entry that is as input for indexing
- * Nov 21, 2012
  * @LevelAPI Experimental  
  */
 public class SearchEntry {

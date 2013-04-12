@@ -3,7 +3,6 @@ package org.exoplatform.commons.api.search.data;
 /**
  * Search result returned by SearchService and all of its connectors, for rendering their search results on UI in a unified format.
  *   
- * Nov 21, 2012
  * @LevelAPI Experimental  
  */
 public class SearchResult {
