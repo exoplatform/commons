@@ -20,8 +20,6 @@ package org.exoplatform.commons.api.settings.data;
 /**
  * SettingScope is composed by [context,scope], associates with setting properties in a specified scope.
  * Use SettingScope to specify context of setting properties in action with database, cache or in dispatching setting event.
- * Created by The eXo Platform SAS Author : Nguyen Viet Bang
- * bangnv@exoplatform.com Nov 26, 2012
  * @LevelAPI Experimental
  */
 public class SettingScope extends SettingContext {

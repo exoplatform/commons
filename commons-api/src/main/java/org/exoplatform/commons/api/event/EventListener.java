@@ -19,37 +19,34 @@ package org.exoplatform.commons.api.event;
 
 import org.exoplatform.services.listener.Event;
 
-/**
- * Created by The eXo Platform SARL
- * Author : Dang Van Minh
- *          minh.dang@exoplatform.com
- * Nov 13, 2012
- * 3:00:06 PM  
- */
 /** 
  * This used to process all the dedicated work which be delegated from <code>EventManager</code>
  * To adapt with event manager system then all listeners should be implemented this interface.
-* @param <S> This is a generic object of source, it can be a File/Folder/Content or something else 
+*  @param <S> This is a generic object of source, it can be a File/Folder/Content or something else 
  * which should be extended from <code>BaseObject</code>.
  * @param <D> This is a generic object of data. It can be an event type such as NODE_ADDED/PROPERTY_CHANGED/NODE_REMOVED
+ * @LevelAPI Experimental
  */
 public interface EventListener<S, D> {
 
     /**
      * Process the dedicated work when the create event has been triggered.
      * @param event The <code>Event</code> object.
+     * @LevelAPI Experimental
      */
     public void create(Event<S, D> event);
 
     /**
      * Process the dedicated work when the update event has been triggered.
      * @param event The <code>Event</code> object.
+     * @LevelAPI Experimental
      */
     public void update(Event<S, D> event);
 
     /**
      * Process the dedicated work when the remove event has been triggered.
      * @param event The <code>Event</code> object.
+     * @LevelAPI Experimental
      */
     public void remove(Event<S, D> event);
 

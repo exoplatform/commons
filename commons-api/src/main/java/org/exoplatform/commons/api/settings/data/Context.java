@@ -20,8 +20,6 @@ import org.exoplatform.services.security.ConversationState;
 
 /**
  * This class allow a user to be able to save some settings linked to a Context.
- * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
- * Nov 9, 2012
  * @LevelAPI Experimental
  */
 

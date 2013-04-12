@@ -20,8 +20,6 @@ package org.exoplatform.commons.api.settings.data;
 /**
  * SettingKey is composed by [context,scope,key], associates with a specified setting property value.
  * Use SettingKey to specify context of setting property in action with database, cache or in dispatching setting event.
- * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
- * Nov 22, 2012
  * @LevelAPI Experimental
  */
 public class SettingKey extends SettingScope {

@@ -18,8 +18,6 @@ package org.exoplatform.commons.api.settings.data;
 
 /**
  * This class allow a user to be able to save some settings linked to a scope.
- * Created by The eXo Platform SAS Author : eXoPlatform
- * bangnv@exoplatform.com Nov 8, 2012
  * @LevelAPI Experimental
  */
 public enum Scope {   

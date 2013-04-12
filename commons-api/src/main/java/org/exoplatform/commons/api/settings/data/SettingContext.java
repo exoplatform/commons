@@ -26,8 +26,6 @@ import org.exoplatform.services.jcr.RepositoryService;
 /**
  * SettingContext associates setting properties with a specified context (GLOBAL/USER).
  * Use SettingScope to specify context of setting properties in action with database, cache or in dispatching setting event.
- * Created by The eXo Platform
- * SAS Author : Nguyen Viet Bang bangnv@exoplatform.com Nov 27, 2012
  * @LevelAPI Experimental
  */
 public class SettingContext implements Serializable {

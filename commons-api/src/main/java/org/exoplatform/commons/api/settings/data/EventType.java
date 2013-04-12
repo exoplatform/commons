@@ -17,8 +17,7 @@
 package org.exoplatform.commons.api.settings.data;
 
 /**
- * All possible value type of event Created by The eXo Platform SAS Author :
- * Nguyen Viet Bang bangnv@exoplatform.com Nov 27, 2012
+ * All possible value type of event
  * @LevelAPI Experimental
  */
 public enum EventType {

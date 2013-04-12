@@ -21,75 +21,78 @@ import java.io.InputStream;
 import java.util.Date;
 
 /**
- * Created by The eXo Platform SARL
- * Author : Dang Van Minh
- *          minh.dang@exoplatform.com
- * Nov 2, 2012
- * 2:14:08 PM  
- */
-
-/**
  * File object instance.
+ * @LevelAPI Experimental
  */
 public interface File extends BaseObject {
 
     /**
      * Return the binary data of <code>File</code> instance
      * @return The value of jcr:data property which stored inside jcr:content node.
+     * @LevelAPI Experimental
      */
     public InputStream getData();
 
     /**
      * Return the MIMETYPE of <code>File</code> instance.
      * @return The value of jcr:mimeType property which stored inside jcr:content node.
+     * @LevelAPI Experimental
      */
     public String getMimeType();
     
     /**
      * Return the last modified date of <code>File</code> instance.
      * @return The value of jcr:lastModified property which stored inside jcr:content node.
+     * @LevelAPI Experimental
      */
     public Date getLastModified();
     
     /**
      * Return the encoding type of <code>File</code> instance.
      * @return The value of jcr:encoding property which stored inside jcr:content node.
+     * @LevelAPI Experimental
      */
     public String getEncoding();
     
     /**
      * Return the creator of <code>File</code> instance.
      * @return The value of dc:creator property which stored inside dc:elementSet mix-in node type.
+     * @LevelAPI Experimental
      */
     public String getDCCreator();
     
     /**
      * Return the description of <code>File</code> instance.
      * @return The value of dc:description property which stored inside dc:elementSet mix-in node type.
+     * @LevelAPI Experimental
      */
     public String getDCDescription();
     
     /**
      * Return the contributor of <code>File</code> instance.
      * @return The value of dc:contributor property which stored inside dc:elementSet mix-in node type.
+     * @LevelAPI Experimental
      */
     public String getDCContributor();
     
     /**
      * Return the publisher of <code>File</code> instance.
      * @return The value of dc:publisher property which stored inside dc:elementSet mix-in node type.
+     * @LevelAPI Experimental
      */
     public String getDCPublisher();
     
     /**
      * Return the subject of <code>File</code> instance.
      * @return The value of dc:subject property which stored inside dc:elementSet mix-in node type.
+     * @LevelAPI Experimental
      */
     public String getDCSubject();
     
     /**
      * Return the last updated date of <code>File</code> instance.
      * @return The value of dc:date property which stored inside dc:elementSet mix-in node type.
+     * @LevelAPI Experimental
      */
     public Date getDCDate();
     
