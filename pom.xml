@@ -23,6 +23,7 @@
     <org.exoplatform.ws.version>2.2.11-GA-SNAPSHOT</org.exoplatform.ws.version>
     <org.exoplatform.jcr.version>1.14.11-GA-SNAPSHOT</org.exoplatform.jcr.version>
     <org.exoplatform.portal.version>3.2.8-PLF-SNAPSHOT</org.exoplatform.portal.version>
+    <org.exoplatform.social.version>1.2.13-SNAPSHOT</org.exoplatform.social.version>
     <picocontainer.version>1.1</picocontainer.version>
     <javax.jcr.api.version>1.0</javax.jcr.api.version>
     <testng.version>5.10</testng.version>
