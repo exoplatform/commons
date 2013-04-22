@@ -66,6 +66,8 @@ public class UISpacesSwitcher extends UIContainer {
   
   private boolean isShowUserSpace = true;
   
+  private boolean isAutoResize = false;
+  
   private String mySpaceLabel = null;
   
   private String portalSpaceLabel = null;
@@ -122,6 +124,14 @@ public class UISpacesSwitcher extends UIContainer {
 
   public void setShowUserSpace(boolean isShowUserSpace) {
     this.isShowUserSpace = isShowUserSpace;
+  }
+  
+  public void setAutoResize(boolean isAutoResize) {
+    this.isAutoResize = isAutoResize;
+  }
+  
+  public boolean isAutoResize() {
+    return isAutoResize;
   }
 
   public String getUsername() {

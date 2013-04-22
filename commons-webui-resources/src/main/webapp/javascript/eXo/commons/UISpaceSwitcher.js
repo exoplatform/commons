@@ -148,18 +148,30 @@ UISpaceSwitcher.prototype.initSpaceInfoAfterReady = function(uicomponentId, user
   storage.spaceLabel = spaceLabel;
 }
 
-UISpaceSwitcher.prototype.initConfig = function(uicomponentId, isShowPortalSpace, isShowUserSpace) {
+UISpaceSwitcher.prototype.initConfig = function(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize) {
   jQuery(window).ready(function(){
     var me = eXo.commons.UISpaceSwitcher;
-    me.initConfigAfterReady(uicomponentId, isShowPortalSpace, isShowUserSpace);
+    me.initConfigAfterReady(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize);
   });
 }
 
-UISpaceSwitcher.prototype.initConfigAfterReady = function(uicomponentId, isShowPortalSpace, isShowUserSpace) {
+UISpaceSwitcher.prototype.initConfigAfterReady = function(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   storage.isShowPortalSpace = isShowPortalSpace;
   storage.isShowUserSpace = isShowUserSpace;
+  
+  // Auto resize
+  if (isAutoResize) {
+    var spaceSwitcher = document.getElementById(uicomponentId);
+    if (spaceSwitcher) {
+      var spacePopup = jQuery(spaceSwitcher).find("ul.spaceChooserPopup")[0];
+      var dropDownButton = jQuery(spaceSwitcher).find("div.spaceChooser")[0];
+  	  if (spacePopup && dropDownButton) {
+  	    spacePopup.style.width = dropDownButton.offsetWidth + "px";
+  	  }
+    }
+  }
 }
 
 UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
