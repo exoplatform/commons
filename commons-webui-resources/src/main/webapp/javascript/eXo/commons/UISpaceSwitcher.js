@@ -230,13 +230,13 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
   var userSpaceId = "/user/" + storage.username;
   var userSpaceName = storage.mySpaceLabel;
   
-  var spaceDiv = "<div class='spaceOption hover' id='UISpaceSwitcher_" + userSpaceId 
+  var spaceDiv = "<a class='spaceOption hover' id='UISpaceSwitcher_" + userSpaceId 
       + "' title='" + userSpaceName 
       + "' alt='" + userSpaceName 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + userSpaceId + "', '" + uicomponentId + "')\">" 
-        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/MyWiki.png' width='19px' alt='" + userSpaceName + "'/>"
-        + "<span style='float:none; margin-left:6px;'  >" + userSpaceName + " </span>"
-      + "</div>";
+        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/MyWiki.png' width='19' alt='" + userSpaceName + "'/>"
+       + userSpaceName +
+       "</a>";
   container.innerHTML = spaceDiv;
 };
 
@@ -250,13 +250,13 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
   var wikiSpaceSwitcher = document.getElementById(uicomponentId);
   var container = jQuery(wikiSpaceSwitcher).find('li.' + containerClazz)[0];
 
-  var spaceDiv = "<div class='spaceOption hover' id='UISpaceSwitcher_" + storage.portalSpaceId 
+  var spaceDiv = "<a class='spaceOption hover' id='UISpaceSwitcher_" + storage.portalSpaceId 
       + "' title='" + storage.portalSpaceLabel 
       + "' alt='" + storage.portalSpaceLabel 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">" 
-        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/CompanyWiki.png' width='19px' alt='" + storage.portalSpaceLabel + "'/>"
-        + "<span style='float:none; margin-left:6px;'  >" + storage.portalSpaceLabel + " </span>"
-      + "</div>";
+        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/CompanyWiki.png' width='19' alt='" + storage.portalSpaceLabel + "'/>"
+         + storage.portalSpaceLabel + 
+       "</a>";
   container.innerHTML = spaceDiv;
 }
 
@@ -293,10 +293,11 @@ UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, contai
 }
 
 UISpaceSwitcher.prototype.createSpaceNode = function(spaceId, name, uicomponentId, avatarUrl) {
-  var spaceDiv = "<li style='display:block' class='spaceOption hover' id='UISpaceSwitcher_" + spaceId 
-      + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">" 
-        + "<image src='" + avatarUrl + "' width='19px' alt='" + name + "'/>"
-        + "<span style='float:none; margin-left:6px;'  >" + name + " </span>"
+  var spaceDiv = "<li style='display:block' class='spaceOption hover' id='UISpaceSwitcher_" + spaceId + "' >" 
+	  + "<a onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + spaceId + "', '" + uicomponentId + "')\">"
+        + "<image src='" + avatarUrl + "' width='19' alt='" + name + "'/>"
+         + name +
+		 "</a>"
       + "</li>";
   return spaceDiv;
 }
