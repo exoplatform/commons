@@ -9,9 +9,8 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 
 /**
- * This abstract class is extended by the SearchService connectors which provide search result for a specific content type
+ * This abstract class is extended by all SearchService connectors, it allow to build from configuration the list of the needed connector for the Unified Search.
  * 
- * @LevelAPI Experimental  
  */
 public abstract class SearchServiceConnector extends BaseComponentPlugin {
   private String searchType; //search type name

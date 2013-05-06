@@ -9,7 +9,7 @@ import org.exoplatform.web.controller.router.Router;
 import org.exoplatform.services.log.Log; 
 
 /**
- * Search context contains context information needed for SearchService and its connectors
+ * Search Context contains a set of data needed for SearchService and all connectors.
  *  
  * @LevelAPI Experimental  
  */

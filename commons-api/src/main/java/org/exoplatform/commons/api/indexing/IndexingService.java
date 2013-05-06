@@ -23,7 +23,6 @@ import org.exoplatform.commons.api.indexing.data.SearchEntryId;
 
 /**
  * The class provides indexing API that connector implements to index it's data 
- * @LevelAPI Experimental  
  */
 public abstract class IndexingService {
   protected static final String DATE_INDEXED = "se_dateIndexed";
