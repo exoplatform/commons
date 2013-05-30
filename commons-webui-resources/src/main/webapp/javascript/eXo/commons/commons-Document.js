@@ -880,6 +880,7 @@ function UIDSUpload() {
 	  var file  = jQuery("#file",form);
 	  if(file.attr("value") == null || file.attr("value") == '') return;  
   	  jQuery(".fileNameLabel").html(file.attr("value"));
+      jQuery(".fileNameLabel").attr("title", file.attr("value"));
  	 //var progressBarFrame = DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
 	  var progressBarFrame = jQuery("div.progressBarFrame:first");
 	  progressBarFrame.show() ;  
