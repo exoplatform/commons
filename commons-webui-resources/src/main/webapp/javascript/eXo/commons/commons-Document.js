@@ -153,7 +153,9 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
                             }).append(link);
 
     listRecords.append(item);
+
  }
+ 
 };
 
 DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
@@ -178,6 +180,14 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
   var fileList = fileContainer.getElementsByTagName("File");
 
   var listRecords = jQuery('#ListRecords');
+  
+  //if has more 7 elements, a scroll vertical will be applied
+  if ((fileList.length + folderList.length) > 7){
+  	listRecords.addClass("uiDocumentSelectorScrolling");
+  }
+  else{
+	listRecords.removeClass("uiDocumentSelectorScrolling");  
+  }
 
   if ((!fileList || fileList.length <= 0)
       && (!folderList || folderList.length <= 0)) {
