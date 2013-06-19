@@ -453,7 +453,7 @@ public class ProductInformations implements Startable {
 
   private String getCurrentProductInformationsAsString() {
     StringWriter stringWriter = new StringWriter();
-    PrintWriter printWriter = new PrintWriter(stringWriter);
+    String info = "";
     try {
       if(previousProductInformationProperties.containsKey(PRODUCT_KEY))
         productInformationProperties.setProperty(PRODUCT_KEY,getProductKey());
@@ -470,34 +470,31 @@ public class ProductInformations implements Startable {
     } catch (MissingProductInformationException e) {
       LOG.info("it's a locked instance!");
     }
-    finally {
-      productInformationProperties.list(printWriter);
-      printWriter.flush();
-      String info = stringWriter.toString();
-      if(info.contains("...")){
-          String s = info.substring(info.indexOf(PRODUCT_KEY), info.indexOf("...")+3);
-          String cle = PRODUCT_KEY + "=" +
-                  previousProductInformationProperties.getProperty(PRODUCT_KEY);
-          info = info.replace(s, cle);
-        }
+      try {
+          productInformationProperties.store(stringWriter,"ProductInformation");
+          info = stringWriter.toString();
+
+      }   catch (IOException ex) {
+          LOG.error("cannot load properties");
+
+      }
+
       return info;
-    }
   }
 
   private String getPreviousProductInformationsAsString() {
     StringWriter stringWriter = new StringWriter();
-    PrintWriter printWriter = new PrintWriter(stringWriter);
-    if(previousProductInformationProperties.containsKey("--")) previousProductInformationProperties.remove("--");
-    previousProductInformationProperties.list(printWriter);
-    printWriter.flush();
-    String info = stringWriter.toString();
-    if(info.contains("...")){
-      String s = info.substring(info.indexOf(PRODUCT_KEY), info.indexOf("...")+3);
-      String cle = PRODUCT_KEY + "=" +
-              previousProductInformationProperties.getProperty(PRODUCT_KEY);
-      info = info.replace(s, cle);
-    }
-    return  info;
+      String info = "";
+      if(previousProductInformationProperties.containsKey("--")) previousProductInformationProperties.remove("--");
+      try {
+          previousProductInformationProperties.store(stringWriter,"ProductInformation");
+          info = stringWriter.toString();
+
+      } catch (IOException ex) {
+          LOG.error("cannot load properties");
+      }
+
+      return info;
   }
 
   public void setUnlockInformation(Properties unlockInformation) {
