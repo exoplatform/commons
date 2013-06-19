@@ -16,10 +16,7 @@
  */
 package org.exoplatform.commons.info.test;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Properties;
 
 import javax.jcr.Node;
@@ -143,9 +140,11 @@ public class TestProductInformations extends BasicTestCase {
 
   private String getPropertiesAsString(Properties properties) {
     StringWriter stringWriter = new StringWriter();
-    PrintWriter printWriter = new PrintWriter(stringWriter);
-    properties.list(printWriter);
-    printWriter.flush();
+    try {
+        properties.store(stringWriter,"ProductInformation");
+    } catch (IOException ex) {
+
+    }
     return stringWriter.toString();
   }
 
