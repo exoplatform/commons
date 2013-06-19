@@ -37,7 +37,7 @@
   <ul class="spaceChooserPopup" style="display:none">
     <li style="display:block" class="title">
       <i class="uiIconClose pull-right" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></i>
-      <%= _ctx.appRes(uicomponent.id + ".title.select-location"); %>
+      <%= _ctx.appRes("UISpaceSwitcher.title.select-location"); %>
     </li>
     <li style="display:block" class="spaceSearch"><input type="text" class="spaceSearchText lostFocus"></input></li>
     <li style="display:block" class="portalSpace"></li>
