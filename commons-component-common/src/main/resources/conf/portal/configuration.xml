@@ -4,7 +4,6 @@
 	xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
 
-
 	<component>
 		<key>org.exoplatform.commons.api.event.EventManager</key>
 		<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
@@ -19,9 +18,9 @@
 		<key>org.exoplatform.commons.api.settings.SettingService</key>
 		<type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
 	</component>
+
 	<external-component-plugins>
-		<target-component>org.exoplatform.commons.chromattic.ChromatticManager
-		</target-component>
+		<target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
 		<component-plugin>
 			<name>chromattic</name>
 			<set-method>addLifeCycle</set-method>
@@ -48,11 +47,8 @@
 		</component-plugin>
 	</external-component-plugins>
 
-
-
 	<external-component-plugins>
-		<target-component>org.exoplatform.services.jcr.RepositoryService
-		</target-component>
+		<target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
 		<component-plugin>
 			<name>add.nodeType</name>
 			<set-method>addPlugin</set-method>
@@ -62,6 +58,7 @@
 					<name>autoCreatedInNewRepository</name>
 					<description>Node types configuration file</description>
 					<value>jar:/conf/settings-nodetypes.xml</value>
+					<value>jar:/conf/notification-nodetypes.xml</value>
 				</values-param>
 			</init-params>
 		</component-plugin>
@@ -73,6 +70,7 @@
 				<properties-param>
 					<name>namespaces</name>
 					<property name="stg" value="http://www.gatein.org/jcr/stg/1.0/" />
+					<property name="ntf" value="http://www.gatein.org/jcr/ntf/1.0/" />
 				</properties-param>
 			</init-params>
 		</component-plugin>

@@ -16,14 +16,53 @@
  */
 package org.exoplatform.commons.notification;
 
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
+import java.util.List;
+
+import javax.jcr.Session;
+
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.app.SessionProviderService;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
+
 
 public class NotificationUtils {
   
-  public static String buildMessageKey() {
+  public static final String   WORKSPACE_PARAM         = "workspace";
+  public static final String   DEFAULT_WORKSPACE_NAME  = "portal-system";
+
+  public static final String   NOTIFICATION_HOME_NODE  = "eXoNotification";
+  public static final String   NOTIFICATION_PARENT_PATH  = "/";
+  public static final String   PREFIX_MESSAGE_HOME_NODE  = "messageHome";
+  
+  public static String listToString(List<String> list) {
+    if (list == null || list.size() == 0) {
+      return "";
+    }
+    StringBuffer values = new StringBuffer();
+    for (String str : list) {
+      if (values.length() > 0) {
+        values.append(",");
+      }
+      values.append(str);
+    }
+    return values.toString();
+  }
+  
+  public static Session getSession(SessionProvider sProvider, String workspace) {
+    RepositoryService repositoryService = CommonsUtils.getService(RepositoryService.class);
+    try {
+      ManageableRepository manageableRepository = repositoryService.getCurrentRepository();
+      return sProvider.getSession(workspace, manageableRepository);//"portal-system"
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     return null;
+  }
+  
+  public static SessionProvider createSystemProvider() {
+    SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
+    return sessionProviderService.getSystemSessionProvider(null);
   }
 }

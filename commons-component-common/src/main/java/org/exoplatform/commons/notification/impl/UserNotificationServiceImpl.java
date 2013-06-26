@@ -16,19 +16,20 @@
  */
 package org.exoplatform.commons.notification.impl;
 
-import javax.jcr.Session;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
+import org.exoplatform.commons.api.notification.UserNotificationSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.service.UserNotificationService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.LazyPageList;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.core.ManageableRepository;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class UserNotificationServiceImpl implements UserNotificationService {
 
@@ -37,20 +38,22 @@ public class UserNotificationServiceImpl implements UserNotificationService {
 
   @Override
   public void saveUserNotificationSetting(String userId, UserNotificationSetting notificationSetting) {
-    String[] providers = notificationSetting.getActiveProviders();
-    StringBuffer values = new StringBuffer();
-    for (int i = 0; i < providers.length; i++) {
-      if(i > 0) {
-        values.append(",");
-      }
-      values.append(providers[i]);
-    }
+    
+    String instantlys = NotificationUtils.listToString(notificationSetting.getInstantlyProviders());
+    String dailys = NotificationUtils.listToString(notificationSetting.getDailyProviders());
+    String weeklys = NotificationUtils.listToString(notificationSetting.getWeeklyProviders());
+    String monthlys = NotificationUtils.listToString(notificationSetting.getMonthlyProviders());
+    
     
     SettingService settingService = CommonsUtils.getService(SettingService.class);
     settingService.set(Context.USER.id(userId), Scope.PORTAL, 
-                       UserNotificationSetting.PROVIDER_KEY, SettingValue.create(values.toString()));
+                       UserNotificationSetting.FREQUENCY.INSTANTLY.getName(), SettingValue.create(instantlys));
     settingService.set(Context.USER.id(userId), Scope.PORTAL, 
-                       UserNotificationSetting.FREQUENCY_KEY, SettingValue.create(notificationSetting.getFrequency()));
+                       UserNotificationSetting.FREQUENCY.DAILY_KEY.getName(), SettingValue.create(dailys));
+    settingService.set(Context.USER.id(userId), Scope.PORTAL, 
+                       UserNotificationSetting.FREQUENCY.WEEKLY_KEY.getName(), SettingValue.create(weeklys));
+    settingService.set(Context.USER.id(userId), Scope.PORTAL, 
+                       UserNotificationSetting.FREQUENCY.MONTHLY_KEY.getName(), SettingValue.create(monthlys));
   }
 
   @Override
@@ -59,22 +62,21 @@ public class UserNotificationServiceImpl implements UserNotificationService {
     SettingService settingService = CommonsUtils.getService(SettingService.class);
 
     //
-    SettingValue<String> frequency = (SettingValue<String>) settingService.get(Context.USER.id(userId), Scope.PORTAL, UserNotificationSetting.FREQUENCY_KEY);
-
-    if(frequency == null) {
-      notificationSetting.setFrequency(UserNotificationSetting.FREQUENCY_DEFAULT_VALUE);
-    } else {
-      notificationSetting.setFrequency(frequency.getValue());
-    }
-
-    //
-    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), Scope.PORTAL, UserNotificationSetting.PROVIDER_KEY);
-
-    if(values != null) {
-      notificationSetting.setActiveProviders(values.getValue().split(","));
-    }
-
+    notificationSetting.setInstantlyProviders(getSettingValue(settingService, userId, FREQUENCY.INSTANTLY));
+    notificationSetting.setDailyProviders(getSettingValue(settingService, userId, FREQUENCY.DAILY_KEY));
+    notificationSetting.setWeeklyProviders(getSettingValue(settingService, userId, FREQUENCY.WEEKLY_KEY));
+    notificationSetting.setMonthlyProviders(getSettingValue(settingService, userId, FREQUENCY.MONTHLY_KEY));
     return notificationSetting;
+  }
+  
+  @SuppressWarnings("unchecked")
+  private List<String> getSettingValue(SettingService settingService, String userId, UserNotificationSetting.FREQUENCY  frequency) {
+    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), Scope.PORTAL, frequency.getName());
+    if (values != null) {
+      String strs = values.getValue();
+      return Arrays.asList(strs.split(","));
+    }
+    return new ArrayList<String>();
   }
 
   @Override
@@ -91,17 +93,4 @@ public class UserNotificationServiceImpl implements UserNotificationService {
     // TODO Auto-generated method stub
     return 0;
   }
-  
-  
-  private Session getSession(SessionProvider provider) {
-    RepositoryService repositoryService = CommonsUtils.getService(RepositoryService.class);
-    try {
-      ManageableRepository manageableRepository = repositoryService.getCurrentRepository();
-      provider.getSession("portal-system", manageableRepository);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-
 }

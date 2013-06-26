@@ -30,14 +30,38 @@ public interface NotificationService {
 
   void addSendNotificationListener(NotificationMessage  message);
 
+  /**
+   * Process notification message when have new a @NotificationMessage created.
+   * 
+   * @param message the new a @NotificationMessage
+   */
   void processNotificationMessage(NotificationMessage  message) ;
   
+  /**
+   * Process the list notification message when have new list @NotificationMessage created.
+   * 
+   * @param messages
+   */
   void processNotificationMessages(Collection<NotificationMessage> messages);
 
+  /**
+   * Save @NotificationMessage on the database
+   * @param message
+   */
   void saveNotificationMessage(NotificationMessage  message);
   
+  /**
+   * Get all @NotificationMessage by provider type
+   * @param providerType
+   * @return
+   */
   NotificationMessage getNotificationMessageByProviderType(String providerType);
   
+  /**
+   * Get all @NotificationMessage by userId
+   * @param userId
+   * @return
+   */
   List<NotificationMessage> getNotificationMessagesByUser(String userId);
 
 }

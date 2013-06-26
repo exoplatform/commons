@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl;
+package org.exoplatform.commons.notification.listener;
 
 import java.util.Calendar;
 import java.util.concurrent.CompletionService;
@@ -24,12 +24,11 @@ import java.util.concurrent.Executors;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
-import org.exoplatform.commons.notification.listener.ExecutorContextListener;
 
 public class NotificationServiceListenerImpl implements NotificationServiceListener<NotificationContext> {
 
-  private final static int TIME_PEDDING = 2; // minutes
-  private final static int NUMBER_NOTIFICATION = 10; // number of notification pedding
+  private final static int PENDING_TIME = 2; // minutes
+  private final static int NUMBER_NOTIFICATION = 10; // number of notification pending
 
   private ExecutorService executor;
   
@@ -40,7 +39,7 @@ public class NotificationServiceListenerImpl implements NotificationServiceListe
   @Override
   public void processListener(NotificationContext ctx) {
     long currentTime = Calendar.getInstance().getTimeInMillis();
-    if (ctx.getSize() > NUMBER_NOTIFICATION || (currentTime - ctx.getTime() > TIME_PEDDING * 60 * 1000)) {
+    if (ctx.getSize() > NUMBER_NOTIFICATION || (currentTime - ctx.getTime() > PENDING_TIME * 60 * 1000)) {
       CompletionService<NotificationContext> cs = new ExecutorCompletionService<NotificationContext>(executor);
       cs.submit(ExecutorContextListener.getInstance(ctx));
     }

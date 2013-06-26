@@ -17,114 +17,159 @@
 package org.exoplatform.commons.api.notification;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+/**
+ * User setting notification
+ */
+
 public class UserNotificationSetting {
-  public static final String FREQUENCY_KEY           = "frequency";
+  public enum FREQUENCY {
+    INSTANTLY("Instantly"), DAILY_KEY("daily"),
+    WEEKLY_KEY("weekly"), MONTHLY_KEY("monthly");
+    private final String name;
 
-  public static final String FREQUENCY_DEFAULT_VALUE = "0";
+    FREQUENCY(String name) {
+      this.name = name;
+    }
 
-  public static final String PROVIDER_KEY            = "provider";
-  
-  private String[] activeProviders;
+    public String getName() {
+      return name;
+    }
 
-  /**
-   * Setting of value frequency to send notification
-   * If value = 0 it is Immediately
-   * If value = 1d it is Daily
-   * If value = 1w it is Weekly, in which the number before is the day number of week
-   * If value = 1m it is Monthly, in which the number before is the day number of month
-   */
-  private String   frequency      = FREQUENCY_DEFAULT_VALUE;  // 1d; 1w 2w 3w; 1m 2m 3m;
+    @Override
+    public String toString() {
+      return name;
+    }
 
-  private boolean  isImmediately = true;
+  }
 
-  private boolean  isDaily       = false;
+  private List<String> instantlyProviders;
 
-  private boolean  isWeekly      = false;
+  private List<String> dailyProviders;
 
-  private boolean  isMonthly     = false;
+  private List<String> weeklyProviders;
+
+  private List<String> monthlyProviders;
 
   public UserNotificationSetting() {
-    this.activeProviders = new String[] {};
+    this.instantlyProviders = new ArrayList<String>();
+    this.dailyProviders = new ArrayList<String>();
+    this.weeklyProviders = new ArrayList<String>();
+    this.weeklyProviders = new ArrayList<String>();
   }
 
   /**
-   * @return the activeProviders
+   * @return the instantlyProviders
    */
-  public String[] getActiveProviders() {
-    return activeProviders;
+  public List<String> getInstantlyProviders() {
+    return instantlyProviders;
   }
 
   /**
-   * @param activeProviders the activeProviders to set
+   * @param instantlyProviders the instantlyProviders to set
    */
-  public void setActiveProviders(String[] activeProviders) {
-    this.activeProviders = activeProviders;
+  public void setInstantlyProviders(List<String> instantlyProviders) {
+    this.instantlyProviders = instantlyProviders;
   }
 
   /**
-   * @param activeProvider the activeProviders to add
+   * @return the dailyProviders
    */
-  public void addActiveProvider(String activeProvider) {
-    List<String> providers = new ArrayList<String>(Arrays.asList(activeProviders));
-    if (providers.contains(activeProvider) == false) {
-      providers.add(activeProvider);
+  public List<String> getDailyProviders() {
+    return dailyProviders;
+  }
+
+  /**
+   * @param dailyProviders the dailyProviders to set
+   */
+  public void setDailyProviders(List<String> dailyProviders) {
+    this.dailyProviders = dailyProviders;
+  }
+
+  /**
+   * @return the weeklyProviders
+   */
+  public List<String> getWeeklyProviders() {
+    return weeklyProviders;
+  }
+
+  /**
+   * @param weeklyProviders the weeklyProviders to set
+   */
+  public void setWeeklyProviders(List<String> weeklyProviders) {
+    this.weeklyProviders = weeklyProviders;
+  }
+
+  /**
+   * @return the monthlyProviders
+   */
+  public List<String> getMonthlyProviders() {
+    return monthlyProviders;
+  }
+
+  /**
+   * @param monthlyProviders the monthlyProviders to set
+   */
+  public void setMonthlyProviders(List<String> monthlyProviders) {
+    this.monthlyProviders = monthlyProviders;
+  }
+
+  /**
+   * @param providerId the provider's id to add
+   */
+  public void addProvider(String providerId, FREQUENCY frequencyType) {
+    if (frequencyType.equals(FREQUENCY.DAILY_KEY)) {
+      addProperty(dailyProviders, providerId);
+    } else if (frequencyType.equals(FREQUENCY.WEEKLY_KEY)) {
+      addProperty(weeklyProviders, providerId);
+    } else if (frequencyType.equals(FREQUENCY.MONTHLY_KEY)) {
+      addProperty(monthlyProviders, providerId);
+    } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
+      addProperty(instantlyProviders, providerId);
     }
-    activeProviders = providers.toArray(new String[providers.size()]);
   }
 
   /**
-   * @return the frequency
+   * @param providerId
+   * @return
    */
-  public String getFrequency() {
-    return frequency;
+  public boolean isInInstantly(String providerId) {
+    return (instantlyProviders.contains(providerId)) ? true : false;
   }
 
   /**
-   * @param frequency the frequency to set
+   * @param providerId
+   * @return
    */
-  public void setFrequency(String frequency) {
-    this.frequency = frequency;
-    isDaily = isWeekly = isMonthly = isImmediately = false;
-    if (frequency.indexOf("d") > 0) {
-      isDaily = true;
-    } else if (frequency.indexOf("w") > 0) {
-      isWeekly = true;
-    } else if (frequency.indexOf("m") > 0) {
-      isMonthly = true;
-    } else {
-      isImmediately = true;
+  public boolean isInDaily(String providerId) {
+    return (dailyProviders.contains(providerId)) ? true : false;
+  }
+
+  /**
+   * @param providerId
+   * @return
+   */
+  public boolean isInWeekly(String providerId) {
+    return (weeklyProviders.contains(providerId)) ? true : false;
+  }
+
+  /**
+   * @param providerId
+   * @return
+   */
+  public boolean isInMonthly(String providerId) {
+    return (monthlyProviders.contains(providerId)) ? true : false;
+  }
+
+  public boolean isActiveWithoutInstantly(String providerId) {
+    return isInDaily(providerId) || isInWeekly(providerId) || isInMonthly(providerId);
+  }
+
+  private void addProperty(List<String> providers, String providerId) {
+    if (providers.contains(providerId) == false) {
+      providers.add(providerId);
     }
   }
-  
 
-  /**
-   * @return the isImmediately
-   */
-  public boolean isImmediately() {
-    return isImmediately;
-  }
-
-  /**
-   * @return the isDaily
-   */
-  public boolean isDaily() {
-    return isDaily;
-  }
-
-  /**
-   * @return the isWeekly
-   */
-  public boolean isWeekly() {
-    return isWeekly;
-  }
-
-  /**
-   * @return the isMonthly
-   */
-  public boolean isMonthly() {
-    return isMonthly;
-  }
 }
