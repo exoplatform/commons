@@ -23,7 +23,9 @@ public class ProviderModel {
 
   private String         name;
 
-  private List<Language> templates;
+  private String         params;
+
+  private List<Template> templates;
 
   public ProviderModel() {
   }
@@ -57,16 +59,30 @@ public class ProviderModel {
   }
 
   /**
+   * @return the params
+   */
+  public String getParams() {
+    return params;
+  }
+
+  /**
+   * @param params the params to set
+   */
+  public void setParams(String params) {
+    this.params = params;
+  }
+
+  /**
    * @return the templates
    */
-  public List<Language> getTemplates() {
+  public List<Template> getTemplates() {
     return templates;
   }
 
   /**
    * @param templates the templates to set
    */
-  public void setTemplates(List<Language> templates) {
+  public void setTemplates(List<Template> templates) {
     this.templates = templates;
   }
 

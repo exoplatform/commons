@@ -16,29 +16,29 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
-public class Language {
+public class Template {
 
-  private String name;
+  private String language;
 
   private String subject;
 
   private String template;
 
-  public Language() {
+  public Template() {
   }
 
   /**
    * @return the name
    */
-  public String getName() {
-    return name;
+  public String getLanguage() {
+    return language;
   }
 
   /**
-   * @param name the name to set
+   * @param language the language to set
    */
-  public void setName(String name) {
-    this.name = name;
+  public void setLanguage(String language) {
+    this.language = language;
   }
 
   /**

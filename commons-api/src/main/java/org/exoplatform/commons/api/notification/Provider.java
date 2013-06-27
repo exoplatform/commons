@@ -16,20 +16,30 @@
  */
 package org.exoplatform.commons.api.notification;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.jcr.Value;
 
 public class Provider {
   private String              type;
 
   private String              name;
 
-  private String              isActive  = "false";
+  private boolean            isActive = false;
+  
+  private List<String>        params = new ArrayList<String>();
 
   private Map<String, String> templates = new HashMap<String, String>();
 
   private Map<String, String> subjects = new HashMap<String, String>();
 
+  public Provider() {
+
+  }
   /**
    * @return the type
    */
@@ -40,8 +50,9 @@ public class Provider {
   /**
    * @param type the id to set
    */
-  public void setType(String type) {
+  public Provider setType(String type) {
     this.type = type;
+    return this;
   }
 
   /**
@@ -54,33 +65,49 @@ public class Provider {
   /**
    * @param name the name to set
    */
-  public void setName(String name) {
+  public Provider setName(String name) {
     this.name = name;
-  }
-
-  /**
-   * @return the isActive
-   */
-  public String getIsActive() {
-    return isActive;
+    return this;
   }
 
   /**
    * @return the boolean of isActive
    */
   public boolean isActive() {
-    return Boolean.valueOf(getIsActive());
+    return isActive;
   }
 
   /**
    * @param isActive the isActive to set
    */
-  public void setIsActive(String isActive) {
+
+  public Provider setIsActive(boolean isActive) {
     this.isActive = isActive;
+    return this;
   }
 
-  public void setIsActive(Boolean isActive) {
-    this.isActive = String.valueOf(isActive);
+  /**
+   * @return the params
+   */
+  public List<String> getParams() {
+    return params;
+  }
+
+  /**
+   * @return the params
+   */
+  public String[] getArrayParams() {
+    if (params != null && params.size() > 0) {
+      return params.toArray(new String[params.size()]);
+    }
+    return new String[] { "" };
+  }
+
+  /**
+   * @param params the params to set
+   */
+  public void setParams(List<String> params) {
+    this.params = params;
   }
 
   /**
@@ -88,6 +115,31 @@ public class Provider {
    */
   public Map<String, String> getTemplates() {
     return templates;
+  }
+  
+  public String[] getArrayTemplates() {
+    Set<String> keys = templates.keySet();
+    String[] templates_ = new String[keys.size()];
+    int i = 0;
+    for (String key : keys) {
+      templates_[i] = new StringBuffer(key).append("=").append(templates.get(key)).toString();
+    }
+    return templates_;
+  }
+  
+  public void setTemplates(Value[] templates) {
+    this.templates.clear();
+    String values, language, template;
+    for (Value value : templates) {
+      try {
+        values = value.getString();
+        language = values.substring(0, values.indexOf("="));
+        template = values.substring(values.indexOf("=") + 1);
+        this.templates.put(language, template);
+      } catch (Exception e) {
+        continue;
+      }
+    }
   }
 
   /**

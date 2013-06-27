@@ -30,6 +30,7 @@ import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.NotificationService;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
 import org.exoplatform.commons.api.notification.service.UserNotificationService;
+import org.exoplatform.commons.notification.NotificationProperties;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.listener.AbstractNotificationServiceListener;
 import org.exoplatform.commons.notification.listener.NotificationServiceListenerImpl;
@@ -38,9 +39,8 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.picocontainer.Startable;
 
-public class NotificationServiceImpl implements NotificationService, Startable {
+public class NotificationServiceImpl implements NotificationService, NotificationProperties {
 
   private static final Log                               LOG = ExoLogger.getLogger(NotificationServiceImpl.class);
 
@@ -60,68 +60,47 @@ public class NotificationServiceImpl implements NotificationService, Startable {
     }
   }
   
-
-  @Override
-  public void start() {
-    //
-    createNotificationHomeNode();
-  }
-
-  @Override
-  public void stop() {
-    
-  }
-
-  private void createNotificationHomeNode() {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
-    try {
-      Node homeNode = NotificationUtils.getSession(sProvider, workspace).getRootNode();
-      if(NotificationUtils.NOTIFICATION_PARENT_PATH.equals(homeNode.getPath()) == false) {
-        homeNode = homeNode.getNode(NotificationUtils.NOTIFICATION_PARENT_PATH);
+  private Node getMessageHome(Node parent, String nodeName) throws Exception {
+    if (parent.hasNode(nodeName) == false) {
+      Node messageHome = parent.addNode(nodeName, NTF_MESSAGE_HOME);
+      if (messageHome.canAddMixin(MIX_SUB_MESSAGE_HOME)) {
+        messageHome.addMixin(MIX_SUB_MESSAGE_HOME);
       }
-
-      if(homeNode.hasNode(NotificationUtils.NOTIFICATION_HOME_NODE) == false) {
-        homeNode.addNode(NotificationUtils.NOTIFICATION_HOME_NODE, "ntf:notification");
-        homeNode.getSession().save();
-      }
-    } catch (Exception e) {
-      LOG.error("Can not creating the home node of notification setting", e);
-    } finally {
-      sProvider.close();
+      return messageHome;
     }
-  }
-  
-  private Node getNotificationHomeNode(SessionProvider sProvider) throws Exception {
-    Node homeNode = NotificationUtils.getSession(sProvider, workspace).getRootNode();
-    if (NotificationUtils.NOTIFICATION_PARENT_PATH.equals(homeNode.getPath()) == false) {
-      homeNode = homeNode.getNode(NotificationUtils.NOTIFICATION_PARENT_PATH);
-    }
-
-    return homeNode.getNode(NotificationUtils.NOTIFICATION_HOME_NODE);
+    return parent.getNode(nodeName);
   }
   
   private Node getMessageHome(SessionProvider sProvider) throws Exception {
-    Node homeNode = getNotificationHomeNode(sProvider);
+    Node homeNode = NotificationUtils.getNotificationHomeNode(sProvider, workspace);
+    
+    return getMessageHome(homeNode, NotificationUtils.PREFIX_MESSAGE_HOME_NODE);
+  }
+  
+  private Node getMessageHomeByDate(Node messageHome) throws Exception {
     
     String lever1 = NotificationUtils.PREFIX_MESSAGE_HOME_NODE + String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-    if(homeNode.hasNode(lever1)) {
-      homeNode = homeNode.getNode(lever1);
-      if(homeNode.getNodes().getSize() > MAX_SIZE) {
-        String lever2 = NotificationUtils.PREFIX_MESSAGE_HOME_NODE + String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        if(homeNode.canAddMixin("mix:subMessageHome")) {
-          homeNode.addMixin("mix:subMessageHome");
-        }
-        homeNode.addNode(lever2, "ntf:messageHome");
-        homeNode.getSession().save();
-        return homeNode.getNode(lever2);
+    if (messageHome.hasNode(lever1)) {
+      messageHome = messageHome.getNode(lever1);
+      //
+      String lever2 = NotificationUtils.PREFIX_MESSAGE_HOME_NODE + String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+      if (messageHome.getNodes().getSize() > MAX_SIZE && messageHome.hasNode(lever2) == false) {
+        messageHome = getMessageHome(messageHome, lever2);
       }
     } else {
-      homeNode.addNode(lever1, "ntf:messageHome");
-      homeNode.getSession().save();
+      messageHome = getMessageHome(messageHome, lever1);
     }
-    
-    return homeNode.getNode(lever1);
+    if (messageHome.isNew()) {
+      messageHome.getSession().save();
+    }
+    return messageHome;
   }
+
+  private Node getMessageHomeByProviderId(SessionProvider sProvider, String providerId) throws Exception {
+    Node messageHome = getMessageHome(getMessageHome(sProvider), providerId);
+    return getMessageHomeByDate(messageHome);
+  }
+  
 
   @Override
   public void addNotificationServiceListener(NotificationContext ctx) {
@@ -187,8 +166,8 @@ public class NotificationServiceImpl implements NotificationService, Startable {
   public void saveNotificationMessage(NotificationMessage message) {
     SessionProvider sProvider = NotificationUtils.createSystemProvider();
     try {
-      Node messageHomeNode = getMessageHome(sProvider);
-      messageHomeNode.addNode(message.getId(), "ntf:message");
+      Node messageHomeNode = getMessageHomeByProviderId(sProvider, message.getProviderType());
+      messageHomeNode.addNode(message.getId(), NTF_MESSAGE);
       
       messageHomeNode.getSession().save();
     } catch (Exception e) {

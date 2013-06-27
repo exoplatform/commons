@@ -56,7 +56,7 @@ public class UserNotificationSetting {
     this.instantlyProviders = new ArrayList<String>();
     this.dailyProviders = new ArrayList<String>();
     this.weeklyProviders = new ArrayList<String>();
-    this.weeklyProviders = new ArrayList<String>();
+    this.monthlyProviders = new ArrayList<String>();
   }
 
   /**

@@ -68,7 +68,7 @@
               <collection type="java.util.ArrayList">               
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>English</string>
                     </field>
                     <field name="subject">
@@ -86,7 +86,7 @@
                 </value>
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>French</string>
                     </field>
                     <field name="subject">
@@ -124,7 +124,7 @@
               <collection type="java.util.ArrayList">               
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>English</string>
                     </field>
                     <field name="subject">
@@ -143,7 +143,7 @@
                 </value>
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>French</string>
                     </field>
                     <field name="subject">
@@ -182,7 +182,7 @@
               <collection type="java.util.ArrayList">               
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>English</string>
                     </field>
                     <field name="subject">
@@ -200,7 +200,7 @@
                 </value>
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>French</string>
                     </field>
                     <field name="subject">
@@ -238,7 +238,7 @@
               <collection type="java.util.ArrayList">               
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>English</string>
                     </field>
                     <field name="subject">
@@ -256,7 +256,7 @@
                 </value>
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>French</string>
                     </field>
                     <field name="subject">
@@ -295,7 +295,7 @@
               <collection type="java.util.ArrayList">               
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>English</string>
                     </field>
                     <field name="subject">
@@ -313,7 +313,7 @@
                 </value>
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>French</string>
                     </field>
                     <field name="subject">
@@ -351,7 +351,7 @@
               <collection type="java.util.ArrayList">               
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>English</string>
                     </field>
                     <field name="subject">
@@ -369,7 +369,7 @@
                 </value>
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>French</string>
                     </field>
                     <field name="subject">
@@ -407,7 +407,7 @@
               <collection type="java.util.ArrayList">               
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>English</string>
                     </field>
                     <field name="subject">
@@ -425,7 +425,7 @@
                 </value>
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>French</string>
                     </field>
                     <field name="subject">
@@ -463,7 +463,7 @@
               <collection type="java.util.ArrayList">               
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>English</string>
                     </field>
                     <field name="subject">
@@ -481,7 +481,7 @@
                 </value>
                 <value>
                   <object type="org.exoplatform.commons.api.notification.plugin.Language">
-                    <field name="name">
+                    <field name="language">
                       <string>French</string>
                     </field>
                     <field name="subject">

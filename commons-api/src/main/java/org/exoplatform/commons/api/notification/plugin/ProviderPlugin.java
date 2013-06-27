@@ -19,9 +19,10 @@ package org.exoplatform.commons.api.notification.plugin;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 
-public class ProviderPlugin {
+public class ProviderPlugin extends BaseComponentPlugin {
   private List<ProviderModel> providerModels = new ArrayList<ProviderModel>();
 
   public ProviderPlugin(InitParams params) {
