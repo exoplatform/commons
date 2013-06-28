@@ -62,6 +62,10 @@ public class NotificationMessage {
   public void setId(String id) {
     this.id = id;
   }
+  
+  public static NotificationMessage getInstance() {
+    return new NotificationMessage();
+  }
 
   /**
    * @return the createData

@@ -17,42 +17,31 @@
 package org.exoplatform.commons.api.notification;
 
 
-public class NotificationContext {
-  private int  size;
-
-  private long time;
-
-  public NotificationContext(int size, long time) {
-    this.size = size;
-    this.time = time;
-  }
+public interface NotificationContext {
 
   /**
-   * @return the size
+   * Append the argument literal.
+   * @param param
+   * @return
    */
-  public int getSize() {
-    return size;
-  }
-
+  <T> NotificationContext append(ArgumentLiteral<T> argument, Object value);
+  
   /**
-   * @param size the size to set
+   * Removes the query parameter.
+   * @param param
+   * @return
    */
-  public void setSize(int size) {
-    this.size = size;
-  }
-
+  <T> NotificationContext remove(ArgumentLiteral<T> filter);
+  
   /**
-   * @return the time
+   * Clear all of filter optional
    */
-  public long getTime() {
-    return time;
-  }
-
+  void clear();
   /**
-   * @param time the time to set
+   * Gets FilterOption which was existing.
+   * @param param
+   * @return
    */
-  public void setTime(long time) {
-    this.time = time;
-  }
-
+  <T> T value(ArgumentLiteral<T> argument);
+  
 }

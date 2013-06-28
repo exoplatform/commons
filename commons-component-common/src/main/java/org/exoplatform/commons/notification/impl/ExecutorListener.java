@@ -34,7 +34,7 @@ public class ExecutorListener implements Callable<NotificationContext>{
     
     // process email notification
     // + get users and process for each user.
-    LOG.info("The callback successfully ... " + ctx.getSize());
+    //LOG.info("The callback successfully ... " + ctx.getSize());
     return ctx;
   }
   

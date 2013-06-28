@@ -19,8 +19,22 @@ package org.exoplatform.commons.api.notification.task;
 import org.exoplatform.commons.api.notification.NotificationMessage;
 
 public interface NotificationTask <T> {
-  void initSupportProvider();
+  /**
+   * Starts something before invokes execute method.
+   * @param ctx
+   */
   void start(T ctx);
+  /**
+   * 
+   * @param ctx
+   * @return
+   */
   NotificationMessage execute(T ctx);
+  /**
+   * End something after invokes execute method.
+   * @param ctx
+   */
   void end(T ctx);
+  boolean isValid(T ctx);
+  String getId();
 }

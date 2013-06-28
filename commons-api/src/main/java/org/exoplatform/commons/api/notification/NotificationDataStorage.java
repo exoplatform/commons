@@ -61,8 +61,6 @@ public class NotificationDataStorage {
   }
   
   private void initNotificationServiceListener() {
-    NotificationContext ctx = new NotificationContext(size(), getTime());
-    notificationService.addNotificationServiceListener(ctx);
     setTime(Calendar.getInstance().getTimeInMillis());
   }
   

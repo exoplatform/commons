@@ -39,10 +39,8 @@ public class NotificationServiceListenerImpl implements NotificationServiceListe
   @Override
   public void processListener(NotificationContext ctx) {
     long currentTime = Calendar.getInstance().getTimeInMillis();
-    if (ctx.getSize() > NUMBER_NOTIFICATION || (currentTime - ctx.getTime() > PENDING_TIME * 60 * 1000)) {
-      CompletionService<NotificationContext> cs = new ExecutorCompletionService<NotificationContext>(executor);
-      cs.submit(ExecutorContextListener.getInstance(ctx));
-    }
+    CompletionService<NotificationContext> cs = new ExecutorCompletionService<NotificationContext>(executor);
+    cs.submit(ExecutorContextListener.getInstance(ctx));
   }
 
 }
