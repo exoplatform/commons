@@ -27,7 +27,7 @@ import org.exoplatform.commons.api.notification.Provider;
 import org.exoplatform.commons.api.notification.plugin.ProviderModel;
 import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.Template;
-import org.exoplatform.commons.api.notification.service.ProviderManager;
+import org.exoplatform.commons.api.notification.service.ProviderService;
 import org.exoplatform.commons.notification.AbstractService;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
@@ -36,14 +36,14 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.picocontainer.Startable;
 
-public class ProviderManagerImpl extends AbstractService implements ProviderManager, Startable {
-  private static final Log LOG = ExoLogger.getLogger(ProviderManagerImpl.class);
+public class ProviderServiceImpl extends AbstractService implements ProviderService, Startable {
+  private static final Log LOG = ExoLogger.getLogger(ProviderServiceImpl.class);
   
   private List<ProviderPlugin>       providerPlugins       = new ArrayList<ProviderPlugin>();
 
   private String                     workspace;
 
-  public ProviderManagerImpl(InitParams params) {
+  public ProviderServiceImpl(InitParams params) {
     this.workspace = params.getValueParam(WORKSPACE_PARAM).getValue();
     if (this.workspace == null) {
       this.workspace = DEFAULT_WORKSPACE_NAME;

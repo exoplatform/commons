@@ -35,8 +35,8 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.ProviderManager</key>
-    <type>org.exoplatform.commons.notification.impl.ProviderManagerImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.ProviderService</key>
+    <type>org.exoplatform.commons.notification.impl.ProviderServiceImpl</type>
     <init-params>
       <value-param>
         <name>workspace</name>
@@ -77,7 +77,7 @@
   
   
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.notification.service.ProviderManager</target-component>
+    <target-component>org.exoplatform.commons.api.notification.service.ProviderService</target-component>
     <component-plugin>
       <name>default.providers</name>
       <set-method>registerProviderPlugin</set-method>

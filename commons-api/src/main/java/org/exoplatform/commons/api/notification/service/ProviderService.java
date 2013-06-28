@@ -21,7 +21,7 @@ import java.util.List;
 import org.exoplatform.commons.api.notification.Provider;
 import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
 
-public interface ProviderManager {
+public interface ProviderService {
 
   void registerProviderPlugin(ProviderPlugin providerPlugin);
 
