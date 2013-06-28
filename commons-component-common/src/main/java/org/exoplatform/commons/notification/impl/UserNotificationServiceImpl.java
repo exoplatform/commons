@@ -28,12 +28,14 @@ import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.notification.NotificationUtils;
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.LazyPageList;
+import org.exoplatform.commons.utils.ListAccess;
 
 public class UserNotificationServiceImpl implements UserNotificationService {
 
-  public UserNotificationServiceImpl() {
+  private SettingService settingService;
+
+  public UserNotificationServiceImpl(SettingService settingService) {
+    this.settingService = settingService;
   }
 
   @Override
@@ -44,33 +46,30 @@ public class UserNotificationServiceImpl implements UserNotificationService {
     String weeklys = NotificationUtils.listToString(notificationSetting.getWeeklyProviders());
     String monthlys = NotificationUtils.listToString(notificationSetting.getMonthlyProviders());
     
-    
-    SettingService settingService = CommonsUtils.getService(SettingService.class);
     settingService.set(Context.USER.id(userId), Scope.PORTAL, 
-                       UserNotificationSetting.FREQUENCY.INSTANTLY.getName(), SettingValue.create(instantlys));
+                       FREQUENCY.INSTANTLY.getName(), SettingValue.create(instantlys));
     settingService.set(Context.USER.id(userId), Scope.PORTAL, 
-                       UserNotificationSetting.FREQUENCY.DAILY_KEY.getName(), SettingValue.create(dailys));
+                       FREQUENCY.DAILY_KEY.getName(), SettingValue.create(dailys));
     settingService.set(Context.USER.id(userId), Scope.PORTAL, 
-                       UserNotificationSetting.FREQUENCY.WEEKLY_KEY.getName(), SettingValue.create(weeklys));
+                       FREQUENCY.WEEKLY_KEY.getName(), SettingValue.create(weeklys));
     settingService.set(Context.USER.id(userId), Scope.PORTAL, 
-                       UserNotificationSetting.FREQUENCY.MONTHLY_KEY.getName(), SettingValue.create(monthlys));
+                       FREQUENCY.MONTHLY_KEY.getName(), SettingValue.create(monthlys));
   }
 
   @Override
   public UserNotificationSetting getUserNotificationSetting(String userId) {
     UserNotificationSetting notificationSetting = new UserNotificationSetting();
-    SettingService settingService = CommonsUtils.getService(SettingService.class);
 
     //
-    notificationSetting.setInstantlyProviders(getSettingValue(settingService, userId, FREQUENCY.INSTANTLY));
-    notificationSetting.setDailyProviders(getSettingValue(settingService, userId, FREQUENCY.DAILY_KEY));
-    notificationSetting.setWeeklyProviders(getSettingValue(settingService, userId, FREQUENCY.WEEKLY_KEY));
-    notificationSetting.setMonthlyProviders(getSettingValue(settingService, userId, FREQUENCY.MONTHLY_KEY));
+    notificationSetting.setInstantlyProviders(getSettingValue(userId, FREQUENCY.INSTANTLY));
+    notificationSetting.setDailyProviders(getSettingValue(userId, FREQUENCY.DAILY_KEY));
+    notificationSetting.setWeeklyProviders(getSettingValue(userId, FREQUENCY.WEEKLY_KEY));
+    notificationSetting.setMonthlyProviders(getSettingValue(userId, FREQUENCY.MONTHLY_KEY));
     return notificationSetting;
   }
   
   @SuppressWarnings("unchecked")
-  private List<String> getSettingValue(SettingService settingService, String userId, UserNotificationSetting.FREQUENCY  frequency) {
+  private List<String> getSettingValue(String userId, FREQUENCY  frequency) {
     SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), Scope.PORTAL, frequency.getName());
     if (values != null) {
       String strs = values.getValue();
@@ -80,16 +79,14 @@ public class UserNotificationServiceImpl implements UserNotificationService {
   }
 
   @Override
-  public LazyPageList<UserNotificationSetting> getDaiLyUserNotificationSettings() {
+  public ListAccess<UserNotificationSetting> getDailyUserNotificationSettings() {
     // TODO Auto-generated method stub
     return null;
   }
 
   
   @Override
-  public int getSizeOfDaiLyUserNotificationSettings() {
-    
-    
+  public int getSizeOfDailyUserNotificationSettings() {
     // TODO Auto-generated method stub
     return 0;
   }

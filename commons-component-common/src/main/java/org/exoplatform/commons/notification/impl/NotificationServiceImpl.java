@@ -30,8 +30,7 @@ import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.NotificationService;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
 import org.exoplatform.commons.api.notification.service.UserNotificationService;
-import org.exoplatform.commons.notification.NotificationProperties;
-import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.AbstractService;
 import org.exoplatform.commons.notification.listener.AbstractNotificationServiceListener;
 import org.exoplatform.commons.notification.listener.NotificationServiceListenerImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -40,7 +39,7 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public class NotificationServiceImpl implements NotificationService, NotificationProperties {
+public class NotificationServiceImpl extends AbstractService implements NotificationService {
 
   private static final Log                               LOG = ExoLogger.getLogger(NotificationServiceImpl.class);
 
@@ -54,9 +53,9 @@ public class NotificationServiceImpl implements NotificationService, Notificatio
 
   public NotificationServiceImpl(InitParams params) {
     this.contextListener = new NotificationServiceListenerImpl();
-    this.workspace = params.getValueParam(NotificationUtils.WORKSPACE_PARAM).getValue();
+    this.workspace = params.getValueParam(WORKSPACE_PARAM).getValue();
     if (this.workspace == null) {
-      this.workspace = NotificationUtils.DEFAULT_WORKSPACE_NAME;
+      this.workspace = DEFAULT_WORKSPACE_NAME;
     }
   }
   
@@ -72,18 +71,18 @@ public class NotificationServiceImpl implements NotificationService, Notificatio
   }
   
   private Node getMessageHome(SessionProvider sProvider) throws Exception {
-    Node homeNode = NotificationUtils.getNotificationHomeNode(sProvider, workspace);
+    Node homeNode = getNotificationHomeNode(sProvider, workspace);
     
-    return getMessageHome(homeNode, NotificationUtils.PREFIX_MESSAGE_HOME_NODE);
+    return getMessageHome(homeNode, PREFIX_MESSAGE_HOME_NODE);
   }
   
   private Node getMessageHomeByDate(Node messageHome) throws Exception {
     
-    String lever1 = NotificationUtils.PREFIX_MESSAGE_HOME_NODE + String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+    String lever1 = PREFIX_MESSAGE_HOME_NODE + String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
     if (messageHome.hasNode(lever1)) {
       messageHome = messageHome.getNode(lever1);
       //
-      String lever2 = NotificationUtils.PREFIX_MESSAGE_HOME_NODE + String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+      String lever2 = PREFIX_MESSAGE_HOME_NODE + String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
       if (messageHome.getNodes().getSize() > MAX_SIZE && messageHome.hasNode(lever2) == false) {
         messageHome = getMessageHome(messageHome, lever2);
       }
@@ -164,7 +163,7 @@ public class NotificationServiceImpl implements NotificationService, Notificatio
 
   @Override
   public void saveNotificationMessage(NotificationMessage message) {
-    SessionProvider sProvider = NotificationUtils.createSystemProvider();
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Node messageHomeNode = getMessageHomeByProviderId(sProvider, message.getProviderType());
       messageHomeNode.addNode(message.getId(), NTF_MESSAGE);

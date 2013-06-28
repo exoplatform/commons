@@ -30,6 +30,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.commons.api.notification.service.ProviderSettingService</key>
+    <type>org.exoplatform.commons.notification.impl.ProviderSettingServiceImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.commons.api.notification.service.ProviderManager</key>
     <type>org.exoplatform.commons.notification.impl.ProviderManagerImpl</type>
     <init-params>
@@ -40,6 +45,36 @@
       </value-param>
     </init-params>
   </component>
+  
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.service.ProviderSettingService</target-component>
+    <component-plugin>
+      <name>active.providers</name>
+      <set-method>registerActiveProviderPlugin</set-method>
+      <type>org.exoplatform.commons.api.notification.plugin.ActiveProviderPlugin</type>
+      <description>Initial values for providers.</description>
+      <init-params>
+        <values-param>
+          <name>active.admin</name>
+          <description>Providers active only for administrators</description>
+          <value></value>
+        </values-param>
+        <values-param>
+          <name>active.global</name>
+          <description>Providers active for all users</description>
+          <value>ActivityMentionProvider</value>
+          <value>ActivityCommentProvider</value>
+          <value>ActivityPostProvider</value>
+          <value>ActivityPostSpaceProvider</value>
+          <value>NewUserJoinSocialIntranet</value>
+          <value>ReceiceConnectionRequest</value>
+          <value>InvitedJoinSpace</value>
+          <value>RequestJoinSpace</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  
   
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.ProviderManager</target-component>
@@ -67,7 +102,7 @@
             <field name="templates">
               <collection type="java.util.ArrayList">               
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>English</string>
                     </field>
@@ -85,7 +120,7 @@
                   </object>
                 </value>
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>French</string>
                     </field>
@@ -123,7 +158,7 @@
             <field name="templates">
               <collection type="java.util.ArrayList">               
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>English</string>
                     </field>
@@ -142,7 +177,7 @@
                   </object>
                 </value>
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>French</string>
                     </field>
@@ -181,7 +216,7 @@
             <field name="templates">
               <collection type="java.util.ArrayList">               
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>English</string>
                     </field>
@@ -199,7 +234,7 @@
                   </object>
                 </value>
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>French</string>
                     </field>
@@ -237,7 +272,7 @@
             <field name="templates">
               <collection type="java.util.ArrayList">               
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>English</string>
                     </field>
@@ -255,7 +290,7 @@
                   </object>
                 </value>
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>French</string>
                     </field>
@@ -294,7 +329,7 @@
             <field name="templates">
               <collection type="java.util.ArrayList">               
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>English</string>
                     </field>
@@ -312,7 +347,7 @@
                   </object>
                 </value>
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>French</string>
                     </field>
@@ -350,7 +385,7 @@
             <field name="templates">
               <collection type="java.util.ArrayList">               
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>English</string>
                     </field>
@@ -368,7 +403,7 @@
                   </object>
                 </value>
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>French</string>
                     </field>
@@ -406,7 +441,7 @@
             <field name="templates">
               <collection type="java.util.ArrayList">               
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>English</string>
                     </field>
@@ -424,7 +459,7 @@
                   </object>
                 </value>
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>French</string>
                     </field>
@@ -462,7 +497,7 @@
             <field name="templates">
               <collection type="java.util.ArrayList">               
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>English</string>
                     </field>
@@ -480,7 +515,7 @@
                   </object>
                 </value>
                 <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Language">
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
                     <field name="language">
                       <string>French</string>
                     </field>

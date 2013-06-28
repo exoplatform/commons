@@ -21,31 +21,32 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 
 import org.exoplatform.commons.api.notification.Provider;
 import org.exoplatform.commons.api.notification.plugin.ProviderModel;
 import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.Template;
 import org.exoplatform.commons.api.notification.service.ProviderManager;
-import org.exoplatform.commons.notification.NotificationProperties;
-import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.AbstractService;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.picocontainer.Startable;
 
-public class ProviderManagerImpl implements ProviderManager, Startable, NotificationProperties {
+public class ProviderManagerImpl extends AbstractService implements ProviderManager, Startable {
   private static final Log LOG = ExoLogger.getLogger(ProviderManagerImpl.class);
   
-  private List<ProviderPlugin>       providerPlugins = new ArrayList<ProviderPlugin>();
+  private List<ProviderPlugin>       providerPlugins       = new ArrayList<ProviderPlugin>();
 
   private String                     workspace;
 
   public ProviderManagerImpl(InitParams params) {
-    this.workspace = params.getValueParam(NotificationUtils.WORKSPACE_PARAM).getValue();
+    this.workspace = params.getValueParam(WORKSPACE_PARAM).getValue();
     if (this.workspace == null) {
-      this.workspace = NotificationUtils.DEFAULT_WORKSPACE_NAME;
+      this.workspace = DEFAULT_WORKSPACE_NAME;
     }
   }
 
@@ -60,29 +61,34 @@ public class ProviderManagerImpl implements ProviderManager, Startable, Notifica
   }
 
   private Node getProviderHomeNode(SessionProvider sProvider) throws Exception {
-    Node homeNode = NotificationUtils.getNotificationHomeNode(sProvider, workspace);
-    if (homeNode.hasNode(NotificationUtils.PROVIDER_HOME_NODE) == false) {
-      Node node = homeNode.addNode(NotificationUtils.PROVIDER_HOME_NODE, NTF_PROVIDER_HOME);
+    Node homeNode = getNotificationHomeNode(sProvider, workspace);
+    if (homeNode.hasNode(PROVIDER_HOME_NODE) == false) {
+      Node node = homeNode.addNode(PROVIDER_HOME_NODE, NTF_PROVIDER_HOME);
       homeNode.getSession().save();
       return node;
     }
-    return homeNode.getNode(NotificationUtils.PROVIDER_HOME_NODE);
+    return homeNode.getNode(PROVIDER_HOME_NODE);
   }
 
   @Override
   public void registerProviderPlugin(ProviderPlugin providerPlugin) {
     providerPlugins.add(providerPlugin);    
   }
-  
 
-  public void initProviders() {
+  private void initProviders() {
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     for (ProviderPlugin pp : providerPlugins) {
       for (ProviderModel pm : pp.getProviderModels()) {
+        //
+        if (isExistingProvider(sProvider, pm.getType())) {
+          continue;
+        }
+        //
         Provider provider = new Provider();
+        provider.setType(pm.getType());
         provider.setName(pm.getName());
-        provider.setIsActive(true);
         provider.setParams(Arrays.asList(pm.getParams().split(",")));
-        
+
         List<Template> templates = pm.getTemplates();
         for (Template template : templates) {
           provider.addSubject(template.getLanguage(), template.getSubject());
@@ -90,15 +96,24 @@ public class ProviderManagerImpl implements ProviderManager, Startable, Notifica
         }
 
         //
-        saveProvier(provider);
+        saveProvider(provider);
       }
     }
-    
+
+  }
+  
+  private boolean isExistingProvider(SessionProvider sProvider, String providerType) {
+    try {
+      Node providerHomeNode = getProviderHomeNode(sProvider);
+      return (providerHomeNode.hasNode(providerType)) ? true : false;
+    } catch (Exception e) {
+      return false;
+    }
   }
   
   @Override
-  public void saveProvier(Provider provider) {
-    SessionProvider sProvider = NotificationUtils.createSystemProvider();
+  public void saveProvider(Provider provider) {
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Node providerHomeNode = getProviderHomeNode(sProvider);
       Node providerNode;
@@ -111,8 +126,8 @@ public class ProviderManagerImpl implements ProviderManager, Startable, Notifica
       providerNode.setProperty(NTF_TYPE, provider.getType());
       providerNode.setProperty(NTF_NAME, provider.getName());
       providerNode.setProperty(NTF_PARAMS, provider.getArrayParams());
-      providerNode.setProperty(NTF_TEMPLATES, provider.getType());
-      providerNode.setProperty(NTF_TYPE, provider.getType());
+      providerNode.setProperty(NTF_TEMPLATES, provider.getArrayTemplates());
+      providerNode.setProperty(NTF_SUBJECTS, provider.getArraySubjects());
       
       if(providerHomeNode.isNew()) {
         providerHomeNode.getSession().save();
@@ -126,21 +141,50 @@ public class ProviderManagerImpl implements ProviderManager, Startable, Notifica
   }
 
   @Override
-  public Provider getProvier(String providerType) {
-    // TODO Auto-generated method stub
+  public Provider getProvider(String providerType) {
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    try {
+      Node providerHomeNode = getProviderHomeNode(sProvider);
+
+      return getProvider(providerHomeNode.getNode(providerType));
+    } catch (Exception e) {
+      LOG.error("Can not save the Provider", e);
+    }
     return null;
   }
 
-  @Override
-  public List<Provider> getActiveProvier(boolean isAdmin) {
-    // TODO Auto-generated method stub
-    return null;
+  private Provider getProvider(Node providerNode) throws Exception {
+    if (providerNode == null) {
+      return null;
+    }
+    Provider provider = new Provider();
+    provider.setType(providerNode.getProperty(NTF_TYPE).getString())
+            .setName(providerNode.getProperty(NTF_NAME).getString())
+
+            .setParams(providerNode.getProperty(NTF_PARAMS).getValues())
+
+            .setSubjects(providerNode.getProperty(NTF_SUBJECTS).getValues())
+            .setTemplates(providerNode.getProperty(NTF_TEMPLATES).getValues());
+    return provider;
   }
 
   @Override
-  public List<Provider> getAddProvier() {
-    // TODO Auto-generated method stub
-    return null;
+  public List<Provider> getAllProviders() {
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    List<Provider> providers = new ArrayList<Provider>();
+    try {
+      Node providerHomeNode = getProviderHomeNode(sProvider);
+      NodeIterator iterator = providerHomeNode.getNodes();
+      while (iterator.hasNext()) {
+        Node node = iterator.nextNode();
+        if (node.isNodeType(NTF_PROVIDER)) {
+          providers.add(getProvider(node));
+        }
+      }
+    } catch (Exception e) {
+      LOG.error("Can not save the Provider", e);
+    }
+    return providers;
   }
 
 }

@@ -29,8 +29,6 @@ public class Provider {
 
   private String              name;
 
-  private boolean            isActive = false;
-  
   private List<String>        params = new ArrayList<String>();
 
   private Map<String, String> templates = new HashMap<String, String>();
@@ -71,22 +69,6 @@ public class Provider {
   }
 
   /**
-   * @return the boolean of isActive
-   */
-  public boolean isActive() {
-    return isActive;
-  }
-
-  /**
-   * @param isActive the isActive to set
-   */
-
-  public Provider setIsActive(boolean isActive) {
-    this.isActive = isActive;
-    return this;
-  }
-
-  /**
    * @return the params
    */
   public List<String> getParams() {
@@ -106,8 +88,18 @@ public class Provider {
   /**
    * @param params the params to set
    */
-  public void setParams(List<String> params) {
+  public Provider setParams(List<String> params) {
     this.params = params;
+    return this;
+  }
+
+  /**
+   * @param params the params to set
+   */
+  public Provider setParams(Value[] params) {
+    this.params.clear();
+    this.params = valuesToList(params);
+    return this;
   }
 
   /**
@@ -118,28 +110,16 @@ public class Provider {
   }
   
   public String[] getArrayTemplates() {
-    Set<String> keys = templates.keySet();
-    String[] templates_ = new String[keys.size()];
-    int i = 0;
-    for (String key : keys) {
-      templates_[i] = new StringBuffer(key).append("=").append(templates.get(key)).toString();
-    }
-    return templates_;
+    return mapToArray(templates);
   }
-  
-  public void setTemplates(Value[] templates) {
+
+  /**
+   * @param templates the value set to templates
+   */
+  public Provider setTemplates(Value[] templates) {
     this.templates.clear();
-    String values, language, template;
-    for (Value value : templates) {
-      try {
-        values = value.getString();
-        language = values.substring(0, values.indexOf("="));
-        template = values.substring(values.indexOf("=") + 1);
-        this.templates.put(language, template);
-      } catch (Exception e) {
-        continue;
-      }
-    }
+    this.templates = valueToMap(templates);
+    return this;
   }
 
   /**
@@ -161,13 +141,70 @@ public class Provider {
   }
   
   /**
+   * @return the arrays of subjects
+   */
+  public String[] getArraySubjects() {
+    return mapToArray(subjects);
+  }
+
+  /**
    * @param subjects the subjects to set
    */
   public void setSubjects(Map<String, String> subjects) {
     this.subjects = subjects;
   }
-  
+
   public void addSubject(String language, String subject) {
     this.subjects.put(language, subject);
+  }
+
+  public Provider setSubjects(Value[] subjects) {
+    this.subjects.clear();
+    this.subjects = valueToMap(subjects);
+    return this;
+  }
+  
+  private String[] mapToArray(Map<String, String> map) {
+    Set<String> keys = map.keySet();
+    String[] strs = new String[keys.size()];
+    int i = 0;
+    for (String key : keys) {
+      strs[i] = new StringBuffer(key).append("=").append(map.get(key)).toString();
+    }
+    return strs;
+  }
+
+  private Map<String, String> valueToMap(Value[] templates) {
+    Map<String, String> map = new HashMap<String, String>();
+    String values, key, value;
+    for (Value vl : templates) {
+      try {
+        values = vl.getString();
+        key = values.substring(0, values.indexOf("="));
+        value = values.substring(values.indexOf("=") + 1);
+        map.put(key, value);
+      } catch (Exception e) {
+        continue;
+      }
+    }
+    return map;
+  }
+
+  private List<String> valuesToList(Value[] values) {
+    List<String> list = new ArrayList<String>();
+    if (values.length < 1)
+      return list;
+    String s;
+    for (int i = 0; i < values.length; ++i) {
+      try {
+        s = values[i].getString();
+        if (s != null && s.trim().length() > 0) {
+          list.add(s);
+        }
+      } catch (Exception e) {
+        continue;
+      }
+    }
+    return list;
   }
 }

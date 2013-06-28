@@ -24,12 +24,11 @@ import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
 public interface ProviderManager {
 
   void registerProviderPlugin(ProviderPlugin providerPlugin);
-  
-  void saveProvier(Provider provider);
 
-  Provider getProvier(String providerType);
+  void saveProvider(Provider provider);
 
-  List<Provider> getActiveProvier(boolean isAdmin);
+  Provider getProvider(String providerType);
 
-  List<Provider> getAddProvier();
+  List<Provider> getAllProviders();
+
 }

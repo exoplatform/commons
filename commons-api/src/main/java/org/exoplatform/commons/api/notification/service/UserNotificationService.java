@@ -17,7 +17,7 @@
 package org.exoplatform.commons.api.notification.service;
 
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
-import org.exoplatform.commons.utils.LazyPageList;
+import org.exoplatform.commons.utils.ListAccess;
 
 public interface UserNotificationService {
 
@@ -25,7 +25,7 @@ public interface UserNotificationService {
 
   UserNotificationSetting getUserNotificationSetting(String userId);
 
-  LazyPageList<UserNotificationSetting> getDaiLyUserNotificationSettings();
+  ListAccess<UserNotificationSetting> getDailyUserNotificationSettings();
 
-  int getSizeOfDaiLyUserNotificationSettings();
+  int getSizeOfDailyUserNotificationSettings();
 }
