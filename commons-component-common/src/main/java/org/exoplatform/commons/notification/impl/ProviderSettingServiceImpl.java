@@ -89,7 +89,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
 
     for (ActiveProviderPlugin pp : activeProviderPlugins) {
       for (String str : pp.getActiveProviderForUsers()) {
-        if ((Boolean) settingService.get(Context.GLOBAL, Scope.GLOBAL, str).getValue() == true) {
+        if (isActive(str, Scope.GLOBAL) == true) {
           providerIds.add(str);
         }
       }
@@ -99,12 +99,23 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
       }
 
       for (String str : pp.getActiveProviderForAdmins()) {
-        if ((Boolean) settingService.get(Context.GLOBAL, Scope.PORTAL, str).getValue() == true) {
+        if (isActive(str, Scope.PORTAL) == true) {
           providerIds.add(str);
         }
       }
     }
     return providerIds;
+  }
+  
+  private boolean isActive(String providerId, Scope scope) {
+    if (providerId == null || providerId.length() == 0) {
+      return false;
+    }
+    SettingValue value = settingService.get(Context.GLOBAL, scope, providerId);
+    if (value != null) {
+      return ((Boolean) value.getValue()) ? true : false;
+    }
+    return false;
   }
 
   @Override

@@ -30,16 +30,26 @@ public class ActiveProviderPlugin extends BaseComponentPlugin {
 
   public ActiveProviderPlugin(InitParams params) {
     ValuesParam vlsParamGlobal = params.getValuesParam("active.global");
-    providerForAllUsers = vlsParamGlobal.getValues();
+    providerForAllUsers = new ArrayList<String>(vlsParamGlobal.getValues());
     ValuesParam vlsParamAdmin = params.getValuesParam("active.admin");
-    providerForAdmins = vlsParamAdmin.getValues();
+    providerForAdmins = new ArrayList<String>(vlsParamAdmin.getValues());
   }
 
   public List<String> getActiveProviderForUsers() {
-    return providerForAllUsers;
+    return removeEmptyItemList(providerForAllUsers);
   }
 
   public List<String> getActiveProviderForAdmins() {
-    return providerForAdmins;
+    return removeEmptyItemList(providerForAdmins);
+  }
+
+  private List<String> removeEmptyItemList(List<String> list) {
+    if (list == null)
+      return new ArrayList<String>();
+
+    while (list.contains("")) {
+      list.remove("");
+    }
+    return list;
   }
 }
