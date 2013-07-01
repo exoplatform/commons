@@ -50,8 +50,11 @@ public class NotificationContextImpl implements NotificationContext {
   public <T> T value(ArgumentLiteral<T> argument) {
     Object value = arguments.get(argument.getKey());
     T got = null;
-    if (value.getClass() == argument.getType()) {
+    
+    try {
       got = argument.getType().cast(value);
+    } catch (Exception e) {
+      return null;
     }
     
     return got;
