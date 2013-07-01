@@ -23,7 +23,7 @@ public class ProviderModel {
 
   private String         name;
 
-  private String         params;
+  private List<String>   params;
 
   private List<Template> templates;
 
@@ -61,14 +61,14 @@ public class ProviderModel {
   /**
    * @return the params
    */
-  public String getParams() {
+  public List<String> getParams() {
     return params;
   }
 
   /**
    * @param params the params to set
    */
-  public void setParams(String params) {
+  public void setParams(List<String> params) {
     this.params = params;
   }
 

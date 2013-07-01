@@ -97,7 +97,17 @@
               <string>activityMention</string>
             </field>
             <field name="params">
-              <string><![CDATA[$userid, $activityName, $user-who-mentionned, $replyAction, $viewAction]]></string>
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <string>$user-who-mentionned: label-user-who-mentionned</string>
+                </value>
+                <value>
+                  <string>$replyAction: label-reply-action</string>
+                </value>
+                <value>
+                  <string>$viewAction: label-view-action</string>
+                </value>
+              </collection>
             </field>
             <field name="templates">
               <collection type="java.util.ArrayList">               
@@ -153,7 +163,23 @@
               <string>activityComment</string>
             </field>
             <field name="params">
-              <string><![CDATA[$other_user_name, $original_activity_message, $activity_comment, $replyAction, $viewAction]]></string>
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <string>$other_user_name: label-other_user_name</string>
+                </value>
+                <value>
+                  <string>$original_activity_message: label-original_activity_message</string>
+                </value>
+                <value>
+                  <string>$activity_comment: label-activity_comment</string>
+                </value>
+                <value>
+                  <string>$replyAction: label-reply-action</string>
+                </value>
+                <value>
+                  <string>$viewAction: label-view-action</string>
+                </value>
+              </collection>
             </field>
             <field name="templates">
               <collection type="java.util.ArrayList">               
@@ -211,7 +237,20 @@
               <string>activityPost</string>
             </field>
             <field name="params">
-              <string><![CDATA[$other_user_name, $activity_message, $replyAction, $viewAction]]></string>
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <string>$other_user_name: label-other_user_name</string>
+                </value>
+                <value>
+                  <string>$activity_message: label-activity_message</string>
+                </value>
+                <value>
+                  <string>$replyAction: label-reply-action</string>
+                </value>
+                <value>
+                  <string>$viewAction: label-view-action</string>
+                </value>
+              </collection>
             </field>
             <field name="templates">
               <collection type="java.util.ArrayList">               
@@ -267,7 +306,23 @@
               <string>activityPostSpace</string>
             </field>
             <field name="params">
-              <string><![CDATA[$other_user_name, $space-name, $activity_message, $replyAction, $viewAction]]></string>
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <string>$other_user_name: label-other_user_name</string>
+                </value>
+                <value>
+                  <string>$space-name: label-space-name</string>
+                </value>
+                <value>
+                  <string>$activity_message: label-activity_message</string>
+                </value>
+                <value>
+                  <string>$replyAction: label-reply-action</string>
+                </value>
+                <value>
+                  <string>$viewAction: label-view-action</string>
+                </value>
+              </collection>
             </field>
             <field name="templates">
               <collection type="java.util.ArrayList">               
@@ -324,7 +379,17 @@
               <string>userJoinSocialIntranet</string>
             </field>
             <field name="params">
-              <string><![CDATA[$new-user-name, $portal-name, $connectAction]]></string>
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <string>$new-user-name: label-new-user-name</string>
+                </value>
+                <value>
+                  <string>$portal-name: label-portal-name</string>
+                </value>
+                <value>
+                  <string>$connectAction: label-connection-action</string>
+                </value>
+              </collection>
             </field>
             <field name="templates">
               <collection type="java.util.ArrayList">               
@@ -380,7 +445,20 @@
               <string>receiceConnectionRequest</string>
             </field>
             <field name="params">
-              <string><![CDATA[$user-name, $domain, $confirmAction, $ignoreAction]]></string>
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <string>$user-name: label-user-name</string>
+                </value>
+                <value>
+                  <string>$domain: label-domain</string>
+                </value>
+                <value>
+                  <string>$confirmAction: label-confirm-action</string>
+                </value>
+                <value>
+                  <string>$ignoreAction: label-ignore-action</string>
+                </value>
+              </collection>
             </field>
             <field name="templates">
               <collection type="java.util.ArrayList">               
@@ -436,7 +514,17 @@
               <string>invitedJoinSpace</string>
             </field>
             <field name="params">
-              <string><![CDATA[$space-name, $acceptAction, $ignoreAction]]></string>
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <string>$space-name: label-space-name</string>
+                </value>
+                <value>
+                  <string>$acceptAction: label-accept-action</string>
+                </value>
+                <value>
+                  <string>$ignoreAction: label-ignore-action</string>
+                </value>
+              </collection>
             </field>
             <field name="templates">
               <collection type="java.util.ArrayList">               
@@ -492,7 +580,17 @@
               <string>requestJoinSpace</string>
             </field>
             <field name="params">
-              <string><![CDATA[$user-name, $space-name, $validateAction]]></string>
+              <collection type="java.util.ArrayList">
+                <value>
+                  <string>$user-name: label-user-name</string>
+                </value>               
+                <value>
+                  <string>$space-name: label-space-name</string>
+                </value>
+                <value>
+                  <string>$validateAction: label-validate-action</string>
+                </value>
+              </collection>
             </field>
             <field name="templates">
               <collection type="java.util.ArrayList">               

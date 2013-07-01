@@ -17,7 +17,6 @@
 package org.exoplatform.commons.notification.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.jcr.Node;
@@ -87,7 +86,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
         Provider provider = new Provider();
         provider.setType(pm.getType());
         provider.setName(pm.getName());
-        provider.setParams(Arrays.asList(pm.getParams().split(",")));
+        provider.setParams(pm.getParams());
 
         List<Template> templates = pm.getTemplates();
         for (Template template : templates) {
