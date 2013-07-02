@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.jcr.Value;
+
 import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationMessage {
@@ -59,8 +61,9 @@ public class NotificationMessage {
     return id;
   }
 
-  public void setId(String id) {
+  public NotificationMessage setId(String id) {
     this.id = id;
+    return this;
   }
   
   public static NotificationMessage getInstance() {
@@ -131,6 +134,18 @@ public class NotificationMessage {
   }
 
   /**
+   * @return the array ownerParameter
+   */
+  public String[] getArrayOwnerParameter() {
+    if (ownerParameter.size() == 0) return new String[] {""};
+
+    String[] strs = ownerParameter.toString().split(", ");
+    strs[0] = strs[0].replace("{", "");
+    strs[strs.length - 1] = strs[strs.length - 1].replace("}", "");
+    return strs;
+  }
+
+  /**
    * @param ownerParameter the ownerParameter to set
    */
   public NotificationMessage setOwnerParameter(Map<String, String> ownerParameter) {
@@ -143,6 +158,28 @@ public class NotificationMessage {
    */
   public NotificationMessage addOwnerParameter(String key, String value) {
     this.ownerParameter.put(key, value);
+    return this;
+  }
+
+  /**
+   * @param arrays the value to set ownerParameter
+   */
+  public NotificationMessage setOwnerParameter(Value[] values) {
+    if (values == null || values.length == 0) return this;
+
+    for (Value val : values) {
+      try {
+        String str = val.getString();
+        if (str.indexOf("=") > 0) {
+          String key = str.substring(0, str.indexOf("=")).trim();
+          String value = str.substring(0, str.indexOf("=") + 1).trim();
+          addOwnerParameter(key, value);
+        }
+      } catch (Exception e) {
+        continue;
+      }
+
+    }
     return this;
   }
 

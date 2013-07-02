@@ -16,19 +16,14 @@
  */
 package org.exoplatform.commons.notification.listener;
 
-import java.util.Calendar;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
 
-public class NotificationServiceListenerImpl implements NotificationServiceListener<NotificationContext> {
-
-  private final static int PENDING_TIME = 2; // minutes
-  private final static int NUMBER_NOTIFICATION = 10; // number of notification pending
+public class NotificationServiceListenerImpl implements NotificationServiceListener<Object> {
 
   private ExecutorService executor;
   
@@ -37,10 +32,9 @@ public class NotificationServiceListenerImpl implements NotificationServiceListe
   }
 
   @Override
-  public void processListener(NotificationContext ctx) {
-    long currentTime = Calendar.getInstance().getTimeInMillis();
-    CompletionService<NotificationContext> cs = new ExecutorCompletionService<NotificationContext>(executor);
-    cs.submit(ExecutorContextListener.getInstance(ctx));
+  public void processListener(Object ctx) {
+    CompletionService<Boolean> cs = new ExecutorCompletionService<Boolean>(executor);
+    cs.submit(ExecutorContextListener.getInstance());
   }
 
 }

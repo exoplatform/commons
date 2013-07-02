@@ -23,19 +23,27 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
+import javax.jcr.ValueFormatException;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
 
-import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.NotificationService;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
 import org.exoplatform.commons.api.notification.service.UserNotificationService;
 import org.exoplatform.commons.notification.AbstractService;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.listener.AbstractNotificationServiceListener;
 import org.exoplatform.commons.notification.listener.NotificationServiceListenerImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -45,7 +53,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
   private List<AbstractNotificationServiceListener>        messageListeners = new ArrayList<AbstractNotificationServiceListener>(2);
 
-  private NotificationServiceListener<NotificationContext> contextListener;
+  private NotificationServiceListener<Object> contextListener;
   
   private String                                           workspace;
 
@@ -102,8 +110,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   
 
   @Override
-  public void addNotificationServiceListener(NotificationContext ctx) {
-    contextListener.processListener(ctx);
+  public void addNotificationServiceListener() {
+    contextListener.processListener(null);
   }
 
   @Override
@@ -167,11 +175,33 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     try {
       Node messageHomeNode = getMessageHomeByProviderId(sProvider, message.getProviderType());
       messageHomeNode.addNode(message.getId(), NTF_MESSAGE);
-      
-      messageHomeNode.getSession().save();
+      messageHomeNode.setProperty(NTF_PROVIDER_TYPE, message.getProviderType());
+      messageHomeNode.setProperty(NTF_FROM, message.getFrom());
+      messageHomeNode.setProperty(NTF_OWNER_PARAMETER, message.getArrayOwnerParameter());
+      messageHomeNode.setProperty(NTF_SEND_TO_DAILY, message.getSendToDaily());
+      messageHomeNode.setProperty(NTF_SEND_TO_WEEKLY, message.getSendToWeekly());
+      messageHomeNode.setProperty(NTF_SEND_TO_MONTHLY, message.getSendToMonthly());
+      if (messageHomeNode.isNew()) {
+        messageHomeNode.getSession().save();
+      } else {
+        messageHomeNode.save();
+      }
     } catch (Exception e) {
       LOG.error("Can not save the NotificationMessage", e);
     }
+  }
+  
+  private NotificationMessage getNotificationMessage(Node node) throws Exception {
+    if(node == null) return null;
+    NotificationMessage message = NotificationMessage.getInstance()
+      .setFrom(node.getProperty(NTF_FROM).getString())
+      .setProviderType(node.getProperty(NTF_PROVIDER_TYPE).getString())
+      .setOwnerParameter(node.getProperty(NTF_OWNER_PARAMETER).getValues())
+      .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_DAILY).getValues()))
+      .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
+      .setSendToMonthly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_MONTHLY).getValues()))
+      .setId(node.getName());
+    return message;
   }
 
   @Override
@@ -181,9 +211,32 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   }
 
   @Override
-  public List<NotificationMessage> getNotificationMessagesByUser(String userId) {
-    // TODO Auto-generated method stub
-    return null;
+  public List<NotificationMessage> getNotificationMessagesByUser(UserNotificationSetting userSetting) {
+    List<NotificationMessage> messages = new ArrayList<NotificationMessage>();
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    try {
+/*
+      StringBuffer queryBuffer = new StringBuffer();
+      Node messageHomeNode = getMessageHomeByProviderId(sProvider, providerId);
+      queryBuffer.append(JCR_ROOT).append(messageHomeNode.getPath()).append("//element(*,").append(NTF_MESSAGE).append(")");
+      //
+      queryBuffer.append("[").append("@").append("").append("]");
+      
+      QueryManager qm = messageHomeNode.getSession().getWorkspace().getQueryManager();
+      QueryImpl query = (QueryImpl) qm.createQuery(queryBuffer.toString(), Query.XPATH);
+
+      //
+      QueryResult result = query.execute();
+      NodeIterator iter = result.getNodes();
+
+      while (iter.hasNext()) {
+        Node node = iter.nextNode();
+        messages.add(getNotificationMessage(node));
+      }*/
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return messages;
   }
 
 }

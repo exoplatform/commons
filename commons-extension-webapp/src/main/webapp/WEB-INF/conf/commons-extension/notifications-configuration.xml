@@ -6,6 +6,11 @@
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   
   <component>
+    <key>org.exoplatform.commons.api.notification.NotificationDataStorage</key>
+    <type>org.exoplatform.commons.api.notification.NotificationDataStorage</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.commons.api.notification.service.NotificationService</key>
     <type>org.exoplatform.commons.notification.impl.NotificationServiceImpl</type>
     <init-params>

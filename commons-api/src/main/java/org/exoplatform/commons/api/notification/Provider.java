@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jcr.Value;
-
+// will rename to ProviderData
 public class Provider {
   private String              type;
 

@@ -18,31 +18,32 @@ package org.exoplatform.commons.notification.listener;
 
 import java.util.concurrent.Callable;
 
-import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.NotificationService;
-import org.exoplatform.container.PortalContainer;
+import org.exoplatform.commons.utils.CommonsUtils;
 
-public class ExecutorContextListener implements Callable<NotificationContext>{
+public class ExecutorContextListener implements Callable<Boolean>{
   
   private static ExecutorContextListener  instance;
-  private NotificationContext  ctx;
   
   @Override
-  public NotificationContext call() throws Exception {
+  public Boolean call() throws Exception {
     // get all notification
-    NotificationDataStorage dataStorage = (NotificationDataStorage)PortalContainer.getInstance()
-                                              .getComponentInstanceOfType(NotificationDataStorage.class);
-    
-    NotificationService notificationService = (NotificationService)PortalContainer.getInstance()
-        .getComponentInstanceOfType(NotificationService.class);
-    
-    notificationService.processNotificationMessages(dataStorage.emails());
-    
-    return ctx;
+    try {
+      NotificationDataStorage dataStorage = CommonsUtils.getService(NotificationDataStorage.class);
+
+      NotificationService notificationService = CommonsUtils.getService(NotificationService.class);
+
+      notificationService.processNotificationMessages(dataStorage.emails());
+
+    } catch (Exception e) {
+      return false;
+    }
+
+    return true;
   }
   
-  public static ExecutorContextListener getInstance(NotificationContext ctx) {
+  public static ExecutorContextListener getInstance() {
     if (instance == null) {
       synchronized (ExecutorContextListener.class) {
         if (instance == null) {
@@ -50,7 +51,6 @@ public class ExecutorContextListener implements Callable<NotificationContext>{
         }
       }
     }
-    instance.ctx = ctx;
 
     return instance;
   }

@@ -43,6 +43,8 @@ public class UserNotificationSetting {
     }
 
   }
+  
+  private String userId;
 
   private List<String> instantlyProviders;
 
@@ -57,6 +59,20 @@ public class UserNotificationSetting {
     this.dailyProviders = new ArrayList<String>();
     this.weeklyProviders = new ArrayList<String>();
     this.monthlyProviders = new ArrayList<String>();
+  }
+
+  /**
+   * @return the userId
+   */
+  public String getUserId() {
+    return userId;
+  }
+
+  /**
+   * @param userId the userId to set
+   */
+  public void setUserId(String userId) {
+    this.userId = userId;
   }
 
   /**

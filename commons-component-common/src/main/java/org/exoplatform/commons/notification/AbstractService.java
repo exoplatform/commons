@@ -62,6 +62,8 @@ public abstract class AbstractService {
 
   public static final String ASCENDING                = " ascending";
 
+  public static final String JCR_ROOT                 = "/jcr:root";
+
   public static final String DESCENDING               = " descending";
 
   public static final String WORKSPACE_PARAM          = "workspace";

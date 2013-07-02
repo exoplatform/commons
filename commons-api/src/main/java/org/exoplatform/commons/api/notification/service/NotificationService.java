@@ -19,14 +19,14 @@ package org.exoplatform.commons.api.notification.service;
 import java.util.Collection;
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.UserNotificationSetting;
 
 
 
 public interface NotificationService {
   
-  void addNotificationServiceListener(NotificationContext ctx);
+  void addNotificationServiceListener();
 
   void addSendNotificationListener(NotificationMessage  message);
 
@@ -60,8 +60,9 @@ public interface NotificationService {
   /**
    * Get all @NotificationMessage by userId
    * @param userId
+   * @param providerId TODO
    * @return
    */
-  List<NotificationMessage> getNotificationMessagesByUser(String userId);
+  List<NotificationMessage> getNotificationMessagesByUser(UserNotificationSetting userSetting);
 
 }

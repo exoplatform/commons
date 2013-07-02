@@ -16,7 +16,10 @@
  */
 package org.exoplatform.commons.notification;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.jcr.Value;
 
 
 public class NotificationUtils {
@@ -34,6 +37,24 @@ public class NotificationUtils {
     }
     return values.toString();
   }
-  
- 
+
+  public static String[] valuesToArray(Value[] Val) throws Exception {
+    if (Val.length < 1)
+      return new String[] {};
+    List<String> list = valuesToList(Val);
+    return list.toArray(new String[list.size()]);
+  }
+
+  public static List<String> valuesToList(Value[] values) throws Exception {
+    List<String> list = new ArrayList<String>();
+    if (values.length < 1)
+      return list;
+    String s;
+    for (int i = 0; i < values.length; ++i) {
+      s = values[i].getString();
+      if (s != null && s.trim().length() > 0)
+        list.add(s);
+    }
+    return list;
+  }
 }
