@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.listener;
+package org.exoplatform.commons.api.notification.service;
 
 import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
+import org.exoplatform.container.component.BaseComponentPlugin;
 
-public abstract class AbstractNotificationServiceListener implements NotificationServiceListener<NotificationMessage> {
+public abstract class AbstractNotificationServiceListener extends BaseComponentPlugin implements NotificationServiceListener<NotificationMessage> {
   public abstract void processListener(NotificationMessage ctx);
 }

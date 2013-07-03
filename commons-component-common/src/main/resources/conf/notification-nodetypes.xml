@@ -1,5 +1,8 @@
 <nodeTypes xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:ntf="ntf" xmlns:mix="http://www.jcp.org/jcr/mix/1.0">
 
+  <nodeType name="mix:defaultNotification" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+  </nodeType>
+
   <nodeType name="ntf:provider" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
     <supertypes>
       <supertype>nt:base</supertype>

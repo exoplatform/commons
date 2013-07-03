@@ -28,7 +28,7 @@ public interface NotificationService {
   
   void addNotificationServiceListener();
 
-  void addSendNotificationListener(NotificationMessage  message);
+  void addSendNotificationListener(AbstractNotificationServiceListener listener);
 
   /**
    * Process notification message when have new a @NotificationMessage created.
@@ -49,13 +49,6 @@ public interface NotificationService {
    * @param message
    */
   void saveNotificationMessage(NotificationMessage  message);
-  
-  /**
-   * Get all @NotificationMessage by provider type
-   * @param providerType
-   * @return
-   */
-  NotificationMessage getNotificationMessageByProviderType(String providerType);
   
   /**
    * Get all @NotificationMessage by userId
