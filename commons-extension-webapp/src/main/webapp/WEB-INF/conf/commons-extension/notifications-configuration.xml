@@ -50,7 +50,7 @@
       </value-param>
     </init-params>
   </component>
-  
+
   <component>
     <key>org.exoplatform.commons.api.notification.service.NotificationProviderService</key>
     <type>org.exoplatform.commons.notification.impl.DigestorProviderImpl</type>
@@ -74,6 +74,7 @@
           <description>Providers active for all users</description>
           <value>ActivityMentionProvider</value>
           <value>ActivityCommentProvider</value>
+          <value>ActivityLikeProvider</value>
           <value>ActivityPostProvider</value>
           <value>ActivityPostSpaceProvider</value>
           <value>NewUserJoinSocialIntranet</value>
@@ -226,6 +227,75 @@
                                  Content: $other_user_name posted a comment on your activity. See the comment below:<br/>
                                  $original_activity_message<br/>
                                  $activity_comment<br/>
+                                 Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
+                        ]]></string>
+                    </field>
+                  </object>
+                </value>
+              </collection>
+            </field>
+          </object>
+        </object-param>
+        
+        <object-param>
+          <name>ActivityLikeProvider</name>
+          <description>The activity like provider</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.ProviderModel">
+            <field name="type">
+              <string>ActivityLikeProvider</string>
+            </field>
+            <field name="name">
+              <string>activityLike</string>
+            </field>
+            <field name="params">
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <string>$other_user_name: label-other_user_name</string>
+                </value>
+                <value>
+                  <string>$activity_comment: label-activity</string>
+                </value>
+                <value>
+                  <string>$replyAction: label-reply-action</string>
+                </value>
+                <value>
+                  <string>$viewAction: label-view-action</string>
+                </value>
+              </collection>
+            </field>
+            <field name="templates">
+              <collection type="java.util.ArrayList">               
+                <value>
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
+                    <field name="language">
+                      <string>English</string>
+                    </field>
+                    <field name="subject">
+                      <string><![CDATA[$other_user_name likes your activity]]></string>
+                    </field>
+                    <field name="template">
+                      <string>
+                        <![CDATA[Title:  New like on your activity <br/>
+                                 Content: $other_user_name likes your activity:<br/>
+                                 $activity<br/>
+                                 Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
+                        ]]></string>
+                    </field>
+                  </object>
+                </value>
+                <value>
+                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
+                    <field name="language">
+                      <string>French</string>
+                    </field>
+                    <field name="subject">
+                      <string><![CDATA[$other_user_name likes your activity]]></string>
+                    </field>
+                    <field name="template">
+                      <string>
+                        <![CDATA[Title:  New like on your activity <br/>
+                                 Content: $other_user_name likes your activity:<br/>
+                                 $activity<br/>
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
