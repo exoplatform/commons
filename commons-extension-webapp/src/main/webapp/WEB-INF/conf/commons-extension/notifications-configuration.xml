@@ -51,6 +51,11 @@
     </init-params>
   </component>
   
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.NotificationProviderService</key>
+    <type>org.exoplatform.commons.notification.impl.DigestorProviderImpl</type>
+  </component>
+  
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.ProviderSettingService</target-component>
     <component-plugin>
