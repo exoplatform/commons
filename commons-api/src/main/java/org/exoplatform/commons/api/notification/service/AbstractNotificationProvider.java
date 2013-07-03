@@ -88,7 +88,7 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
   private String getValue(Map<String, String> maps, String language) {
     String value = "";
     if (language != null) {
-      maps.get(language);
+      value = maps.get(language);
     }
     if ((value == null || value.length() == 0) && maps.size() > 0) {
       value = maps.values().iterator().next();

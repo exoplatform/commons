@@ -23,7 +23,7 @@ public class MessageInfo {
 
   private String to;
 
-  private String body;
+  private String body = "";
 
   private String subject = "";
 
@@ -114,7 +114,7 @@ public class MessageInfo {
     message.setFrom(from);
     message.setTo(to);
     message.setSubject(subject);
-    message.setBody(body);
+    message.setBody(body + ((foodter != null && foodter.length() > 0) ? foodter : ""));
     return message;
   }
 
@@ -125,11 +125,12 @@ public class MessageInfo {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
+    String body = this.body + ((foodter != null && foodter.length() > 0) ? foodter : ""); 
     builder.append("{ ")
-           .append("subject: '").append(subject).append("', ")
+           .append("subject: '").append(subject.replaceAll("'", "&#39;")).append("', ")
            .append("from: '").append(from).append("', ")
            .append("to: '").append(to).append("', ")
-           .append("body: '").append(body).append("' ")
+           .append("body: '").append(body.replaceAll("'", "&#39;")).append("' ")
            .append("}");
     return builder.toString();
   }
