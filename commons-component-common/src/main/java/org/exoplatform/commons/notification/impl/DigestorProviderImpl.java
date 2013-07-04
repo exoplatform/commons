@@ -22,10 +22,17 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.ProviderData;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationProvider;
 import org.exoplatform.commons.api.notification.service.NotificationProviderService;
+import org.exoplatform.commons.api.notification.service.ProviderService;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 public class DigestorProviderImpl extends AbstractNotificationProvider implements NotificationProviderService {
+  
+  private static final Log LOG = ExoLogger.getLogger(DigestorProviderImpl.class);
 
   private List<AbstractNotificationProvider> listSupportProviderImpl = new ArrayList<AbstractNotificationProvider>();
 
@@ -49,6 +56,41 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
 
   @Override
   public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData) {
+    MessageInfo messageInfo = null;
+    
+    if (notificationData == null || notificationData.size() == 0)
+      return messageInfo;
+
+    try {
+      messageInfo = new MessageInfo();
+      ProviderService providerService = CommonsUtils.getService(ProviderService.class);
+      
+      List<ProviderData> providerDatas = providerService.getAllProviders();
+      StringBuilder sb = new StringBuilder();
+      for (ProviderData providerData : providerDatas) {
+        String providerType = providerData.getType();
+        List<NotificationMessage> messages = notificationData.get(providerData.getType());
+        if (messages == null || messages.size() == 0)
+          continue;
+        AbstractNotificationProvider providerImpl = getSupportProviderImpl(providerType);
+        sb.append(providerImpl.buildDigestMessageInfo(messages));
+      }
+      
+      if (sb.toString().isEmpty())
+        return null;
+      
+      ProviderData digestProvider = providerService.getProvider("DigestProvider");
+      NotificationMessage notificationMessage = notificationData.values().iterator().next().get(0);
+      String language = getLanguage(notificationMessage);
+      String body = getTemplate(digestProvider, language);
+      String subject = getSubject(digestProvider, language);
+      
+      body = body.replace("$content", sb.toString());
+      messageInfo.setBody(body).setSubject(subject).setTo(getTo(notificationMessage));
+    } catch (Exception e) {
+      LOG.error("Can not build template of DigestorProviderImpl");
+      return null;
+    }
     // get digest provider ==> get subject, template
     // building body...
     // for providerids get by ProviderService
@@ -56,7 +98,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
        // for list messages
         // providerImpl process message
     
-    return null;
+    return messageInfo;
   }
 
   @Override
@@ -71,8 +113,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
 
   @Override
   public String buildDigestMessageInfo(List<NotificationMessage> messages) {
-    return null;
+   return null;
   }
-
 
 }
