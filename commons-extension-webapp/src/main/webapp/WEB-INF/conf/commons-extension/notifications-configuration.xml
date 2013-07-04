@@ -107,6 +107,9 @@
             <field name="name">
               <string>activityMention</string>
             </field>
+            <field name="order">
+              <string>5</string>
+            </field>
             <field name="params">
               <collection type="java.util.ArrayList">               
                 <value>
@@ -138,6 +141,19 @@
                                Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has mentionned you in an activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string></string>
+                        </value>
+                        <value>
+                          <string></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -156,6 +172,13 @@
                                Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has mentionned you in an activity: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
               </collection>
@@ -172,6 +195,9 @@
             </field>
             <field name="name">
               <string>activityComment</string>
+            </field>
+            <field name="order">
+              <string>8</string>
             </field>
             <field name="params">
               <collection type="java.util.ArrayList">               
@@ -211,6 +237,19 @@
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname have commented on your activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname and $user3-fullname have commented on your activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname, $user3-fullname and $number-other-commenters others have commented on your activity: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -230,6 +269,19 @@
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname have commented on your activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname and $user3-fullname have commented on your activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname, $user3-fullname and $number-other-commenters others have commented on your activity: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
               </collection>
@@ -246,6 +298,9 @@
             </field>
             <field name="name">
               <string>activityLike</string>
+            </field>
+            <field name="order">
+              <string>9</string>
             </field>
             <field name="params">
               <collection type="java.util.ArrayList">               
@@ -281,6 +336,19 @@
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname likes your activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname and $user3-fullname like your activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname, $user3-fullname and $number-other-commenters others like your activity: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -299,6 +367,19 @@
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname likes your activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname and $user3-fullname like your activity: $activity]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname, $user3-fullname and $number-other-commenters others like your activity: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
               </collection>
@@ -315,6 +396,9 @@
             </field>
             <field name="name">
               <string>activityPost</string>
+            </field>
+            <field name="order">
+              <string>6</string>
             </field>
             <field name="params">
               <collection type="java.util.ArrayList">               
@@ -350,6 +434,13 @@
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has posted on your activity stream: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -368,6 +459,13 @@
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has posted on your activity stream: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
               </collection>
@@ -384,6 +482,9 @@
             </field>
             <field name="name">
               <string>activityPostSpace</string>
+            </field>
+            <field name="order">
+              <string>7</string>
             </field>
             <field name="params">
               <collection type="java.util.ArrayList">               
@@ -422,6 +523,13 @@
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has posted an activity in the $space-name space: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -440,6 +548,13 @@
                                  Action: <a href="$replyAction" target="_blank">Reply</a> | <a href="$viewAction" target="_blank">View</a> the full discussion
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has posted an activity in the $space-name space: $activity]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
               </collection>
@@ -457,6 +572,9 @@
             </field>
             <field name="name">
               <string>userJoinSocialIntranet</string>
+            </field>
+            <field name="order">
+              <string>1</string>
             </field>
             <field name="params">
               <collection type="java.util.ArrayList">               
@@ -489,6 +607,19 @@
                                  Action: <a href="$connectAction" target="_blank">Connect now</a>
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has joined the social intranet.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname and $user3-fullname have joined the social intranet.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname, $user3-fullname and $number-other-new-users other have joined the social intranet.]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -507,6 +638,19 @@
                                  Action: <a href="$connectAction" target="_blank">Connect now</a>
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has joined the social intranet.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname and $user3-fullname have joined the social intranet.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[$user1-fullname, $user2-fullname, $user3-fullname and $number-other-new-users other have joined the social intranet.]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
               </collection>
@@ -523,6 +667,9 @@
             </field>
             <field name="name">
               <string>receiceConnectionRequest</string>
+            </field>
+            <field name="order">
+              <string>2</string>
             </field>
             <field name="params">
               <collection type="java.util.ArrayList">               
@@ -558,6 +705,19 @@
                                  Action: <a href="$confirmAction" target="_blank">Confirm</a> | <a href="$ignoreAction" target="_blank">Ignore</a>
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[You have received a connection request from &user1-fullname]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[You have received a connection request from $user1-fullname, $user2-fullname and $user3-fullname]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[You have received a connection request from $user1-fullname, $user2-fullname, $user3-fullname and $number-other-requests other]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -576,6 +736,19 @@
                                  Action: <a href="$confirmAction" target="_blank">Confirm</a> | <a href="$ignoreAction" target="_blank">Ignore</a>
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[You have received a connection request from &user1-fullname]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[You have received a connection request from $user1-fullname, $user2-fullname and $user3-fullname]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[You have received a connection request from $user1-fullname, $user2-fullname, $user3-fullname and $number-other-requests other]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
               </collection>
@@ -592,6 +765,9 @@
             </field>
             <field name="name">
               <string>invitedJoinSpace</string>
+            </field>
+            <field name="order">
+              <string>3</string>
             </field>
             <field name="params">
               <collection type="java.util.ArrayList">               
@@ -624,6 +800,19 @@
                                  Action: <a href="$acceptAction" target="_blank">Accept</a> | <a href="$ignoreAction" target="_blank">Ignore</a>
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[You have been asked to join the following space: @space-name.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[You have been asked to joing the following spaces: @space1-name, @space2-name and @space3-name.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[You have been asked to joing the following spaces: @space1-name, @space2-name, @space3-name and $number-other-invitation other.]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -642,6 +831,19 @@
                                  Action: <a href="$acceptAction" target="_blank">Accept</a> | <a href="$ignoreAction" target="_blank">Ignore</a>
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[You have been asked to join the following space: @space-name.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[You have been asked to joing the following spaces: @space1-name, @space2-name and @space3-name.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[You have been asked to joing the following spaces: @space1-name, @space2-name, @space3-name and $number-other-invitation other.]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
               </collection>
@@ -658,6 +860,9 @@
             </field>
             <field name="name">
               <string>requestJoinSpace</string>
+            </field>
+            <field name="order">
+              <string>4</string>
             </field>
             <field name="params">
               <collection type="java.util.ArrayList">
@@ -690,6 +895,19 @@
                                  Action: <a href="$validateAction" target="_blank">Validate</a>
                         ]]></string>
                     </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has asked to join the $space-name space.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[The following users have asked to join the $space-name space: $user1-fullname, $user2-fullname and $user3-fullname.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[The following users have asked to join the $space-name space: $user1-fullname, $user2-fullname, $user3-fullname with $number-other-requests other.]]></string>
+                        </value>
+                      </collection>
+                    </field>
                   </object>
                 </value>
                 <value>
@@ -707,6 +925,19 @@
                                  $user-name has requested access to the $space-name space where you are a manager. Would you like to authorize $user-name access to your space?<br/>
                                  Action: <a href="$validateAction" target="_blank">Validate</a>
                         ]]></string>
+                    </field>
+                    <field name="digesters">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string><![CDATA[$user1-fullname has asked to join the $space-name space.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[The following users have asked to join the $space-name space: $user1-fullname, $user2-fullname and $user3-fullname.]]></string>
+                        </value>
+                        <value>
+                          <string><![CDATA[The following users have asked to join the $space-name space: $user1-fullname, $user2-fullname, $user3-fullname with $number-other-requests other.]]></string>
+                        </value>
+                      </collection>
                     </field>
                   </object>
                 </value>

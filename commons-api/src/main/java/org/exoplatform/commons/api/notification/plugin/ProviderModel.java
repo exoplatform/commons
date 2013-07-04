@@ -22,6 +22,8 @@ public class ProviderModel {
   private String         type;
 
   private String         name;
+  
+  private String         order;
 
   private List<String>   params;
 
@@ -56,6 +58,20 @@ public class ProviderModel {
    */
   public void setName(String name) {
     this.name = name;
+  }
+
+  /**
+   * @return the order
+   */
+  public String getOrder() {
+    return order;
+  }
+
+  /**
+   * @param order the order to set
+   */
+  public void setOrder(String order) {
+    this.order = order;
   }
 
   /**

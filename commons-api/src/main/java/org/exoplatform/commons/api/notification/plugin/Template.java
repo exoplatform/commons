@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
+import java.util.List;
+
 public class Template {
 
   private String language;
@@ -23,6 +25,8 @@ public class Template {
   private String subject;
 
   private String template;
+  
+  private List<String> digesters;
 
   public Template() {
   }
@@ -67,6 +71,20 @@ public class Template {
    */
   public void setTemplate(String template) {
     this.template = template;
+  }
+
+  /**
+   * @return the digesters
+   */
+  public List<String> getDigesters() {
+    return digesters;
+  }
+
+  /**
+   * @param digesters the digesters to set
+   */
+  public void setDigesters(List<String> digesters) {
+    this.digesters = digesters;
   }
 
 }
