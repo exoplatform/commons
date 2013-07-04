@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.Provider;
+import org.exoplatform.commons.api.notification.ProviderData;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.services.organization.OrganizationService;
@@ -96,14 +96,15 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
     return value;
   }
 
-  protected String getTemplate(Provider provider, String language) {
+  protected String getTemplate(ProviderData provider, String language) {
     return getValue(provider.getTemplates(), language);
   }
 
-  protected String getSubject(Provider provider, String language) {
+  protected String getSubject(ProviderData provider, String language) {
     return getValue(provider.getSubjects(), language);
   }
   
   public abstract List<String> getSupportType();
   public abstract MessageInfo buildMessageInfo(NotificationMessage message);
+  public abstract String buildDigestMessageInfo(List<NotificationMessage> messages);
 }

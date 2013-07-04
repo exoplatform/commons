@@ -23,11 +23,17 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jcr.Value;
-// will rename to ProviderData
-public class Provider {
+
+public class ProviderData {
+  public enum DIGEST_TYPE {
+    ONE, THREE, MORE
+  } 
+  
   private String              type;
 
   private String              name;
+  
+  private int                 order     = 0;
 
   private List<String>        params = new ArrayList<String>();
 
@@ -35,7 +41,9 @@ public class Provider {
 
   private Map<String, String> subjects = new HashMap<String, String>();
 
-  public Provider() {
+  private Map<String, String> digesters = new HashMap<String, String>();
+
+  public ProviderData() {
 
   }
   /**
@@ -48,7 +56,7 @@ public class Provider {
   /**
    * @param type the id to set
    */
-  public Provider setType(String type) {
+  public ProviderData setType(String type) {
     this.type = type;
     return this;
   }
@@ -61,9 +69,22 @@ public class Provider {
   }
 
   /**
+   * @return the order
+   */
+  public int getOrder() {
+    return order;
+  }
+  /**
+   * @param order the order to set
+   */
+  public ProviderData setOrder(int order) {
+    this.order = order;
+    return this;
+  }
+  /**
    * @param name the name to set
    */
-  public Provider setName(String name) {
+  public ProviderData setName(String name) {
     this.name = name;
     return this;
   }
@@ -88,7 +109,7 @@ public class Provider {
   /**
    * @param params the params to set
    */
-  public Provider setParams(List<String> params) {
+  public ProviderData setParams(List<String> params) {
     this.params = params;
     return this;
   }
@@ -96,7 +117,7 @@ public class Provider {
   /**
    * @param params the params to set
    */
-  public Provider setParams(Value[] params) {
+  public ProviderData setParams(Value[] params) {
     this.params.clear();
     this.params = valuesToList(params);
     return this;
@@ -116,7 +137,7 @@ public class Provider {
   /**
    * @param templates the value set to templates
    */
-  public Provider setTemplates(Value[] templates) {
+  public ProviderData setTemplates(Value[] templates) {
     this.templates.clear();
     this.templates = valueToMap(templates);
     return this;
@@ -158,9 +179,69 @@ public class Provider {
     this.subjects.put(language, subject);
   }
 
-  public Provider setSubjects(Value[] subjects) {
+  public ProviderData setSubjects(Value[] subjects) {
     this.subjects.clear();
     this.subjects = valueToMap(subjects);
+    return this;
+  }
+
+ 
+  /**
+   * @return the arrays of digesters
+   */
+  public String[] getArrayDigesters() {
+    return mapToArray(digesters);
+  }
+  
+  /**
+   * Get the digester by language and digester type
+   *  
+   * @param language the language
+   * @param type the type of digester
+   *  + Size of items to replace is one type is @DIGEST_TYPE.ONE
+   *  + Size of items to replace is two and three type is @DIGEST_TYPE.THREE
+   *  + Size of items to replace is more than three type is @DIGEST_TYPE.MORE
+   * @return
+   */
+  public String getDigester(String language, DIGEST_TYPE type) {
+    return digesters.get(language+ '-' +type.name());
+  }
+
+  /**
+   * Get the digester only by language 
+   * - Apply for case only one digester
+   * 
+   * @param language
+   * @return
+   */
+  public String getDigester(String language) {
+    return digesters.get(language);
+  }
+  
+  /**
+   * Set value of digesters when digester contain type
+   *   
+   * @param language
+   * @param digester
+   * @param type
+   */
+  public void addDigester(String language, String digester, DIGEST_TYPE type) {
+    this.digesters.put(language+ '-' +type.name(), digester);
+  }
+
+  /**
+   * Set value of digesters when digester has not contain type
+   * 
+   * @param language
+   * @param digester
+   */
+  public void addDigester(String language, String digester) {
+    this.digesters.put(language, digester);
+  }
+  
+  public ProviderData setDigesters(Value[] digesters) {
+    this.digesters.clear();
+    this.digesters = valueToMap(digesters);
     return this;
   }
   

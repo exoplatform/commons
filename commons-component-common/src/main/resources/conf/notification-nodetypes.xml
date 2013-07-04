@@ -1,6 +1,6 @@
 <nodeTypes xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:ntf="ntf" xmlns:mix="http://www.jcp.org/jcr/mix/1.0">
 
-  <nodeType name="mix:defaultNotification" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+  <nodeType name="mix:defaultSetting" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
   </nodeType>
 
   <nodeType name="ntf:provider" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
@@ -14,6 +14,9 @@
       <propertyDefinition name="ntf:name" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
         <valueConstraints />
       </propertyDefinition>
+      <propertyDefinition name="ntf:order" requiredType="Integer" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints />
+      </propertyDefinition>
       <propertyDefinition name="ntf:params" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
         <valueConstraints />
       </propertyDefinition>
@@ -21,6 +24,9 @@
         <valueConstraints />
       </propertyDefinition>
       <propertyDefinition name="ntf:subjects" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
+        <valueConstraints />
+      </propertyDefinition>
+      <propertyDefinition name="ntf:digesters" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
         <valueConstraints />
       </propertyDefinition>
     </propertyDefinitions>
@@ -49,6 +55,9 @@
         <valueConstraints />
       </propertyDefinition>
       <propertyDefinition name="ntf:from" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints />
+      </propertyDefinition>
+      <propertyDefinition name="ntf:order" requiredType="Integer" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
         <valueConstraints />
       </propertyDefinition>
       <propertyDefinition name="ntf:ownerParameter" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">

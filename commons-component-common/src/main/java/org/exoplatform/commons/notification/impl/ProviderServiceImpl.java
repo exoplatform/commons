@@ -22,7 +22,8 @@ import java.util.List;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 
-import org.exoplatform.commons.api.notification.Provider;
+import org.exoplatform.commons.api.notification.ProviderData;
+import org.exoplatform.commons.api.notification.ProviderData.DIGEST_TYPE;
 import org.exoplatform.commons.api.notification.plugin.ProviderModel;
 import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.Template;
@@ -83,7 +84,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
           continue;
         }
         //
-        Provider provider = new Provider();
+        ProviderData provider = new ProviderData();
         provider.setType(pm.getType());
         provider.setName(pm.getName());
         provider.setParams(pm.getParams());
@@ -92,6 +93,14 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
         for (Template template : templates) {
           provider.addSubject(template.getLanguage(), template.getSubject());
           provider.addTemplate(template.getLanguage(), template.getTemplate());
+          List<String> digests = template.getDigesters();
+          if(digests.size() == 1) {
+            provider.addDigester(template.getLanguage(), digests.get(0));
+          } else {
+            provider.addDigester(template.getLanguage(), digests.get(0), DIGEST_TYPE.ONE);
+            provider.addDigester(template.getLanguage(), digests.get(1), DIGEST_TYPE.THREE);
+            provider.addDigester(template.getLanguage(), digests.get(2), DIGEST_TYPE.MORE);
+          }
         }
 
         //
@@ -111,7 +120,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
   }
   
   @Override
-  public void saveProvider(Provider provider) {
+  public void saveProvider(ProviderData provider) {
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Node providerHomeNode = getProviderHomeNode(sProvider);
@@ -124,9 +133,11 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
 
       providerNode.setProperty(NTF_TYPE, provider.getType());
       providerNode.setProperty(NTF_NAME, provider.getName());
+      providerNode.setProperty(NTF_ORDER, provider.getOrder());
       providerNode.setProperty(NTF_PARAMS, provider.getArrayParams());
       providerNode.setProperty(NTF_TEMPLATES, provider.getArrayTemplates());
       providerNode.setProperty(NTF_SUBJECTS, provider.getArraySubjects());
+      providerNode.setProperty(NTF_DIGESTERS, provider.getArrayDigesters());
       
       if(providerHomeNode.isNew()) {
         providerHomeNode.getSession().save();
@@ -140,11 +151,11 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
   }
 
   @Override
-  public Provider getProvider(String providerType) {
+  public ProviderData getProvider(String providerType) {
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Node providerHomeNode = getProviderHomeNode(sProvider);
-
+      //
       return getProvider(providerHomeNode.getNode(providerType));
     } catch (Exception e) {
       LOG.error("Can not save the Provider", e);
@@ -152,25 +163,27 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
     return null;
   }
 
-  private Provider getProvider(Node providerNode) throws Exception {
+  private ProviderData getProvider(Node providerNode) throws Exception {
     if (providerNode == null) {
       return null;
     }
-    Provider provider = new Provider();
+    ProviderData provider = new ProviderData();
     provider.setType(providerNode.getProperty(NTF_TYPE).getString())
             .setName(providerNode.getProperty(NTF_NAME).getString())
+            .setOrder(Integer.valueOf(providerNode.getProperty(NTF_ORDER).getString()))
 
             .setParams(providerNode.getProperty(NTF_PARAMS).getValues())
 
+            .setDigesters(providerNode.getProperty(NTF_DIGESTERS).getValues())
             .setSubjects(providerNode.getProperty(NTF_SUBJECTS).getValues())
             .setTemplates(providerNode.getProperty(NTF_TEMPLATES).getValues());
     return provider;
   }
 
   @Override
-  public List<Provider> getAllProviders() {
+  public List<ProviderData> getAllProviders() {
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
-    List<Provider> providers = new ArrayList<Provider>();
+    List<ProviderData> providers = new ArrayList<ProviderData>();
     try {
       Node providerHomeNode = getProviderHomeNode(sProvider);
       NodeIterator iterator = providerHomeNode.getNodes();

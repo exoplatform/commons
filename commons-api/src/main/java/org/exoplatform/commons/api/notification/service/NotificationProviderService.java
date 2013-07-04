@@ -17,6 +17,7 @@
 package org.exoplatform.commons.api.notification.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
@@ -25,7 +26,7 @@ public interface NotificationProviderService {
 
   public void addSupportProviderImpl(AbstractNotificationProvider providerImpl);
   
-  public MessageInfo buildMessageInfo(NotificationMessage message);
+  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData);
   
   public List<String> getSupportType();
 

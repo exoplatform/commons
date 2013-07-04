@@ -16,8 +16,9 @@
  */
 package org.exoplatform.commons.api.notification.service;
 
+import java.util.List;
+
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
-import org.exoplatform.commons.utils.ListAccess;
 
 public interface UserNotificationService {
 
@@ -25,7 +26,9 @@ public interface UserNotificationService {
 
   UserNotificationSetting getUserNotificationSetting(String userId);
 
-  ListAccess<UserNotificationSetting> getDailyUserNotificationSettings();
+  List<UserNotificationSetting> getDailyUserNotificationSettings(int offset, int limit);
 
-  int getSizeOfDailyUserNotificationSettings();
+  long getSizeDailyUserNotificationSettings();
+  
+  List<String> getDefaultDailyUserNotificationSettings();
 }

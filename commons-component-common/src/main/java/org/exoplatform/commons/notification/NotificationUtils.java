@@ -38,10 +38,10 @@ public class NotificationUtils {
     return values.toString();
   }
 
-  public static String[] valuesToArray(Value[] Val) throws Exception {
-    if (Val.length < 1)
+  public static String[] valuesToArray(Value[] values) throws Exception {
+    if (values.length < 1)
       return new String[] {};
-    List<String> list = valuesToList(Val);
+    List<String> list = valuesToList(values);
     return list.toArray(new String[list.size()]);
   }
 

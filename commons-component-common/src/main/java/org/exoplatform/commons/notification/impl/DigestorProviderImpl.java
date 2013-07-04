@@ -18,6 +18,7 @@ package org.exoplatform.commons.notification.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
@@ -47,6 +48,18 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
   }
 
   @Override
+  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData) {
+    // get digest provider ==> get subject, template
+    // building body...
+    // for providerids get by ProviderService
+       // get support provider
+       // for list messages
+        // providerImpl process message
+    
+    return null;
+  }
+
+  @Override
   public MessageInfo buildMessageInfo(NotificationMessage message) {
     return null;
   }
@@ -54,6 +67,11 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
   @Override
   public List<String> getSupportType() {
     return new ArrayList<String>();
+  }
+
+  @Override
+  public String buildDigestMessageInfo(List<NotificationMessage> messages) {
+    return null;
   }
 
 

@@ -18,17 +18,17 @@ package org.exoplatform.commons.api.notification.service;
 
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.Provider;
+import org.exoplatform.commons.api.notification.ProviderData;
 import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
 
 public interface ProviderService {
 
   void registerProviderPlugin(ProviderPlugin providerPlugin);
 
-  void saveProvider(Provider provider);
+  void saveProvider(ProviderData provider);
 
-  Provider getProvider(String providerType);
+  ProviderData getProvider(String providerType);
 
-  List<Provider> getAllProviders();
+  List<ProviderData> getAllProviders();
 
 }

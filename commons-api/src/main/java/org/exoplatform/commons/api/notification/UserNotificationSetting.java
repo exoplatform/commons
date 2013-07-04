@@ -25,8 +25,8 @@ import java.util.List;
 
 public class UserNotificationSetting {
   public enum FREQUENCY {
-    INSTANTLY("Instantly"), DAILY_KEY("daily"),
-    WEEKLY_KEY("weekly"), MONTHLY_KEY("monthly");
+    INSTANTLY("exo:Instantly"), DAILY_KEY("exo:daily"),
+    WEEKLY_KEY("exo:weekly"), MONTHLY_KEY("exo:monthly");
     private final String name;
 
     FREQUENCY(String name) {
@@ -44,6 +44,8 @@ public class UserNotificationSetting {
 
   }
   
+  private boolean isDefault = false;
+
   private String userId;
 
   private List<String> instantlyProviders;
@@ -73,6 +75,20 @@ public class UserNotificationSetting {
    */
   public void setUserId(String userId) {
     this.userId = userId;
+  }
+
+  /**
+   * @return the isDefault
+   */
+  public boolean isDefault() {
+    return isDefault;
+  }
+
+  /**
+   * @param isDefault the isDefault to set
+   */
+  public void setDefault(boolean isDefault) {
+    this.isDefault = isDefault;
   }
 
   /**
@@ -179,7 +195,7 @@ public class UserNotificationSetting {
   }
 
   public boolean isActiveWithoutInstantly(String providerId) {
-    return isInDaily(providerId) || isInWeekly(providerId) || isInMonthly(providerId);
+    return isInDaily(providerId) || isInWeekly(providerId) || isInMonthly(providerId) || isDefault();
   }
 
   private void addProperty(List<String> providers, String providerId) {

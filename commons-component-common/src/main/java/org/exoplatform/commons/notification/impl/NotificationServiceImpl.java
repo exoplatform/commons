@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -131,10 +133,10 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     for (String userId : userIds) {
       UserNotificationSetting userNotificationSetting = notificationService.getUserNotificationSetting(userId);
       //
-      if (userNotificationSetting.isInInstantly(providerId)) {
+      if (userNotificationSetting.isInInstantly(providerId) || userNotificationSetting.isDefault()) {
         message.setSendToUserIds(Arrays.asList(userId));
         processSendNotificationListener(message);
-      } 
+      }
       //
       if(userNotificationSetting.isActiveWithoutInstantly(providerId)){
         userIdPendings.add(userId);
@@ -161,7 +163,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     if (userNotificationSetting.isInDaily(providerId)) {
       message.setSendToDaily(userId);
     }
-    if (userNotificationSetting.isInWeekly(providerId)) {
+    if (userNotificationSetting.isInWeekly(providerId) || userNotificationSetting.isDefault()) {
       message.setSendToWeekly(userId);
     }
     if (userNotificationSetting.isInMonthly(providerId)) {
@@ -176,6 +178,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       Node messageHomeNode = getMessageHomeByProviderId(sProvider, message.getProviderType());
       Node messageNode = messageHomeNode.addNode(message.getId(), NTF_MESSAGE);
       messageNode.setProperty(NTF_FROM, message.getFrom());
+      messageNode.setProperty(NTF_ORDER, message.getOrder());
       messageNode.setProperty(NTF_PROVIDER_TYPE, message.getProviderType());
       messageNode.setProperty(NTF_OWNER_PARAMETER, message.getArrayOwnerParameter());
       messageNode.setProperty(NTF_SEND_TO_DAILY, message.getSendToDaily());
@@ -196,6 +199,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     if(node == null) return null;
     NotificationMessage message = NotificationMessage.getInstance()
       .setFrom(node.getProperty(NTF_FROM).getString())
+      .setOrder(Integer.valueOf(node.getProperty(NTF_ORDER).getString()))
       .setProviderType(node.getProperty(NTF_PROVIDER_TYPE).getString())
       .setOwnerParameter(node.getProperty(NTF_OWNER_PARAMETER).getValues())
       .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_DAILY).getValues()))
@@ -211,6 +215,15 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         session.getItem(string).remove();
       }
       session.save();
+    }
+  }
+
+  private void removeProperty(Node node, String property, String userId) throws Exception {
+    List<String> values = NotificationUtils.valuesToList(node.getProperty(property).getValues());
+    if(values.contains(userId)) {
+      values.remove(userId);
+      node.setProperty(property, values.toArray(new String[values.size()]));
+      node.save();
     }
   }
   
@@ -236,11 +249,13 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private List<NotificationMessage> getNotificationMessages(SessionProvider sProvider, String providerId,
                                                             String property, String userId) throws Exception{
     List<NotificationMessage> messages = new ArrayList<NotificationMessage>();
-    StringBuffer queryBuffer = new StringBuffer();
+    StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
     Node messageHomeNode = getMessageHomeByProviderId(sProvider, providerId);
     Session session = messageHomeNode.getSession();
-    queryBuffer.append(JCR_ROOT).append(messageHomeNode.getPath()).append("//element(*,").append(NTF_MESSAGE).append(")");
-    queryBuffer.append("[").append("@").append(property).append("=").append(userId).append("]");
+    queryBuffer.append(messageHomeNode.getPath()).append("//element(*,").append(NTF_MESSAGE).append(")")
+               .append("[").append("@").append(property).append("=").append(userId).append("]  order by @")
+               .append(NTF_ORDER).append(ASCENDING).append(", @").append("exo:dateCreated").append(DESCENDING);
+
     QueryManager qm = session.getWorkspace().getQueryManager();
     Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
     NodeIterator iter = query.execute().getNodes();
@@ -252,6 +267,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       messages.add(message);
       if(isRemove(message, property)) {
         removePaths.add(node.getPath());
+      } else {
+        removeProperty(node, property, userId);
       }
     }
     
@@ -261,36 +278,50 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     return messages;
   }
 
+  private static void strageMap(Map<String, List<NotificationMessage>> notificationData, String key, List<NotificationMessage> values) {
+    if(notificationData.containsKey(key)) {
+      List<NotificationMessage> messages = notificationData.get(key);
+      for (NotificationMessage notificationMessage : values) {
+        if(messages.contains(notificationMessage) == false) {
+          messages.add(notificationMessage);
+        }
+      }
+      notificationData.put(key, messages);
+    } else {
+      notificationData.put(key, values);
+    }
+  }
+
   @Override
-  public List<NotificationMessage> getNotificationMessagesByUser(UserNotificationSetting userSetting) {
-    List<NotificationMessage> messages = new ArrayList<NotificationMessage>();
+  public Map<String, List<NotificationMessage>> getNotificationMessagesByUser(UserNotificationSetting userSetting) {
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    Map<String, List<NotificationMessage>> notificationData = new LinkedHashMap<String, List<NotificationMessage>>();
     
     try {
       Calendar calendar = Calendar.getInstance();
       //for daily
       for (String providerId : userSetting.getDailyProviders()) {
-        messages.addAll(getNotificationMessages(sProvider, providerId, NTF_SEND_TO_DAILY, userSetting.getUserId()));
+        strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_DAILY, userSetting.getUserId()));
       }
       
       // for weekly
-      if(calendar.get(Calendar.DAY_OF_WEEK) == 5) {
+      if(calendar.get(Calendar.DAY_OF_WEEK) == 6) {
         for (String providerId : userSetting.getWeeklyProviders()) {
-          messages.addAll(getNotificationMessages(sProvider, providerId, NTF_SEND_TO_WEEKLY, userSetting.getUserId()));
+          strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_WEEKLY, userSetting.getUserId()));
         }
       }
 
       // for monthly
-      if(calendar.get(Calendar.DAY_OF_MONTH) == 27) {
+      if(calendar.get(Calendar.DAY_OF_MONTH) == 28) {
         for (String providerId : userSetting.getMonthlyProviders()) {
-          messages.addAll(getNotificationMessages(sProvider, providerId, NTF_SEND_TO_MONTHLY, userSetting.getUserId()));
+          strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_MONTHLY, userSetting.getUserId()));
         }
       }
 
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return messages;
+    return notificationData;
   }
 
 }

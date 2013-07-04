@@ -18,7 +18,6 @@ package org.exoplatform.commons.api.notification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +30,12 @@ public class NotificationMessage {
   public static final String PREFIX_ID = "NotificationMessage";
 
   private String              id;
-  private Date                createData;
 
   private String              providerType;                                  //
 
   private String              from;
+
+  private int                 order;
 
   private Map<String, String> ownerParameter = new HashMap<String, String>();
 
@@ -70,21 +70,6 @@ public class NotificationMessage {
     return new NotificationMessage();
   }
 
-  /**
-   * @return the createData
-   */
-  public Date getCreateData() {
-    return createData;
-  }
-
-  /**
-   * @param createData the createData to set
-   */
-  public NotificationMessage setCreateData(Date createData) {
-    this.createData = createData;
-    return this;
-  }
-
   public String getProviderType() {
     return providerType;
   }
@@ -100,6 +85,21 @@ public class NotificationMessage {
 
   public NotificationMessage setFrom(String from) {
     this.from = from;
+    return this;
+  }
+  
+  /**
+   * @return the order
+   */
+  public int getOrder() {
+    return order;
+  }
+
+  /**
+   * @param order the order to set
+   */
+  public NotificationMessage setOrder(int order) {
+    this.order = order;
     return this;
   }
 
@@ -251,10 +251,25 @@ public class NotificationMessage {
     this.sendToMonthly = addMoreItemInArray(sendToMonthly, userId);
     return this;
   }
+  
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof NotificationMessage) {
+      return ((NotificationMessage) o).getId().equals(this.getId());
+    }
+    return false;
+  }
 
   private String[] addMoreItemInArray(String[] src, String element) {
-    List<String> where = new ArrayList<String>(Arrays.asList(src));
-    if (element != null && where.contains(element) == false) {
+    if(element == null || element.trim().length() == 0) {
+      return src;
+    }
+    //
+    List<String> where = new ArrayList<String>();
+    if (src.length > 1 || (src.length == 1 && src[0].equals("") == false)) {
+      where = new ArrayList<String>(Arrays.asList(src));
+    }
+    if (where.contains(element) == false) {
       where.add(element);
       return where.toArray(new String[where.size()]);
     }

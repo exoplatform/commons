@@ -24,11 +24,15 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public abstract class AbstractService {
 
+  public static final String STG_SCOPE                = "stg:scope";
+
   public static final String NTF_FROM                 = "ntf:from";
 
   public static final String NTF_TYPE                 = "ntf:type";
 
   public static final String NTF_NAME                 = "ntf:name";
+
+  public static final String NTF_ORDER                = "ntf:order";
 
   public static final String NTF_PARAMS               = "ntf:params";
 
@@ -41,6 +45,8 @@ public abstract class AbstractService {
   public static final String NTF_PROVIDER             = "ntf:provider";
 
   public static final String NTF_TEMPLATES            = "ntf:templates";
+
+  public static final String NTF_DIGESTERS            = "ntf:digesters";
 
   public static final String NTF_SEND_TO_DAILY        = "ntf:sendToDaily";
 
@@ -57,6 +63,8 @@ public abstract class AbstractService {
   public static final String NTF_SEND_TO_MONTHLY      = "ntf:sendToMonthly";
 
   public static final String MIX_SUB_MESSAGE_HOME     = "mix:subMessageHome";
+
+  public static final String MIX_DEFAULT_SETTING      = "mix:defaultSetting";
 
   public static final String NTF_OWNER_PARAMETER      = "ntf:ownerParameter";
 
@@ -75,6 +83,8 @@ public abstract class AbstractService {
   public static final String PREFIX_MESSAGE_HOME_NODE = "messageHome";
   
   public static final String PROVIDER_HOME_NODE       = "providerHome";
+
+  public static final String SETTING_USER_PATH        = "settings/user";
 
   public static final String NOTIFICATION_PARENT_PATH = "/";
   
@@ -95,6 +105,9 @@ public abstract class AbstractService {
   
   public static Session getSession(SessionProvider sProvider, String workspace) {
     try {
+      if (workspace == null || workspace.length() == 0) {
+        workspace = DEFAULT_WORKSPACE_NAME;
+      }
       return sProvider.getSession(workspace, CommonsUtils.getRepository());
     } catch (Exception e) {
       return null;

@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
@@ -56,6 +57,6 @@ public interface NotificationService {
    * @param providerId TODO
    * @return
    */
-  List<NotificationMessage> getNotificationMessagesByUser(UserNotificationSetting userSetting);
+  Map<String, List<NotificationMessage>> getNotificationMessagesByUser(UserNotificationSetting userSetting);
 
 }
