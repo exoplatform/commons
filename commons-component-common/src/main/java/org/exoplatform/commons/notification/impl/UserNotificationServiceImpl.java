@@ -42,6 +42,8 @@ import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 public class UserNotificationServiceImpl extends AbstractService implements UserNotificationService {
 
   private SettingService settingService;
+  
+  private static final Scope NOTIFICATION_SCOPE = Scope.GLOBAL.id("notification");
 
   public UserNotificationServiceImpl(SettingService settingService) {
     this.settingService = settingService;
@@ -65,7 +67,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   }
   
   private void saveUserSetting(String userId, FREQUENCY frequency, String value) {
-    settingService.set(Context.USER.id(userId), Scope.PORTAL, 
+    settingService.set(Context.USER.id(userId), NOTIFICATION_SCOPE, 
                        frequency.getName(), SettingValue.create(value));
   }
 
@@ -87,25 +89,39 @@ public class UserNotificationServiceImpl extends AbstractService implements User
     }
     return notificationSetting;
   }
+
+  @SuppressWarnings("unchecked")
+  private List<String> getSettingValue(String userId, FREQUENCY  frequency) {
+    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, frequency.getName());
+    if (values != null) {
+      String strs = values.getValue();
+      return Arrays.asList(strs.split(","));
+    }
+    return null;
+  }
   
   private void addMixinForDefautlSetting(String userId) {
     SessionProvider sProvider = createSystemProvider();
     try {
       Session session = getSession(sProvider, null);
-      Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
-      Node userNode;
+      Node settingNode = session.getRootNode().getNode(SETTING_NODE);
+      Node userHomeNode, userNode = null;
+      if(settingNode.hasNode(SETTING_USER_NODE)) {
+        userHomeNode = settingNode.getNode(SETTING_USER_NODE);
+      } else {
+        userHomeNode = settingNode.addNode(SETTING_USER_NODE, STG_SUBCONTEXT);
+      }
       if (userHomeNode.hasNode(userId)) {
         userNode = userHomeNode.getNode(userId);
       } else {
-        userNode = userHomeNode.addNode(userId);
+        userNode = userHomeNode.addNode(userId, STG_SIMPLE_CONTEXT);
       }
+      sessionSave(userHomeNode);
+      
+      //
       if (userNode.canAddMixin(MIX_DEFAULT_SETTING)) {
         userNode.addMixin(MIX_DEFAULT_SETTING);
-      }
-      if (userHomeNode.isNew()) {
-        session.save();
-      } else {
-        userNode.save();
+        sessionSave(userNode);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -121,26 +137,13 @@ public class UserNotificationServiceImpl extends AbstractService implements User
         Node userNode = userHomeNode.getNode(userId);
         if (userNode.isNodeType(MIX_DEFAULT_SETTING)) {
           userNode.removeMixin(MIX_DEFAULT_SETTING);
-          if (userHomeNode.isNew()) {
-            session.save();
-          } else {
-            userNode.save();
-          }
+          //
+          sessionSave(userNode);
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-  
-  @SuppressWarnings("unchecked")
-  private List<String> getSettingValue(String userId, FREQUENCY  frequency) {
-    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), Scope.PORTAL, frequency.getName());
-    if (values != null) {
-      String strs = values.getValue();
-      return Arrays.asList(strs.split(","));
-    }
-    return null;
   }
   
   private StringBuffer buildQuery() {

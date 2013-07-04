@@ -206,6 +206,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
       .setSendToMonthly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_MONTHLY).getValues()))
       .setId(node.getName());
+    
     return message;
   }
 
@@ -264,6 +265,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     while (iter.hasNext()) {
       Node node = iter.nextNode();
       NotificationMessage message = getNotificationMessage(node);
+      message.setSendToUserIds(Arrays.asList(userId));
       messages.add(message);
       if(isRemove(message, property)) {
         removePaths.add(node.getPath());

@@ -21,6 +21,8 @@ import java.util.List;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.ProviderData;
 import org.exoplatform.commons.api.notification.ProviderData.DIGEST_TYPE;
@@ -158,7 +160,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
       //
       return getProvider(providerHomeNode.getNode(providerType));
     } catch (Exception e) {
-      LOG.error("Can not save the Provider", e);
+      LOG.error("Can not get the Provider", e);
     }
     return null;
   }
@@ -186,7 +188,13 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
     List<ProviderData> providers = new ArrayList<ProviderData>();
     try {
       Node providerHomeNode = getProviderHomeNode(sProvider);
-      NodeIterator iterator = providerHomeNode.getNodes();
+      StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
+      queryBuffer.append(providerHomeNode.getPath()).append("//element(*,").append(NTF_PROVIDER)
+                 .append(") order by @").append(NTF_ORDER).append(ASCENDING);
+
+      QueryManager qm = providerHomeNode.getSession().getWorkspace().getQueryManager();
+      Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
+      NodeIterator iterator = query.execute().getNodes();
       while (iterator.hasNext()) {
         Node node = iterator.nextNode();
         if (node.isNodeType(NTF_PROVIDER)) {
@@ -194,7 +202,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
         }
       }
     } catch (Exception e) {
-      LOG.error("Can not save the Provider", e);
+      LOG.error("Can not get all the Providers", e);
     }
     return providers;
   }

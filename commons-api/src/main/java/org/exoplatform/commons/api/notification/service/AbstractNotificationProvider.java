@@ -31,6 +31,8 @@ import org.exoplatform.services.organization.UserProfile;
 public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
   protected OrganizationService organizationService;
   
+  private static final String DEFAULT_LANGUAGE = "English";
+  
   protected OrganizationService getOrganizationService() {
     if (organizationService == null) {
       organizationService = (OrganizationService) PortalContainer.getInstance().getComponentInstanceOfType(OrganizationService.class);
@@ -81,7 +83,7 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
       UserProfile profile = getOrganizationService().getUserProfileHandler().findUserProfileByName(to);
       return profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]);
     } catch (Exception e) {
-      return null;
+      return DEFAULT_LANGUAGE;
     }
   }
   

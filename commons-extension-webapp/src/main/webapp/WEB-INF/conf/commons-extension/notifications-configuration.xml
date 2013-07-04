@@ -55,6 +55,36 @@
     <key>org.exoplatform.commons.api.notification.service.NotificationProviderService</key>
     <type>org.exoplatform.commons.notification.impl.DigestorProviderImpl</type>
   </component>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
+    <component-plugin>
+      <name>SendNotificationJob</name>
+      <set-method>addPeriodJob</set-method>
+      <type>org.exoplatform.commons.notification.job.NotificationInfoJob</type>
+      <description>add a send notification job to the JobSchedulerService</description>
+      <init-params>
+        <properties-param>
+          <name>job.info</name>
+          <description>save the monitor data  periodically</description>
+          <property name="jobName" value="NotificationJob"/>
+          <property name="groupName" value="Notification"/>
+          <property name="job" value="org.exoplatform.commons.notification.job.NotificationJob"/>
+          <property name="repeatCount" value="0"/>
+          <property name="period" value="8640000"/> <!-- 1 day-->    
+          <property name="startTime" value="+1000"/>
+          <property name="endTime" value=""/>               
+        </properties-param>
+        <properties-param>
+          <name>notification.info</name>
+          <description></description>
+          <property name="maxToSend" value="20"/> <!-- 20 mails on one time to send-->          
+          <property name="sleepTimeNextSend" value="20"/> <!-- 20 seconds on one time to send-->  
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
   
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.ProviderService</target-component>

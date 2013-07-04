@@ -251,6 +251,7 @@ public class ProviderData {
     int i = 0;
     for (String key : keys) {
       strs[i] = new StringBuffer(key).append("=").append(map.get(key)).toString();
+      ++i;
     }
     return strs;
   }

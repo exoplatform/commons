@@ -26,6 +26,12 @@ public abstract class AbstractService {
 
   public static final String STG_SCOPE                = "stg:scope";
 
+  public static final String STG_CONTEXT              = "stg:context";
+
+  public static final String STG_SUBCONTEXT           = "stg:subcontext";
+
+  public static final String STG_SIMPLE_CONTEXT       = "stg:simplecontext";
+
   public static final String NTF_FROM                 = "ntf:from";
 
   public static final String NTF_TYPE                 = "ntf:type";
@@ -84,6 +90,10 @@ public abstract class AbstractService {
   
   public static final String PROVIDER_HOME_NODE       = "providerHome";
 
+  public static final String SETTING_NODE             = "settings";
+
+  public static final String SETTING_USER_NODE        = "user";
+
   public static final String SETTING_USER_PATH        = "settings/user";
 
   public static final String NOTIFICATION_PARENT_PATH = "/";
@@ -117,4 +127,13 @@ public abstract class AbstractService {
   public static SessionProvider createSystemProvider() {
     return CommonsUtils.getSystemSessionProvider();
   }
+  
+  protected static void sessionSave(Node node) throws Exception {
+    if (node.isNew()) {
+      node.getSession().save();
+    } else {
+      node.save();
+    }
+  }
+  
 }
