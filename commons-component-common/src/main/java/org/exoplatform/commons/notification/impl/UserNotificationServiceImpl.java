@@ -38,12 +38,15 @@ import org.exoplatform.commons.notification.AbstractService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 public class UserNotificationServiceImpl extends AbstractService implements UserNotificationService {
+  private static final Log   LOG                = ExoLogger.getLogger(UserNotificationServiceImpl.class); 
+  
+  private static final Scope NOTIFICATION_SCOPE = Scope.GLOBAL;
 
   private SettingService settingService;
-  
-  private static final Scope NOTIFICATION_SCOPE = Scope.GLOBAL.id("notification");
 
   public UserNotificationServiceImpl(SettingService settingService) {
     this.settingService = settingService;
@@ -124,7 +127,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
         sessionSave(userNode);
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Failed to add mixin for default setting of user: " + userId, e);
     }
   }
 
@@ -142,7 +145,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Failed to remove mixin for default setting of user: " + userId, e);
     }
   }
   
@@ -185,11 +188,12 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   }
 
   private UserNotificationSetting getUserNotificationSetting(Node node) throws Exception {
-    UserNotificationSetting notificationSetting = new UserNotificationSetting();
+    UserNotificationSetting notificationSetting = UserNotificationSetting.getInstance();
     notificationSetting.setDailyProviders(getValues(node, FREQUENCY.DAILY_KEY));
     notificationSetting.setWeeklyProviders(getValues(node, FREQUENCY.WEEKLY_KEY));
     notificationSetting.setMonthlyProviders(getValues(node, FREQUENCY.MONTHLY_KEY));
     notificationSetting.setUserId(node.getParent().getName());
+    notificationSetting.setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
     return notificationSetting;
   }
 
@@ -204,7 +208,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
         notificationSettings.add(getUserNotificationSetting(node));
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Failed to get all daily users have notification messages", e);
     }
     
     
@@ -223,24 +227,28 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   }
 
   @Override
-  public List<String> getDefaultDailyUserNotificationSettings() {
+  public List<UserNotificationSetting> getDefaultDailyUserNotificationSettings() {
     SessionProvider sProvider = createSystemProvider();
-    List<String> users = new ArrayList<String>();
+    List<UserNotificationSetting> users = new ArrayList<UserNotificationSetting>();
     try {
       Session session = getSession(sProvider, null);
-      Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
-
-      StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
-      queryBuffer.append(userHomeNode.getPath()).append("//element(*,").append(MIX_DEFAULT_SETTING).append(")");
-      QueryManager qm = session.getWorkspace().getQueryManager();
-      Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
-      NodeIterator iter = query.execute().getNodes();
-      while (iter.hasNext()) {
-        Node node = iter.nextNode();
-        users.add(node.getName());
+      if(session.getRootNode().hasNode(SETTING_USER_PATH)) {
+        Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
+        
+        StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
+        queryBuffer.append(userHomeNode.getPath()).append("//element(*,").append(MIX_DEFAULT_SETTING).append(")");
+        QueryManager qm = session.getWorkspace().getQueryManager();
+        Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
+        NodeIterator iter = query.execute().getNodes();
+        while (iter.hasNext()) {
+          Node node = iter.nextNode();
+          users.add(UserNotificationSetting.getInstance()
+                    .setUserId(node.getName())
+                    .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
+        }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Failed to get default daily users have notification messages", e);
     }
 
     return users;

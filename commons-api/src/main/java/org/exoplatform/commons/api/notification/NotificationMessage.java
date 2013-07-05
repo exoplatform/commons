@@ -35,6 +35,8 @@ public class NotificationMessage {
 
   private String              from;
 
+  private String              to;
+
   private int                 order;
 
   private Map<String, String> ownerParameter = new HashMap<String, String>();
@@ -88,6 +90,22 @@ public class NotificationMessage {
     return this;
   }
   
+  
+  /**
+   * @return the to
+   */
+  public String getTo() {
+    return to;
+  }
+
+  /**
+   * @param to the to to set
+   */
+  public NotificationMessage setTo(String to) {
+    this.to = to;
+    return this;
+  }
+
   /**
    * @return the order
    */
@@ -258,6 +276,16 @@ public class NotificationMessage {
       return ((NotificationMessage) o).getId().equals(this.getId());
     }
     return false;
+  }
+  
+  @Override
+  public String toString() {
+    StringBuffer buffer = new StringBuffer("{");
+    buffer.append("providerType: ").append(providerType)
+    .append(", sendToDaily: ").append(Arrays.asList(sendToDaily).toString())
+    .append(", sendToWeekly: ").append(Arrays.asList(sendToWeekly).toString())
+    .append(", sendToMonthly: ").append(Arrays.asList(sendToMonthly).toString());
+    return buffer.toString();
   }
 
   private String[] addMoreItemInArray(String[] src, String element) {

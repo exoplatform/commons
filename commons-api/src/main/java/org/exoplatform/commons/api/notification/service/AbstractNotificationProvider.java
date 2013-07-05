@@ -31,7 +31,7 @@ import org.exoplatform.services.organization.UserProfile;
 public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
   protected OrganizationService organizationService;
   
-  private static final String DEFAULT_LANGUAGE = "English";
+  public static final String DEFAULT_LANGUAGE = "English";
   
   protected OrganizationService getOrganizationService() {
     if (organizationService == null) {
@@ -70,7 +70,7 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
   }
 
   protected String getTo(NotificationMessage message) {
-    String to = message.getSendToUserIds().get(0);
+    String to = message.getTo();
     if (to.indexOf("@") < 0) {
       return getEmailFormat(to);
     }
@@ -78,7 +78,7 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
   }
 
   protected String getLanguage(NotificationMessage message) {
-    String to = message.getSendToUserIds().get(0);
+    String to = message.getTo();
     try {
       UserProfile profile = getOrganizationService().getUserProfileHandler().findUserProfileByName(to);
       return profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]);

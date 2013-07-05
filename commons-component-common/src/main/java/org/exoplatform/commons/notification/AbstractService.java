@@ -74,6 +74,8 @@ public abstract class AbstractService {
 
   public static final String NTF_OWNER_PARAMETER      = "ntf:ownerParameter";
 
+  public static final String EXO_LAST_MODIFIED_DATE   = "exo:lastModifiedDate";
+
   public static final String ASCENDING                = " ascending";
 
   public static final String JCR_ROOT                 = "/jcr:root";

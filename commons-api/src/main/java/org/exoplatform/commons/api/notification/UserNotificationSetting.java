@@ -17,6 +17,7 @@
 package org.exoplatform.commons.api.notification;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -44,9 +45,11 @@ public class UserNotificationSetting {
 
   }
   
-  private boolean isDefault = false;
+  private Calendar     lastUpdateTime;
 
-  private String userId;
+  private boolean     isDefault = false;
+
+  private String       userId;
 
   private List<String> instantlyProviders;
 
@@ -61,6 +64,11 @@ public class UserNotificationSetting {
     this.dailyProviders = new ArrayList<String>();
     this.weeklyProviders = new ArrayList<String>();
     this.monthlyProviders = new ArrayList<String>();
+    this.lastUpdateTime = Calendar.getInstance();
+  }
+  
+  public static UserNotificationSetting getInstance() {
+    return new UserNotificationSetting();
   }
 
   /**
@@ -73,8 +81,9 @@ public class UserNotificationSetting {
   /**
    * @param userId the userId to set
    */
-  public void setUserId(String userId) {
+  public UserNotificationSetting setUserId(String userId) {
     this.userId = userId;
+    return this;
   }
 
   /**
@@ -89,6 +98,21 @@ public class UserNotificationSetting {
    */
   public void setDefault(boolean isDefault) {
     this.isDefault = isDefault;
+  }
+
+  /**
+   * @return the lastUpdateTime
+   */
+  public Calendar getLastUpdateTime() {
+    return lastUpdateTime;
+  }
+
+  /**
+   * @param lastUpdateTime the lastUpdateTime to set
+   */
+  public UserNotificationSetting setLastUpdateTime(Calendar lastUpdateTime) {
+    this.lastUpdateTime = lastUpdateTime;
+    return this;
   }
 
   /**

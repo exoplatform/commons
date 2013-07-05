@@ -16,42 +16,15 @@
  */
 package org.exoplatform.commons.api.notification;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.exoplatform.commons.api.notification.service.NotificationService;
+public interface NotificationDataStorage {
 
-public class NotificationDataStorage {
+  public NotificationDataStorage add(NotificationMessage notificationMessage);
+
+  public NotificationDataStorage addAll(Collection<NotificationMessage> notificationMessages);
   
-  NotificationService              notificationService;
-
-  Queue<NotificationMessage>       queue = new ConcurrentLinkedQueue<NotificationMessage>();
-
-  public NotificationDataStorage(NotificationService notificationService) {
-    this.notificationService = notificationService;
-  }
+  public int size();
   
-  public NotificationDataStorage add(NotificationMessage notificationMessage) {
-    queue.add(notificationMessage);
-    notificationService.addNotificationServiceListener();
-    return this;
-  }
-
-  public NotificationDataStorage addAll(Collection<NotificationMessage> notificationMessages) {
-    queue.addAll(notificationMessages);
-    notificationService.addNotificationServiceListener();
-    return this;
-  }
-  
-  public int size() {
-    return queue.size();
-  }
-  
-  public Collection<NotificationMessage> emails() {
-    Collection<NotificationMessage> messages = new ArrayList<NotificationMessage>(queue);
-    queue.clear();
-    return messages;
-  }
+  public Collection<NotificationMessage> emails();
 }

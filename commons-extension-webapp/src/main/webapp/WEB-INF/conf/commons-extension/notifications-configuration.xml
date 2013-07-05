@@ -7,7 +7,7 @@
   
   <component>
     <key>org.exoplatform.commons.api.notification.NotificationDataStorage</key>
-    <type>org.exoplatform.commons.api.notification.NotificationDataStorage</type>
+    <type>org.exoplatform.commons.api.notification.NotificationDataStorageImpl</type>
   </component>
 
   <component>

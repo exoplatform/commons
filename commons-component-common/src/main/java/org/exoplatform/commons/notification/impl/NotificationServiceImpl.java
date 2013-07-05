@@ -17,7 +17,6 @@
 package org.exoplatform.commons.notification.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -125,6 +124,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
   @Override
   public void processNotificationMessage(NotificationMessage message) {
+    LOG.info("processNotificationMessage " + message.getId());
     UserNotificationService notificationService = CommonsUtils.getService(UserNotificationService.class);
     List<String> userIds = message.getSendToUserIds();
     List<String> userIdPendings = new ArrayList<String>();
@@ -134,8 +134,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       UserNotificationSetting userNotificationSetting = notificationService.getUserNotificationSetting(userId);
       //
       if (userNotificationSetting.isInInstantly(providerId) || userNotificationSetting.isDefault()) {
-        message.setSendToUserIds(Arrays.asList(userId));
-        processSendNotificationListener(message);
+        LOG.info("call send inInstantly to user " + userId + " with message of provider type " + providerId);
+        processSendNotificationListener(message.setTo(userId));
       }
       //
       if(userNotificationSetting.isActiveWithoutInstantly(providerId)){
@@ -151,6 +151,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   }
 
   public void processNotificationMessages(Collection<NotificationMessage> messages) {
+    LOG.info("processNotificationMessages with " + messages.size() + " messages on new thread...");
     for (NotificationMessage message : messages) {
       processNotificationMessage(message);
     }
@@ -173,6 +174,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
   @Override
   public void saveNotificationMessage(NotificationMessage message) {
+    LOG.info("saveNotificationMessage to jcr " + message.toString());
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Node messageHomeNode = getMessageHomeByProviderId(sProvider, message.getProviderType());
@@ -191,7 +193,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         messageHomeNode.save();
       }
     } catch (Exception e) {
-      LOG.error("Can not save the NotificationMessage", e);
+      LOG.error("Failed to save the NotificationMessage", e);
     }
   }
   
@@ -265,8 +267,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     while (iter.hasNext()) {
       Node node = iter.nextNode();
       NotificationMessage message = getNotificationMessage(node);
-      message.setSendToUserIds(Arrays.asList(userId));
-      messages.add(message);
+      messages.add(message.setTo(userId));
       if(isRemove(message, property)) {
         removePaths.add(node.getPath());
       } else {
@@ -296,6 +297,9 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
   @Override
   public Map<String, List<NotificationMessage>> getNotificationMessagesByUser(UserNotificationSetting userSetting) {
+    LOG.info("Get all messages notification by user " +userSetting.getUserId() );
+    long startTime = System.currentTimeMillis();
+    
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     Map<String, List<NotificationMessage>> notificationData = new LinkedHashMap<String, List<NotificationMessage>>();
     
@@ -321,8 +325,10 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Failed to get the NotificationMessage by user: " + userSetting.getUserId(), e);
     }
+    
+    LOG.info("And get all messages notification by user " + userSetting.getUserId() + " ... " + (System.currentTimeMillis() - startTime) + " ms");
     return notificationData;
   }
 

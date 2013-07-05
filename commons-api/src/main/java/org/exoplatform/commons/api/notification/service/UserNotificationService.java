@@ -30,5 +30,5 @@ public interface UserNotificationService {
 
   long getSizeDailyUserNotificationSettings();
   
-  List<String> getDefaultDailyUserNotificationSettings();
+  List<UserNotificationSetting> getDefaultDailyUserNotificationSettings();
 }

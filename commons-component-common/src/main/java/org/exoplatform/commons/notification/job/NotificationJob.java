@@ -57,18 +57,20 @@ public class NotificationJob extends MultiTenancyJob {
     
     private void processSendEmailNotification(NotificationService notificationService, NotificationProviderService notificationProviderService,
                                                MailService mailService, UserNotificationSetting userSetting) {
+      long startTime = System.currentTimeMillis();
+      LOG.info("Process send daily email notification for user: " + userSetting.getUserId());
       try {
         // get all notificationMessage will send to this user.
         Map<String, List<NotificationMessage>> notificationMessageMap = notificationService.getNotificationMessagesByUser(userSetting);
 
         // build digest messageInfo
-        MessageInfo messageInfo = notificationProviderService.buildMessageInfo(notificationMessageMap);
+        MessageInfo messageInfo = notificationProviderService.buildMessageInfo(notificationMessageMap, userSetting);
 
         if (messageInfo != null) {
           Message message_ = messageInfo.makeEmailNotification();
 
           mailService.sendMessage(message_);
-          LOG.info("Process send daily email notification successfully for user: " + userSetting.getUserId());
+          LOG.info("Process send daily email notification successfully for user: " + userSetting.getUserId() + ": " + (System.currentTimeMillis() - startTime) + " ms");
         }
       } catch (Exception e) {
         LOG.error("Failed to send email for user " + userSetting.getUserId(), e);
@@ -76,7 +78,7 @@ public class NotificationJob extends MultiTenancyJob {
     }
     
     private UserNotificationSetting getDefaultUserNotificationSetting() {
-      UserNotificationSetting notificationSetting = new UserNotificationSetting();
+      UserNotificationSetting notificationSetting = UserNotificationSetting.getInstance();
       ProviderSettingService settingService = getService(ProviderSettingService.class);
       List<String> activesProvider = settingService.getActiveProviderIds(false);
       for (String string : activesProvider) {
@@ -90,6 +92,7 @@ public class NotificationJob extends MultiTenancyJob {
     public void run() {
       super.run();
       try {
+        LOG.info("Start run job to send daily email notification .....");
         UserNotificationService userService = getService(UserNotificationService.class);
         NotificationService notificationService = getService(NotificationService.class);
         NotificationProviderService notificationProviderService = getService(NotificationProviderService.class);
@@ -126,18 +129,18 @@ public class NotificationJob extends MultiTenancyJob {
         // case two: for user used default setting.
         UserNotificationSetting userNotificationSetting = getDefaultUserNotificationSetting();
         // get all user had default setting
-        List<String> usersDefaultSetting = userService.getDefaultDailyUserNotificationSettings();
+        List<UserNotificationSetting> usersDefaultSettings = userService.getDefaultDailyUserNotificationSettings();
         
-        size = usersDefaultSetting.size();
+        size = usersDefaultSettings.size();
         offset = 0;
         while ((size - offset) > 0) {
           int toIndex = offset + limit;
           if (toIndex > size)
             toIndex = (int) size;
-          List<String> subList = usersDefaultSetting.subList(offset, toIndex);
+          List<UserNotificationSetting> subList = usersDefaultSettings.subList(offset, toIndex);
 
-          for (String userId : subList) {
-            userNotificationSetting.setUserId(userId);
+          for (UserNotificationSetting user : subList) {
+            userNotificationSetting.setUserId(user.getUserId()).setLastUpdateTime(user.getLastUpdateTime());
             //
             processSendEmailNotification(notificationService, notificationProviderService, mailService, userNotificationSetting);
           }

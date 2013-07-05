@@ -37,6 +37,8 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
 
   private List<ActiveProviderPlugin> activeProviderPlugins = new ArrayList<ActiveProviderPlugin>();
 
+  private static final String NAME_SPACES = "exo:";
+
   private SettingService settingService;
 
   public ProviderSettingServiceImpl(SettingService settingService) {
@@ -46,8 +48,10 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
   @Override
   public void start() {
     try {
+      long startTime = System.currentTimeMillis();
       LOG.info("initializing active Provider...");
       initActiveProviders();
+      LOG.info("end initialize Provider... " + (System.currentTimeMillis() - startTime) + " ms");
     } catch (Exception e) {
       LOG.error("Error while active Provider: ", e);
     }
@@ -63,26 +67,39 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
   }
   
   private void initActiveProviders() {
-    List<String> providerIds;
     //
     for (ActiveProviderPlugin pp : activeProviderPlugins) {
-      
-      providerIds = pp.getActiveProviderForUsers();
-      for (String str : providerIds) {
-        if (str != null && str.length() > 0) {
-          settingService.set(Context.GLOBAL, Scope.GLOBAL, str, SettingValue.create(true));
-        }
-      }
-      
-      providerIds = pp.getActiveProviderForAdmins();
-      for (String str : providerIds) {
-        if (str != null && str.length() > 0) {
-          settingService.set(Context.GLOBAL, Scope.PORTAL, str, SettingValue.create(true));
-        }
+      //
+      saveSetting(pp.getActiveProviderForUsers(), Scope.GLOBAL);
+      //
+      saveSetting(pp.getActiveProviderForAdmins(), Scope.PORTAL);
+    }
+  }
+  
+  private void saveSetting(List<String> providerIds, Scope scope) {
+    for (String str : providerIds) {
+      if (str != null && str.length() > 0) {
+        saveSetting(scope, str, true);
       }
     }
   }
 
+  private void saveSetting(Scope scope, String property, boolean value) {
+    settingService.set(Context.GLOBAL, scope, (NAME_SPACES + property), SettingValue.create(value));
+  }
+
+  private void removeSetting(Scope scope, String property) {
+    settingService.remove(Context.GLOBAL, scope, (NAME_SPACES + property));
+  }
+
+  private boolean getValueSetting(Scope scope, String property) {
+    SettingValue value =settingService.get(Context.GLOBAL, scope, (NAME_SPACES + property));
+    if (value != null) {
+      return ((Boolean) value.getValue()) ? true : false;
+    }
+    return false;
+  }
+  
   @Override
   public List<String> getActiveProviderIds(boolean isAdmin) {
     List<String> providerIds = new ArrayList<String>();
@@ -111,11 +128,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
     if (providerId == null || providerId.length() == 0) {
       return false;
     }
-    SettingValue value = settingService.get(Context.GLOBAL, scope, providerId);
-    if (value != null) {
-      return ((Boolean) value.getValue()) ? true : false;
-    }
-    return false;
+    return getValueSetting(scope, providerId);
   }
 
   @Override
@@ -123,16 +136,16 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
     Map<String, Boolean> mapProviderId = new HashMap<String, Boolean>();
 
     for (String str : getAllKeyOfProviderSetting()) {
-
-      SettingValue value = settingService.get(Context.GLOBAL, Scope.PORTAL, str);
-      if (value != null) {
-        mapProviderId.put((String) value.getValue(), true);
+      // for administrators
+      boolean value = getValueSetting(Scope.PORTAL, str);
+      if (value == true) {
+        mapProviderId.put(str, true);
         continue;
       }
-
-      value = settingService.get(Context.GLOBAL, Scope.GLOBAL, str);
-      if (value != null) {
-        mapProviderId.put((String) value.getValue(), false);
+      // for users
+      value = getValueSetting(Scope.GLOBAL, str);
+      if (value == true) {
+        mapProviderId.put(str, false);
       }
     }
     return mapProviderId;
@@ -144,11 +157,11 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
     for (String str : getAllKeyOfProviderSetting()) {
       
       if (key.contains(str) == true) {
-        settingService.set(Context.GLOBAL, (mapProviderId.get(str) == true) ? Scope.PORTAL : Scope.GLOBAL,
-                                          str, SettingValue.create(mapProviderId.get(str)));
+        saveSetting((mapProviderId.get(str) == true) ? Scope.PORTAL : Scope.GLOBAL, str, true);
+
       } else {
-        settingService.remove(Context.GLOBAL, Scope.GLOBAL, str);
-        settingService.remove(Context.GLOBAL, Scope.PORTAL, str);
+        removeSetting(Scope.GLOBAL, str);
+        removeSetting(Scope.PORTAL, str);
       }
     }
   }

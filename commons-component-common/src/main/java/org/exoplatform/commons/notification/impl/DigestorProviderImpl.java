@@ -23,6 +23,7 @@ import java.util.Map;
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.ProviderData;
+import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationProvider;
 import org.exoplatform.commons.api.notification.service.NotificationProviderService;
 import org.exoplatform.commons.api.notification.service.ProviderService;
@@ -46,6 +47,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
   
   @Override
   public AbstractNotificationProvider getSupportProviderImpl(String providerType) {
+    LOG.info("\n get class support to provider:" + providerType);
     for (AbstractNotificationProvider providerImpl : listSupportProviderImpl) {
       if(providerImpl.getSupportType().contains(providerType)) {
         return providerImpl;
@@ -55,7 +57,10 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
   }
 
   @Override
-  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData) {
+  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting) {
+    LOG.info("\nBuild digest MessageInfo ....");
+    long startTime = System.currentTimeMillis();
+
     MessageInfo messageInfo = null;
     
     if (notificationData == null || notificationData.size() == 0)
@@ -97,6 +102,9 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
        // get support provider
        // for list messages
         // providerImpl process message
+    
+    
+    LOG.info("End build template of DigestorProviderImpl ... " + (System.currentTimeMillis() - startTime) + " ms");
     
     return messageInfo;
   }
