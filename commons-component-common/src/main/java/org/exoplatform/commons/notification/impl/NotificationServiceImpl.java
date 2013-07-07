@@ -36,10 +36,10 @@ import org.exoplatform.commons.api.notification.service.NotificationService;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
 import org.exoplatform.commons.api.notification.service.UserNotificationService;
 import org.exoplatform.commons.notification.AbstractService;
+import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.listener.NotificationServiceListenerImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -55,13 +55,13 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private String                                           workspace;
 
   private int                                              MAX_SIZE = 1000;
+  
+  private NotificationConfiguration configuration;
 
-  public NotificationServiceImpl(InitParams params) {
+  public NotificationServiceImpl(NotificationConfiguration configuration) {
     this.contextListener = new NotificationServiceListenerImpl();
-    this.workspace = params.getValueParam(WORKSPACE_PARAM).getValue();
-    if (this.workspace == null) {
-      this.workspace = DEFAULT_WORKSPACE_NAME;
-    }
+    this.workspace = configuration.getWorkspace();
+    this.configuration = configuration;
   }
   
   private Node getMessageHome(Node parent, String nodeName) throws Exception {
@@ -215,6 +215,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private void removeNotificationMessage(Session session, List<String> removePaths) throws Exception {
     if (removePaths.size() > 0) {
       for (String string : removePaths) {
+        LOG.info("Remove NotificationMessage " + string);
         session.getItem(string).remove();
       }
       session.save();
@@ -223,6 +224,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
   private void removeProperty(Node node, String property, String userId) throws Exception {
     List<String> values = NotificationUtils.valuesToList(node.getProperty(property).getValues());
+    LOG.info("Remove Property NotificationMessage " + property + " of user " + userId);
     if(values.contains(userId)) {
       values.remove(userId);
       node.setProperty(property, values.toArray(new String[values.size()]));
@@ -253,10 +255,10 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
                                                             String property, String userId) throws Exception{
     List<NotificationMessage> messages = new ArrayList<NotificationMessage>();
     StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
-    Node messageHomeNode = getMessageHomeByProviderId(sProvider, providerId);
+    Node messageHomeNode = getMessageHome(getMessageHome(sProvider), providerId);
     Session session = messageHomeNode.getSession();
     queryBuffer.append(messageHomeNode.getPath()).append("//element(*,").append(NTF_MESSAGE).append(")")
-               .append("[").append("@").append(property).append("=").append(userId).append("]  order by @")
+               .append("[").append("@").append(property).append("='").append(userId).append("']  order by @")
                .append(NTF_ORDER).append(ASCENDING).append(", @").append("exo:dateCreated").append(DESCENDING);
 
     QueryManager qm = session.getWorkspace().getQueryManager();
@@ -282,15 +284,18 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   }
 
   private static void strageMap(Map<String, List<NotificationMessage>> notificationData, String key, List<NotificationMessage> values) {
-    if(notificationData.containsKey(key)) {
+    if (notificationData.containsKey(key)) {
       List<NotificationMessage> messages = notificationData.get(key);
       for (NotificationMessage notificationMessage : values) {
-        if(messages.contains(notificationMessage) == false) {
+        if (messages.size() == 0 || messages.contains(notificationMessage) == false) {
           messages.add(notificationMessage);
         }
       }
-      notificationData.put(key, messages);
-    } else {
+      //
+      if(messages.size() > 0 ) {
+        notificationData.put(key, messages);
+      }
+    } else if (values.size() > 0) {
       notificationData.put(key, values);
     }
   }
@@ -302,23 +307,24 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     Map<String, List<NotificationMessage>> notificationData = new LinkedHashMap<String, List<NotificationMessage>>();
-    
     try {
-      Calendar calendar = Calendar.getInstance();
       //for daily
       for (String providerId : userSetting.getDailyProviders()) {
+        LOG.info("Get NotificationMessage for daily... ");
         strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_DAILY, userSetting.getUserId()));
       }
       
       // for weekly
-      if(calendar.get(Calendar.DAY_OF_WEEK) == 6) {
+      if(NotificationUtils.isWeekEnd(configuration.getDayOfWeekend())) {
+        LOG.info("Get NotificationMessage for weekly... ");
         for (String providerId : userSetting.getWeeklyProviders()) {
           strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_WEEKLY, userSetting.getUserId()));
         }
       }
 
       // for monthly
-      if(calendar.get(Calendar.DAY_OF_MONTH) == 28) {
+      if(NotificationUtils.isMonthEnd(configuration.getDayOfMonthend())) {
+        LOG.info("Get NotificationMessage for monthly... ");
         for (String providerId : userSetting.getMonthlyProviders()) {
           strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_MONTHLY, userSetting.getUserId()));
         }
@@ -328,7 +334,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       LOG.error("Failed to get the NotificationMessage by user: " + userSetting.getUserId(), e);
     }
     
-    LOG.info("And get all messages notification by user " + userSetting.getUserId() + " ... " + (System.currentTimeMillis() - startTime) + " ms");
+    LOG.info("And get all messages notification by user " + userSetting.getUserId() + " " + notificationData.size() + " .. " + (System.currentTimeMillis() - startTime) + " ms");
     return notificationData;
   }
 

@@ -63,8 +63,9 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
 
     MessageInfo messageInfo = null;
     
-    if (notificationData == null || notificationData.size() == 0)
+    if (notificationData == null || notificationData.size() == 0) {
       return messageInfo;
+    }
 
     try {
       messageInfo = new MessageInfo();
@@ -93,7 +94,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       body = body.replace("$content", sb.toString());
       messageInfo.setBody(body).setSubject(subject).setTo(getTo(notificationMessage));
     } catch (Exception e) {
-      LOG.error("Can not build template of DigestorProviderImpl");
+      LOG.error("Can not build template of DigestorProviderImpl ", e);
       return null;
     }
     // get digest provider ==> get subject, template

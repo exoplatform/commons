@@ -63,14 +63,16 @@ public class NotificationJob extends MultiTenancyJob {
         // get all notificationMessage will send to this user.
         Map<String, List<NotificationMessage>> notificationMessageMap = notificationService.getNotificationMessagesByUser(userSetting);
 
-        // build digest messageInfo
-        MessageInfo messageInfo = notificationProviderService.buildMessageInfo(notificationMessageMap, userSetting);
+        if (notificationMessageMap.size() > 0) {
 
-        if (messageInfo != null) {
-          Message message_ = messageInfo.makeEmailNotification();
-
-          mailService.sendMessage(message_);
-          LOG.info("Process send daily email notification successfully for user: " + userSetting.getUserId() + ": " + (System.currentTimeMillis() - startTime) + " ms");
+          // build digest messageInfo
+          MessageInfo messageInfo = notificationProviderService.buildMessageInfo(notificationMessageMap, userSetting);
+          if(messageInfo != null) {
+            Message message_ = messageInfo.makeEmailNotification();
+            
+            mailService.sendMessage(message_);
+            LOG.info("Process send daily email notification successfully for user: " + userSetting.getUserId() + ": " + (System.currentTimeMillis() - startTime) + " ms");
+          }
         }
       } catch (Exception e) {
         LOG.error("Failed to send email for user " + userSetting.getUserId(), e);

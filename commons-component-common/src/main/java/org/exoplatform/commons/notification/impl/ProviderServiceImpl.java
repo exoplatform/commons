@@ -31,8 +31,8 @@ import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.Template;
 import org.exoplatform.commons.api.notification.service.ProviderService;
 import org.exoplatform.commons.notification.AbstractService;
+import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -45,11 +45,8 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
 
   private String                     workspace;
 
-  public ProviderServiceImpl(InitParams params) {
-    this.workspace = params.getValueParam(WORKSPACE_PARAM).getValue();
-    if (this.workspace == null) {
-      this.workspace = DEFAULT_WORKSPACE_NAME;
-    }
+  public ProviderServiceImpl(NotificationConfiguration configuration) {
+    this.workspace = configuration.getWorkspace();
   }
 
   @Override

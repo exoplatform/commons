@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.jcr.Value;
@@ -56,5 +57,15 @@ public class NotificationUtils {
         list.add(s);
     }
     return list;
+  }
+  
+  public static boolean isWeekEnd(int number) {
+    Calendar calendar = Calendar.getInstance();
+    return (calendar.get(Calendar.DAY_OF_WEEK) == number) ? true : false;
+  }
+  
+  public static boolean isMonthEnd(int number) {
+    Calendar calendar = Calendar.getInstance();
+    return (calendar.get(Calendar.DAY_OF_MONTH) == number) ? true : false;
   }
 }

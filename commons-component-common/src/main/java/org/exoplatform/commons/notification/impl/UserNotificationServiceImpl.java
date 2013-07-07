@@ -18,7 +18,6 @@ package org.exoplatform.commons.notification.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import javax.jcr.Node;
@@ -35,6 +34,7 @@ import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.notification.AbstractService;
+import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
@@ -47,9 +47,12 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   private static final Scope NOTIFICATION_SCOPE = Scope.GLOBAL;
 
   private SettingService settingService;
+  
+  private String workspace;
 
-  public UserNotificationServiceImpl(SettingService settingService) {
+  public UserNotificationServiceImpl(SettingService settingService, NotificationConfiguration configuration) {
     this.settingService = settingService;
+    this.workspace = configuration.getWorkspace();
   }
 
   @Override
@@ -106,7 +109,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   private void addMixinForDefautlSetting(String userId) {
     SessionProvider sProvider = createSystemProvider();
     try {
-      Session session = getSession(sProvider, null);
+      Session session = getSession(sProvider, workspace);
       Node settingNode = session.getRootNode().getNode(SETTING_NODE);
       Node userHomeNode, userNode = null;
       if(settingNode.hasNode(SETTING_USER_NODE)) {
@@ -134,7 +137,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   private void removeMixinForDefautlSetting(String userId) {
     SessionProvider sProvider = createSystemProvider();
     try {
-      Session session = getSession(sProvider, null);
+      Session session = getSession(sProvider, workspace);
       Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
       if (userHomeNode.hasNode(userId)) {
         Node userNode = userHomeNode.getNode(userId);
@@ -151,16 +154,13 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   
   private StringBuffer buildQuery() {
     StringBuffer queryBuffer = new StringBuffer();
-    Calendar calendar = Calendar.getInstance();
-    boolean isWeekEnd = (calendar.get(Calendar.DAY_OF_WEEK) == 6);
-    boolean isMonthEnd = (calendar.get(Calendar.DAY_OF_WEEK) == 28);
     
     queryBuffer.append("@").append(FREQUENCY.DAILY_KEY.getName()).append("!=").append("''");
-    if(isWeekEnd) {
+    if(NotificationUtils.isWeekEnd(6)) {
       queryBuffer.append("or @").append(FREQUENCY.WEEKLY_KEY.getName()).append("!=").append("''");
     }
     
-    if(isMonthEnd) {
+    if(NotificationUtils.isMonthEnd(28)) {
       queryBuffer.append("or @").append(FREQUENCY.MONTHLY_KEY.getName()).append("!=").append("''");
     }
     
@@ -168,7 +168,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   }
   
   private NodeIterator getDailyUserNotificationSettings(SessionProvider sProvider, int offset, int limit) throws Exception {
-    Session session = getSession(sProvider, null);
+    Session session = getSession(sProvider, workspace);
     Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
 
     StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
@@ -231,7 +231,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
     SessionProvider sProvider = createSystemProvider();
     List<UserNotificationSetting> users = new ArrayList<UserNotificationSetting>();
     try {
-      Session session = getSession(sProvider, null);
+      Session session = getSession(sProvider, workspace);
       if(session.getRootNode().hasNode(SETTING_USER_PATH)) {
         Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
         
