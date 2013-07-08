@@ -34,8 +34,18 @@
 	.spaceOption {
 	  line-height: 20px;  
 	  color: #333;
-	  
 	}
+	
+	.spaceTitle {
+	  color: #333;
+	  background: #f7f7f7;
+	  border-top: 1px solid @tableBorder;
+	  border-bottom: 1px solid @tableBorder;
+	  font-weight: bold;
+	  box-shadow: 0 -15px 17px #F1F1F1 inset;
+	  padding: 5px 0 5px 9px;
+	}
+				
 	.spaceSearch {
 	  line-height: 20px; 
 	  padding: 10px 10px 5px 10px; 
@@ -57,17 +67,8 @@
 	}
 
 	.spaceList {
-	  overflow: hidden;
-	  .spaceTitle {
-		  color: #333;
-		  background: #f7f7f7;
-		  border-top: 1px solid @tableBorder;
-		  border-bottom: 1px solid @tableBorder;
-		  font-weight: bold;
-		  box-shadow: 0 -15px 17px #F1F1F1 inset;
-		  padding: 5px 0 5px 9px;
-		}
-		
+	  overflow-y: auto;
+	  height: 311px !important;
 		img {
 			width: 19px;
 			margin-right: 6px;
