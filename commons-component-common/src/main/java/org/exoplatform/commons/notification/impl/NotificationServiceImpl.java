@@ -133,7 +133,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     for (String userId : userIds) {
       UserNotificationSetting userNotificationSetting = notificationService.getUserNotificationSetting(userId);
       //
-      if (userNotificationSetting.isInInstantly(providerId) || userNotificationSetting.isDefault()) {
+      if (userNotificationSetting.isInInstantly(providerId)) {
         LOG.info("call send inInstantly to user " + userId + " with message of provider type " + providerId);
         processSendNotificationListener(message.setTo(userId));
       }
@@ -164,7 +164,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     if (userNotificationSetting.isInDaily(providerId)) {
       message.setSendToDaily(userId);
     }
-    if (userNotificationSetting.isInWeekly(providerId) || userNotificationSetting.isDefault()) {
+    if (userNotificationSetting.isInWeekly(providerId)) {
       message.setSendToWeekly(userId);
     }
     if (userNotificationSetting.isInMonthly(providerId)) {

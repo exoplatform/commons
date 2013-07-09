@@ -56,40 +56,45 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   }
 
   @Override
-  public void saveUserNotificationSetting(String userId, UserNotificationSetting notificationSetting) {
+  public void saveUserNotificationSetting(UserNotificationSetting notificationSetting) {
     
+    String userId = notificationSetting.getUserId();
     String instantlys = NotificationUtils.listToString(notificationSetting.getInstantlyProviders());
     String dailys = NotificationUtils.listToString(notificationSetting.getDailyProviders());
     String weeklys = NotificationUtils.listToString(notificationSetting.getWeeklyProviders());
     String monthlys = NotificationUtils.listToString(notificationSetting.getMonthlyProviders());
     
-    saveUserSetting(userId, FREQUENCY.INSTANTLY, instantlys);
-    saveUserSetting(userId, FREQUENCY.DAILY_KEY, dailys);
-    saveUserSetting(userId, FREQUENCY.WEEKLY_KEY, weeklys);
-    saveUserSetting(userId, FREQUENCY.MONTHLY_KEY, monthlys);
+    saveUserSetting(userId, EXO_IS_ACTIVE, String.valueOf(notificationSetting.isActive()));
+    saveUserSetting(userId, FREQUENCY.INSTANTLY.getName(), instantlys);
+    saveUserSetting(userId, FREQUENCY.DAILY_KEY.getName(), dailys);
+    saveUserSetting(userId, FREQUENCY.WEEKLY_KEY.getName(), weeklys);
+    saveUserSetting(userId, FREQUENCY.MONTHLY_KEY.getName(), monthlys);
     
     //
     removeMixinForDefautlSetting(userId);
   }
   
-  private void saveUserSetting(String userId, FREQUENCY frequency, String value) {
+  private void saveUserSetting(String userId, String key, String value) {
     settingService.set(Context.USER.id(userId), NOTIFICATION_SCOPE, 
-                       frequency.getName(), SettingValue.create(value));
+                       key, SettingValue.create(value));
   }
 
   @Override
   public UserNotificationSetting getUserNotificationSetting(String userId) {
     UserNotificationSetting notificationSetting = new UserNotificationSetting();
+    notificationSetting.setUserId(userId);
 
     //
     List<String> instantlys = getSettingValue(userId, FREQUENCY.INSTANTLY);
     if(instantlys != null) {
+      notificationSetting.setActive(isActiveValue(userId));
+
       notificationSetting.setInstantlyProviders(instantlys);
       notificationSetting.setDailyProviders(getSettingValue(userId, FREQUENCY.DAILY_KEY));
       notificationSetting.setWeeklyProviders(getSettingValue(userId, FREQUENCY.WEEKLY_KEY));
       notificationSetting.setMonthlyProviders(getSettingValue(userId, FREQUENCY.MONTHLY_KEY));
     } else {
-      notificationSetting.setDefault(true);
+      notificationSetting = UserNotificationSetting.getDefaultInstance();
       //
       addMixinForDefautlSetting(userId);
     }
@@ -104,6 +109,15 @@ public class UserNotificationServiceImpl extends AbstractService implements User
       return Arrays.asList(strs.split(","));
     }
     return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  private boolean isActiveValue(String userId) {
+    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_IS_ACTIVE);
+    if (values != null) {
+      return Boolean.valueOf(values.getValue());
+    }
+    return false;
   }
   
   private void addMixinForDefautlSetting(String userId) {
@@ -154,16 +168,19 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   
   private StringBuffer buildQuery() {
     StringBuffer queryBuffer = new StringBuffer();
-    
-    queryBuffer.append("@").append(FREQUENCY.DAILY_KEY.getName()).append("!=").append("''");
+    queryBuffer.append("@").append(EXO_IS_ACTIVE).append("='true' and (")
+               .append("@").append(FREQUENCY.DAILY_KEY.getName()).append("!=").append("''");
+    //
     if(NotificationUtils.isWeekEnd(6)) {
       queryBuffer.append("or @").append(FREQUENCY.WEEKLY_KEY.getName()).append("!=").append("''");
     }
-    
+    //
     if(NotificationUtils.isMonthEnd(28)) {
       queryBuffer.append("or @").append(FREQUENCY.MONTHLY_KEY.getName()).append("!=").append("''");
     }
-    
+    //
+    queryBuffer.append(")");
+
     return queryBuffer;
   }
   
@@ -242,7 +259,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
         NodeIterator iter = query.execute().getNodes();
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          users.add(UserNotificationSetting.getInstance()
+          users.add(UserNotificationSetting.getDefaultInstance()
                     .setUserId(node.getName())
                     .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
         }

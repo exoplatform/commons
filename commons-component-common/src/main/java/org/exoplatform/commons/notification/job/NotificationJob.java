@@ -79,15 +79,21 @@ public class NotificationJob extends MultiTenancyJob {
       }
     }
     
-    private UserNotificationSetting getDefaultUserNotificationSetting() {
+    private UserNotificationSetting getDefaultUserNotificationSetting(UserNotificationSetting setting) {
       UserNotificationSetting notificationSetting = UserNotificationSetting.getInstance();
       ProviderSettingService settingService = getService(ProviderSettingService.class);
       List<String> activesProvider = settingService.getActiveProviderIds(false);
       for (String string : activesProvider) {
-        notificationSetting.addProvider(string, FREQUENCY.WEEKLY_KEY);
+        if(setting.isInWeekly(string)) {
+          notificationSetting.addProvider(string, FREQUENCY.WEEKLY_KEY);
+        } else if(setting.isInDaily(string)) {
+          notificationSetting.addProvider(string, FREQUENCY.DAILY_KEY);
+        } else if(setting.isInMonthly(string)) {
+          notificationSetting.addProvider(string, FREQUENCY.MONTHLY_KEY);
+        }
       }
 
-      return notificationSetting;
+      return notificationSetting.setUserId(setting.getUserId()).setLastUpdateTime(setting.getLastUpdateTime());
     }
 
     @Override
@@ -129,7 +135,7 @@ public class NotificationJob extends MultiTenancyJob {
         
         
         // case two: for user used default setting.
-        UserNotificationSetting userNotificationSetting = getDefaultUserNotificationSetting();
+        UserNotificationSetting userNotificationSetting;
         // get all user had default setting
         List<UserNotificationSetting> usersDefaultSettings = userService.getDefaultDailyUserNotificationSettings();
         
@@ -141,8 +147,8 @@ public class NotificationJob extends MultiTenancyJob {
             toIndex = (int) size;
           List<UserNotificationSetting> subList = usersDefaultSettings.subList(offset, toIndex);
 
-          for (UserNotificationSetting user : subList) {
-            userNotificationSetting.setUserId(user.getUserId()).setLastUpdateTime(user.getLastUpdateTime());
+          for (UserNotificationSetting setting : subList) {
+            userNotificationSetting = getDefaultUserNotificationSetting(setting);
             //
             processSendEmailNotification(notificationService, notificationProviderService, mailService, userNotificationSetting);
           }

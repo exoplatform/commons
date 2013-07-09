@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.plugin.ActiveProviderPlugin;
+import org.exoplatform.commons.api.notification.plugin.GroupProviderModel;
+import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
 
 public interface ProviderSettingService {
   /**
@@ -28,6 +30,13 @@ public interface ProviderSettingService {
    * @param activeProviderPlugin
    */
   void registerActiveProviderPlugin(ActiveProviderPlugin activeProviderPlugin);
+
+  /**
+   * The function to register group provider plugin.
+   * 
+   * @param groupProviderPlugin
+   */
+  void registerGroupProviderPlugin(GroupProviderPlugin groupProviderPlugin);
 
   /**
    * Get all active Provider's Id for users's setting
@@ -54,5 +63,11 @@ public interface ProviderSettingService {
    *  + Value is administrator or not.
    */
   void setActiveProviders(Map<String, Boolean> mapProviderId);
+  
+  /**
+   * 
+   * @return
+   */
+  List<GroupProviderModel> getGroupProviders();
 
 }

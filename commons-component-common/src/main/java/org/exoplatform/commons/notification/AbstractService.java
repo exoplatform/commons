@@ -32,6 +32,8 @@ public abstract class AbstractService {
 
   public static final String STG_SIMPLE_CONTEXT       = "stg:simplecontext";
 
+  public static final String EXO_IS_ACTIVE            = "exo:isActive";
+
   public static final String NTF_FROM                 = "ntf:from";
 
   public static final String NTF_TYPE                 = "ntf:type";

@@ -27,12 +27,13 @@ public class ActiveProviderPlugin extends BaseComponentPlugin {
   private List<String> providerForAdmins   = new ArrayList<String>();
 
   private List<String> providerForAllUsers = new ArrayList<String>();
-
+  
   public ActiveProviderPlugin(InitParams params) {
     ValuesParam vlsParamGlobal = params.getValuesParam("active.global");
     providerForAllUsers = new ArrayList<String>(vlsParamGlobal.getValues());
     ValuesParam vlsParamAdmin = params.getValuesParam("active.admin");
     providerForAdmins = new ArrayList<String>(vlsParamAdmin.getValues());
+
   }
 
   public List<String> getActiveProviderForUsers() {

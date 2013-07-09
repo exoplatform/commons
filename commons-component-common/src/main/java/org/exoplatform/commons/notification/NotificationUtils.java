@@ -19,12 +19,39 @@ package org.exoplatform.commons.notification;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.jcr.Value;
 
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.resources.ResourceBundleService;
+
 
 public class NotificationUtils {
-  
+  private static final Log LOG = ExoLogger.getLogger(NotificationUtils.class);
+
+  public static String getResourceBundle(String key, Locale locale) {
+    if (locale == null) {
+      locale = Locale.ENGLISH;
+    }
+    ResourceBundle res = null;
+    // if null, try another way
+    ResourceBundleService bundleService = CommonsUtils.getService(ResourceBundleService.class);
+    if (bundleService != null) {
+      res = bundleService.getResourceBundle("locale.notification.Notification", locale);
+    }
+    // still null
+    if (res == null) {
+      LOG.warn("Can not resource bundle by key: " + key);
+      return key.substring(key.lastIndexOf(".") + 1);
+    }
+
+    return res.getString(key);
+  }
+
   public static String listToString(List<String> list) {
     if (list == null || list.size() == 0) {
       return "";

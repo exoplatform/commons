@@ -25,6 +25,8 @@ import java.util.List;
  */
 
 public class UserNotificationSetting {
+  private static UserNotificationSetting defaultSetting = null;
+  
   public enum FREQUENCY {
     INSTANTLY("exo:Instantly"), DAILY_KEY("exo:daily"),
     WEEKLY_KEY("exo:weekly"), MONTHLY_KEY("exo:monthly");
@@ -44,10 +46,9 @@ public class UserNotificationSetting {
     }
 
   }
-  
-  private Calendar     lastUpdateTime;
+  private boolean     isActive = true;
 
-  private boolean     isDefault = false;
+  private Calendar     lastUpdateTime;
 
   private String       userId;
 
@@ -72,6 +73,20 @@ public class UserNotificationSetting {
   }
 
   /**
+   * @return the isActive
+   */
+  public boolean isActive() {
+    return isActive;
+  }
+
+  /**
+   * @param isActive the isActive to set
+   */
+  public void setActive(boolean isActive) {
+    this.isActive = isActive;
+  }
+
+  /**
    * @return the userId
    */
   public String getUserId() {
@@ -84,20 +99,6 @@ public class UserNotificationSetting {
   public UserNotificationSetting setUserId(String userId) {
     this.userId = userId;
     return this;
-  }
-
-  /**
-   * @return the isDefault
-   */
-  public boolean isDefault() {
-    return isDefault;
-  }
-
-  /**
-   * @param isDefault the isDefault to set
-   */
-  public void setDefault(boolean isDefault) {
-    this.isDefault = isDefault;
   }
 
   /**
@@ -219,13 +220,42 @@ public class UserNotificationSetting {
   }
 
   public boolean isActiveWithoutInstantly(String providerId) {
-    return isInDaily(providerId) || isInWeekly(providerId) || isInMonthly(providerId) || isDefault();
+    return isInDaily(providerId) || isInWeekly(providerId) || isInMonthly(providerId);
   }
 
   private void addProperty(List<String> providers, String providerId) {
     if (providers.contains(providerId) == false) {
       providers.add(providerId);
     }
+  }
+  
+  public static final UserNotificationSetting getDefaultInstance() {
+    if (defaultSetting == null) {
+      defaultSetting = getInstance();
+      defaultSetting.addProvider("NewUserJoinSocialIntranet", FREQUENCY.DAILY_KEY);
+
+      defaultSetting.addProvider("ReceiceConnectionRequest", FREQUENCY.INSTANTLY);
+      defaultSetting.addProvider("ReceiceConnectionRequest", FREQUENCY.DAILY_KEY);
+
+      defaultSetting.addProvider("InvitedJoinSpace", FREQUENCY.INSTANTLY);
+      defaultSetting.addProvider("InvitedJoinSpace", FREQUENCY.WEEKLY_KEY);
+
+      defaultSetting.addProvider("RequestJoinSpace", FREQUENCY.INSTANTLY);
+      defaultSetting.addProvider("RequestJoinSpace", FREQUENCY.WEEKLY_KEY);
+
+      defaultSetting.addProvider("ActivityMentionProvider", FREQUENCY.DAILY_KEY);
+
+      defaultSetting.addProvider("ActivityCommentProvider", FREQUENCY.INSTANTLY);
+      defaultSetting.addProvider("ActivityCommentProvider", FREQUENCY.DAILY_KEY);
+
+      defaultSetting.addProvider("ActivityLikeProvider", FREQUENCY.WEEKLY_KEY);
+
+      defaultSetting.addProvider("ActivityPostProvider", FREQUENCY.INSTANTLY);
+
+      defaultSetting.addProvider("ActivityPostSpaceProvider", FREQUENCY.INSTANTLY);
+    }
+
+    return defaultSetting;
   }
 
 }

@@ -22,7 +22,7 @@ import org.exoplatform.commons.api.notification.UserNotificationSetting;
 
 public interface UserNotificationService {
 
-  void saveUserNotificationSetting(String userId, UserNotificationSetting notificationSetting);
+  void saveUserNotificationSetting(UserNotificationSetting notificationSetting);
 
   UserNotificationSetting getUserNotificationSetting(String userId);
 

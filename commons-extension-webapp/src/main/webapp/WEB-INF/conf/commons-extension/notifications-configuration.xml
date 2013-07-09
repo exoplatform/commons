@@ -39,16 +39,14 @@
 			</value-param>
 			<value-param>
 				<name>dayOfWeekend</name>
-				<value>1</value>
+				<value>6</value>
 			</value-param>
 			<value-param>
 				<name>dayOfMonthend</name>
-				<value>7</value>
+				<value>28</value>
 			</value-param>
 		</init-params>
   </component>
-  
-  
 
   <component>
     <key>org.exoplatform.commons.api.notification.service.NotificationProviderService</key>

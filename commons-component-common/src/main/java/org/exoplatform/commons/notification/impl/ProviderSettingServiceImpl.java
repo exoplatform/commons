@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.exoplatform.commons.api.notification.plugin.ActiveProviderPlugin;
+import org.exoplatform.commons.api.notification.plugin.GroupProviderModel;
+import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
 import org.exoplatform.commons.api.notification.service.ProviderSettingService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -36,6 +38,10 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
   private static final Log LOG = ExoLogger.getLogger(ProviderSettingServiceImpl.class);
 
   private List<ActiveProviderPlugin> activeProviderPlugins = new ArrayList<ActiveProviderPlugin>();
+
+  private List<GroupProviderPlugin>  groupProviderPlugins  = new ArrayList<GroupProviderPlugin>();
+  
+  private List<String> activeProviderIds = new ArrayList<String>();
 
   private static final String NAME_SPACES = "exo:";
 
@@ -65,6 +71,11 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
   public void registerActiveProviderPlugin(ActiveProviderPlugin activeProviderPlugin) {
     activeProviderPlugins.add(activeProviderPlugin);    
   }
+
+  @Override
+  public void registerGroupProviderPlugin(GroupProviderPlugin groupProviderPlugin) {
+    groupProviderPlugins.add(groupProviderPlugin);    
+  }
   
   private void initActiveProviders() {
     //
@@ -82,6 +93,8 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
         saveSetting(scope, str, true);
       }
     }
+    //
+    activeProviderIds.clear();
   }
 
   private void saveSetting(Scope scope, String property, boolean value) {
@@ -102,26 +115,26 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
   
   @Override
   public List<String> getActiveProviderIds(boolean isAdmin) {
-    List<String> providerIds = new ArrayList<String>();
-
-    for (ActiveProviderPlugin pp : activeProviderPlugins) {
-      for (String str : pp.getActiveProviderForUsers()) {
-        if (isActive(str, Scope.GLOBAL) == true) {
-          providerIds.add(str);
+    if (activeProviderIds.size() == 0) {
+      for (ActiveProviderPlugin pp : activeProviderPlugins) {
+        for (String str : pp.getActiveProviderForUsers()) {
+          if (isActive(str, Scope.GLOBAL) == true) {
+            activeProviderIds.add(str);
+          }
         }
-      }
 
-      if (isAdmin == false) {
-        continue;
-      }
+        if (isAdmin == false) {
+          continue;
+        }
 
-      for (String str : pp.getActiveProviderForAdmins()) {
-        if (isActive(str, Scope.PORTAL) == true) {
-          providerIds.add(str);
+        for (String str : pp.getActiveProviderForAdmins()) {
+          if (isActive(str, Scope.PORTAL) == true) {
+            activeProviderIds.add(str);
+          }
         }
       }
     }
-    return providerIds;
+    return activeProviderIds;
   }
   
   private boolean isActive(String providerId, Scope scope) {
@@ -164,15 +177,26 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
         removeSetting(Scope.PORTAL, str);
       }
     }
+    activeProviderIds.clear();
   }
   
   private List<String> getAllKeyOfProviderSetting() {
     List<String> providerIds = new ArrayList<String>();
-    for (ActiveProviderPlugin pp : activeProviderPlugins) {
-      providerIds.addAll(pp.getActiveProviderForUsers());
+    for (ActiveProviderPlugin app : activeProviderPlugins) {
+      providerIds.addAll(app.getActiveProviderForUsers());
       //
-      providerIds.addAll(pp.getActiveProviderForAdmins());
+      providerIds.addAll(app.getActiveProviderForAdmins());
     }
     return providerIds;
+  }
+
+  @Override
+  public List<GroupProviderModel> getGroupProviders() {
+    List<GroupProviderModel> groupProviders = new ArrayList<GroupProviderModel>();
+    for (GroupProviderPlugin gpp : groupProviderPlugins) {
+      GroupProviderPlugin.addGroupProviderData(groupProviders, gpp.getGroupProviders());
+    }
+
+    return groupProviders;
   }
 }
