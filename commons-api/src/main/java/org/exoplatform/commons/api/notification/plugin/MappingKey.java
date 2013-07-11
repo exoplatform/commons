@@ -20,17 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MappingKey {
-  /*
-      String srcResource = mappingKey.getSrcResouce();
-    String subjectKey = mappingKey.getKeyValue("subject", getDefaultKey(DEFAULT_SUBJECT_KEY, providerId));
-    String templateKey = mappingKey.getKeyValue("template", getDefaultKey(DEFAULT_TEMPLATE_KEY, providerId));
-    String digestKey = mappingKey.getKeyValue("digest", getDefaultKey(DEFAULT_SIMPLE_DIGEST_KEY, providerId));
-    String digestOneKey = mappingKey.getKeyValue("digest.one", getDefaultKey(DEFAULT_DIGEST_ONE_KEY, providerId));
-    String digestThreeKey = mappingKey.getKeyValue("digest.three", getDefaultKey(DEFAULT_DIGEST_THREE_KEY, providerId));
-    String digestMoreKey = mappingKey.getKeyValue("digest.more", getDefaultKey(DEFAULT_DIGEST_MORE_KEY, providerId));
-    String footer = mappingKey.getKeyValue("footer", getDefaultKey(DEFAULT_FOOTER_KEY, providerId));
-  
-  */
   public static final String DEFAULT_SRC_RESOURCE_KEY  = "locale.notification.template.NotificationTemplate";
 
   public static final String  SUBJECT_KEY              = "subject";

@@ -50,6 +50,7 @@ public class NotificationUtils {
   public static final String DEFAULT_FOOTER_KEY        = "Notification.footer.$providerid";
 
   public static String getResourceBundle(String key, Locale locale, String srcResource) {
+    LOG.info("Get resouce bundle of local " + srcResource);
     if (key == null || key.trim().length() == 0) {
       return "";
     }

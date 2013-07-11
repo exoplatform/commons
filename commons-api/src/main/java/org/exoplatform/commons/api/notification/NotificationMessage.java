@@ -152,6 +152,13 @@ public class NotificationMessage {
   }
 
   /**
+   * @return the value of ownerParameter
+   */
+  public String getValueOwnerParameter(String key) {
+    return ownerParameter.get(key);
+  }
+
+  /**
    * @return the array ownerParameter
    */
   public String[] getArrayOwnerParameter() {

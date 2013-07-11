@@ -63,7 +63,7 @@ public class TemplateGeneratorImpl implements TemplateGenerator {
   }
   
   public NotificationTemplate getNotificationTemplate(String providerId, String language) {
-    if (language != null) {
+    if (language == null) {
       language = Locale.ENGLISH.getLanguage();
     }
     String key = new StringBuffer(providerId).append(language).toString();

@@ -17,6 +17,7 @@
 package org.exoplatform.commons.api.notification.service;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
@@ -30,7 +31,7 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
   protected OrganizationService organizationService;
   protected TemplateGenerator templateGenerator;
   
-  public static final String DEFAULT_LANGUAGE = "English";
+  public static final String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
   
   protected OrganizationService getOrganizationService() {
     if (organizationService == null) {
