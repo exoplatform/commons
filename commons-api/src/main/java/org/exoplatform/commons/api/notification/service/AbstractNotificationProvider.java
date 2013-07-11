@@ -17,11 +17,9 @@
 package org.exoplatform.commons.api.notification.service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.ProviderData;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.services.organization.OrganizationService;
@@ -30,6 +28,7 @@ import org.exoplatform.services.organization.UserProfile;
 
 public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
   protected OrganizationService organizationService;
+  protected TemplateGenerator templateGenerator;
   
   public static final String DEFAULT_LANGUAGE = "English";
   
@@ -63,8 +62,10 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
       from = getEmailFormat(from);
     }
     
-    if(from == null || from.length() < 0) {
-      from = System.getProperty("gatein.email.smtp.from");
+    if(from == null || from.length() <= 0) {
+      from = System.getProperty("gatein.email.smtp.from", "noreply@exoplatform.com");
+      String senderName = System.getProperty("exo.notifications.portalname", "eXo");
+      from = new StringBuffer(senderName).append("<").append(from).append(">").toString();
     }
     return from;
   }
@@ -85,25 +86,6 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
     } catch (Exception e) {
       return DEFAULT_LANGUAGE;
     }
-  }
-  
-  private String getValue(Map<String, String> maps, String language) {
-    String value = "";
-    if (language != null) {
-      value = maps.get(language);
-    }
-    if ((value == null || value.length() == 0) && maps.size() > 0) {
-      value = maps.values().iterator().next();
-    }
-    return value;
-  }
-
-  protected String getTemplate(ProviderData provider, String language) {
-    return getValue(provider.getTemplates(), language);
-  }
-
-  protected String getSubject(ProviderData provider, String language) {
-    return getValue(provider.getSubjects(), language);
   }
   
   public abstract List<String> getSupportType();

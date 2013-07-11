@@ -16,42 +16,25 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ProviderModel {
-  private String         type;
+import org.exoplatform.container.component.BaseComponentPlugin;
+import org.exoplatform.container.xml.InitParams;
 
-  private String         order;
+public class TemplateConfigurationPlugin extends BaseComponentPlugin {
 
-  public ProviderModel() {
+  private List<MappingKey> mappingKeys;
+
+  public TemplateConfigurationPlugin(InitParams params) {
+    mappingKeys = params.getObjectParamValues(MappingKey.class);
   }
 
-  /**
-   * @return the type
-   */
-  public String getType() {
-    return type;
-  }
-
-  /**
-   * @param type the type to set
-   */
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  /**
-   * @return the order
-   */
-  public String getOrder() {
-    return order;
-  }
-
-  /**
-   * @param order the order to set
-   */
-  public void setOrder(String order) {
-    this.order = order;
+  public List<MappingKey> getMappingKeys() {
+    if (mappingKeys == null || mappingKeys.size() == 0) {
+      return new ArrayList<MappingKey>();
+    }
+    return mappingKeys;
   }
 
 }

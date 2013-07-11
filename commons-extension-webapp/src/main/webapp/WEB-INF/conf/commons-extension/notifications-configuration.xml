@@ -52,6 +52,11 @@
     <key>org.exoplatform.commons.api.notification.service.NotificationProviderService</key>
     <type>org.exoplatform.commons.notification.impl.DigestorProviderImpl</type>
   </component>
+  
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.TemplateGenerator</key>
+    <type>org.exoplatform.commons.notification.impl.TemplateGeneratorImpl</type>
+  </component>
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
@@ -81,97 +86,4 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
-
-  
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.notification.service.ProviderService</target-component>
-    <component-plugin>
-      <name>default.providers</name>
-      <set-method>registerProviderPlugin</set-method>
-      <type>org.exoplatform.commons.api.notification.plugin.ProviderPlugin</type>
-      <description>Initial values for providers.</description>
-      
-      <init-params>
-        <object-param>
-          <name>DigestProvider</name>
-          <description>The digest message</description>
-          <object type="org.exoplatform.commons.api.notification.plugin.ProviderModel">
-            <field name="type">
-              <string>DigestProvider</string>
-            </field>
-            <field name="name">
-              <string>DigestProvider</string>
-            </field>
-            <field name="order">
-              <string>0</string>
-            </field>
-            <field name="params">
-              <collection type="java.util.ArrayList">               
-                <value>
-                  <string></string>
-                </value>
-              </collection>
-            </field>
-            <field name="templates">
-              <collection type="java.util.ArrayList">               
-                <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
-                    <field name="language">
-                      <string>English</string>
-                    </field>
-                    <field name="subject">
-                      <string><![CDATA[Your $Domain Intranet Updates: $start-date - $end-date]]></string>
-                    </field>
-                    <field name="template">
-                      <string>
-                        <![CDATA[Title: Your $Domain Intranet Updates: $start-date - $end-date<br/>
-                                 Hi $first-name</br>
-                                 Here's what's been happening in your Social Intranet in the past 24 hours/week/month.</br>
-                                 $content
-                                 If you do not want to receive such notifications, <a href="$changeSettings" target="_blank">Click here</a> to change your notification settings.
-                        ]]></string>
-                    </field>
-                    <field name="digesters">
-                      <collection type="java.util.ArrayList">
-                        <value>
-                          <string></string>
-                        </value>
-                      </collection>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.commons.api.notification.plugin.Template">
-                    <field name="language">
-                      <string>French</string>
-                    </field>
-                    <field name="subject">
-                      <string><![CDATA[Your $Domain Intranet Updates: $start-date - $end-date]]></string>
-                    </field>
-                    <field name="template">
-                      <string>
-                        <![CDATA[Title: Your $Domain Intranet Updates: $start-date - $end-date<br/>
-                                 Hi $first-name</br>
-                                 Here's what's been happening in your Social Intranet in the past 24 hours/week/month.</br>
-                                 $content <br/>
-                                 If you do not want to receive such notifications, <a href="$changeSettings" target="_blank">Click here</a> to change your notification settings.
-                        ]]></string>
-                    </field>
-                    <field name="digesters">
-                      <collection type="java.util.ArrayList">
-                        <value>
-                          <string></string>
-                        </value>
-                      </collection>
-                    </field>
-                  </object>
-                </value>
-              </collection>
-            </field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-  
 </configuration>

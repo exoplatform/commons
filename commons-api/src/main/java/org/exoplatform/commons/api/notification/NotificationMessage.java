@@ -33,7 +33,7 @@ public class NotificationMessage {
 
   private String              providerType;                                  //
 
-  private String              from;
+  private String              from           = "";
 
   private String              to;
 

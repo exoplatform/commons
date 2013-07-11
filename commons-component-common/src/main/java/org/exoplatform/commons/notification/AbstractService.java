@@ -38,23 +38,13 @@ public abstract class AbstractService {
 
   public static final String NTF_TYPE                 = "ntf:type";
 
-  public static final String NTF_NAME                 = "ntf:name";
-
   public static final String NTF_ORDER                = "ntf:order";
 
-  public static final String NTF_PARAMS               = "ntf:params";
-
   public static final String NTF_MESSAGE              = "ntf:message";
-
-  public static final String NTF_SUBJECTS             = "ntf:subjects";
 
   public static final String NTF_IS_ACTIVE            = "ntf:isActive";
 
   public static final String NTF_PROVIDER             = "ntf:provider";
-
-  public static final String NTF_TEMPLATES            = "ntf:templates";
-
-  public static final String NTF_DIGESTERS            = "ntf:digesters";
 
   public static final String NTF_SEND_TO_DAILY        = "ntf:sendToDaily";
 

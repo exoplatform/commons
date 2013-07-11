@@ -25,10 +25,8 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.ProviderData;
-import org.exoplatform.commons.api.notification.ProviderData.DIGEST_TYPE;
 import org.exoplatform.commons.api.notification.plugin.ProviderModel;
 import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
-import org.exoplatform.commons.api.notification.plugin.Template;
 import org.exoplatform.commons.api.notification.service.ProviderService;
 import org.exoplatform.commons.notification.AbstractService;
 import org.exoplatform.commons.notification.NotificationConfiguration;
@@ -85,22 +83,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
         //
         ProviderData provider = new ProviderData();
         provider.setType(pm.getType());
-        provider.setName(pm.getName());
-        provider.setParams(pm.getParams());
-
-        List<Template> templates = pm.getTemplates();
-        for (Template template : templates) {
-          provider.addSubject(template.getLanguage(), template.getSubject());
-          provider.addTemplate(template.getLanguage(), template.getTemplate());
-          List<String> digests = template.getDigesters();
-          if(digests.size() == 1) {
-            provider.addDigester(template.getLanguage(), digests.get(0));
-          } else {
-            provider.addDigester(template.getLanguage(), digests.get(0), DIGEST_TYPE.ONE);
-            provider.addDigester(template.getLanguage(), digests.get(1), DIGEST_TYPE.THREE);
-            provider.addDigester(template.getLanguage(), digests.get(2), DIGEST_TYPE.MORE);
-          }
-        }
+        provider.setOrder(Integer.valueOf(pm.getOrder()));
 
         //
         saveProvider(provider);
@@ -131,12 +114,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
       }
 
       providerNode.setProperty(NTF_TYPE, provider.getType());
-      providerNode.setProperty(NTF_NAME, provider.getName());
       providerNode.setProperty(NTF_ORDER, provider.getOrder());
-      providerNode.setProperty(NTF_PARAMS, provider.getArrayParams());
-      providerNode.setProperty(NTF_TEMPLATES, provider.getArrayTemplates());
-      providerNode.setProperty(NTF_SUBJECTS, provider.getArraySubjects());
-      providerNode.setProperty(NTF_DIGESTERS, provider.getArrayDigesters());
       
       if(providerHomeNode.isNew()) {
         providerHomeNode.getSession().save();
@@ -168,14 +146,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
     }
     ProviderData provider = new ProviderData();
     provider.setType(providerNode.getProperty(NTF_TYPE).getString())
-            .setName(providerNode.getProperty(NTF_NAME).getString())
-            .setOrder(Integer.valueOf(providerNode.getProperty(NTF_ORDER).getString()))
-
-            .setParams(providerNode.getProperty(NTF_PARAMS).getValues())
-
-            .setDigesters(providerNode.getProperty(NTF_DIGESTERS).getValues())
-            .setSubjects(providerNode.getProperty(NTF_SUBJECTS).getValues())
-            .setTemplates(providerNode.getProperty(NTF_TEMPLATES).getValues());
+            .setOrder(Integer.valueOf(providerNode.getProperty(NTF_ORDER).getString()));
     return provider;
   }
 

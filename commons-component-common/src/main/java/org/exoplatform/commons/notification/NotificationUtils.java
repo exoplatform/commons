@@ -24,6 +24,8 @@ import java.util.ResourceBundle;
 
 import javax.jcr.Value;
 
+import org.exoplatform.commons.api.notification.NotificationTemplate;
+import org.exoplatform.commons.api.notification.plugin.MappingKey;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -33,25 +35,75 @@ import org.exoplatform.services.resources.ResourceBundleService;
 public class NotificationUtils {
   private static final Log LOG = ExoLogger.getLogger(NotificationUtils.class);
 
-  public static String getResourceBundle(String key, Locale locale) {
+  public static final String DEFAULT_TEMPLATE_KEY      = "Notification.template.$providerid";
+
+  public static final String DEFAULT_SUBJECT_KEY       = "Notification.subject.$providerid";
+
+  public static final String DEFAULT_SIMPLE_DIGEST_KEY = "Notification.digest.$providerid";
+
+  public static final String DEFAULT_DIGEST_ONE_KEY    = "Notification.digest.one.$providerid";
+
+  public static final String DEFAULT_DIGEST_THREE_KEY  = "Notification.digest.three.$providerid";
+
+  public static final String DEFAULT_DIGEST_MORE_KEY   = "Notification.digest.more.$providerid";
+
+  public static final String DEFAULT_FOOTER_KEY        = "Notification.footer.$providerid";
+
+  public static String getResourceBundle(String key, Locale locale, String srcResource) {
+    if (key == null || key.trim().length() == 0) {
+      return "";
+    }
+
     if (locale == null) {
       locale = Locale.ENGLISH;
     }
+
     ResourceBundle res = null;
     // if null, try another way
     ResourceBundleService bundleService = CommonsUtils.getService(ResourceBundleService.class);
     if (bundleService != null) {
-      res = bundleService.getResourceBundle("locale.notification.Notification", locale);
+      res = bundleService.getResourceBundle(srcResource, locale);
     }
     // still null
-    if (res == null) {
+    if (res == null || res.containsKey(key) == false) {
       LOG.warn("Can not resource bundle by key: " + key);
-      return key.substring(key.lastIndexOf(".") + 1);
+      return "";
     }
 
     return res.getString(key);
   }
+  
+  public static String getDefaultKey(String key, String providerId) {
+    return key.replace("$providerid", providerId);
+  }
 
+  public static NotificationTemplate getTemplate(MappingKey mappingKey, String providerId, String language) {
+    NotificationTemplate notificationTemplate = NotificationTemplate.getInstance();
+    String srcResource = mappingKey.getSrcResouce();
+    String subjectKey = mappingKey.getKeyValue(MappingKey.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, providerId));
+    String templateKey = mappingKey.getKeyValue(MappingKey.TEMPLATE_KEY, getDefaultKey(DEFAULT_TEMPLATE_KEY, providerId));
+    String digestKey = mappingKey.getKeyValue(MappingKey.DIGEST_KEY, getDefaultKey(DEFAULT_SIMPLE_DIGEST_KEY, providerId));
+    String digestOneKey = mappingKey.getKeyValue(MappingKey.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, providerId));
+    String digestThreeKey = mappingKey.getKeyValue(MappingKey.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, providerId));
+    String digestMoreKey = mappingKey.getKeyValue(MappingKey.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, providerId));
+    String footer = mappingKey.getKeyValue(MappingKey.FOOTER_KEY, getDefaultKey(DEFAULT_FOOTER_KEY, providerId));
+    
+    Locale locale = Locale.ENGLISH;
+    if (language != null) {
+      locale = new Locale(language);
+    }
+    notificationTemplate.setLanguage(language)
+    .setSubject(NotificationUtils.getResourceBundle(subjectKey, locale, srcResource))
+    .setTemplate(NotificationUtils.getResourceBundle(templateKey, locale, srcResource))
+    .setSimpleDigest(NotificationUtils.getResourceBundle(digestKey, locale, srcResource))
+    .setDigestOne(NotificationUtils.getResourceBundle(digestOneKey, locale, srcResource))
+    .setDigestThree(NotificationUtils.getResourceBundle(digestThreeKey, locale, srcResource))
+    .setDigestMore(NotificationUtils.getResourceBundle(digestMoreKey, locale, srcResource))
+    .setFooter(NotificationUtils.getResourceBundle(footer, locale, srcResource));
+    return notificationTemplate;
+  }
+  
+  
   public static String listToString(List<String> list) {
     if (list == null || list.size() == 0) {
       return "";

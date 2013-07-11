@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationProvider;
 import org.exoplatform.commons.api.notification.service.NotificationProviderService;
 import org.exoplatform.commons.api.notification.service.ProviderService;
+import org.exoplatform.commons.api.notification.service.TemplateGenerator;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -37,7 +39,10 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
 
   private List<AbstractNotificationProvider> listSupportProviderImpl = new ArrayList<AbstractNotificationProvider>();
 
-  public DigestorProviderImpl() {
+  TemplateGenerator                          templateGenerator;
+
+  public DigestorProviderImpl(TemplateGenerator templateGenerator) {
+    this.templateGenerator = templateGenerator;
   }
   
   @Override
@@ -85,13 +90,19 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       if (sb.toString().isEmpty())
         return null;
       
-      ProviderData digestProvider = providerService.getProvider("DigestProvider");
       NotificationMessage notificationMessage = notificationData.values().iterator().next().get(0);
       String language = getLanguage(notificationMessage);
-      String body = getTemplate(digestProvider, language);
-      String subject = getSubject(digestProvider, language);
       
-      body = body.replace("$content", sb.toString());
+      Map<String, String> valueables = new HashMap<String, String>();
+
+      valueables.put("$PORTAL_NAME", "");
+      valueables.put("$PERIOD", "");
+      String subject = templateGenerator.processSubjectIntoString("DigestProvider", valueables, language);
+
+      valueables.put("$FOOTER_LINK", "");
+      valueables.put("$DIGEST_MESSAGES_LIST", sb.toString());
+      String body = templateGenerator.processTemplateIntoString("DigestProvider", valueables, language);
+
       messageInfo.setBody(body).setSubject(subject).setTo(getTo(notificationMessage));
     } catch (Exception e) {
       LOG.error("Can not build template of DigestorProviderImpl ", e);

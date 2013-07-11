@@ -14,44 +14,20 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.plugin;
+package org.exoplatform.commons.api.notification.service;
 
-import java.util.List;
+import java.util.Map;
 
-public class ProviderModel {
-  private String         type;
+import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
 
-  private String         order;
 
-  public ProviderModel() {
-  }
+public interface TemplateGenerator {
 
-  /**
-   * @return the type
-   */
-  public String getType() {
-    return type;
-  }
+  public void registerTemplateConfigurationPlugin(TemplateConfigurationPlugin configurationPlugin);
 
-  /**
-   * @param type the type to set
-   */
-  public void setType(String type) {
-    this.type = type;
-  }
+  public String processTemplateIntoString(String providerId, Map<String, String> valueables, String language);
 
-  /**
-   * @return the order
-   */
-  public String getOrder() {
-    return order;
-  }
+  public String processSubjectIntoString(String providerId, Map<String, String> valueables, String language);
 
-  /**
-   * @param order the order to set
-   */
-  public void setOrder(String order) {
-    this.order = order;
-  }
-
+  public String processDigestIntoString(String providerId, Map<String, String> valueables, String language, int size);
 }
