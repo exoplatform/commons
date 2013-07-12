@@ -222,9 +222,9 @@ public class NotificationTemplate {
 
   public String processDigest(int size) {
     String digest = getSimpleDigest();
-    if(size == 1) {
+    if (size == 1) {
       digest = getDigestOne();
-    }else if(size <= 3) {
+    } else if (size > 1 && size <= 3) {
       digest = getDigestThree();
     }
     if(size > 3) {
