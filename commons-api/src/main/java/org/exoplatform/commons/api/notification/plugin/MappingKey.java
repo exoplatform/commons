@@ -20,11 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MappingKey {
-  public static final String DEFAULT_SRC_RESOURCE_KEY  = "locale.notification.template.NotificationTemplate";
+  public static final String  DEFAULT_SRC_RESOURCE_BUNDLE_KEY = "locale.notification.template.NotificationTemplate";
+  
+  public static final String  DEFAULT_SRC_RESOURCE_TEMPLATE_KEY = "groovy/notification/template";
 
   public static final String  SUBJECT_KEY              = "subject";
-
-  public static final String  TEMPLATE_KEY             = "template";
 
   public static final String  DIGEST_KEY               = "digest";
 
@@ -35,44 +35,77 @@ public class MappingKey {
   public static final String  DIGEST_MORE_KEY          = "digest.more";
 
   public static final String  FOOTER_KEY               = "footer";
-  
-  private String providerId;
-  private String srcResouce;
-  private Map<String, String> keyMapping = new HashMap<String, String>();
+
+  private String              providerId;
+
+  private String              localeResouceBundle;
+
+  private String              localeResouceTemplate;
+
+  private Map<String, String> keyMapping               = new HashMap<String, String>();
+
   public MappingKey() {
-    srcResouce = DEFAULT_SRC_RESOURCE_KEY;
+    localeResouceBundle = DEFAULT_SRC_RESOURCE_BUNDLE_KEY;
   }
+
+  public MappingKey(String providerId) {
+    this();
+    this.providerId = providerId;
+  }
+
   /**
    * @return the providerId
    */
   public String getProviderId() {
     return providerId;
   }
+
   /**
    * @param providerId the providerId to set
    */
   public void setProviderId(String providerId) {
     this.providerId = providerId;
   }
-  
+
   /**
-   * @return the srcResouce
+   * @return the localeResouceBundle
    */
-  public String getSrcResouce() {
-    return srcResouce;
+  public String getLocaleResouceBundle() {
+    return localeResouceBundle;
   }
+
   /**
-   * @param srcResouce the srcResouce to set
+   * @param localeResouceBundle the localeResouceBundle to set
    */
-  public void setSrcResouce(String srcResouce) {
-    this.srcResouce = srcResouce;
+  public void setLocaleResouceBundle(String localeResouceBundle) {
+    this.localeResouceBundle = localeResouceBundle;
   }
+
+  /**
+   * @return the localeResouceTemplate
+   */
+  public String getLocaleResouceTemplate() {
+    if(localeResouceTemplate == null) {
+      localeResouceTemplate = new StringBuffer(DEFAULT_SRC_RESOURCE_TEMPLATE_KEY)
+                                .append("/").append(providerId).append(".gtmpl").toString();
+    }
+    return localeResouceTemplate;
+  }
+
+  /**
+   * @param localeResouceTemplate the localeResouceTemplate to set
+   */
+  public void setLocaleResouceTemplate(String localeResouceTemplate) {
+    this.localeResouceTemplate = localeResouceTemplate;
+  }
+
   /**
    * @return the keyMapping
    */
   public Map<String, String> getKeyMapping() {
     return keyMapping;
   }
+
   /**
    * @param keyMapping the keyMapping to set
    */
@@ -84,14 +117,14 @@ public class MappingKey {
     this.keyMapping.put(key, value);
     return this;
   }
-  
+
   public String getKeyValue(String key, String defaultValue) {
     if (keyMapping.containsKey(key)) {
       return keyMapping.get(key);
     }
     return defaultValue;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof MappingKey) {
@@ -99,5 +132,5 @@ public class MappingKey {
     }
     return false;
   }
-  
+
 }

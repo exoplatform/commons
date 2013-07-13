@@ -25,10 +25,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import junit.framework.TestCase;
+
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
-
-import junit.framework.TestCase;
 
 /**
  * Created by The eXo Platform SAS

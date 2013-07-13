@@ -24,18 +24,19 @@ import java.util.ResourceBundle;
 
 import javax.jcr.Value;
 
-import org.exoplatform.commons.api.notification.NotificationTemplate;
 import org.exoplatform.commons.api.notification.plugin.MappingKey;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValuesParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.ResourceBundleService;
+import org.exoplatform.services.resources.impl.BaseResourceBundlePlugin;
+import org.exoplatform.services.resources.impl.SimpleResourceBundleService;
 
 
 public class NotificationUtils {
   private static final Log LOG = ExoLogger.getLogger(NotificationUtils.class);
-
-  public static final String DEFAULT_TEMPLATE_KEY      = "Notification.template.$providerid";
 
   public static final String DEFAULT_SUBJECT_KEY       = "Notification.subject.$providerid";
 
@@ -47,10 +48,7 @@ public class NotificationUtils {
 
   public static final String DEFAULT_DIGEST_MORE_KEY   = "Notification.digest.more.$providerid";
 
-  public static final String DEFAULT_FOOTER_KEY        = "Notification.footer.$providerid";
-
   public static String getResourceBundle(String key, Locale locale, String srcResource) {
-    LOG.info("Get resouce bundle of local " + srcResource);
     if (key == null || key.trim().length() == 0) {
       return "";
     }
@@ -63,12 +61,39 @@ public class NotificationUtils {
     // if null, try another way
     ResourceBundleService bundleService = CommonsUtils.getService(ResourceBundleService.class);
     if (bundleService != null) {
+      
+//      bundleService.saveResourceBundle(data);
+      
       res = bundleService.getResourceBundle(srcResource, locale);
+      if(res == null && bundleService instanceof SimpleResourceBundleService) {
+        ArrayList arrayList = new ArrayList();
+        arrayList.add(srcResource);
+
+        InitParams initParams = new InitParams();
+        ValuesParam param = new ValuesParam();
+        param.setDescription("The resources apply for notification.");
+        
+        param.setValues(arrayList);
+        param.setName("classpath.resources");
+        initParams.addParam(param);
+        
+        param = new ValuesParam();
+        param.setDescription("The properties files apply for notification.");
+        param.setValues(arrayList);
+        param.setName("portal.resource.names");
+        initParams.addParam(param);
+        
+        BaseResourceBundlePlugin resourceBundlePlugin = new BaseResourceBundlePlugin(initParams);
+        
+        ((SimpleResourceBundleService)bundleService).addResourceBundle(resourceBundlePlugin);
+        
+        res = bundleService.getResourceBundle(srcResource, locale);
+      }
     }
     // still null
     if (res == null || res.containsKey(key) == false) {
       LOG.warn("Can not resource bundle by key: " + key);
-      return "";
+      return key;
     }
 
     return res.getString(key);
@@ -78,30 +103,26 @@ public class NotificationUtils {
     return key.replace("$providerid", providerId);
   }
 
-  public static NotificationTemplate getTemplate(MappingKey mappingKey, String providerId, String language) {
-    NotificationTemplate notificationTemplate = NotificationTemplate.getInstance();
-    String srcResource = mappingKey.getSrcResouce();
+  public static SubjectAndDigestTemplate getTemplate(MappingKey mappingKey, String providerId, String language) {
+    SubjectAndDigestTemplate subjectAndDigest = SubjectAndDigestTemplate.getInstance();
+    String srcResource = mappingKey.getLocaleResouceBundle();
     String subjectKey = mappingKey.getKeyValue(MappingKey.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, providerId));
-    String templateKey = mappingKey.getKeyValue(MappingKey.TEMPLATE_KEY, getDefaultKey(DEFAULT_TEMPLATE_KEY, providerId));
     String digestKey = mappingKey.getKeyValue(MappingKey.DIGEST_KEY, getDefaultKey(DEFAULT_SIMPLE_DIGEST_KEY, providerId));
     String digestOneKey = mappingKey.getKeyValue(MappingKey.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, providerId));
     String digestThreeKey = mappingKey.getKeyValue(MappingKey.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, providerId));
     String digestMoreKey = mappingKey.getKeyValue(MappingKey.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, providerId));
-    String footer = mappingKey.getKeyValue(MappingKey.FOOTER_KEY, getDefaultKey(DEFAULT_FOOTER_KEY, providerId));
     
     Locale locale = Locale.ENGLISH;
     if (language != null) {
       locale = new Locale(language);
     }
-    notificationTemplate.setLanguage(language)
-    .setSubject(NotificationUtils.getResourceBundle(subjectKey, locale, srcResource))
-    .setTemplate(NotificationUtils.getResourceBundle(templateKey, locale, srcResource))
-    .setSimpleDigest(NotificationUtils.getResourceBundle(digestKey, locale, srcResource))
-    .setDigestOne(NotificationUtils.getResourceBundle(digestOneKey, locale, srcResource))
-    .setDigestThree(NotificationUtils.getResourceBundle(digestThreeKey, locale, srcResource))
-    .setDigestMore(NotificationUtils.getResourceBundle(digestMoreKey, locale, srcResource))
-    .setFooter(NotificationUtils.getResourceBundle(footer, locale, srcResource));
-    return notificationTemplate;
+    subjectAndDigest.setLanguage(language)
+    .setSubject(getResourceBundle(subjectKey, locale, srcResource))
+    .setSimpleDigest(getResourceBundle(digestKey, locale, srcResource))
+    .setDigestOne(getResourceBundle(digestOneKey, locale, srcResource))
+    .setDigestThree(getResourceBundle(digestThreeKey, locale, srcResource))
+    .setDigestMore(getResourceBundle(digestMoreKey, locale, srcResource));
+    return subjectAndDigest;
   }
   
   

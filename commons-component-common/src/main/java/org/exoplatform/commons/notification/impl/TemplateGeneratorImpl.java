@@ -22,47 +22,64 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.exoplatform.commons.api.notification.NotificationTemplate;
 import org.exoplatform.commons.api.notification.plugin.MappingKey;
 import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
-import org.exoplatform.commons.api.notification.service.TemplateGenerator;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.SubjectAndDigestTemplate;
+import org.exoplatform.commons.notification.template.TemplateContext;
+import org.exoplatform.commons.notification.template.TemplateElement;
+import org.exoplatform.commons.notification.template.TemplateResouceBundle;
 
-public class TemplateGeneratorImpl implements TemplateGenerator {
+public class TemplateGeneratorImpl {
 
-  private Map<String, NotificationTemplate> cacheTemplate = new ConcurrentHashMap<String, NotificationTemplate>();
+  private Map<String, SubjectAndDigestTemplate> cacheTemplate = new ConcurrentHashMap<String, SubjectAndDigestTemplate>();
   
   private Set<MappingKey> allMappingKeys = new HashSet<MappingKey>();
+  
+  private static TemplateGeneratorImpl instance;
 
-  public TemplateGeneratorImpl() {
+  private TemplateGeneratorImpl() {
   }
   
-  @Override
+  public static TemplateGeneratorImpl getInstance() {
+    if (instance == null) {
+      instance = new TemplateGeneratorImpl();
+    }
+    return instance;
+  }
+  
   public void registerTemplateConfigurationPlugin(TemplateConfigurationPlugin configurationPlugin) {
     allMappingKeys.addAll(configurationPlugin.getMappingKeys());
   }
   
-  @Override
-  public String processTemplateIntoString(String providerId, Map<String, String> valueables, String language) {
-    NotificationTemplate template = getNotificationTemplate(providerId, language);
-    template.setValueables(valueables);
-    return template.processTemplate();
+  public String processTemplateIntoString(TemplateElement template) {
+    TemplateContext context = TemplateContext.getInstance();
+    context.visit(template);
+    return template.getTemplate();
   }
 
-  @Override
+  public TemplateElement getTemplateElement(String providerId, String language) {
+    MappingKey mappingKey = getMappingKey(providerId);
+    String resouceLocal = mappingKey.getLocaleResouceTemplate();
+    TemplateElement templateElement = new TemplateElement(language, resouceLocal);
+    templateElement.setResouceBundle(new TemplateResouceBundle(language, mappingKey.getLocaleResouceBundle()));
+    templateElement.setResouceBunldMappingKey(mappingKey.getKeyMapping());
+    return templateElement;
+  }
+  
   public String processSubjectIntoString(String providerId, Map<String, String> valueables, String language) {
-    NotificationTemplate template = getNotificationTemplate(providerId, language);
+    SubjectAndDigestTemplate template = getSubjectOrDigestTemplate(providerId, language);
     template.setValueables(valueables);
     return template.processSubject();
   }
-  @Override
+
   public String processDigestIntoString(String providerId, Map<String, String> valueables, String language, int size) {
-    NotificationTemplate template = getNotificationTemplate(providerId, language);
+    SubjectAndDigestTemplate template = getSubjectOrDigestTemplate(providerId, language);
     template.setValueables(valueables);
     return template.processDigest(size);
   }
   
-  public NotificationTemplate getNotificationTemplate(String providerId, String language) {
+  public SubjectAndDigestTemplate getSubjectOrDigestTemplate(String providerId, String language) {
     if (language == null) {
       language = Locale.ENGLISH.getLanguage();
     }
@@ -72,11 +89,10 @@ public class TemplateGeneratorImpl implements TemplateGenerator {
     }
     //
     MappingKey mappingKey = getMappingKey(providerId);
-    NotificationTemplate template = NotificationUtils.getTemplate(mappingKey, providerId, language);
+    SubjectAndDigestTemplate template = NotificationUtils.getTemplate(mappingKey, providerId, language);
     cacheTemplate.put(key, template);
     return template;
   }
-  
   
   public MappingKey getMappingKey(String providerId) {
     for (MappingKey mappingKey : allMappingKeys) {
@@ -84,7 +100,7 @@ public class TemplateGeneratorImpl implements TemplateGenerator {
         return mappingKey;
       }
     }
-    return new MappingKey();
+    return new MappingKey(providerId);
   }
 
 }

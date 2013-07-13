@@ -30,4 +30,5 @@ public interface TemplateGenerator {
   public String processSubjectIntoString(String providerId, Map<String, String> valueables, String language);
 
   public String processDigestIntoString(String providerId, Map<String, String> valueables, String language, int size);
+  
 }

@@ -17,8 +17,8 @@
 package org.exoplatform.settings.chromattic;
   
   import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
-  import org.exoplatform.commons.chromattic.SessionContext;
-  import org.exoplatform.settings.impl.SettingServiceImpl;
+import org.exoplatform.commons.chromattic.SessionContext;
+import org.exoplatform.settings.impl.SettingServiceImpl;
   
   /**
    * Created by The eXo Platform SAS

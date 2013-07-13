@@ -19,8 +19,6 @@ package org.exoplatform.services.bench;
 
 import java.util.HashMap;
 
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.services.bench.DataInjector;
 import org.exoplatform.services.log.Log;
 
 /**
