@@ -26,6 +26,8 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   private String toolbar;
   
   private String enterMode;
+  
+  private String css;
 
   public UIFormRichtextInput(String name, String bindingField, String value) {
     super(name, bindingField, String.class);
@@ -37,6 +39,13 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     this.value_ = value;
     this.enterMode = enterMode;
  }
+  
+  public UIFormRichtextInput(String name, String bindingField, String value, String enterMode, String css) {
+	    super(name, bindingField, String.class);
+	    this.value_ = value;
+	    this.enterMode = enterMode;
+	    this.css = css;
+	 }
   
   public String getWidth() {
     return width;
@@ -69,6 +78,14 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   public void setEnterMode(String enterMode) {
   	this.enterMode = enterMode;
   }
+  
+  public void setCss(String css) {
+	  this.css = css;
+  }
+  
+  public String getCss() {
+	  return css;
+  }
 
   public void processRender(WebuiRequestContext context) throws Exception {
 
@@ -76,6 +93,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     if (width == null) width = "'100%'";
     if (height == null) height = "200";
     if (enterMode == null) enterMode = "1";
+    if(css == null) css = "'/CommonsResources/ckeditor/contents.css'";
      
 
     StringBuffer buffer = new StringBuffer();
@@ -88,11 +106,11 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     }
     
     buffer.append("<script type='text/javascript'>\n");
-    buffer.append("    require(['/eXoWCMResources/ckeditor/ckeditor.js'], function() {");
+    buffer.append("    require(['/CommonsResources/ckeditor/ckeditor.js'], function() {");
     buffer.append("  //<![CDATA[\n");
     buffer.append("    var instance = CKEDITOR.instances['" + name + "']; if (instance) { CKEDITOR.remove(instance); instance = null;}\n");
     buffer.append("    CKEDITOR.replace('" + name + "', {toolbar:'" + toolbar + "', height:"
-    		+ height + ",enterMode:" + enterMode + ", shiftEnterMode:" + enterMode + "});\n");
+    		+ height + ", contentsCss:" + css + ", enterMode:" + enterMode + ", shiftEnterMode:" + enterMode + "});\n");
     buffer.append("       });");
     buffer.append("  //]]>\n");
     buffer.append("</script>\n");
