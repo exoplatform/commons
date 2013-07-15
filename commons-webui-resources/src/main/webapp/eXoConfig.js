@@ -13,14 +13,24 @@ CKEDITOR.eXoPath = CKEDITOR.basePath.substr(0, CKEDITOR.basePath.indexOf("ckedit
 (function() {CKEDITOR.plugins.addExternal('helpBBCode','/forumResources/eXoPlugins/helpBBCode/','plugin.js');})();
 
 CKEDITOR.editorConfig = function( config ){
+<<<<<<< HEAD
 	config.extraPlugins = 'content,insertGadget,insertPortalLink,autosave,scayt,wsc,acceptInline,cancelInline,pbckcode,onchange,helpBBCode';
+=======
+	config.extraPlugins = 'content,insertGadget,insertPortalLink,scayt,wsc,acceptInline,cancelInline,onchange,helpBBCode,syntaxhighlight';
+>>>>>>> ECMS-5357: Move rich text component with CKEditor to the common product
 	config.toolbarCanCollapse = false;
 	config.skin = 'moono';
 	config.allowedContent = true;
 	config.resize_enabled = true;
 	config.scayt_autoStartup = true;
 	config.language = eXo.env.portal.language || 'en';
+<<<<<<< HEAD
 	//config.uiColor = '#AADC6E';
+=======
+        config.syntaxhighlight_lang = 'java';
+	config.syntaxhighlight_hideControls = true;
+
+>>>>>>> ECMS-5357: Move rich text component with CKEditor to the common product
 	config.toolbar_Default = [
 		['Source','Templates'],
 		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','Scayt'],
@@ -79,6 +89,7 @@ CKEDITOR.editorConfig = function( config ){
 	] ;
 
 	config.toolbar_Forum = [
+<<<<<<< HEAD
 		['Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
 		['Blockquote', 'pbckcode','helpBBCode.btn']
@@ -89,6 +100,18 @@ CKEDITOR.editorConfig = function( config ){
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],	
 		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
 		['Blockquote', 'pbckcode','helpBBCode.btn']
+=======
+		['Source','Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
+		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
+		['Blockquote', 'Syntaxhighlight','helpBBCode.btn']
+	] ;
+
+	config.toolbar_FAQ = [
+		['Source','Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
+		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],	
+		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
+		['Blockquote', 'Syntaxhighlight','helpBBCode.btn']
+>>>>>>> ECMS-5357: Move rich text component with CKEditor to the common product
 	] ;
 
 };
