@@ -16,9 +16,22 @@
  */
 package org.exoplatform.commons.api.notification.task;
 
-public interface SendNotificationTask <T>{
+import org.exoplatform.commons.api.notification.service.ProviderSettingService;
+import org.exoplatform.container.PortalContainer;
 
-  void start(T msg);
-  void send(T msg);
-  void end(T msg);
+public abstract class AbstractNotificationTask<T> implements NotificationTask<T> {
+  private ProviderSettingService service;
+
+  private ProviderSettingService getProviderSettingService() {
+    if (service == null) {
+      service = (ProviderSettingService) PortalContainer.getInstance().getComponentInstanceOfType(ProviderSettingService.class);
+    }
+    return service;
+  }
+
+  public boolean isSuperValid(T ctx) {
+
+    return getProviderSettingService().getActiveFeature();
+  }
+
 }

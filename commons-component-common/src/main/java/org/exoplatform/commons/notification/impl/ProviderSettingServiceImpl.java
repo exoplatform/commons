@@ -41,9 +41,11 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
 
   private List<GroupProviderPlugin>  groupProviderPlugins  = new ArrayList<GroupProviderPlugin>();
   
-  private List<String> activeProviderIds = new ArrayList<String>();
+  private List<String>               activeProviderIds     = new ArrayList<String>();
 
-  private static final String NAME_SPACES = "exo:";
+  private static final String       NAME_SPACES           = "exo:";
+
+  private static final String       ACTIVE_FEATURE_KEY    = "feature.Notification";
 
   private SettingService settingService;
 
@@ -198,5 +200,15 @@ public class ProviderSettingServiceImpl implements ProviderSettingService, Start
     }
 
     return groupProviders;
+  }
+
+  @Override
+  public boolean getActiveFeature() {
+    return Boolean.valueOf(System.getProperty(ACTIVE_FEATURE_KEY, "true"));
+  }
+
+  @Override
+  public void saveActiveFeature(boolean isActive) {
+    
   }
 }

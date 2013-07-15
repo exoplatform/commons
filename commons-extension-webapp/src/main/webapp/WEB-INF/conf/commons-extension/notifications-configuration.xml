@@ -55,7 +55,7 @@
   
   <component>
     <key>org.exoplatform.commons.api.notification.service.TemplateGenerator</key>
-    <type>org.exoplatform.commons.notification.impl.TemplateGeneratorImpl</type>
+    <type>org.exoplatform.commons.notification.cache.CacheTemplateGenerator</type>
   </component>
 
   <external-component-plugins>

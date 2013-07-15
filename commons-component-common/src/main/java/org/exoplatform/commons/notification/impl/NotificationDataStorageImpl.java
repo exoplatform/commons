@@ -24,26 +24,34 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.exoplatform.commons.api.notification.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.service.NotificationService;
+import org.exoplatform.commons.api.notification.service.ProviderSettingService;
 
 public class NotificationDataStorageImpl implements NotificationDataStorage {
   
-  NotificationService              notificationService;
+  private NotificationService        notificationService;
 
-  Queue<NotificationMessage>       queue = new ConcurrentLinkedQueue<NotificationMessage>();
+  private ProviderSettingService     providerSettingService;
 
-  public NotificationDataStorageImpl(NotificationService notificationService) {
+  private Queue<NotificationMessage>       queue = new ConcurrentLinkedQueue<NotificationMessage>();
+
+  public NotificationDataStorageImpl(NotificationService notificationService, ProviderSettingService providerSettingService) {
     this.notificationService = notificationService;
+    this.providerSettingService = providerSettingService;
   }
   
   public NotificationDataStorageImpl add(NotificationMessage notificationMessage) {
-    queue.add(notificationMessage);
-    notificationService.addNotificationServiceListener();
+    if(providerSettingService.getActiveFeature()) {
+      queue.add(notificationMessage);
+      notificationService.addNotificationServiceListener();
+    }
     return this;
   }
 
   public NotificationDataStorageImpl addAll(Collection<NotificationMessage> notificationMessages) {
-    queue.addAll(notificationMessages);
-    notificationService.addNotificationServiceListener();
+    if(providerSettingService.getActiveFeature()) {
+      queue.addAll(notificationMessages);
+      notificationService.addNotificationServiceListener();
+    }
     return this;
   }
   

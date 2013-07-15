@@ -69,5 +69,15 @@ public interface ProviderSettingService {
    * @return
    */
   List<GroupProviderModel> getGroupProviders();
+  
+  /**
+   * @return
+   */
+  boolean getActiveFeature() ;
+  
+  /**
+   * 
+   */
+  void saveActiveFeature(boolean isActive);
 
 }
