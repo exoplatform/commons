@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.NotificationMessage.SEND_TYPE;
 import org.exoplatform.commons.api.notification.ProviderData;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationProvider;
@@ -31,9 +33,9 @@ import org.exoplatform.commons.api.notification.service.NotificationProviderServ
 import org.exoplatform.commons.api.notification.service.ProviderService;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.webui.utils.TimeConvertUtils;
 
 public class DigestorProviderImpl extends AbstractNotificationProvider implements NotificationProviderService {
   
@@ -64,7 +66,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
   }
 
   @Override
-  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting) {
+  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting, SEND_TYPE type) {
     LOG.info("\nBuild digest MessageInfo ....");
     long startTime = System.currentTimeMillis();
 
@@ -86,27 +88,47 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
         if (messages == null || messages.size() == 0)
           continue;
         AbstractNotificationProvider providerImpl = getSupportProviderImpl(providerType);
-        sb.append(providerImpl.buildDigestMessageInfo(messages));
+        sb.append(providerImpl.buildDigestMessageInfo(messages)).append("<br/>");
       }
       
       if (sb.toString().isEmpty())
         return null;
       
       NotificationMessage notificationMessage = notificationData.values().iterator().next().get(0);
-      
-      Calendar period = userSetting.getLastUpdateTime();
+      String language = getLanguage(notificationMessage);
+
+      String fromTo = "Today";
+      Calendar periodFrom = userSetting.getLastUpdateTime();
       long currentTime = System.currentTimeMillis();
-      long lastTime =  currentTime - period.getTimeInMillis();
-      if((lastTime/86400000) > 7) {
-        period.setTimeInMillis(currentTime - (86400000 * 7));
+      long lastTime =  currentTime - periodFrom.getTimeInMillis();
+      long day = lastTime/86400000;
+      
+      
+      String periodType = "ToDay";
+      if(SEND_TYPE.WEEKLY.equals(type)) {
+        periodType = "Weekly";
+        if(day > 7) {
+          periodFrom.setTimeInMillis(currentTime - (86400000 * 7));
+        }
+      } else if(SEND_TYPE.MONTHLY.equals(type)) {
+        periodType = "Monthly";
+        if(day > 28) {
+          periodFrom.setTimeInMillis(currentTime - (86400000 * 28));
+        }
       }
       
-      String language = getLanguage(notificationMessage);
+      if(SEND_TYPE.DAILY.equals(type) == false){
+        Locale locale = new Locale(language);
+        fromTo = TimeConvertUtils.getFormatDate(periodFrom.getTime(), "mmmm dd", locale);
+        fromTo += " - ";
+        fromTo += TimeConvertUtils.getFormatDate(Calendar.getInstance().getTime(), "mmmm dd, yyyy", locale);
+      }
       
       Map<String, String> valueables = new HashMap<String, String>();
 
       valueables.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
-      valueables.put("PERIOD", "");
+      valueables.put("PERIOD", periodType);
+      valueables.put("FROM_TO", fromTo);
       String subject = templateGenerator.processSubjectIntoString("DigestProvider", valueables, language);
       
       valueables.put("FOOTER_LINK", getProfileUrl(userSetting.getUserId()));
@@ -118,13 +140,6 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       LOG.error("Can not build template of DigestorProviderImpl ", e);
       return null;
     }
-    // get digest provider ==> get subject, template
-    // building body...
-    // for providerids get by ProviderService
-       // get support provider
-       // for list messages
-        // providerImpl process message
-    
     
     LOG.info("End build template of DigestorProviderImpl ... " + (System.currentTimeMillis() - startTime) + " ms");
     

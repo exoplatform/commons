@@ -27,6 +27,19 @@ import javax.jcr.Value;
 import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationMessage {
+  public enum SEND_TYPE {
+    DAILY("daily"), WEEKLY("weekly"), MONTHLY("monthly");
+    private String type;
+
+    SEND_TYPE(String type) {
+      this.type = type;
+    }
+
+    public String getType() {
+      return this.type;
+    }
+  }
+
   public static final String PREFIX_ID = "NotificationMessage";
 
   private String              id;
@@ -40,8 +53,6 @@ public class NotificationMessage {
   private int                 order;
 
   private Map<String, String> ownerParameter = new HashMap<String, String>();
-
-  private String              messageType;
 
   private List<String>        sendToUserIds  = new ArrayList<String>();
 
@@ -118,15 +129,6 @@ public class NotificationMessage {
    */
   public NotificationMessage setOrder(int order) {
     this.order = order;
-    return this;
-  }
-
-  public String getMessageType() {
-    return messageType;
-  }
-
-  public NotificationMessage setMessageType(String messageType) {
-    this.messageType = messageType;
     return this;
   }
 

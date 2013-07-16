@@ -59,4 +59,5 @@ public interface NotificationService {
    */
   Map<String, List<NotificationMessage>> getNotificationMessagesByUser(UserNotificationSetting userSetting);
 
+  NotificationMessage.SEND_TYPE getSendNotificationType(String userId);
 }

@@ -92,7 +92,7 @@ public abstract class AbstractService {
 
   public static final String NOTIFICATION_PARENT_PATH = "/";
   
-  public static Node getNotificationHomeNode(SessionProvider sProvider, String workspace) throws Exception {
+  protected static Node getNotificationHomeNode(SessionProvider sProvider, String workspace) throws Exception {
     Node homeNode = getSession(sProvider, workspace).getRootNode();
     if (NOTIFICATION_PARENT_PATH.equals(homeNode.getPath()) == false) {
       homeNode = homeNode.getNode(NOTIFICATION_PARENT_PATH);
@@ -118,7 +118,15 @@ public abstract class AbstractService {
     }
   }
   
-  public static SessionProvider createSystemProvider() {
+  public static String getCurrentTenantName() {
+    try {
+      return CommonsUtils.getRepository().getConfiguration().getName();
+    } catch (Exception e) {
+      return "defaultTenantName";
+    }
+  }
+  
+  protected static SessionProvider createSystemProvider() {
     return CommonsUtils.getSystemSessionProvider();
   }
   

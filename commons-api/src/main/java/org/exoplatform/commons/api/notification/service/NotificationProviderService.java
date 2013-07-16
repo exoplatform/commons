@@ -21,13 +21,14 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.NotificationMessage.SEND_TYPE;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
 
 public interface NotificationProviderService {
 
   public void addSupportProviderImpl(AbstractNotificationProvider providerImpl);
   
-  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting);
+  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting, SEND_TYPE type);
   
   public List<String> getSupportType();
 
