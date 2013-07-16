@@ -104,7 +104,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       long day = lastTime/86400000;
       
       
-      String periodType = "ToDay";
+      String periodType = "Daily";
       if(SEND_TYPE.WEEKLY.equals(type)) {
         periodType = "Weekly";
         if(day > 7) {
@@ -126,6 +126,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       
       Map<String, String> valueables = new HashMap<String, String>();
 
+      valueables.put("FIRSTNAME", getFirstName(userSetting.getUserId()));
       valueables.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
       valueables.put("PERIOD", periodType);
       valueables.put("FROM_TO", fromTo);

@@ -26,6 +26,7 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserProfile;
 
 public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
@@ -50,11 +51,25 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
   protected String getDomain() {
     return System.getProperty("gatein.email.domain.url", "http://localhost:8080");
   }
+  
+  protected String getFirstName(String userName) {
+    User user = null;
+    try {
+      UserHandler userHandler = getOrganizationService().getUserHandler();
+      user = userHandler.findUserByName(userName);
+      return user.getFirstName();
+    } catch (Exception e) {
+      return null;
+    }
+  }
 
   protected String getProfileUrl(String userId) {
     StringBuffer footerLink = new StringBuffer(getDomain());
-    footerLink.append("/").append(getPortalName()).append("/intranet/profile/").append(userId);
-    return footerLink.toString();
+    ExoContainerContext context = (ExoContainerContext) PortalContainer.getInstance()
+                                                           .getComponentInstanceOfType(ExoContainerContext.class);
+    return footerLink.append("/").append(context.getRestContextName())
+                     .append("/").append("social/notifications/redirectUrl/settings")
+                     .append("/").append(userId).toString();
   }
   
   private String getEmailFormat(String userId) {
