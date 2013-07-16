@@ -243,7 +243,7 @@ public class UserNotificationSetting {
       defaultSetting.addProvider("RequestJoinSpace", FREQUENCY.INSTANTLY);
       defaultSetting.addProvider("RequestJoinSpace", FREQUENCY.WEEKLY_KEY);
 
-      defaultSetting.addProvider("ActivityMentionProvider", FREQUENCY.DAILY_KEY);
+      defaultSetting.addProvider("ActivityMentionProvider", FREQUENCY.INSTANTLY);
 
       defaultSetting.addProvider("ActivityCommentProvider", FREQUENCY.INSTANTLY);
       defaultSetting.addProvider("ActivityCommentProvider", FREQUENCY.DAILY_KEY);

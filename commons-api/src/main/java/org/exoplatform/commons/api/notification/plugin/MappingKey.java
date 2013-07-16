@@ -22,7 +22,7 @@ import java.util.Map;
 public class MappingKey {
   public static final String  DEFAULT_SRC_RESOURCE_BUNDLE_KEY = "locale.notification.template.NotificationTemplate";
   
-  public static final String  DEFAULT_SRC_RESOURCE_TEMPLATE_KEY = "groovy/notification/template";
+  public static final String  DEFAULT_SRC_RESOURCE_TEMPLATE_KEY = "war:/notification/templates";
 
   public static final String  SUBJECT_KEY              = "subject";
 

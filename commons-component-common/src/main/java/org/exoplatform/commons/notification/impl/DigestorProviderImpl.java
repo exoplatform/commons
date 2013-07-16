@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.exoplatform.commons.api.notification.service.NotificationProviderServ
 import org.exoplatform.commons.api.notification.service.ProviderService;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -91,16 +93,24 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
         return null;
       
       NotificationMessage notificationMessage = notificationData.values().iterator().next().get(0);
+      
+      Calendar period = userSetting.getLastUpdateTime();
+      long currentTime = System.currentTimeMillis();
+      long lastTime =  currentTime - period.getTimeInMillis();
+      if((lastTime/86400000) > 7) {
+        period.setTimeInMillis(currentTime - (86400000 * 7));
+      }
+      
       String language = getLanguage(notificationMessage);
       
       Map<String, String> valueables = new HashMap<String, String>();
 
-      valueables.put("$PORTAL_NAME", "");
-      valueables.put("$PERIOD", "");
+      valueables.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
+      valueables.put("PERIOD", "");
       String subject = templateGenerator.processSubjectIntoString("DigestProvider", valueables, language);
-
-      valueables.put("$FOOTER_LINK", "");
-      valueables.put("$DIGEST_MESSAGES_LIST", sb.toString());
+      
+      valueables.put("FOOTER_LINK", getProfileUrl(userSetting.getUserId()));
+      valueables.put("DIGEST_MESSAGES_LIST", sb.toString());
       String body = templateGenerator.processTemplateIntoString("DigestProvider", valueables, language);
 
       messageInfo.setBody(body).setSubject(subject).setTo(getTo(notificationMessage));

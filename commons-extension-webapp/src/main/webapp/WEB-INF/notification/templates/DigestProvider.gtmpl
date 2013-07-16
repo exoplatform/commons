@@ -1,0 +1,13 @@
+
+<div style="">
+	<strong><%=_ctx.appRes("Notification.title.DigestProvider", PORTAL_NAME, PERIOD)%></strong><br/>
+	
+	<%=_ctx.appRes("Notification.label.SayHello")%> <%=FIRSTNAME%>,<br/>
+	<%=_ctx.appRes("Notification.message.DigestProvider", PORTAL_NAME, PERIOD)%><br/>
+	<%=DIGEST_MESSAGES_LIST%>
+	<br/>
+	<br/>
+	
+	<%=_ctx.appRes("Notification.label.DigestProvider", FOOTER_LINK)%><br/>
+
+</div>

@@ -21,6 +21,7 @@ import java.util.Locale;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.services.organization.OrganizationService;
@@ -40,6 +41,22 @@ public abstract class AbstractNotificationProvider extends BaseComponentPlugin {
     return organizationService;
   }
 
+  protected String getPortalName() {
+    ExoContainerContext eXoContext = (ExoContainerContext) PortalContainer.getInstance()
+                                                              .getComponentInstanceOfType(ExoContainerContext.class);
+    return eXoContext.getPortalContainerName();
+  }
+  
+  protected String getDomain() {
+    return System.getProperty("gatein.email.domain.url", "http://localhost:8080");
+  }
+
+  protected String getProfileUrl(String userId) {
+    StringBuffer footerLink = new StringBuffer(getDomain());
+    footerLink.append("/").append(getPortalName()).append("/intranet/profile/").append(userId);
+    return footerLink.toString();
+  }
+  
   private String getEmailFormat(String userId) {
     try {
       User user = getOrganizationService().getUserHandler().findUserByName(userId);

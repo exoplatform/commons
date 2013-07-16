@@ -92,7 +92,9 @@ public class NotificationUtils {
     }
     // still null
     if (res == null || res.containsKey(key) == false) {
-      LOG.warn("Can not resource bundle by key: " + key);
+      if (key.indexOf(".digest.") < 0) {
+        LOG.warn("Can not resource bundle by key: " + key);
+      }
       return key;
     }
 

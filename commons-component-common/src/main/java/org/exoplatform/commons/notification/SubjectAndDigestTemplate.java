@@ -162,6 +162,7 @@ public class SubjectAndDigestTemplate {
 
   private String processReplace(String value) {
     for (String findKey : valueables.keySet()) {
+      value = StringUtils.replace(value, "$"+findKey, valueables.get(findKey));
       value = StringUtils.replace(value, findKey, valueables.get(findKey));
     }
     return value;

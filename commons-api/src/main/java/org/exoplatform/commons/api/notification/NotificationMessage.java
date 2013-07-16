@@ -197,7 +197,7 @@ public class NotificationMessage {
         String str = val.getString();
         if (str.indexOf("=") > 0) {
           String key = str.substring(0, str.indexOf("=")).trim();
-          String value = str.substring(0, str.indexOf("=") + 1).trim();
+          String value = str.substring(str.indexOf("=") + 1).trim();
           addOwnerParameter(key, value);
         }
       } catch (Exception e) {
