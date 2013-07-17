@@ -16,6 +16,9 @@
  */
 package org.exoplatform.commons.api.notification;
 
+import java.util.List;
+
+import org.exoplatform.commons.api.notification.service.NotificationManager;
 
 public interface NotificationContext {
 
@@ -43,5 +46,45 @@ public interface NotificationContext {
    * @return
    */
   <T> T value(ArgumentLiteral<T> argument);
+  
+  /**
+   * Gets notification message
+   * @return
+   */
+  NotificationMessage getNotificationMessage();
+  
+  /**
+   * Sets notification message
+   * @param notification
+   */
+  void setNotificationMessage(NotificationMessage notification);
+  
+  /**
+   * Gets the NotificationManager to manage NotificationPlugin
+   * @return
+   */
+  NotificationManager getNotificationManager();
+  
+  /**
+   * Sets notification message list
+   * @param notifications
+   */
+  void setNotificationMessages(List<NotificationMessage> notifications);
+  
+  /**
+   * Gets notification message list
+   * @return
+   */
+  List<NotificationMessage> getNotificationMessages();
+  
+  
+  Exception getException();
+  
+  <T> T getException(Class<T> type);
+  
+  void setException(Throwable t);
+  
+  boolean isFailed();
+  
   
 }

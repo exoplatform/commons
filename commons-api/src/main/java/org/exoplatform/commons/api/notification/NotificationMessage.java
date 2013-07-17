@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.jcr.Value;
 
+import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationMessage {
@@ -44,7 +45,7 @@ public class NotificationMessage {
 
   private String              id;
 
-  private String              providerType;                                  //
+  private NotificationKey     key;                                  //
 
   private String              from           = "";
 
@@ -79,16 +80,21 @@ public class NotificationMessage {
     return this;
   }
   
-  public static NotificationMessage getInstance() {
+  public static NotificationMessage instance() {
     return new NotificationMessage();
   }
 
-  public String getProviderType() {
-    return providerType;
+  public NotificationKey getKey() {
+    return this.key;
   }
 
-  public NotificationMessage setProviderType(String providerType) {
-    this.providerType = providerType;
+  public NotificationMessage key(NotificationKey key) {
+    this.key = key;
+    return this;
+  }
+  
+  public NotificationMessage key(String id) {
+    this.key = NotificationKey.key(id);
     return this;
   }
 
@@ -136,12 +142,12 @@ public class NotificationMessage {
     return sendToUserIds;
   }
 
-  public NotificationMessage setSendToUserIds(List<String> sendToUserIds) {
+  public NotificationMessage to(List<String> sendToUserIds) {
     this.sendToUserIds = sendToUserIds;
     return this;
   }
 
-  public NotificationMessage addSendToUserId(String sendToUserId) {
+  public NotificationMessage to(String sendToUserId) {
     this.sendToUserIds.add(sendToUserId);
     return this;
   }
@@ -183,8 +189,12 @@ public class NotificationMessage {
   /**
    * @param ownerParameter the ownerParameter to set
    */
-  public NotificationMessage addOwnerParameter(String key, String value) {
+  public NotificationMessage with(String key, String value) {
     this.ownerParameter.put(key, value);
+    return this;
+  }
+  
+  public NotificationMessage end() {
     return this;
   }
 
@@ -200,7 +210,7 @@ public class NotificationMessage {
         if (str.indexOf("=") > 0) {
           String key = str.substring(0, str.indexOf("=")).trim();
           String value = str.substring(str.indexOf("=") + 1).trim();
-          addOwnerParameter(key, value);
+          with(key, value);
         }
       } catch (Exception e) {
         continue;
@@ -290,7 +300,7 @@ public class NotificationMessage {
   @Override
   public String toString() {
     StringBuffer buffer = new StringBuffer("{");
-    buffer.append("providerType: ").append(providerType)
+    buffer.append("providerType: ").append(key)
     .append(", sendToDaily: ").append(Arrays.asList(sendToDaily).toString())
     .append(", sendToWeekly: ").append(Arrays.asList(sendToWeekly).toString())
     .append(", sendToMonthly: ").append(Arrays.asList(sendToMonthly).toString());

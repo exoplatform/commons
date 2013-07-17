@@ -136,7 +136,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       valueables.put("DIGEST_MESSAGES_LIST", sb.toString());
       String body = templateGenerator.processTemplateIntoString("DigestProvider", valueables, language);
 
-      messageInfo.setBody(body).setSubject(subject).setTo(getTo(notificationMessage));
+      messageInfo.body(body).subject(subject).to(getTo(notificationMessage));
     } catch (Exception e) {
       LOG.error("Can not build template of DigestorProviderImpl ", e);
       return null;

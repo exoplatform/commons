@@ -42,7 +42,7 @@ public class MessageInfo {
   /**
    * @param from the from to set
    */
-  public MessageInfo setFrom(String from) {
+  public MessageInfo from(String from) {
     this.from = from;
     return this;
   }
@@ -57,7 +57,7 @@ public class MessageInfo {
   /**
    * @param to the to to set
    */
-  public MessageInfo setTo(String to) {
+  public MessageInfo to(String to) {
     this.to = to;
     return this;
   }
@@ -72,7 +72,7 @@ public class MessageInfo {
   /**
    * @param body the body to set
    */
-  public MessageInfo setBody(String body) {
+  public MessageInfo body(String body) {
     this.body = body;
     return this;
   }
@@ -87,7 +87,7 @@ public class MessageInfo {
   /**
    * @param header the header to set
    */
-  public MessageInfo setSubject(String subject) {
+  public MessageInfo subject(String subject) {
     this.subject = subject;
     return this;
   }
@@ -102,8 +102,16 @@ public class MessageInfo {
   /**
    * @param foodter the foodter to set
    */
-  public MessageInfo setFoodter(String foodter) {
+  public MessageInfo footer(String foodter) {
     this.foodter = foodter;
+    return this;
+  }
+  
+  /**
+   * Finishes to assign states to current MessageInfo instance
+   * @return
+   */
+  public MessageInfo end() {
     return this;
   }
   

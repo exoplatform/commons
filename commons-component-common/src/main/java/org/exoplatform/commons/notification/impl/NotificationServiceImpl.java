@@ -133,7 +133,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     List<String> userIds = message.getSendToUserIds();
     List<String> userIdPendings = new ArrayList<String>();
 
-    String providerId = message.getProviderType();
+    String providerId = message.getKey().getId();
     for (String userId : userIds) {
       UserNotificationSetting userNotificationSetting = notificationService.getUserNotificationSetting(userId);
       //
@@ -149,7 +149,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     }
 
     if (userIdPendings.size() > 0) {
-      message.setSendToUserIds(userIdPendings);
+      message.to(userIdPendings);
       saveNotificationMessage(message);
     }
   }
@@ -164,7 +164,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private void setValueSendbyFrequency(NotificationMessage message,
                                              UserNotificationSetting userNotificationSetting,
                                              String userId) {
-    String providerId = message.getProviderType();
+    String providerId = message.getKey().getId();
     if (userNotificationSetting.isInDaily(providerId)) {
       message.setSendToDaily(userId);
     }
@@ -181,11 +181,11 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     LOG.info("saveNotificationMessage to jcr " + message.toString());
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
-      Node messageHomeNode = getMessageHomeByProviderId(sProvider, message.getProviderType());
+      Node messageHomeNode = getMessageHomeByProviderId(sProvider, message.getKey().getId());
       Node messageNode = messageHomeNode.addNode(message.getId(), NTF_MESSAGE);
       messageNode.setProperty(NTF_FROM, message.getFrom());
       messageNode.setProperty(NTF_ORDER, message.getOrder());
-      messageNode.setProperty(NTF_PROVIDER_TYPE, message.getProviderType());
+      messageNode.setProperty(NTF_PROVIDER_TYPE, message.getKey().getId());
       messageNode.setProperty(NTF_OWNER_PARAMETER, message.getArrayOwnerParameter());
       messageNode.setProperty(NTF_SEND_TO_DAILY, message.getSendToDaily());
       messageNode.setProperty(NTF_SEND_TO_WEEKLY, message.getSendToWeekly());
@@ -203,10 +203,10 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   
   private NotificationMessage getNotificationMessage(Node node) throws Exception {
     if(node == null) return null;
-    NotificationMessage message = NotificationMessage.getInstance()
+    NotificationMessage message = NotificationMessage.instance()
       .setFrom(node.getProperty(NTF_FROM).getString())
       .setOrder(Integer.valueOf(node.getProperty(NTF_ORDER).getString()))
-      .setProviderType(node.getProperty(NTF_PROVIDER_TYPE).getString())
+      .key(node.getProperty(NTF_PROVIDER_TYPE).getString())
       .setOwnerParameter(node.getProperty(NTF_OWNER_PARAMETER).getValues())
       .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_DAILY).getValues()))
       .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
