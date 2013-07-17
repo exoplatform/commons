@@ -79,8 +79,16 @@ CKEDITOR.editorConfig = function( config ){
 	] ;
 
 	config.toolbar_Forum = [
-	['Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
-	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
-	['Blockquote', 'pbckcode','helpBBCode.btn']
-] ;
+		['Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
+		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
+		['Blockquote', 'pbckcode','helpBBCode.btn']
+	] ;
+
+	config.toolbar_FAQ = [
+		['Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
+		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],	
+		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
+		['Blockquote', 'pbckcode','helpBBCode.btn']
+	] ;
+
 };
