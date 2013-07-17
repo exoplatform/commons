@@ -5,14 +5,15 @@
 CKEDITOR.eXoPath = CKEDITOR.basePath.substr(0, CKEDITOR.basePath.indexOf("ckeditor/"));
 
 // config to add custom plugin	
-(function() {CKEDITOR.plugins.addExternal('content',CKEDITOR.eXoPath+'eXoPlugins/content/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('insertGadget',CKEDITOR.eXoPath+'eXoPlugins/insertGadget/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('insertPortalLink',CKEDITOR.eXoPath+'eXoPlugins/insertPortalLink/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('acceptInline',CKEDITOR.eXoPath+'eXoPlugins/acceptInline/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('cancelInline',CKEDITOR.eXoPath+'eXoPlugins/cancelInline/','plugin.js');})();
+(function() {CKEDITOR.plugins.addExternal('content','/eXoWCMResources/eXoPlugins/content/','plugin.js');})();
+(function() {CKEDITOR.plugins.addExternal('insertGadget','/eXoWCMResources/eXoPlugins/insertGadget/','plugin.js');})();
+(function() {CKEDITOR.plugins.addExternal('insertPortalLink','/eXoWCMResources/eXoPlugins/insertPortalLink/','plugin.js');})();
+(function() {CKEDITOR.plugins.addExternal('acceptInline','/eXoWCMResources/eXoPlugins/acceptInline/','plugin.js');})();
+(function() {CKEDITOR.plugins.addExternal('cancelInline','/eXoWCMResources/eXoPlugins/cancelInline/','plugin.js');})();
+(function() {CKEDITOR.plugins.addExternal('helpBBCode','/forumResources/eXoPlugins/helpBBCode/','plugin.js');})();
 
 CKEDITOR.editorConfig = function( config ){
-	config.extraPlugins = 'content,insertGadget,insertPortalLink,autosave,scayt,wsc,acceptInline,cancelInline';
+	config.extraPlugins = 'content,insertGadget,insertPortalLink,autosave,scayt,wsc,acceptInline,cancelInline,pbckcode,onchange,helpBBCode';
 	config.toolbarCanCollapse = false;
 	config.skin = 'moono';
 	config.allowedContent = true;
@@ -76,4 +77,10 @@ CKEDITOR.editorConfig = function( config ){
 		['-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Blockquote'],
     		['-','Style','Format','Font','FontSize']
 	] ;
+
+	config.toolbar_Forum = [
+	['Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
+	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
+	['Blockquote', 'pbckcode','helpBBCode.btn']
+] ;
 };

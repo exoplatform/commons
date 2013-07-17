@@ -32,20 +32,30 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   public UIFormRichtextInput(String name, String bindingField, String value) {
     super(name, bindingField, String.class);
     this.value_ = value;
- }
+  }
 
   public UIFormRichtextInput(String name, String bindingField, String value, String enterMode) {
     super(name, bindingField, String.class);
     this.value_ = value;
     this.enterMode = enterMode;
- }
+  }
   
-  public UIFormRichtextInput(String name, String bindingField, String value, String enterMode, String css) {
-	    super(name, bindingField, String.class);
-	    this.value_ = value;
-	    this.enterMode = enterMode;
-	    this.css = css;
-	 }
+
+  public UIFormRichtextInput(String name, String bindingField, String value, String enterMode, String toolbar) {
+    super(name, bindingField, String.class);
+    this.value_ = value;
+    this.enterMode = enterMode;
+    this.toolbar = toolbar;
+  }
+  
+  
+  public UIFormRichtextInput(String name, String bindingField, String value, String enterMode, String toolbar, String css) {
+    super(name, bindingField, String.class);
+	this.value_ = value;
+	this.enterMode = enterMode;
+	this.toolbar = toolbar;
+	this.css = css;
+  }
   
   public String getWidth() {
     return width;
@@ -111,6 +121,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     buffer.append("    var instance = CKEDITOR.instances['" + name + "']; if (instance) { CKEDITOR.remove(instance); instance = null;}\n");
     buffer.append("    CKEDITOR.replace('" + name + "', {toolbar:'" + toolbar + "', height:"
     		+ height + ", contentsCss:" + css + ", enterMode:" + enterMode + ", shiftEnterMode:" + enterMode + "});\n");
+    buffer.append("    instance = CKEDITOR.instances['" + name + "']; instance.on( 'change', function(e) { document.getElementById('"+name+"').value = instance.getData(); }); \n");
     buffer.append("       });");
     buffer.append("  //]]>\n");
     buffer.append("</script>\n");
