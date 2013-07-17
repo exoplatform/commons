@@ -28,64 +28,34 @@ import java.util.List;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.groovyscript.GroovyTemplate;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 public class TemplateContext extends HashMap<String, Object> {
-  private static final long    serialVersionUID     = 1L;
+  private static final long     serialVersionUID     = 1L;
 
-  private ConfigurationManager configurationManager = null;
+  private static final Log       LOG                  = ExoLogger.getLogger(TemplateContext.class);
 
-  private List<TemplateElement> elementStacks = new ArrayList<TemplateElement>();
+  private ConfigurationManager    configurationManager = null;
 
-  private StringWriter         writer;
-  
-  private static TemplateContext context = null;
+  private List<TemplateElement>   elementStacks        = new ArrayList<TemplateElement>();
+
+  private StringWriter            writer;
+
+  private static TemplateContext context              = null;
 
   private TemplateContext() {
     writer = new StringWriter();
   }
   
-  
   public static TemplateContext getInstance() {
     if(context == null) {
       context = new TemplateContext();
-      context.setConfigurationService(CommonsUtils.getService(ConfigurationManager.class));
+      context.configurationManager = CommonsUtils.getService(ConfigurationManager.class);
     }
     return context;
   }
 
-  /**
-   * @param configurationService the configurationService to set
-   */
-  public void setConfigurationService(ConfigurationManager configurationManager) {
-    this.configurationManager = configurationManager;
-  }
-
-  public InputStream getTemplateInputStream(String sourceLocal) throws Exception {
-    try {
-      String uri = sourceLocal;
-      if (sourceLocal.indexOf("war") < 0 && sourceLocal.indexOf("jar") < 0) {
-        URL url = null;
-        if (sourceLocal.indexOf("/") == 0) {
-          sourceLocal = sourceLocal.substring(1);
-        }
-        uri = "war:/" + sourceLocal;
-        url = configurationManager.getURL(uri);
-        if (url == null) {
-          uri = "jar:/" + sourceLocal;
-          url = configurationManager.getURL(uri);
-        }
-      }
-      return configurationManager.getInputStream(uri);
-    } catch (Exception e) {
-      throw new RuntimeException("Error to get notification template " + sourceLocal, e);
-    }
-  }
-
-  public Reader getTemplate(String sourceLocal) throws Exception {
-
-    return new InputStreamReader(getTemplateInputStream(sourceLocal));
-  }
-  
   /**
    * @return the writer
    */
@@ -124,7 +94,7 @@ public class TemplateContext extends HashMap<String, Object> {
       gTemplate.render(context.getWriter(), context);
       element.setTemplate(context.getWriter().toString());
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.warn("Can not process template " + element.getResouceLocal() + "\n" + e.getCause());
     }
   }
   
@@ -137,6 +107,32 @@ public class TemplateContext extends HashMap<String, Object> {
     elementStacks.add(element);
     clear();
     setWriter(new StringWriter());
+  }
+
+  private InputStream getTemplateInputStream(String sourceLocal) throws Exception {
+    try {
+      String uri = sourceLocal;
+      if (sourceLocal.indexOf("war") < 0 && sourceLocal.indexOf("jar") < 0) {
+        URL url = null;
+        if (sourceLocal.indexOf("/") == 0) {
+          sourceLocal = sourceLocal.substring(1);
+        }
+        uri = "war:/" + sourceLocal;
+        url = configurationManager.getURL(uri);
+        if (url == null) {
+          uri = "jar:/" + sourceLocal;
+          url = configurationManager.getURL(uri);
+        }
+      }
+      return configurationManager.getInputStream(uri);
+    } catch (Exception e) {
+      throw new RuntimeException("Error to get notification template " + sourceLocal, e);
+    }
+  }
+
+  private Reader getTemplate(String sourceLocal) throws Exception {
+
+    return new InputStreamReader(getTemplateInputStream(sourceLocal));
   }
 
 }

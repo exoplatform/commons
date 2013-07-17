@@ -16,14 +16,28 @@
  */
 package org.exoplatform.commons.notification.template;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Scanner;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.resources.ResourceBundleData;
+import org.exoplatform.services.resources.ResourceBundleService;
 
 public class TemplateResouceBundle {
-  private String language;
-  private String resouceLocal;
+  private static final Log LOG = ExoLogger.getLogger(TemplateResouceBundle.class);
+
+  private static final String CONF_LOCATION = "war:/classes/";
+
+  private String           language;
+
+  private String           resouceLocal;
 
   public TemplateResouceBundle(String language, String resouceLocal) {
     this.language = language;
@@ -57,13 +71,13 @@ public class TemplateResouceBundle {
   public void setResouceLocal(String resouceLocal) {
     this.resouceLocal = resouceLocal;
   }
-  
-  public String appRes(String key){
+
+  public String appRes(String key) {
     Locale locale = Locale.ENGLISH;
-    if(language != null && language.length() > 0) {
+    if (language != null && language.length() > 0) {
       locale = new Locale(language);
     }
-    return NotificationUtils.getResourceBundle(key,  locale,  resouceLocal) ;
+    return getResourceBundle(key, locale, resouceLocal);
   }
 
   public String appRes(String key, String... strs) {
@@ -76,4 +90,74 @@ public class TemplateResouceBundle {
     return value;
   }
 
+  private static ResourceBundle addResourceBundle(ResourceBundleService bundleService, String resourceLocale, Locale locale) {
+    String id = new StringBuffer(CONF_LOCATION).append(resourceLocale.replace(".", "/"))
+                      .append("_").append(locale.getLanguage()).append(".properties").toString();
+    try {
+      ConfigurationManager configurationManager = CommonsUtils.getService(ConfigurationManager.class);
+      InputStream inputStream = configurationManager.getInputStream(id);
+      if (inputStream != null) {
+        String data = getContent(inputStream);
+        ResourceBundleData bundleData = new ResourceBundleData(data);
+        bundleData.setLanguage(locale.getLanguage());
+        bundleData.setName(resourceLocale);
+        bundleData.setCountry("");
+        bundleData.setVariant("");
+        //
+        bundleService.saveResourceBundle(bundleData);
+        return bundleService.getResourceBundle(resourceLocale, locale);
+      }
+    } catch (Exception e) {
+      LOG.warn("Can not add resouce bundle of locale " + resourceLocale + "\n" + e.getCause());
+    }
+    return null;
+  }
+
+  public static String getResourceBundle(String key, Locale locale, String resourceLocale) {
+    if (key == null || key.trim().length() == 0) {
+      return "";
+    }
+
+    if (locale == null) {
+      locale = Locale.ENGLISH;
+    }
+
+    ResourceBundle res = null;
+    ResourceBundleService bundleService = CommonsUtils.getService(ResourceBundleService.class);
+    if (bundleService != null) {
+      res = bundleService.getResourceBundle(resourceLocale, locale);
+      // if null, try another way
+      if (res == null) {
+        //
+        res = addResourceBundle(bundleService, resourceLocale, locale);
+      }
+    }
+    // still null
+    if (res == null || res.containsKey(key) == false) {
+      if (key.indexOf(".digest.") < 0) {
+        LOG.warn("Can not resource bundle by key: " + key);
+      }
+      return key;
+    }
+
+    return res.getString(key);
+  }
+
+  static private String getContent(InputStream input) throws IOException {
+    StringBuilder content = new StringBuilder();
+    Scanner scanner = new Scanner(input, "UTF-8");
+    try {
+      while (scanner.hasNextLine()) {
+        if (content.length() > 0) {
+          content.append("\n");
+        }
+        String s = scanner.nextLine();
+        content.append(s);
+      }
+    } finally {
+      scanner.close();
+      input.close();
+    }
+    return content.toString();
+  }
 }
