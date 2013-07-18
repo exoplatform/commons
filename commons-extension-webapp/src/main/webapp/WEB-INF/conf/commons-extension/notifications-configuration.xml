@@ -73,7 +73,7 @@
           <property name="groupName" value="Notification"/>
           <property name="job" value="org.exoplatform.commons.notification.job.NotificationJob"/>
           <property name="repeatCount" value="0"/>
-          <property name="period" value="8640000"/> <!-- 1 day-->    
+          <property name="period" value="180000"/> <!-- 1 day-->    
           <property name="startTime" value="+30000"/>
           <property name="endTime" value=""/>               
         </properties-param>
@@ -100,7 +100,7 @@
           <description>The template of DigestProvider</description>
           <object type="org.exoplatform.commons.api.notification.plugin.MappingKey">
             <field name="providerId">
-              <string>ActivityMentionProvider</string>
+              <string>DigestProvider</string>
             </field>
             <field name="localeResouceBundle">
               <string>locale.notification.template.NotificationTemplate</string>
