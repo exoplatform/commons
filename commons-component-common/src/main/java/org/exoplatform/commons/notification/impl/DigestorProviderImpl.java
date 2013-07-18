@@ -134,7 +134,7 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       
       valueables.put("FOOTER_LINK", getProfileUrl(userSetting.getUserId()));
       valueables.put("DIGEST_MESSAGES_LIST", sb.toString());
-      String body = templateGenerator.processTemplateIntoString("DigestProvider", valueables, language);
+      String body = templateGenerator.processTemplate("DigestProvider", valueables, language);
 
       messageInfo.body(body).subject(subject).to(getTo(notificationMessage));
     } catch (Exception e) {

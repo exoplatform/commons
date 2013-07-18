@@ -21,6 +21,8 @@ import java.util.List;
 public class GroupProviderModel {
   private String       name;
 
+  private String       resourceBundleKey;
+
   private List<String> values;
 
   public GroupProviderModel() {
@@ -38,6 +40,20 @@ public class GroupProviderModel {
    */
   public void setName(String name) {
     this.name = name;
+  }
+
+  /**
+   * @return the resourceBundleKey
+   */
+  public String getResourceBundleKey() {
+    return resourceBundleKey;
+  }
+
+  /**
+   * @param resourceBundleKey the resourceBundleKey to set
+   */
+  public void setResourceBundleKey(String resourceBundleKey) {
+    this.resourceBundleKey = resourceBundleKey;
   }
 
   /**

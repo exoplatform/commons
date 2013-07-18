@@ -22,6 +22,7 @@ import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlug
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.notification.impl.TemplateGeneratorImpl;
+import org.exoplatform.commons.notification.template.TemplateContext;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
@@ -36,6 +37,8 @@ public class CacheTemplateGenerator implements TemplateGenerator {
 
   private TemplateGeneratorImpl generatorImpl;
   
+  private static final String CONTAINER_LOCALE = "war:/notification/templates/TemplateContainer.gtmpl";
+  
   public CacheTemplateGenerator(CacheService cacheService) {
     generatorImpl = TemplateGeneratorImpl.getInstance();
     //
@@ -48,7 +51,7 @@ public class CacheTemplateGenerator implements TemplateGenerator {
         return service.getTemplateElement(key.getType(), key.getKey());
       }
     };
-    futureExoCache = new FutureExoCache<SimpleCacheKey, TemplateElement, TemplateGeneratorImpl>(loader,templateCache);
+    futureExoCache = new FutureExoCache<SimpleCacheKey, TemplateElement, TemplateGeneratorImpl>(loader, templateCache);
   }
 
   @Override
@@ -60,15 +63,50 @@ public class CacheTemplateGenerator implements TemplateGenerator {
     return futureExoCache.get(generatorImpl, cacheKey);
   }
   
+  
+  public void putTemplateToCache(SimpleCacheKey cacheKey, TemplateElement template) {
+    templateCache.put(cacheKey, template);
+  }
+  
   @Override
-  public String processTemplateIntoString(String providerId, Map<String, String> valueables, String language) {
+  public String processTemplate(String providerId, Map<String, String> valueables, String language) {
     SimpleCacheKey cacheKey = new SimpleCacheKey(providerId, language);
     TemplateElement template = getTemplateElement(cacheKey);
-    boolean isAddCache = (template.getTemplateText() == null || template.getTemplateText().length() == 0);
-    String content = generatorImpl.processTemplateIntoString(template.putAllValueables(valueables));
+    boolean isAddCache = isAddCache(template);
+    TemplateContext context = TemplateContext.getInstance();
+    context.putAll(valueables);
+    String content = generatorImpl.processTemplateIntoString(context, template);
     //
     if (isAddCache) {
-      templateCache.put(cacheKey, template);
+      putTemplateToCache(cacheKey, template);
+    }
+    return content;
+  }
+
+  private boolean isAddCache(TemplateElement template) {
+    return (template.getTemplateText() == null || template.getTemplateText().length() == 0);
+  }
+  
+  @Override
+  public String processTemplateInContainer(String providerId, Map<String, String> valueables, String language) {
+    SimpleCacheKey cacheKey = new SimpleCacheKey(providerId, language);
+    TemplateElement template = getTemplateElement(cacheKey);
+
+    SimpleCacheKey containerKey = new SimpleCacheKey(CONTAINER_LOCALE, language);
+    TemplateElement container =  getTemplateElement(containerKey);
+    boolean isAddCacheContainer = isAddCache(template); 
+    
+    TemplateContext context = TemplateContext.getInstance();
+    context.putAll(valueables);
+    context.put("childLocal", template.getResouceLocal());
+    container.setResouceBundle(template.getResouceBundle());
+    container.setResouceBunldMappingKey(template.getResouceBunldMappingKey());
+    
+    String content = generatorImpl.processTemplateIntoString(context, container);
+    
+    //
+    if (isAddCacheContainer) {
+      putTemplateToCache(containerKey, container);
     }
     return content;
   }

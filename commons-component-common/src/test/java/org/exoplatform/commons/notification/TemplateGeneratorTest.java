@@ -101,8 +101,10 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
     valueables.put("REPLY_ACTION_URL", "http://localhost/test/reply/activtyxxx");
     valueables.put("VIEW_FULL_DISCUSSION_ACTION_URL", "http://localhost/test/view/activtyxxx");
     valueables.put("USER_NOTIFICATION_SETTINGS_URL", "http://localhost/test/settings/demo");
+
+    valueables.put("subContent", "<br/> I love you !");
     
-    String templateProcessed = generator.processTemplateIntoString(providerId, valueables, language);
+    String templateProcessed = generator.processTemplate(providerId, valueables, language);
     
     assertNotNull(templateProcessed);
     // Test cache template
@@ -110,12 +112,24 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
     assertNotNull(template);
     assertNotNull(template.getTemplateText());
     
+    // Test include
+    assertTrue(templateProcessed.indexOf("template-include") > 0);
+    assertTrue(templateProcessed.indexOf("I love you") > 0);
+    
     // Test process by groovy
     assertTrue(template.getTemplateText().indexOf("VIEW_FULL_DISCUSSION_ACTION_URL") > 0);
     assertTrue(templateProcessed.indexOf("http://localhost/test/view/activtyxxx") > 0);
     
     //Test resouce bundle
     assertTrue(templateProcessed.indexOf("Notification of activity post") > 0);
+    
+    // Test renderTemplateByUrl
+    String url = "jar:/groovy/notification/template/include.gtmpl";
+    valueables.clear();
+    valueables.put("subContent", "<br/> test render by url!");
+    String value = generator.processTemplate(url, valueables, language);
+    assertNotNull(value);
+    assertTrue(value.indexOf("test render by url") > 0);
   }
 
 }

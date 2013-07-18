@@ -16,9 +16,11 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
-import java.util.List;
 
 public class ProviderModel {
+  
+  private String groupName;
+  
   private String         type;
 
   private String         order;

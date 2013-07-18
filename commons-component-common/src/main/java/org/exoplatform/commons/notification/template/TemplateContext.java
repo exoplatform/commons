@@ -43,7 +43,7 @@ public class TemplateContext extends HashMap<String, Object> {
   private StringWriter            writer;
 
   private static TemplateContext context              = null;
-
+  
   private TemplateContext() {
     writer = new StringWriter();
   }
@@ -53,6 +53,8 @@ public class TemplateContext extends HashMap<String, Object> {
       context = new TemplateContext();
       context.configurationManager = CommonsUtils.getService(ConfigurationManager.class);
     }
+    context.clear();
+    context.setWriter(new StringWriter());
     return context;
   }
 
@@ -69,9 +71,9 @@ public class TemplateContext extends HashMap<String, Object> {
   public void setWriter(StringWriter writer) {
     this.writer = writer;
   }
-  
+
   public void visit(TemplateElement element) {
-    pushElement(element);
+    pushElement(element, true);
     try {
       element.accept(this).process();
     } finally {
@@ -98,15 +100,14 @@ public class TemplateContext extends HashMap<String, Object> {
     }
   }
   
-  private void popElement() {
-    elementStacks.remove(elementStacks.size() - 1);
-
+  public void popElement() {
+    if(elementStacks.size() > 0) {
+      elementStacks.remove(elementStacks.size() - 1);
+    }
   }
 
-  private void pushElement(TemplateElement element) {
+  private void pushElement(TemplateElement element, boolean isClear) {
     elementStacks.add(element);
-    clear();
-    setWriter(new StringWriter());
   }
 
   private InputStream getTemplateInputStream(String sourceLocal) throws Exception {

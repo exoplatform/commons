@@ -19,6 +19,11 @@ package org.exoplatform.commons.notification.template;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.exoplatform.commons.api.notification.service.TemplateGenerator;
+import org.exoplatform.commons.notification.cache.CacheTemplateGenerator;
+import org.exoplatform.commons.notification.cache.SimpleCacheKey;
+import org.exoplatform.commons.utils.CommonsUtils;
+
 public class TemplateElement {
   private String                language;
 
@@ -32,10 +37,9 @@ public class TemplateElement {
 
   private TemplateContext       context;
 
-  private Map<String, Object>   valueables = new HashMap<String, Object>();
   private Map<String, String>   resouceBunldMappingKey = new HashMap<String, String>();
 
-  public TemplateElement(String language, String resouceLocal) {
+  public TemplateElement(String resouceLocal, String language) {
     this.language = language;
     this.resouceLocal = resouceLocal;
   }
@@ -43,8 +47,6 @@ public class TemplateElement {
   public TemplateContext accept(TemplateContext context) {
     this.context = context;
     this.context.put("_ctx", this);
-    this.context.putAll(valueables);
-    valueables.clear();
     return this.context;
   }
 
@@ -140,20 +142,6 @@ public class TemplateElement {
     this.resouceBunldMappingKey.put(key, value);
   }
   
-  /**
-   * @return the valueables
-   */
-  public Map<String, Object> getValueables() {
-    return valueables;
-  }
-
-  /**
-   * @param valueables2 the valueables to set
-   */
-  public TemplateElement putAllValueables(Map<String, String> valueables) {
-    this.valueables.putAll(valueables);
-    return this;
-  }
 
   private String getBundleKey(String key) {
     String value = resouceBunldMappingKey.get(key);
@@ -171,13 +159,17 @@ public class TemplateElement {
     return resouceBundle.appRes(getBundleKey(key), strs);
   }
 
-  public TemplateElement include(String elementLocal) throws Exception {
-
-    TemplateElement element = new TemplateElement(language, elementLocal);
+  public void include(String elementLocal) throws Exception {
+    CacheTemplateGenerator generator = (CacheTemplateGenerator) CommonsUtils.getService(TemplateGenerator.class);
+    SimpleCacheKey cacheKey = new SimpleCacheKey(elementLocal, language);
+    TemplateElement element = generator.getTemplateElement(cacheKey);
     element.setResouceBundle(resouceBundle);
     //
+    context.popElement();
     context.visit(element);
-    return this;
+    if (element.getTemplateText() != null && element.getTemplateText().length() > 0) {
+      generator.putTemplateToCache(cacheKey, element);
+    }
   }
 
 }

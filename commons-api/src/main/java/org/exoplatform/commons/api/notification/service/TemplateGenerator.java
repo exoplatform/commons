@@ -25,10 +25,12 @@ public interface TemplateGenerator {
 
   public void registerTemplateConfigurationPlugin(TemplateConfigurationPlugin configurationPlugin);
 
-  public String processTemplateIntoString(String providerId, Map<String, String> valueables, String language);
+  public String processTemplate(String providerId, Map<String, String> templateContext, String language);
+  
+  public String processTemplateInContainer(String providerId, Map<String, String> templateContext, String language);
 
-  public String processSubjectIntoString(String providerId, Map<String, String> valueables, String language);
+  public String processSubjectIntoString(String providerId, Map<String, String> templateContext, String language);
 
-  public String processDigestIntoString(String providerId, Map<String, String> valueables, String language, int size);
+  public String processDigestIntoString(String providerId, Map<String, String> templateContext, String language, int size);
   
 }

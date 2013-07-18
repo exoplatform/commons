@@ -52,18 +52,22 @@ public class TemplateGeneratorImpl {
     allMappingKeys.addAll(configurationPlugin.getMappingKeys());
   }
   
-  public String processTemplateIntoString(TemplateElement template) {
-    TemplateContext context = TemplateContext.getInstance();
+  public String processTemplateIntoString(TemplateContext context, TemplateElement template) {
     context.visit(template);
     return template.getTemplate();
   }
 
-  public TemplateElement getTemplateElement(String providerId, String language) {
-    MappingKey mappingKey = getMappingKey(providerId);
-    String resouceLocal = mappingKey.getLocaleResouceTemplate();
-    TemplateElement templateElement = new TemplateElement(language, resouceLocal);
-    templateElement.setResouceBundle(new TemplateResouceBundle(language, mappingKey.getLocaleResouceBundle()));
-    templateElement.setResouceBunldMappingKey(mappingKey.getKeyMapping());
+  public TemplateElement getTemplateElement(String key, String language) {
+    TemplateElement templateElement;
+    if(key.indexOf("/") < 0) {
+      MappingKey mappingKey = getMappingKey(key);
+      String resouceLocal = mappingKey.getLocaleResouceTemplate();
+      templateElement = new TemplateElement(resouceLocal, language);
+      templateElement.setResouceBundle(new TemplateResouceBundle(language, mappingKey.getLocaleResouceBundle()));
+      templateElement.setResouceBunldMappingKey(mappingKey.getKeyMapping());
+    } else {
+      templateElement = new TemplateElement(key, language);
+    }
     return templateElement;
   }
   
