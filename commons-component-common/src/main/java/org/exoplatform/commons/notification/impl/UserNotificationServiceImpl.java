@@ -259,7 +259,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
         NodeIterator iter = query.execute().getNodes();
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          users.add(UserNotificationSetting.getDefaultInstance()
+          users.add(UserNotificationSetting.getDefaultInstance().clone()
                     .setUserId(node.getName())
                     .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
         }

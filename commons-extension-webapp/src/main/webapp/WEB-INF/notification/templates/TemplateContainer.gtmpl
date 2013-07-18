@@ -1,8 +1,7 @@
-<div class="container">
-
+<div style="border:solid 1px #b7b7b7; padding: 20px; border-radius: 10px; background: #EDF5FF;">
+	<!--div> Top</div -->
 <%
 	_ctx.include(childLocal);
 %>
-
-
+<!--div> footer</div -->
 </div>

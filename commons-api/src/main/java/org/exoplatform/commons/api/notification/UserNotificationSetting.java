@@ -229,6 +229,18 @@ public class UserNotificationSetting {
     }
   }
   
+  @Override
+  public UserNotificationSetting clone() {
+    UserNotificationSetting setting = getInstance();
+    setting.setActive(isActive);
+    setting.setDailyProviders(dailyProviders);
+    setting.setWeeklyProviders(weeklyProviders);
+    setting.setMonthlyProviders(monthlyProviders);
+    setting.setInstantlyProviders(instantlyProviders);
+    setting.setUserId(userId);
+    return setting;
+  }
+  
   public static final UserNotificationSetting getDefaultInstance() {
     if (defaultSetting == null) {
       defaultSetting = getInstance();
