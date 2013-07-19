@@ -61,14 +61,14 @@ public abstract class AbstractNotificationPlugin {
    * @param context
    * @return
    */
-  public abstract NotificationMessage makeNotification(NotificationContext ctx);
+  protected abstract NotificationMessage makeNotification(NotificationContext ctx);
   
   /**
    * Makes the MessageInfor from given NotificationMessage what keep inside NotificationContext
    * @param context
    * @return
    */
-  public abstract MessageInfo makeMessage(NotificationContext ctx);
+  protected abstract MessageInfo makeMessage(NotificationContext ctx);
   
   /**
    * Makes the Digest message from given NotificationMessage what keep inside NotificationContext
@@ -76,14 +76,14 @@ public abstract class AbstractNotificationPlugin {
    * @param wtiter
    * @return
    */
-  public abstract boolean makeDigest(NotificationContext ctx, Writer writer);
+  protected abstract boolean makeDigest(NotificationContext ctx, Writer writer);
   
   /**
    * Makes notification
    * @param ctx
    * @return
    */
-  protected NotificationMessage buildNotification(NotificationContext ctx) {
+  public NotificationMessage buildNotification(NotificationContext ctx) {
     return makeNotification(ctx);
   }
   
@@ -92,7 +92,7 @@ public abstract class AbstractNotificationPlugin {
    * @param ctx
    * @return
    */
-  protected MessageInfo buildMessage(NotificationContext ctx) {
+  public MessageInfo buildMessage(NotificationContext ctx) {
     return makeMessage(ctx);
   }
   
@@ -102,7 +102,7 @@ public abstract class AbstractNotificationPlugin {
    * @param writer
    * @return
    */
-  protected boolean buildDigest(NotificationContext ctx, Writer writer) {
+  public boolean buildDigest(NotificationContext ctx, Writer writer) {
     return makeDigest(ctx, writer);
   }
   

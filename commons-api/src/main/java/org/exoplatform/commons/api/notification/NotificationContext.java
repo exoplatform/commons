@@ -18,6 +18,9 @@ package org.exoplatform.commons.api.notification;
 
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.command.NotificationCommand;
+import org.exoplatform.commons.api.notification.command.NotificationExecutor;
+import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.commons.api.notification.service.NotificationManager;
 
 public interface NotificationContext {
@@ -86,5 +89,8 @@ public interface NotificationContext {
   
   boolean isFailed();
   
+  NotificationExecutor getNotificationExecutor();
+  
+  NotificationCommand makeCommand(NotificationKey key);
   
 }

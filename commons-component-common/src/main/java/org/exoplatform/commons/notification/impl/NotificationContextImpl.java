@@ -23,9 +23,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.exoplatform.commons.api.notification.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.command.NotificationCommand;
+import org.exoplatform.commons.api.notification.command.NotificationExecutor;
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.NotificationKey;
+import org.exoplatform.commons.api.notification.plugin.NotificationPluginService;
 import org.exoplatform.commons.api.notification.service.NotificationManager;
+import org.exoplatform.commons.notification.impl.command.NotificationCommandImpl;
 
-public class NotificationContextImpl implements NotificationContext {
+public final class NotificationContextImpl implements NotificationContext {
   
   public static final NotificationContext DEFAULT = new NotificationContextImpl();
   
@@ -36,7 +42,26 @@ public class NotificationContextImpl implements NotificationContext {
   private List<NotificationMessage> notifications;
   
   private Exception exception;
+  
+  private final NotificationExecutor executor;
+  
+  private final NotificationPluginService pluginService;
 
+  private NotificationContextImpl() {
+    executor = new NotificationExecutorImpl();
+    //TODO get from container
+    pluginService = new NotificationPluginServiceImpl();
+  }
+  
+  @Override
+  public NotificationExecutor getNotificationExecutor() {
+    return this.executor;
+  }
+  
+  public NotificationPluginService getNotificationPluginService() {
+    return this.pluginService;
+  }
+  
   @Override
   public <T> NotificationContext append(ArgumentLiteral<T> argument, Object value) {
     arguments.put(argument.getKey(), value);
@@ -92,9 +117,7 @@ public class NotificationContextImpl implements NotificationContext {
     if (type == exception.getClass()) {
       return type.cast(exception);
     }
-    
     return null;
-    
   }
 
   public void setException(Throwable t) {
@@ -120,6 +143,12 @@ public class NotificationContextImpl implements NotificationContext {
   @Override
   public List<NotificationMessage> getNotificationMessages() {
     return this.notifications;
+  }
+  
+  @Override
+  public NotificationCommand makeCommand(NotificationKey key) {
+    AbstractNotificationPlugin plugin = this.pluginService.getPlugin(key);
+    return new NotificationCommandImpl(plugin);
   }
 
 }
