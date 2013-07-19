@@ -27,9 +27,10 @@ import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
-import org.exoplatform.commons.api.notification.plugin.NotificationPluginService;
-import org.exoplatform.commons.api.notification.service.NotificationManager;
+import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
 import org.exoplatform.commons.notification.impl.command.NotificationCommandImpl;
+import org.exoplatform.commons.notification.impl.setting.NotificationPluginServiceImpl;
+import org.exoplatform.commons.notification.impl.spi.NotificationExecutorImpl;
 
 public final class NotificationContextImpl implements NotificationContext {
   
@@ -102,11 +103,6 @@ public final class NotificationContextImpl implements NotificationContext {
   @Override
   public void setNotificationMessage(NotificationMessage notification) {
     this.notification = notification;
-  }
-
-  @Override
-  public NotificationManager getNotificationManager() {
-    return null;
   }
   
   public Exception getException() {

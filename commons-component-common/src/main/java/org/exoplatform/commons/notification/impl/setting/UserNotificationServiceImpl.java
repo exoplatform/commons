@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl;
+package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +28,7 @@ import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.UserNotificationSetting.FREQUENCY;
-import org.exoplatform.commons.api.notification.service.UserNotificationService;
+import org.exoplatform.commons.api.notification.service.setting.UserNotificationService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;

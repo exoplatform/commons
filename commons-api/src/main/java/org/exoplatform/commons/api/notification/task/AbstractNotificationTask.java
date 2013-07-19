@@ -16,7 +16,7 @@
  */
 package org.exoplatform.commons.api.notification.task;
 
-import org.exoplatform.commons.api.notification.service.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.container.PortalContainer;
 
 public abstract class AbstractNotificationTask<T> implements NotificationTask<T> {

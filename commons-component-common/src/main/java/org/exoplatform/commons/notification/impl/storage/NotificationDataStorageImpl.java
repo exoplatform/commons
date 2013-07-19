@@ -14,17 +14,17 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl;
+package org.exoplatform.commons.notification.impl.storage;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.exoplatform.commons.api.notification.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.service.NotificationService;
-import org.exoplatform.commons.api.notification.service.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
+import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 
 public class NotificationDataStorageImpl implements NotificationDataStorage {
   

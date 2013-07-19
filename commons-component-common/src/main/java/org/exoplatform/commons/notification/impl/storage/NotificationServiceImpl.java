@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl;
+package org.exoplatform.commons.notification.impl.storage;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,9 +34,9 @@ import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.NotificationMessage.SEND_TYPE;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
-import org.exoplatform.commons.api.notification.service.NotificationService;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
-import org.exoplatform.commons.api.notification.service.UserNotificationService;
+import org.exoplatform.commons.api.notification.service.setting.UserNotificationService;
+import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.AbstractService;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;

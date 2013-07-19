@@ -18,8 +18,8 @@ package org.exoplatform.commons.notification.listener;
 
 import java.util.concurrent.Callable;
 
-import org.exoplatform.commons.api.notification.NotificationDataStorage;
-import org.exoplatform.commons.api.notification.service.NotificationService;
+import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
+import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.utils.CommonsUtils;
 
 public class ExecutorContextListener implements Callable<Boolean>{

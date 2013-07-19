@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl;
+package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ import java.util.Set;
 import org.exoplatform.commons.api.notification.plugin.ActiveProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderModel;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
-import org.exoplatform.commons.api.notification.service.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;

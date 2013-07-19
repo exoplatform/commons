@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.service;
+package org.exoplatform.commons.api.notification.service.setting;
 
 import java.util.List;
 import java.util.Map;

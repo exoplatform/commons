@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl;
+package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
-import org.exoplatform.commons.api.notification.plugin.NotificationPluginService;
+import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
 
 public class NotificationPluginServiceImpl implements NotificationPluginService {
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;

@@ -14,21 +14,19 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.service;
+package org.exoplatform.commons.api.notification.service.storage;
 
-import java.util.List;
+import java.util.Collection;
 
-import org.exoplatform.commons.api.notification.ProviderData;
-import org.exoplatform.commons.api.notification.plugin.ProviderPlugin;
+import org.exoplatform.commons.api.notification.NotificationMessage;
 
-public interface ProviderService {
+public interface NotificationDataStorage {
 
-  void registerProviderPlugin(ProviderPlugin providerPlugin);
+  public NotificationDataStorage add(NotificationMessage notificationMessage);
 
-  void saveProvider(ProviderData provider);
-
-  ProviderData getProvider(String providerType);
-
-  List<ProviderData> getAllProviders();
-
+  public NotificationDataStorage addAll(Collection<NotificationMessage> notificationMessages);
+  
+  public int size();
+  
+  public Collection<NotificationMessage> emails();
 }

@@ -14,43 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.service;
-
-import java.util.Map;
+package org.exoplatform.commons.api.notification.service.setting;
 
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 
+public interface NotificationPluginService {
 
-public interface NotificationManager {
+  AbstractNotificationPlugin getPlugin(NotificationKey key);
   
-  public enum ScheduleType {
-    DAILY,
-    INSTANTLY,
-    WEEKY
-  }
-
-  /**
-   * Gets the notification plug in list
-   * @return
-   */
-  Map<NotificationKey, AbstractNotificationPlugin> getNotificationPlugins();
+  void add(AbstractNotificationPlugin plugin);
   
-  AbstractNotificationPlugin get(NotificationKey key);
-  
-  boolean register(AbstractNotificationPlugin plugin);
-  
-  boolean unregister(NotificationKey key);
-  
-  boolean isActivated(NotificationKey key);
-  
-  /**
-   * 
-   * @param remoteId
-   * @param key
-   * @param option
-   * @return
-   */
-  boolean isValid(String remoteId, NotificationKey key, ScheduleType option);
-  
+  boolean remove(NotificationKey key);
 }
