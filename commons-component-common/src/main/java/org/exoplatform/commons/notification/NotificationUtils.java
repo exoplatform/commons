@@ -47,8 +47,8 @@ public class NotificationUtils {
     return key.replace("$providerid", providerId);
   }
 
-  public static SubjectAndDigestTemplate getTemplate(MappingKey mappingKey, String providerId, String language) {
-    SubjectAndDigestTemplate subjectAndDigest = SubjectAndDigestTemplate.getInstance();
+  public static SubjectAndDigest getSubjectAndDigest(MappingKey mappingKey, String providerId, String language) {
+    SubjectAndDigest subjectAndDigest = SubjectAndDigest.getInstance();
     String srcResource = mappingKey.getLocaleResouceBundle();
     String subjectKey = mappingKey.getKeyValue(MappingKey.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, providerId));
     String digestKey = mappingKey.getKeyValue(MappingKey.DIGEST_KEY, getDefaultKey(DEFAULT_SIMPLE_DIGEST_KEY, providerId));

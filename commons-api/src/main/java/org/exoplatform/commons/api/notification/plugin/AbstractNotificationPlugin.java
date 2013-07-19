@@ -17,20 +17,13 @@
 package org.exoplatform.commons.api.notification.plugin;
 
 import java.io.Writer;
-import java.util.Locale;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.UserProfile;
 
 public abstract class AbstractNotificationPlugin {
-  
-  public static final String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
-  
-  private OrganizationService organizationService;
   
   /**
    * Start the plug in
@@ -93,9 +86,12 @@ public abstract class AbstractNotificationPlugin {
    * @return
    */
   public MessageInfo buildMessage(NotificationContext ctx) {
-    return makeMessage(ctx);
+    NotificationMessage message = ctx.getNotificationMessage();
+    MessageInfo messageInfo = makeMessage(ctx);
+    return messageInfo.from(NotificationPluginUtils.getFrom(message.getFrom()))
+               .to(NotificationPluginUtils.getTo(message.getTo())).end();
   }
-  
+
   /**
    * Makes digest message
    * @param ctx
@@ -120,20 +116,11 @@ public abstract class AbstractNotificationPlugin {
    * @return
    */
   protected String getLanguage(NotificationMessage message) {
-    String to = message.getTo();
-    try {
-      UserProfile profile = getOrganizationService().getUserProfileHandler().findUserProfileByName(to);
-      return profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]);
-    } catch (Exception e) {
-      return DEFAULT_LANGUAGE;
-    }
+    return NotificationPluginUtils.getLanguage(message.getTo());
   }
   
   protected OrganizationService getOrganizationService() {
-    if (organizationService == null) {
-      organizationService = (OrganizationService) PortalContainer.getInstance().getComponentInstanceOfType(OrganizationService.class);
-    }
-    return organizationService;
+    return NotificationPluginUtils.getOrganizationService();
   }
 
 }

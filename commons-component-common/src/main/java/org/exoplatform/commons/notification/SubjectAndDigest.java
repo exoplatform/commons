@@ -21,8 +21,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.api.notification.TemplateContext;
 
-public class SubjectAndDigestTemplate {
+public class SubjectAndDigest {
   private String              language;
 
   private String              subject;
@@ -37,13 +38,13 @@ public class SubjectAndDigestTemplate {
 
   private Map<String, String> valueables;
 
-  public SubjectAndDigestTemplate() {
+  public SubjectAndDigest() {
     valueables = new ConcurrentHashMap<String, String>();
     language = Locale.ENGLISH.getLanguage();
   }
 
-  public static SubjectAndDigestTemplate getInstance() {
-    return new SubjectAndDigestTemplate();
+  public static SubjectAndDigest getInstance() {
+    return new SubjectAndDigest();
   }
 
   /**
@@ -57,7 +58,7 @@ public class SubjectAndDigestTemplate {
   /**
    * @param language the language to set
    */
-  public SubjectAndDigestTemplate setLanguage(String language) {
+  public SubjectAndDigest setLanguage(String language) {
     this.language = language;
     return this;
   }
@@ -72,7 +73,7 @@ public class SubjectAndDigestTemplate {
   /**
    * @param subject the subject to set
    */
-  public SubjectAndDigestTemplate setSubject(String subject) {
+  public SubjectAndDigest setSubject(String subject) {
     this.subject = subject;
     return this;
   }
@@ -87,7 +88,7 @@ public class SubjectAndDigestTemplate {
   /**
    * @param simpleDigest the simpleDigest to set
    */
-  public SubjectAndDigestTemplate setSimpleDigest(String simpleDigest) {
+  public SubjectAndDigest setSimpleDigest(String simpleDigest) {
     this.simpleDigest = simpleDigest;
     return this;
   }
@@ -102,7 +103,7 @@ public class SubjectAndDigestTemplate {
   /**
    * @param digestOne the digestOne to set
    */
-  public SubjectAndDigestTemplate setDigestOne(String digestOne) {
+  public SubjectAndDigest setDigestOne(String digestOne) {
     this.digestOne = digestOne;
     return this;
   }
@@ -117,7 +118,7 @@ public class SubjectAndDigestTemplate {
   /**
    * @param digestThree the digestThree to set
    */
-  public SubjectAndDigestTemplate setDigestThree(String digestThree) {
+  public SubjectAndDigest setDigestThree(String digestThree) {
     this.digestThree = digestThree;
     return this;
   }
@@ -132,7 +133,7 @@ public class SubjectAndDigestTemplate {
   /**
    * @param digestMore the digestMore to set
    */
-  public SubjectAndDigestTemplate setDigestMore(String digestMore) {
+  public SubjectAndDigest setDigestMore(String digestMore) {
     this.digestMore = digestMore;
     return this;
   }
@@ -145,17 +146,22 @@ public class SubjectAndDigestTemplate {
   }
 
   /**
-   * @param valueables the valueables to set
+   * @param ctx the valueables to set
    */
-  public SubjectAndDigestTemplate setValueables(Map<String, String> valueables) {
-    this.valueables = valueables;
+  public SubjectAndDigest setValueables(TemplateContext ctx) {
+    for (String key : ctx.keySet()) {
+      Object value = ctx.get(key);
+      if (value instanceof String) {
+        valueables.put(key, (String) value);
+      }
+    }
     return this;
   }
 
   /**
    * @param valueables the valueables to set
    */
-  public SubjectAndDigestTemplate addValueables(String key, String value) {
+  public SubjectAndDigest addValueables(String key, String value) {
     this.valueables.put(key, value);
     return this;
   }

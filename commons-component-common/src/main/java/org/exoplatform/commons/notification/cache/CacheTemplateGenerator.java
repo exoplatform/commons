@@ -18,11 +18,12 @@ package org.exoplatform.commons.notification.cache;
 
 import java.util.Map;
 
+import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.notification.impl.TemplateGeneratorImpl;
-import org.exoplatform.commons.notification.template.TemplateContext;
+import org.exoplatform.commons.notification.template.TemplateVisitorContext;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
@@ -69,12 +70,12 @@ public class CacheTemplateGenerator implements TemplateGenerator {
   }
   
   @Override
-  public String processTemplate(String providerId, Map<String, String> valueables, String language) {
-    SimpleCacheKey cacheKey = new SimpleCacheKey(providerId, language);
+  public String processTemplate(TemplateContext ctx) {
+    SimpleCacheKey cacheKey = new SimpleCacheKey(ctx.getProviderId(), ctx.getLanguage());
     TemplateElement template = getTemplateElement(cacheKey);
     boolean isAddCache = isAddCache(template);
-    TemplateContext context = TemplateContext.getInstance();
-    context.putAll(valueables);
+    TemplateVisitorContext context = TemplateVisitorContext.getInstance();
+    context.putAll(ctx);
     String content = generatorImpl.processTemplateIntoString(context, template);
     //
     if (isAddCache) {
@@ -88,16 +89,16 @@ public class CacheTemplateGenerator implements TemplateGenerator {
   }
   
   @Override
-  public String processTemplateInContainer(String providerId, Map<String, String> valueables, String language) {
-    SimpleCacheKey cacheKey = new SimpleCacheKey(providerId, language);
+  public String processTemplateInContainer(TemplateContext ctx) {
+    SimpleCacheKey cacheKey = new SimpleCacheKey(ctx.getProviderId(), ctx.getLanguage());
     TemplateElement template = getTemplateElement(cacheKey);
 
-    SimpleCacheKey containerKey = new SimpleCacheKey(CONTAINER_LOCALE, language);
+    SimpleCacheKey containerKey = new SimpleCacheKey(CONTAINER_LOCALE, ctx.getLanguage());
     TemplateElement container =  getTemplateElement(containerKey);
     boolean isAddCacheContainer = isAddCache(template); 
     
-    TemplateContext context = TemplateContext.getInstance();
-    context.putAll(valueables);
+    TemplateVisitorContext context = TemplateVisitorContext.getInstance();
+    context.putAll(ctx);
     context.put("childLocal", template.getResouceLocal());
     container.setResouceBundle(template.getResouceBundle());
     container.setResouceBunldMappingKey(template.getResouceBunldMappingKey());
@@ -112,13 +113,13 @@ public class CacheTemplateGenerator implements TemplateGenerator {
   }
 
   @Override
-  public String processSubjectIntoString(String providerId, Map<String, String> valueables, String language) {
-    return generatorImpl.processSubjectIntoString(providerId, valueables, language);
+  public String processSubject(TemplateContext ctx) {
+    return generatorImpl.processSubject(ctx);
   }
 
   @Override
-  public String processDigestIntoString(String providerId, Map<String, String> valueables, String language, int size) {
-    return generatorImpl.processDigestIntoString(providerId, valueables, language, size);
+  public String processDigest(TemplateContext ctx) {
+    return generatorImpl.processDigest(ctx);
   }
 
 }

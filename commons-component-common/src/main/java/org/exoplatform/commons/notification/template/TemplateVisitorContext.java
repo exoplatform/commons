@@ -31,10 +31,10 @@ import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public class TemplateContext extends HashMap<String, Object> {
+public class TemplateVisitorContext extends HashMap<String, Object> {
   private static final long     serialVersionUID     = 1L;
 
-  private static final Log       LOG                  = ExoLogger.getLogger(TemplateContext.class);
+  private static final Log       LOG                  = ExoLogger.getLogger(TemplateVisitorContext.class);
 
   private ConfigurationManager    configurationManager = null;
 
@@ -42,15 +42,15 @@ public class TemplateContext extends HashMap<String, Object> {
 
   private StringWriter            writer;
 
-  private static TemplateContext context              = null;
+  private static TemplateVisitorContext context              = null;
   
-  private TemplateContext() {
+  private TemplateVisitorContext() {
     writer = new StringWriter();
   }
   
-  public static TemplateContext getInstance() {
+  public static TemplateVisitorContext getInstance() {
     if(context == null) {
-      context = new TemplateContext();
+      context = new TemplateVisitorContext();
       context.configurationManager = CommonsUtils.getService(ConfigurationManager.class);
     }
     context.clear();
@@ -85,7 +85,7 @@ public class TemplateContext extends HashMap<String, Object> {
     TemplateElement element = elementStacks.iterator().next();
     GroovyTemplate gTemplate;
     try {
-      TemplateContext context = element.getContext();
+      TemplateVisitorContext context = element.getContext();
       if(element.getTemplateText() == null) {
         gTemplate = new GroovyTemplate(context.getTemplate(element.getResouceLocal()));
         element.setTemplateText(gTemplate.getText());

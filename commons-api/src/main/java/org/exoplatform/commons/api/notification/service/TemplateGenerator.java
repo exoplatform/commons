@@ -16,8 +16,7 @@
  */
 package org.exoplatform.commons.api.notification.service;
 
-import java.util.Map;
-
+import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
 
 
@@ -25,12 +24,12 @@ public interface TemplateGenerator {
 
   public void registerTemplateConfigurationPlugin(TemplateConfigurationPlugin configurationPlugin);
 
-  public String processTemplate(String providerId, Map<String, String> templateContext, String language);
+  public String processTemplate(TemplateContext ctx);
   
-  public String processTemplateInContainer(String providerId, Map<String, String> templateContext, String language);
+  public String processTemplateInContainer(TemplateContext ctx);
 
-  public String processSubjectIntoString(String providerId, Map<String, String> templateContext, String language);
+  public String processSubject(TemplateContext ctx);
 
-  public String processDigestIntoString(String providerId, Map<String, String> templateContext, String language, int size);
+  public String processDigest(TemplateContext ctx);
   
 }

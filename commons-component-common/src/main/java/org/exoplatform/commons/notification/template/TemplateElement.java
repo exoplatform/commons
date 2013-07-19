@@ -35,7 +35,7 @@ public class TemplateElement {
 
   private TemplateResouceBundle resouceBundle;
 
-  private TemplateContext       context;
+  private TemplateVisitorContext       context;
 
   private Map<String, String>   resouceBunldMappingKey = new HashMap<String, String>();
 
@@ -44,7 +44,7 @@ public class TemplateElement {
     this.resouceLocal = resouceLocal;
   }
 
-  public TemplateContext accept(TemplateContext context) {
+  public TemplateVisitorContext accept(TemplateVisitorContext context) {
     this.context = context;
     this.context.put("_ctx", this);
     return this.context;
@@ -92,7 +92,7 @@ public class TemplateElement {
     this.resouceLocal = resouceLocal;
   }
 
-  public TemplateContext getContext() {
+  public TemplateVisitorContext getContext() {
     return context;
   }
 

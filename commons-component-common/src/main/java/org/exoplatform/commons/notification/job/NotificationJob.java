@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.NotificationMessage.SEND_TYPE;
+import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.UserNotificationSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.service.NotificationProviderService;
 import org.exoplatform.commons.api.notification.service.NotificationService;

@@ -18,7 +18,6 @@ package org.exoplatform.commons.notification.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,6 +26,7 @@ import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.NotificationMessage.SEND_TYPE;
 import org.exoplatform.commons.api.notification.ProviderData;
+import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationProvider;
 import org.exoplatform.commons.api.notification.service.NotificationProviderService;
@@ -117,24 +117,24 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
         }
       }
       
-      if(SEND_TYPE.DAILY.equals(type) == false){
-        Locale locale = new Locale(language);
+      if (SEND_TYPE.DAILY.equals(type) == false) {
+        Locale locale = (language == null || language.length() == 0) ? Locale.ENGLISH : new Locale(language);
         fromTo = TimeConvertUtils.getFormatDate(periodFrom.getTime(), "mmmm dd", locale);
         fromTo += " - ";
         fromTo += TimeConvertUtils.getFormatDate(Calendar.getInstance().getTime(), "mmmm dd, yyyy", locale);
       }
       
-      Map<String, String> valueables = new HashMap<String, String>();
+      TemplateContext ctx = new TemplateContext("DigestProvider", language);
 
-      valueables.put("FIRSTNAME", getFirstName(userSetting.getUserId()));
-      valueables.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
-      valueables.put("PERIOD", periodType);
-      valueables.put("FROM_TO", fromTo);
-      String subject = templateGenerator.processSubjectIntoString("DigestProvider", valueables, language);
+      ctx.put("FIRSTNAME", getFirstName(userSetting.getUserId()));
+      ctx.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
+      ctx.put("PERIOD", periodType);
+      ctx.put("FROM_TO", fromTo);
+      String subject = templateGenerator.processSubject(ctx);
       
-      valueables.put("FOOTER_LINK", getProfileUrl(userSetting.getUserId()));
-      valueables.put("DIGEST_MESSAGES_LIST", sb.toString());
-      String body = templateGenerator.processTemplateInContainer("DigestProvider", valueables, language);
+      ctx.put("FOOTER_LINK", getProfileUrl(userSetting.getUserId()));
+      ctx.put("DIGEST_MESSAGES_LIST", sb.toString());
+      String body = templateGenerator.processTemplateInContainer(ctx);
 
       messageInfo.body(body).subject(subject).to(getTo(notificationMessage));
     } catch (Exception e) {

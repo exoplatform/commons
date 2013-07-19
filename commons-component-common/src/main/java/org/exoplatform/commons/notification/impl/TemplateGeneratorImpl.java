@@ -22,17 +22,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.plugin.MappingKey;
 import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
 import org.exoplatform.commons.notification.NotificationUtils;
-import org.exoplatform.commons.notification.SubjectAndDigestTemplate;
-import org.exoplatform.commons.notification.template.TemplateContext;
+import org.exoplatform.commons.notification.SubjectAndDigest;
+import org.exoplatform.commons.notification.template.TemplateVisitorContext;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.commons.notification.template.TemplateResouceBundle;
 
 public class TemplateGeneratorImpl {
 
-  private Map<String, SubjectAndDigestTemplate> cacheTemplate = new ConcurrentHashMap<String, SubjectAndDigestTemplate>();
+  private Map<String, SubjectAndDigest> cacheTemplate = new ConcurrentHashMap<String, SubjectAndDigest>();
   
   private Set<MappingKey> allMappingKeys = new HashSet<MappingKey>();
   
@@ -52,7 +53,7 @@ public class TemplateGeneratorImpl {
     allMappingKeys.addAll(configurationPlugin.getMappingKeys());
   }
   
-  public String processTemplateIntoString(TemplateContext context, TemplateElement template) {
+  public String processTemplateIntoString(TemplateVisitorContext context, TemplateElement template) {
     context.visit(template);
     return template.getTemplate();
   }
@@ -71,19 +72,20 @@ public class TemplateGeneratorImpl {
     return templateElement;
   }
   
-  public String processSubjectIntoString(String providerId, Map<String, String> valueables, String language) {
-    SubjectAndDigestTemplate template = getSubjectOrDigestTemplate(providerId, language);
-    template.setValueables(valueables);
+  public String processSubject(TemplateContext ctx) {
+    SubjectAndDigest template = getSubjectOrDigestTemplate(ctx.getProviderId(), ctx.getLanguage());
+    template.setValueables(ctx);
     return template.processSubject();
   }
 
-  public String processDigestIntoString(String providerId, Map<String, String> valueables, String language, int size) {
-    SubjectAndDigestTemplate template = getSubjectOrDigestTemplate(providerId, language);
-    template.setValueables(valueables);
-    return template.processDigest(size);
+  public String processDigest(TemplateContext ctx) {
+    SubjectAndDigest template = getSubjectOrDigestTemplate(ctx.getProviderId(), ctx.getLanguage());
+    template.setValueables(ctx);
+    ctx.clear();
+    return template.processDigest(ctx.getDigestSize());
   }
   
-  public SubjectAndDigestTemplate getSubjectOrDigestTemplate(String providerId, String language) {
+  public SubjectAndDigest getSubjectOrDigestTemplate(String providerId, String language) {
     if (language == null) {
       language = Locale.ENGLISH.getLanguage();
     }
@@ -93,7 +95,7 @@ public class TemplateGeneratorImpl {
     }
     //
     MappingKey mappingKey = getMappingKey(providerId);
-    SubjectAndDigestTemplate template = NotificationUtils.getTemplate(mappingKey, providerId, language);
+    SubjectAndDigest template = NotificationUtils.getSubjectAndDigest(mappingKey, providerId, language);
     cacheTemplate.put(key, template);
     return template;
   }

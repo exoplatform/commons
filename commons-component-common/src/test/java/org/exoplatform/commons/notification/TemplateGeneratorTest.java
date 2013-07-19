@@ -17,11 +17,10 @@
 package org.exoplatform.commons.notification;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
+import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.plugin.MappingKey;
 import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
@@ -94,17 +93,17 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
 
     assertNull(template.getTemplateText());
 
-    Map<String, String> valueables = new HashMap<String, String>();
-    valueables.put("FIRSTNAME", "Demo");
-    valueables.put("USER", "Root");
-    valueables.put("ACTIVITY", "Hey demo, How are you ? Today, I have time to meet you. Are you busy ? Have good time !");
-    valueables.put("REPLY_ACTION_URL", "http://localhost/test/reply/activtyxxx");
-    valueables.put("VIEW_FULL_DISCUSSION_ACTION_URL", "http://localhost/test/view/activtyxxx");
-    valueables.put("USER_NOTIFICATION_SETTINGS_URL", "http://localhost/test/settings/demo");
+    TemplateContext ctx = new TemplateContext(providerId, language);
+    ctx.put("FIRSTNAME", "Demo");
+    ctx.put("USER", "Root");
+    ctx.put("ACTIVITY", "Hey demo, How are you ? Today, I have time to meet you. Are you busy ? Have good time !");
+    ctx.put("REPLY_ACTION_URL", "http://localhost/test/reply/activtyxxx");
+    ctx.put("VIEW_FULL_DISCUSSION_ACTION_URL", "http://localhost/test/view/activtyxxx");
+    ctx.put("USER_NOTIFICATION_SETTINGS_URL", "http://localhost/test/settings/demo");
 
-    valueables.put("subContent", "<br/> I love you !");
+    ctx.put("subContent", "<br/> I love you !");
     
-    String templateProcessed = generator.processTemplate(providerId, valueables, language);
+    String templateProcessed = generator.processTemplate(ctx);
     
     assertNotNull(templateProcessed);
     // Test cache template
@@ -125,9 +124,10 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
     
     // Test renderTemplateByUrl
     String url = "jar:/groovy/notification/template/include.gtmpl";
-    valueables.clear();
-    valueables.put("subContent", "<br/> test render by url!");
-    String value = generator.processTemplate(url, valueables, language);
+    ctx.clear();
+    ctx.provider(url);
+    ctx.put("subContent", "<br/> test render by url!");
+    String value = generator.processTemplate(ctx);
     assertNotNull(value);
     assertTrue(value.indexOf("test render by url") > 0);
   }
