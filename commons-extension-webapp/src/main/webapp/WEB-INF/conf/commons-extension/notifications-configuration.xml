@@ -6,28 +6,28 @@
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   
   <component>
-    <key>org.exoplatform.commons.api.notification.NotificationDataStorage</key>
-    <type>org.exoplatform.commons.notification.impl.NotificationDataStorageImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
+    <type>org.exoplatform.commons.notification.impl.storage.NotificationDataStorageImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.NotificationService</key>
-    <type>org.exoplatform.commons.notification.impl.NotificationServiceImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.storage.NotificationService</key>
+    <type>org.exoplatform.commons.notification.impl.storage.NotificationServiceImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.UserNotificationService</key>
-    <type>org.exoplatform.commons.notification.impl.UserNotificationServiceImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.setting.UserNotificationService</key>
+    <type>org.exoplatform.commons.notification.impl.setting.UserNotificationServiceImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.ProviderSettingService</key>
-    <type>org.exoplatform.commons.notification.impl.ProviderSettingServiceImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.setting.ProviderSettingService</key>
+    <type>org.exoplatform.commons.notification.impl.setting.ProviderSettingServiceImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.ProviderService</key>
-    <type>org.exoplatform.commons.notification.impl.ProviderServiceImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.storage.ProviderService</key>
+    <type>org.exoplatform.commons.notification.impl.storage.ProviderServiceImpl</type>
   </component>
   
   <component>
