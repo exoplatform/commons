@@ -30,6 +30,7 @@ import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.gatein.common.io.IOTools;
 
 public class TemplateVisitorContext extends HashMap<String, Object> {
   private static final long     serialVersionUID     = 1L;
@@ -86,12 +87,10 @@ public class TemplateVisitorContext extends HashMap<String, Object> {
     GroovyTemplate gTemplate;
     try {
       TemplateVisitorContext context = element.getContext();
-      if(element.getTemplateText() == null) {
-        gTemplate = new GroovyTemplate(context.getTemplate(element.getResouceLocal()));
-        element.setTemplateText(gTemplate.getText());
-      } else {
-        gTemplate = new GroovyTemplate(element.getTemplateText());
+      if (element.getTemplateText() == null) {
+        element.setTemplateText(context.getTemplate(element.getResouceLocal()));
       }
+      gTemplate = new GroovyTemplate(element.getTemplateText());
       //
       gTemplate.render(context.getWriter(), context);
       element.setTemplate(context.getWriter().toString());
@@ -131,9 +130,21 @@ public class TemplateVisitorContext extends HashMap<String, Object> {
     }
   }
 
-  private Reader getTemplate(String sourceLocal) throws Exception {
+  private String getTemplate(String sourceLocal) throws Exception {
+    StringWriter templateText = new StringWriter();
+    Reader reader = null;
+    try {
+      reader = new InputStreamReader(getTemplateInputStream(sourceLocal));
+      IOTools.copy(reader, templateText);
+    } catch (Exception e) {
+      LOG.debug("Failed to reader template file: " + sourceLocal, e);
+    } finally {
+      if (reader != null) {
+        reader.close();
+      }
+    }
 
-    return new InputStreamReader(getTemplateInputStream(sourceLocal));
+    return templateText.toString();
   }
 
 }

@@ -23,7 +23,7 @@ import java.util.Locale;
 
 import javax.jcr.Value;
 
-import org.exoplatform.commons.api.notification.plugin.MappingKey;
+import org.exoplatform.commons.api.notification.plugin.model.TemplateConfig;
 import org.exoplatform.commons.notification.template.TemplateResouceBundle;
 
 
@@ -47,14 +47,14 @@ public class NotificationUtils {
     return key.replace("$providerid", providerId);
   }
 
-  public static SubjectAndDigest getSubjectAndDigest(MappingKey mappingKey, String providerId, String language) {
+  public static SubjectAndDigest getSubjectAndDigest(TemplateConfig templateConfig, String providerId, String language) {
     SubjectAndDigest subjectAndDigest = SubjectAndDigest.getInstance();
-    String srcResource = mappingKey.getLocaleResouceBundle();
-    String subjectKey = mappingKey.getKeyValue(MappingKey.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, providerId));
-    String digestKey = mappingKey.getKeyValue(MappingKey.DIGEST_KEY, getDefaultKey(DEFAULT_SIMPLE_DIGEST_KEY, providerId));
-    String digestOneKey = mappingKey.getKeyValue(MappingKey.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, providerId));
-    String digestThreeKey = mappingKey.getKeyValue(MappingKey.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, providerId));
-    String digestMoreKey = mappingKey.getKeyValue(MappingKey.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, providerId));
+    String srcResource = templateConfig.getLocaleResouceBundle();
+    String subjectKey = templateConfig.getKeyValue(TemplateConfig.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, providerId));
+    String digestKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_KEY, getDefaultKey(DEFAULT_SIMPLE_DIGEST_KEY, providerId));
+    String digestOneKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, providerId));
+    String digestThreeKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, providerId));
+    String digestMoreKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, providerId));
     
     Locale locale = Locale.ENGLISH;
     if (language != null) {

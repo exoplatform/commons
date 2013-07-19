@@ -14,32 +14,52 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.plugin;
+package org.exoplatform.commons.api.notification.plugin.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class GroupProviderModel {
-  private String       name;
+public class GroupConfig {
 
-  private String       resourceBundleKey;
+  private String       order;
 
-  private List<String> values;
+  private String       id;
 
-  public GroupProviderModel() {
+  private String       resourceBundleKey = "";
+
+  private List<String> providers;
+
+  public GroupConfig() {
+    providers = new ArrayList<String>();
   }
 
   /**
-   * @return the name
+   * @return the id
    */
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 
   /**
-   * @param name the name to set
+   * @param id the id to set
    */
-  public void setName(String name) {
-    this.name = name;
+  public GroupConfig setId(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * @return the order
+   */
+  public String getOrder() {
+    return order;
+  }
+
+  /**
+   * @param order the order to set
+   */
+  public void setOrder(String order) {
+    this.order = order;
   }
 
   /**
@@ -57,23 +77,28 @@ public class GroupProviderModel {
   }
 
   /**
-   * @return the values
+   * @return the providers
    */
-  public List<String> getValues() {
-    return values;
+  public List<String> getProviders() {
+    return providers;
   }
 
   /**
-   * @param values the values to set
+   * @param providers the providers to set
    */
-  public void setValues(List<String> values) {
-    this.values = values;
+  public void setProviders(List<String> providers) {
+    this.providers = providers;
   }
-  
+
+  public GroupConfig addProvider(String providerId) {
+    this.providers.add(providerId);
+    return this;
+  }
+
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof GroupProviderModel) {
-      return ((GroupProviderModel) obj).getName().equals(this.getName());
+    if (obj instanceof GroupConfig) {
+      return ((GroupConfig) obj).getId().equals(this.getId());
     }
     return super.equals(obj);
   }

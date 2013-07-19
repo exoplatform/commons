@@ -17,13 +17,27 @@
 package org.exoplatform.commons.api.notification.plugin;
 
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
+import org.exoplatform.container.component.BaseComponentPlugin;
+import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.OrganizationService;
 
-public abstract class AbstractNotificationPlugin {
+public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
+  List<PluginConfig> pluginConfig = new ArrayList<PluginConfig>();
+  
+  public AbstractNotificationPlugin(InitParams initParams) {
+    pluginConfig = initParams.getObjectParamValues(PluginConfig.class);
+  }
+  
+  public List<PluginConfig> getPluginConfigs() {
+    return pluginConfig;
+  }
   
   /**
    * Start the plug in

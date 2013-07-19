@@ -21,13 +21,17 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
+import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 
 public class NotificationPluginServiceImpl implements NotificationPluginService {
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
+  private ProviderSettingService settingService;
   
-  public NotificationPluginServiceImpl() {
+  public NotificationPluginServiceImpl(ProviderSettingService settingService) {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
+    this.settingService = settingService;
   }
 
   @Override
@@ -38,7 +42,10 @@ public class NotificationPluginServiceImpl implements NotificationPluginService 
   @Override
   public void add(AbstractNotificationPlugin plugin) {
     pluginMap.put(plugin.getKey(), plugin);
-    
+    //
+    for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
+      settingService.registerPluginConfig(pluginConfig);
+    }
   }
 
   @Override

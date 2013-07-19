@@ -16,25 +16,14 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.exoplatform.container.component.BaseComponentPlugin;
-import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.commons.api.notification.MessageInfo;
+import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.UserNotificationSetting;
 
-public class TemplateConfigurationPlugin extends BaseComponentPlugin {
+public interface DigestorService {
 
-  private List<MappingKey> mappingKeys;
-
-  public TemplateConfigurationPlugin(InitParams params) {
-    mappingKeys = params.getObjectParamValues(MappingKey.class);
-  }
-
-  public List<MappingKey> getMappingKeys() {
-    if (mappingKeys == null || mappingKeys.size() == 0) {
-      return new ArrayList<MappingKey>();
-    }
-    return mappingKeys;
-  }
-
+  public MessageInfo buildMessage(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting);
 }

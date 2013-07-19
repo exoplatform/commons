@@ -113,5 +113,15 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
+  
+  
+ <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.service.storage.NotificationService</target-component>
+    <component-plugin>
+      <name>NotificationServiceListener</name>
+      <set-method>addSendNotificationListener</set-method>
+      <type>org.exoplatform.commons.notification.listener.SendNotificationListenerImpl</type>
+    </component-plugin>
+  </external-component-plugins>
 
 </configuration>

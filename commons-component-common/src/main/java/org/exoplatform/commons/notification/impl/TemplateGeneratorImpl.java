@@ -23,20 +23,24 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.api.notification.TemplateContext;
-import org.exoplatform.commons.api.notification.plugin.MappingKey;
-import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
+import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
+import org.exoplatform.commons.api.notification.plugin.model.TemplateConfig;
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.SubjectAndDigest;
-import org.exoplatform.commons.notification.template.TemplateVisitorContext;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.commons.notification.template.TemplateResouceBundle;
+import org.exoplatform.commons.notification.template.TemplateVisitorContext;
+import org.exoplatform.commons.utils.CommonsUtils;
 
 public class TemplateGeneratorImpl {
 
   private Map<String, SubjectAndDigest> cacheTemplate = new ConcurrentHashMap<String, SubjectAndDigest>();
   
-  private Set<MappingKey> allMappingKeys = new HashSet<MappingKey>();
+  private Set<TemplateConfig> TemplateConfig = new HashSet<TemplateConfig>();
   
+  private ProviderSettingService providerSettingService;
+
   private static TemplateGeneratorImpl instance;
 
   private TemplateGeneratorImpl() {
@@ -48,11 +52,18 @@ public class TemplateGeneratorImpl {
     }
     return instance;
   }
-  
-  public void registerTemplateConfigurationPlugin(TemplateConfigurationPlugin configurationPlugin) {
-    allMappingKeys.addAll(configurationPlugin.getMappingKeys());
+
+  private ProviderSettingService getProviderSettingService() {
+    if (providerSettingService == null) {
+      providerSettingService = CommonsUtils.getService(ProviderSettingService.class);
+    }
+    return providerSettingService;
   }
-  
+
+  public void setProviderSettingService(ProviderSettingService providerSettingService) {
+    this.providerSettingService = providerSettingService;
+  }
+
   public String processTemplateIntoString(TemplateVisitorContext context, TemplateElement template) {
     context.visit(template);
     return template.getTemplate();
@@ -61,11 +72,11 @@ public class TemplateGeneratorImpl {
   public TemplateElement getTemplateElement(String key, String language) {
     TemplateElement templateElement;
     if(key.indexOf("/") < 0) {
-      MappingKey mappingKey = getMappingKey(key);
-      String resouceLocal = mappingKey.getLocaleResouceTemplate();
+      TemplateConfig templateConfig = getTemplateConfig(key);
+      String resouceLocal = templateConfig.getLocaleResouceTemplate();
       templateElement = new TemplateElement(resouceLocal, language);
-      templateElement.setResouceBundle(new TemplateResouceBundle(language, mappingKey.getLocaleResouceBundle()));
-      templateElement.setResouceBunldMappingKey(mappingKey.getKeyMapping());
+      templateElement.setResouceBundle(new TemplateResouceBundle(language, templateConfig.getLocaleResouceBundle()));
+      templateElement.setResouceBunldMappingKey(templateConfig.getKeyMapping());
     } else {
       templateElement = new TemplateElement(key, language);
     }
@@ -94,19 +105,18 @@ public class TemplateGeneratorImpl {
       return cacheTemplate.get(key);
     }
     //
-    MappingKey mappingKey = getMappingKey(providerId);
-    SubjectAndDigest template = NotificationUtils.getSubjectAndDigest(mappingKey, providerId, language);
+    TemplateConfig templateConfig = getTemplateConfig(providerId);
+    SubjectAndDigest template = NotificationUtils.getSubjectAndDigest(templateConfig, providerId, language);
     cacheTemplate.put(key, template);
     return template;
   }
   
-  public MappingKey getMappingKey(String providerId) {
-    for (MappingKey mappingKey : allMappingKeys) {
-      if(mappingKey.getProviderId().equals(providerId)) {
-        return mappingKey;
-      }
+  public TemplateConfig getTemplateConfig(String providerId) {
+    PluginConfig pluginConfig = getProviderSettingService().getPluginConfig(providerId);
+    if(pluginConfig != null) {
+      return pluginConfig.getTemplateConfig();
     }
-    return new MappingKey(providerId);
+    return  new TemplateConfig(providerId);
   }
 
 }

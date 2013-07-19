@@ -29,8 +29,8 @@ import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugi
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
 import org.exoplatform.commons.notification.impl.command.NotificationCommandImpl;
-import org.exoplatform.commons.notification.impl.setting.NotificationPluginServiceImpl;
 import org.exoplatform.commons.notification.impl.spi.NotificationExecutorImpl;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
 
 public final class NotificationContextImpl implements NotificationContext {
@@ -51,9 +51,7 @@ public final class NotificationContextImpl implements NotificationContext {
 
   private NotificationContextImpl() {
     executor = new NotificationExecutorImpl();
-    //TODO get from container
-    //pluginService = new NotificationPluginServiceImpl();
-    pluginService = (NotificationPluginService) PortalContainer.getInstance().getComponentInstanceOfType(NotificationPluginService.class);
+    pluginService = CommonsUtils.getService(NotificationPluginService.class);
   }
   
   @Override

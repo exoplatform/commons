@@ -95,13 +95,13 @@
 	</component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.NotificationService</key>
-    <type>org.exoplatform.commons.notification.impl.NotificationServiceImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.storage.NotificationService</key>
+    <type>org.exoplatform.commons.notification.impl.storage.NotificationServiceImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.UserNotificationService</key>
-    <type>org.exoplatform.commons.notification.impl.UserNotificationServiceImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.setting.UserNotificationService</key>
+    <type>org.exoplatform.commons.notification.impl.setting.UserNotificationServiceImpl</type>
   </component>
   
 	<external-component-plugins>

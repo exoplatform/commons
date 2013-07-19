@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -31,7 +30,6 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.NotificationMessage.SEND_TYPE;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
 import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
@@ -57,8 +55,6 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private String                                           workspace;
 
   private int                                              MAX_SIZE = 1000;
-  
-  private Map<String, SEND_TYPE> storageSendTypes = new ConcurrentHashMap<String, NotificationMessage.SEND_TYPE>();
   
   private NotificationConfiguration configuration;
 
@@ -308,16 +304,14 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   public Map<String, List<NotificationMessage>> getNotificationMessagesByUser(UserNotificationSetting userSetting) {
     LOG.info("Get all messages notification by user " +userSetting.getUserId() );
     long startTime = System.currentTimeMillis();
-    String key = getCurrentTenantName() + userSetting.getUserId();
     
-    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
     Map<String, List<NotificationMessage>> notificationData = new LinkedHashMap<String, List<NotificationMessage>>();
     try {
       //for daily
       for (String providerId : userSetting.getDailyProviders()) {
         LOG.info("Get NotificationMessage for daily... ");
         strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_DAILY, userSetting.getUserId()));
-        storageSendTypes.put(key, SEND_TYPE.DAILY);
       }
       
       // for weekly
@@ -325,33 +319,17 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         LOG.info("Get NotificationMessage for weekly... ");
         for (String providerId : userSetting.getWeeklyProviders()) {
           strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_WEEKLY, userSetting.getUserId()));
-          storageSendTypes.put(key, SEND_TYPE.WEEKLY);
-        }
-      }
-
-      // for monthly
-      if(NotificationUtils.isMonthEnd(configuration.getDayOfMonthend())) {
-        LOG.info("Get NotificationMessage for monthly... ");
-        for (String providerId : userSetting.getMonthlyProviders()) {
-          strageMap(notificationData, providerId, getNotificationMessages(sProvider, providerId, NTF_SEND_TO_MONTHLY, userSetting.getUserId()));
-          storageSendTypes.put(key, SEND_TYPE.MONTHLY);
         }
       }
 
     } catch (Exception e) {
       LOG.error("Failed to get the NotificationMessage by user: " + userSetting.getUserId(), e);
+    } finally {
+      sProvider.close();
     }
     
     LOG.info("And get all messages notification by user " + userSetting.getUserId() + " " + notificationData.size() + " .. " + (System.currentTimeMillis() - startTime) + " ms");
     return notificationData;
-  }
-
-  @Override
-  public SEND_TYPE getSendNotificationType(String userId) {
-    String key = getCurrentTenantName() + userId;
-    SEND_TYPE type = storageSendTypes.get(key);
-    storageSendTypes.remove(key);
-    return type;
   }
 
 }

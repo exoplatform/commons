@@ -17,12 +17,8 @@
 package org.exoplatform.commons.api.notification.service;
 
 import org.exoplatform.commons.api.notification.TemplateContext;
-import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
-
 
 public interface TemplateGenerator {
-
-  public void registerTemplateConfigurationPlugin(TemplateConfigurationPlugin configurationPlugin);
 
   public String processTemplate(TemplateContext ctx);
   

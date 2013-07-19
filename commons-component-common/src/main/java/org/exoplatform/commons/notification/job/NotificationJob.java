@@ -21,10 +21,9 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.NotificationMessage.SEND_TYPE;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
 import org.exoplatform.commons.api.notification.UserNotificationSetting.FREQUENCY;
-import org.exoplatform.commons.api.notification.service.NotificationProviderService;
+import org.exoplatform.commons.api.notification.plugin.DigestorService;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserNotificationService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
@@ -56,7 +55,7 @@ public class NotificationJob extends MultiTenancyJob {
     }
     
     
-    private void processSendEmailNotification(NotificationService notificationService, NotificationProviderService notificationProviderService,
+    private void processSendEmailNotification(NotificationService notificationService, DigestorService digestorService,
                                                MailService mailService, UserNotificationSetting userSetting) {
       long startTime = System.currentTimeMillis();
       LOG.info("Process send daily email notification for user: " + userSetting.getUserId());
@@ -65,9 +64,8 @@ public class NotificationJob extends MultiTenancyJob {
         Map<String, List<NotificationMessage>> notificationMessageMap = notificationService.getNotificationMessagesByUser(userSetting);
 
         if (notificationMessageMap.size() > 0) {
-          SEND_TYPE type = notificationService.getSendNotificationType(userSetting.getUserId());
           // build digest messageInfo
-          MessageInfo messageInfo = notificationProviderService.buildMessageInfo(notificationMessageMap, userSetting, type);
+          MessageInfo messageInfo = digestorService.buildMessage(notificationMessageMap, userSetting);
           if(messageInfo != null) {
             Message message_ = messageInfo.makeEmailNotification();
             
@@ -83,7 +81,7 @@ public class NotificationJob extends MultiTenancyJob {
     private UserNotificationSetting getDefaultUserNotificationSetting(UserNotificationSetting setting) {
       UserNotificationSetting notificationSetting = UserNotificationSetting.getInstance();
       ProviderSettingService settingService = getService(ProviderSettingService.class);
-      List<String> activesProvider = settingService.getActiveProviderIds(false);
+      List<String> activesProvider = settingService.getActiveProviderIds();
       for (String string : activesProvider) {
         if(setting.isInWeekly(string)) {
           notificationSetting.addProvider(string, FREQUENCY.WEEKLY_KEY);
@@ -104,7 +102,7 @@ public class NotificationJob extends MultiTenancyJob {
         LOG.info("Start run job to send daily email notification .....");
         UserNotificationService userService = getService(UserNotificationService.class);
         NotificationService notificationService = getService(NotificationService.class);
-        NotificationProviderService notificationProviderService = getService(NotificationProviderService.class);
+        DigestorService digestorService = getService(DigestorService.class);
         MailService mailService = getService(MailService.class);
         
         JobDataMap dataMap = context.getMergedJobDataMap();
@@ -124,7 +122,7 @@ public class NotificationJob extends MultiTenancyJob {
           userSettings = userService.getDailyUserNotificationSettings(offset, limit);
           for (UserNotificationSetting userSetting : userSettings) {
             //
-            processSendEmailNotification(notificationService, notificationProviderService, mailService, userSetting);
+            processSendEmailNotification(notificationService, digestorService, mailService, userSetting);
             
           }
           
@@ -151,7 +149,7 @@ public class NotificationJob extends MultiTenancyJob {
           for (UserNotificationSetting setting : subList) {
             userNotificationSetting = getDefaultUserNotificationSetting(setting);
             //
-            processSendEmailNotification(notificationService, notificationProviderService, mailService, userNotificationSetting);
+            processSendEmailNotification(notificationService, digestorService, mailService, userNotificationSetting);
           }
 
           offset = toIndex;

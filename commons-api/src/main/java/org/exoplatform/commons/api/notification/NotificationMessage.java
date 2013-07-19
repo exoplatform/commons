@@ -28,19 +28,6 @@ import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationMessage {
-  public enum SEND_TYPE {
-    DAILY("daily"), WEEKLY("weekly"), MONTHLY("monthly");
-    private String type;
-
-    SEND_TYPE(String type) {
-      this.type = type;
-    }
-
-    public String getType() {
-      return this.type;
-    }
-  }
-
   public static final String PREFIX_ID = "NotificationMessage";
 
   private String              id;

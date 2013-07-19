@@ -17,44 +17,24 @@
 package org.exoplatform.commons.api.notification.plugin;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.plugin.model.GroupConfig;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 
 public class GroupProviderPlugin extends BaseComponentPlugin {
   
-  private List<GroupProviderModel> groupProviders = new ArrayList<GroupProviderModel>();
+  private List<GroupConfig> groupProviders = new ArrayList<GroupConfig>();
 
   public GroupProviderPlugin(InitParams params) {
     //
-    groupProviders = params.getObjectParamValues(GroupProviderModel.class);
+    groupProviders = params.getObjectParamValues(GroupConfig.class);
   }
 
-  public List<GroupProviderModel> getGroupProviders() {
+  public List<GroupConfig> getGroupProviders() {
     return groupProviders;
   }
   
-  public static void addGroupProviderData(List<GroupProviderModel> srcgroupProviders, List<GroupProviderModel> destGroupProviders) {
-    if (destGroupProviders.size() > 0) {
-      //
-      for (GroupProviderModel key : destGroupProviders) {
-        if (srcgroupProviders.contains(key) == false) {
-          srcgroupProviders.add(key);
-        }
-      }
-      //
-      Collections.sort(srcgroupProviders, new ComparatorGroupProviderASC());
-    }
-  }
   
-  private static class ComparatorGroupProviderASC implements Comparator<GroupProviderModel> {
-    public int compare(GroupProviderModel o1, GroupProviderModel o2) throws ClassCastException {
-      String name1 = o1.getName();
-      String name2 = o2.getName();
-      return name1.compareTo(name2);
-    }
-  }
 }

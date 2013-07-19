@@ -18,24 +18,29 @@ package org.exoplatform.commons.notification;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.exoplatform.commons.api.notification.TemplateContext;
-import org.exoplatform.commons.api.notification.plugin.MappingKey;
-import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
+import org.exoplatform.commons.api.notification.plugin.model.GroupConfig;
+import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
+import org.exoplatform.commons.api.notification.plugin.model.TemplateConfig;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.notification.cache.CacheTemplateGenerator;
 import org.exoplatform.commons.notification.cache.SimpleCacheKey;
 import org.exoplatform.commons.notification.impl.TemplateGeneratorImpl;
+import org.exoplatform.commons.notification.impl.setting.ProviderSettingServiceImpl;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.container.xml.ObjectParameter;
 
 public class TemplateGeneratorTest extends BaseCommonsTestCase {
   
   private TemplateGenerator generator;
   private TemplateGeneratorImpl generatorImpl;
+  private SettingService settingService;
   private List<String> providerIds = Arrays.asList("provider1", "provider2", "provider3");
   
   public void setUp() throws Exception {
@@ -44,34 +49,59 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
     generator = getService(TemplateGenerator.class);
     
     generatorImpl = TemplateGeneratorImpl.getInstance();
+    
+    settingService = new SettingService() {
+      @Override
+      public void set(Context context, Scope scope, String key, SettingValue<?> value) {
+      }
+      @Override
+      public void remove(Context context) {
+      }
+      @Override
+      public void remove(Context context, Scope scope) {
+      }
+      @Override
+      public void remove(Context context, Scope scope, String key) {
+      }
+      @Override
+      public SettingValue<?> get(Context context, Scope scope, String key) {
+        return null;
+      }
+    };
+    
     makeTemplatePlugin();
     
   }
   
   private void makeTemplatePlugin() {
 
-    InitParams params = new InitParams();
-    Random random = new Random(System.currentTimeMillis());
+    ProviderSettingService providerSettingService = new ProviderSettingServiceImpl(settingService);
+    
     for(String providerId : providerIds) {
       
-      MappingKey mappingKey = new MappingKey();
-      mappingKey.setProviderId(providerId);
-      mappingKey.setLocaleResouceTemplate("jar:/groovy/notification/template/" + providerId + ".gtmpl");
-      mappingKey.addKeyMapping(MappingKey.SUBJECT_KEY, "Notification." + providerId + ".subject")
-                .addKeyMapping(MappingKey.DIGEST_KEY, "Notification." + providerId + ".digest")
-                .addKeyMapping(MappingKey.DIGEST_ONE_KEY, "Notification." + providerId + ".digestone")
-                .addKeyMapping(MappingKey.DIGEST_MORE_KEY, "Notification." + providerId + ".digestmore")
-                .addKeyMapping(MappingKey.DIGEST_THREE_KEY, "Notification." + providerId + ".digestthree");
+      TemplateConfig templateConfig = new TemplateConfig();
+      templateConfig.setProviderId(providerId);
+      templateConfig.setLocaleResouceTemplate("jar:/groovy/notification/template/" + providerId + ".gtmpl");
+      templateConfig.addKeyMapping(TemplateConfig.SUBJECT_KEY, "Notification." + providerId + ".subject")
+                .addKeyMapping(TemplateConfig.DIGEST_KEY, "Notification." + providerId + ".digest")
+                .addKeyMapping(TemplateConfig.DIGEST_ONE_KEY, "Notification." + providerId + ".digestone")
+                .addKeyMapping(TemplateConfig.DIGEST_MORE_KEY, "Notification." + providerId + ".digestmore")
+                .addKeyMapping(TemplateConfig.DIGEST_THREE_KEY, "Notification." + providerId + ".digestthree");
       
-      ObjectParameter parameter = new ObjectParameter();
-      parameter.setName("pr" + random.nextLong());
-      parameter.setObject(mappingKey);
-      parameter.setDescription("");
-      params.addParam(parameter);
+      GroupConfig groupConfig = new GroupConfig();
+      groupConfig.setId("abc");
+      groupConfig.setOrder("0");
       
+      PluginConfig pluginConfig = new PluginConfig();
+      pluginConfig.setOrder("0");
+      pluginConfig.setPluginId(providerId);
+      pluginConfig.setResourceBundleKey("");
+      pluginConfig.setTemplateConfig(templateConfig);
+      pluginConfig.setGroupConfig(groupConfig);
+      providerSettingService.registerPluginConfig(pluginConfig);
     }
-    TemplateConfigurationPlugin configurationPlugin = new TemplateConfigurationPlugin(params);
-    generator.registerTemplateConfigurationPlugin(configurationPlugin);
+    //
+    generatorImpl.setProviderSettingService(providerSettingService);
   }
 
   public void testGetTemplate(){

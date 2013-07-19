@@ -16,57 +16,42 @@
  */
 package org.exoplatform.commons.notification.impl;
 
-import java.util.ArrayList;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.MessageInfo;
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.NotificationMessage.SEND_TYPE;
-import org.exoplatform.commons.api.notification.ProviderData;
 import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.UserNotificationSetting;
-import org.exoplatform.commons.api.notification.service.AbstractNotificationProvider;
-import org.exoplatform.commons.api.notification.service.NotificationProviderService;
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.DigestorService;
+import org.exoplatform.commons.api.notification.plugin.NotificationKey;
+import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
-import org.exoplatform.commons.api.notification.service.storage.ProviderService;
+import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 
-public class DigestorProviderImpl extends AbstractNotificationProvider implements NotificationProviderService {
+public class DigestorServiceImpl implements DigestorService {
   
-  private static final Log LOG = ExoLogger.getLogger(DigestorProviderImpl.class);
+  private static final Log LOG = ExoLogger.getLogger(DigestorServiceImpl.class);
 
-  private List<AbstractNotificationProvider> listSupportProviderImpl = new ArrayList<AbstractNotificationProvider>();
 
-  TemplateGenerator                          templateGenerator;
-
-  public DigestorProviderImpl(TemplateGenerator templateGenerator) {
-    this.templateGenerator = templateGenerator;
+  public DigestorServiceImpl() {
   }
   
-  @Override
-  public void addSupportProviderImpl(AbstractNotificationProvider providerImpl) {
-    listSupportProviderImpl.add(providerImpl);
-  }
   
-  @Override
-  public AbstractNotificationProvider getSupportProviderImpl(String providerType) {
-    LOG.info("\n get class support to provider:" + providerType);
-    for (AbstractNotificationProvider providerImpl : listSupportProviderImpl) {
-      if(providerImpl.getSupportType().contains(providerType)) {
-        return providerImpl;
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public MessageInfo buildMessageInfo(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting, SEND_TYPE type) {
+  public MessageInfo buildMessage(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting) {
     LOG.info("\nBuild digest MessageInfo ....");
     long startTime = System.currentTimeMillis();
 
@@ -78,24 +63,32 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
 
     try {
       messageInfo = new MessageInfo();
-      ProviderService providerService = CommonsUtils.getService(ProviderService.class);
+      ProviderSettingService providerService = CommonsUtils.getService(ProviderSettingService.class);
+      NotificationPluginService pluginService = CommonsUtils.getService(NotificationPluginService.class);
+      TemplateGenerator templateGenerator = CommonsUtils.getService(TemplateGenerator.class);
+      NotificationContext nCtx = CommonsUtils.getService(NotificationContext.class);
+      NotificationConfiguration configuration= CommonsUtils.getService(NotificationConfiguration.class);
       
-      List<ProviderData> providerDatas = providerService.getAllProviders();
-      StringBuilder sb = new StringBuilder();
-      for (ProviderData providerData : providerDatas) {
-        String providerType = providerData.getType();
-        List<NotificationMessage> messages = notificationData.get(providerData.getType());
+      List<String> activeProviders = providerService.getActiveProviderIds();
+
+      Writer writer = new StringWriter();
+      for (String providerId : activeProviders) {
+        List<NotificationMessage> messages = notificationData.get(providerId);
         if (messages == null || messages.size() == 0)
           continue;
-        AbstractNotificationProvider providerImpl = getSupportProviderImpl(providerType);
-        sb.append(providerImpl.buildDigestMessageInfo(messages)).append("<br/>");
+        
+        AbstractNotificationPlugin plugin = pluginService.getPlugin(NotificationKey.key(providerId));
+        nCtx.setNotificationMessages(messages);
+        plugin.buildDigest(nCtx, writer);
+        writer.append("<br/>");
       }
       
-      if (sb.toString().isEmpty())
+      StringBuffer sb = ((StringWriter)writer).getBuffer();
+      if (sb.length() == 0) {
         return null;
+      }
       
-      NotificationMessage notificationMessage = notificationData.values().iterator().next().get(0);
-      String language = getLanguage(notificationMessage);
+      String language = NotificationPluginUtils.getLanguage(userSetting.getUserId());
 
       String fromTo = "Today";
       Calendar periodFrom = userSetting.getLastUpdateTime();
@@ -105,19 +98,15 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       
       
       String periodType = "Daily";
-      if(SEND_TYPE.WEEKLY.equals(type)) {
+      if(NotificationUtils.isWeekEnd(configuration.getDayOfWeekend()) &&
+          userSetting.getWeeklyProviders().size() > 0) {
         periodType = "Weekly";
         if(day > 7) {
           periodFrom.setTimeInMillis(currentTime - (86400000 * 7));
         }
-      } else if(SEND_TYPE.MONTHLY.equals(type)) {
-        periodType = "Monthly";
-        if(day > 28) {
-          periodFrom.setTimeInMillis(currentTime - (86400000 * 28));
-        }
       }
       
-      if (SEND_TYPE.DAILY.equals(type) == false) {
+      if ("Weekly".equals(periodType) == true) {
         Locale locale = (language == null || language.length() == 0) ? Locale.ENGLISH : new Locale(language);
         fromTo = TimeConvertUtils.getFormatDate(periodFrom.getTime(), "mmmm dd", locale);
         fromTo += " - ";
@@ -126,17 +115,17 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
       
       TemplateContext ctx = new TemplateContext("DigestProvider", language);
 
-      ctx.put("FIRSTNAME", getFirstName(userSetting.getUserId()));
+      ctx.put("FIRSTNAME", NotificationPluginUtils.getFirstName(userSetting.getUserId()));
       ctx.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
       ctx.put("PERIOD", periodType);
       ctx.put("FROM_TO", fromTo);
       String subject = templateGenerator.processSubject(ctx);
       
-      ctx.put("FOOTER_LINK", getProfileUrl(userSetting.getUserId()));
+      ctx.put("FOOTER_LINK", NotificationPluginUtils.getProfileUrl(userSetting.getUserId()));
       ctx.put("DIGEST_MESSAGES_LIST", sb.toString());
       String body = templateGenerator.processTemplateInContainer(ctx);
 
-      messageInfo.body(body).subject(subject).to(getTo(notificationMessage));
+      messageInfo.body(body).subject(subject).to(NotificationPluginUtils.getTo(userSetting.getUserId()));
     } catch (Exception e) {
       LOG.error("Can not build template of DigestorProviderImpl ", e);
       return null;
@@ -145,21 +134,6 @@ public class DigestorProviderImpl extends AbstractNotificationProvider implement
     LOG.info("End build template of DigestorProviderImpl ... " + (System.currentTimeMillis() - startTime) + " ms");
     
     return messageInfo;
-  }
-
-  @Override
-  public MessageInfo buildMessageInfo(NotificationMessage message) {
-    return null;
-  }
-
-  @Override
-  public List<String> getSupportType() {
-    return new ArrayList<String>();
-  }
-
-  @Override
-  public String buildDigestMessageInfo(List<NotificationMessage> messages) {
-   return null;
   }
 
 }

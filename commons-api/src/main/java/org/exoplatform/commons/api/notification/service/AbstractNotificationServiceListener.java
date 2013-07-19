@@ -17,7 +17,6 @@
 package org.exoplatform.commons.api.notification.service;
 
 import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.service.NotificationServiceListener;
 import org.exoplatform.container.component.BaseComponentPlugin;
 
 public abstract class AbstractNotificationServiceListener extends BaseComponentPlugin implements NotificationServiceListener<NotificationMessage> {

@@ -14,12 +14,12 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.plugin;
+package org.exoplatform.commons.api.notification.plugin.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappingKey {
+public class TemplateConfig {
   public static final String  DEFAULT_SRC_RESOURCE_BUNDLE_KEY = "locale.notification.template.NotificationTemplate";
   
   public static final String  DEFAULT_SRC_RESOURCE_TEMPLATE_KEY = "war:/notification/templates";
@@ -44,11 +44,11 @@ public class MappingKey {
 
   private Map<String, String> keyMapping               = new HashMap<String, String>();
 
-  public MappingKey() {
+  public TemplateConfig() {
     localeResouceBundle = DEFAULT_SRC_RESOURCE_BUNDLE_KEY;
   }
 
-  public MappingKey(String providerId) {
+  public TemplateConfig(String providerId) {
     this();
     this.providerId = providerId;
   }
@@ -63,8 +63,9 @@ public class MappingKey {
   /**
    * @param providerId the providerId to set
    */
-  public void setProviderId(String providerId) {
+  public TemplateConfig setProviderId(String providerId) {
     this.providerId = providerId;
+    return this;
   }
 
   /**
@@ -113,7 +114,7 @@ public class MappingKey {
     this.keyMapping = keyMapping;
   }
 
-  public MappingKey addKeyMapping(String key, String value) {
+  public TemplateConfig addKeyMapping(String key, String value) {
     this.keyMapping.put(key, value);
     return this;
   }
@@ -127,8 +128,8 @@ public class MappingKey {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof MappingKey) {
-      return ((MappingKey) obj).getProviderId().equals(this.getProviderId());
+    if (obj instanceof TemplateConfig) {
+      return ((TemplateConfig) obj).getProviderId().equals(this.getProviderId());
     }
     return false;
   }

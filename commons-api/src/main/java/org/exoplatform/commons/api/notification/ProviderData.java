@@ -18,14 +18,19 @@ package org.exoplatform.commons.api.notification;
 
 
 public class ProviderData {
-  
-  private String              type;
 
-  private int                 order     = 0;
+  private String  type;
+
+  private int     order    = 0;
+
+  private String  resourceBundleKey;
+
+  private boolean isActive = true;
 
   public ProviderData() {
 
   }
+
   /**
    * @return the type
    */
@@ -47,11 +52,46 @@ public class ProviderData {
   public int getOrder() {
     return order;
   }
+
   /**
    * @param order the order to set
    */
   public ProviderData setOrder(int order) {
     this.order = order;
+    return this;
+  }
+
+  /**
+   * @return the resourceBundleKey
+   */
+  public String getResourceBundleKey() {
+    return resourceBundleKey;
+  }
+
+  /**
+   * @param resourceBundleKey the resourceBundleKey to set
+   */
+  public ProviderData setResourceBundleKey(String resourceBundleKey) {
+    this.resourceBundleKey = resourceBundleKey;
+    return this;
+  }
+
+  /**
+   * @return the isActive
+   */
+  public boolean isActive() {
+    return isActive;
+  }
+
+  /**
+   * @param isActive the isActive to set
+   */
+  public ProviderData setActive(boolean isActive) {
+    this.isActive = isActive;
+    return this;
+  }
+
+  public ProviderData end() {
     return this;
   }
 }

@@ -17,64 +17,50 @@
 package org.exoplatform.commons.api.notification.service.setting;
 
 import java.util.List;
-import java.util.Map;
 
-import org.exoplatform.commons.api.notification.plugin.ActiveProviderPlugin;
-import org.exoplatform.commons.api.notification.plugin.GroupProviderModel;
+import org.exoplatform.commons.api.notification.GroupProvider;
+import org.exoplatform.commons.api.notification.ProviderData;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
+import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
 
 public interface ProviderSettingService {
-  /**
-   * The function to register active provider plugin.
-   * 
-   * @param activeProviderPlugin
-   */
-  void registerActiveProviderPlugin(ActiveProviderPlugin activeProviderPlugin);
 
   /**
-   * The function to register group provider plugin.
-   * 
-   * @param groupProviderPlugin
+   * @param pluginConfig
    */
-  void registerGroupProviderPlugin(GroupProviderPlugin groupProviderPlugin);
+  void registerPluginConfig(PluginConfig pluginConfig);
 
   /**
-   * Get all active Provider's Id for users's setting
-   * 
-   * @param isAdmin is administrator or not.
-   * @return
+   * @param pluginConfig
    */
-  List<String> getActiveProviderIds(boolean isAdmin);
-
-  /**
-   * Get all active profiver's Id for administrator's setting
-   * 
-   * @return the Map data with
-   *  + Key is active provider's Id
-   *  + Value is administrator or not.
-   */
-  Map<String, Boolean> getActiveProviderIdForSetting();
-
-  /**
-   * Save active provider's Id on administrators's setting
-   * 
-   * @param mapProviderId the map to save
-   *  + Key is active provider's Id
-   *  + Value is administrator or not.
-   */
-  void setActiveProviders(Map<String, Boolean> mapProviderId);
+  void registerGroupConfig(GroupProviderPlugin groupConfig);
   
   /**
-   * 
+   * @param pluginId
    * @return
    */
-  List<GroupProviderModel> getGroupProviders();
-  
+  PluginConfig getPluginConfig(String pluginId);
+
   /**
    * @return
    */
-  boolean getActiveFeature() ;
-  
+  List<GroupProvider> getGroupProviders();
+
+  /**
+   * @param providerDatas
+   */
+  void saveActiveProviders(List<ProviderData> providerDatas);
+
+  /**
+   * @return
+   */
+  List<String> getActiveProviderIds();
+
+  /**
+   * @return
+   */
+  boolean getActiveFeature();
+
   /**
    * 
    */

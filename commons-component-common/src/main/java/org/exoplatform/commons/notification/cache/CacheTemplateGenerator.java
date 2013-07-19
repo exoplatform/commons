@@ -16,15 +16,12 @@
  */
 package org.exoplatform.commons.notification.cache;
 
-import java.util.Map;
-
 import org.exoplatform.commons.api.notification.TemplateContext;
-import org.exoplatform.commons.api.notification.plugin.TemplateConfigurationPlugin;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.notification.impl.TemplateGeneratorImpl;
-import org.exoplatform.commons.notification.template.TemplateVisitorContext;
 import org.exoplatform.commons.notification.template.TemplateElement;
+import org.exoplatform.commons.notification.template.TemplateVisitorContext;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.future.FutureExoCache;
@@ -37,6 +34,7 @@ public class CacheTemplateGenerator implements TemplateGenerator {
   protected FutureExoCache<SimpleCacheKey, TemplateElement, TemplateGeneratorImpl> futureExoCache;
 
   private TemplateGeneratorImpl generatorImpl;
+  
   
   private static final String CONTAINER_LOCALE = "war:/notification/templates/TemplateContainer.gtmpl";
   
@@ -53,11 +51,7 @@ public class CacheTemplateGenerator implements TemplateGenerator {
       }
     };
     futureExoCache = new FutureExoCache<SimpleCacheKey, TemplateElement, TemplateGeneratorImpl>(loader, templateCache);
-  }
-
-  @Override
-  public void registerTemplateConfigurationPlugin(TemplateConfigurationPlugin configurationPlugin) {
-    generatorImpl.registerTemplateConfigurationPlugin(configurationPlugin);
+    
   }
 
   public TemplateElement getTemplateElement(SimpleCacheKey cacheKey) {
