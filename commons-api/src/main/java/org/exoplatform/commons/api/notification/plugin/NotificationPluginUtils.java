@@ -104,7 +104,7 @@ public class NotificationPluginUtils {
   public static String getLanguage(String userId) {
     try {
       UserProfile profile = getOrganizationService().getUserProfileHandler().findUserProfileByName(userId);
-      return profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]);
+      return (profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]) != null) ? profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]) : DEFAULT_LANGUAGE;
     } catch (Exception e) {
       return DEFAULT_LANGUAGE;
     }

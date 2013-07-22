@@ -36,12 +36,15 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   
   private boolean process(NotificationContext ctx, NotificationCommand command) {
     NotificationDataStorage storage = CommonsUtils.getService(NotificationDataStorage.class);
-    storage.add(create(ctx, command));
+    NotificationMessage message = create(ctx, command);
+    if (message != null ) {
+      storage.add(message);
+    }
     return true;
   }
 
   private NotificationMessage create(NotificationContext ctx, NotificationCommand command) {
-    return null;
+    return command.getPlugin().buildNotification(ctx);
   }
 
   @Override
@@ -60,7 +63,9 @@ public class NotificationExecutorImpl implements NotificationExecutor {
 
   @Override
   public NotificationExecutor with(NotificationCommand command) {
-    this.commands.add(command);
+    if (command != null) {
+      this.commands.add(command);
+    }
     return this;
   }
 
