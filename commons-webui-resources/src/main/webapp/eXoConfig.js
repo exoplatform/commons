@@ -69,11 +69,13 @@ CKEDITOR.editorConfig = function( config ){
 	] ;
 
 	config.toolbar_InlineEdit = [
-		['Bold','Italic','Underline','Strike'],
-    		['-','NumberedList','BulletedList','Outdent','Indent'],
-		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Blockquote'],
-		['-','Link','Unlink','insertPortalLink.btn','content.btn', 'Image'],
-    		['-','Style','Format','Font','FontSize'],
+		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','Scayt','-','Undo','Redo'],
+		['insertGadget.btn','Flash','Table','SpecialChar', 'content.btn', 'Image'],
+                ['Bold','Italic','Underline','Strike','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+		'/',
+                ['NumberedList','BulletedList','-','TextColor','BGColor','-','RemoveFormat'],		
+		['Link','insertPortalLink.btn','Unlink','Anchor'],		
+		['Style','Format','Font','FontSize'],
 		['-','acceptInline.btn','cancelInline.btn']
 	] ;
 	config.toolbar_InlineEditTitle = [
