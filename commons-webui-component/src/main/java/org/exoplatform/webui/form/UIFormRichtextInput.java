@@ -101,7 +101,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
 
     if (toolbar == null) toolbar = BASIC_TOOLBAR;
     if (width == null) width = "'100%'";
-    if (height == null) height = "200";
+    if (height == null) height = "'200px'";
     if (enterMode == null) enterMode = "1";
     if(css == null) css = "'/CommonsResources/ckeditor/contents.css'";
      
