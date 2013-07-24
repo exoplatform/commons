@@ -33,10 +33,10 @@ import org.exoplatform.commons.api.notification.plugin.DigestorService;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
-import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -64,7 +64,7 @@ public class DigestorServiceImpl implements DigestorService {
     try {
       messageInfo = new MessageInfo();
       ProviderSettingService providerService = CommonsUtils.getService(ProviderSettingService.class);
-      NotificationPluginService pluginService = CommonsUtils.getService(NotificationPluginService.class);
+      NotificationPluginContainer pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
       TemplateGenerator templateGenerator = CommonsUtils.getService(TemplateGenerator.class);
       NotificationContext nCtx = CommonsUtils.getService(NotificationContext.class);
       NotificationConfiguration configuration= CommonsUtils.getService(NotificationConfiguration.class);
@@ -96,11 +96,12 @@ public class DigestorServiceImpl implements DigestorService {
       long lastTime =  currentTime - periodFrom.getTimeInMillis();
       long day = lastTime/86400000;
       
-      
+      String pluginId = "DigestDailyPlugin";
       String periodType = "Daily";
       if(NotificationUtils.isWeekEnd(configuration.getDayOfWeekend()) &&
           userSetting.getWeeklyProviders().size() > 0) {
         periodType = "Weekly";
+        pluginId = "DigestWeeklyPlugin";
         if(day > 7) {
           periodFrom.setTimeInMillis(currentTime - (86400000 * 7));
         }
@@ -113,7 +114,7 @@ public class DigestorServiceImpl implements DigestorService {
         fromTo += TimeConvertUtils.getFormatDate(Calendar.getInstance().getTime(), "mmmm dd, yyyy", locale);
       }
       
-      TemplateContext ctx = new TemplateContext("DigestProvider", language);
+      TemplateContext ctx = new TemplateContext(pluginId, language);
 
       ctx.put("FIRSTNAME", NotificationPluginUtils.getFirstName(userSetting.getUserId()));
       ctx.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
@@ -123,7 +124,7 @@ public class DigestorServiceImpl implements DigestorService {
       
       ctx.put("FOOTER_LINK", NotificationPluginUtils.getProfileUrl(userSetting.getUserId()));
       ctx.put("DIGEST_MESSAGES_LIST", sb.toString());
-      String body = templateGenerator.processTemplateInContainer(ctx);
+      String body = templateGenerator.processTemplate(ctx);
 
       messageInfo.body(body).subject(subject).to(NotificationPluginUtils.getTo(userSetting.getUserId()));
     } catch (Exception e) {

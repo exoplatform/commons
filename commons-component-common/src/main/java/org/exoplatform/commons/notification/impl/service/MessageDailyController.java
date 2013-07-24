@@ -20,11 +20,11 @@ import java.util.List;
 
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.model.UserSetting;
-import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.notification.impl.service.process.MessageDaily;
 import org.exoplatform.commons.notification.impl.service.process.MessageProcess;
 import org.exoplatform.commons.notification.impl.service.process.MessageWeekly;
+import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.utils.CommonsUtils;
 
 public class MessageDailyController {
@@ -33,7 +33,7 @@ public class MessageDailyController {
 
   public static MessageDailyController DEFAULT = new MessageDailyController();
   
-  private final NotificationPluginService pluginService;
+  private final NotificationPluginContainer pluginService;
   
   private final ProviderSettingService providerService;
   
@@ -42,7 +42,7 @@ public class MessageDailyController {
     //initialize chain of responsibilities processing
     this.daily = new MessageDaily();
     daily.setNext(new MessageWeekly());
-    this.pluginService = CommonsUtils.getService(NotificationPluginService.class);
+    this.pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
     this.providerService = CommonsUtils.getService(ProviderSettingService.class);
   }
   

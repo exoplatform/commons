@@ -1,0 +1,15 @@
+<div style="border:solid 1px #b7b7b7; padding: 20px; border-radius: 10px; background: #EDF5FF;">
+
+	<strong><%=_ctx.appRes("Notification.title.DigestProvider", PORTAL_NAME, _ctx.appRes("Notification.label.Today"))%></strong><br/>
+	
+	<%=_ctx.appRes("Notification.label.SayHello")%> <%=FIRSTNAME%>,<br/>
+	<%=_ctx.appRes("Notification.message.DigestProvider", PORTAL_NAME, _ctx.appRes("Notification.label.Daily"))%><br/>
+	<%=DIGEST_MESSAGES_LIST%>
+	<br/>
+	<br/>
+	<%
+		String foodLink = "<a href=\"" + FOOTER_LINK + "\">" + _ctx.appRes("Notification.label.ClickHere") + "</a>";
+	%>
+	<%=_ctx.appRes("Notification.footer.DigestProvider", foodLink)%><br/>
+
+</div>

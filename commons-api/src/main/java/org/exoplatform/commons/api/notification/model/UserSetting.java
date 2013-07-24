@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.container.PortalContainer;
+
 /**
  * User setting notification
  */
@@ -28,10 +31,18 @@ public class UserSetting {
   private static UserSetting defaultSetting = null;
   
   public enum FREQUENCY {
-    INSTANTLY, 
-    DAILY_KEY,
-    WEEKLY_KEY;
+    INSTANTLY, DAILY_KEY, WEEKLY_KEY;
+
+    public static FREQUENCY getFrequecy(String name) {
+      for (int i = 0; i < values().length; ++i) {
+        if (values()[i].name().equalsIgnoreCase(name)) {
+          return values()[i];
+        }
+      }
+      return null;
+    }
   }
+
   private boolean     isActive = true;
 
   private Calendar     lastUpdateTime;
@@ -204,27 +215,14 @@ public class UserSetting {
   public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
       defaultSetting = getInstance();
-      defaultSetting.addProvider("NewUserJoinSocialIntranet", FREQUENCY.DAILY_KEY);
-
-      defaultSetting.addProvider("ReceiceConnectionRequest", FREQUENCY.INSTANTLY);
-      defaultSetting.addProvider("ReceiceConnectionRequest", FREQUENCY.DAILY_KEY);
-
-      defaultSetting.addProvider("InvitedJoinSpace", FREQUENCY.INSTANTLY);
-      defaultSetting.addProvider("InvitedJoinSpace", FREQUENCY.WEEKLY_KEY);
-
-      defaultSetting.addProvider("RequestJoinSpace", FREQUENCY.INSTANTLY);
-      defaultSetting.addProvider("RequestJoinSpace", FREQUENCY.WEEKLY_KEY);
-
-      defaultSetting.addProvider("ActivityMentionProvider", FREQUENCY.INSTANTLY);
-
-      defaultSetting.addProvider("ActivityCommentProvider", FREQUENCY.INSTANTLY);
-      defaultSetting.addProvider("ActivityCommentProvider", FREQUENCY.DAILY_KEY);
-
-      defaultSetting.addProvider("ActivityLikeProvider", FREQUENCY.WEEKLY_KEY);
-
-      defaultSetting.addProvider("ActivityPostProvider", FREQUENCY.INSTANTLY);
-
-      defaultSetting.addProvider("ActivityPostSpaceProvider", FREQUENCY.INSTANTLY);
+      ProviderSettingService settingService = (ProviderSettingService) PortalContainer.getInstance()
+                                              .getComponentInstanceOfType(ProviderSettingService.class);
+      List<ProviderData> providerDatas = settingService.getActiveProviders();
+      for (ProviderData providerData : providerDatas) {
+        for (String defaultConf : providerData.getDefaultConfig()) {
+          defaultSetting.addProvider(providerData.getType(), FREQUENCY.getFrequecy("exo:" + defaultConf));
+        }
+      }
     }
 
     return defaultSetting;

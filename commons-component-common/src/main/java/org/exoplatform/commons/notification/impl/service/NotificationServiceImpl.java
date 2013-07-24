@@ -28,13 +28,13 @@ import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.plugin.DigestorService;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
-import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.impl.AbstractService;
+import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -48,10 +48,10 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private List<AbstractNotificationServiceListener> messageListeners = new ArrayList<AbstractNotificationServiceListener>(2);
 
   private final NotificationDataStorage storage;
-  private final NotificationPluginService pluginService;
+  private final NotificationPluginContainer pluginService;
   private final NotificationConfiguration configuration;
 
-  public NotificationServiceImpl(NotificationPluginService pluginService, NotificationDataStorage storage, NotificationConfiguration configuration) {
+  public NotificationServiceImpl(NotificationPluginContainer pluginService, NotificationDataStorage storage, NotificationConfiguration configuration) {
     this.storage = storage;
     this.pluginService = pluginService;
     this.configuration = configuration;

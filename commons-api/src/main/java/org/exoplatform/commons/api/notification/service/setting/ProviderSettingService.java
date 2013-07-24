@@ -59,6 +59,11 @@ public interface ProviderSettingService {
   /**
    * @return
    */
+  List<ProviderData> getActiveProviders();
+
+  /**
+   * @return
+   */
   boolean getActiveFeature();
 
   /**

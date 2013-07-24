@@ -18,7 +18,6 @@ package org.exoplatform.commons.notification.cache;
 
 import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.service.TemplateGenerator;
-import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.notification.impl.TemplateGeneratorImpl;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.commons.notification.template.TemplateVisitorContext;
@@ -41,7 +40,7 @@ public class CacheTemplateGenerator implements TemplateGenerator {
   public CacheTemplateGenerator(CacheService cacheService) {
     generatorImpl = TemplateGeneratorImpl.getInstance();
     //
-    templateCache = cacheService.getCacheInstance(SettingService.class.getSimpleName());
+    templateCache = cacheService.getCacheInstance(TemplateGenerator.class.getSimpleName());
     //
     Loader<SimpleCacheKey, TemplateElement, TemplateGeneratorImpl> loader = 
           new Loader<SimpleCacheKey, TemplateElement, TemplateGeneratorImpl>() {

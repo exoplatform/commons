@@ -22,9 +22,9 @@ import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
-import org.exoplatform.commons.notification.impl.service.process.NotificationProcess;
 import org.exoplatform.commons.notification.impl.service.process.NotificationDaily;
 import org.exoplatform.commons.notification.impl.service.process.NotificationInstantly;
+import org.exoplatform.commons.notification.impl.service.process.NotificationProcess;
 import org.exoplatform.commons.notification.impl.service.process.NotificationWeekly;
 import org.exoplatform.commons.utils.CommonsUtils;
 

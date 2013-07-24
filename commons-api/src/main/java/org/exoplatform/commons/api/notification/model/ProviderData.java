@@ -16,16 +16,21 @@
  */
 package org.exoplatform.commons.api.notification.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ProviderData {
 
-  private String  type;
+  private String       type;
 
-  private int     order    = 0;
+  private int          order         = 0;
 
-  private String  resourceBundleKey;
+  private String       resourceBundleKey;
 
-  private boolean isActive = true;
+  private boolean      isActive      = true;
+
+  private List<String> defaultConfig = new ArrayList<String>();
 
   public ProviderData() {
 
@@ -59,6 +64,20 @@ public class ProviderData {
   public ProviderData setOrder(int order) {
     this.order = order;
     return this;
+  }
+
+  /**
+   * @return the defaultConfig
+   */
+  public List<String> getDefaultConfig() {
+    return defaultConfig;
+  }
+
+  /**
+   * @param defaultConfig the defaultConfig to set
+   */
+  public void setDefaultConfig(List<String> defaultConfig) {
+    this.defaultConfig = defaultConfig;
   }
 
   /**

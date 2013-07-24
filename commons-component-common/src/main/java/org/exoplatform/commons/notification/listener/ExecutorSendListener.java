@@ -22,7 +22,7 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
-import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
+import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
@@ -58,7 +58,7 @@ public class ExecutorSendListener implements Callable<NotificationMessage>{
 
 
   private void processSendEmailNotifcation() {
-    NotificationPluginService pluginService = CommonsUtils.getService(NotificationPluginService.class);
+    NotificationPluginContainer pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
     AbstractNotificationPlugin supportProvider = pluginService.getPlugin(message.getKey());
     if (supportProvider != null) {
       NotificationContext nCtx = CommonsUtils.getService(NotificationContext.class);

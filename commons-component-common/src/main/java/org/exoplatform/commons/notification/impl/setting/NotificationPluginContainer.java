@@ -22,25 +22,31 @@ import java.util.Map;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
-import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.picocontainer.Startable;
 
-public class NotificationPluginServiceImpl implements NotificationPluginService {
-  //TODO rename to NotificationPluginContainer, don't need interface
+public class NotificationPluginContainer implements Startable {
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
   private ProviderSettingService settingService;
   
-  public NotificationPluginServiceImpl(ProviderSettingService settingService) {
+  public NotificationPluginContainer() {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
-    this.settingService = settingService;
+    this.settingService = CommonsUtils.getService(ProviderSettingService.class);
   }
 
   @Override
+  public void start() {
+  }
+
+  @Override
+  public void stop() {
+  }
+
   public AbstractNotificationPlugin getPlugin(NotificationKey key) {
     return pluginMap.get(key);
   }
 
-  @Override
   public void add(AbstractNotificationPlugin plugin) {
     pluginMap.put(plugin.getKey(), plugin);
     //
@@ -49,10 +55,10 @@ public class NotificationPluginServiceImpl implements NotificationPluginService 
     }
   }
 
-  @Override
   public boolean remove(NotificationKey key) {
     pluginMap.remove(key);
     return true;
   }
+
 
 }

@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.notification;
 
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.exoplatform.commons.notification.impl.TemplateGeneratorImpl;
 import org.exoplatform.commons.notification.impl.setting.ProviderSettingServiceImpl;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.groovyscript.GroovyTemplate;
 
 public class TemplateGeneratorTest extends BaseCommonsTestCase {
   
@@ -154,12 +156,25 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
     
     // Test renderTemplateByUrl
     String url = "jar:/groovy/notification/template/include.gtmpl";
-    ctx.clear();
-    ctx.provider(url);
-    ctx.put("subContent", "<br/> test render by url!");
-    String value = generator.processTemplate(ctx);
+    TemplateContext ctx_ = new TemplateContext(url, language);
+    ctx_.put("subContent", "<br/> test render by url!");
+    String value = generator.processTemplate(ctx_);
     assertNotNull(value);
     assertTrue(value.indexOf("test render by url") > 0);
+    
+    // Test performance template
+    ctx.put("_ctx", template);
+    String tml = template.getTemplateText();
+    try {
+    GroovyTemplate gTemplate = new GroovyTemplate(tml);
+    for (int i = 0; i < 1; ++i) {
+//      generator.processTemplate(ctx_);
+        StringWriter  writer = new StringWriter();
+        gTemplate.render(writer, ctx);
+    }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
 }

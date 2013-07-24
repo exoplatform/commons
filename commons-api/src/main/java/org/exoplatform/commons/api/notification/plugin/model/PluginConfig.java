@@ -16,15 +16,20 @@
  */
 package org.exoplatform.commons.api.notification.plugin.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PluginConfig {
 
   private String         pluginId;
 
   private String         resourceBundleKey;
 
-  private String         order;
+  private String         order = "0";
 
   private String         groupId = "other";
+  
+  private List<String>   defaultConfig = new ArrayList<String>();
 
   private GroupConfig    groupConfig;
 
@@ -73,6 +78,20 @@ public class PluginConfig {
    */
   public void setOrder(String order) {
     this.order = order;
+  }
+
+  /**
+   * @return the defaultConfig
+   */
+  public List<String> getDefaultConfig() {
+    return defaultConfig;
+  }
+
+  /**
+   * @param defaultConfig the defaultConfig to set
+   */
+  public void setDefaultConfig(List<String> defaultConfig) {
+    this.defaultConfig = defaultConfig;
   }
 
   /**

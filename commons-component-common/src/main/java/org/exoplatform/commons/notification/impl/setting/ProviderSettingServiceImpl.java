@@ -40,7 +40,9 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
 
   private Map<String, GroupProvider> groupProviderMap   = new ConcurrentHashMap<String, GroupProvider>();
 
-  private List<String>               activeProviderIds        = new ArrayList<String>();
+  private List<String>               activeProviderIds  = new ArrayList<String>();
+
+  private List<ProviderData>         activeProviders    = new ArrayList<ProviderData>();
 
   private static final String        NAME_SPACES        = "exo:";
 
@@ -55,30 +57,30 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
   @Override
   public void registerPluginConfig(PluginConfig pluginConfig) {
     pluginConfigs.add(pluginConfig);
-
     ProviderData providerData = new ProviderData();
     providerData.setType(pluginConfig.getPluginId())
                 .setOrder(Integer.valueOf(pluginConfig.getOrder()))
                 .setActive(isActive(pluginConfig.getPluginId(), true))
                 .setResourceBundleKey(pluginConfig.getResourceBundleKey());
+    
+    //
+    String groupId = pluginConfig.getGroupId();
     GroupConfig gConfig = pluginConfig.getGroupConfig();
     if(gConfig != null) {
-      if (groupProviderMap.containsKey(gConfig.getId())) {
-        groupProviderMap.get(gConfig.getId()).addProviderData(providerData);
-      } else {
-        GroupProvider groupProvider = new GroupProvider(gConfig.getId());
+      groupId = gConfig.getId();
+    }
+    //
+    if (groupProviderMap.containsKey(groupId)) {
+      groupProviderMap.get(groupId).addProviderData(providerData);
+    } else if (groupId != null && groupId.length() > 0) {
+      GroupProvider groupProvider = new GroupProvider(groupId);
+      groupProvider.addProviderData(providerData);
+      if (gConfig != null) {
         groupProvider.setOrder(Integer.valueOf(gConfig.getOrder()));
         groupProvider.setResouceBundleKey(gConfig.getResourceBundleKey());
-        groupProvider.addProviderData(providerData);
-        groupProviderMap.put(gConfig.getId(), groupProvider);
       }
-    } else {
-      String groupId = pluginConfig.getGroupId();
-      if (groupProviderMap.containsKey(groupId)) {
-        groupProviderMap.get(groupId).addProviderData(providerData);
-      }
+      groupProviderMap.put(groupId, groupProvider);
     }
-    
     
   }
 
@@ -88,6 +90,9 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
       GroupProvider groupProvider = new GroupProvider(gconfig.getId());
       groupProvider.setOrder(Integer.valueOf(gconfig.getOrder()));
       groupProvider.setResouceBundleKey(gconfig.getResourceBundleKey());
+      if (groupProviderMap.containsKey(gconfig.getId())) {
+        groupProvider.setProviderDatas(groupProviderMap.get(gconfig.getId()).getProviderDatas());
+      }
       groupProviderMap.put(gconfig.getId(), groupProvider);
     }
   }
@@ -124,6 +129,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
       }
     }
     activeProviderIds.clear();
+    activeProviders.clear();
   }
 
   @Override
@@ -138,6 +144,21 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
     }
 
     return activeProviderIds;
+  }
+
+  @Override
+  public List<ProviderData> getActiveProviders() {
+    if(activeProviders.size() == 0) {
+      for (GroupProvider groupProvider : groupProviderMap.values()) {
+        for (ProviderData providerData : groupProvider.getProviderDatas()) {
+          if(isActive(providerData.getType(), false)) {
+            activeProviders.add(providerData);
+          }
+        }
+      }
+    }
+    
+    return activeProviders;
   }
 
   private void saveSetting(String property, boolean value) {
