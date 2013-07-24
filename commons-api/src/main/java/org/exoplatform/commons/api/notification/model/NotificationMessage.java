@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification;
+package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,13 +49,10 @@ public class NotificationMessage {
 
   private String[]            sendToWeekly;
 
-  private String[]            sendToMonthly;
-
   public NotificationMessage() {
     this.id = PREFIX_ID + IdGenerator.generate();
     this.sendToDaily = new String[] { "" };
     this.sendToWeekly = new String[] { "" };
-    this.sendToMonthly = new String[] { "" };
   }
 
   public String getId() {
@@ -253,28 +250,6 @@ public class NotificationMessage {
     return this;
   }
 
-  /**
-   * @return the sendToMonthly
-   */
-  public String[] getSendToMonthly() {
-    return sendToMonthly;
-  }
-
-  /**
-   * @param userIds the list userIds to set for sendToMonthly
-   */
-  public NotificationMessage setSendToMonthly(String[] userIds) {
-    this.sendToMonthly = userIds;
-    return this;
-  }
-
-  /**
-   * @param userId the userId to set into sendToMonthly
-   */
-  public NotificationMessage setSendToMonthly(String userId) {
-    this.sendToMonthly = addMoreItemInArray(sendToMonthly, userId);
-    return this;
-  }
   
   @Override
   public boolean equals(Object o) {
@@ -289,8 +264,7 @@ public class NotificationMessage {
     StringBuffer buffer = new StringBuffer("{");
     buffer.append("providerType: ").append(key)
     .append(", sendToDaily: ").append(Arrays.asList(sendToDaily).toString())
-    .append(", sendToWeekly: ").append(Arrays.asList(sendToWeekly).toString())
-    .append(", sendToMonthly: ").append(Arrays.asList(sendToMonthly).toString());
+    .append(", sendToWeekly: ").append(Arrays.asList(sendToWeekly).toString());
     return buffer.toString();
   }
 

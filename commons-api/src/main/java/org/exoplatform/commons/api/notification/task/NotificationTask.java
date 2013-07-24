@@ -16,7 +16,7 @@
  */
 package org.exoplatform.commons.api.notification.task;
 
-import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
 
 public interface NotificationTask <T> {
   /**

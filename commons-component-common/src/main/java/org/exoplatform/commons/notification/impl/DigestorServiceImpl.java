@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.exoplatform.commons.api.notification.MessageInfo;
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.TemplateContext;
-import org.exoplatform.commons.api.notification.UserNotificationSetting;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.DigestorService;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
@@ -51,7 +51,7 @@ public class DigestorServiceImpl implements DigestorService {
   }
   
   
-  public MessageInfo buildMessage(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting) {
+  public MessageInfo buildMessage(Map<NotificationKey, List<NotificationMessage>> notificationData, UserSetting userSetting) {
     LOG.info("\nBuild digest MessageInfo ....");
     long startTime = System.currentTimeMillis();
 
@@ -73,7 +73,7 @@ public class DigestorServiceImpl implements DigestorService {
 
       Writer writer = new StringWriter();
       for (String providerId : activeProviders) {
-        List<NotificationMessage> messages = notificationData.get(providerId);
+        List<NotificationMessage> messages = notificationData.get(NotificationKey.key(providerId));
         if (messages == null || messages.size() == 0)
           continue;
         

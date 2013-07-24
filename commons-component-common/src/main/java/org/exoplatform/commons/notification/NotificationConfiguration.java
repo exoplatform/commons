@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.notification;
 
+import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.container.xml.InitParams;
 
 public class NotificationConfiguration {

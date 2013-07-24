@@ -62,7 +62,7 @@ public final class NotificationKey implements Serializable {
   }
   @Override
   public int hashCode() {
-    return id != null ? id.hashCode() : 0;
+    return (id != null ? id.hashCode() : 0);
   }
   
   @Override

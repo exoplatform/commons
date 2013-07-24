@@ -8,17 +8,28 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.service;
+package org.exoplatform.commons.notification.impl.service.process;
 
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
-import org.exoplatform.container.component.BaseComponentPlugin;
+import org.exoplatform.commons.api.notification.model.UserSetting;
 
-public abstract class AbstractNotificationServiceListener extends BaseComponentPlugin implements NotificationServiceListener<NotificationMessage> {
-  public abstract void processListener(NotificationMessage ctx);
+public class MessageDaily extends MessageProcess {
+
+  @Override
+  void doProcess(UserSetting setting, NotificationMessage notification) {
+    //process digest mail here
+    
+  }
+
+  @Override
+  boolean isValid(UserSetting setting, NotificationMessage notification) {
+    return setting.isInDaily(notification.getKey().getId());
+  }
+
 }

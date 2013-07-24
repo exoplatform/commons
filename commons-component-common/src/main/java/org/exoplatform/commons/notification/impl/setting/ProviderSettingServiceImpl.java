@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.api.notification.GroupProvider;
-import org.exoplatform.commons.api.notification.ProviderData;
+import org.exoplatform.commons.api.notification.model.ProviderData;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.model.GroupConfig;
 import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;

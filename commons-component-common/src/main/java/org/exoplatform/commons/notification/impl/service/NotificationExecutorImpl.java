@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl.spi;
+package org.exoplatform.commons.notification.impl.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
-import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.utils.CommonsUtils;
 
 public class NotificationExecutorImpl implements NotificationExecutor {
@@ -35,16 +35,18 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   }
   
   private boolean process(NotificationContext ctx, NotificationCommand command) {
-    NotificationDataStorage storage = CommonsUtils.getService(NotificationDataStorage.class);
-    NotificationMessage message = create(ctx, command);
-    if (message != null ) {
-      storage.add(message);
+    try {
+      NotificationService service = CommonsUtils.getService(NotificationService.class);
+      service.process(create(ctx, command));
+      return true;
+    } catch (Exception e) {
+      ctx.setException(e);
+      return false;
     }
-    return true;
   }
 
   private NotificationMessage create(NotificationContext ctx, NotificationCommand command) {
-    return command.getPlugin().buildNotification(ctx);
+    return command.processNotification(ctx);
   }
 
   @Override

@@ -19,11 +19,11 @@ package org.exoplatform.commons.api.notification.plugin;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.commons.api.notification.MessageInfo;
-import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.UserNotificationSetting;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.UserSetting;
 
 public interface DigestorService {
 
-  public MessageInfo buildMessage(Map<String, List<NotificationMessage>> notificationData, UserNotificationSetting userSetting);
+  public MessageInfo buildMessage(Map<NotificationKey, List<NotificationMessage>> notificationData, UserSetting userSetting);
 }

@@ -18,6 +18,7 @@ package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.jcr.Node;
@@ -26,89 +27,88 @@ import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
-import org.exoplatform.commons.api.notification.UserNotificationSetting;
-import org.exoplatform.commons.api.notification.UserNotificationSetting.FREQUENCY;
-import org.exoplatform.commons.api.notification.service.setting.UserNotificationService;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.notification.AbstractService;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public class UserNotificationServiceImpl extends AbstractService implements UserNotificationService {
-  private static final Log   LOG                = ExoLogger.getLogger(UserNotificationServiceImpl.class); 
-  
+public class UserSettingServiceImpl extends AbstractService implements UserSettingService {
+  private static final Log   LOG  = ExoLogger.getLogger(UserSettingServiceImpl.class); 
+  /** Setting Scope on Common Setting **/
   private static final Scope NOTIFICATION_SCOPE = Scope.GLOBAL;
-
   private SettingService settingService;
-  
   private String workspace;
 
-  public UserNotificationServiceImpl(SettingService settingService, NotificationConfiguration configuration) {
+  public UserSettingServiceImpl(SettingService settingService, NotificationConfiguration configuration) {
     this.settingService = settingService;
     this.workspace = configuration.getWorkspace();
   }
 
   @Override
-  public void saveUserNotificationSetting(UserNotificationSetting notificationSetting) {
+  public void save(UserSetting model) {
     
-    String userId = notificationSetting.getUserId();
-    String instantlys = NotificationUtils.listToString(notificationSetting.getInstantlyProviders());
-    String dailys = NotificationUtils.listToString(notificationSetting.getDailyProviders());
-    String weeklys = NotificationUtils.listToString(notificationSetting.getWeeklyProviders());
-    String monthlys = NotificationUtils.listToString(notificationSetting.getMonthlyProviders());
+    String userId = model.getUserId();
+    String instantlys = NotificationUtils.listToString(model.getInstantlyProviders());
+    String dailys = NotificationUtils.listToString(model.getDailyProviders());
+    String weeklys = NotificationUtils.listToString(model.getWeeklyProviders());
     
-    saveUserSetting(userId, EXO_IS_ACTIVE, String.valueOf(notificationSetting.isActive()));
-    saveUserSetting(userId, FREQUENCY.INSTANTLY.getName(), instantlys);
-    saveUserSetting(userId, FREQUENCY.DAILY_KEY.getName(), dailys);
-    saveUserSetting(userId, FREQUENCY.WEEKLY_KEY.getName(), weeklys);
-    saveUserSetting(userId, FREQUENCY.MONTHLY_KEY.getName(), monthlys);
+    saveUserSetting(userId, EXO_IS_ACTIVE, String.valueOf(model.isActive()));
+    saveUserSetting(userId, EXO_INSTANTLY, instantlys);
+    saveUserSetting(userId, EXO_DAILY, dailys);
+    saveUserSetting(userId, EXO_WEEKLY, weeklys);
     
     //
-    removeMixinForDefautlSetting(userId);
+    removeMixin(userId);
   }
   
+  /**
+   * Using the common setting service to store the data
+   * 
+   * @param userId the userId
+   * @param key the Setting key
+   * @param value the Setting value
+   */
   private void saveUserSetting(String userId, String key, String value) {
-    settingService.set(Context.USER.id(userId), NOTIFICATION_SCOPE, 
-                       key, SettingValue.create(value));
+    settingService.set(Context.USER.id(userId), NOTIFICATION_SCOPE, key, SettingValue.create(value));
   }
 
   @Override
-  public UserNotificationSetting getUserNotificationSetting(String userId) {
-    UserNotificationSetting notificationSetting = new UserNotificationSetting();
-    notificationSetting.setUserId(userId);
+  public UserSetting get(String userId) {
+    UserSetting model = new UserSetting();
+    model.setUserId(userId);
 
     //
-    List<String> instantlys = getSettingValue(userId, FREQUENCY.INSTANTLY);
+    List<String> instantlys = getSettingValue(userId, EXO_INSTANTLY);
     if(instantlys != null) {
-      notificationSetting.setActive(isActiveValue(userId));
-
-      notificationSetting.setInstantlyProviders(instantlys);
-      notificationSetting.setDailyProviders(getSettingValue(userId, FREQUENCY.DAILY_KEY));
-      notificationSetting.setWeeklyProviders(getSettingValue(userId, FREQUENCY.WEEKLY_KEY));
-      notificationSetting.setMonthlyProviders(getSettingValue(userId, FREQUENCY.MONTHLY_KEY));
+      model.setActive(isActiveValue(userId));
+      model.setInstantlyProviders(instantlys);
+      model.setDailyProviders(getSettingValue(userId, EXO_DAILY));
+      model.setWeeklyProviders(getSettingValue(userId, EXO_WEEKLY));
     } else {
-      notificationSetting = UserNotificationSetting.getDefaultInstance();
+      model = UserSetting.getDefaultInstance();
       //
-      addMixinForDefautlSetting(userId);
+      addMixin(userId);
     }
-    return notificationSetting;
+    return model;
   }
 
   @SuppressWarnings("unchecked")
-  private List<String> getSettingValue(String userId, FREQUENCY  frequency) {
-    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, frequency.getName());
+  private List<String> getSettingValue(String userId, String propertyName) {
+    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_DAILY);
     if (values != null) {
       String strs = values.getValue();
       return Arrays.asList(strs.split(","));
     }
-    return null;
+    return Collections.EMPTY_LIST;
   }
 
   @SuppressWarnings("unchecked")
@@ -120,10 +120,15 @@ public class UserNotificationServiceImpl extends AbstractService implements User
     return false;
   }
   
-  private void addMixinForDefautlSetting(String userId) {
-    SessionProvider sProvider = createSystemProvider();
+  /**
+   * Using the mixin type to mark the user's setting.
+   * 
+   * @param userId
+   */
+  private void addMixin(String userId) {
+    SessionProvider sProvider = getSystemProvider();
+    Session session = getSession(sProvider, workspace);
     try {
-      Session session = getSession(sProvider, workspace);
       Node settingNode = session.getRootNode().getNode(SETTING_NODE);
       Node userHomeNode, userNode = null;
       if(settingNode.hasNode(SETTING_USER_NODE)) {
@@ -131,25 +136,34 @@ public class UserNotificationServiceImpl extends AbstractService implements User
       } else {
         userHomeNode = settingNode.addNode(SETTING_USER_NODE, STG_SUBCONTEXT);
       }
+      
+      
       if (userHomeNode.hasNode(userId)) {
         userNode = userHomeNode.getNode(userId);
       } else {
         userNode = userHomeNode.addNode(userId, STG_SIMPLE_CONTEXT);
       }
-      sessionSave(userHomeNode);
+      
       
       //
       if (userNode.canAddMixin(MIX_DEFAULT_SETTING)) {
         userNode.addMixin(MIX_DEFAULT_SETTING);
-        sessionSave(userNode);
       }
+      
+      session.save();
     } catch (Exception e) {
       LOG.error("Failed to add mixin for default setting of user: " + userId, e);
     }
   }
 
-  private void removeMixinForDefautlSetting(String userId) {
-    SessionProvider sProvider = createSystemProvider();
+  /**
+   * When has any changes on the user's default setting.
+   * We must remove the mix type for user setting.
+   * 
+   * @param userId the userId for removing
+   */
+  private void removeMixin(String userId) {
+    SessionProvider sProvider = getSystemProvider();
     try {
       Session session = getSession(sProvider, workspace);
       Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
@@ -169,22 +183,28 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   private StringBuffer buildQuery() {
     StringBuffer queryBuffer = new StringBuffer();
     queryBuffer.append("@").append(EXO_IS_ACTIVE).append("='true' and (")
-               .append("@").append(FREQUENCY.DAILY_KEY.getName()).append("!=").append("''");
+               .append("@").append(EXO_DAILY).append("!=").append("''");
     //
     if(NotificationUtils.isWeekEnd(6)) {
-      queryBuffer.append("or @").append(FREQUENCY.WEEKLY_KEY.getName()).append("!=").append("''");
+      queryBuffer.append("or @").append(EXO_WEEKLY).append("!=").append("''");
     }
-    //
-    if(NotificationUtils.isMonthEnd(28)) {
-      queryBuffer.append("or @").append(FREQUENCY.MONTHLY_KEY.getName()).append("!=").append("''");
-    }
+    
     //
     queryBuffer.append(")");
 
     return queryBuffer;
   }
   
-  private NodeIterator getDailyUserNotificationSettings(SessionProvider sProvider, int offset, int limit) throws Exception {
+  /**
+   * Gets these plugins what configured the daily
+   * 
+   * @param sProvider
+   * @param offset
+   * @param limit
+   * @return
+   * @throws Exception
+   */
+  private NodeIterator getDailyIterator(SessionProvider sProvider, int offset, int limit) throws Exception {
     Session session = getSession(sProvider, workspace);
     Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
 
@@ -200,43 +220,56 @@ public class UserNotificationServiceImpl extends AbstractService implements User
     return query.execute().getNodes();
   }
   
-  private List<String> getValues(Node node, FREQUENCY frequency) throws Exception {
-    return Arrays.asList(node.getProperty(frequency.getName()).getString().split(","));
-  }
-
-  private UserNotificationSetting getUserNotificationSetting(Node node) throws Exception {
-    UserNotificationSetting notificationSetting = UserNotificationSetting.getInstance();
-    notificationSetting.setDailyProviders(getValues(node, FREQUENCY.DAILY_KEY));
-    notificationSetting.setWeeklyProviders(getValues(node, FREQUENCY.WEEKLY_KEY));
-    notificationSetting.setMonthlyProviders(getValues(node, FREQUENCY.MONTHLY_KEY));
-    notificationSetting.setUserId(node.getParent().getName());
-    notificationSetting.setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
-    return notificationSetting;
-  }
 
   @Override
-  public List<UserNotificationSetting> getDailyUserNotificationSettings(int offset, int limit) {
-    SessionProvider sProvider = createSystemProvider();
-    List<UserNotificationSetting> notificationSettings = new ArrayList<UserNotificationSetting>();
+  public List<UserSetting> getDaily(int offset, int limit) {
+    SessionProvider sProvider = getSystemProvider();
+    List<UserSetting> models = new ArrayList<UserSetting>();
     try {
-      NodeIterator iter = getDailyUserNotificationSettings(sProvider, offset, limit);
+      NodeIterator iter = getDailyIterator(sProvider, offset, limit);
       while (iter.hasNext()) {
         Node node = iter.nextNode();
-        notificationSettings.add(getUserNotificationSetting(node));
+        models.add(fillModel(node));
       }
     } catch (Exception e) {
       LOG.error("Failed to get all daily users have notification messages", e);
     }
     
     
-    return notificationSettings;
+    return models;
+  }
+  
+  /**
+   * Gets plugin's ID by propertyName
+   * @param node
+   * @param frequency
+   * @return
+   * @throws Exception
+   */
+  private List<String> getValues(Node node, String propertyName) throws Exception {
+    return Arrays.asList(node.getProperty(propertyName).getString().split(","));
+  }
+
+  /**
+   * Fill the model data from UserSetting node
+   * @param node the given node
+   * @return the UserSetting
+   * @throws Exception
+   */
+  private UserSetting fillModel(Node node) throws Exception {
+    UserSetting model = UserSetting.getInstance();
+    model.setDailyProviders(getValues(node, EXO_DAILY));
+    model.setWeeklyProviders(getValues(node, EXO_WEEKLY));
+    model.setUserId(node.getParent().getName());
+    model.setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
+    return model;
   }
   
   @Override
-  public long getSizeDailyUserNotificationSettings() {
-    SessionProvider sProvider = createSystemProvider();
+  public long getNumberOfDaily() {
+    SessionProvider sProvider = getSystemProvider();
     try {
-      NodeIterator iter = getDailyUserNotificationSettings(sProvider, 0, 0);
+      NodeIterator iter = getDailyIterator(sProvider, 0, 0);
       return iter.getSize();
     } catch (Exception e) {
       return 0l;
@@ -244,9 +277,9 @@ public class UserNotificationServiceImpl extends AbstractService implements User
   }
 
   @Override
-  public List<UserNotificationSetting> getDefaultDailyUserNotificationSettings() {
-    SessionProvider sProvider = createSystemProvider();
-    List<UserNotificationSetting> users = new ArrayList<UserNotificationSetting>();
+  public List<UserSetting> getDefaultDaily() {
+    SessionProvider sProvider = getSystemProvider();
+    List<UserSetting> users = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
       if(session.getRootNode().hasNode(SETTING_USER_PATH)) {
@@ -259,7 +292,7 @@ public class UserNotificationServiceImpl extends AbstractService implements User
         NodeIterator iter = query.execute().getNodes();
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          users.add(UserNotificationSetting.getDefaultInstance().clone()
+          users.add(UserSetting.getDefaultInstance().clone()
                     .setUserId(node.getName())
                     .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
         }
@@ -270,7 +303,5 @@ public class UserNotificationServiceImpl extends AbstractService implements User
 
     return users;
   }
-
-  
 
 }

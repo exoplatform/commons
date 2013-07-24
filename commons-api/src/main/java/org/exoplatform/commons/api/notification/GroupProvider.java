@@ -19,6 +19,8 @@ package org.exoplatform.commons.api.notification;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.model.ProviderData;
+
 public class GroupProvider {
   private String             groupId;
 

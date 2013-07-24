@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
 
 public class SendNotificationListenerImpl extends AbstractNotificationServiceListener {

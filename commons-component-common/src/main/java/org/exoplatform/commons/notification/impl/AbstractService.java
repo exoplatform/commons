@@ -14,7 +14,9 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification;
+package org.exoplatform.commons.notification.impl;
+
+import java.util.Calendar;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
@@ -33,6 +35,12 @@ public abstract class AbstractService {
   public static final String STG_SIMPLE_CONTEXT       = "stg:simplecontext";
 
   public static final String EXO_IS_ACTIVE            = "exo:isActive";
+  
+  public static final String EXO_INSTANTLY            = "exo:instantly";
+  
+  public static final String EXO_DAILY                = "exo:daily";
+  
+  public static final String EXO_WEEKLY               = "exo:weekly";
 
   public static final String NTF_FROM                 = "ntf:from";
 
@@ -57,8 +65,6 @@ public abstract class AbstractService {
   public static final String NTF_PROVIDER_HOME        = "ntf:providerHome";
 
   public static final String NTF_PROVIDER_TYPE        = "ntf:providerType";
-
-  public static final String NTF_SEND_TO_MONTHLY      = "ntf:sendToMonthly";
 
   public static final String MIX_SUB_MESSAGE_HOME     = "mix:subMessageHome";
 
@@ -107,6 +113,34 @@ public abstract class AbstractService {
     return notificationHome;
   }
   
+  /**
+   * Makes the node path for MessageHome node
+   * "/eXoNotification/messageHome/<providerId>/<DAY_OF_MONTH>/<HOUR_OF_DAY>/"
+   * @param sProvider
+   * @param providerId
+   * @return
+   * @throws Exception
+   */
+  protected Node getOrCreateMessageParent(SessionProvider sProvider, String workspace, String providerId) throws Exception {
+    //rootPath = "/eXoNotification/messageHome/"
+    Node root = getNotificationHomeNode(sProvider, workspace);
+    //providerPath = /eXoNotification/messageHome/<providerId>/
+    Node providerNode = getOrCreateNode(root, providerId);
+    String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)); 
+    Node dayNode = getOrCreateNode(providerNode, dayName);
+    String hourName = String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+    Node messageParentNode = getOrCreateNode(dayNode, hourName);
+    return messageParentNode;
+  }
+  
+  private Node getOrCreateNode(Node parent, String nodeName) throws Exception {
+    if (parent.hasNode(nodeName) == false) {
+      Node messageHome = parent.addNode(nodeName, NTF_MESSAGE_HOME);
+      return messageHome;
+    }
+    return parent.getNode(nodeName);
+  }
+  
   public static Session getSession(SessionProvider sProvider, String workspace) {
     try {
       if (workspace == null || workspace.length() == 0) {
@@ -126,16 +160,12 @@ public abstract class AbstractService {
     }
   }
   
-  protected static SessionProvider createSystemProvider() {
+  protected static SessionProvider getSystemProvider() {
     return CommonsUtils.getSystemSessionProvider();
   }
   
   protected static void sessionSave(Node node) throws Exception {
-    if (node.isNew()) {
-      node.getSession().save();
-    } else {
-      node.save();
-    }
+    node.getSession().save();
   }
   
 }

@@ -22,16 +22,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.api.notification.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.NotificationMessage;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.commons.api.notification.service.setting.NotificationPluginService;
 import org.exoplatform.commons.notification.impl.command.NotificationCommandImpl;
-import org.exoplatform.commons.notification.impl.spi.NotificationExecutorImpl;
+import org.exoplatform.commons.notification.impl.service.NotificationExecutorImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.PortalContainer;
 
 public final class NotificationContextImpl implements NotificationContext {
   
@@ -101,8 +100,9 @@ public final class NotificationContextImpl implements NotificationContext {
   }
 
   @Override
-  public void setNotificationMessage(NotificationMessage notification) {
+  public NotificationContext setNotificationMessage(NotificationMessage notification) {
     this.notification = notification;
+    return this;
   }
   
   public Exception getException() {

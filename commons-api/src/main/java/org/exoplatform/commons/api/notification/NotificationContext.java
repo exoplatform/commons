@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 
 public interface NotificationContext {
@@ -59,7 +60,7 @@ public interface NotificationContext {
    * Sets notification message
    * @param notification
    */
-  void setNotificationMessage(NotificationMessage notification);
+  NotificationContext setNotificationMessage(NotificationMessage notification);
   
   /**
    * Sets notification message list

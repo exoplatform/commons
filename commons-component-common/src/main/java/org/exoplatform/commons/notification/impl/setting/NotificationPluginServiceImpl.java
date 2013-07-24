@@ -26,6 +26,7 @@ import org.exoplatform.commons.api.notification.service.setting.NotificationPlug
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 
 public class NotificationPluginServiceImpl implements NotificationPluginService {
+  //TODO rename to NotificationPluginContainer, don't need interface
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
   private ProviderSettingService settingService;
   

@@ -20,44 +20,40 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.exoplatform.commons.api.notification.NotificationMessage;
-import org.exoplatform.commons.api.notification.UserNotificationSetting;
-import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 
 
 
 public interface NotificationService {
-  
-  void addNotificationServiceListener();
-
-  void addSendNotificationListener(AbstractNotificationServiceListener listener);
-
   /**
    * Process notification message when have new a @NotificationMessage created.
    * 
    * @param message the new a @NotificationMessage
    */
-  void processNotificationMessage(NotificationMessage  message) ;
+  void process(NotificationMessage  message) throws Exception;
+  
+  /**
+   * Process daily
+   * 
+   * @param message
+   * @throws Exception
+   */
+  void processDaily() throws Exception;
   
   /**
    * Process the list notification message when have new list @NotificationMessage created.
    * 
    * @param messages
    */
-  void processNotificationMessages(Collection<NotificationMessage> messages);
+  void process(Collection<NotificationMessage> messages) throws Exception;
 
-  /**
-   * Save @NotificationMessage on the database
-   * @param message
-   */
-  void saveNotificationMessage(NotificationMessage  message);
-  
   /**
    * Get all @NotificationMessage by userId
    * @param userId
    * @param providerId TODO
    * @return
    */
-  Map<String, List<NotificationMessage>> getNotificationMessagesByUser(UserNotificationSetting userSetting);
-
+  Map<NotificationKey, List<NotificationMessage>> getByUser(UserSetting userSetting);
 }

@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification;
+package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,27 +24,13 @@ import java.util.List;
  * User setting notification
  */
 
-public class UserNotificationSetting {
-  private static UserNotificationSetting defaultSetting = null;
+public class UserSetting {
+  private static UserSetting defaultSetting = null;
   
   public enum FREQUENCY {
-    INSTANTLY("exo:Instantly"), DAILY_KEY("exo:daily"),
-    WEEKLY_KEY("exo:weekly"), MONTHLY_KEY("exo:monthly");
-    private final String name;
-
-    FREQUENCY(String name) {
-      this.name = name;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    @Override
-    public String toString() {
-      return name;
-    }
-
+    INSTANTLY, 
+    DAILY_KEY,
+    WEEKLY_KEY;
   }
   private boolean     isActive = true;
 
@@ -58,18 +44,15 @@ public class UserNotificationSetting {
 
   private List<String> weeklyProviders;
 
-  private List<String> monthlyProviders;
-
-  public UserNotificationSetting() {
+  public UserSetting() {
     this.instantlyProviders = new ArrayList<String>();
     this.dailyProviders = new ArrayList<String>();
     this.weeklyProviders = new ArrayList<String>();
-    this.monthlyProviders = new ArrayList<String>();
     this.lastUpdateTime = Calendar.getInstance();
   }
   
-  public static UserNotificationSetting getInstance() {
-    return new UserNotificationSetting();
+  public static UserSetting getInstance() {
+    return new UserSetting();
   }
 
   /**
@@ -96,7 +79,7 @@ public class UserNotificationSetting {
   /**
    * @param userId the userId to set
    */
-  public UserNotificationSetting setUserId(String userId) {
+  public UserSetting setUserId(String userId) {
     this.userId = userId;
     return this;
   }
@@ -111,7 +94,7 @@ public class UserNotificationSetting {
   /**
    * @param lastUpdateTime the lastUpdateTime to set
    */
-  public UserNotificationSetting setLastUpdateTime(Calendar lastUpdateTime) {
+  public UserSetting setLastUpdateTime(Calendar lastUpdateTime) {
     this.lastUpdateTime = lastUpdateTime;
     return this;
   }
@@ -158,19 +141,6 @@ public class UserNotificationSetting {
     this.weeklyProviders = weeklyProviders;
   }
 
-  /**
-   * @return the monthlyProviders
-   */
-  public List<String> getMonthlyProviders() {
-    return monthlyProviders;
-  }
-
-  /**
-   * @param monthlyProviders the monthlyProviders to set
-   */
-  public void setMonthlyProviders(List<String> monthlyProviders) {
-    this.monthlyProviders = monthlyProviders;
-  }
 
   /**
    * @param providerId the provider's id to add
@@ -180,8 +150,6 @@ public class UserNotificationSetting {
       addProperty(dailyProviders, providerId);
     } else if (frequencyType.equals(FREQUENCY.WEEKLY_KEY)) {
       addProperty(weeklyProviders, providerId);
-    } else if (frequencyType.equals(FREQUENCY.MONTHLY_KEY)) {
-      addProperty(monthlyProviders, providerId);
     } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
       addProperty(instantlyProviders, providerId);
     }
@@ -211,16 +179,9 @@ public class UserNotificationSetting {
     return (weeklyProviders.contains(providerId)) ? true : false;
   }
 
-  /**
-   * @param providerId
-   * @return
-   */
-  public boolean isInMonthly(String providerId) {
-    return (monthlyProviders.contains(providerId)) ? true : false;
-  }
 
   public boolean isActiveWithoutInstantly(String providerId) {
-    return isInDaily(providerId) || isInWeekly(providerId) || isInMonthly(providerId);
+    return isInDaily(providerId) || isInWeekly(providerId);
   }
 
   private void addProperty(List<String> providers, String providerId) {
@@ -230,18 +191,17 @@ public class UserNotificationSetting {
   }
   
   @Override
-  public UserNotificationSetting clone() {
-    UserNotificationSetting setting = getInstance();
+  public UserSetting clone() {
+    UserSetting setting = getInstance();
     setting.setActive(isActive);
     setting.setDailyProviders(dailyProviders);
     setting.setWeeklyProviders(weeklyProviders);
-    setting.setMonthlyProviders(monthlyProviders);
     setting.setInstantlyProviders(instantlyProviders);
     setting.setUserId(userId);
     return setting;
   }
   
-  public static final UserNotificationSetting getDefaultInstance() {
+  public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
       defaultSetting = getInstance();
       defaultSetting.addProvider("NewUserJoinSocialIntranet", FREQUENCY.DAILY_KEY);

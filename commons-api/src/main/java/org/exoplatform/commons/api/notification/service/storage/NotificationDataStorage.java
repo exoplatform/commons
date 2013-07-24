@@ -16,17 +16,18 @@
  */
 package org.exoplatform.commons.api.notification.service.storage;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
-import org.exoplatform.commons.api.notification.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.plugin.NotificationKey;
+
 
 public interface NotificationDataStorage {
 
-  public NotificationDataStorage add(NotificationMessage notificationMessage);
-
-  public NotificationDataStorage addAll(Collection<NotificationMessage> notificationMessages);
+  void save(NotificationMessage notification) throws Exception;
   
-  public int size();
+  Map<NotificationKey, List<NotificationMessage>> getByUser(UserSetting userSetting);
   
-  public Collection<NotificationMessage> emails();
 }
