@@ -35,34 +35,26 @@ public abstract class AbstractService {
   public static final String STG_SIMPLE_CONTEXT       = "stg:simplecontext";
 
   public static final String EXO_IS_ACTIVE            = "exo:isActive";
-  
+
   public static final String EXO_INSTANTLY            = "exo:instantly";
-  
+
   public static final String EXO_DAILY                = "exo:daily";
-  
+
   public static final String EXO_WEEKLY               = "exo:weekly";
 
   public static final String NTF_FROM                 = "ntf:from";
-
-  public static final String NTF_TYPE                 = "ntf:type";
 
   public static final String NTF_ORDER                = "ntf:order";
 
   public static final String NTF_MESSAGE              = "ntf:message";
 
-  public static final String NTF_IS_ACTIVE            = "ntf:isActive";
-
-  public static final String NTF_PROVIDER             = "ntf:provider";
-
   public static final String NTF_SEND_TO_DAILY        = "ntf:sendToDaily";
-
-  public static final String NTF_MESSAGE_HOME         = "ntf:messageHome";
 
   public static final String NTF_SEND_TO_WEEKLY       = "ntf:sendToWeekly";
 
-  public static final String NTF_NOTIFICATION         = "ntf:notification";
+  public static final String NTF_MESSAGE_HOME         = "ntf:messageHome";
 
-  public static final String NTF_PROVIDER_HOME        = "ntf:providerHome";
+  public static final String NTF_NOTIFICATION         = "ntf:notification";
 
   public static final String NTF_PROVIDER_TYPE        = "ntf:providerType";
 
@@ -74,9 +66,9 @@ public abstract class AbstractService {
 
   public static final String EXO_LAST_MODIFIED_DATE   = "exo:lastModifiedDate";
 
-  public static final String ASCENDING                = " ascending";
-
   public static final String JCR_ROOT                 = "/jcr:root";
+
+  public static final String ASCENDING                = " ascending";
 
   public static final String DESCENDING               = " descending";
 
@@ -97,6 +89,10 @@ public abstract class AbstractService {
   public static final String SETTING_USER_PATH        = "settings/user";
 
   public static final String NOTIFICATION_PARENT_PATH = "/";
+
+  private static final String DAY                     = "d";
+
+  private static final String HOUR                    = "h";
   
   protected static Node getNotificationHomeNode(SessionProvider sProvider, String workspace) throws Exception {
     Node homeNode = getSession(sProvider, workspace).getRootNode();
@@ -112,35 +108,38 @@ public abstract class AbstractService {
     }
     return notificationHome;
   }
-  
+
   /**
    * Makes the node path for MessageHome node
    * "/eXoNotification/messageHome/<providerId>/<DAY_OF_MONTH>/<HOUR_OF_DAY>/"
+   * 
    * @param sProvider
    * @param providerId
    * @return
    * @throws Exception
    */
   protected Node getOrCreateMessageParent(SessionProvider sProvider, String workspace, String providerId) throws Exception {
-    //rootPath = "/eXoNotification/messageHome/"
     Node root = getNotificationHomeNode(sProvider, workspace);
-    //providerPath = /eXoNotification/messageHome/<providerId>/
-    Node providerNode = getOrCreateNode(root, providerId);
-    String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)); 
-    Node dayNode = getOrCreateNode(providerNode, dayName);
+    // rootPath = "/eXoNotification/messageHome/"
+    Node messageHome = getOrCreateNode(root, PREFIX_MESSAGE_HOME_NODE);
+    // providerPath = /eXoNotification/messageHome/<providerId>/
+    Node providerNode = getOrCreateNode(messageHome, providerId);
+    String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+    Node dayNode = getOrCreateNode(providerNode, DAY + dayName);
     String hourName = String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-    Node messageParentNode = getOrCreateNode(dayNode, hourName);
+    Node messageParentNode = getOrCreateNode(dayNode, HOUR + hourName);
     return messageParentNode;
   }
-  
+
   private Node getOrCreateNode(Node parent, String nodeName) throws Exception {
     if (parent.hasNode(nodeName) == false) {
       Node messageHome = parent.addNode(nodeName, NTF_MESSAGE_HOME);
+      messageHome.addMixin(MIX_SUB_MESSAGE_HOME);
       return messageHome;
     }
     return parent.getNode(nodeName);
   }
-  
+
   public static Session getSession(SessionProvider sProvider, String workspace) {
     try {
       if (workspace == null || workspace.length() == 0) {
@@ -151,7 +150,7 @@ public abstract class AbstractService {
       return null;
     }
   }
-  
+
   public static String getCurrentTenantName() {
     try {
       return CommonsUtils.getRepository().getConfiguration().getName();
@@ -159,13 +158,13 @@ public abstract class AbstractService {
       return "defaultTenantName";
     }
   }
-  
+
   protected static SessionProvider getSystemProvider() {
     return CommonsUtils.getSystemSessionProvider();
   }
-  
+
   protected static void sessionSave(Node node) throws Exception {
     node.getSession().save();
   }
-  
+
 }

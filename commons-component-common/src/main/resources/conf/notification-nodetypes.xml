@@ -3,49 +3,6 @@
   <nodeType name="mix:defaultSetting" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
   </nodeType>
 
-  <nodeType name="ntf:provider" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
-    <supertypes>
-      <supertype>nt:base</supertype>
-    </supertypes>
-    <propertyDefinitions>
-      <propertyDefinition name="ntf:type" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
-        <valueConstraints />
-      </propertyDefinition>
-      <propertyDefinition name="ntf:name" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
-        <valueConstraints />
-      </propertyDefinition>
-      <propertyDefinition name="ntf:order" requiredType="Integer" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
-        <valueConstraints />
-      </propertyDefinition>
-      <propertyDefinition name="ntf:params" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
-        <valueConstraints />
-      </propertyDefinition>
-      <propertyDefinition name="ntf:templates" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
-        <valueConstraints />
-      </propertyDefinition>
-      <propertyDefinition name="ntf:subjects" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
-        <valueConstraints />
-      </propertyDefinition>
-      <propertyDefinition name="ntf:digesters" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
-        <valueConstraints />
-      </propertyDefinition>
-    </propertyDefinitions>
-  </nodeType>
-
-  <nodeType name="ntf:providerHome" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
-    <supertypes>
-      <supertype>nt:base</supertype>
-    </supertypes>
-    <childNodeDefinitions>
-      <childNodeDefinition name="*" defaultPrimaryType="ntf:provider" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" sameNameSiblings="false">
-        <requiredPrimaryTypes>
-          <requiredPrimaryType>ntf:provider</requiredPrimaryType>
-        </requiredPrimaryTypes>
-      </childNodeDefinition>
-    </childNodeDefinitions>
-  </nodeType>
-
-
   <nodeType name="ntf:message" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
     <supertypes>
       <supertype>nt:base</supertype>
@@ -103,11 +60,6 @@
       <supertype>nt:unstructured</supertype>
     </supertypes>
     <childNodeDefinitions>
-      <childNodeDefinition name="*" defaultPrimaryType="ntf:providerHome" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" sameNameSiblings="false">
-        <requiredPrimaryTypes>
-          <requiredPrimaryType>ntf:providerHome</requiredPrimaryType>
-        </requiredPrimaryTypes>
-      </childNodeDefinition>
       <childNodeDefinition name="*" defaultPrimaryType="ntf:messageHome" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" sameNameSiblings="false">
         <requiredPrimaryTypes>
           <requiredPrimaryType>ntf:messageHome</requiredPrimaryType>
