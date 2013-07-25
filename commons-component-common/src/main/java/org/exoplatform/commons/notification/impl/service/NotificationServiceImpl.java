@@ -57,6 +57,11 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     this.configuration = configuration;
   }
 
+  @Override
+  public void addSendNotificationListener(AbstractNotificationServiceListener messageListener) {
+    messageListeners.add(messageListener);
+  }
+
   private void processSendNotificationListener(NotificationMessage message) {
     for (AbstractNotificationServiceListener messageListener : messageListeners) {
       messageListener.processListener(message);
@@ -169,9 +174,9 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     List<String> activesProvider = settingService.getActiveProviderIds();
     for (String string : activesProvider) {
       if(setting.isInWeekly(string)) {
-        notificationSetting.addProvider(string, FREQUENCY.WEEKLY_KEY);
+        notificationSetting.addProvider(string, FREQUENCY.WEEKLY);
       } else if(setting.isInDaily(string)) {
-        notificationSetting.addProvider(string, FREQUENCY.DAILY_KEY);
+        notificationSetting.addProvider(string, FREQUENCY.DAILY);
       }
     }
 

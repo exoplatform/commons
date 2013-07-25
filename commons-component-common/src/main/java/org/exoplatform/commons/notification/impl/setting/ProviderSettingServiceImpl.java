@@ -61,8 +61,8 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
     providerData.setType(pluginConfig.getPluginId())
                 .setOrder(Integer.valueOf(pluginConfig.getOrder()))
                 .setActive(isActive(pluginConfig.getPluginId(), true))
-                .setResourceBundleKey(pluginConfig.getResourceBundleKey());
-    
+                .setResourceBundleKey(pluginConfig.getResourceBundleKey())
+                .setDefaultConfig(pluginConfig.getDefaultConfig());
     //
     String groupId = pluginConfig.getGroupId();
     GroupConfig gConfig = pluginConfig.getGroupConfig();
@@ -173,11 +173,15 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
     if (providerId == null || providerId.length() == 0) {
       return false;
     }
-    SettingValue sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + providerId));
-    if (sValue != null) {
-      return ((Boolean) sValue.getValue()) ? true : false;
-    } else if (defaultValue == true) {
-      saveSetting(providerId, true);
+    try {
+      SettingValue sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + providerId));
+      if (sValue != null) {
+        return ((Boolean) sValue.getValue()) ? true : false;
+      } else if (defaultValue == true) {
+        saveSetting(providerId, true);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
     return defaultValue;
   }

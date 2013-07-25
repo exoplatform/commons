@@ -42,34 +42,40 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public class UserSettingServiceImpl extends AbstractService implements UserSettingService {
-  private static final Log   LOG  = ExoLogger.getLogger(UserSettingServiceImpl.class); 
+  private static final Log        LOG                = ExoLogger.getLogger(UserSettingServiceImpl.class);
+
   /** Setting Scope on Common Setting **/
-  private static final Scope NOTIFICATION_SCOPE = Scope.GLOBAL;
-  private SettingService settingService;
-  private String workspace;
+  private static final Scope      NOTIFICATION_SCOPE = Scope.GLOBAL;
+
+  private SettingService            settingService;
+
+  private String                    workspace;
+
+  private NotificationConfiguration configuration;
 
   public UserSettingServiceImpl(SettingService settingService, NotificationConfiguration configuration) {
     this.settingService = settingService;
+    this.configuration = configuration;
     this.workspace = configuration.getWorkspace();
   }
 
   @Override
   public void save(UserSetting model) {
-    
+
     String userId = model.getUserId();
     String instantlys = NotificationUtils.listToString(model.getInstantlyProviders());
     String dailys = NotificationUtils.listToString(model.getDailyProviders());
     String weeklys = NotificationUtils.listToString(model.getWeeklyProviders());
-    
+
     saveUserSetting(userId, EXO_IS_ACTIVE, String.valueOf(model.isActive()));
     saveUserSetting(userId, EXO_INSTANTLY, instantlys);
     saveUserSetting(userId, EXO_DAILY, dailys);
     saveUserSetting(userId, EXO_WEEKLY, weeklys);
-    
+
     //
     removeMixin(userId);
   }
-  
+
   /**
    * Using the common setting service to store the data
    * 
@@ -88,13 +94,13 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
     //
     List<String> instantlys = getSettingValue(userId, EXO_INSTANTLY);
-    if(instantlys != null) {
+    if (instantlys != null) {
       model.setActive(isActiveValue(userId));
       model.setInstantlyProviders(instantlys);
       model.setDailyProviders(getSettingValue(userId, EXO_DAILY));
       model.setWeeklyProviders(getSettingValue(userId, EXO_WEEKLY));
     } else {
-      model = UserSetting.getDefaultInstance();
+      model = UserSetting.getDefaultInstance().setUserId(userId);
       //
       addMixin(userId);
     }
@@ -131,25 +137,23 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     try {
       Node settingNode = session.getRootNode().getNode(SETTING_NODE);
       Node userHomeNode, userNode = null;
-      if(settingNode.hasNode(SETTING_USER_NODE)) {
+      if (settingNode.hasNode(SETTING_USER_NODE)) {
         userHomeNode = settingNode.getNode(SETTING_USER_NODE);
       } else {
         userHomeNode = settingNode.addNode(SETTING_USER_NODE, STG_SUBCONTEXT);
       }
-      
-      
+
       if (userHomeNode.hasNode(userId)) {
         userNode = userHomeNode.getNode(userId);
       } else {
         userNode = userHomeNode.addNode(userId, STG_SIMPLE_CONTEXT);
       }
-      
-      
+
       //
       if (userNode.canAddMixin(MIX_DEFAULT_SETTING)) {
         userNode.addMixin(MIX_DEFAULT_SETTING);
       }
-      
+
       session.save();
     } catch (Exception e) {
       LOG.error("Failed to add mixin for default setting of user: " + userId, e);
@@ -185,16 +189,16 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     queryBuffer.append("@").append(EXO_IS_ACTIVE).append("='true' and (")
                .append("@").append(EXO_DAILY).append("!=").append("''");
     //
-    if(NotificationUtils.isWeekEnd(6)) {
+    if (NotificationUtils.isWeekEnd(configuration.getDayOfWeekend())) {
       queryBuffer.append("or @").append(EXO_WEEKLY).append("!=").append("''");
     }
-    
+
     //
     queryBuffer.append(")");
 
     return queryBuffer;
   }
-  
+
   /**
    * Gets these plugins what configured the daily
    * 
@@ -206,6 +210,9 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    */
   private NodeIterator getDailyIterator(SessionProvider sProvider, int offset, int limit) throws Exception {
     Session session = getSession(sProvider, workspace);
+    if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
+      return null;
+    }
     Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
 
     StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
@@ -213,34 +220,33 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     queryBuffer.append("[").append(buildQuery()).append("]");
     QueryManager qm = session.getWorkspace().getQueryManager();
     QueryImpl query = (QueryImpl) qm.createQuery(queryBuffer.toString(), Query.XPATH);
-    if(limit > 0) {
+    if (limit > 0) {
       query.setLimit(limit);
       query.setOffset(offset);
     }
     return query.execute().getNodes();
   }
   
-
   @Override
   public List<UserSetting> getDaily(int offset, int limit) {
     SessionProvider sProvider = getSystemProvider();
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
       NodeIterator iter = getDailyIterator(sProvider, offset, limit);
-      while (iter.hasNext()) {
+      while (iter != null && iter.hasNext()) {
         Node node = iter.nextNode();
         models.add(fillModel(node));
       }
     } catch (Exception e) {
       LOG.error("Failed to get all daily users have notification messages", e);
     }
-    
-    
+
     return models;
   }
-  
+
   /**
    * Gets plugin's ID by propertyName
+   * 
    * @param node
    * @param frequency
    * @return
@@ -252,6 +258,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   /**
    * Fill the model data from UserSetting node
+   * 
    * @param node the given node
    * @return the UserSetting
    * @throws Exception
@@ -270,7 +277,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     SessionProvider sProvider = getSystemProvider();
     try {
       NodeIterator iter = getDailyIterator(sProvider, 0, 0);
-      return iter.getSize();
+      return (iter == null) ? 0l : iter.getSize();
     } catch (Exception e) {
       return 0l;
     }
@@ -282,9 +289,9 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
-      if(session.getRootNode().hasNode(SETTING_USER_PATH)) {
+      if (session.getRootNode().hasNode(SETTING_USER_PATH)) {
         Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
-        
+
         StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
         queryBuffer.append(userHomeNode.getPath()).append("//element(*,").append(MIX_DEFAULT_SETTING).append(")");
         QueryManager qm = session.getWorkspace().getQueryManager();
@@ -292,7 +299,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         NodeIterator iter = query.execute().getNodes();
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          users.add(UserSetting.getDefaultInstance().clone()
+          users.add(UserSetting.getDefaultInstance()
                     .setUserId(node.getName())
                     .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
         }

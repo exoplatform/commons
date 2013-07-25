@@ -23,6 +23,7 @@ import java.util.Map;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
+import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
 
 
 
@@ -50,10 +51,16 @@ public interface NotificationService {
   void process(Collection<NotificationMessage> messages) throws Exception;
 
   /**
-   * Get all @NotificationMessage by userId
-   * @param userId
-   * @param providerId TODO
+   * Get all @NotificationMessage by userSetting
+   * @param userSetting
    * @return
    */
   Map<NotificationKey, List<NotificationMessage>> getByUser(UserSetting userSetting);
+
+  /**
+   *  Add the send notification listener
+   *  
+   * @param messageListener
+   */
+  void addSendNotificationListener(AbstractNotificationServiceListener messageListener);
 }

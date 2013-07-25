@@ -31,7 +31,7 @@ public class UserSetting {
   private static UserSetting defaultSetting = null;
   
   public enum FREQUENCY {
-    INSTANTLY, DAILY_KEY, WEEKLY_KEY;
+    INSTANTLY, DAILY, WEEKLY;
 
     public static FREQUENCY getFrequecy(String name) {
       for (int i = 0; i < values().length; ++i) {
@@ -157,9 +157,9 @@ public class UserSetting {
    * @param providerId the provider's id to add
    */
   public void addProvider(String providerId, FREQUENCY frequencyType) {
-    if (frequencyType.equals(FREQUENCY.DAILY_KEY)) {
+    if (frequencyType.equals(FREQUENCY.DAILY)) {
       addProperty(dailyProviders, providerId);
-    } else if (frequencyType.equals(FREQUENCY.WEEKLY_KEY)) {
+    } else if (frequencyType.equals(FREQUENCY.WEEKLY)) {
       addProperty(weeklyProviders, providerId);
     } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
       addProperty(instantlyProviders, providerId);
@@ -220,12 +220,12 @@ public class UserSetting {
       List<ProviderData> providerDatas = settingService.getActiveProviders();
       for (ProviderData providerData : providerDatas) {
         for (String defaultConf : providerData.getDefaultConfig()) {
-          defaultSetting.addProvider(providerData.getType(), FREQUENCY.getFrequecy("exo:" + defaultConf));
+          defaultSetting.addProvider(providerData.getType(), FREQUENCY.getFrequecy(defaultConf));
         }
       }
     }
 
-    return defaultSetting;
+    return defaultSetting.clone();
   }
 
 }

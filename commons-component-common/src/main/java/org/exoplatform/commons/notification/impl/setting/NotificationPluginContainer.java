@@ -32,11 +32,16 @@ public class NotificationPluginContainer implements Startable {
   
   public NotificationPluginContainer() {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
-    this.settingService = CommonsUtils.getService(ProviderSettingService.class);
+    settingService = CommonsUtils.getService(ProviderSettingService.class);
   }
 
   @Override
   public void start() {
+    for (AbstractNotificationPlugin plugin : pluginMap.values()) {
+      for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
+        settingService.registerPluginConfig(pluginConfig);
+      }
+    }
   }
 
   @Override
@@ -49,10 +54,6 @@ public class NotificationPluginContainer implements Startable {
 
   public void add(AbstractNotificationPlugin plugin) {
     pluginMap.put(plugin.getKey(), plugin);
-    //
-    for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
-      settingService.registerPluginConfig(pluginConfig);
-    }
   }
 
   public boolean remove(NotificationKey key) {
