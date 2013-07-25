@@ -16,10 +16,8 @@
  */
 package org.exoplatform.commons.notification.impl;
 
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.api.notification.TemplateContext;
@@ -36,8 +34,6 @@ import org.exoplatform.commons.utils.CommonsUtils;
 public class TemplateGeneratorImpl {
 
   private Map<String, SubjectAndDigest> cacheTemplate = new ConcurrentHashMap<String, SubjectAndDigest>();
-  
-  private Set<TemplateConfig> TemplateConfig = new HashSet<TemplateConfig>();
   
   private ProviderSettingService providerSettingService;
 

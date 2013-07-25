@@ -92,13 +92,13 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     UserSetting model = UserSetting.getInstance();
 
     //
-    List<String> instantlys = getSettingValue(userId, EXO_INSTANTLY);
+    List<String> instantlys = getSettingValue(userId, EXO_INSTANTLY, null);
     if (instantlys != null) {
       model.setUserId(userId);
       model.setActive(isActiveValue(userId));
       model.setInstantlyProviders(instantlys);
-      model.setDailyProviders(getSettingValue(userId, EXO_DAILY));
-      model.setWeeklyProviders(getSettingValue(userId, EXO_WEEKLY));
+      model.setDailyProviders(getSettingValue(userId, EXO_DAILY, Collections.emptyList()));
+      model.setWeeklyProviders(getSettingValue(userId, EXO_WEEKLY, Collections.emptyList()));
     } else {
       model = UserSetting.getDefaultInstance().setUserId(userId);
       //
@@ -108,13 +108,13 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   }
 
   @SuppressWarnings("unchecked")
-  private List<String> getSettingValue(String userId, String propertyName) {
+  private List<String> getSettingValue(String userId, String propertyName, List defaultValue ) {
     SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_DAILY);
     if (values != null) {
       String strs = values.getValue();
       return Arrays.asList(strs.split(","));
     }
-    return Collections.EMPTY_LIST;
+    return defaultValue;
   }
 
   @SuppressWarnings("unchecked")
