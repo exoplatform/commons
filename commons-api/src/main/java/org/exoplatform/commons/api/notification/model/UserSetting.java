@@ -215,6 +215,7 @@ public class UserSetting {
   public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
       defaultSetting = getInstance();
+      defaultSetting.setActive(true);
       ProviderSettingService settingService = (ProviderSettingService) PortalContainer.getInstance()
                                               .getComponentInstanceOfType(ProviderSettingService.class);
       List<ProviderData> providerDatas = settingService.getActiveProviders();

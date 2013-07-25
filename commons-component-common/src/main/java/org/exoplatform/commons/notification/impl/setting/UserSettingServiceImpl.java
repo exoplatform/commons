@@ -89,12 +89,12 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public UserSetting get(String userId) {
-    UserSetting model = new UserSetting();
-    model.setUserId(userId);
+    UserSetting model = UserSetting.getInstance();
 
     //
     List<String> instantlys = getSettingValue(userId, EXO_INSTANTLY);
     if (instantlys != null) {
+      model.setUserId(userId);
       model.setActive(isActiveValue(userId));
       model.setInstantlyProviders(instantlys);
       model.setDailyProviders(getSettingValue(userId, EXO_DAILY));

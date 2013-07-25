@@ -66,11 +66,10 @@ public class DigestorServiceImpl implements DigestorService {
       ProviderSettingService providerService = CommonsUtils.getService(ProviderSettingService.class);
       NotificationPluginContainer pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
       TemplateGenerator templateGenerator = CommonsUtils.getService(TemplateGenerator.class);
-      NotificationContext nCtx = CommonsUtils.getService(NotificationContext.class);
       NotificationConfiguration configuration= CommonsUtils.getService(NotificationConfiguration.class);
       
       List<String> activeProviders = providerService.getActiveProviderIds();
-
+      NotificationContext nCtx = NotificationContextImpl.DEFAULT;
       Writer writer = new StringWriter();
       for (String providerId : activeProviders) {
         List<NotificationMessage> messages = notificationData.get(NotificationKey.key(providerId));
