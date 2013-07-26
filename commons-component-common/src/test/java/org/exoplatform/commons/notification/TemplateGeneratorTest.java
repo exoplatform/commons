@@ -19,6 +19,7 @@ package org.exoplatform.commons.notification;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.plugin.model.GroupConfig;
@@ -112,7 +113,7 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
     assertNotNull(template);
     
     assertEquals("jar:/groovy/notification/template/" + providerId + ".gtmpl", template.getResouceLocal());
-    assertEquals("locale.notification.template.NotificationTemplate", template.getResouceBundle().getResouceLocal());
+    assertEquals("locale.notification.template.Notification", template.getResouceBundle().getResouceLocal());
   }
 
   public void testProcessTemplate(){

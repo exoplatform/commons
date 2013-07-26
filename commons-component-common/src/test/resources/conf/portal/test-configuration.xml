@@ -100,8 +100,8 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.setting.UserNotificationService</key>
-    <type>org.exoplatform.commons.notification.impl.setting.UserNotificationServiceImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
+    <type>org.exoplatform.commons.notification.impl.setting.UserSettingServiceImpl</type>
   </component>
   
 	<external-component-plugins>
@@ -173,12 +173,12 @@
         <values-param>
           <name>classpath.resources</name>
           <description>The resources that start with the following package name should be load from file system</description>
-          <value>locale.notification.template.NotificationTemplate</value>
+          <value>locale.notification.template.Notification</value>
         </values-param>
         <values-param>
           <name>portal.resource.names</name>
           <description>The properties files of the portal , those file will be merged into one ResoruceBundle properties </description>
-          <value>locale.notification.template.NotificationTemplate</value>
+          <value>locale.notification.template.Notification</value>
         </values-param>
       </init-params>
     </component-plugin>

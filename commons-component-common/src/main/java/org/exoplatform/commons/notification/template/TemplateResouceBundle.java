@@ -118,7 +118,7 @@ public class TemplateResouceBundle {
       return "";
     }
 
-    if (locale == null) {
+    if (locale == null || locale.getLanguage().isEmpty()) {
       locale = Locale.ENGLISH;
     }
 
@@ -135,7 +135,7 @@ public class TemplateResouceBundle {
     // still null
     if (res == null || res.containsKey(key) == false) {
       if (key.indexOf(".digest.") < 0) {
-        LOG.warn("Can not resource bundle by key: " + key);
+        LOG.warn("Can not get resource bundle by key: " + key);
       }
       return key;
     }
