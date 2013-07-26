@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TemplateConfig {
-  public static final String  DEFAULT_SRC_RESOURCE_BUNDLE_KEY = "locale.notification.template.NotificationTemplate";
+  public static final String  DEFAULT_SRC_RESOURCE_BUNDLE_KEY = "locale.notification.template.Notification";
   
   public static final String  DEFAULT_SRC_RESOURCE_TEMPLATE_KEY = "war:/notification/templates";
 

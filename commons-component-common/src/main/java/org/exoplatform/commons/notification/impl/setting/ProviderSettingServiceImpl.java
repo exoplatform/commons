@@ -173,15 +173,11 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
     if (providerId == null || providerId.length() == 0) {
       return false;
     }
-    try {
-      SettingValue sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + providerId));
-      if (sValue != null) {
-        return ((Boolean) sValue.getValue()) ? true : false;
-      } else if (defaultValue == true) {
-        saveSetting(providerId, true);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
+    SettingValue<?> sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + providerId));
+    if (sValue != null) {
+      return ((Boolean) sValue.getValue()) ? true : false;
+    } else if (defaultValue == true) {
+      saveSetting(providerId, true);
     }
     return defaultValue;
   }

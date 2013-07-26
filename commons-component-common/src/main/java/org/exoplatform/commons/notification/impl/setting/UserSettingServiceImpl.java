@@ -92,13 +92,13 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     UserSetting model = UserSetting.getInstance();
 
     //
-    List<String> instantlys = getSettingValue(userId, EXO_INSTANTLY, null);
+    List<String> instantlys = getArrayListValue(userId, EXO_INSTANTLY, null);
     if (instantlys != null) {
       model.setUserId(userId);
-      model.setActive(isActiveValue(userId));
+      model.setActive(isActive(userId));
       model.setInstantlyProviders(instantlys);
-      model.setDailyProviders(getSettingValue(userId, EXO_DAILY, Collections.emptyList()));
-      model.setWeeklyProviders(getSettingValue(userId, EXO_WEEKLY, Collections.emptyList()));
+      model.setDailyProviders(getArrayListValue(userId, EXO_DAILY, Collections.<String> emptyList()));
+      model.setWeeklyProviders(getArrayListValue(userId, EXO_WEEKLY, Collections.<String> emptyList()));
     } else {
       model = UserSetting.getDefaultInstance().setUserId(userId);
       //
@@ -108,8 +108,12 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   }
 
   @SuppressWarnings("unchecked")
-  private List<String> getSettingValue(String userId, String propertyName, List defaultValue ) {
-    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_DAILY);
+  private SettingValue<String> getSettingValue(String userId, String propertyName) {
+    return (SettingValue<String>) settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, propertyName);
+  }
+
+  private List<String> getArrayListValue(String userId, String propertyName, List<String> defaultValue) {
+    SettingValue<String> values = getSettingValue(userId, propertyName);
     if (values != null) {
       String strs = values.getValue();
       return Arrays.asList(strs.split(","));
@@ -117,9 +121,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     return defaultValue;
   }
 
-  @SuppressWarnings("unchecked")
-  private boolean isActiveValue(String userId) {
-    SettingValue<String> values = (SettingValue<String>) settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_IS_ACTIVE);
+  private boolean isActive(String userId) {
+    SettingValue<String> values = getSettingValue(userId, EXO_IS_ACTIVE);
     if (values != null) {
       return Boolean.valueOf(values.getValue());
     }

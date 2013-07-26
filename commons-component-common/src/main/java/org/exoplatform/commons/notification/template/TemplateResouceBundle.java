@@ -108,7 +108,7 @@ public class TemplateResouceBundle {
         return bundleService.getResourceBundle(resourceLocale, locale);
       }
     } catch (Exception e) {
-      LOG.warn("Can not add resouce bundle of locale " + resourceLocale + "\n" + e.getCause());
+      LOG.warn("Can not add resouce bundle of locale " + resourceLocale + "\n" + e.getMessage());
     }
     return null;
   }
