@@ -7,7 +7,7 @@
 	<portal-skin>
 		<skin-name>Default</skin-name>
 		<skin-module>DocumentSelector</skin-module>
-		<css-path>/skin/DefaultSkin/commons/Stylesheet.css</css-path>
+		<css-path>/skin/css/commons.css</css-path>
 	</portal-skin>
 
 	<module>
