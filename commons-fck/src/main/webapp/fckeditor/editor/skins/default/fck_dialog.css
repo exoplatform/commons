@@ -323,38 +323,6 @@ body, .BackColor
 	z-index: 11;
 }
 
-#closeButton
-{
-	position: absolute;
-	right: 0px;
-	top: 0px;
-	margin-top: 5px;
-	margin-right: 10px;
-	width: 20px;
-	height: 20px;
-	cursor: pointer;
-	background-image: url(images/sprites.png);
-	background-repeat: no-repeat;
-	background-position: -16px -651px;
-}
-
-* html #closeButton
-{
-	cursor: hand;
-	background-image: url(images/sprites.gif);
-}
-
-.rtl #closeButton
-{
-	right: auto;
-	left: 10px;
-	margin-right: 0px;
-}
-
-#closeButton:hover
-{
-	background-position: -16px -687px;
-}
 
 #throbberBlock
 {
