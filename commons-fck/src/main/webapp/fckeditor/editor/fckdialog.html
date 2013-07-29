@@ -753,17 +753,20 @@ var onReadyRegister = function()
 })() ;
 // ]]>
 		</script>
+			<link href="/eXoResources/skin/bootstrap/css/bootstrap.css" type="text/css" rel="stylesheet" />
+	<link href="/eXoResources/skin/css/Core.css" type="text/css" rel="stylesheet" />
 	</head>
 	<body onload="Init();" class="PopupBody">
-		<div class="contents" id="contents">
-			<div id="header">
-				<div id="TitleArea" class="PopupTitle PopupTitleBorder">
+		<div class="contents uiPopup" id="contents">
+			<div id="header" class="popupHeader clearFix">
+				<div id="closeButton" class="uiIconClose pull-right" onclick="Cancel();"></div>
+				<div id="TitleArea"  class="popupTitle">
 					<script type="text/javascript">
 // <![CDATA[
 document.write( Args().Title ) ;
 // ]]>
 					</script>
-					<div id="closeButton" onclick="Cancel();"></div>
+					
 				</div>
 				<div id="TabsRow" class="PopupTabArea" style="display: none">
 					<table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -774,28 +777,18 @@ document.write( Args().Title ) ;
 					</table>
 				</div>
 			</div>
-			<div id="innerContents"></div>
-			<div id="PopupButtons" class="PopupButtons">
-				<table border="0" cellpadding="0" cellspacing="0">
-					<tr>
-						<td width="100%">&nbsp;</td>
-						<td nowrap="nowrap">
-							<input id="btnOk" style="visibility: hidden;" type="button" value="Ok" class="Button" onclick="Ok();" fckLang="DlgBtnOK" />
-							&nbsp;
-							<input id="btnCancel" type="button" value="Cancel" class="Button" onclick="Cancel();" fckLang="DlgBtnCancel" />
-						</td>
-					</tr>
-				</table>
+			<div class="popupContent">			
+				<div id="innerContents" class="resizable"></div>
+				<div id="PopupButtons" class=" uiAction uiActionBorder" style="height:60px;padding-top:20px">
+						
+								<input id="btnOk" style="display:none" type="button" value="Ok" class="btn" onclick="Ok();" fckLang="DlgBtnOK" />
+								&nbsp;
+								<input id="btnCancel" type="button" value="Cancel" class="btn" onclick="Cancel();" fckLang="DlgBtnCancel" />
+						
+				</div>
 			</div>
 		</div>
-		<div class="tl"></div>
-		<div class="tc"></div>
-		<div class="tr"></div>
-		<div class="ml"></div>
-		<div class="mr"></div>
-		<div class="bl"></div>
-		<div class="bc"></div>
-		<div class="br"></div>
+		
 		<div class="cover" id="cover" style="display:none"></div>
 		<div id="throbberBlock" style="position: absolute; visibility: hidden"></div>
 		<script type="text/javascript">
