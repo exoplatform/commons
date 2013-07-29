@@ -79,8 +79,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     Map<NotificationKey, List<NotificationMessage>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationMessage>>();
     try {
       //for daily
+      LOG.info("Get NotificationMessage for daily... ");
       for (String providerId : setting.getDailyProviders()) {
-        LOG.info("Get NotificationMessage for daily... ");
         putMap(notificationData, NotificationKey.key(providerId), getNotificationMessages(sProvider, providerId, NTF_SEND_TO_DAILY, setting.getUserId()));
       }
       
