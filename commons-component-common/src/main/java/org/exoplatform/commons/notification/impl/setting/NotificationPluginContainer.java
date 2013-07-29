@@ -17,35 +17,47 @@
 package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.notification.template.ResouceBundleConfigDeployer;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
 
 public class NotificationPluginContainer implements Startable {
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
-  private ProviderSettingService settingService;
+  private ProviderSettingService pSettingService;
+  private ResouceBundleConfigDeployer deployer;
   
   public NotificationPluginContainer() {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
-    settingService = CommonsUtils.getService(ProviderSettingService.class);
+    pSettingService = CommonsUtils.getService(ProviderSettingService.class);
+    deployer = new ResouceBundleConfigDeployer();
   }
 
   @Override
   public void start() {
+    Set<String> datas = new HashSet<String>();
     for (AbstractNotificationPlugin plugin : pluginMap.values()) {
       for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
-        settingService.registerPluginConfig(pluginConfig);
+        pSettingService.registerPluginConfig(pluginConfig);
+        datas.add(pluginConfig.getTemplateConfig().getLocaleResouceBundle());
       }
+    }
+    if(ServletContainerFactory.getServletContainer().addWebAppListener(deployer)) {
+      deployer.initBundlePath(datas);
     }
   }
 
   @Override
   public void stop() {
+    ServletContainerFactory.getServletContainer().removeWebAppListener(deployer);
   }
 
   public AbstractNotificationPlugin getPlugin(NotificationKey key) {

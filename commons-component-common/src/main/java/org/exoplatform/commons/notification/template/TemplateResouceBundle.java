@@ -18,18 +18,13 @@ package org.exoplatform.commons.notification.template;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Scanner;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
-import org.exoplatform.container.configuration.ConfigurationManagerImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.ResourceBundleData;
@@ -99,37 +94,6 @@ public class TemplateResouceBundle {
     String id = new StringBuffer(CONF_LOCATION).append(resourceLocale.replace(".", "/"))
                       .append("_").append(locale.getLanguage()).append(".properties").toString();
     try {
-      
-      String path = id.replace("war:", ConfigurationManagerImpl.WAR_CONF_LOCATION);
-      String spath = path.substring(0, path.lastIndexOf("/"));
-      Set<String> sPaths = PortalContainer.getInstance().getPortalContext().getResourcePaths(spath);
-      System.out.println("\n all path of " + spath + "  size " + sPaths.size());
-      for (String string : sPaths) {
-        System.out.println(string);
-      }
-      System.out.println("\n\n");
-
-        
-      Enumeration<URL> v = PortalContainer.getInstance().getPortalClassLoader().getResources(path);
-      InputStream is;
-      for (Enumeration<URL> e = v; e.hasMoreElements();) {
-        URL url = e.nextElement();
-        System.out.println("url.getPath() " + url.getPath());
-        is = url.openStream();
-        if(is != null) {
-          String data = getContent(is);
-          System.out.println("XXX: " + data.substring(0, 10));
-          is.close();
-        }
-      }
-      
-      is = PortalContainer.getInstance().getPortalContext().getResourceAsStream(path);
-      if(is != null) {
-        String data = getContent(is);
-        System.out.println(data.substring(0, 10));
-        is.close();
-      }
-
       ConfigurationManager configurationManager = CommonsUtils.getService(ConfigurationManager.class);
       InputStream inputStream = configurationManager.getInputStream(id);
       if (inputStream != null) {

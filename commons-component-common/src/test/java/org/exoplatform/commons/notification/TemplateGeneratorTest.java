@@ -19,7 +19,6 @@ package org.exoplatform.commons.notification;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.plugin.model.GroupConfig;
