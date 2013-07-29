@@ -83,11 +83,19 @@ public class NotificationPluginUtils {
     }
 
     if (from == null || from.length() <= 0) {
-      from = System.getProperty("gatein.email.smtp.from", "noreply@exoplatform.com");
-      String senderName = System.getProperty("exo.notifications.portalname", "eXo");
+      from = getEmailFrom();
+      String senderName = getSenderName();
       from = new StringBuffer(senderName).append("<").append(from).append(">").toString();
     }
     return from;
+  }
+
+  public static String getEmailFrom() {
+    return System.getProperty("gatein.email.smtp.from", "noreply@exoplatform.com");
+  }
+
+  public static String getSenderName() {
+    return System.getProperty("exo.notifications.portalname", "eXo");
   }
 
   public static String getTo(String to) {

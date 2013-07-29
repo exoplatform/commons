@@ -109,27 +109,31 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
 
   @Override
   public List<GroupProvider> getGroupProviders() {
-    List<GroupProvider> groupProviders = new ArrayList<GroupProvider>(groupProviderMap.values());
-    for (GroupProvider groupProvider : groupProviders) {
+    List<GroupProvider> groupProviders = new ArrayList<GroupProvider>();
+    for (GroupProvider groupProvider : groupProviderMap.values()) {
       for (ProviderData providerData : groupProvider.getProviderDatas()) {
         providerData.setActive(isActive(providerData.getType(), false));
       }
+      groupProviders.add(groupProvider);
     }
     Collections.sort(groupProviders, new ComparatorASC());
     return groupProviders;
   }
 
   @Override
-  public void saveActiveProviders(List<ProviderData> providerDatas) {
-    for (ProviderData providerData : providerDatas) {
-      if (providerData.isActive()) {
-        saveSetting(providerData.getType(), true);
-      } else {
-        removeSetting(providerData.getType());
-      }
+  public void saveProvider(String providerId, boolean isActive) {
+    if(isActive) {
+      saveSetting(providerId, isActive);
+    } else {
+      removeSetting(providerId);
     }
     activeProviderIds.clear();
     activeProviders.clear();
+  }
+  
+  @Override
+  public boolean isActive(String providerId) {
+    return isActive(providerId, false);
   }
 
   @Override

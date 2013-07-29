@@ -47,10 +47,16 @@ public interface ProviderSettingService {
   List<GroupProvider> getGroupProviders();
 
   /**
-   * @param providerDatas
+   * @param providerId
+   * @param isActive
    */
-  void saveActiveProviders(List<ProviderData> providerDatas);
+  void saveProvider(String providerId, boolean isActive);
 
+  /**
+   * @param providerId
+   * @return
+   */
+  boolean isActive(String providerId);
   /**
    * @return
    */
