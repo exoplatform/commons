@@ -78,6 +78,9 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     for (String userId : userIds) {
       UserSetting userSetting = notificationService.get(userId);
       
+      if (! userSetting.isActive()) {
+        continue;
+      }
       //
       if (userSetting.isInInstantly(providerId)) {
         processSendNotificationListener(notification.setTo(userId));

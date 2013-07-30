@@ -91,7 +91,7 @@ public class SettingServiceImplTest extends BaseCommonsTestCase {
   }
 
   public void testRemoveSimple() {
-    settingService.set(Context.USER, Scope.SPACE, "a", SettingValue.create("b"));
+    settingService.set(Context.USER.id("foo"), Scope.SPACE, "a", SettingValue.create("b"));
     assertEquals("b", settingService.get(Context.USER.id("foo"), Scope.SPACE, "a").getValue());
 
     settingService.remove(Context.USER, Scope.SPACE, "a");
