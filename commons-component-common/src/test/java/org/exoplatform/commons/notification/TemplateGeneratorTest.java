@@ -20,19 +20,19 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.TemplateContext;
-import org.exoplatform.commons.api.notification.plugin.model.GroupConfig;
-import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
-import org.exoplatform.commons.api.notification.plugin.model.TemplateConfig;
-import org.exoplatform.commons.api.notification.service.TemplateGenerator;
+import org.exoplatform.commons.api.notification.plugin.config.GroupConfig;
+import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
+import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.template.TemplateContext;
+import org.exoplatform.commons.api.notification.service.template.TemplateGenerator;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.notification.cache.CacheTemplateGenerator;
 import org.exoplatform.commons.notification.cache.SimpleCacheKey;
-import org.exoplatform.commons.notification.impl.TemplateGeneratorImpl;
+import org.exoplatform.commons.notification.impl.service.template.TemplateGeneratorImpl;
 import org.exoplatform.commons.notification.impl.setting.ProviderSettingServiceImpl;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
@@ -83,7 +83,7 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
       
       TemplateConfig templateConfig = new TemplateConfig();
       templateConfig.setProviderId(providerId);
-      templateConfig.setLocaleResouceTemplate("jar:/groovy/notification/template/" + providerId + ".gtmpl");
+      templateConfig.setTemplatePath("jar:/groovy/notification/template/" + providerId + ".gtmpl");
       templateConfig.addKeyMapping(TemplateConfig.SUBJECT_KEY, "Notification." + providerId + ".subject")
                 .addKeyMapping(TemplateConfig.DIGEST_KEY, "Notification." + providerId + ".digest")
                 .addKeyMapping(TemplateConfig.DIGEST_ONE_KEY, "Notification." + providerId + ".digestone")

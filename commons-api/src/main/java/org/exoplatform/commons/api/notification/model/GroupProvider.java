@@ -14,12 +14,10 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification;
+package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.exoplatform.commons.api.notification.model.ProviderData;
 
 public class GroupProvider {
   private String             groupId;

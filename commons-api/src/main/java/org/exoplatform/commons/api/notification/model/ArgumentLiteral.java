@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification;
-
+package org.exoplatform.commons.api.notification.model;
 
 public final class ArgumentLiteral<T> implements Cloneable {
   

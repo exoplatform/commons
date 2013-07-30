@@ -14,16 +14,18 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.plugin;
+package org.exoplatform.commons.notification.impl;
 
 import java.io.Writer;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.container.xml.InitParams;
 
 public class DigestDailyPlugin extends AbstractNotificationPlugin {
+  public static final String ID = "DigestDailyPlugin";
 
   public DigestDailyPlugin(InitParams initParams) {
     super(initParams);
@@ -31,7 +33,7 @@ public class DigestDailyPlugin extends AbstractNotificationPlugin {
 
   @Override
   public String getId() {
-    return "DigestDailyPlugin";
+    return ID;
   }
 
   @Override

@@ -20,8 +20,9 @@ import java.util.List;
 
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
+import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
+import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
-import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 
 public interface NotificationContext {
 

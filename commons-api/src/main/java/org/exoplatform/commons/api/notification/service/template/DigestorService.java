@@ -14,39 +14,17 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.plugin;
+package org.exoplatform.commons.api.notification.service.template;
 
-import java.io.Writer;
+import java.util.List;
+import java.util.Map;
 
-import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
-import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.commons.api.notification.model.UserSetting;
 
-public class DigestWeeklyPlugin extends AbstractNotificationPlugin {
+public interface DigestorService {
 
-  public DigestWeeklyPlugin(InitParams initParams) {
-    super(initParams);
-  }
-
-  @Override
-  public String getId() {
-    return "DigestWeeklyPlugin";
-  }
-
-  @Override
-  protected boolean makeDigest(NotificationContext ctx, Writer writer) {
-    return false;
-  }
-
-  @Override
-  protected NotificationMessage makeNotification(NotificationContext ctx) {
-    return null;
-  }
-
-  @Override
-  protected MessageInfo makeMessage(NotificationContext ctx) {
-    return null;
-  }
-
+  public MessageInfo buildMessage(Map<NotificationKey, List<NotificationMessage>> notificationData, UserSetting userSetting);
 }

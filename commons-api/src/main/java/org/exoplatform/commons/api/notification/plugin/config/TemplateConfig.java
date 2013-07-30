@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.plugin.model;
+package org.exoplatform.commons.api.notification.plugin.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +38,14 @@ public class TemplateConfig {
 
   private String              providerId;
 
-  private String              localeResouceBundle;
+  private String              bundlePath;
 
-  private String              localeResouceTemplate;
+  private String              templatePath;
 
   private Map<String, String> keyMapping               = new HashMap<String, String>();
 
   public TemplateConfig() {
-    localeResouceBundle = DEFAULT_SRC_RESOURCE_BUNDLE_KEY;
+    bundlePath = DEFAULT_SRC_RESOURCE_BUNDLE_KEY;
   }
 
   public TemplateConfig(String providerId) {
@@ -69,35 +69,35 @@ public class TemplateConfig {
   }
 
   /**
-   * @return the localeResouceBundle
+   * @return the bundlePath
    */
-  public String getLocaleResouceBundle() {
-    return localeResouceBundle;
+  public String getBundlePath() {
+    return bundlePath;
   }
 
   /**
-   * @param localeResouceBundle the localeResouceBundle to set
+   * @param bundlePath the bundlePath to set
    */
-  public void setLocaleResouceBundle(String localeResouceBundle) {
-    this.localeResouceBundle = localeResouceBundle;
+  public void setBundlePath(String bundlePath) {
+    this.bundlePath = bundlePath;
   }
 
   /**
-   * @return the localeResouceTemplate
+   * @return the templatePath
    */
-  public String getLocaleResouceTemplate() {
-    if(localeResouceTemplate == null) {
-      localeResouceTemplate = new StringBuffer(DEFAULT_SRC_RESOURCE_TEMPLATE_KEY)
+  public String getTemplatePath() {
+    if(templatePath == null) {
+      templatePath = new StringBuffer(DEFAULT_SRC_RESOURCE_TEMPLATE_KEY)
                                 .append("/").append(providerId).append(".gtmpl").toString();
     }
-    return localeResouceTemplate;
+    return templatePath;
   }
 
   /**
-   * @param localeResouceTemplate the localeResouceTemplate to set
+   * @param templatePath the templatePath to set
    */
-  public void setLocaleResouceTemplate(String localeResouceTemplate) {
-    this.localeResouceTemplate = localeResouceTemplate;
+  public void setTemplatePath(String templatePath) {
+    this.templatePath = templatePath;
   }
 
   /**

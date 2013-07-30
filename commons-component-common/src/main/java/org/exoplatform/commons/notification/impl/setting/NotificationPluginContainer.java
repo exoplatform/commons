@@ -21,9 +21,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
-import org.exoplatform.commons.api.notification.plugin.NotificationKey;
-import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
+import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.notification.template.ResouceBundleConfigDeployer;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -47,7 +47,7 @@ public class NotificationPluginContainer implements Startable {
     for (AbstractNotificationPlugin plugin : pluginMap.values()) {
       for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
         pSettingService.registerPluginConfig(pluginConfig);
-        datas.add(pluginConfig.getTemplateConfig().getLocaleResouceBundle());
+        datas.add(pluginConfig.getTemplateConfig().getBundlePath());
       }
     }
     if(ServletContainerFactory.getServletContainer().addWebAppListener(deployer)) {

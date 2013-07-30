@@ -14,16 +14,16 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl;
+package org.exoplatform.commons.notification.impl.service.template;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.exoplatform.commons.api.notification.TemplateContext;
-import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
-import org.exoplatform.commons.api.notification.plugin.model.TemplateConfig;
+import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
+import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.SubjectAndDigest;
 import org.exoplatform.commons.notification.template.TemplateElement;
@@ -69,9 +69,9 @@ public class TemplateGeneratorImpl {
     TemplateElement templateElement;
     if(key.indexOf("/") < 0) {
       TemplateConfig templateConfig = getTemplateConfig(key);
-      String resouceLocal = templateConfig.getLocaleResouceTemplate();
+      String resouceLocal = templateConfig.getTemplatePath();
       templateElement = new TemplateElement(resouceLocal, language);
-      templateElement.setResouceBundle(new TemplateResouceBundle(language, templateConfig.getLocaleResouceBundle()));
+      templateElement.setResouceBundle(new TemplateResouceBundle(language, templateConfig.getBundlePath()));
       templateElement.setResouceBunldMappingKey(templateConfig.getKeyMapping());
     } else {
       templateElement = new TemplateElement(key, language);

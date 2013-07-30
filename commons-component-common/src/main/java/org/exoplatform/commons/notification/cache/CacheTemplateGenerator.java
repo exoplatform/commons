@@ -16,9 +16,9 @@
  */
 package org.exoplatform.commons.notification.cache;
 
-import org.exoplatform.commons.api.notification.TemplateContext;
-import org.exoplatform.commons.api.notification.service.TemplateGenerator;
-import org.exoplatform.commons.notification.impl.TemplateGeneratorImpl;
+import org.exoplatform.commons.api.notification.service.template.TemplateContext;
+import org.exoplatform.commons.api.notification.service.template.TemplateGenerator;
+import org.exoplatform.commons.notification.impl.service.template.TemplateGeneratorImpl;
 import org.exoplatform.commons.notification.template.TemplateElement;
 import org.exoplatform.commons.notification.template.TemplateVisitorContext;
 import org.exoplatform.services.cache.CacheService;

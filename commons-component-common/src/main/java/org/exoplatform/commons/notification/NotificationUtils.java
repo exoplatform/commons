@@ -23,7 +23,7 @@ import java.util.Locale;
 
 import javax.jcr.Value;
 
-import org.exoplatform.commons.api.notification.plugin.model.TemplateConfig;
+import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.notification.template.TemplateResouceBundle;
 
 
@@ -49,7 +49,7 @@ public class NotificationUtils {
 
   public static SubjectAndDigest getSubjectAndDigest(TemplateConfig templateConfig, String providerId, String language) {
     SubjectAndDigest subjectAndDigest = SubjectAndDigest.getInstance();
-    String srcResource = templateConfig.getLocaleResouceBundle();
+    String srcResource = templateConfig.getBundlePath();
     String subjectKey = templateConfig.getKeyValue(TemplateConfig.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, providerId));
     String digestKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_KEY, getDefaultKey(DEFAULT_SIMPLE_DIGEST_KEY, providerId));
     String digestOneKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, providerId));

@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl;
+package org.exoplatform.commons.notification.impl.service.template;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -24,18 +24,21 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.TemplateContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
-import org.exoplatform.commons.api.notification.plugin.DigestorService;
-import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
-import org.exoplatform.commons.api.notification.service.TemplateGenerator;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.template.DigestorService;
+import org.exoplatform.commons.api.notification.service.template.TemplateContext;
+import org.exoplatform.commons.api.notification.service.template.TemplateGenerator;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
+import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
@@ -94,13 +97,13 @@ public class DigestorServiceImpl implements DigestorService {
       long currentTime = System.currentTimeMillis();
       long lastTime =  currentTime - periodFrom.getTimeInMillis();
       long day = lastTime/86400000;
-      
-      String pluginId = "DigestDailyPlugin";
+      //TODO need to make utils with 
+      String pluginId = DigestDailyPlugin.ID;
       String periodType = "Daily";
       if(NotificationUtils.isWeekEnd(configuration.getDayOfWeekend()) &&
           userSetting.getWeeklyProviders().size() > 0) {
         periodType = "Weekly";
-        pluginId = "DigestWeeklyPlugin";
+        pluginId = DigestWeeklyPlugin.ID;
         if(day > 7) {
           periodFrom.setTimeInMillis(currentTime - (86400000 * 7));
         }

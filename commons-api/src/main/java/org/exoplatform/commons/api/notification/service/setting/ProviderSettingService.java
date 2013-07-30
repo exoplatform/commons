@@ -18,10 +18,10 @@ package org.exoplatform.commons.api.notification.service.setting;
 
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.GroupProvider;
+import org.exoplatform.commons.api.notification.model.GroupProvider;
 import org.exoplatform.commons.api.notification.model.ProviderData;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
-import org.exoplatform.commons.api.notification.plugin.model.PluginConfig;
+import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 
 public interface ProviderSettingService {
 

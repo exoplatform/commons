@@ -19,7 +19,7 @@ package org.exoplatform.commons.notification.template;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.exoplatform.commons.api.notification.service.TemplateGenerator;
+import org.exoplatform.commons.api.notification.service.template.TemplateGenerator;
 import org.exoplatform.commons.notification.cache.CacheTemplateGenerator;
 import org.exoplatform.commons.notification.cache.SimpleCacheKey;
 import org.exoplatform.commons.utils.CommonsUtils;

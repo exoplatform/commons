@@ -31,7 +31,7 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.plugin.DigestorService</key>
+    <key>org.exoplatform.commons.api.notification.service.template.DigestorService</key>
     <type>org.exoplatform.commons.notification.impl.DigestorServiceImpl</type>
   </component>
   
@@ -97,31 +97,22 @@
     <component-plugin>
       <name>notification.plugins</name>
       <set-method>add</set-method>
-      <type>org.exoplatform.commons.api.notification.plugin.DigestDailyPlugin</type>
+      <type>org.exoplatform.commons.notification.impl.DigestDailyPlugin</type>
       <description>Initial information for plugin.</description>
       <init-params>
         <object-param>
           <name>template.DigestDailyPlugin</name>
           <description>The template of DigestDailyPlugin</description>
-          <object type="org.exoplatform.commons.api.notification.plugin.model.PluginConfig">
+          <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
             <field name="pluginId">
               <string>DigestDailyPlugin</string>
             </field>
-            <field name="resourceBundleKey">
-              <string>Notification.label.DigestDailyPlugin</string>
-            </field>
-            <field name="order">
-              <string>0</string>
-            </field>
-            <field name="groupId">
-              <string></string>
-            </field>
             <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.model.TemplateConfig">
-                <field name="localeResouceBundle">
+              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
+                <field name="bundlePath">
                   <string>locale.notification.template.CommonsNotification</string>
                 </field>
-                <field name="localeResouceTemplate">
+                <field name="templatePath">
                   <string>war:/notification/templates/DigestDailyPlugin.gtmpl</string>
                 </field>
               </object>
@@ -137,31 +128,22 @@
     <component-plugin>
       <name>notification.plugins</name>
       <set-method>add</set-method>
-      <type>org.exoplatform.commons.api.notification.plugin.DigestWeeklyPlugin</type>
+      <type>org.exoplatform.commons.notification.impl.DigestWeeklyPlugin</type>
       <description>Initial information for plugin.</description>
       <init-params>
         <object-param>
           <name>template.DigestWeeklyPlugin</name>
           <description>The template of DigestWeeklyPlugin</description>
-          <object type="org.exoplatform.commons.api.notification.plugin.model.PluginConfig">
+          <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
             <field name="pluginId">
               <string>DigestWeeklyPlugin</string>
             </field>
-            <field name="resourceBundleKey">
-              <string>Notification.label.DigestWeeklyPlugin</string>
-            </field>
-            <field name="order">
-              <string>0</string>
-            </field>
-            <field name="groupId">
-              <string></string>
-            </field>
             <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.model.TemplateConfig">
-                <field name="localeResouceBundle">
+              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
+                <field name="bundlePath">
                   <string>locale.notification.template.CommonsNotification</string>
                 </field>
-                <field name="localeResouceTemplate">
+                <field name="templatePath">
                   <string>war:/notification/templates/DigestWeeklyPlugin.gtmpl</string>
                 </field>
               </object>
@@ -183,7 +165,7 @@
         <object-param>
           <name>group.general</name>
           <description>The information of group general</description>
-          <object type="org.exoplatform.commons.api.notification.plugin.model.GroupConfig">
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
             <field name="id">
               <string>general</string>
             </field>
@@ -199,7 +181,7 @@
         <object-param>
           <name>group.connections</name>
           <description>The information of group connections</description>
-          <object type="org.exoplatform.commons.api.notification.plugin.model.GroupConfig">
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
             <field name="id">
               <string>connections</string>
             </field>
@@ -215,7 +197,7 @@
         <object-param>
           <name>group.spaces</name>
           <description>The information of group spaces</description>
-          <object type="org.exoplatform.commons.api.notification.plugin.model.GroupConfig">
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
             <field name="id">
               <string>spaces</string>
             </field>
@@ -231,7 +213,7 @@
         <object-param>
           <name>group.activity.stream</name>
           <description>The information of group activity stream</description>
-          <object type="org.exoplatform.commons.api.notification.plugin.model.GroupConfig">
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
             <field name="id">
               <string>activity_stream</string>
             </field>
@@ -245,9 +227,9 @@
         </object-param>
        
         <object-param>
-          <name>group.activity.other</name>
+          <name>group.other</name>
           <description>The information of group activity other</description>
-          <object type="org.exoplatform.commons.api.notification.plugin.model.GroupConfig">
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
             <field name="id">
               <string>other</string>
             </field>

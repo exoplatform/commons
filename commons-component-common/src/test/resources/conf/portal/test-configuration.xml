@@ -18,7 +18,7 @@
 	</component>
 
 	<component>
-		<key>org.exoplatform.commons.api.notification.service.TemplateGenerator</key>
+		<key>org.exoplatform.commons.api.notification.service.template.TemplateGenerator</key>
 		<type>org.exoplatform.commons.notification.cache.CacheTemplateGenerator</type>
 	</component>
 

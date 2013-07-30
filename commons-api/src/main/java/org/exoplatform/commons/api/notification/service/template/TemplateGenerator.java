@@ -14,16 +14,16 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.plugin;
+package org.exoplatform.commons.api.notification.service.template;
 
-import java.util.List;
-import java.util.Map;
+public interface TemplateGenerator {
 
-import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
-import org.exoplatform.commons.api.notification.model.UserSetting;
+  public String processTemplate(TemplateContext ctx);
+  
+  public String processTemplateInContainer(TemplateContext ctx);
 
-public interface DigestorService {
+  public String processSubject(TemplateContext ctx);
 
-  public MessageInfo buildMessage(Map<NotificationKey, List<NotificationMessage>> notificationData, UserSetting userSetting);
+  public String processDigest(TemplateContext ctx);
+  
 }

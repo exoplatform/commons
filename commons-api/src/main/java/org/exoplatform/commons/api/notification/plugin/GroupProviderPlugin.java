@@ -19,7 +19,7 @@ package org.exoplatform.commons.api.notification.plugin;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.plugin.model.GroupConfig;
+import org.exoplatform.commons.api.notification.plugin.config.GroupConfig;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 

@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.plugin;
+package org.exoplatform.commons.api.notification.model;
 
 import java.io.Serializable;
+
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 
 public final class NotificationKey implements Serializable {
   private static final long serialVersionUID = 1L;

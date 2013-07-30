@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.commons.api.notification.TemplateContext;
+import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 
 public class SubjectAndDigest {
   private String              language;

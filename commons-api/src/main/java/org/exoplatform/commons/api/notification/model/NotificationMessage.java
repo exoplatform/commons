@@ -24,7 +24,6 @@ import java.util.Map;
 
 import javax.jcr.Value;
 
-import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationMessage {

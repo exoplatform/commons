@@ -48,7 +48,7 @@ public class ResouceBundleConfigDeployer implements WebAppListener {
 
   private Map<String, String>        dataResourceBundle         = new ConcurrentHashMap<String, String>();
 
-  protected final Map<String, WebApp> contexts;
+  private final Map<String, WebApp> contexts;
 
   public ResouceBundleConfigDeployer() {
     bundleService = CommonsUtils.getService(ResourceBundleService.class);

@@ -19,9 +19,9 @@ package org.exoplatform.commons.api.notification.service.storage;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.model.UserSetting;
-import org.exoplatform.commons.api.notification.plugin.NotificationKey;
 
 
 public interface NotificationDataStorage {
