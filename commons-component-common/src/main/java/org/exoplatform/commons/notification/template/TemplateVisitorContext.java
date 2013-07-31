@@ -88,14 +88,14 @@ public class TemplateVisitorContext extends HashMap<String, Object> {
     try {
       TemplateVisitorContext context = element.getContext();
       if (element.getTemplateText() == null) {
-        element.setTemplateText(context.getTemplate(element.getResouceLocal()));
+        element.setTemplateText(context.getTemplate(element.getTemplatePath()));
       }
       gTemplate = new GroovyTemplate(element.getTemplateText());
       //
       gTemplate.render(context.getWriter(), context);
       element.setTemplate(context.getWriter().toString());
     } catch (Exception e) {
-      LOG.warn("Can not process template " + element.getResouceLocal() + "\n" + e.getCause());
+      LOG.warn("Can not process template " + element.getTemplatePath() + "\n" + e.getCause());
     }
   }
   

@@ -27,7 +27,7 @@ import org.exoplatform.commons.api.notification.service.template.TemplateContext
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.SubjectAndDigest;
 import org.exoplatform.commons.notification.template.TemplateElement;
-import org.exoplatform.commons.notification.template.TemplateResouceBundle;
+import org.exoplatform.commons.notification.template.TemplateResourceBundle;
 import org.exoplatform.commons.notification.template.TemplateVisitorContext;
 import org.exoplatform.commons.utils.CommonsUtils;
 
@@ -69,10 +69,10 @@ public class TemplateGeneratorImpl {
     TemplateElement templateElement;
     if(key.indexOf("/") < 0) {
       TemplateConfig templateConfig = getTemplateConfig(key);
-      String resouceLocal = templateConfig.getTemplatePath();
-      templateElement = new TemplateElement(resouceLocal, language);
-      templateElement.setResouceBundle(new TemplateResouceBundle(language, templateConfig.getBundlePath()));
-      templateElement.setResouceBunldMappingKey(templateConfig.getKeyMapping());
+      String templatePath = templateConfig.getTemplatePath();
+      templateElement = new TemplateElement(templatePath, language);
+      templateElement.setResourceBundle(new TemplateResourceBundle(language, templateConfig.getBundlePath()));
+      templateElement.setResourceBunldMappingKey(templateConfig.getKeyMapping());
     } else {
       templateElement = new TemplateElement(key, language);
     }

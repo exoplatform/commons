@@ -77,7 +77,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
       groupProvider.addProviderData(providerData);
       if (gConfig != null) {
         groupProvider.setOrder(Integer.valueOf(gConfig.getOrder()));
-        groupProvider.setResouceBundleKey(gConfig.getResourceBundleKey());
+        groupProvider.setResourceBundleKey(gConfig.getResourceBundleKey());
       }
       groupProviderMap.put(groupId, groupProvider);
     }
@@ -89,7 +89,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
     for (GroupConfig gconfig : groupConfigPlg.getGroupProviders()) {
       GroupProvider groupProvider = new GroupProvider(gconfig.getId());
       groupProvider.setOrder(Integer.valueOf(gconfig.getOrder()));
-      groupProvider.setResouceBundleKey(gconfig.getResourceBundleKey());
+      groupProvider.setResourceBundleKey(gconfig.getResourceBundleKey());
       if (groupProviderMap.containsKey(gconfig.getId())) {
         groupProvider.setProviderDatas(groupProviderMap.get(gconfig.getId()).getProviderDatas());
       }

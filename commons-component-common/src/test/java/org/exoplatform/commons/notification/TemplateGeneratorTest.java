@@ -111,8 +111,8 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
     TemplateElement template = generatorImpl.getTemplateElement(providerId, "en");
     assertNotNull(template);
     
-    assertEquals("jar:/groovy/notification/template/" + providerId + ".gtmpl", template.getResouceLocal());
-    assertEquals("locale.notification.template.Notification", template.getResouceBundle().getResouceLocal());
+    assertEquals("jar:/groovy/notification/template/" + providerId + ".gtmpl", template.getTemplatePath());
+    assertEquals("locale.notification.template.Notification", template.getResourceBundle().getBundlePath());
   }
 
   public void testProcessTemplate(){
@@ -151,7 +151,7 @@ public class TemplateGeneratorTest extends BaseCommonsTestCase {
     assertTrue(template.getTemplateText().indexOf("VIEW_FULL_DISCUSSION_ACTION_URL") > 0);
     assertTrue(templateProcessed.indexOf("http://localhost/test/view/activtyxxx") > 0);
     
-    //Test resouce bundle
+    //Test resource bundle
     assertTrue(templateProcessed.indexOf("Notification of activity post") > 0);
     
     // Test renderTemplateByUrl

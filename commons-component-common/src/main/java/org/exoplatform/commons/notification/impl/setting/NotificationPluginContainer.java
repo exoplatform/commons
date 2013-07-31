@@ -25,7 +25,7 @@ import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
-import org.exoplatform.commons.notification.template.ResouceBundleConfigDeployer;
+import org.exoplatform.commons.notification.template.ResourceBundleConfigDeployer;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
@@ -33,12 +33,12 @@ import org.picocontainer.Startable;
 public class NotificationPluginContainer implements Startable {
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
   private ProviderSettingService pSettingService;
-  private ResouceBundleConfigDeployer deployer;
+  private ResourceBundleConfigDeployer deployer;
   
   public NotificationPluginContainer() {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
     pSettingService = CommonsUtils.getService(ProviderSettingService.class);
-    deployer = new ResouceBundleConfigDeployer();
+    deployer = new ResourceBundleConfigDeployer();
   }
 
   @Override

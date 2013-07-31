@@ -30,18 +30,18 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.ResourceBundleData;
 import org.exoplatform.services.resources.ResourceBundleService;
 
-public class TemplateResouceBundle {
-  private static final Log LOG = ExoLogger.getLogger(TemplateResouceBundle.class);
+public class TemplateResourceBundle {
+  private static final Log LOG = ExoLogger.getLogger(TemplateResourceBundle.class);
 
   private static final String CONF_LOCATION = "war:/classes/";
 
   private String           language;
 
-  private String           resouceLocal;
+  private String           bundlePath;
 
-  public TemplateResouceBundle(String language, String resouceLocal) {
+  public TemplateResourceBundle(String language, String bundlePath) {
     this.language = language;
-    this.resouceLocal = resouceLocal;
+    this.bundlePath = bundlePath;
   }
 
   /**
@@ -59,17 +59,17 @@ public class TemplateResouceBundle {
   }
 
   /**
-   * @return the resouceLocal
+   * @return the bundlePath
    */
-  public String getResouceLocal() {
-    return resouceLocal;
+  public String getBundlePath() {
+    return bundlePath;
   }
 
   /**
-   * @param resouceLocal the resouceLocal to set
+   * @param bundlePath the bundlePath to set
    */
-  public void setResouceLocal(String resouceLocal) {
-    this.resouceLocal = resouceLocal;
+  public void setBundlePath(String bundlePath) {
+    this.bundlePath = bundlePath;
   }
 
   public String appRes(String key) {
@@ -77,7 +77,7 @@ public class TemplateResouceBundle {
     if (language != null && language.length() > 0) {
       locale = new Locale(language);
     }
-    return getResourceBundle(key, locale, resouceLocal);
+    return getResourceBundle(key, locale, bundlePath);
   }
 
   public String appRes(String key, String... strs) {
@@ -108,7 +108,7 @@ public class TemplateResouceBundle {
         return bundleService.getResourceBundle(resourceLocale, locale);
       }
     } catch (Exception e) {
-      LOG.warn("Can not add resouce bundle of locale " + resourceLocale + "\n" + e.getMessage());
+      LOG.warn("Can not add resource bundle of locale " + resourceLocale + "\n" + e.getMessage());
     }
     return null;
   }

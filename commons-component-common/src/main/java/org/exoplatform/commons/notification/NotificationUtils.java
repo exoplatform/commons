@@ -24,7 +24,7 @@ import java.util.Locale;
 import javax.jcr.Value;
 
 import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
-import org.exoplatform.commons.notification.template.TemplateResouceBundle;
+import org.exoplatform.commons.notification.template.TemplateResourceBundle;
 
 
 public class NotificationUtils {
@@ -40,7 +40,7 @@ public class NotificationUtils {
   public static final String DEFAULT_DIGEST_MORE_KEY   = "Notification.digest.more.$providerid";
 
   public static String getResourceBundle(String key, Locale locale, String srcResource) {
-    return TemplateResouceBundle.getResourceBundle(key, locale, srcResource);
+    return TemplateResourceBundle.getResourceBundle(key, locale, srcResource);
   }
   
   public static String getDefaultKey(String key, String providerId) {

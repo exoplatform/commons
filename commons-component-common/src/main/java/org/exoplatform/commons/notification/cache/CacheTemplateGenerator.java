@@ -92,9 +92,9 @@ public class CacheTemplateGenerator implements TemplateGenerator {
     
     TemplateVisitorContext context = TemplateVisitorContext.getInstance();
     context.putAll(ctx);
-    context.put("childLocal", template.getResouceLocal());
-    container.setResouceBundle(template.getResouceBundle());
-    container.setResouceBunldMappingKey(template.getResouceBunldMappingKey());
+    context.put("childLocal", template.getTemplatePath());
+    container.setResourceBundle(template.getResourceBundle());
+    container.setResourceBunldMappingKey(template.getResourceBunldMappingKey());
     
     String content = generatorImpl.processTemplateIntoString(context, container);
     

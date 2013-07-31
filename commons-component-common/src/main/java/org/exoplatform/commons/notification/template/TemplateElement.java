@@ -31,17 +31,17 @@ public class TemplateElement {
 
   private String                templateText;
 
-  private String                resouceLocal;
+  private String                templatePath;
 
-  private TemplateResouceBundle resouceBundle;
+  private TemplateResourceBundle resourceBundle;
 
   private TemplateVisitorContext       context;
 
-  private Map<String, String>   resouceBunldMappingKey = new HashMap<String, String>();
+  private Map<String, String>   resourceBunldMappingKey = new HashMap<String, String>();
 
-  public TemplateElement(String resouceLocal, String language) {
+  public TemplateElement(String templatePath, String language) {
     this.language = language;
-    this.resouceLocal = resouceLocal;
+    this.templatePath = templatePath;
   }
 
   public TemplateVisitorContext accept(TemplateVisitorContext context) {
@@ -79,17 +79,17 @@ public class TemplateElement {
   }
 
   /**
-   * @return the resouceLocal
+   * @return the templatePath
    */
-  public String getResouceLocal() {
-    return resouceLocal;
+  public String getTemplatePath() {
+    return templatePath;
   }
 
   /**
-   * @param resouceLocal the resouceLocal to set
+   * @param templatePath the templatePath to set
    */
-  public void setResouceLocal(String resouceLocal) {
-    this.resouceLocal = resouceLocal;
+  public void setTemplatePath(String templatePath) {
+    this.templatePath = templatePath;
   }
 
   public TemplateVisitorContext getContext() {
@@ -111,40 +111,40 @@ public class TemplateElement {
   }
 
   /**
-   * @return the resouceBundle
+   * @return the resourceBundle
    */
-  public TemplateResouceBundle getResouceBundle() {
-    return resouceBundle;
+  public TemplateResourceBundle getResourceBundle() {
+    return resourceBundle;
   }
 
   /**
-   * @param resouceBundle the resouceBundle to set
+   * @param resourceBundle the resourceBundle to set
    */
-  public void setResouceBundle(TemplateResouceBundle resouceBundle) {
-    this.resouceBundle = resouceBundle;
+  public void setResourceBundle(TemplateResourceBundle resourceBundle) {
+    this.resourceBundle = resourceBundle;
   }
 
   /**
-   * @return the resouceBunldMappingKey
+   * @return the resourceBunldMappingKey
    */
-  public Map<String, String> getResouceBunldMappingKey() {
-    return resouceBunldMappingKey;
+  public Map<String, String> getResourceBunldMappingKey() {
+    return resourceBunldMappingKey;
   }
 
   /**
-   * @param resouceBunldMappingKey the resouceBunldMappingKey to set
+   * @param resourceBunldMappingKey the resourceBunldMappingKey to set
    */
-  public void setResouceBunldMappingKey(Map<String, String> resouceBunldMappingKey) {
-    this.resouceBunldMappingKey = resouceBunldMappingKey;
+  public void setResourceBunldMappingKey(Map<String, String> resourceBunldMappingKey) {
+    this.resourceBunldMappingKey = resourceBunldMappingKey;
   }
 
-  public void addResouceBunldMappingKey(String key, String value) {
-    this.resouceBunldMappingKey.put(key, value);
+  public void addResourceBunldMappingKey(String key, String value) {
+    this.resourceBunldMappingKey.put(key, value);
   }
   
 
   private String getBundleKey(String key) {
-    String value = resouceBunldMappingKey.get(key);
+    String value = resourceBunldMappingKey.get(key);
     if (value != null) {
       return value;
     }
@@ -152,18 +152,18 @@ public class TemplateElement {
   }
 
   public String appRes(String key) {
-    return resouceBundle.appRes(getBundleKey(key));
+    return resourceBundle.appRes(getBundleKey(key));
   }
 
   public String appRes(String key, String... strs) {
-    return resouceBundle.appRes(getBundleKey(key), strs);
+    return resourceBundle.appRes(getBundleKey(key), strs);
   }
 
   public void include(String elementLocal) throws Exception {
     CacheTemplateGenerator generator = (CacheTemplateGenerator) CommonsUtils.getService(TemplateGenerator.class);
     SimpleCacheKey cacheKey = new SimpleCacheKey(elementLocal, language);
     TemplateElement element = generator.getTemplateElement(cacheKey);
-    element.setResouceBundle(resouceBundle);
+    element.setResourceBundle(resourceBundle);
     //
     context.popElement();
     context.visit(element);

@@ -37,8 +37,8 @@ import org.gatein.wci.WebAppEvent;
 import org.gatein.wci.WebAppLifeCycleEvent;
 import org.gatein.wci.WebAppListener;
 
-public class ResouceBundleConfigDeployer implements WebAppListener {
-  private static final Log          LOG                       = ExoLogger.getLogger(ResouceBundleConfigDeployer.class);
+public class ResourceBundleConfigDeployer implements WebAppListener {
+  private static final Log          LOG                       = ExoLogger.getLogger(ResourceBundleConfigDeployer.class);
 
   ResourceBundleService               bundleService;
 
@@ -50,7 +50,7 @@ public class ResouceBundleConfigDeployer implements WebAppListener {
 
   private final Map<String, WebApp> contexts;
 
-  public ResouceBundleConfigDeployer() {
+  public ResourceBundleConfigDeployer() {
     bundleService = CommonsUtils.getService(ResourceBundleService.class);
     this.contexts = new HashMap<String, WebApp>();
   }

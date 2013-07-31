@@ -22,7 +22,7 @@ import java.util.List;
 public class GroupProvider {
   private String             groupId;
 
-  private String             resouceBundleKey;
+  private String             resourceBundleKey;
 
   private int                order         = 0;
 
@@ -47,17 +47,17 @@ public class GroupProvider {
   }
 
   /**
-   * @return the resouceBundleKey
+   * @return the resourceBundleKey
    */
-  public String getResouceBundleKey() {
-    return resouceBundleKey;
+  public String getResourceBundleKey() {
+    return resourceBundleKey;
   }
 
   /**
-   * @param resouceBundleKey the resouceBundleKey to set
+   * @param resourceBundleKey the resourceBundleKey to set
    */
-  public void setResouceBundleKey(String resouceBundleKey) {
-    this.resouceBundleKey = resouceBundleKey;
+  public void setResourceBundleKey(String resourceBundleKey) {
+    this.resourceBundleKey = resourceBundleKey;
   }
 
   /**
