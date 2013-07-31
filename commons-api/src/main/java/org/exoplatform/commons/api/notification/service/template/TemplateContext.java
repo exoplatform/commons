@@ -26,13 +26,28 @@ public class TemplateContext extends HashMap<String, Object> {
   private String            language;
 
   private int               digestSize       = 0;
+  
+  private Throwable         error = null;
 
   public TemplateContext() {
+    
   }
 
   public TemplateContext(String providerId, String language) {
     this.providerId = providerId;
     this.language = language;
+  }
+  
+  /**
+   * Holds the exception if have any on transform processing.
+   * @param exception
+   */
+  public void setException(Throwable exception) {
+    this.error = exception;
+  }
+  
+  public Throwable getException() {
+    return this.error;
   }
 
   public TemplateContext digestType(int digestSize) {

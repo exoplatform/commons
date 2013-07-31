@@ -46,6 +46,7 @@ public class TemplateElement {
 
   public TemplateVisitorContext accept(TemplateVisitorContext context) {
     this.context = context;
+    //TODO WHY???
     this.context.put("_ctx", this);
     return this.context;
   }
