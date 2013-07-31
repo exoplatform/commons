@@ -23,28 +23,36 @@ import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.mail.Message;
 
-public class ExecutorSendListener implements Callable<NotificationMessage>{
-  private static final Log LOG = ExoLogger.getExoLogger(ExecutorSendListener.class);
-  
-  private static ExecutorSendListener  instance;
-  private NotificationMessage  message;
-  
+public class ExecutorSendListener implements Callable<NotificationMessage> {
+  private static final Log            LOG = ExoLogger.getExoLogger(ExecutorSendListener.class);
+
+  private static ExecutorSendListener instance;
+
+  private NotificationMessage         message;
+
   @Override
   public NotificationMessage call() throws Exception {
     // process send email notification
     processSendEmailNotifcation();
+    return instance.message;
+  }
+
+  public NotificationMessage getNotificationMessage() {
     return message;
   }
-  
-  public static ExecutorSendListener getInstance(NotificationMessage message) {
+
+  private ExecutorSendListener setNotificationMessage(NotificationMessage message) {
+    this.message = message;
+    return this;
+  }
+
+  private static ExecutorSendListener getInstance() {
     if (instance == null) {
       synchronized (ExecutorSendListener.class) {
         if (instance == null) {
@@ -52,15 +60,17 @@ public class ExecutorSendListener implements Callable<NotificationMessage>{
         }
       }
     }
-    instance.message = message;
-
     return instance;
   }
 
+  public static ExecutorSendListener getInstance(NotificationMessage message) {
+    return getInstance().setNotificationMessage(message);
+  }
 
   private void processSendEmailNotifcation() {
     NotificationContext nCtx = NotificationContextImpl.DEFAULT;
-    AbstractNotificationPlugin supportProvider = ((NotificationContextImpl)nCtx).getNotificationPluginContainer().getPlugin(message.getKey());
+    NotificationMessage message = ExecutorSendListener.getInstance().getNotificationMessage();
+    AbstractNotificationPlugin supportProvider = ((NotificationContextImpl) nCtx).getNotificationPluginContainer().getPlugin(message.getKey());
     if (supportProvider != null) {
       nCtx.setNotificationMessage(message);
       MessageInfo messageInfo = supportProvider.buildMessage(nCtx);
@@ -78,6 +88,5 @@ public class ExecutorSendListener implements Callable<NotificationMessage>{
       }
 
     }
-    
   }
 }
