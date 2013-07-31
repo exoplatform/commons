@@ -32,7 +32,7 @@
 
   <component>
     <key>org.exoplatform.commons.api.notification.service.template.DigestorService</key>
-    <type>org.exoplatform.commons.notification.impl.DigestorServiceImpl</type>
+    <type>org.exoplatform.commons.notification.impl.service.template.DigestorServiceImpl</type>
   </component>
   
   <component>
@@ -59,7 +59,7 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.TemplateGenerator</key>
+    <key>org.exoplatform.commons.api.notification.service.template.TemplateGenerator</key>
     <type>org.exoplatform.commons.notification.cache.CacheTemplateGenerator</type>
   </component>
 
