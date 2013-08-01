@@ -35,7 +35,6 @@ public class SendNotificationListenerImpl extends AbstractNotificationServiceLis
 
   @Override
   public void processListener(NotificationMessage message) {
-    System.out.println("\n\n -------- ExecutorService send to " + message.getTo());
     CompletionService<NotificationMessage> cs = new ExecutorCompletionService<NotificationMessage>(executor);
     cs.submit(ExecutorSendListener.getInstance(message));
   }
