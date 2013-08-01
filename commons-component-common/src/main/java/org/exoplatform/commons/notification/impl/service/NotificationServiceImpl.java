@@ -32,29 +32,20 @@ import org.exoplatform.commons.api.notification.service.setting.UserSettingServi
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
-import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.impl.AbstractService;
-import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.mail.Message;
 
 public class NotificationServiceImpl extends AbstractService implements NotificationService {
 
-  private static final Log LOG = ExoLogger.getLogger(NotificationServiceImpl.class);
 
   private List<AbstractNotificationServiceListener> messageListeners = new ArrayList<AbstractNotificationServiceListener>(2);
 
   private final NotificationDataStorage storage;
-  private final NotificationPluginContainer pluginService;
-  private final NotificationConfiguration configuration;
 
-  public NotificationServiceImpl(NotificationPluginContainer pluginService, NotificationDataStorage storage, NotificationConfiguration configuration) {
+  public NotificationServiceImpl( NotificationDataStorage storage) {
     this.storage = storage;
-    this.pluginService = pluginService;
-    this.configuration = configuration;
   }
 
   @Override
@@ -83,7 +74,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       }
       //
       if (userSetting.isInInstantly(providerId)) {
-        processSendNotificationListener(message.setTo(userId));
+        processSendNotificationListener(message.clone().setTo(userId));
       }
       //
       if(userSetting.isActiveWithoutInstantly(providerId)){

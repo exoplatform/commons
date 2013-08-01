@@ -24,11 +24,11 @@ import java.util.concurrent.Executors;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
 
-public class SendNotificationListenerImpl extends AbstractNotificationServiceListener {
+public class SendNotificationListener extends AbstractNotificationServiceListener {
 
   private ExecutorService executor;
   
-  public SendNotificationListenerImpl() {
+  public SendNotificationListener() {
     executor = Executors.newFixedThreadPool(1);
   }
 

@@ -252,8 +252,20 @@ public class NotificationMessage {
   
   @Override
   public boolean equals(Object o) {
+
     if (o instanceof NotificationMessage) {
-      return ((NotificationMessage) o).getId().equals(this.getId());
+      NotificationMessage m = (NotificationMessage) o;
+      if (super.equals(o)) {
+        return true;
+      }
+      if (m.getId().equals(this.id)) {
+        return true;
+      }
+
+      if (m.getTo() != null && m.getTo().length() > 0 && m.getTo().equals(to) 
+            && m.getKey() != null && m.getKey().equals(key)) {
+        return true;
+      }
     }
     return false;
   }
