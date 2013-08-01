@@ -283,4 +283,17 @@ public class NotificationMessage {
     return src;
   }
 
+  @Override
+  public NotificationMessage clone() {
+    NotificationMessage message = instance();
+    message.setFrom(from)
+           .key(key)
+           .setId(id)
+           .setOrder(order)
+           .setOwnerParameter(ownerParameter)
+           .setSendToDaily(sendToDaily)
+           .setSendToWeekly(sendToWeekly)
+           .setTo(to);
+    return message;
+  }
 }

@@ -69,12 +69,12 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   }
 
   @Override
-  public void process(NotificationMessage notification) throws Exception {
+  public void process(NotificationMessage message) throws Exception {
     UserSettingService notificationService = CommonsUtils.getService(UserSettingService.class);
-    List<String> userIds = notification.getSendToUserIds();
+    List<String> userIds = message.getSendToUserIds();
     List<String> userIdPendings = new ArrayList<String>();
 
-    String providerId = notification.getKey().getId();
+    String providerId = message.getKey().getId();
     for (String userId : userIds) {
       UserSetting userSetting = notificationService.get(userId);
       
@@ -83,18 +83,18 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       }
       //
       if (userSetting.isInInstantly(providerId)) {
-        processSendNotificationListener(notification.setTo(userId));
+        processSendNotificationListener(message.setTo(userId));
       }
       //
       if(userSetting.isActiveWithoutInstantly(providerId)){
         userIdPendings.add(userId);
-        setValueSendbyFrequency(notification, userSetting, userId);
+        setValueSendbyFrequency(message, userSetting, userId);
       }
     }
 
     if (userIdPendings.size() > 0) {
-      notification.to(userIdPendings);
-      storage.save(notification);
+      message.to(userIdPendings);
+      storage.save(message);
     }
   }
 

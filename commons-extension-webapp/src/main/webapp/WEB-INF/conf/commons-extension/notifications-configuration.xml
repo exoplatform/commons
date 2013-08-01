@@ -107,6 +107,9 @@
             <field name="pluginId">
               <string>DigestDailyPlugin</string>
             </field>
+            <field name="groupId">
+              <string></string>
+            </field>
             <field name="templateConfig">
               <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
                 <field name="bundlePath">
@@ -137,6 +140,9 @@
           <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
             <field name="pluginId">
               <string>DigestWeeklyPlugin</string>
+            </field>
+            <field name="groupId">
+              <string></string>
             </field>
             <field name="templateConfig">
               <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">

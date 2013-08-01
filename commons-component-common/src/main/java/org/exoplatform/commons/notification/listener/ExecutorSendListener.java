@@ -48,7 +48,7 @@ public class ExecutorSendListener implements Callable<NotificationMessage> {
   }
 
   private ExecutorSendListener setNotificationMessage(NotificationMessage message) {
-    this.message = message;
+    this.message = message.clone();
     return this;
   }
 
@@ -74,6 +74,7 @@ public class ExecutorSendListener implements Callable<NotificationMessage> {
     if (supportProvider != null) {
       nCtx.setNotificationMessage(message);
       MessageInfo messageInfo = supportProvider.buildMessage(nCtx);
+      
       if (messageInfo != null) {
         Message message_ = messageInfo.makeEmailNotification();
 
@@ -81,7 +82,7 @@ public class ExecutorSendListener implements Callable<NotificationMessage> {
 
         try {
           mailService.sendMessage(message_);
-          LOG.info("Process send email notification successfully ... " + message.getKey().getId());
+          LOG.info("Process send email notification successfully ... " + message.getKey().getId() + " for user: " + messageInfo.getTo());
         } catch (Exception e) {
           LOG.error("Send email error!", e);
         }
