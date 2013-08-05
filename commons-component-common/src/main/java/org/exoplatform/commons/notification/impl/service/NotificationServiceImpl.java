@@ -34,15 +34,17 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.mail.Message;
 
 public class NotificationServiceImpl extends AbstractService implements NotificationService {
-
+  private static final Log                          LOG            = ExoLogger.getExoLogger(NotificationServiceImpl.class);
 
   private List<AbstractNotificationServiceListener> messageListeners = new ArrayList<AbstractNotificationServiceListener>(2);
 
-  private final NotificationDataStorage storage;
+  private final NotificationDataStorage             storage;
 
   public NotificationServiceImpl( NotificationDataStorage storage) {
     this.storage = storage;
@@ -133,31 +135,31 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     int limit = 20;
     
     List<UserSetting> userSettings = userService.getDaily(offset, limit);
-    
+    send(digest, notificationService, mailService, userSettings, false);
+
+    //
+    List<UserSetting> usersDefaultSettings = userService.getDefaultDaily();
+    send(digest, notificationService, mailService, usersDefaultSettings, true);
+  }
+  
+  
+  private void send(DigestorService digest, NotificationService notification, MailService mail, List<UserSetting> userSettings, boolean isDefault) {
     for (UserSetting userSetting : userSettings) {
-      Map<NotificationKey, List<NotificationMessage>> notificationMessageMap = notificationService.getByUser(userSetting);
+      if (isDefault) {
+        userSetting = getDefaultUserNotificationSetting(userSetting);
+      }
+      Map<NotificationKey, List<NotificationMessage>> notificationMessageMap = notification.getByUser(userSetting);
       if (notificationMessageMap.size() > 0) {
         MessageInfo messageInfo = digest.buildMessage(notificationMessageMap, userSetting);
-        if(messageInfo != null) {
+        if (messageInfo != null) {
           Message message_ = messageInfo.makeEmailNotification();
-          mailService.sendMessage(message_);
+          try {
+            mail.sendMessage(message_);
+            LOG.info("Successfully, to sent email notification to user: " + message_.getTo());
+          } catch (Exception e) {
+            LOG.error("Send email error!", e);
+          }
         }
-        
-      }
-    }
-    
-    List<UserSetting> usersDefaultSettings = userService.getDefaultDaily();
-    for (UserSetting setting : usersDefaultSettings) {
-      UserSetting userNotificationSetting = getDefaultUserNotificationSetting(setting);
-      //
-      Map<NotificationKey, List<NotificationMessage>> notificationMessageMap = notificationService.getByUser(userNotificationSetting);
-      if (notificationMessageMap.size() > 0) {
-        MessageInfo messageInfo = digest.buildMessage(notificationMessageMap, userNotificationSetting);
-        if(messageInfo != null) {
-          Message message_ = messageInfo.makeEmailNotification();
-          mailService.sendMessage(message_);
-        }
-        
       }
     }
   }

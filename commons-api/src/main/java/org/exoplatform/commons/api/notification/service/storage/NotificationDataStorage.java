@@ -29,5 +29,7 @@ public interface NotificationDataStorage {
   void save(NotificationMessage notification) throws Exception;
   
   Map<NotificationKey, List<NotificationMessage>> getByUser(UserSetting userSetting);
+
+  void createParentNodeOfPlugin(String pluginId);
   
 }

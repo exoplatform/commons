@@ -49,6 +49,17 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     this.workspace = configuration.getWorkspace();
     this.configuration = configuration;
   }
+  
+  @Override
+  public void createParentNodeOfPlugin(String pluginId) {
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    try {
+      Node node = getOrCreateMessageParent(sProvider, workspace, pluginId);
+      sessionSave(node);
+    } catch (Exception e) {
+      LOG.error("Failed to create parent Node of plugin " + pluginId, e);
+    }
+  }
 
   @Override
   public void save(NotificationMessage message) throws Exception {

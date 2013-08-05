@@ -16,9 +16,7 @@
  */
 package org.exoplatform.commons.notification.listener;
 
-import java.util.HashSet;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -83,11 +81,11 @@ public class ExecutorSendListener implements Callable<NotificationMessage> {
       if (messageInfo != null) {
         Message message_ = messageInfo.makeEmailNotification();
 
-        MailService mailService = (MailService) PortalContainer.getInstance().getComponentInstanceOfType(MailService.class);
 
         try {
+          MailService mailService = (MailService) PortalContainer.getInstance().getComponentInstanceOfType(MailService.class);
           mailService.sendMessage(message_);
-          LOG.info("Process send email notification successfully ... " + message.getKey().getId() + " for user: " + messageInfo.getTo());
+          LOG.info("Successfully, to sent email notification to user: " + message_.getTo());
         } catch (Exception e) {
           LOG.error("Send email error!", e);
         }

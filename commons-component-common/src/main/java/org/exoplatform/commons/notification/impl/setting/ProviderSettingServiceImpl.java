@@ -29,10 +29,12 @@ import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.GroupConfig;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.utils.CommonsUtils;
 
 public class ProviderSettingServiceImpl implements ProviderSettingService {
 
@@ -49,7 +51,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
   private static final String        ACTIVE_FEATURE_KEY = "feature.Notification";
 
   private SettingService             settingService;
-
+  
   public ProviderSettingServiceImpl(SettingService settingService) {
     this.settingService = settingService;
   }
@@ -81,7 +83,11 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
       }
       groupProviderMap.put(groupId, groupProvider);
     }
-    
+    //
+    NotificationDataStorage dataStorage = CommonsUtils.getService(NotificationDataStorage.class);
+    if(dataStorage != null) {
+      dataStorage.createParentNodeOfPlugin(pluginConfig.getPluginId());
+    }
   }
 
   @Override

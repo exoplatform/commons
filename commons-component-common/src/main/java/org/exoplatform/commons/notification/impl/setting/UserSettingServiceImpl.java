@@ -144,6 +144,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         userHomeNode = settingNode.getNode(SETTING_USER_NODE);
       } else {
         userHomeNode = settingNode.addNode(SETTING_USER_NODE, STG_SUBCONTEXT);
+        
       }
 
       if (userHomeNode.hasNode(userId)) {
