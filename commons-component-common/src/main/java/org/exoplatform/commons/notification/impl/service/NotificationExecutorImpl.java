@@ -16,8 +16,9 @@
  */
 package org.exoplatform.commons.notification.impl.service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
@@ -28,10 +29,19 @@ import org.exoplatform.commons.utils.CommonsUtils;
 
 public class NotificationExecutorImpl implements NotificationExecutor {
 
-  private final List<NotificationCommand> commands;
+  private static NotificationExecutor executor;
+
+  private final Queue<NotificationCommand>  commands;
   
-  public NotificationExecutorImpl() {
-    commands = new ArrayList<NotificationCommand>();
+  private NotificationExecutorImpl() {
+    commands = new ConcurrentLinkedQueue<NotificationCommand>();
+  }
+  
+  public static NotificationExecutor getInstance() {
+    if (executor == null) {
+      executor = new NotificationExecutorImpl();
+    }
+    return executor;
   }
   
   private boolean process(NotificationContext ctx, NotificationCommand command) {
@@ -53,14 +63,11 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   public boolean execute(NotificationContext ctx) {
     boolean result = true;
     //
-    for(NotificationCommand command : commands) {
-      result &= process(ctx, command);
+    while (commands.isEmpty() == false) {
+      result &= process(ctx, commands.poll());
     }
-    
-    //empty commands
-    this.commands.clear();
+
     return result;
-    
   }
 
   @Override

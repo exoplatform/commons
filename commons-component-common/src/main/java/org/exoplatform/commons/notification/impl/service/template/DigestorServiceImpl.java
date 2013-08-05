@@ -72,7 +72,7 @@ public class DigestorServiceImpl implements DigestorService {
       NotificationConfiguration configuration= CommonsUtils.getService(NotificationConfiguration.class);
       
       List<String> activeProviders = providerService.getActiveProviderIds();
-      NotificationContext nCtx = NotificationContextImpl.DEFAULT;
+      NotificationContext nCtx = NotificationContextImpl.cloneInstance();
       Writer writer = new StringWriter();
       for (String providerId : activeProviders) {
         List<NotificationMessage> messages = notificationData.get(NotificationKey.key(providerId));

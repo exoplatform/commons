@@ -72,7 +72,7 @@ public class ExecutorSendListener implements Callable<NotificationMessage> {
   }
 
   private void processSendEmailNotifcation(NotificationMessage message) {
-    NotificationContext nCtx = NotificationContextImpl.DEFAULT;
+    NotificationContext nCtx = NotificationContextImpl.cloneInstance();
     AbstractNotificationPlugin supportProvider = ((NotificationContextImpl) nCtx).getNotificationPluginContainer().getPlugin(message.getKey());
     if (supportProvider != null) {
       nCtx.setNotificationMessage(message);

@@ -24,7 +24,7 @@ import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 
-public interface NotificationContext {
+public interface NotificationContext extends Cloneable {
 
   /**
    * Append the argument literal.
@@ -87,5 +87,14 @@ public interface NotificationContext {
   NotificationExecutor getNotificationExecutor();
   
   NotificationCommand makeCommand(NotificationKey key);
+
+  /**
+   * Creates and returns a copy of this object
+   * 
+   * If class extends NotificationContextImpl and implements method clone(),
+   * then must use supper.clone();
+   * @see java.lang.Object#clone()
+   */
+  NotificationContext clone();
   
 }

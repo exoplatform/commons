@@ -34,7 +34,7 @@ import org.exoplatform.commons.utils.CommonsUtils;
 
 public final class NotificationContextImpl implements NotificationContext {
   
-  public static final NotificationContext DEFAULT = new NotificationContextImpl();
+  private static final NotificationContext DEFAULT = new NotificationContextImpl();
   
   private Map<String, Object> arguments = new ConcurrentHashMap<String, Object>();
   
@@ -49,10 +49,14 @@ public final class NotificationContextImpl implements NotificationContext {
   private final NotificationPluginContainer pluginService;
 
   private NotificationContextImpl() {
-    executor = new NotificationExecutorImpl();
+    executor = NotificationExecutorImpl.getInstance();
     pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
   }
-  
+
+  public static NotificationContext cloneInstance() {
+    return DEFAULT.clone();
+  }
+
   @Override
   public NotificationExecutor getNotificationExecutor() {
     return this.executor;
@@ -145,6 +149,11 @@ public final class NotificationContextImpl implements NotificationContext {
   public NotificationCommand makeCommand(NotificationKey key) {
     AbstractNotificationPlugin plugin = this.pluginService.getPlugin(key);
     return (plugin != null) ? new NotificationCommandImpl(plugin) : null;
+  }
+
+  @Override
+  public NotificationContext clone() {
+    return new NotificationContextImpl();
   }
 
 }
