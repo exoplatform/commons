@@ -85,14 +85,14 @@ CKEDITOR.editorConfig = function( config ){
 	] ;
 
 	config.toolbar_Forum = [
-		['Source','Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
+		['Maximize','-','Cut','Copy','PasteText','-','Undo','Redo','-','Bold','Italic','Underline'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
 		['Blockquote', 'Syntaxhighlight','helpBBCode.btn']
 	] ;
 
 	config.toolbar_FAQ = [
-		['Source','Maximize','-','Cut','Copy','Paste','-','Undo','Redo','-','Bold','Italic','Underline'],
+		['Maximize','-','Cut','Copy','PasteText','-','Undo','Redo','-','Bold','Italic','Underline'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],	
 		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
 		['Blockquote', 'Syntaxhighlight','helpBBCode.btn']

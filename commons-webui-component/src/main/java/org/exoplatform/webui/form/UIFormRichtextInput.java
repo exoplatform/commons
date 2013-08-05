@@ -11,9 +11,12 @@ import org.exoplatform.webui.application.WebuiRequestContext;
  */
 public class UIFormRichtextInput extends UIFormInputBase<String> {
 
-  public static final String FULL_TOOLBAR = "Full";
-
+  public static final String FULL_TOOLBAR = "CompleteWCM";
   public static final String BASIC_TOOLBAR = "Basic";
+  public static final String SUPER_BASIC_TOOLBAR = "SuperBasicWCM";
+  public static final String INLINE_TOOLBAR = "InlineEdit";
+  public static final String FORUM_TOOLBAR = "Forum";
+  public static final String FAQ_TOOLBAR = "FAQ";
   
   public static final String ENTER_P = "1";
   public static final String ENTER_BR = "2";
@@ -28,6 +31,8 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   private String enterMode;
   
   private String css;
+  
+  private boolean isPasteAsPlainText = false;
 
   public UIFormRichtextInput(String name, String bindingField, String value) {
     super(name, bindingField, String.class);
@@ -89,6 +94,14 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   	this.enterMode = enterMode;
   }
   
+  public void setIsPasteAsPlainText(boolean isPasteAsPlainText) {
+	  this.isPasteAsPlainText = isPasteAsPlainText;
+  }
+  
+  public boolean getIsPasteAsPlainText() {
+	  return this.isPasteAsPlainText;
+  }
+  
   public void setCss(String css) {
 	  this.css = css;
   }
@@ -119,8 +132,12 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     buffer.append("    require(['/CommonsResources/ckeditor/ckeditor.js'], function() {");
     buffer.append("  //<![CDATA[\n");
     buffer.append("    var instance = CKEDITOR.instances['" + name + "']; if (instance) { CKEDITOR.remove(instance); instance = null;}\n");
-    buffer.append("    CKEDITOR.replace('" + name + "', {toolbar:'" + toolbar + "', height:"
-    		+ height + ", contentsCss:" + css + ", enterMode:" + enterMode + ", shiftEnterMode:" + enterMode + "});\n");
+    if(isPasteAsPlainText)
+    	buffer.append("    CKEDITOR.replace('" + name + "', {toolbar:'" + toolbar + "', height:"
+    		+ height + ", forcePasteAsPlainText: true, contentsCss:" + css + ", enterMode:" + enterMode + ", shiftEnterMode:" + enterMode + "});\n");
+    else
+    	buffer.append("    CKEDITOR.replace('" + name + "', {toolbar:'" + toolbar + "', height:"
+        	+ height + ", contentsCss:" + css + ", enterMode:" + enterMode + ", shiftEnterMode:" + enterMode + "});\n");
     buffer.append("    instance = CKEDITOR.instances['" + name + "']; instance.on( 'change', function(e) { document.getElementById('"+name+"').value = instance.getData(); }); \n");
     buffer.append("       });");
     buffer.append("  //]]>\n");
