@@ -113,7 +113,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   public void processRender(WebuiRequestContext context) throws Exception {
 
     if (toolbar == null) toolbar = BASIC_TOOLBAR;
-    if (width == null) width = "'100%'";
+    if (width == null) width = "98%";
     if (height == null) height = "'200px'";
     if (enterMode == null) enterMode = "1";
     if(css == null) css = "'/CommonsResources/ckeditor/contents.css'";
@@ -121,7 +121,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
 
     StringBuffer buffer = new StringBuffer();
     buffer.append("<div>");
-    buffer.append("<span style='float:left; width:98%;'>");
+    buffer.append("<span style='float:left; width:"+width+";'>");
     if (value_!=null) {
       buffer.append("<textarea id='" + name + "' name='" + name + "'>" + value_ + "</textarea>\n");
     }else {
