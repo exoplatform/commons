@@ -25,7 +25,9 @@ import org.quartz.JobExecutionContext;
 
 public class NotificationJob extends MultiTenancyJob {
   private static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
-
+  
+  private static final String FEATURE_NAME = "notification";
+  
   @Override
   public Class<? extends MultiTenancyTask> getTask() {
     return SendNotificationTask.class;
@@ -39,6 +41,9 @@ public class NotificationJob extends MultiTenancyJob {
 
     @Override
     public void run() {
+      if (isValid() == false) {
+        return;
+      }
       super.run();
       try {
         //you could pass the container as argument on processDaily()...
@@ -47,6 +52,15 @@ public class NotificationJob extends MultiTenancyJob {
         LOG.error("Failed to running NotificationJob", e);
       }
       
+    }
+    
+    private boolean isValid() {
+      try {
+        return CommonsUtils.getRepository().getState() != 0 && CommonsUtils.isFeatureActive(FEATURE_NAME);
+      } catch (Exception e) {
+        LOG.error("Failed to get current repository", e);
+        return false;
+      }
     }
   }
 }

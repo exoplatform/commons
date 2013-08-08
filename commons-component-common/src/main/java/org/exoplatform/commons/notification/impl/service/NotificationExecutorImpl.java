@@ -33,6 +33,8 @@ public class NotificationExecutorImpl implements NotificationExecutor {
 
   private final Queue<NotificationCommand>  commands;
   
+  private static final String FEATURE_NAME = "notification"; 
+  
   private NotificationExecutorImpl() {
     commands = new ConcurrentLinkedQueue<NotificationCommand>();
   }
@@ -62,6 +64,12 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   @Override
   public boolean execute(NotificationContext ctx) {
     boolean result = true;
+    
+    // Notification will not be executed when the feature is off
+    if (CommonsUtils.isFeatureActive(FEATURE_NAME) == false) {
+      return result;
+    }
+    
     //
     while (commands.isEmpty() == false) {
       result &= process(ctx, commands.poll());

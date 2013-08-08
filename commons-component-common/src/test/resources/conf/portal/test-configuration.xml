@@ -18,6 +18,11 @@
 	</component>
 
 	<component>
+		<key>org.exoplatform.commons.api.settings.ExoFeatureService</key>
+		<type>org.exoplatform.settings.impl.ExoFeatureServiceImpl</type>
+	</component>
+
+	<component>
 		<key>org.exoplatform.commons.api.notification.service.template.TemplateGenerator</key>
 		<type>org.exoplatform.commons.notification.cache.CacheTemplateGenerator</type>
 	</component>
@@ -96,7 +101,7 @@
 
   <component>
     <key>org.exoplatform.commons.api.notification.service.storage.NotificationService</key>
-    <type>org.exoplatform.commons.notification.impl.storage.NotificationServiceImpl</type>
+    <type>org.exoplatform.commons.notification.impl.service.NotificationServiceImpl</type>
   </component>
 
   <component>
