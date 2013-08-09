@@ -38,6 +38,8 @@ public class NotificationUtils {
   public static final String DEFAULT_DIGEST_THREE_KEY  = "Notification.digest.three.$providerid";
 
   public static final String DEFAULT_DIGEST_MORE_KEY   = "Notification.digest.more.$providerid";
+  
+  public static final String FEATURE_NAME              = "notification";
 
   public static String getResourceBundle(String key, Locale locale, String srcResource) {
     return TemplateResourceBundle.getResourceBundle(key, locale, srcResource);

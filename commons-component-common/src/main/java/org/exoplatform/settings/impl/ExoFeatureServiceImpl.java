@@ -21,7 +21,6 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.container.PortalContainer;
 
 public class ExoFeatureServiceImpl implements ExoFeatureService {
   
@@ -29,10 +28,8 @@ public class ExoFeatureServiceImpl implements ExoFeatureService {
 
   private SettingService      settingService;
   
-  public ExoFeatureServiceImpl() {
-    if (settingService == null) {
-      settingService = (SettingService) PortalContainer.getInstance().getComponentInstanceOfType(SettingService.class);
-    }
+  public ExoFeatureServiceImpl(SettingService      settingService) {
+    this.settingService = settingService;
   }
 
   @Override

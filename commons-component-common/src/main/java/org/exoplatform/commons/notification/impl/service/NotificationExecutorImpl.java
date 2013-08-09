@@ -25,6 +25,7 @@ import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 
 public class NotificationExecutorImpl implements NotificationExecutor {
@@ -32,8 +33,6 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   private static NotificationExecutor executor;
 
   private final Queue<NotificationCommand>  commands;
-  
-  private static final String FEATURE_NAME = "notification"; 
   
   private NotificationExecutorImpl() {
     commands = new ConcurrentLinkedQueue<NotificationCommand>();
@@ -66,7 +65,7 @@ public class NotificationExecutorImpl implements NotificationExecutor {
     boolean result = true;
     
     // Notification will not be executed when the feature is off
-    if (CommonsUtils.isFeatureActive(FEATURE_NAME) == false) {
+    if (CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME) == false) {
       return result;
     }
     

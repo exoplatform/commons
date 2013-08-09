@@ -1,6 +1,5 @@
 package org.exoplatform.commons.utils;
 
-import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.api.settings.ExoFeatureService;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;

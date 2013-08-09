@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.job;
 
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.job.MultiTenancyJob;
 import org.exoplatform.services.log.ExoLogger;
@@ -25,8 +26,6 @@ import org.quartz.JobExecutionContext;
 
 public class NotificationJob extends MultiTenancyJob {
   private static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
-  
-  private static final String FEATURE_NAME = "notification";
   
   @Override
   public Class<? extends MultiTenancyTask> getTask() {
@@ -56,7 +55,7 @@ public class NotificationJob extends MultiTenancyJob {
     
     private boolean isValid() {
       try {
-        return CommonsUtils.getRepository().getState() != 0 && CommonsUtils.isFeatureActive(FEATURE_NAME);
+        return CommonsUtils.getRepository().getState() != 0 && CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME);
       } catch (Exception e) {
         LOG.error("Failed to get current repository", e);
         return false;
