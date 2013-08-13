@@ -27,6 +27,7 @@ import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
+import org.exoplatform.commons.api.notification.service.SendEmailNotificationProcessor;
 import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
@@ -39,7 +40,6 @@ import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
-import org.exoplatform.services.mail.Message;
 
 public class NotificationServiceImpl extends AbstractService implements NotificationService {
   private static final Log                          LOG            = ExoLogger.getExoLogger(NotificationServiceImpl.class);
@@ -199,13 +199,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       if (notificationMessageMap.size() > 0) {
         MessageInfo messageInfo = digest.buildMessage(notificationMessageMap, userSetting);
         if (messageInfo != null) {
-          Message message_ = messageInfo.makeEmailNotification();
-          try {
-            mail.sendMessage(message_);
-            LOG.info("Successfully, to sent email notification to user: " + message_.getTo());
-          } catch (Exception e) {
-            LOG.error("Send email error!", e);
-          }
+          //
+          CommonsUtils.getService(SendEmailNotificationProcessor.class).put(messageInfo);
         }
       }
     }

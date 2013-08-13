@@ -39,6 +39,25 @@
     <key>org.exoplatform.commons.api.notification.service.template.DigestorService</key>
     <type>org.exoplatform.commons.notification.impl.service.template.DigestorServiceImpl</type>
   </component>
+
+	<component>
+		<key>org.exoplatform.commons.api.notification.service.SendEmailNotificationProcessor</key>
+		<type>org.exoplatform.commons.notification.impl.service.SendEmailNotificationProcessorImpl</type>
+		<init-params>
+			<value-param>
+				<name>maxToSend</name> <!-- Max number of mails to send in period time -->
+				<value>50</value>
+			</value-param>
+			<value-param>
+				<name>initialDelay</name>
+				<value>120</value>
+			</value-param>
+			<value-param>
+				<name>delayTime</name>
+				<value>60</value>
+			</value-param>
+		</init-params>
+	</component>
   
   <component>
     <type>org.exoplatform.commons.notification.NotificationConfiguration</type>

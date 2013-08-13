@@ -24,12 +24,11 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.service.SendEmailNotificationProcessor;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.container.PortalContainer;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.mail.MailService;
-import org.exoplatform.services.mail.Message;
 
 public class ExecutorSendListener implements Callable<NotificationMessage> {
   private static final Log           LOG      = ExoLogger.getExoLogger(ExecutorSendListener.class);
@@ -79,16 +78,7 @@ public class ExecutorSendListener implements Callable<NotificationMessage> {
       MessageInfo messageInfo = supportProvider.buildMessage(nCtx);
 
       if (messageInfo != null) {
-        Message message_ = messageInfo.makeEmailNotification();
-
-
-        try {
-          MailService mailService = (MailService) PortalContainer.getInstance().getComponentInstanceOfType(MailService.class);
-          mailService.sendMessage(message_);
-          LOG.info("Successfully, to sent email notification to user: " + message_.getTo());
-        } catch (Exception e) {
-          LOG.error("Send email error!", e);
-        }
+        CommonsUtils.getService(SendEmailNotificationProcessor.class).put(messageInfo);
       }
     }
   }
