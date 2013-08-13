@@ -142,7 +142,6 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     send(digest, notificationService, mailService, usersDefaultSettings, true);
   }
   
-  
   private void send(DigestorService digest, NotificationService notification, MailService mail, List<UserSetting> userSettings, boolean isDefault) {
     for (UserSetting userSetting : userSettings) {
       if (isDefault) {

@@ -315,7 +315,7 @@
               <string>general</string>
             </field>
             <field name="resourceBundleKey">
-              <string>Notification.label.group.General</string>
+              <string>UINotification.label.group.General</string>
             </field>
             <field name="order">
               <string>1</string>
@@ -331,7 +331,7 @@
               <string>connections</string>
             </field>
             <field name="resourceBundleKey">
-              <string>Notification.label.group.Connections</string>
+              <string>UINotification.label.group.Connections</string>
             </field>
             <field name="order">
               <string>2</string>
@@ -347,7 +347,7 @@
               <string>spaces</string>
             </field>
             <field name="resourceBundleKey">
-              <string>Notification.label.group.Spaces</string>
+              <string>UINotification.label.group.Spaces</string>
             </field>
             <field name="order">
               <string>3</string>
@@ -363,7 +363,7 @@
               <string>activity_stream</string>
             </field>
             <field name="resourceBundleKey">
-              <string>Notification.label.group.ActivityStream</string>
+              <string>UINotification.label.group.ActivityStream</string>
             </field>
             <field name="order">
               <string>4</string>
@@ -379,7 +379,7 @@
               <string>other</string>
             </field>
             <field name="resourceBundleKey">
-              <string>Notification.label.group.Other</string>
+              <string>UINotification.label.group.Other</string>
             </field>
             <field name="order">
               <string>99</string>

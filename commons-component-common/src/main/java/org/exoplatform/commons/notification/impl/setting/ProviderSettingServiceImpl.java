@@ -64,6 +64,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
                 .setOrder(Integer.valueOf(pluginConfig.getOrder()))
                 .setActive(isActive(pluginConfig.getPluginId(), true))
                 .setResourceBundleKey(pluginConfig.getResourceBundleKey())
+                .setBundlePath(pluginConfig.getTemplateConfig().getBundlePath())
                 .setDefaultConfig(pluginConfig.getDefaultConfig());
     //
     String groupId = pluginConfig.getGroupId();

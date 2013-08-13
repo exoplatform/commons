@@ -17,9 +17,13 @@
 package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GroupProvider {
+  public static final List<String> defaultGroupIds = Arrays.asList("general", "connections", 
+                                                                     "spaces", "activity_stream", "other");
+
   private String             groupId;
 
   private String             resourceBundleKey;

@@ -27,8 +27,10 @@ public class ProviderData {
   private int          order         = 0;
 
   private String       resourceBundleKey;
+  
+  private String       bundlePath;
 
-  private boolean      isActive      = true;
+  private boolean     isActive      = true;
 
   private List<String> defaultConfig = new ArrayList<String>();
 
@@ -92,6 +94,21 @@ public class ProviderData {
    */
   public ProviderData setResourceBundleKey(String resourceBundleKey) {
     this.resourceBundleKey = resourceBundleKey;
+    return this;
+  }
+  
+  /**
+   * @return the bundlePath
+   */
+  public String getBundlePath() {
+    return bundlePath;
+  }
+
+  /**
+   * @param bundlePath the bundlePath to set
+   */
+  public ProviderData setBundlePath(String bundlePath) {
+    this.bundlePath = bundlePath;
     return this;
   }
 
