@@ -20,7 +20,8 @@ CKEDITOR.editorConfig = function( config ){
 	config.resize_enabled = true;
 	config.scayt_autoStartup = true;
 	config.language = eXo.env.portal.language || 'en';
-
+	config.pasteFromWordRemoveFontStyles = false;
+	config.pasteFromWordRemoveStyles = false;
         config.syntaxhighlight_lang = 'java';
 	config.syntaxhighlight_hideControls = true;
 
