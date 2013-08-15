@@ -214,11 +214,16 @@ public class UserSetting {
   
   public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
-      defaultSetting = getInstance();
-      defaultSetting.setActive(true);
       ProviderSettingService settingService = (ProviderSettingService) PortalContainer.getInstance()
                                               .getComponentInstanceOfType(ProviderSettingService.class);
       List<ProviderData> providerDatas = settingService.getActiveProviders();
+      
+      if (providerDatas == null || providerDatas.size()==0) {
+        return new UserSetting();
+      }
+      
+      defaultSetting = getInstance();
+      defaultSetting.setActive(true);
       for (ProviderData providerData : providerDatas) {
         for (String defaultConf : providerData.getDefaultConfig()) {
           defaultSetting.addProvider(providerData.getType(), FREQUENCY.getFrequecy(defaultConf));

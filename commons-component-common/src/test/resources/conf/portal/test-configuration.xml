@@ -16,11 +16,21 @@
 		<key>org.exoplatform.settings.impl.SettingServiceImpl</key>
 		<type>org.exoplatform.settings.impl.SettingServiceImpl</type>
 	</component>
+	
+	<component>
+    <key>org.exoplatform.commons.api.notification.service.setting.ProviderSettingService</key>
+    <type>org.exoplatform.commons.notification.impl.setting.ProviderSettingServiceImpl</type>
+  </component>
 
 	<component>
 		<key>org.exoplatform.commons.api.settings.ExoFeatureService</key>
 		<type>org.exoplatform.settings.impl.ExoFeatureServiceImpl</type>
 	</component>
+	
+	<component>
+    <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
+  </component>
 
 	<component>
 		<key>org.exoplatform.commons.api.notification.service.template.TemplateGenerator</key>
@@ -103,7 +113,25 @@
     <key>org.exoplatform.commons.api.notification.service.storage.NotificationService</key>
     <type>org.exoplatform.commons.notification.impl.service.NotificationServiceImpl</type>
   </component>
-
+  
+  <component>
+    <type>org.exoplatform.commons.notification.NotificationConfiguration</type>
+    <init-params>
+      <value-param>
+        <name>workspace</name>
+        <value>portal-test</value>
+      </value-param>
+      <value-param>
+        <name>dayOfWeekend</name>
+        <value>6</value>
+      </value-param>
+      <value-param>
+        <name>dayOfMonthend</name>
+        <value>28</value>
+      </value-param>
+    </init-params>
+  </component>
+  
   <component>
     <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
     <type>org.exoplatform.commons.notification.impl.setting.UserSettingServiceImpl</type>

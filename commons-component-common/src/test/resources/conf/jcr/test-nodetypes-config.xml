@@ -9,6 +9,10 @@
         onParentVersion="COPY" protected="false" multiple="false">
         <valueConstraints/>	      
       </propertyDefinition>
+      <propertyDefinition name="exo:lastModifiedDate" requiredType="Date" autoCreated="true" mandatory="false"
+        onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>       
+      </propertyDefinition>
     </propertyDefinitions>
   </nodeType>
 </nodeTypes>

@@ -31,4 +31,6 @@ public interface UserSettingService {
   long getNumberOfDaily();
   
   List<UserSetting> getDefaultDaily();
+  
+  List<String> getUserSettingByPlugin(String pluginId);
 }

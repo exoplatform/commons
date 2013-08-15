@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.impl.service.storage;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,11 +129,11 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     }
   }
   
-  private List<NotificationMessage> getNotificationMessages(SessionProvider sProvider, String providerId,
+  private List<NotificationMessage> getNotificationMessages(SessionProvider sProvider, String pluginId,
                                                             String property, String userId) throws Exception{
     List<NotificationMessage> messages = new ArrayList<NotificationMessage>();
     StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
-    Node messageHomeNode = getOrCreateMessageParent(sProvider, workspace, providerId);
+    Node messageHomeNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
     Session session = messageHomeNode.getSession();
     queryBuffer.append(messageHomeNode.getPath()).append("//element(*,").append(NTF_MESSAGE).append(")")
                .append("[").append("@").append(property).append("='").append(userId).append("']  order by @")
@@ -209,5 +210,48 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     }
   }
   
+  public Map<String, NotificationMessage> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend) {
+    Map<String, NotificationMessage> messages = new LinkedHashMap<String, NotificationMessage>();
+    try {
+      SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+      Node messageHomeNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
+      messageHomeNode = (isWeekend) ? messageHomeNode : messageHomeNode.getNode("d" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+      if (messageHomeNode == null)
+        return messages;
+      
+      StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
+      Session session = messageHomeNode.getSession();
+      queryBuffer.append(messageHomeNode.getPath()).append("//element(*,").append(NTF_MESSAGE).append(")");
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
+      NodeIterator iter = query.execute().getNodes();
+      
+      while (iter.hasNext()) {
+        Node node = iter.nextNode();
+        NotificationMessage model = fillModel(node);
+        messages.put(model.getFrom(), model);
+      }
+    } catch (Exception e) {
+      LOG.debug("Failed to get the list of messages by " + pluginId, e);
+    }
   
+    return messages;
+  }
+  
+  public void removeNotificationMessages(String pluginId) {
+    try {
+      SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+      Node messageHomeNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
+      Session session = messageHomeNode.getSession();
+      NodeIterator iter = messageHomeNode.getNodes();
+      while (iter.hasNext()) {
+        Node node = iter.nextNode();
+        node.remove();
+      }
+      session.save();
+      
+    } catch (Exception e) {
+      LOG.debug("Failed to delete the list of messages by " + pluginId, e);
+    }
+  }
 }

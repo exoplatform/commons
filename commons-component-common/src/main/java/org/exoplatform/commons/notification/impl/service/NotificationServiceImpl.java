@@ -32,6 +32,8 @@ import org.exoplatform.commons.api.notification.service.setting.UserSettingServi
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
+import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
@@ -45,6 +47,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private List<AbstractNotificationServiceListener> messageListeners = new ArrayList<AbstractNotificationServiceListener>(2);
 
   private final NotificationDataStorage             storage;
+  
+  private static final String NEW_USER_PLUGIN_ID = "NewUserPlugin";
 
   public NotificationServiceImpl( NotificationDataStorage storage) {
     this.storage = storage;
@@ -60,7 +64,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       messageListener.processListener(message);
     }
   }
-
+  
   @Override
   public void process(NotificationMessage message) throws Exception {
     UserSettingService notificationService = CommonsUtils.getService(UserSettingService.class);
@@ -68,6 +72,13 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     List<String> userIdPendings = new ArrayList<String>();
 
     String providerId = message.getKey().getId();
+    
+    //In case of NewUserPlugin, we process only the send instantly, and the daily or weekly when the job is called
+    if (NEW_USER_PLUGIN_ID.equals(providerId)) {
+      userIds = notificationService.getUserSettingByPlugin(providerId);
+      storage.save(message);
+    }
+    
     for (String userId : userIds) {
       UserSetting userSetting = notificationService.get(userId);
       
@@ -79,7 +90,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         processSendNotificationListener(message.clone().setTo(userId));
       }
       //
-      if(userSetting.isActiveWithoutInstantly(providerId)){
+      if(NEW_USER_PLUGIN_ID.equals(providerId) == false && userSetting.isActiveWithoutInstantly(providerId)){
         userIdPendings.add(userId);
         setValueSendbyFrequency(message, userSetting, userId);
       }
@@ -111,6 +122,11 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     }
     
   }
+  
+  @Override
+  public Map<String, NotificationMessage> getNotificationMessagesByProviderId(String providerId, boolean isWeekend) {
+    return storage.getNotificationMessagesByProviderId(providerId, isWeekend);
+  }
 
 
   @Override
@@ -140,14 +156,46 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     //
     List<UserSetting> usersDefaultSettings = userService.getDefaultDaily();
     send(digest, notificationService, mailService, usersDefaultSettings, true);
+    
+    //if today is friday, clear all stored message for the new user plugin
+    if (isWeekend()) {
+      notificationService.removeNotificationMessages(NEW_USER_PLUGIN_ID);
+    }
+  }
+  
+  @Override
+  public void removeNotificationMessages(String pluginId) {
+    storage.removeNotificationMessages(pluginId);
   }
   
   private void send(DigestorService digest, NotificationService notification, MailService mail, List<UserSetting> userSettings, boolean isDefault) {
+    
+    //get list of new user notification message follow by daily or weekly
+    Map<String, NotificationMessage> newUserMessages = getNotificationMessagesByProviderId(NEW_USER_PLUGIN_ID, isWeekend());
+
     for (UserSetting userSetting : userSettings) {
       if (isDefault) {
         userSetting = getDefaultUserNotificationSetting(userSetting);
       }
       Map<NotificationKey, List<NotificationMessage>> notificationMessageMap = notification.getByUser(userSetting);
+      
+      NotificationMessage message = newUserMessages.get(userSetting.getUserId());
+      //notify new user event only when the user has this config daily or weekly with today = friday
+      if (newUserMessages.size() > 0 && (userSetting.isInDaily(NEW_USER_PLUGIN_ID) || (userSetting.isInWeekly(NEW_USER_PLUGIN_ID) && isWeekend()))) {
+        List<NotificationMessage> messages = new ArrayList<NotificationMessage>(newUserMessages.values());
+
+        //remove the current user of userSetting from list messages
+        messages.remove(message);
+        if (messages.size() > 0) {
+          //set the information of the receiver for the first message
+          NotificationMessage first = messages.get(0);
+          first.setTo(userSetting.getUserId());
+          messages.set(0, first);
+          //put to map
+          notificationMessageMap.put(NotificationKey.key(NEW_USER_PLUGIN_ID), messages);
+        }
+      }
+      
       if (notificationMessageMap.size() > 0) {
         MessageInfo messageInfo = digest.buildMessage(notificationMessageMap, userSetting);
         if (messageInfo != null) {
@@ -178,4 +226,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     return notificationSetting.setUserId(setting.getUserId()).setLastUpdateTime(setting.getLastUpdateTime());
   }
   
+  private boolean isWeekend() {
+    NotificationConfiguration configuration= CommonsUtils.getService(NotificationConfiguration.class);
+    return NotificationUtils.isWeekEnd(configuration.getDayOfWeekend());
+  }
 }

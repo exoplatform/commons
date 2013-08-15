@@ -32,4 +32,8 @@ public interface NotificationDataStorage {
 
   void createParentNodeOfPlugin(String pluginId);
   
+  Map<String, NotificationMessage> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend);
+  
+  void removeNotificationMessages(String pluginId);
+  
 }

@@ -111,19 +111,15 @@ public abstract class AbstractService {
 
   /**
    * Makes the node path for MessageHome node
-   * "/eXoNotification/messageHome/<providerId>/<DAY_OF_MONTH>/<HOUR_OF_DAY>/"
+   * "/eXoNotification/messageHome/<pluginId>/<DAY_OF_MONTH>/<HOUR_OF_DAY>/"
    * 
    * @param sProvider
-   * @param providerId
+   * @param pluginId
    * @return
    * @throws Exception
    */
-  protected Node getOrCreateMessageParent(SessionProvider sProvider, String workspace, String providerId) throws Exception {
-    Node root = getNotificationHomeNode(sProvider, workspace);
-    // rootPath = "/eXoNotification/messageHome/"
-    Node messageHome = getOrCreateNode(root, PREFIX_MESSAGE_HOME_NODE);
-    // providerPath = /eXoNotification/messageHome/<providerId>/
-    Node providerNode = getOrCreateNode(messageHome, providerId);
+  protected Node getOrCreateMessageParent(SessionProvider sProvider, String workspace, String pluginId) throws Exception {
+    Node providerNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
     String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
     Node dayNode = getOrCreateNode(providerNode, DAY + dayName);
     String hourName = String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
@@ -131,6 +127,23 @@ public abstract class AbstractService {
     return messageParentNode;
   }
 
+  /**
+   * Makes the node path for MessageHome node
+   * 
+   * @param sProvider
+   * @param workspace
+   * @param pluginId
+   * @return
+   * @throws Exception
+   */
+  protected Node getMessageNodeByPluginId(SessionProvider sProvider, String workspace, String pluginId) throws Exception {
+    Node root = getNotificationHomeNode(sProvider, workspace);
+    // rootPath = "/eXoNotification/messageHome/"
+    Node messageHome = getOrCreateNode(root, PREFIX_MESSAGE_HOME_NODE);
+    // pluginPath = /eXoNotification/messageHome/<pluginId>/
+    return getOrCreateNode(messageHome, pluginId);
+  }
+  
   private Node getOrCreateNode(Node parent, String nodeName) throws Exception {
     if (parent.hasNode(nodeName) == false) {
       Node messageHome = parent.addNode(nodeName, NTF_MESSAGE_HOME);

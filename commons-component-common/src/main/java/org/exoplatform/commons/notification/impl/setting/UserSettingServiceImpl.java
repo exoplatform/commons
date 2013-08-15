@@ -46,7 +46,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   /** Setting Scope on Common Setting **/
   private static final Scope      NOTIFICATION_SCOPE = Scope.GLOBAL;
-
+  
   private SettingService            settingService;
 
   private String                    workspace;
@@ -202,6 +202,39 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
     return queryBuffer;
   }
+  
+  private StringBuffer buildQuery(String pluginId) {
+    if (pluginId == null) {
+      return buildQuery();
+    }
+    StringBuffer queryBuffer = new StringBuffer();
+    queryBuffer.append("@").append(EXO_IS_ACTIVE).append("='true' and (")
+                //if user wants to receive this kind of notification instantly
+               .append("@").append(EXO_INSTANTLY).append("=").append("'").append(pluginId).append("'")
+               .append(" or jcr:like(").append(EXO_INSTANTLY).append(", '%,").append(pluginId).append(",%')")
+               .append(" or jcr:like(").append(EXO_INSTANTLY).append(", '%,").append(pluginId).append("')")
+               .append(" or jcr:like(").append(EXO_INSTANTLY).append(", '").append(pluginId).append(",%')")
+               .append(")");
+
+    return queryBuffer;
+  }
+  
+  @Override
+  public List<String> getUserSettingByPlugin(String pluginId) {
+    SessionProvider sProvider = getSystemProvider();
+    List<String> userIds = new ArrayList<String>();
+    try {
+      NodeIterator iter = getDailyIterator(sProvider, 0, 0, pluginId);
+      while (iter != null && iter.hasNext()) {
+        Node node = iter.nextNode();
+        userIds.add(fillModel(node).getUserId());
+      }
+    } catch (Exception e) {
+      LOG.error("Failed to get all users have the " + pluginId + " in settings", e);
+    }
+
+    return userIds;
+  }
 
   /**
    * Gets these plugins what configured the daily
@@ -212,7 +245,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * @return
    * @throws Exception
    */
-  private NodeIterator getDailyIterator(SessionProvider sProvider, int offset, int limit) throws Exception {
+  private NodeIterator getDailyIterator(SessionProvider sProvider, int offset, int limit, String pluginId) throws Exception {
     Session session = getSession(sProvider, workspace);
     if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
       return null;
@@ -221,7 +254,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
     StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
     queryBuffer.append(userHomeNode.getPath()).append("//element(*,").append(STG_SCOPE).append(")");
-    queryBuffer.append("[").append(buildQuery()).append("]");
+    queryBuffer.append("[").append(buildQuery(pluginId)).append("]");
     QueryManager qm = session.getWorkspace().getQueryManager();
     QueryImpl query = (QueryImpl) qm.createQuery(queryBuffer.toString(), Query.XPATH);
     if (limit > 0) {
@@ -236,7 +269,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     SessionProvider sProvider = getSystemProvider();
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
-      NodeIterator iter = getDailyIterator(sProvider, offset, limit);
+      NodeIterator iter = getDailyIterator(sProvider, offset, limit, null);
       while (iter != null && iter.hasNext()) {
         Node node = iter.nextNode();
         models.add(fillModel(node));
@@ -272,7 +305,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     model.setDailyProviders(getValues(node, EXO_DAILY));
     model.setWeeklyProviders(getValues(node, EXO_WEEKLY));
     model.setUserId(node.getParent().getName());
-    model.setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
+    //model.setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
     return model;
   }
   
@@ -280,7 +313,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   public long getNumberOfDaily() {
     SessionProvider sProvider = getSystemProvider();
     try {
-      NodeIterator iter = getDailyIterator(sProvider, 0, 0);
+      NodeIterator iter = getDailyIterator(sProvider, 0, 0, null);
       return (iter == null) ? 0l : iter.getSize();
     } catch (Exception e) {
       return 0l;
