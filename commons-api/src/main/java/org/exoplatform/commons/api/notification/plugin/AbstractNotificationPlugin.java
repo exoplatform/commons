@@ -103,7 +103,7 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
   public MessageInfo buildMessage(NotificationContext ctx) {
     NotificationMessage message = ctx.getNotificationMessage();
     MessageInfo messageInfo = makeMessage(ctx);
-    return messageInfo.from(NotificationPluginUtils.getFrom(message.getFrom()))
+    return messageInfo.pluginId(getId()).from(NotificationPluginUtils.getFrom(message.getFrom()))
                .to(NotificationPluginUtils.getTo(message.getTo())).end();
   }
 

@@ -19,47 +19,36 @@ package org.exoplatform.commons.notification.job;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.job.MultiTenancyJob;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.quartz.Job;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
-public class NotificationJob extends MultiTenancyJob {
+public class NotificationJob implements Job {
   private static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
-  
+
+  public NotificationJob() {}
+
   @Override
-  public Class<? extends MultiTenancyTask> getTask() {
-    return SendNotificationTask.class;
+  public void execute(JobExecutionContext context) throws JobExecutionException {
+    if (isValid() == false) {
+      return;
+    }
+
+    try {
+      CommonsUtils.getService(NotificationService.class).processDaily();
+    } catch (Exception e) {
+      LOG.error("Failed to running NotificationJob", e);
+    }
   }
-
-  public class SendNotificationTask extends MultiTenancyTask {
-
-    public SendNotificationTask(JobExecutionContext context, String repoName) {
-      super(context, repoName);
-    }
-
-    @Override
-    public void run() {
-      if (isValid() == false) {
-        return;
-      }
-      super.run();
-      try {
-        //you could pass the container as argument on processDaily()...
-        CommonsUtils.getService(NotificationService.class).processDaily();
-      } catch (Exception e) {
-        LOG.error("Failed to running NotificationJob", e);
-      }
-      
-    }
-    
-    private boolean isValid() {
-      try {
-        return CommonsUtils.getRepository().getState() != 0 && CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME);
-      } catch (Exception e) {
-        LOG.error("Failed to get current repository", e);
-        return false;
-      }
+ 
+  private boolean isValid() {
+    try {
+      return CommonsUtils.getRepository().getState() != 0 && CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME);
+    } catch (Exception e) {
+      LOG.error("Failed to get current repository", e);
+      return false;
     }
   }
 }

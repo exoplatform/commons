@@ -23,14 +23,33 @@ public class MessageInfo {
 
   private String to;
 
-  private String body = "";
+  private String body     = "";
 
-  private String subject = "";
+  private String subject  = "";
 
-  private String foodter;
+  private String footer;
+
+  private String pluginId = "";
 
   public MessageInfo() {
   }
+  
+  /**
+   * @return the pluginId
+   */
+  public String getPluginId() {
+    return pluginId;
+  }
+
+
+  /**
+   * @param pluginId the pluginId to set
+   */
+  public MessageInfo pluginId(String pluginId) {
+    this.pluginId = pluginId;
+    return this;
+  }
+
 
   /**
    * @return the from
@@ -93,17 +112,17 @@ public class MessageInfo {
   }
 
   /**
-   * @return the foodter
+   * @return the footer
    */
-  public String getFoodter() {
-    return foodter;
+  public String getFooter() {
+    return footer;
   }
 
   /**
-   * @param foodter the foodter to set
+   * @param footer the foodter to set
    */
-  public MessageInfo footer(String foodter) {
-    this.foodter = foodter;
+  public MessageInfo footer(String footer) {
+    this.footer = footer;
     return this;
   }
   
@@ -122,7 +141,7 @@ public class MessageInfo {
     message.setFrom(from);
     message.setTo(to);
     message.setSubject(subject);
-    message.setBody(body + ((foodter != null && foodter.length() > 0) ? foodter : ""));
+    message.setBody(body + ((footer != null && footer.length() > 0) ? footer : ""));
     return message;
   }
 
@@ -133,7 +152,7 @@ public class MessageInfo {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    String body = this.body + ((foodter != null && foodter.length() > 0) ? foodter : ""); 
+    String body = this.body + ((footer != null && footer.length() > 0) ? footer : ""); 
     builder.append("{ ")
            .append("subject: '").append(subject.replaceAll("'", "&#39;")).append("', ")
            .append("from: '").append(from).append("', ")

@@ -18,6 +18,8 @@ package org.exoplatform.commons.notification;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -114,5 +116,64 @@ public class NotificationUtils {
   public static boolean isMonthEnd(int number) {
     Calendar calendar = Calendar.getInstance();
     return (calendar.get(Calendar.DAY_OF_MONTH) == number) ? true : false;
+  }
+  
+  public static Date getStartTime(String stime) {
+    //
+    if (stime == null || stime.length() == 0 || stime.equals("-1")) {
+      return new Date(System.currentTimeMillis() + 180000);
+    }
+    //
+    if (stime.startsWith("+")) {
+      return new Date(System.currentTimeMillis() + Long.parseLong(stime.substring(1)));
+    }
+    //
+    stime = stime.toLowerCase().replace(":", "");
+
+    int h = 0;
+    if (stime.indexOf("am") > 0) {
+      h = Integer.parseInt(stime.replace("am", "").trim());
+    } else if (stime.indexOf("pm") > 0) {
+      h = Integer.parseInt(stime.replace("pm", "").trim());
+      h = 12 + h;
+    } else {
+      h = Integer.parseInt(stime.trim());
+      if (h == 24) {
+        h = 0;
+      }
+    }
+
+    return getDateByHours(h);
+  }
+
+  public static Date getDateByHours(int h) {
+    Calendar calendar = GregorianCalendar.getInstance();
+    int crh = calendar.get(Calendar.HOUR_OF_DAY);
+    calendar.set(Calendar.MINUTE, 0);
+    if (h >= crh) {
+      calendar.set(Calendar.HOUR_OF_DAY, h);
+    } else {
+      int delta = (24 - crh + h);
+      calendar.setTimeInMillis(calendar.getTimeInMillis() + 3600000 * delta);
+    }
+    return calendar.getTime();
+  }
+
+  public static long getRepeatInterval(String period) {
+    period = period.toLowerCase();
+
+    if (period.indexOf("m") > 0) {
+      return 60000 * Integer.parseInt(period.replace("m", "").trim());
+    }
+
+    if (period.indexOf("h") > 0) {
+      return 3600000 * Integer.parseInt(period.replace("h", "").trim());
+    }
+
+    if (period.indexOf("d") > 0) {
+      return 86400000 * Integer.parseInt(period.replace("d", "").trim());
+    }
+
+    return Long.parseLong(period.trim());
   }
 }

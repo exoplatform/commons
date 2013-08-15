@@ -58,23 +58,33 @@
 			</value-param>
 		</init-params>
 	</component>
-  
+
   <component>
     <type>org.exoplatform.commons.notification.NotificationConfiguration</type>
     <init-params>
-			<value-param>
-				<name>workspace</name>
-				<value>portal-system</value>
-			</value-param>
-			<value-param>
-				<name>dayOfWeekend</name>
-				<value>6</value>
-			</value-param>
-			<value-param>
-				<name>dayOfMonthend</name>
-				<value>28</value>
-			</value-param>
-		</init-params>
+      <value-param>
+        <name>workspace</name>
+        <value>portal-system</value>
+      </value-param>
+
+      <value-param>
+        <name>dayOfWeekend</name>
+        <value>6</value>
+      </value-param>
+      <value-param>
+        <name>dayOfMonthend</name>
+        <value>28</value>
+      </value-param>
+
+      <value-param>
+        <name>period</name><!-- repeat interval call send email notification -->
+        <value>1d</value><!-- The value is number of m/h/d or time millisecond -->
+      </value-param>
+      <value-param>
+        <name>startAtTime</name><!-- The start time will call send email notification -->
+        <value>1am</value><!-- The value is number hours of a day: 16, 4:am, 4:pm -->
+      </value-param>
+    </init-params>
   </component>
 
   <component>
@@ -218,34 +228,6 @@
             </field>
           </object>
         </object-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
-    <component-plugin>
-      <name>SendNotificationJob</name>
-      <set-method>addPeriodJob</set-method>
-      <type>org.exoplatform.commons.notification.job.NotificationInfoJob</type>
-      <description>add a send notification job to the JobSchedulerService</description>
-      <init-params>
-        <properties-param>
-          <name>job.info</name>
-          <description>save the monitor data  periodically</description>
-          <property name="jobName" value="NotificationJob"/>
-          <property name="groupName" value="Notification"/>
-          <property name="job" value="org.exoplatform.commons.notification.job.NotificationJob"/>
-          <property name="repeatCount" value="0"/>
-          <property name="period" value="300000"/> <!-- 1 day-->    
-          <property name="startTime" value="+180000"/>
-          <property name="endTime" value=""/>               
-        </properties-param>
-        <properties-param>
-          <name>notification.info</name>
-          <description></description>
-          <property name="maxToSend" value="20"/> <!-- 20 mails on one time to send-->          
-          <property name="sleepTimeNextSend" value="20"/> <!-- 20 seconds on one time to send-->  
-        </properties-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>
