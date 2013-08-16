@@ -19,7 +19,6 @@ package org.exoplatform.commons.notification;
 import java.util.Date;
 
 import org.exoplatform.commons.notification.impl.AbstractService;
-import org.exoplatform.commons.notification.job.NotificationConfigurationJob;
 import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
