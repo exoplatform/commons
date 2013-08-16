@@ -28,7 +28,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.jcr.Value;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.notification.template.TemplateResourceBundle;
 
@@ -207,5 +210,23 @@ public class NotificationUtils {
     }
 
     return Long.parseLong(period.trim());
+  }
+  
+  public static boolean isValidEmailAddresses(String addressList){
+    if (addressList == null || addressList.length() < 0)
+      return false;
+    addressList = StringUtils.remove(addressList, " ");
+    addressList = StringUtils.replace(addressList, ";", ",");
+    try {
+      InternetAddress[] iAdds = InternetAddress.parse(addressList, true);
+      String emailRegex = "[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[_A-Za-z0-9-.]+\\.[A-Za-z]{2,5}";
+      for (int i = 0; i < iAdds.length; i++) {
+        if (!iAdds[i].getAddress().matches(emailRegex))
+          return false;
+      }
+    } catch (AddressException e) {
+      return false;
+    }
+    return true;
   }
 }

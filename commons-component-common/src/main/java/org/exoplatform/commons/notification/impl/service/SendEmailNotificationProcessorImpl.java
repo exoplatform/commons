@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.service.SendEmailNotificationProcessor;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -65,31 +66,32 @@ public class SendEmailNotificationProcessorImpl implements SendEmailNotification
   @Override
   public boolean put(MessageInfo message) {
     //
-    try {
-      
-      messageQueue.add(message);
-      
-    } catch (Exception e) {
+    if (message == null || message.getTo() == null || message.getTo().length() == 0) {
       return false;
     }
-    
+    //
+    if (NotificationUtils.isValidEmailAddresses(message.getTo()) == false) {
+      return false;
+    }
+    messageQueue.add(message);
+
     return true;
   }
 
   @Override
   public void send() {
     
-    for (int i = 0; i < messageQueue.size(); i++) {
+    for (int i = 0; i < MAX_TO_SEND; i++) {
       try {
         
-        MessageInfo mailMessage = messageQueue.poll();
-        
-        if (mailMessage != null) {
-          LOG.info("Send notification to user "+ mailMessage.getTo());
+        if (messageQueue.isEmpty() == false) {
+          MessageInfo mailMessage = messageQueue.poll();
           mailService.sendMessage(mailMessage.makeEmailNotification());
+          LOG.info("Sent notification to user "+ mailMessage.getTo());
+        } else {
+          break;
         }
         
-        if (i == MAX_TO_SEND) break;
       } catch (Exception e) {
         LOG.error("Failed to send notification.", e);
       }
