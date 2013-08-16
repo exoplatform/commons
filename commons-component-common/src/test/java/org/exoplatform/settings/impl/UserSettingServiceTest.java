@@ -25,8 +25,10 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
     userSettingService.save(createUserSetting("john", Arrays.asList("4,5"), Arrays.asList("2,8"), Arrays.asList("6,7")));
     userSettingService.save(createUserSetting("mary", Arrays.asList("32,5"), Arrays.asList("4,6"), Arrays.asList("1,9")));
     userSettingService.save(createUserSetting("demo", Arrays.asList("2"), Arrays.asList("3,9"), Arrays.asList("2,7")));
-    UserSetting userSetting = userSettingService.get("root");
-    assertNotNull(userSetting);
+    addLastUpdateTime("root");
+    addLastUpdateTime("john");
+    addLastUpdateTime("mary");
+    addLastUpdateTime("demo");
     List<String> list = userSettingService.getUserSettingByPlugin("2");
     assertEquals(2, list.size());
   }
@@ -36,7 +38,10 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
     UserSetting userSetting = userSettingService.get("root");
     assertNotNull(userSetting);
     //add mix:defaultSetting for user root
-    addMixin("root");
+    userSettingService.addMixin("root");
+    
+    addLastUpdateTime("root");
+    
     List<UserSetting> list = userSettingService.getDefaultDaily();
     assertEquals(1, list.size());
   }
@@ -51,29 +56,10 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
     return model;
   }
   
-  private void addMixin(String userId) throws Exception {
-    Node settingNode = session.getRootNode().getNode("settings");
-    Node userHomeNode, userNode = null;
-    if (settingNode.hasNode("user")) {
-      userHomeNode = settingNode.getNode("user");
-    } else {
-      userHomeNode = settingNode.addNode("user", "stg:subcontext");
-      
-    }
-
-    if (userHomeNode.hasNode(userId)) {
-      userNode = userHomeNode.getNode(userId);
-    } else {
-      userNode = userHomeNode.addNode(userId, "stg:simplecontext");
-    }
-
-    //
-    if (userNode.canAddMixin("mix:defaultSetting")) {
-      userNode.addMixin("mix:defaultSetting");
-      userNode.addMixin("exo:datetime");
-      userNode.setProperty("exo:lastModifiedDate", Calendar.getInstance());
-    }
-
+  private void addLastUpdateTime(String userId) throws Exception {
+    Node rootNode = session.getRootNode().getNode("settings").getNode("user").getNode(userId);
+    rootNode.addMixin("exo:datetime");
+    rootNode.setProperty("exo:lastModifiedDate", Calendar.getInstance());
     session.save();
   }
   

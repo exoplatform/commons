@@ -19,6 +19,7 @@ package org.exoplatform.commons.api.notification.service.setting;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.services.organization.User;
 
 public interface UserSettingService {
 
@@ -33,4 +34,8 @@ public interface UserSettingService {
   List<UserSetting> getDefaultDaily();
   
   List<String> getUserSettingByPlugin(String pluginId);
+  
+  void addMixin(String userId);
+  
+  void addMixin(User[] users);
 }

@@ -36,10 +36,14 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.impl.UserImpl;
 
 public class UserSettingServiceImpl extends AbstractService implements UserSettingService {
   private static final Log        LOG                = ExoLogger.getLogger(UserSettingServiceImpl.class);
@@ -57,6 +61,18 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     this.settingService = settingService;
     this.configuration = configuration;
     this.workspace = configuration.getWorkspace();
+  }
+
+  private Node getUserSettingHome(Session session) throws Exception {
+    Node settingNode = session.getRootNode().getNode(SETTING_NODE);
+    Node userHomeNode = null;
+    if (settingNode.hasNode(SETTING_USER_NODE) == false) {
+      userHomeNode = settingNode.addNode(SETTING_USER_NODE, STG_SUBCONTEXT);
+      session.save();
+    } else {
+      userHomeNode = settingNode.getNode(SETTING_USER_NODE);
+    }
+    return userHomeNode;
   }
 
   @Override
@@ -129,38 +145,32 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     return false;
   }
   
-  /**
-   * Using the mixin type to mark the user's setting.
-   * 
-   * @param userId
-   */
-  private void addMixin(String userId) {
+  @Override
+  public void addMixin(String userId) {
+    addMixin(new User[] { new UserImpl(userId) });
+  }
+
+  @Override
+  public void addMixin(User[] users) {
     SessionProvider sProvider = getSystemProvider();
-    Session session = getSession(sProvider, workspace);
     try {
-      Node settingNode = session.getRootNode().getNode(SETTING_NODE);
-      Node userHomeNode, userNode = null;
-      if (settingNode.hasNode(SETTING_USER_NODE)) {
-        userHomeNode = settingNode.getNode(SETTING_USER_NODE);
-      } else {
-        userHomeNode = settingNode.addNode(SETTING_USER_NODE, STG_SUBCONTEXT);
-        
+      Session session = getSession(sProvider, workspace);
+      Node userHomeNode = getUserSettingHome(session);
+      Node userNode;
+      for (User user : users) {
+        if (userHomeNode.hasNode(user.getUserName())) {
+          userNode = userHomeNode.getNode(user.getUserName());
+        } else {
+          userNode = userHomeNode.addNode(user.getUserName(), STG_SIMPLE_CONTEXT);
+        }
+        //
+        if (userNode.canAddMixin(MIX_DEFAULT_SETTING)) {
+          userNode.addMixin(MIX_DEFAULT_SETTING);
+        }
       }
-
-      if (userHomeNode.hasNode(userId)) {
-        userNode = userHomeNode.getNode(userId);
-      } else {
-        userNode = userHomeNode.addNode(userId, STG_SIMPLE_CONTEXT);
-      }
-
-      //
-      if (userNode.canAddMixin(MIX_DEFAULT_SETTING)) {
-        userNode.addMixin(MIX_DEFAULT_SETTING);
-      }
-
       session.save();
     } catch (Exception e) {
-      LOG.error("Failed to add mixin for default setting of user: " + userId, e);
+      LOG.error("Failed to add mixin for default setting of users", e);
     }
   }
 
@@ -290,7 +300,11 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * @throws Exception
    */
   private List<String> getValues(Node node, String propertyName) throws Exception {
-    return Arrays.asList(node.getProperty(propertyName).getString().split(","));
+    String values = node.getProperty(propertyName).getString();
+    if (values.trim().length() == 0) {
+      return new ArrayList<String>();
+    }
+    return Arrays.asList(values.split(","));
   }
 
   /**
@@ -305,7 +319,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     model.setDailyProviders(getValues(node, EXO_DAILY));
     model.setWeeklyProviders(getValues(node, EXO_WEEKLY));
     model.setUserId(node.getParent().getName());
-    //model.setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
+    model.setLastUpdateTime(node.getParent().getProperty(EXO_LAST_MODIFIED_DATE).getDate());
     return model;
   }
   
@@ -347,5 +361,4 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
     return users;
   }
-
 }
