@@ -56,7 +56,7 @@ public class NotificationPluginUtils {
   public static String getProfileUrl(String userId) {
     StringBuffer footerLink = new StringBuffer(getDomain());
     return footerLink.append("/").append(getExoContainerContext().getRestContextName())
-            .append("/").append("social/notifications/redirectUrl/settings")
+            .append("/").append("social/notifications/redirectUrl/notification_settings")
             .append("/").append(userId).toString();
   }
 
