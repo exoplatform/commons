@@ -120,36 +120,36 @@ public class NotificationUtils {
   
   public static Date getStartTime(String stime) {
     //
-    if (stime == null || stime.length() == 0 || stime.equals("-1")) {
-      return new Date(System.currentTimeMillis() + 180000);
+    if (stime == null || stime.trim().length() == 0 || stime.trim().indexOf("-") == 0) {
+      return new Date(System.currentTimeMillis() + 120000);
     }
     //
     if (stime.startsWith("+")) {
       return new Date(System.currentTimeMillis() + Long.parseLong(stime.substring(1)));
     }
     //
-    stime = stime.toLowerCase().replace(":", "");
+    stime = stime.toLowerCase();
+    int m = 0;
+    int h = (stime.indexOf("pm") > 0) ? 12 : 0;
 
-    int h = 0;
-    if (stime.indexOf("am") > 0) {
-      h = Integer.parseInt(stime.replace("am", "").trim());
-    } else if (stime.indexOf("pm") > 0) {
-      h = Integer.parseInt(stime.replace("pm", "").trim());
-      h = 12 + h;
+    stime = stime.replace("am", "").replace("pm", "").trim();
+    if(stime.indexOf(":") > 0) {
+      String []strs = stime.split(":");
+      h += Integer.parseInt(strs[0].trim());
+      m = Integer.parseInt(strs[1].trim());
     } else {
-      h = Integer.parseInt(stime.trim());
-      if (h == 24) {
-        h = 0;
-      }
+      h += Integer.parseInt(stime);
     }
+    //
+    h = h % 24;
 
-    return getDateByHours(h);
+    return getDateByHours(h, m);
   }
 
-  public static Date getDateByHours(int h) {
+  public static Date getDateByHours(int h, int m) {
     Calendar calendar = GregorianCalendar.getInstance();
     int crh = calendar.get(Calendar.HOUR_OF_DAY);
-    calendar.set(Calendar.MINUTE, 0);
+    calendar.set(Calendar.MINUTE, m);
     if (h >= crh) {
       calendar.set(Calendar.HOUR_OF_DAY, h);
     } else {
@@ -160,7 +160,7 @@ public class NotificationUtils {
   }
 
   public static long getRepeatInterval(String period) {
-    period = period.toLowerCase();
+    period = period.toLowerCase().replace("+", "");
 
     if (period.indexOf("m") > 0) {
       return 60000 * Integer.parseInt(period.replace("m", "").trim());

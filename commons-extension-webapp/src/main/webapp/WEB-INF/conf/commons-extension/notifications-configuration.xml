@@ -49,11 +49,11 @@
 				<value>50</value>
 			</value-param>
 			<value-param>
-				<name>initialDelay</name>
+				<name>initialDelay</name><!-- The start time will call send email notification -->
 				<value>120</value>
 			</value-param>
 			<value-param>
-				<name>delayTime</name>
+				<name>delayTime</name><!-- The time to repeat interval call send email notification -->
 				<value>60</value>
 			</value-param>
 		</init-params>
@@ -77,12 +77,12 @@
       </value-param>
 
       <value-param>
-        <name>period</name><!-- repeat interval call send email notification -->
-        <value>1d</value><!-- The value is number of m/h/d or time millisecond -->
+        <name>period</name><!-- repeat interval call make email notification -->
+        <value>1d</value><!-- The value is number of m/h/d or +time milliseconds (ex: +180000)-->
       </value-param>
       <value-param>
-        <name>startAtTime</name><!-- The start time will call send email notification -->
-        <value>1am</value><!-- The value is number hours of a day: 16, 4:am, 4:pm -->
+        <name>startAtTime</name><!-- The start time will call make email notification -->
+        <value>11:00pm</value><!-- The value is number hours of a day: 23, 11:15am, 11:20pm -->
       </value-param>
     </init-params>
   </component>

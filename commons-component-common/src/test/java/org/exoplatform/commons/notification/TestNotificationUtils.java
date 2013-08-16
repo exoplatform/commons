@@ -35,10 +35,14 @@ public class TestNotificationUtils extends TestCase {
 
   public void testGetDateByHours() {
     String stime = null;
-    assertTrue(NotificationUtils.getStartTime(stime).getTime() > System.currentTimeMillis());
-    stime = "+1800000";
-    assertTrue(NotificationUtils.getStartTime(stime).getTime() > (System.currentTimeMillis() + 179000));
+    assertTrue(NotificationUtils.getStartTime(stime).getTime() > System.currentTimeMillis() + 119000);
+    
+    stime = "-1";
+    assertTrue(NotificationUtils.getStartTime(stime).getTime() > (System.currentTimeMillis() + 119000));
    
+    stime = "+2400000";
+    assertTrue(NotificationUtils.getStartTime(stime).getTime() > (System.currentTimeMillis() + 2390000));
+    
     stime = "4 AM";
     Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(NotificationUtils.getStartTime(stime).getTime());
@@ -53,8 +57,14 @@ public class TestNotificationUtils extends TestCase {
     calendar.setTimeInMillis(NotificationUtils.getStartTime(stime).getTime());
     assertEquals(16, calendar.get(Calendar.HOUR_OF_DAY));
 
-    stime = "04:am";
-    assertNotNull(NotificationUtils.getStartTime(stime));
+    stime = "32";
+    calendar.setTimeInMillis(NotificationUtils.getStartTime(stime).getTime());
+    assertEquals(8, calendar.get(Calendar.HOUR_OF_DAY));
+
+    stime = "04:15";
+    calendar.setTimeInMillis(NotificationUtils.getStartTime(stime).getTime());
+    assertEquals(4, calendar.get(Calendar.HOUR_OF_DAY));
+    assertEquals(15, calendar.get(Calendar.MINUTE));
   }
   
   public void testGetRepeatInterval() {

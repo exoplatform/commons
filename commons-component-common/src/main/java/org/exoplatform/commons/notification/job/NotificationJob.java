@@ -32,6 +32,7 @@ public class NotificationJob implements Job {
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
+    LOG.info("Starting run job to send email notification ... ");
     if (isValid() == false) {
       return;
     }

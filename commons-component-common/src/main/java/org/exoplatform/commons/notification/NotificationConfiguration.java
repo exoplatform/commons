@@ -60,6 +60,7 @@ public class NotificationConfiguration implements Startable {
   }
 
   public void createJob() {
+    LOG.info("Initializing job for sending email notification ");
     try {
       String jobName = "NotificationJob";
       String jobGroup = "Notification";
@@ -67,6 +68,9 @@ public class NotificationConfiguration implements Startable {
       Date endTime = null;
       int repeatCount = 0;
       long repeatInterval = NotificationUtils.getRepeatInterval(period);// period
+      
+      LOG.info("startTime: " + startTime + ", endTime: " + endTime + ", repeatCount: " 
+               + repeatCount + ", repeatInterval: " + repeatInterval + "");
 
       PeriodInfo periodInfo = new PeriodInfo(startTime, endTime, repeatCount, repeatInterval);
       //
