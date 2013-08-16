@@ -16,12 +16,16 @@
  */
 package org.exoplatform.commons.notification;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.jcr.Value;
 
@@ -42,6 +46,10 @@ public class NotificationUtils {
   public static final String DEFAULT_DIGEST_MORE_KEY   = "Notification.digest.more.$providerid";
   
   public static final String FEATURE_NAME              = "notification";
+  
+  public static Pattern patternInteger = Pattern.compile("^[0-9]+$");
+  
+  private static Map<String, Integer> dataDayOfWeek = new HashMap<String, Integer>();
 
   public static String getResourceBundle(String key, Locale locale, String srcResource) {
     return TemplateResourceBundle.getResourceBundle(key, locale, srcResource);
@@ -106,6 +114,30 @@ public class NotificationUtils {
         list.add(s);
     }
     return list;
+  }
+  
+  public static boolean isInteger(String str) {
+    return patternInteger.matcher(str).matches();
+  }
+
+  public static int getDayOfWeek(String dayName) {
+    if (dataDayOfWeek.size() == 0) {
+      DateFormatSymbols dateFormat = DateFormatSymbols.getInstance(Locale.ENGLISH);
+      String symbolDayNames[] = dateFormat.getWeekdays();
+      for (int countDayname = 0; countDayname < symbolDayNames.length; countDayname++) {
+        dataDayOfWeek.put(symbolDayNames[countDayname].toLowerCase(), countDayname);
+      }
+    }
+    if (dayName == null) {
+      return 0;
+    }
+    dayName = dayName.toLowerCase().trim();
+    if (isInteger(dayName)) {
+      return Integer.parseInt(dayName);
+    } else {
+      Integer dayOfWeek = dataDayOfWeek.get(dayName.toLowerCase());
+      return (dayOfWeek == null) ? 0 : dayOfWeek;
+    }
   }
   
   public static boolean isWeekEnd(int number) {

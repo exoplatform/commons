@@ -29,8 +29,18 @@ public class TestNotificationUtils extends TestCase {
     
   }
 
-  public void testGetStartTime() {
+  public void testGetDayOfWeek() {
+    String intput = null;
+    assertEquals(0, NotificationUtils.getDayOfWeek(intput));
     
+    intput = "1";
+    assertEquals(1, NotificationUtils.getDayOfWeek(intput));
+
+    intput = "Tuesday";
+    assertEquals(3, NotificationUtils.getDayOfWeek(intput));
+
+    intput = "TUESDAY";
+    assertEquals(3, NotificationUtils.getDayOfWeek(intput));
   }
 
   public void testGetDateByHours() {

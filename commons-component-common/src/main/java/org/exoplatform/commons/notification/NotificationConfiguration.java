@@ -42,7 +42,7 @@ public class NotificationConfiguration implements Startable {
 
   public NotificationConfiguration(InitParams params) {
     this.workspace = getValueParam(params, AbstractService.WORKSPACE_PARAM, AbstractService.DEFAULT_WORKSPACE_NAME);
-    this.dayOfWeekend = getValueParam(params, "dayOfWeekend", 6);
+    this.dayOfWeekend = NotificationUtils.getDayOfWeek(getValueParam(params, "dayOfWeekend", "6"));
     this.dayOfMonthend = getValueParam(params, "dayOfMonthend", 28);
     this.period = getValueParam(params, "period", "1d");
     this.startAtTime = getValueParam(params, "startAtTime", "01:am");
