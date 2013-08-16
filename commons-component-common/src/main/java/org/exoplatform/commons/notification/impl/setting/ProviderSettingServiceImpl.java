@@ -48,8 +48,6 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
 
   private static final String        NAME_SPACES        = "exo:";
 
-  private static final String        ACTIVE_FEATURE_KEY = "feature.Notification";
-
   private SettingService             settingService;
   
   public ProviderSettingServiceImpl(SettingService settingService) {
@@ -119,7 +117,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
     List<GroupProvider> groupProviders = new ArrayList<GroupProvider>();
     for (GroupProvider groupProvider : groupProviderMap.values()) {
       for (ProviderData providerData : groupProvider.getProviderDatas()) {
-        providerData.setActive(isActive(providerData.getType(), false));
+        providerData.setActive(isActive(providerData.getType()));
       }
       groupProviders.add(groupProvider);
     }
@@ -129,11 +127,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
 
   @Override
   public void saveProvider(String providerId, boolean isActive) {
-    if(isActive) {
-      saveSetting(providerId, isActive);
-    } else {
-      removeSetting(providerId);
-    }
+    saveSetting(providerId, isActive);
     activeProviderIds.clear();
     activeProviders.clear();
   }
@@ -148,7 +142,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
     if(activeProviderIds.size() == 0) {
       Collections.sort(pluginConfigs, new ComparatorASC());
       for (PluginConfig pluginConfig : pluginConfigs) {
-        if (isActive(pluginConfig.getPluginId(), false)) {
+        if (isActive(pluginConfig.getPluginId())) {
           activeProviderIds.add(pluginConfig.getPluginId());
         }
       }
@@ -162,7 +156,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
     if(activeProviders.size() == 0) {
       for (GroupProvider groupProvider : groupProviderMap.values()) {
         for (ProviderData providerData : groupProvider.getProviderDatas()) {
-          if(isActive(providerData.getType(), false)) {
+          if(isActive(providerData.getType())) {
             activeProviders.add(providerData);
           }
         }
@@ -174,10 +168,6 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
 
   private void saveSetting(String property, boolean value) {
     settingService.set(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + property), SettingValue.create(value));
-  }
-
-  private void removeSetting(String property) {
-    settingService.remove(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + property));
   }
 
   private boolean isActive(String providerId, boolean defaultValue) {
@@ -208,16 +198,6 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
       }
       return 0;
     }
-  }
-
-  @Override
-  public boolean getActiveFeature() {
-    return Boolean.valueOf(System.getProperty(ACTIVE_FEATURE_KEY, "true"));
-  }
-
-  @Override
-  public void saveActiveFeature(boolean isActive) {
-
   }
 
 }

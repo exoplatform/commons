@@ -67,14 +67,4 @@ public interface ProviderSettingService {
    */
   List<ProviderData> getActiveProviders();
 
-  /**
-   * @return
-   */
-  boolean getActiveFeature();
-
-  /**
-   * 
-   */
-  void saveActiveFeature(boolean isActive);
-
 }
