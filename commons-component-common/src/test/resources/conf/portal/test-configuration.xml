@@ -3,6 +3,10 @@
 	xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
 	xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
+    <component>
+		<key>org.exoplatform.commons.api.notification.service.setting.ProviderSettingService</key>
+		<type>org.exoplatform.commons.notification.impl.setting.ProviderSettingServiceImpl</type>
+	</component>
 	<component>
 		<key>org.exoplatform.commons.api.event.EventManager</key>
 		<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
@@ -33,8 +37,7 @@
   </component>
 
 	<component>
-		<key>org.exoplatform.commons.api.notification.service.template.TemplateGenerator</key>
-		<type>org.exoplatform.commons.notification.cache.CacheTemplateGenerator</type>
+		<type>org.exoplatform.commons.notification.cache.TemplateCaching</type>
 	</component>
 
   <component>

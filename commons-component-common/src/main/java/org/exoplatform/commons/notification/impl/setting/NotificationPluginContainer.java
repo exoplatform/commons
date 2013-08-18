@@ -24,20 +24,21 @@ import java.util.Set;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
-import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
+import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.notification.template.ResourceBundleConfigDeployer;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
 
-public class NotificationPluginContainer implements Startable {
+public class NotificationPluginContainer implements PluginContainer, Startable {
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
-  private ProviderSettingService pSettingService;
+  private PluginSettingService pSettingService;
   private ResourceBundleConfigDeployer deployer;
   
   public NotificationPluginContainer() {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
-    pSettingService = CommonsUtils.getService(ProviderSettingService.class);
+    pSettingService = CommonsUtils.getService(PluginSettingService.class);
     deployer = new ResourceBundleConfigDeployer();
   }
 
@@ -60,14 +61,17 @@ public class NotificationPluginContainer implements Startable {
     ServletContainerFactory.getServletContainer().removeWebAppListener(deployer);
   }
 
+  @Override
   public AbstractNotificationPlugin getPlugin(NotificationKey key) {
     return pluginMap.get(key);
   }
 
+  @Override
   public void add(AbstractNotificationPlugin plugin) {
     pluginMap.put(plugin.getKey(), plugin);
   }
 
+  @Override
   public boolean remove(NotificationKey key) {
     pluginMap.remove(key);
     return true;

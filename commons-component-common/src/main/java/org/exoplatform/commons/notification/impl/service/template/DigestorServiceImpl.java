@@ -25,21 +25,21 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
-import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
-import org.exoplatform.commons.api.notification.service.template.TemplateGenerator;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
+import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -54,7 +54,7 @@ public class DigestorServiceImpl implements DigestorService {
   }
   
   
-  public MessageInfo buildMessage(Map<NotificationKey, List<NotificationMessage>> notificationData, UserSetting userSetting) {
+  public MessageInfo buildMessage(Map<NotificationKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
     LOG.info("\nBuild digest MessageInfo ....");
     long startTime = System.currentTimeMillis();
 
@@ -66,21 +66,20 @@ public class DigestorServiceImpl implements DigestorService {
 
     try {
       messageInfo = new MessageInfo();
-      ProviderSettingService providerService = CommonsUtils.getService(ProviderSettingService.class);
-      NotificationPluginContainer pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
-      TemplateGenerator templateGenerator = CommonsUtils.getService(TemplateGenerator.class);
+      PluginSettingService pluginService = CommonsUtils.getService(PluginSettingService.class);
+      NotificationPluginContainer containerService = CommonsUtils.getService(NotificationPluginContainer.class);
       NotificationConfiguration configuration= CommonsUtils.getService(NotificationConfiguration.class);
       
-      List<String> activeProviders = providerService.getActiveProviderIds();
+      List<String> activeProviders = pluginService.getActivePluginIds();
       NotificationContext nCtx = NotificationContextImpl.cloneInstance();
       Writer writer = new StringWriter();
       for (String providerId : activeProviders) {
-        List<NotificationMessage> messages = notificationData.get(NotificationKey.key(providerId));
+        List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
         if (messages == null || messages.size() == 0)
           continue;
         
-        AbstractNotificationPlugin plugin = pluginService.getPlugin(NotificationKey.key(providerId));
-        nCtx.setNotificationMessages(messages);
+        AbstractNotificationPlugin plugin = containerService.getPlugin(NotificationKey.key(providerId));
+        nCtx.setNotificationInfos(messages);
         plugin.buildDigest(nCtx, writer);
       }
       
@@ -121,11 +120,11 @@ public class DigestorServiceImpl implements DigestorService {
       ctx.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
       ctx.put("PERIOD", periodType);
       ctx.put("FROM_TO", fromTo);
-      String subject = templateGenerator.processSubject(ctx);
+      String subject = TemplateUtils.processSubject(ctx);
       
       ctx.put("FOOTER_LINK", NotificationPluginUtils.getProfileUrl(userSetting.getUserId()));
       ctx.put("DIGEST_MESSAGES_LIST", sb.toString());
-      String body = templateGenerator.processTemplate(ctx);
+      String body = TemplateUtils.processGroovy(ctx);
 
       messageInfo.body(body).subject(subject).to(NotificationPluginUtils.getTo(userSetting.getUserId()));
     } catch (Exception e) {

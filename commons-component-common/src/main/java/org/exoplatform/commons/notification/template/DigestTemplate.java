@@ -16,7 +16,6 @@
  */
 package org.exoplatform.commons.notification.template;
 
-import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.api.notification.template.ElementVisitor;
 
@@ -24,58 +23,49 @@ import org.exoplatform.commons.api.notification.template.ElementVisitor;
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
+ *          thanhvc@exoplatform.com
  * Aug 1, 2013  
  */
 
-public class MailTemplate extends SimpleElement {
-  private String language;
-
-  private final Element subject;
-
-  private final Element digestSimple;
-
+public class DigestTemplate extends SimpleElement {
+  
+  public enum ElementType {
+    DIGEST_ONE(1),
+    DIGEST_THREE(3),
+    DIGEST_MORE(4);
+    
+    private int value = 0;
+    
+    ElementType(int value) {
+      this.value = value;
+    }
+    
+    public int getValue() {
+      return this.value;
+    }
+   
+  }
+  
   private final Element digestOne;
 
   private final Element digestThree;
 
   private final Element digestMore;
   
-  private TemplateContext context;
-  
-  public MailTemplate() {
-    subject = new SimpleElement();
-    digestSimple = new SimpleElement();
+  public DigestTemplate() {
+    
     digestOne = new SimpleElement();
     digestThree = new SimpleElement();
     digestMore = new SimpleElement();
   }
-  /**
-   * Sets the subject for Mail
-   * @param template
-   * @return
-   */
-  public MailTemplate subject(String template) {
-    subject.template(template);
-    return this;
-  }
-  
-  /**
-   * Sets the digestSimple
-   * @param template
-   * @return
-   */
-  public MailTemplate digestSimple(String template) {
-    digestSimple.template(template);
-    return this;
-  }
+ 
   
   /**
    * Sets the digestOne
    * @param template
    * @return
    */
-  public MailTemplate digestOne(String template) {
+  public DigestTemplate digestOne(String template) {
     digestOne.template(template);
     return this;
   }
@@ -85,7 +75,7 @@ public class MailTemplate extends SimpleElement {
    * @param template
    * @return
    */
-  public MailTemplate digestThree(String template) {
+  public DigestTemplate digestThree(String template) {
     digestThree.template(template);
     return this;
   }
@@ -95,27 +85,22 @@ public class MailTemplate extends SimpleElement {
    * @param template
    * @return
    */
-  public MailTemplate digestMore(String template) {
+  public DigestTemplate digestMore(String template) {
     digestMore.template(template);
-    return this;
-  }
-  
-  /**
-   * 
-   * @param context
-   * @return
-   */
-  public MailTemplate with(TemplateContext context) {
-    this.context = context;
     return this;
   }
   
   @Override
   public ElementVisitor accept(ElementVisitor visitor) {
-    visitor.with(this.context);
-    //TODO base on the type what we make the decision to visit
+    if (visitor.getTemplateContext().getDigestSize() == ElementType.DIGEST_ONE.getValue()) {
+      visitor.visit(this.digestOne);
+    } else if (visitor.getTemplateContext().getDigestSize() == ElementType.DIGEST_THREE.getValue()) {
+      visitor.visit(this.digestThree);
+    } else if (visitor.getTemplateContext().getDigestSize() >= ElementType.DIGEST_MORE.getValue()) {
+      visitor.visit(this.digestMore);
+    }
     
-    return super.accept(visitor);
+    return visitor;
   }
-  
+
 }

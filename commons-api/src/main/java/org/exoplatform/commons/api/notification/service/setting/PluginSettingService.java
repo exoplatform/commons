@@ -19,11 +19,11 @@ package org.exoplatform.commons.api.notification.service.setting;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.model.GroupProvider;
-import org.exoplatform.commons.api.notification.model.ProviderData;
+import org.exoplatform.commons.api.notification.model.PluginInfo;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 
-public interface ProviderSettingService {
+public interface PluginSettingService {
 
   /**
    * @param pluginConfig
@@ -44,27 +44,27 @@ public interface ProviderSettingService {
   /**
    * @return
    */
-  List<GroupProvider> getGroupProviders();
+  List<GroupProvider> getGroupPlugins();
 
   /**
-   * @param providerId
+   * @param pluginId
    * @param isActive
    */
-  void saveProvider(String providerId, boolean isActive);
+  void savePlugin(String pluginId, boolean isActive);
 
   /**
-   * @param providerId
+   * @param pluginId
    * @return
    */
-  boolean isActive(String providerId);
+  boolean isActive(String pluginId);
   /**
    * @return
    */
-  List<String> getActiveProviderIds();
+  List<String> getActivePluginIds();
 
   /**
    * @return
    */
-  List<ProviderData> getActiveProviders();
+  List<PluginInfo> getActivePlugins();
 
 }

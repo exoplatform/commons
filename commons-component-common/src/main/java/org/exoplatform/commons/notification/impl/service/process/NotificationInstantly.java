@@ -16,19 +16,19 @@
  */
 package org.exoplatform.commons.notification.impl.service.process;
 
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 
 public class NotificationInstantly extends NotificationProcess {
 
   @Override
-  void doProcess(UserSetting setting, NotificationMessage notification) {
+  void doProcess(UserSetting setting, NotificationInfo notification) {
     //do send mail directly to users.
     
   }
 
   @Override
-  boolean isValid(UserSetting setting, NotificationMessage notification) {
+  boolean isValid(UserSetting setting, NotificationInfo notification) {
     return setting.isInInstantly(notification.getKey().getId());
   }
 

@@ -24,19 +24,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.api.notification.model.GroupProvider;
-import org.exoplatform.commons.api.notification.model.ProviderData;
+import org.exoplatform.commons.api.notification.model.PluginInfo;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.GroupConfig;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
-import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.CommonsUtils;
 
-public class ProviderSettingServiceImpl implements ProviderSettingService {
+public class PluginSettingServiceImpl implements PluginSettingService {
 
   private List<PluginConfig>         pluginConfigs      = new ArrayList<PluginConfig>();
 
@@ -44,20 +44,20 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
 
   private List<String>               activeProviderIds  = new ArrayList<String>();
 
-  private List<ProviderData>         activeProviders    = new ArrayList<ProviderData>();
+  private List<PluginInfo>         activeProviders    = new ArrayList<PluginInfo>();
 
   private static final String        NAME_SPACES        = "exo:";
 
   private SettingService             settingService;
   
-  public ProviderSettingServiceImpl(SettingService settingService) {
+  public PluginSettingServiceImpl(SettingService settingService) {
     this.settingService = settingService;
   }
 
   @Override
   public void registerPluginConfig(PluginConfig pluginConfig) {
     pluginConfigs.add(pluginConfig);
-    ProviderData providerData = new ProviderData();
+    PluginInfo providerData = new PluginInfo();
     providerData.setType(pluginConfig.getPluginId())
                 .setOrder(Integer.valueOf(pluginConfig.getOrder()))
                 .setActive(isActive(pluginConfig.getPluginId(), true))
@@ -113,10 +113,10 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
   }
 
   @Override
-  public List<GroupProvider> getGroupProviders() {
+  public List<GroupProvider> getGroupPlugins() {
     List<GroupProvider> groupProviders = new ArrayList<GroupProvider>();
     for (GroupProvider groupProvider : groupProviderMap.values()) {
-      for (ProviderData providerData : groupProvider.getProviderDatas()) {
+      for (PluginInfo providerData : groupProvider.getProviderDatas()) {
         providerData.setActive(isActive(providerData.getType()));
       }
       groupProviders.add(groupProvider);
@@ -126,7 +126,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
   }
 
   @Override
-  public void saveProvider(String providerId, boolean isActive) {
+  public void savePlugin(String providerId, boolean isActive) {
     saveSetting(providerId, isActive);
     activeProviderIds.clear();
     activeProviders.clear();
@@ -138,7 +138,7 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
   }
 
   @Override
-  public List<String> getActiveProviderIds() {
+  public List<String> getActivePluginIds() {
     if(activeProviderIds.size() == 0) {
       Collections.sort(pluginConfigs, new ComparatorASC());
       for (PluginConfig pluginConfig : pluginConfigs) {
@@ -152,10 +152,10 @@ public class ProviderSettingServiceImpl implements ProviderSettingService {
   }
 
   @Override
-  public List<ProviderData> getActiveProviders() {
+  public List<PluginInfo> getActivePlugins() {
     if(activeProviders.size() == 0) {
       for (GroupProvider groupProvider : groupProviderMap.values()) {
-        for (ProviderData providerData : groupProvider.getProviderDatas()) {
+        for (PluginInfo providerData : groupProvider.getProviderDatas()) {
           if(isActive(providerData.getType())) {
             activeProviders.add(providerData);
           }

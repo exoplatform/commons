@@ -17,11 +17,13 @@
 package org.exoplatform.commons.api.notification.service.template;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public class TemplateContext extends HashMap<String, Object> {
+  
   private static final long serialVersionUID = 1L;
 
-  private String            providerId;
+  private String            pluginId;
 
   private String            language;
 
@@ -33,8 +35,8 @@ public class TemplateContext extends HashMap<String, Object> {
     
   }
 
-  public TemplateContext(String providerId, String language) {
-    this.providerId = providerId;
+  public TemplateContext(String pluginId, String language) {
+    this.pluginId = pluginId;
     this.language = language;
   }
   
@@ -56,7 +58,7 @@ public class TemplateContext extends HashMap<String, Object> {
   }
 
   public TemplateContext provider(String providerId) {
-    this.providerId = providerId;
+    this.pluginId = providerId;
     return this;
   }
 
@@ -73,16 +75,20 @@ public class TemplateContext extends HashMap<String, Object> {
   }
 
   /**
-   * @return the providerId
+   * @return the pluginId
    */
-  public String getProviderId() {
-    return providerId;
+  public String getPluginId() {
+    return pluginId;
   }
 
   /**
    * @return the language
    */
   public String getLanguage() {
+    if (this.language == null) {
+      return Locale.ENGLISH.getLanguage();
+    }
+    
     return language;
   }
 
@@ -90,6 +96,7 @@ public class TemplateContext extends HashMap<String, Object> {
    * @return the digestSize
    */
   public int getDigestSize() {
-    return digestSize;
+    return this.digestSize;
   }
+    
 }

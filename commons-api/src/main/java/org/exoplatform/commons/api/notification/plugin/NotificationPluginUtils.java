@@ -26,7 +26,7 @@ import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserProfile;
 
 public class NotificationPluginUtils {
-  public static final String         DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
+  public static final String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
 
   private static OrganizationService organizationService;
 

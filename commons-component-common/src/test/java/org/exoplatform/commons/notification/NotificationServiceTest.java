@@ -8,7 +8,7 @@ import javax.jcr.NodeIterator;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
@@ -31,21 +31,21 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
   
   public void testGetMessagesByProviderId() throws Exception {
     
-    Map<String, NotificationMessage> list = notificationService.getNotificationMessagesByProviderId("NewUserPlugin", false);
+    Map<String, NotificationInfo> list = notificationService.getNotificationMessagesByProviderId("NewUserPlugin", false);
     assertEquals(0, list.size());
     
-    NotificationMessage message1 = new NotificationMessage();
+    NotificationInfo message1 = new NotificationInfo();
     message1.setFrom("root");
     message1.key("NewUserPlugin");
     notificationDataStorage.save(message1);
     addMixin(message1.getId());
     
-    NotificationMessage message2 = new NotificationMessage();
+    NotificationInfo message2 = new NotificationInfo();
     message2.key("ActivityCommentPlugin");
     notificationDataStorage.save(message2);
     addMixin(message2.getId());
     
-    NotificationMessage message3 = new NotificationMessage();
+    NotificationInfo message3 = new NotificationInfo();
     message3.setFrom("demo");
     message3.key("NewUserPlugin");
     notificationDataStorage.save(message3);

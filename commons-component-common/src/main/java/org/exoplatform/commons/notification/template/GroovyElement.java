@@ -8,17 +8,30 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.service;
+package org.exoplatform.commons.notification.template;
 
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
-import org.exoplatform.container.component.BaseComponentPlugin;
+import java.util.Locale;
 
-public abstract class AbstractNotificationServiceListener extends BaseComponentPlugin implements NotificationServiceListener<NotificationMessage> {
-  public abstract void processListener(NotificationMessage ctx);
+
+/**
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          thanhvc@exoplatform.com
+ * Aug 8, 2013  
+ */
+public class GroovyElement extends SimpleElement {
+
+  public String appRes(String key, Locale locale) {
+    return TemplateUtils.getResourceBundle(key, locale, getTemplateConfig().getBundlePath());
+  }
+  
+  public String appRes(String key, String... strs) {
+    return appRes(key, strs);
+  }
 }

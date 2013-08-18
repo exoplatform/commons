@@ -16,35 +16,51 @@
  */
 package org.exoplatform.commons.notification.template;
 
-import org.apache.commons.lang.StringUtils;
+import java.io.StringWriter;
+import java.io.Writer;
+
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
-import org.exoplatform.commons.api.notification.template.TemplateTransformer;
+import org.exoplatform.commons.api.notification.template.Element;
+import org.exoplatform.commons.api.notification.template.ElementVisitor;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          thanhvc@exoplatform.com
- * Aug 1, 2013  
+ * Aug 8, 2013  
  */
-public class SimpleTemplateTransformer implements TemplateTransformer {
-  
-  private String template;
+public class GroovyElementVisitor implements ElementVisitor {
 
+  private final Writer writer;
+  private TemplateContext ctx;
+  public GroovyElementVisitor() {
+    writer = new StringWriter();
+  }
+  
   @Override
-  public TemplateTransformer from(String template) {
-    this.template = template;
+  public ElementVisitor visit(Element element) {
+    TemplateUtils.loadGroovy(this.getTemplateContext(), element, getWriter());
     return this;
   }
 
   @Override
-  public String transform(TemplateContext context) {
-    //TODO need to check the key what has the prefix with "$" or not
-    String got = template;
-    //
-    for (String key : context.keySet()) {
-      got = StringUtils.replace(got, key, (String) context.get(key));
-    }
-    return got;
+  public String out() {
+    return writer.toString();
   }
 
+  @Override
+  public TemplateContext getTemplateContext() {
+    return this.ctx;
+  }
+
+  @Override
+  public ElementVisitor with(TemplateContext ctx) {
+    this.ctx = ctx;
+    return this;
+  }
+
+  @Override
+  public Writer getWriter() {
+    return this.writer;
+  }
 }

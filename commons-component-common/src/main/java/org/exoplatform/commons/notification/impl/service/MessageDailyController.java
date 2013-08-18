@@ -18,9 +18,9 @@ package org.exoplatform.commons.notification.impl.service;
 
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
-import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.notification.impl.service.process.MessageDaily;
 import org.exoplatform.commons.notification.impl.service.process.MessageProcess;
 import org.exoplatform.commons.notification.impl.service.process.MessageWeekly;
@@ -35,7 +35,7 @@ public class MessageDailyController {
   
   private final NotificationPluginContainer pluginService;
   
-  private final ProviderSettingService providerService;
+  private final PluginSettingService providerService;
   
   public MessageDailyController() {
     
@@ -43,18 +43,18 @@ public class MessageDailyController {
     this.daily = new MessageDaily();
     daily.setNext(new MessageWeekly());
     this.pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
-    this.providerService = CommonsUtils.getService(ProviderSettingService.class);
+    this.providerService = CommonsUtils.getService(PluginSettingService.class);
   }
   
   
-  public void process(List<NotificationMessage> notifications, UserSetting setting) {
+  public void process(List<NotificationInfo> notifications, UserSetting setting) {
     //AbstractNotificationPlugin plugin =  this.pluginService.getPlugin(key);
     //List<ProviderData> all = providerService.getAllProviders();
     
-    List<String> activeProviders = providerService.getActiveProviderIds();
+    List<String> activeProviders = providerService.getActivePluginIds();
     
     
-    for(NotificationMessage notification : notifications) {
+    for(NotificationInfo notification : notifications) {
       //plugin.buildDigest(NotificationContextImpl.DEFAULT.setNotificationMessage(notification), out);
     }
   }

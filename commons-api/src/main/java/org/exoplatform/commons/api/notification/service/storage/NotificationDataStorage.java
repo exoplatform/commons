@@ -20,19 +20,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 
 
 public interface NotificationDataStorage {
 
-  void save(NotificationMessage notification) throws Exception;
+  void save(NotificationInfo notification) throws Exception;
   
-  Map<NotificationKey, List<NotificationMessage>> getByUser(UserSetting userSetting);
+  Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting userSetting);
 
   void createParentNodeOfPlugin(String pluginId);
   
-  Map<String, NotificationMessage> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend);
+  Map<String, NotificationInfo> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend);
   
   void removeNotificationMessages(String pluginId);
   

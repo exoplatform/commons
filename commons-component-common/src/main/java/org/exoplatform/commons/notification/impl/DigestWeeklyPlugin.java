@@ -20,7 +20,7 @@ import java.io.Writer;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.container.xml.InitParams;
 
@@ -42,7 +42,7 @@ public class DigestWeeklyPlugin extends AbstractNotificationPlugin {
   }
 
   @Override
-  protected NotificationMessage makeNotification(NotificationContext ctx) {
+  protected NotificationInfo makeNotification(NotificationContext ctx) {
     return null;
   }
 

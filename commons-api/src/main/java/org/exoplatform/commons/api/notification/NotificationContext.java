@@ -21,8 +21,10 @@ import java.util.List;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
+import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 
 public interface NotificationContext extends Cloneable {
 
@@ -52,28 +54,28 @@ public interface NotificationContext extends Cloneable {
   <T> T value(ArgumentLiteral<T> argument);
   
   /**
-   * Gets notification message
+   * Gets notification information
    * @return
    */
-  NotificationMessage getNotificationMessage();
+  NotificationInfo getNotificationInfo();
   
   /**
-   * Sets notification message
+   * Sets notification infomation
    * @param notification
    */
-  NotificationContext setNotificationMessage(NotificationMessage notification);
+  NotificationContext setNotificationInfo(NotificationInfo notification);
   
   /**
-   * Sets notification message list
+   * Sets notification information list
    * @param notifications
    */
-  void setNotificationMessages(List<NotificationMessage> notifications);
+  void setNotificationInfos(List<NotificationInfo> notifications);
   
   /**
    * Gets notification message list
    * @return
    */
-  List<NotificationMessage> getNotificationMessages();
+  List<NotificationInfo> getNotificationInfos();
   
   
   Exception getException();
@@ -96,5 +98,13 @@ public interface NotificationContext extends Cloneable {
    * @see java.lang.Object#clone()
    */
   NotificationContext clone();
+  
+  PluginSettingService getPluginSettingService();
+  
+  /**
+   * Gets the plugin container what contains all plugins on Notification
+   * @return
+   */
+  PluginContainer getPluginContainer();
   
 }

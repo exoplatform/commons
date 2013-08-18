@@ -22,7 +22,7 @@ import org.exoplatform.commons.api.notification.service.template.TemplateContext
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
+ *          thanhvc@exoplatform.com
  * Aug 1, 2013  
  */
 public interface TemplateTransformer {

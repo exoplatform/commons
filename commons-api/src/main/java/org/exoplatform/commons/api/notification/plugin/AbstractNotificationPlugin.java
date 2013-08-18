@@ -23,7 +23,7 @@ import java.util.List;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
@@ -69,7 +69,7 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
    * @param context
    * @return
    */
-  protected abstract NotificationMessage makeNotification(NotificationContext ctx);
+  protected abstract NotificationInfo makeNotification(NotificationContext ctx);
   
   /**
    * Makes the MessageInfor from given NotificationMessage what keep inside NotificationContext
@@ -91,7 +91,7 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
    * @param ctx
    * @return
    */
-  public NotificationMessage buildNotification(NotificationContext ctx) {
+  public NotificationInfo buildNotification(NotificationContext ctx) {
     return makeNotification(ctx);
   }
   
@@ -101,7 +101,7 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
    * @return
    */
   public MessageInfo buildMessage(NotificationContext ctx) {
-    NotificationMessage message = ctx.getNotificationMessage();
+    NotificationInfo message = ctx.getNotificationInfo();
     MessageInfo messageInfo = makeMessage(ctx);
     return messageInfo.pluginId(getId()).from(NotificationPluginUtils.getFrom(message.getFrom()))
                .to(NotificationPluginUtils.getTo(message.getTo())).end();
@@ -130,7 +130,7 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
    * @param message
    * @return
    */
-  protected String getLanguage(NotificationMessage message) {
+  protected String getLanguage(NotificationInfo message) {
     return NotificationPluginUtils.getLanguage(message.getTo());
   }
   

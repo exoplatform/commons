@@ -16,7 +16,7 @@
  */
 package org.exoplatform.commons.notification.impl.service.process;
 
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 
 public abstract class NotificationProcess {
@@ -38,7 +38,7 @@ public abstract class NotificationProcess {
    * @param setting the setting
    * @param notification the notificationMessage
    */
-  public void process(UserSetting setting, NotificationMessage notification) {
+  public void process(UserSetting setting, NotificationInfo notification) {
     if (isValid(setting, notification)) {
       doProcess(setting, notification);
       
@@ -52,7 +52,7 @@ public abstract class NotificationProcess {
    * @param setting
    * @param notification
    */
-  private void processNext(UserSetting setting, NotificationMessage notification) {
+  private void processNext(UserSetting setting, NotificationInfo notification) {
     if (getNext().isValid(setting, notification) && getNext() != null) {
       getNext().process(setting, notification);
     }
@@ -62,7 +62,7 @@ public abstract class NotificationProcess {
    * @param setting
    * @param notification
    */
-  abstract void doProcess(UserSetting setting, NotificationMessage notification);
+  abstract void doProcess(UserSetting setting, NotificationInfo notification);
   
-  abstract boolean isValid(UserSetting setting, NotificationMessage notification);
+  abstract boolean isValid(UserSetting setting, NotificationInfo notification);
 }

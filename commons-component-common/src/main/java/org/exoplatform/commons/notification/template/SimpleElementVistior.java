@@ -28,16 +28,24 @@ import org.exoplatform.commons.api.notification.template.TemplateTransformer;
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
+ *          thanhvc@exoplatform.com
  * Aug 1, 2013  
  */
 public class SimpleElementVistior implements ElementVisitor {
-  private final static String BREAK_LINE = "<br>";
+  private final static String BREAK_LINE = "<br/>";
   private final TemplateTransformer transformer;
   private final Writer writer;
   private TemplateContext ctx;
   
-  public SimpleElementVistior() {
+  /**
+   * Create new instance of ElementVisitor
+   * @return
+   */
+  public static ElementVisitor instance() {
+    return new SimpleElementVistior();
+  }
+  
+  private SimpleElementVistior() {
     transformer = new SimpleTemplateTransformer();
     writer = new StringWriter();
   }
@@ -72,6 +80,11 @@ public class SimpleElementVistior implements ElementVisitor {
   @Override
   public TemplateContext getTemplateContext() {
     return this.ctx;
+  }
+
+  @Override
+  public Writer getWriter() {
+    return this.writer;
   }
 
 }

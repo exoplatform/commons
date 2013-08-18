@@ -23,16 +23,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.service.SendEmailNotificationProcessor;
+import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 
-public class SendEmailNotificationProcessorImpl implements SendEmailNotificationProcessor {
+public class QueueMessageImpl implements QueueMessage {
   
-  private static final Log           LOG      = ExoLogger.getExoLogger(SendEmailNotificationProcessorImpl.class);
+  private static final Log LOG = ExoLogger.getExoLogger(QueueMessageImpl.class);
   
   private final static Queue<MessageInfo> messageQueue = new ConcurrentLinkedQueue<MessageInfo>();
   
@@ -46,7 +46,7 @@ public class SendEmailNotificationProcessorImpl implements SendEmailNotification
   
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
   
-  public SendEmailNotificationProcessorImpl(InitParams params, MailService mailService) {
+  public QueueMessageImpl(InitParams params, MailService mailService) {
     
     MAX_TO_SEND = Integer.parseInt(params.getValueParam("maxToSend").getValue());
     DELAY_TIME = Integer.parseInt(params.getValueParam("delayTime").getValue());

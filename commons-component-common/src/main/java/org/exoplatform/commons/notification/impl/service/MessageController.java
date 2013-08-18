@@ -18,7 +18,7 @@ package org.exoplatform.commons.notification.impl.service;
 
 import java.io.Writer;
 
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.notification.impl.service.process.MessageDaily;
 import org.exoplatform.commons.notification.impl.service.process.MessageProcess;
@@ -37,7 +37,7 @@ public class MessageController {
   }
   
   
-  public void process(UserSetting setting, NotificationMessage notification, Writer out) {
+  public void process(UserSetting setting, NotificationInfo notification, Writer out) {
     this.daily.process(setting, notification, out);
   }
 }

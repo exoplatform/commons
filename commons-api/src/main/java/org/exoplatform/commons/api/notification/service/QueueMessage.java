@@ -18,10 +18,17 @@ package org.exoplatform.commons.api.notification.service;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 
-public interface SendEmailNotificationProcessor {
+public interface QueueMessage {
 
+  /**
+   * Puts the message into the queue
+   * @param message
+   * @return
+   */
   boolean put(MessageInfo message);
   
+  /**
+   * Peek the message from queue and send
+   */
   void send() ;
-  
 }

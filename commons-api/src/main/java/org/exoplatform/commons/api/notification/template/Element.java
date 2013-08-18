@@ -1,5 +1,7 @@
 package org.exoplatform.commons.api.notification.template;
 
+import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
+
 public interface Element {
   /**
    * Gets the language what belongs to the template
@@ -32,5 +34,19 @@ public interface Element {
    * @param template
    * @return
    */
-  Element template(String template);   
+  Element template(String template);
+  
+  /**
+   * Gets template configure for the element
+   * uses it in the case when we need to get the groovy template.
+   * @return
+   */
+  TemplateConfig getTemplateConfig();
+  
+  /**
+   * Sets the template configure for the element 
+   * @param templateConfig
+   * @return
+   */
+  Element config(TemplateConfig templateConfig);
 }

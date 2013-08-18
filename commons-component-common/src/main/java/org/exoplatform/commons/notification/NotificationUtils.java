@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification;
 
 import java.text.DateFormatSymbols;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,55 +34,73 @@ import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
-import org.exoplatform.commons.notification.template.TemplateResourceBundle;
+import org.exoplatform.commons.api.notification.template.Element;
+import org.exoplatform.commons.notification.template.DigestTemplate;
+import org.exoplatform.commons.notification.template.SimpleElement;
+import org.exoplatform.commons.notification.template.TemplateUtils;
 
 
 public class NotificationUtils {
 
-  public static final String DEFAULT_SUBJECT_KEY       = "Notification.subject.$providerid";
+  public static final String DEFAULT_SUBJECT_KEY       = "Notification.subject.{0}";
 
-  public static final String DEFAULT_SIMPLE_DIGEST_KEY = "Notification.digest.$providerid";
+  public static final String DEFAULT_SIMPLE_DIGEST_KEY = "Notification.digest.{0}";
 
-  public static final String DEFAULT_DIGEST_ONE_KEY    = "Notification.digest.one.$providerid";
+  public static final String DEFAULT_DIGEST_ONE_KEY    = "Notification.digest.one.{0}";
 
-  public static final String DEFAULT_DIGEST_THREE_KEY  = "Notification.digest.three.$providerid";
-
-  public static final String DEFAULT_DIGEST_MORE_KEY   = "Notification.digest.more.$providerid";
+  public static final String DEFAULT_DIGEST_THREE_KEY  = "Notification.digest.three.{0}";
   
+  public static final String DEFAULT_DIGEST_MORE_KEY   = "Notification.digest.more.{0}";
+
   public static final String FEATURE_NAME              = "notification";
   
   public static Pattern patternInteger = Pattern.compile("^[0-9]+$");
   
   private static Map<String, Integer> dataDayOfWeek = new HashMap<String, Integer>();
+  
 
-  public static String getResourceBundle(String key, Locale locale, String srcResource) {
-    return TemplateResourceBundle.getResourceBundle(key, locale, srcResource);
+  public static String getDefaultKey(String key, String providerId) {
+    return MessageFormat.format(key, providerId);
   }
   
-  public static String getDefaultKey(String key, String providerId) {
-    return key.replace("$providerid", providerId);
-  }
-
-  public static SubjectAndDigest getSubjectAndDigest(TemplateConfig templateConfig, String providerId, String language) {
-    SubjectAndDigest subjectAndDigest = SubjectAndDigest.getInstance();
+  /**
+   * Gets the digest's resource bundle
+   * 
+   * @param templateConfig
+   * @param pluginId
+   * @param language
+   * @return
+   */
+  public static DigestTemplate getDigest(TemplateConfig templateConfig, String pluginId, String language) {
     String srcResource = templateConfig.getBundlePath();
-    String subjectKey = templateConfig.getKeyValue(TemplateConfig.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, providerId));
-    String digestKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_KEY, getDefaultKey(DEFAULT_SIMPLE_DIGEST_KEY, providerId));
-    String digestOneKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, providerId));
-    String digestThreeKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, providerId));
-    String digestMoreKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, providerId));
+    String digestOneKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, pluginId));
+    String digestThreeKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, pluginId));
+    String digestMoreKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, pluginId));
     
-    Locale locale = Locale.ENGLISH;
-    if (language != null) {
-      locale = new Locale(language);
-    }
-    subjectAndDigest.setLanguage(language)
-      .setSubject(getResourceBundle(subjectKey, locale, srcResource))
-      .setSimpleDigest(getResourceBundle(digestKey, locale, srcResource))
-      .setDigestOne(getResourceBundle(digestOneKey, locale, srcResource))
-      .setDigestThree(getResourceBundle(digestThreeKey, locale, srcResource))
-      .setDigestMore(getResourceBundle(digestMoreKey, locale, srcResource));
-    return subjectAndDigest;
+    Locale locale = new Locale(language);
+    
+    return new DigestTemplate().digestOne(TemplateUtils.getResourceBundle(digestOneKey, locale, srcResource))
+                               .digestThree(TemplateUtils.getResourceBundle(digestThreeKey, locale, srcResource))
+                               .digestMore(TemplateUtils.getResourceBundle(digestMoreKey, locale, srcResource));
+        
+                                
+  }
+  
+  /**
+   * Gets the subject's resource bundle
+   * 
+   * @param templateConfig
+   * @param pluginId
+   * @param language
+   * @return
+   */
+  public static Element getSubject(TemplateConfig templateConfig, String pluginId, String language) {
+    String bundlePath = templateConfig.getBundlePath();
+    String subjectKey = templateConfig.getKeyValue(TemplateConfig.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, pluginId));
+    
+    Locale locale = new Locale(language);
+    
+    return new SimpleElement().language(locale.getLanguage()).template(TemplateUtils.getResourceBundle(subjectKey, locale, bundlePath));
   }
   
   
@@ -181,6 +200,13 @@ public class NotificationUtils {
     return getDateByHours(h, m);
   }
 
+  /**
+   * Parsers the hours and minutes  value from configuration to date value
+   * 
+   * @param h
+   * @param m
+   * @return
+   */
   public static Date getDateByHours(int h, int m) {
     Calendar calendar = GregorianCalendar.getInstance();
     int crh = calendar.get(Calendar.HOUR_OF_DAY);
@@ -194,6 +220,11 @@ public class NotificationUtils {
     return calendar.getTime();
   }
 
+  /**
+   * Parsers the repeat interval value from configuration to long value
+   * @param period
+   * @return
+   */
   public static long getRepeatInterval(String period) {
     period = period.toLowerCase().replace("+", "");
 

@@ -29,7 +29,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
@@ -63,7 +63,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   }
 
   @Override
-  public void save(NotificationMessage message) throws Exception {
+  public void save(NotificationInfo message) throws Exception {
     LOG.info("saveNotificationMessage to jcr " + message.toString());
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
@@ -83,12 +83,12 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
  
   
   @Override
-  public Map<NotificationKey, List<NotificationMessage>> getByUser(UserSetting setting) {
+  public Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting setting) {
     LOG.info("Get all messages notification by user " + setting.getUserId());
     long startTime = System.currentTimeMillis();
     
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
-    Map<NotificationKey, List<NotificationMessage>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationMessage>>();
+    Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
     try {
       //for daily
       LOG.info("Get NotificationMessage for daily... ");
@@ -112,10 +112,10 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     return notificationData;
   }
   
-  private static void putMap(Map<NotificationKey, List<NotificationMessage>> notificationData, NotificationKey key, List<NotificationMessage> values) {
+  private static void putMap(Map<NotificationKey, List<NotificationInfo>> notificationData, NotificationKey key, List<NotificationInfo> values) {
     if (notificationData.containsKey(key)) {
-      List<NotificationMessage> messages = notificationData.get(key);
-      for (NotificationMessage notificationMessage : values) {
+      List<NotificationInfo> messages = notificationData.get(key);
+      for (NotificationInfo notificationMessage : values) {
         if (messages.size() == 0 || messages.contains(notificationMessage) == false) {
           messages.add(notificationMessage);
         }
@@ -129,9 +129,9 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     }
   }
   
-  private List<NotificationMessage> getNotificationMessages(SessionProvider sProvider, String pluginId,
+  private List<NotificationInfo> getNotificationMessages(SessionProvider sProvider, String pluginId,
                                                             String property, String userId) throws Exception{
-    List<NotificationMessage> messages = new ArrayList<NotificationMessage>();
+    List<NotificationInfo> messages = new ArrayList<NotificationInfo>();
     StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
     Node messageHomeNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
     Session session = messageHomeNode.getSession();
@@ -146,7 +146,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     List<String> removePaths = new ArrayList<String>();
     while (iter.hasNext()) {
       Node node = iter.nextNode();
-      NotificationMessage model = fillModel(node);
+      NotificationInfo model = fillModel(node);
       messages.add(model.setTo(userId));
       if(isRemove(model, property)) {
         removePaths.add(node.getPath());
@@ -161,9 +161,9 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     return messages;
   }
   
-  private NotificationMessage fillModel(Node node) throws Exception {
+  private NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
-    NotificationMessage message = NotificationMessage.instance()
+    NotificationInfo message = NotificationInfo.instance()
       .setFrom(node.getProperty(NTF_FROM).getString())
       .setOrder(Integer.valueOf(node.getProperty(NTF_ORDER).getString()))
       .key(node.getProperty(NTF_PROVIDER_TYPE).getString())
@@ -175,7 +175,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     return message;
   }
   
-  private boolean isRemove(NotificationMessage message, String property) {
+  private boolean isRemove(NotificationInfo message, String property) {
     if(property.equals(NTF_SEND_TO_DAILY) && message.getSendToDaily().length == 1){
       if(message.getSendToWeekly().length == 0) {
         return true;
@@ -210,8 +210,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     }
   }
   
-  public Map<String, NotificationMessage> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend) {
-    Map<String, NotificationMessage> messages = new LinkedHashMap<String, NotificationMessage>();
+  public Map<String, NotificationInfo> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend) {
+    Map<String, NotificationInfo> messages = new LinkedHashMap<String, NotificationInfo>();
     try {
       SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
       Node messageHomeNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
@@ -228,7 +228,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       
       while (iter.hasNext()) {
         Node node = iter.nextNode();
-        NotificationMessage model = fillModel(node);
+        NotificationInfo model = fillModel(node);
         messages.put(model.getFrom(), model);
       }
     } catch (Exception e) {

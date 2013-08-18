@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.container.PortalContainer;
 
 /**
@@ -214,9 +214,9 @@ public class UserSetting {
   
   public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
-      ProviderSettingService settingService = (ProviderSettingService) PortalContainer.getInstance()
-                                              .getComponentInstanceOfType(ProviderSettingService.class);
-      List<ProviderData> providerDatas = settingService.getActiveProviders();
+      PluginSettingService settingService = (PluginSettingService) PortalContainer.getInstance()
+                                              .getComponentInstanceOfType(PluginSettingService.class);
+      List<PluginInfo> providerDatas = settingService.getActivePlugins();
       
       if (providerDatas == null || providerDatas.size()==0) {
         return new UserSetting();
@@ -224,7 +224,7 @@ public class UserSetting {
       
       defaultSetting = getInstance();
       defaultSetting.setActive(true);
-      for (ProviderData providerData : providerDatas) {
+      for (PluginInfo providerData : providerDatas) {
         for (String defaultConf : providerData.getDefaultConfig()) {
           defaultSetting.addProvider(providerData.getType(), FREQUENCY.getFrequecy(defaultConf));
         }

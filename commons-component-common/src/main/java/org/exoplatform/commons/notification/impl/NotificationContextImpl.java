@@ -24,11 +24,13 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
+import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.notification.impl.command.NotificationCommandImpl;
-import org.exoplatform.commons.notification.impl.service.NotificationExecutorImpl;
+import org.exoplatform.commons.notification.impl.command.NotificationExecutorImpl;
 import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.utils.CommonsUtils;
 
@@ -38,19 +40,24 @@ public final class NotificationContextImpl implements NotificationContext {
   
   private Map<String, Object> arguments = new ConcurrentHashMap<String, Object>();
   
-  private NotificationMessage notification;
+  private NotificationInfo notification;
   
-  private List<NotificationMessage> notifications;
+  private List<NotificationInfo> notifications;
   
   private Exception exception;
   
   private final NotificationExecutor executor;
   
   private final NotificationPluginContainer pluginService;
+  
+  private final PluginSettingService settingService;
 
   private NotificationContextImpl() {
+    //TODO apply static method for Notification
+    //Create the pluginConttext for operation-per-session such as transaction 
     executor = NotificationExecutorImpl.getInstance();
     pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
+    settingService = CommonsUtils.getService(PluginSettingService.class);
   }
 
   public static NotificationContext cloneInstance() {
@@ -62,8 +69,13 @@ public final class NotificationContextImpl implements NotificationContext {
     return this.executor;
   }
   
-  public NotificationPluginContainer getNotificationPluginContainer() {
+  @Override
+  public PluginContainer getPluginContainer() {
     return this.pluginService;
+  }
+  
+  public PluginSettingService getPluginSettingService() {
+    return this.settingService;
   }
   
   @Override
@@ -99,12 +111,12 @@ public final class NotificationContextImpl implements NotificationContext {
   }
 
   @Override
-  public NotificationMessage getNotificationMessage() {
+  public NotificationInfo getNotificationInfo() {
     return this.notification;
   }
 
   @Override
-  public NotificationContext setNotificationMessage(NotificationMessage notification) {
+  public NotificationContext setNotificationInfo(NotificationInfo notification) {
     this.notification = notification;
     return this;
   }
@@ -136,12 +148,12 @@ public final class NotificationContextImpl implements NotificationContext {
   }
 
   @Override
-  public void setNotificationMessages(List<NotificationMessage> notifications) {
+  public void setNotificationInfos(List<NotificationInfo> notifications) {
     this.notifications = notifications;
   }
 
   @Override
-  public List<NotificationMessage> getNotificationMessages() {
+  public List<NotificationInfo> getNotificationInfos() {
     return this.notifications;
   }
   

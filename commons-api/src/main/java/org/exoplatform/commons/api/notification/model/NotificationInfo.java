@@ -26,7 +26,7 @@ import javax.jcr.Value;
 
 import org.exoplatform.services.jcr.util.IdGenerator;
 
-public class NotificationMessage {
+public class NotificationInfo {
   public static final String PREFIX_ID = "NotificationMessage";
 
   private String              id;
@@ -48,7 +48,7 @@ public class NotificationMessage {
 
   private String[]            sendToWeekly;
 
-  public NotificationMessage() {
+  public NotificationInfo() {
     this.id = PREFIX_ID + IdGenerator.generate();
     this.sendToDaily = new String[] { "" };
     this.sendToWeekly = new String[] { "" };
@@ -58,25 +58,25 @@ public class NotificationMessage {
     return id;
   }
 
-  public NotificationMessage setId(String id) {
+  public NotificationInfo setId(String id) {
     this.id = id;
     return this;
   }
   
-  public static NotificationMessage instance() {
-    return new NotificationMessage();
+  public static NotificationInfo instance() {
+    return new NotificationInfo();
   }
 
   public NotificationKey getKey() {
     return this.key;
   }
 
-  public NotificationMessage key(NotificationKey key) {
+  public NotificationInfo key(NotificationKey key) {
     this.key = key;
     return this;
   }
   
-  public NotificationMessage key(String id) {
+  public NotificationInfo key(String id) {
     this.key = NotificationKey.key(id);
     return this;
   }
@@ -85,7 +85,7 @@ public class NotificationMessage {
     return from;
   }
 
-  public NotificationMessage setFrom(String from) {
+  public NotificationInfo setFrom(String from) {
     this.from = from;
     return this;
   }
@@ -101,7 +101,7 @@ public class NotificationMessage {
   /**
    * @param to the to to set
    */
-  public NotificationMessage setTo(String to) {
+  public NotificationInfo setTo(String to) {
     this.to = to;
     return this;
   }
@@ -116,7 +116,7 @@ public class NotificationMessage {
   /**
    * @param order the order to set
    */
-  public NotificationMessage setOrder(int order) {
+  public NotificationInfo setOrder(int order) {
     this.order = order;
     return this;
   }
@@ -125,12 +125,12 @@ public class NotificationMessage {
     return sendToUserIds;
   }
 
-  public NotificationMessage to(List<String> sendToUserIds) {
+  public NotificationInfo to(List<String> sendToUserIds) {
     this.sendToUserIds = sendToUserIds;
     return this;
   }
 
-  public NotificationMessage to(String sendToUserId) {
+  public NotificationInfo to(String sendToUserId) {
     this.sendToUserIds.add(sendToUserId);
     return this;
   }
@@ -164,7 +164,7 @@ public class NotificationMessage {
   /**
    * @param ownerParameter the ownerParameter to set
    */
-  public NotificationMessage setOwnerParameter(Map<String, String> ownerParameter) {
+  public NotificationInfo setOwnerParameter(Map<String, String> ownerParameter) {
     this.ownerParameter = ownerParameter;
     return this;
   }
@@ -172,19 +172,19 @@ public class NotificationMessage {
   /**
    * @param ownerParameter the ownerParameter to set
    */
-  public NotificationMessage with(String key, String value) {
+  public NotificationInfo with(String key, String value) {
     this.ownerParameter.put(key, value);
     return this;
   }
   
-  public NotificationMessage end() {
+  public NotificationInfo end() {
     return this;
   }
 
   /**
    * @param arrays the value to set ownerParameter
    */
-  public NotificationMessage setOwnerParameter(Value[] values) {
+  public NotificationInfo setOwnerParameter(Value[] values) {
     if (values == null || values.length == 0) return this;
 
     for (Value val : values) {
@@ -213,7 +213,7 @@ public class NotificationMessage {
   /**
    * @param userIds the list userIds to set for sendToDaily
    */
-  public NotificationMessage setSendToDaily(String[] userIds) {
+  public NotificationInfo setSendToDaily(String[] userIds) {
     this.sendToDaily = userIds;
     return this;
   }
@@ -221,7 +221,7 @@ public class NotificationMessage {
   /**
    * @param userId the userId to set into sendToDaily
    */
-  public NotificationMessage setSendToDaily(String userId) {
+  public NotificationInfo setSendToDaily(String userId) {
     this.sendToDaily = addMoreItemInArray(sendToDaily, userId);
     return this;
   }
@@ -236,7 +236,7 @@ public class NotificationMessage {
   /**
    * @param userIds the list userIds to set for sendToWeekly
    */
-  public NotificationMessage setSendToWeekly(String[] userIds) {
+  public NotificationInfo setSendToWeekly(String[] userIds) {
     this.sendToWeekly = userIds;
     return this;
   }
@@ -244,7 +244,7 @@ public class NotificationMessage {
   /**
    * @param userId the userId to set into sendToWeekly
    */
-  public NotificationMessage setSendToWeekly(String userId) {
+  public NotificationInfo setSendToWeekly(String userId) {
     this.sendToWeekly = addMoreItemInArray(sendToWeekly, userId);
     return this;
   }
@@ -253,8 +253,8 @@ public class NotificationMessage {
   @Override
   public boolean equals(Object o) {
 
-    if (o instanceof NotificationMessage) {
-      NotificationMessage m = (NotificationMessage) o;
+    if (o instanceof NotificationInfo) {
+      NotificationInfo m = (NotificationInfo) o;
       if (super.equals(o)) {
         return true;
       }
@@ -296,8 +296,8 @@ public class NotificationMessage {
   }
 
   @Override
-  public NotificationMessage clone() {
-    NotificationMessage message = instance();
+  public NotificationInfo clone() {
+    NotificationInfo message = instance();
     message.setFrom(from)
            .key(key)
            .setId(id)

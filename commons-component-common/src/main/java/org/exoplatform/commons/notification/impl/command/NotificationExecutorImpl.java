@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl.service;
+package org.exoplatform.commons.notification.impl.command;
 
 import java.util.List;
 import java.util.Queue;
@@ -23,8 +23,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
-import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -57,7 +56,7 @@ public class NotificationExecutorImpl implements NotificationExecutor {
     }
   }
 
-  private NotificationMessage create(NotificationContext ctx, NotificationCommand command) {
+  private NotificationInfo create(NotificationContext ctx, NotificationCommand command) {
     return command.processNotification(ctx);
   }
 

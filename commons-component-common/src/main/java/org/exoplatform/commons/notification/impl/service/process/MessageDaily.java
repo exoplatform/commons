@@ -16,19 +16,19 @@
  */
 package org.exoplatform.commons.notification.impl.service.process;
 
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 
 public class MessageDaily extends MessageProcess {
 
   @Override
-  void doProcess(UserSetting setting, NotificationMessage notification) {
+  void doProcess(UserSetting setting, NotificationInfo notification) {
     //process digest mail here
     
   }
 
   @Override
-  boolean isValid(UserSetting setting, NotificationMessage notification) {
+  boolean isValid(UserSetting setting, NotificationInfo notification) {
     return setting.isInDaily(notification.getKey().getId());
   }
 

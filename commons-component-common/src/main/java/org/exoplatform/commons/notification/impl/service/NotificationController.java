@@ -18,7 +18,7 @@ package org.exoplatform.commons.notification.impl.service;
 
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
@@ -52,7 +52,7 @@ public class NotificationController {
   }
   
   
-  public void process(NotificationMessage notification) throws Exception {
+  public void process(NotificationInfo notification) throws Exception {
     List<String> userIds = notification.getSendToUserIds();
     for (String userId : userIds) {
       UserSetting setting = notificationService.get(userId);
@@ -63,7 +63,7 @@ public class NotificationController {
   }
 
 
-  private void save(NotificationMessage notification) throws Exception {
+  private void save(NotificationInfo notification) throws Exception {
     if (notification.getSendToDaily().length > 0 || 
         notification.getSendToWeekly().length > 0) {
       storage.save(notification);

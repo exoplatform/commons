@@ -18,13 +18,14 @@ package org.exoplatform.commons.notification.template;
 
 import java.util.Locale;
 
+import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.api.notification.template.ElementVisitor;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
+ *          thanhvc@exoplatform.com
  * Aug 1, 2013  
  */
 public class SimpleElement implements Element {
@@ -37,6 +38,11 @@ public class SimpleElement implements Element {
    * The template
    */
   private String template;
+  
+  /**
+   * The template configure
+   */
+  private TemplateConfig templateConfig;
   
   public SimpleElement() {
     this.language = Locale.ENGLISH.getLanguage();
@@ -54,7 +60,7 @@ public class SimpleElement implements Element {
 
   @Override
   public String getTemplate() {
-    return template;
+    return this.template;
   }
 
   @Override
@@ -66,12 +72,23 @@ public class SimpleElement implements Element {
   @Override
   public Element template(String template) {
     this.template = template;
-    return null;
+    return this;
+  }
+  
+  @Override
+  public Element config(TemplateConfig templateConfig) {
+    this.templateConfig = templateConfig;
+    return this;
   }
   
   
   @Override
   public String toString() {
     return "[language = " + this.language +"; template = " + this.template + "]";
+  }
+
+  @Override
+  public TemplateConfig getTemplateConfig() {
+    return this.templateConfig;
   }
 }

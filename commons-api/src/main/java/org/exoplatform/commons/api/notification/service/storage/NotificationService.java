@@ -16,25 +16,22 @@
  */
 package org.exoplatform.commons.api.notification.service.storage;
 
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
-import org.exoplatform.commons.api.notification.service.AbstractNotificationServiceListener;
-
 
 
 public interface NotificationService {
   /**
    * Process notification message when have new a @NotificationMessage created.
    * 
-   * @param message the new a @NotificationMessage
+   * @param notification the new a @NotificationMessage
    */
-  void process(NotificationMessage  message) throws Exception;
+  void process(NotificationInfo  notification) throws Exception;
   
   /**
    * Process daily
@@ -47,24 +44,17 @@ public interface NotificationService {
   /**
    * Process the list notification message when have new list @NotificationMessage created.
    * 
-   * @param messages
+   * @param notifications
    */
-  void process(Collection<NotificationMessage> messages) throws Exception;
+  void process(Collection<NotificationInfo> notifications) throws Exception;
 
   /**
    * Get all @NotificationMessage by userSetting
    * @param userSetting
    * @return
    */
-  Map<NotificationKey, List<NotificationMessage>> getByUser(UserSetting userSetting);
+  Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting userSetting);
 
-  /**
-   *  Add the send notification listener
-   *  
-   * @param messageListener
-   */
-  void addSendNotificationListener(AbstractNotificationServiceListener messageListener);
-  
   /**
    * Get the list of all message of providerId by date
    * 
@@ -72,7 +62,7 @@ public interface NotificationService {
    * @param isWeekend if isWeekend, get all messages, else get message of the current date
    * @return
    */
-  Map<String, NotificationMessage> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend);
+  Map<String, NotificationInfo> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend);
   
   /**
    * Delete all notification messages by plugin's id

@@ -14,27 +14,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.command;
+package org.exoplatform.commons.api.notification.service.setting;
 
-import java.io.Writer;
-
-import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 
-public interface NotificationCommand {
+/**
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          thanhvc@exoplatform.com
+ * Aug 18, 2013  
+ */
+public interface PluginContainer {
 
-  AbstractNotificationPlugin getPlugin();
-  
-  NotificationKey getNotificationKey();
-  
-  MessageInfo processMessage(NotificationContext ctx);
-  
-  NotificationInfo processNotification(NotificationContext ctx);
-  
-  void processDigest(NotificationContext ctx, Writer writer);
-  
-  
+  /**
+   * Gets plugin by NotificationKey
+   * @param key
+   * @return
+   */
+  AbstractNotificationPlugin getPlugin(NotificationKey key);
+
+  /**
+   * Register plugin in Container
+   * @param plugin
+   */
+  void add(AbstractNotificationPlugin plugin);
+
+  /**
+   * Removes plugin in Container
+   * @param key
+   * @return
+   */
+  boolean remove(NotificationKey key);
 }

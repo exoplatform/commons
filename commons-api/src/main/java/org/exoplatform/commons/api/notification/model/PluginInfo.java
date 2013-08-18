@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ProviderData {
+public class PluginInfo {
 
   private String       type;
 
@@ -34,7 +34,7 @@ public class ProviderData {
 
   private List<String> defaultConfig = new ArrayList<String>();
 
-  public ProviderData() {
+  public PluginInfo() {
 
   }
 
@@ -48,7 +48,7 @@ public class ProviderData {
   /**
    * @param type the id to set
    */
-  public ProviderData setType(String type) {
+  public PluginInfo setType(String type) {
     this.type = type;
     return this;
   }
@@ -63,7 +63,7 @@ public class ProviderData {
   /**
    * @param order the order to set
    */
-  public ProviderData setOrder(int order) {
+  public PluginInfo setOrder(int order) {
     this.order = order;
     return this;
   }
@@ -92,7 +92,7 @@ public class ProviderData {
   /**
    * @param resourceBundleKey the resourceBundleKey to set
    */
-  public ProviderData setResourceBundleKey(String resourceBundleKey) {
+  public PluginInfo setResourceBundleKey(String resourceBundleKey) {
     this.resourceBundleKey = resourceBundleKey;
     return this;
   }
@@ -107,7 +107,7 @@ public class ProviderData {
   /**
    * @param bundlePath the bundlePath to set
    */
-  public ProviderData setBundlePath(String bundlePath) {
+  public PluginInfo setBundlePath(String bundlePath) {
     this.bundlePath = bundlePath;
     return this;
   }
@@ -122,12 +122,12 @@ public class ProviderData {
   /**
    * @param isActive the isActive to set
    */
-  public ProviderData setActive(boolean isActive) {
+  public PluginInfo setActive(boolean isActive) {
     this.isActive = isActive;
     return this;
   }
 
-  public ProviderData end() {
+  public PluginInfo end() {
     return this;
   }
 }
