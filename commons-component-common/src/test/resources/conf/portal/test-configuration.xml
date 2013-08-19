@@ -4,8 +4,8 @@
 	xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
     <component>
-		<key>org.exoplatform.commons.api.notification.service.setting.ProviderSettingService</key>
-		<type>org.exoplatform.commons.notification.impl.setting.ProviderSettingServiceImpl</type>
+		<key>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</key>
+		<type>org.exoplatform.commons.notification.impl.setting.PluginSettingServiceImpl</type>
 	</component>
 	<component>
 		<key>org.exoplatform.commons.api.event.EventManager</key>
@@ -21,11 +21,6 @@
 		<type>org.exoplatform.settings.impl.SettingServiceImpl</type>
 	</component>
 	
-	<component>
-    <key>org.exoplatform.commons.api.notification.service.setting.ProviderSettingService</key>
-    <type>org.exoplatform.commons.notification.impl.setting.ProviderSettingServiceImpl</type>
-  </component>
-
 	<component>
 		<key>org.exoplatform.commons.api.settings.ExoFeatureService</key>
 		<type>org.exoplatform.settings.impl.ExoFeatureServiceImpl</type>
