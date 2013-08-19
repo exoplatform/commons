@@ -65,10 +65,8 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   public boolean execute(NotificationContext ctx) {
     boolean result = true;
     
-    // Notification will not be executed when the feature is off or the plugin is disable
-    ProviderSettingService providerSettingService = CommonsUtils.getService(ProviderSettingService.class);
-    if (CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME) == false ||
-        providerSettingService.isActive(ctx.getNotificationMessage().getKey().getId()) == false) {
+    // Notification will not be executed when the feature is off
+    if (CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME) == false) {
       return result;
     }
     

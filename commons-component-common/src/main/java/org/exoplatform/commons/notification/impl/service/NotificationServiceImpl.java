@@ -73,8 +73,15 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
     String providerId = message.getKey().getId();
     
-    //In case of NewUserPlugin, we process only the send instantly, and the daily or weekly when the job is called
+    //if the provider is not active, do nothing
+    ProviderSettingService settingService = CommonsUtils.getService(ProviderSettingService.class);
+    if (settingService.isActive(providerId) == false) return;
+    
     if (NEW_USER_PLUGIN_ID.equals(providerId)) {
+      //add mixin for new user
+      UserSettingService userSettingService = CommonsUtils.getService(UserSettingService.class);
+      userSettingService.addMixin(message.getValueOwnerParameter("remoteId"));
+      //Get all user has config instantly for new user plugin
       userIds = notificationService.getUserSettingByPlugin(providerId);
       storage.save(message);
     }
