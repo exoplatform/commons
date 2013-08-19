@@ -82,7 +82,6 @@ public class DigestorServiceImpl implements DigestorService {
         AbstractNotificationPlugin plugin = pluginService.getPlugin(NotificationKey.key(providerId));
         nCtx.setNotificationMessages(messages);
         plugin.buildDigest(nCtx, writer);
-        writer.append("<br/>");
       }
       
       StringBuffer sb = ((StringWriter)writer).getBuffer();

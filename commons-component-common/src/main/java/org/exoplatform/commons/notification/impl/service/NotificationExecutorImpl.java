@@ -24,6 +24,7 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.NotificationMessage;
+import org.exoplatform.commons.api.notification.service.setting.ProviderSettingService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -64,8 +65,10 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   public boolean execute(NotificationContext ctx) {
     boolean result = true;
     
-    // Notification will not be executed when the feature is off
-    if (CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME) == false) {
+    // Notification will not be executed when the feature is off or the plugin is disable
+    ProviderSettingService providerSettingService = CommonsUtils.getService(ProviderSettingService.class);
+    if (CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME) == false ||
+        providerSettingService.isActive(ctx.getNotificationMessage().getKey().getId()) == false) {
       return result;
     }
     
