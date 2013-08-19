@@ -16,7 +16,6 @@
  */
 package org.exoplatform.commons.notification.template;
 
-import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.api.notification.template.TemplateTransformer;
 
@@ -38,11 +37,12 @@ public class SimpleTemplateTransformer implements TemplateTransformer {
 
   @Override
   public String transform(TemplateContext context) {
-    //TODO need to check the key what has the prefix with "$" or not
     String got = template;
+    String newKey = "";
     //
     for (String key : context.keySet()) {
-      got = StringUtils.replace(got, key, (String) context.get(key));
+      newKey = key.indexOf("$") == 0 ? key : "$" + key;
+      got = got.replace(newKey, (String) context.get(key));
     }
     return got;
   }

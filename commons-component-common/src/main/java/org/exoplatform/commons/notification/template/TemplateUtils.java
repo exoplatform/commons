@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -45,7 +46,8 @@ import org.exoplatform.services.resources.ResourceBundleService;
 import org.gatein.common.io.IOTools;
 
 public class TemplateUtils {
-  
+  private static final String DIGEST_TEMPLATE_KEY = "Digest.{0}.{1}";
+  private static final String SIMPLE_TEMPLATE_KEY = "Simple.{0}.{1}";
   private static final Log LOG = ExoLogger.getLogger(TemplateUtils.class);
   private static Map<String, Element> cacheTemplate = new ConcurrentHashMap<String, Element>();
   
@@ -98,7 +100,7 @@ public class TemplateUtils {
       ConfigurationManager configurationManager =  CommonsUtils.getService(ConfigurationManager.class);
       
       String uri = templatePath;
-      if (templatePath.indexOf("war") < 0 && templatePath.indexOf("jar") < 0) {
+      if (templatePath.indexOf("war") < 0 && templatePath.indexOf("jar") < 0 && templatePath.indexOf("classpath") < 0) {
         URL url = null;
         if (templatePath.indexOf("/") == 0) {
           templatePath = templatePath.substring(1);
@@ -159,7 +161,7 @@ public class TemplateUtils {
    */
   public static String processSubject(TemplateContext ctx) {
     Element subject = null;
-    String key = new StringBuffer(ctx.getPluginId()).append(ctx.getLanguage()).toString();
+    String key = makeTemplateKey(SIMPLE_TEMPLATE_KEY, ctx.getPluginId(), ctx.getLanguage());
     if (cacheTemplate.containsKey(key)) {
       subject = cacheTemplate.get(key);
     } else {
@@ -177,7 +179,7 @@ public class TemplateUtils {
    */
   public static String processDigest(TemplateContext ctx) {
     DigestTemplate digest = null;
-    String key = new StringBuffer(ctx.getPluginId()).append(ctx.getLanguage()).toString();
+    String key = makeTemplateKey(DIGEST_TEMPLATE_KEY, ctx.getPluginId(), ctx.getLanguage());
     if (cacheTemplate.containsKey(key)) {
       digest = (DigestTemplate) cacheTemplate.get(key);
     } else {
@@ -187,6 +189,10 @@ public class TemplateUtils {
     }
     
     return digest.accept(SimpleElementVistior.instance().with(ctx)).out();
+  }
+  
+  private static String makeTemplateKey(String pattern, String pluginId, String language) {
+    return MessageFormat.format(pattern, pluginId, language);
   }
 
 

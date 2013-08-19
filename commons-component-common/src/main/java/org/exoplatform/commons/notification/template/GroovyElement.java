@@ -18,6 +18,8 @@ package org.exoplatform.commons.notification.template;
 
 import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * Created by The eXo Platform SAS
@@ -27,11 +29,22 @@ import java.util.Locale;
  */
 public class GroovyElement extends SimpleElement {
 
-  public String appRes(String key, Locale locale) {
+  public String appRes(String key) {
+    Locale locale = Locale.ENGLISH;
+    if (getLanguage() != null && getLanguage().length() > 0) {
+      locale = new Locale(getLanguage());
+    }
     return TemplateUtils.getResourceBundle(key, locale, getTemplateConfig().getBundlePath());
   }
-  
+
   public String appRes(String key, String... strs) {
-    return appRes(key, strs);
+    
+    String value = appRes(key);
+    if (strs != null && strs.length > 0) {
+      for (int i = 0; i < strs.length; ++i) {
+        value = StringUtils.replace(value, "{" + i + "}", strs[i]);
+      }
+    }
+    return value;
   }
 }
