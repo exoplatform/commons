@@ -66,6 +66,7 @@ public class NotificationExecutorImpl implements NotificationExecutor {
     
     // Notification will not be executed when the feature is off
     if (CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME) == false) {
+      commands.clear();
       return result;
     }
     
