@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.notification;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import org.exoplatform.commons.notification.impl.AbstractService;
@@ -42,7 +43,7 @@ public class NotificationConfiguration implements Startable {
 
   public NotificationConfiguration(InitParams params) {
     this.workspace = getValueParam(params, AbstractService.WORKSPACE_PARAM, AbstractService.DEFAULT_WORKSPACE_NAME);
-    this.dayOfWeekend = NotificationUtils.getDayOfWeek(getValueParam(params, "dayOfWeekend", "6"));
+    this.dayOfWeekend = NotificationUtils.getDayOfWeek(getValueParam(params, "dayOfWeekend", String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK))));
     this.dayOfMonthend = getValueParam(params, "dayOfMonthend", 28);
     this.period = getValueParam(params, "period", "1d");
     this.startAtTime = getValueParam(params, "startAtTime", "01:am");
@@ -59,7 +60,7 @@ public class NotificationConfiguration implements Startable {
 
   }
 
-  public void createJob() {
+  private void createJob() {
     LOG.info("Initializing job for sending email notification ");
     try {
       String jobName = "NotificationJob";
@@ -69,7 +70,7 @@ public class NotificationConfiguration implements Startable {
       int repeatCount = 0;
       long repeatInterval = NotificationUtils.getRepeatInterval(period);// period
       
-      LOG.info("startTime: " + startTime + ", endTime: " + endTime + ", repeatCount: " 
+      LOG.debug("startTime: " + startTime + ", endTime: " + endTime + ", repeatCount: " 
                + repeatCount + ", repeatInterval: " + repeatInterval + "");
 
       PeriodInfo periodInfo = new PeriodInfo(startTime, endTime, repeatCount, repeatInterval);

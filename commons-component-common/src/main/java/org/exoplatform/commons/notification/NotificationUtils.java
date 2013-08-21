@@ -150,8 +150,8 @@ public class NotificationUtils {
         dataDayOfWeek.put(symbolDayNames[countDayname].toLowerCase(), countDayname);
       }
     }
-    if (dayName == null) {
-      return 0;
+    if (dayName == null || dayName.length() == 0) {
+      return Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
     }
     dayName = dayName.toLowerCase().trim();
     if (isInteger(dayName)) {

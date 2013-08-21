@@ -23,20 +23,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.jcr.Node;
+
 import org.exoplatform.commons.api.notification.model.GroupProvider;
 import org.exoplatform.commons.api.notification.model.PluginInfo;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.GroupConfig;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
-import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
-public class PluginSettingServiceImpl implements PluginSettingService {
+public class PluginSettingServiceImpl extends AbstractService implements PluginSettingService {
+  private static final Log LOG = ExoLogger.getLogger(PluginSettingServiceImpl.class);
 
   private List<PluginConfig>         pluginConfigs      = new ArrayList<PluginConfig>();
 
@@ -44,9 +51,9 @@ public class PluginSettingServiceImpl implements PluginSettingService {
 
   private List<String>               activeProviderIds  = new ArrayList<String>();
 
-  private List<PluginInfo>         activeProviders    = new ArrayList<PluginInfo>();
+  private List<PluginInfo>           activeProviders    = new ArrayList<PluginInfo>();
 
-  private static final String        NAME_SPACES        = "exo:";
+  private static final String       NAME_SPACES        = "exo:";
 
   private SettingService             settingService;
   
@@ -83,12 +90,9 @@ public class PluginSettingServiceImpl implements PluginSettingService {
       groupProviderMap.put(groupId, groupProvider);
     }
     //
-    NotificationDataStorage dataStorage = CommonsUtils.getService(NotificationDataStorage.class);
-    if(dataStorage != null) {
-      dataStorage.createParentNodeOfPlugin(pluginConfig.getPluginId());
-    }
+    createParentNodeOfPlugin(pluginConfig.getPluginId());
   }
-
+  
   @Override
   public void registerGroupConfig(GroupProviderPlugin groupConfigPlg) {
     for (GroupConfig gconfig : groupConfigPlg.getGroupProviders()) {
@@ -168,6 +172,17 @@ public class PluginSettingServiceImpl implements PluginSettingService {
 
   private void saveSetting(String property, boolean value) {
     settingService.set(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + property), SettingValue.create(value));
+  }
+
+  private void createParentNodeOfPlugin(String pluginId) {
+    try {
+      SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+      NotificationConfiguration configuration = CommonsUtils.getService(NotificationConfiguration.class);
+      Node node = getOrCreateMessageParent(sProvider, configuration.getWorkspace(), pluginId);
+      sessionSave(node);
+    } catch (Exception e) {
+      LOG.error("Failed to create parent Node for plugin " + pluginId);
+    }
   }
 
   private boolean isActive(String providerId, boolean defaultValue) {

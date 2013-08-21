@@ -60,16 +60,30 @@ public class NotificationPluginUtils {
             .append("/").append(userId).toString();
   }
 
+  public static String getFullName(String userId) {
+    try {
+      User user = getOrganizationService().getUserHandler().findUserByName(userId);
+      return getFullName(user);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  private static String getFullName(User user) {
+    StringBuilder userInfor = new StringBuilder();
+    String displayName = user.getDisplayName();
+    if (displayName == null || displayName.length() == 0) {
+      userInfor.append(user.getFirstName()).append(" ").append(user.getLastName());
+    } else {
+      userInfor.append(displayName);
+    }
+    return userInfor.toString();
+  }
+
   private static String getEmailFormat(String userId) {
     try {
       User user = getOrganizationService().getUserHandler().findUserByName(userId);
-      StringBuilder userInfor = new StringBuilder();
-      String displayName = user.getDisplayName();
-      if (displayName == null || displayName.length() == 0) {
-        userInfor.append(user.getFirstName()).append(" ").append(user.getLastName());
-      } else {
-        userInfor.append(displayName);
-      }
+      StringBuilder userInfor = new StringBuilder(getFullName(user));
       userInfor.append("<").append(user.getEmail()).append(">");
       return userInfor.toString();
     } catch (Exception e) {

@@ -235,7 +235,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       NodeIterator iter = getDailyIterator(sProvider, 0, 0, pluginId);
       while (iter != null && iter.hasNext()) {
         Node node = iter.nextNode();
-        userIds.add(fillModel(node).getUserId());
+        userIds.add(node.getParent().getName());
       }
     } catch (Exception e) {
       LOG.error("Failed to get all users have the " + pluginId + " in settings", e);

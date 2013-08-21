@@ -74,7 +74,7 @@
 
       <value-param>
         <name>dayOfWeekend</name><!-- The day of week to send weekly notification-->
-        <value>6</value><!-- The value is number lest than 7 and more than 0 or name day of week (Monday, Tuesday, Wednesday...)-->
+        <value></value><!-- The value is number lest than 7 and more than 0 or name day of week (Monday, Tuesday, Wednesday...)-->
       </value-param>
       <value-param>
         <name>dayOfMonthend</name>

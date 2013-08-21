@@ -31,7 +31,7 @@ public class TestNotificationUtils extends TestCase {
 
   public void testGetDayOfWeek() {
     String intput = null;
-    assertEquals(0, NotificationUtils.getDayOfWeek(intput));
+    assertEquals(Calendar.getInstance().get(Calendar.DAY_OF_WEEK), NotificationUtils.getDayOfWeek(intput));
     
     intput = "1";
     assertEquals(1, NotificationUtils.getDayOfWeek(intput));

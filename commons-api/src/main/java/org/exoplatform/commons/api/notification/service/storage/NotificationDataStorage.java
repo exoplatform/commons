@@ -30,10 +30,6 @@ public interface NotificationDataStorage {
   
   Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting userSetting);
 
-  void createParentNodeOfPlugin(String pluginId);
-  
-  Map<String, NotificationInfo> getNotificationMessagesByPluginId(String pluginId, boolean isWeekend);
-  
-  void removeNotificationMessages(String pluginId);
+  void removeMessageCallBack() throws Exception;
   
 }

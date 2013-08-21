@@ -24,12 +24,13 @@ import java.util.Map;
 
 import javax.jcr.Value;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationInfo {
   public static final String  PREFIX_ID     = "NotificationMessage";
 
-  public static final String  FOR_ALL_USER  = "all";
+  public static final String  FOR_ALL_USER  = "&forAllUser";
 
   private String              id;
 
@@ -55,6 +56,10 @@ public class NotificationInfo {
     this.sendToDaily = new String[] { "" };
     this.sendToWeekly = new String[] { "" };
   }
+  
+  public static NotificationInfo instance() {
+    return new NotificationInfo();
+  }
 
   public String getId() {
     return id;
@@ -64,10 +69,23 @@ public class NotificationInfo {
     this.id = id;
     return this;
   }
-  
-  public static NotificationInfo instance() {
-    return new NotificationInfo();
+
+  public NotificationInfo setSendAll(boolean isSendAll) {
+    if (isSendAll) {
+      setSendToDaily(new String[] { FOR_ALL_USER });
+      setSendToWeekly(new String[] { FOR_ALL_USER });
+    } else {
+      removeOnSendToDaily(FOR_ALL_USER);
+      removeOnSendToWeekly(FOR_ALL_USER);
+    }
+    return this;
   }
+  
+  public boolean isSendAll() {
+    return ArrayUtils.contains(sendToDaily, FOR_ALL_USER) || 
+      ArrayUtils.contains(sendToWeekly, FOR_ALL_USER);
+  }
+
 
   public NotificationKey getKey() {
     return this.key;
@@ -91,7 +109,6 @@ public class NotificationInfo {
     this.from = from;
     return this;
   }
-  
   
   /**
    * @return the to
@@ -221,10 +238,18 @@ public class NotificationInfo {
   }
 
   /**
-   * @param userId the userId to set into sendToDaily
+   * @param userId the userId to add into sendToDaily
    */
   public NotificationInfo setSendToDaily(String userId) {
     this.sendToDaily = addMoreItemInArray(sendToDaily, userId);
+    return this;
+  }
+
+  /**
+   * @param userId the userId to remove into sendToDaily
+   */
+  public NotificationInfo removeOnSendToDaily(String userId) {
+    this.sendToDaily = removeItemInArray(sendToDaily, userId);
     return this;
   }
 
@@ -242,12 +267,20 @@ public class NotificationInfo {
     this.sendToWeekly = userIds;
     return this;
   }
-
+  
   /**
-   * @param userId the userId to set into sendToWeekly
+   * @param userId the userId to add into sendToWeekly
    */
   public NotificationInfo setSendToWeekly(String userId) {
     this.sendToWeekly = addMoreItemInArray(sendToWeekly, userId);
+    return this;
+  }
+  
+  /**
+   * @param userId the userId to remove into sendToWeekly
+   */
+  public NotificationInfo removeOnSendToWeekly(String userId) {
+    this.sendToWeekly = removeItemInArray(sendToWeekly, userId);
     return this;
   }
 
@@ -280,7 +313,7 @@ public class NotificationInfo {
     .append(", sendToWeekly: ").append(Arrays.asList(sendToWeekly).toString());
     return buffer.toString();
   }
-
+  
   private String[] addMoreItemInArray(String[] src, String element) {
     if(element == null || element.trim().length() == 0) {
       return src;
@@ -292,6 +325,22 @@ public class NotificationInfo {
     }
     if (where.contains(element) == false) {
       where.add(element);
+      return where.toArray(new String[where.size()]);
+    }
+    return src;
+  }
+
+  private String[] removeItemInArray(String[] src, String element) {
+    if (element == null || element.trim().length() == 0) {
+      return src;
+    }
+    //
+    List<String> where = new ArrayList<String>();
+    if (src.length > 1 || (src.length == 1 && src[0].equals("") == false)) {
+      where = new ArrayList<String>(Arrays.asList(src));
+    }
+    if (where.contains(element)) {
+      where.remove(element);
       return where.toArray(new String[where.size()]);
     }
     return src;
