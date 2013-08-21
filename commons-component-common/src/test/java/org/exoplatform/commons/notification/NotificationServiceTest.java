@@ -29,9 +29,9 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     assertNotNull(notificationDataStorage);
   }
   
-  public void testGetMessagesByProviderId() throws Exception {
+  public void testGetNotificationMessagesByPluginId() throws Exception {
     
-    Map<String, NotificationInfo> list = notificationService.getNotificationMessagesByProviderId("NewUserPlugin", false);
+    Map<String, NotificationInfo> list = notificationDataStorage.getNotificationMessagesByPluginId("NewUserPlugin", false);
     assertEquals(0, list.size());
     
     NotificationInfo message1 = new NotificationInfo();
@@ -51,15 +51,15 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     notificationDataStorage.save(message3);
     addMixin(message3.getId());
     
-    list = notificationService.getNotificationMessagesByProviderId("NewUserPlugin", false);
+    list = notificationDataStorage.getNotificationMessagesByPluginId("NewUserPlugin", false);
     assertEquals(2, list.size());
     //check order by date
     assertEquals(message1.getId(), list.get("root").getId());
     assertEquals(message3.getId(), list.get("demo").getId());
     
     //clear all message of type NewUserPlugin
-    notificationService.removeNotificationMessages("NewUserPlugin");
-    list = notificationService.getNotificationMessagesByProviderId("NewUserPlugin", false);
+    notificationDataStorage.removeNotificationMessages("NewUserPlugin");
+    list = notificationDataStorage.getNotificationMessagesByPluginId("NewUserPlugin", false);
     assertEquals(0, list.size());
   }
   

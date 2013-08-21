@@ -39,7 +39,7 @@ public interface NotificationService {
    * @param message
    * @throws Exception
    */
-  void processDaily() throws Exception;
+  void processDigest() throws Exception;
   
   /**
    * Process the list notification message when have new list @NotificationMessage created.
@@ -47,27 +47,5 @@ public interface NotificationService {
    * @param notifications
    */
   void process(Collection<NotificationInfo> notifications) throws Exception;
-
-  /**
-   * Get all @NotificationMessage by userSetting
-   * @param userSetting
-   * @return
-   */
-  Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting userSetting);
-
-  /**
-   * Get the list of all message of providerId by date
-   * 
-   * @param pluginId id of plugin
-   * @param isWeekend if isWeekend, get all messages, else get message of the current date
-   * @return
-   */
-  Map<String, NotificationInfo> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend);
   
-  /**
-   * Delete all notification messages by plugin's id
-   * 
-   * @param pluginId
-   */
-  void removeNotificationMessages(String pluginId);
 }

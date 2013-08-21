@@ -92,15 +92,15 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     try {
       //for daily
       LOG.info("Get NotificationMessage for daily... ");
-      for (String providerId : setting.getDailyProviders()) {
-        putMap(notificationData, NotificationKey.key(providerId), getNotificationMessages(sProvider, providerId, NTF_SEND_TO_DAILY, setting.getUserId()));
+      for (String pluginId : setting.getDailyProviders()) {
+        putMap(notificationData, NotificationKey.key(pluginId), getNotificationMessages(sProvider, pluginId, NTF_SEND_TO_DAILY, setting.getUserId()));
       }
       
       // for weekly
       if(NotificationUtils.isWeekEnd(configuration.getDayOfWeekend())) {
         LOG.info("Get NotificationMessage for weekly... ");
-        for (String providerId : setting.getWeeklyProviders()) {
-          putMap(notificationData, NotificationKey.key(providerId), getNotificationMessages(sProvider, providerId, NTF_SEND_TO_WEEKLY, setting.getUserId()));
+        for (String pluginId : setting.getWeeklyProviders()) {
+          putMap(notificationData, NotificationKey.key(pluginId), getNotificationMessages(sProvider, pluginId, NTF_SEND_TO_WEEKLY, setting.getUserId()));
         }
       }
 
@@ -210,7 +210,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     }
   }
   
-  public Map<String, NotificationInfo> getNotificationMessagesByProviderId(String pluginId, boolean isWeekend) {
+  public Map<String, NotificationInfo> getNotificationMessagesByPluginId(String pluginId, boolean isWeekend) {
     Map<String, NotificationInfo> messages = new LinkedHashMap<String, NotificationInfo>();
     try {
       SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();

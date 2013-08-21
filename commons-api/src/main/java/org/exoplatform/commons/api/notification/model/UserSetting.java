@@ -191,8 +191,8 @@ public class UserSetting {
   }
 
 
-  public boolean isActiveWithoutInstantly(String providerId) {
-    return isInDaily(providerId) || isInWeekly(providerId);
+  public boolean isActiveWithoutInstantly(String pluginId) {
+    return isInDaily(pluginId) || isInWeekly(pluginId);
   }
 
   private void addProperty(List<String> providers, String providerId) {

@@ -38,7 +38,7 @@ public class NotificationJob implements Job {
     }
 
     try {
-      CommonsUtils.getService(NotificationService.class).processDaily();
+      CommonsUtils.getService(NotificationService.class).processDigest();
     } catch (Exception e) {
       LOG.error("Failed to running NotificationJob", e);
     }

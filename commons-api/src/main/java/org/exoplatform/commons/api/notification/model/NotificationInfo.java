@@ -27,7 +27,9 @@ import javax.jcr.Value;
 import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationInfo {
-  public static final String PREFIX_ID = "NotificationMessage";
+  public static final String  PREFIX_ID     = "NotificationMessage";
+
+  public static final String  FOR_ALL_USER  = "all";
 
   private String              id;
 
