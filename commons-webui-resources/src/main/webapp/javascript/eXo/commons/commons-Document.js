@@ -729,6 +729,22 @@ function UIDSUpload() {
 	    if(nodeList.length > 0) oProgress = nodeList[0];
 	    var percent = oProgress.getAttribute("percent");
 	    var fileName = oProgress.getAttribute("fileName");
+	    var limit = oProgress.getAttribute("limit");
+	    var unit = oProgress.getAttribute("unit");
+	    var total = oProgress.getAttribute("totalSize");
+	    if (limit && unit) {
+	    	var realLimit = limit;
+	    	if (unit == "KB") realLimit *= 1024;
+	    	if (unit == "MB") realLimit *= 1024 * 1024;
+	    	if (unit == "GB") realLimit *= 1024 * 1024 * 1024;
+	    	if (realLimit < total) {
+	  	      this.abortUpload(elementId);
+		      //var message = eXo.core.DOMUtil.findFirstChildByClass(container, "div", "LimitMessage").innerHTML ;
+		      var message = jQuery("div.LimitMessage:first-child").html();
+		      alert(message.replace("{0}", limit).replace("{1}", unit)) ;
+		      return;
+	    	}
+	    }
             //progress Bar Label
 	    var progressBarFrame = jQuery("div.progressBarFrame:first");
   	    var percentVal = jQuery("div.percent",progressBarFrame);
