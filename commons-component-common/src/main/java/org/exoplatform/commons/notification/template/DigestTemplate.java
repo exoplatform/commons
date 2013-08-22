@@ -94,7 +94,7 @@ public class DigestTemplate extends SimpleElement {
   public ElementVisitor accept(ElementVisitor visitor) {
     if (visitor.getTemplateContext().getDigestSize() == ElementType.DIGEST_ONE.getValue()) {
       visitor.visit(this.digestOne);
-    } else if (visitor.getTemplateContext().getDigestSize() == ElementType.DIGEST_THREE.getValue()) {
+    } else if (visitor.getTemplateContext().getDigestSize() <= ElementType.DIGEST_THREE.getValue()) {
       visitor.visit(this.digestThree);
     } else if (visitor.getTemplateContext().getDigestSize() >= ElementType.DIGEST_MORE.getValue()) {
       visitor.visit(this.digestMore);
