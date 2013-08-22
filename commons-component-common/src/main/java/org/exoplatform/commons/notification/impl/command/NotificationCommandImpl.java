@@ -58,5 +58,10 @@ public class NotificationCommandImpl implements NotificationCommand {
     plugin.buildDigest(ctx, writer);
     
   }
+  
+  @Override
+  public String toString() {
+    return "NotificationCommand[" + plugin.getKey().getId() + "]";
+  }
 
 }
