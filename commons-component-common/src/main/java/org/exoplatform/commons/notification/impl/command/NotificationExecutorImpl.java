@@ -47,6 +47,9 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   
   private boolean process(NotificationContext ctx, NotificationCommand command) {
     try {
+      if (command.getPlugin().isValid(ctx) == false) {
+        return false;
+      }
       NotificationService service = CommonsUtils.getService(NotificationService.class);
       service.process(create(ctx, command));
       return true;

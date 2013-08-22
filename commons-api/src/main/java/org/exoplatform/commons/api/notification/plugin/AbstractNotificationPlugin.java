@@ -65,6 +65,12 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
   public abstract String getId();
   
   /**
+   * Check, for each plugin, if we will send notification
+   * @return
+   */
+  public abstract boolean isValid(NotificationContext ctx);
+  
+  /**
    * Makes MessageInfo from given information what keep inside NotificationContext
    * @param context
    * @return

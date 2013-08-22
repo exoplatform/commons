@@ -51,4 +51,9 @@ public class DigestWeeklyPlugin extends AbstractNotificationPlugin {
     return null;
   }
 
+  @Override
+  public boolean isValid(NotificationContext ctx) {
+    return true;
+  }
+
 }
