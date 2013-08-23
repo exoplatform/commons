@@ -88,7 +88,7 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</key>
+    <key>org.exoplatform.commons.api.notification.service.setting.PluginContainer</key>
     <type>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</type>
   </component>
 
@@ -232,7 +232,7 @@
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</target-component>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
     <component-plugin>
       <name>notification.plugins</name>
       <set-method>add</set-method>
@@ -266,7 +266,7 @@
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</target-component>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
     <component-plugin>
       <name>notification.plugins</name>
       <set-method>add</set-method>
@@ -300,7 +300,7 @@
   </external-component-plugins>
   
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.notification.service.setting.ProviderSettingService</target-component>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</target-component>
     <component-plugin>
       <name>notification.groups</name>
       <set-method>registerGroupConfig</set-method>
