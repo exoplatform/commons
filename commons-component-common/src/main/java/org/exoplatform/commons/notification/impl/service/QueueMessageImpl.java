@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -46,13 +47,13 @@ public class QueueMessageImpl implements QueueMessage {
   
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
   
-  public QueueMessageImpl(InitParams params, MailService mailService) {
+  public QueueMessageImpl(InitParams params) {
     
     MAX_TO_SEND = Integer.parseInt(params.getValueParam("maxToSend").getValue());
     DELAY_TIME = Integer.parseInt(params.getValueParam("delayTime").getValue());
     INITIAL_DELAY = Integer.parseInt(params.getValueParam("initialDelay").getValue());
     
-    this.mailService = mailService;
+    this.mailService = CommonsUtils.getService(MailService.class);
     
     scheduler.scheduleAtFixedRate(new Runnable() {
       @Override
