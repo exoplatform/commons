@@ -166,7 +166,7 @@ public class TemplateUtils {
       subject = cacheTemplate.get(key);
     } else {
       TemplateConfig templateConfig = getTemplateConfig(ctx.getPluginId());
-      subject = NotificationUtils.getSubject(templateConfig, ctx.getPluginId(), ctx.getLanguage());
+      subject = NotificationUtils.getSubject(templateConfig, ctx.getPluginId(), ctx.getLanguage()).addNewLine(false);
       cacheTemplate.put(key, subject);
     }
     return subject.accept(SimpleElementVistior.instance().with(ctx)).out();

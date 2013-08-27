@@ -54,7 +54,10 @@ public class SimpleElementVistior implements ElementVisitor {
   public ElementVisitor visit(Element element) {
     String value = transformer.from(element.getTemplate()).transform(this.ctx);
     try {
-      writer.append(value).append(BREAK_LINE);
+      writer.append(value);
+      if (element.isNewLine()) {
+        writer.append(BREAK_LINE);
+      }
     } catch (IOException e) {
       ctx.setException(e);
     }

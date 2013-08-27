@@ -70,7 +70,7 @@ public class TemplateTestCase extends TestCase {
   }
   
   public void testInstantlyMail() throws Exception {
-    Element instantly = makeDigestMore();
+    Element instantly = makeDigestMore().addNewLine(true);
     ElementVisitor visitor = SimpleElementVistior.instance();
     TemplateContext context = new TemplateContext();
     
@@ -83,7 +83,7 @@ public class TemplateTestCase extends TestCase {
   }
   
   public void testDigestOne() throws Exception {
-    Element instantly = makeDigestOne();
+    Element instantly = makeDigestOne().addNewLine(true);
     ElementVisitor visitor = SimpleElementVistior.instance();
     TemplateContext context = new TemplateContext();
     
@@ -95,7 +95,7 @@ public class TemplateTestCase extends TestCase {
   }
   
   public void testDigestThree() throws Exception {
-    Element instantly = makeDigestThree();
+    Element instantly = makeDigestThree().addNewLine(true);
     ElementVisitor visitor = SimpleElementVistior.instance();
     TemplateContext context = new TemplateContext();
     
@@ -107,7 +107,7 @@ public class TemplateTestCase extends TestCase {
   }
   
   public void testDigestMore() throws Exception {
-    Element instantly = makeDigestThree();
+    Element instantly = makeDigestThree().addNewLine(true);
     ElementVisitor visitor = SimpleElementVistior.instance();
     TemplateContext context = new TemplateContext();
     

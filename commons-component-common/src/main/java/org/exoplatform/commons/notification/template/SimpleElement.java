@@ -44,6 +44,11 @@ public class SimpleElement implements Element {
    */
   private TemplateConfig templateConfig;
   
+  /**
+   * need add new line tag
+   */
+  private boolean newLine = false;
+  
   public SimpleElement() {
     this.language = Locale.ENGLISH.getLanguage();
   }
@@ -90,5 +95,16 @@ public class SimpleElement implements Element {
   @Override
   public TemplateConfig getTemplateConfig() {
     return this.templateConfig;
+  }
+
+  @Override
+  public Element addNewLine(boolean needNewLine) {
+    this.newLine = needNewLine;
+    return this;
+  }
+
+  @Override
+  public boolean isNewLine() {
+    return this.newLine;
   }
 }

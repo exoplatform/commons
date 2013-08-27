@@ -54,9 +54,9 @@ public class DigestTemplate extends SimpleElement {
   
   public DigestTemplate() {
     
-    digestOne = new SimpleElement();
-    digestThree = new SimpleElement();
-    digestMore = new SimpleElement();
+    digestOne = new SimpleElement().addNewLine(true);
+    digestThree = new SimpleElement().addNewLine(true);
+    digestMore = new SimpleElement().addNewLine(true);
   }
  
   
