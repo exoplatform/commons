@@ -26,8 +26,13 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 public class NotificationExecutorImpl implements NotificationExecutor {
+  
+  /** Logger */
+  private static final Log LOG = ExoLogger.getLogger(NotificationExecutorImpl.class);
 
   private static NotificationExecutor executor;
 
@@ -75,11 +80,18 @@ public class NotificationExecutorImpl implements NotificationExecutor {
     //
     for(NotificationCommand command : commands) {
       result &= process(ctx, command);
+      printLog(ctx);
     }
     
     commands.clear();
 
     return result;
+  }
+  
+  private void printLog(NotificationContext ctx) {
+    if (ctx.isFailed()) {
+      LOG.error("Failed to process the notification.", ctx.getException());
+    }
   }
 
   @Override
