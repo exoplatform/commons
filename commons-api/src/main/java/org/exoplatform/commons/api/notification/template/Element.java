@@ -49,4 +49,17 @@ public interface Element {
    * @return
    */
   Element config(TemplateConfig templateConfig);
+
+  /**
+   * Set the value isNewLine for the case digest
+   * @param needNewLine
+   * @return
+   */
+  Element addNewLine(boolean needNewLine);
+
+  /**
+   * Get the value of isNewLine
+   * @return
+   */
+  boolean isNewLine();
 }
