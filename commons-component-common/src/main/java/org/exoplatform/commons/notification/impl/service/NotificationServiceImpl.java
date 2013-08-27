@@ -49,6 +49,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
   @Override
   public void process(NotificationInfo notification) throws Exception {
+
     String pluginId = notification.getKey().getId();
     // if the provider is not active, do nothing
     if (CommonsUtils.getService(PluginSettingService.class).isActive(pluginId) == false) {
@@ -57,6 +58,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     //
     UserSettingService notificationService = CommonsUtils.getService(UserSettingService.class);
     List<String> userIds = notification.getSendToUserIds();
+    //
     if (notification.isSendAll()) {
       userIds = notificationService.getUserSettingByPlugin(pluginId);
     }
@@ -79,7 +81,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       }
     }
 
-    if (userIdPendings.size() > 0) {
+    if (userIdPendings.size() > 0 || notification.isSendAll()) {
       notification.to(userIdPendings);
       storage.save(notification);
     }
@@ -151,7 +153,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     send(digest, mailService, usersDefaultSettings, true);
     
     //Clear all stored message
-    storage.removeMessageCallBack();
+    storage.removeMessageAfterSent();
   }
   
   private void send(DigestorService digest, MailService mail, List<UserSetting> userSettings, boolean isDefault) {

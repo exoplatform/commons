@@ -105,6 +105,10 @@ public class NotificationConfiguration implements Startable {
   public int getDayOfMonthend() {
     return dayOfMonthend;
   }
+  
+  public void setDayOfWeekend(int dayOfWeekend) {
+    this.dayOfWeekend = dayOfWeekend;
+  }
 
   private String getValueParam(InitParams params, String key, String defaultValue) {
     try {

@@ -78,7 +78,7 @@ public abstract class AbstractService {
 
   public static final String NOTIFICATION_HOME_NODE   = "eXoNotification";
   
-  public static final String PREFIX_MESSAGE_HOME_NODE = "messageHome";
+  public static final String MESSAGE_HOME_NODE        = "messageHome";
   
   public static final String PROVIDER_HOME_NODE       = "providerHome";
 
@@ -139,7 +139,7 @@ public abstract class AbstractService {
   protected Node getMessageNodeByPluginId(SessionProvider sProvider, String workspace, String pluginId) throws Exception {
     Node root = getNotificationHomeNode(sProvider, workspace);
     // rootPath = "/eXoNotification/messageHome/"
-    Node messageHome = getOrCreateNode(root, PREFIX_MESSAGE_HOME_NODE);
+    Node messageHome = getOrCreateNode(root, MESSAGE_HOME_NODE);
     // pluginPath = /eXoNotification/messageHome/<pluginId>/
     return getOrCreateNode(messageHome, pluginId);
   }

@@ -71,7 +71,7 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     
   }
   
-  public void testNormalGetByUserAndCallBack() throws Exception {
+  public void testNormalGetByUserAndRemoveMessagesSent() throws Exception {
     NotificationInfo notification = saveNotification();
     UserSetting userSetting = UserSetting.getInstance();
     userSetting.setUserId("root")
@@ -98,13 +98,15 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     assertEquals(1, list.size());
     
     
-    notificationDataStorage.removeMessageCallBack();
+    notificationDataStorage.removeMessageAfterSent();
     
     node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
     assertNull(node);
   }
 
-  public void testSpecialGetByUserAndCallBack() throws Exception {
+  public void testSpecialGetByUserAndRemoveMessagesSent() throws Exception {
+    NotificationConfiguration configuration = getService(NotificationConfiguration.class);
+    int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
     NotificationInfo notification = NotificationInfo.instance();
     Map<String, String> params = new HashMap<String, String>();
     params.put("objectId", "idofobject");
@@ -115,28 +117,34 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     UserSetting userSetting = UserSetting.getInstance();
     userSetting.setUserId("root").addProvider("TestPlugin", FREQUENCY.DAILY);
     userSetting.setActive(true);
-    
+    // Test send to daily
+    configuration.setDayOfWeekend(currentDay + 1);
     Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(userSetting);
     
     List<NotificationInfo> list = map.get(new NotificationKey("TestPlugin"));
     assertEquals(1, list.size());
     
     assertTrue(list.get(0).equals(notification));
-    // after sent, user demo will auto remove from property daily
+    // check value from node
     Node node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
     assertNotNull(node);
     
-    NotificationInfo notification2 = fillModel(node);
+    assertEquals(NotificationInfo.FOR_ALL_USER, fillModel(node).getSendToDaily()[0]);
+    // remove value on property sendToDaily
+    notificationDataStorage.removeMessageAfterSent();
+
+    // after sent, the value on on property sendToDaily will auto removed
+    node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
+    assertEquals(0, fillModel(node).getSendToDaily().length);
     
-    assertEquals(NotificationInfo.FOR_ALL_USER, notification2.getSendToDaily()[0]);
-    
+    // Test send to weekly
+    configuration.setDayOfWeekend(currentDay);
     userSetting.setUserId("demo").addProvider("TestPlugin", FREQUENCY.WEEKLY);
     map = notificationDataStorage.getByUser(userSetting);
     list = map.get(new NotificationKey("TestPlugin"));
     assertEquals(1, list.size());
     
-    
-    notificationDataStorage.removeMessageCallBack();
+    notificationDataStorage.removeMessageAfterSent();
     
     node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
     assertNull(node);

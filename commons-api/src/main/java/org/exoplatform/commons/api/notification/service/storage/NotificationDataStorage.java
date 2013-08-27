@@ -30,6 +30,6 @@ public interface NotificationDataStorage {
   
   Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting userSetting);
 
-  void removeMessageCallBack() throws Exception;
+  void removeMessageAfterSent() throws Exception;
   
 }

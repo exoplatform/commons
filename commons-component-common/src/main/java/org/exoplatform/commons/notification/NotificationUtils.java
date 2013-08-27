@@ -183,16 +183,19 @@ public class NotificationUtils {
     }
     //
     stime = stime.toLowerCase();
-    int m = 0;
-    int h = (stime.indexOf("pm") > 0) ? 12 : 0;
+    int m = 0, h;
+    int p = (stime.indexOf("pm") > 0) ? 12 : 0;
 
     stime = stime.replace("am", "").replace("pm", "").trim();
     if(stime.indexOf(":") > 0) {
       String []strs = stime.split(":");
-      h += Integer.parseInt(strs[0].trim());
+      h = Integer.parseInt(strs[0].trim());
       m = Integer.parseInt(strs[1].trim());
     } else {
-      h += Integer.parseInt(stime);
+      h = Integer.parseInt(stime);
+    }
+    if (h < 12) {
+      h += p;
     }
     //
     h = h % 24;
