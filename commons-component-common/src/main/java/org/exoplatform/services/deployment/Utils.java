@@ -33,11 +33,19 @@ import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.impl.core.NodeImpl;
 import org.exoplatform.services.jcr.util.VersionHistoryImporter;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.owasp.validator.html.AntiSamy;
+import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.Policy;
 
 /**
  * @author benjaminmestrallet
@@ -46,6 +54,7 @@ public class Utils {
   private final static Log   LOG          = ExoLogger.getLogger(Utils.class);
   
   public static final String MAPPING_FILE = "mapping.properties";
+  private static final String POLICY_FILE_LOCATION = "jar:/conf/portal/antisamy.xml";
 
   public static Node makePath(Node rootNode, String path, String nodetype)
   throws PathNotFoundException, RepositoryException {
@@ -210,6 +219,51 @@ public class Utils {
   private static String getVersionHistory(String valueHistory) {
     String[] arrHistoryValue = valueHistory.split(";");
     return arrHistoryValue[0];
+  }
+  
+  public static String sanitize(String value) {
+    try {
+      ConfigurationManager configMan = getService(ConfigurationManager.class);
+      Policy policy = Policy.getInstance(configMan.getResource(POLICY_FILE_LOCATION));
+      AntiSamy as = new AntiSamy();
+      CleanResults cr = as.scan(value, policy);
+      value = cr.getCleanHTML();
+      return value;
+    } catch(Exception ex) {
+      return value;
+    }
+  }
+  public static String sanitizeSearch(String value) {
+    try {
+      value = sanitize(value);
+      value = value.replaceAll("<iframe", "").replaceAll("<frame", "").replaceAll("<frameset", "");
+      return value;
+    } catch(Exception ex) {
+      return value;
+    }
+  }
+  
+  /**
+   * Gets the service.
+   *
+   * @param clazz the clazz
+   *
+   * @return the service
+   */
+  public static <T> T getService(Class<T> clazz) {
+    return getService(clazz, null);
+  }
+  
+  public static <T> T getService(Class<T> clazz, String containerName) {
+    ExoContainer container = ExoContainerContext.getCurrentContainer();
+    if (containerName != null) {
+      container = RootContainer.getInstance().getPortalContainer(containerName);
+    }
+    if (container.getComponentInstanceOfType(clazz)==null) {
+      containerName = PortalContainer.getCurrentPortalContainerName();
+      container = RootContainer.getInstance().getPortalContainer(containerName);
+    }
+    return clazz.cast(container.getComponentInstanceOfType(clazz));
   }
   
 }
