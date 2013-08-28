@@ -60,7 +60,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public void save(NotificationInfo message) throws Exception {
-    LOG.info("saveNotificationMessage to jcr " + message.toString());
+    LOG.debug("saveNotificationMessage to jcr " + message.toString());
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Node messageHomeNode = getOrCreateMessageParent(sProvider, workspace, message.getKey().getId());
@@ -79,21 +79,16 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting setting) {
-    LOG.info("Get all messages notification by user " + setting.getUserId());
-    long startTime = System.currentTimeMillis();
-
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
     try {
       // for daily
-      LOG.info("Get NotificationMessage for daily... ");
       for (String pluginId : setting.getDailyProviders()) {
         putMap(notificationData, NotificationKey.key(pluginId), getNotificationMessages(sProvider, pluginId, NTF_SEND_TO_DAILY, setting.getUserId()));
       }
 
       // for weekly
       if (NotificationUtils.isWeekEnd(configuration.getDayOfWeekend())) {
-        LOG.info("Get NotificationMessage for weekly... ");
         for (String pluginId : setting.getWeeklyProviders()) {
           putMap(notificationData, NotificationKey.key(pluginId), getNotificationMessages(sProvider, pluginId, NTF_SEND_TO_WEEKLY, setting.getUserId()));
         }
@@ -103,7 +98,6 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       LOG.error("Failed to get the NotificationMessage by user: " + setting.getUserId(), e);
     }
 
-    LOG.info("And get all messages notification by user " + setting.getUserId() + " " + notificationData.size() + " .. " + (System.currentTimeMillis() - startTime) + " ms");
     return notificationData;
   }
 
@@ -220,7 +214,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
         node.save();
       }
     } catch (Exception e) {
-      LOG.info(String.format("Failed to remove property %s of value %s on node ", property, value));
+      LOG.warn(String.format("Failed to remove property %s of value %s on node ", property, value));
     }
   }
 
@@ -237,7 +231,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
         for (String nodePath : listPaths) {
           try {
             session.getItem(nodePath).remove();
-            LOG.info("Remove NotificationMessage " + nodePath);
+            LOG.debug("Remove NotificationMessage " + nodePath);
           } catch (Exception e) {
             LOG.warn("Failed to remove node of NotificationMessage " + nodePath, e);
           }
@@ -256,9 +250,12 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       if (NotificationUtils.isWeekEnd(configuration.getDayOfWeekend())) {
         Node messageHomeNode = notificationHome.getNode(MESSAGE_HOME_NODE);
         NodeIterator iterator = getNotificationNodeMessages(messageHomeNode, NTF_SEND_TO_WEEKLY, NotificationInfo.FOR_ALL_USER);
+        String nodePath;
         while (iterator.hasNext()) {
           Node node = iterator.nextNode();
+          nodePath = node.getPath();
           node.remove();
+          LOG.debug("Remove NotificationMessage " + nodePath);
         }
         session.save();
       }

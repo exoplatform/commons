@@ -31,7 +31,6 @@ import org.exoplatform.services.log.Log;
 
 public class NotificationExecutorImpl implements NotificationExecutor {
   
-  /** Logger */
   private static final Log LOG = ExoLogger.getLogger(NotificationExecutorImpl.class);
 
   private static NotificationExecutor executor;

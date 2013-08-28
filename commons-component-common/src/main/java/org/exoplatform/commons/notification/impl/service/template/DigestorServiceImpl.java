@@ -55,78 +55,54 @@ public class DigestorServiceImpl implements DigestorService {
   
   
   public MessageInfo buildMessage(Map<NotificationKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
-    LOG.info("\nBuild digest MessageInfo ....");
-    long startTime = System.currentTimeMillis();
-
     MessageInfo messageInfo = null;
-    
+
     if (notificationData == null || notificationData.size() == 0) {
       return messageInfo;
     }
 
+    long startTime = System.currentTimeMillis();
     try {
       messageInfo = new MessageInfo();
       PluginSettingService pluginService = CommonsUtils.getService(PluginSettingService.class);
       NotificationPluginContainer containerService = CommonsUtils.getService(NotificationPluginContainer.class);
-      NotificationConfiguration configuration= CommonsUtils.getService(NotificationConfiguration.class);
+      NotificationConfiguration configuration = CommonsUtils.getService(NotificationConfiguration.class);
       
       List<String> activeProviders = pluginService.getActivePluginIds();
       NotificationContext nCtx = NotificationContextImpl.cloneInstance();
       Writer writer = new StringWriter();
       for (String providerId : activeProviders) {
         List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
-        if (messages == null || messages.size() == 0)
+        if (messages == null || messages.size() == 0){
           continue;
-        
+        }
+
         AbstractNotificationPlugin plugin = containerService.getPlugin(NotificationKey.key(providerId));
         nCtx.setNotificationInfos(messages);
         plugin.buildDigest(nCtx, writer);
       }
-      
-      StringBuffer sb = ((StringWriter)writer).getBuffer();
+
+      StringBuffer sb = ((StringWriter) writer).getBuffer();
       if (sb.length() == 0) {
         return null;
       }
-      
-      String language = NotificationPluginUtils.getLanguage(userSetting.getUserId());
 
-      String fromTo = "Today";
-      Calendar periodFrom = userSetting.getLastUpdateTime();
-      long currentTime = System.currentTimeMillis();
-      long lastTime =  currentTime - periodFrom.getTimeInMillis();
-      long day = lastTime/86400000;
-      //TODO need to make utils with 
-      String pluginId = DigestDailyPlugin.ID;
-      String periodType = "Daily";
-      if(NotificationUtils.isWeekEnd(configuration.getDayOfWeekend()) &&
-          userSetting.getWeeklyProviders().size() > 0) {
-        periodType = "Weekly";
-        pluginId = DigestWeeklyPlugin.ID;
-        if(day > 7) {
-          periodFrom.setTimeInMillis(currentTime - (86400000 * 7));
-        }
-      }
-      
-      if ("Weekly".equals(periodType) == true) {
-        Locale locale = (language == null || language.length() == 0) ? Locale.ENGLISH : new Locale(language);
-        fromTo = TimeConvertUtils.getFormatDate(periodFrom.getTime(), "mmmm dd", locale);
-        fromTo += " - ";
-        fromTo += TimeConvertUtils.getFormatDate(Calendar.getInstance().getTime(), "mmmm dd, yyyy", locale);
-      }
-      
-      TemplateContext ctx = new TemplateContext(pluginId, language);
+      DigestInfo digestInfo = new DigestInfo(configuration, userSetting);
 
-      ctx.put("FIRSTNAME", NotificationPluginUtils.getFirstName(userSetting.getUserId()));
-      ctx.put("PORTAL_NAME", System.getProperty("exo.notifications.portalname", "eXo"));
-      ctx.put("PERIOD", periodType);
-      ctx.put("FROM_TO", fromTo);
+      TemplateContext ctx = new TemplateContext(digestInfo.getPluginId(), digestInfo.getLocale().getLanguage());
+
+      ctx.put("FIRSTNAME", digestInfo.getFirstName());
+      ctx.put("PORTAL_NAME", digestInfo.getPortalName());
+      ctx.put("PERIOD", digestInfo.getPeriodType());
+      ctx.put("FROM_TO", digestInfo.getFromTo());
       String subject = TemplateUtils.processSubject(ctx);
       
-      ctx.put("FOOTER_LINK", NotificationPluginUtils.getProfileUrl(userSetting.getUserId()));
+      ctx.put("FOOTER_LINK", digestInfo.getFooterLink());
       ctx.put("DIGEST_MESSAGES_LIST", sb.toString());
+
       String body = TemplateUtils.processGroovy(ctx);
 
-      messageInfo.body(body).subject(subject).to(NotificationPluginUtils.getTo(userSetting.getUserId()));
+      messageInfo.body(body).subject(subject).to(digestInfo.getSendTo());
     } catch (Exception e) {
       LOG.error("Can not build template of DigestorProviderImpl ", e);
       return null;
@@ -136,5 +112,86 @@ public class DigestorServiceImpl implements DigestorService {
     
     return messageInfo;
   }
+  
+  private class DigestInfo {
+    private String  firstName;
 
+    private String  portalName;
+
+    private String  sendTo;
+
+    private String  footerLink;
+
+    private String  fromTo     = "Today";
+
+    private String  periodType = fromTo;
+
+    private String  pluginId   = DigestDailyPlugin.ID;
+
+    private Locale  locale;
+
+    private boolean isWeekly;
+
+    public DigestInfo(NotificationConfiguration configuration, UserSetting userSetting) {
+      firstName = NotificationPluginUtils.getFirstName(userSetting.getUserId());
+      sendTo = NotificationPluginUtils.getTo(userSetting.getUserId());
+      portalName = NotificationPluginUtils.getSenderName();
+      footerLink = NotificationPluginUtils.getProfileUrl(userSetting.getUserId());
+      String language = NotificationPluginUtils.getLanguage(userSetting.getUserId());
+      locale = (language == null || language.length() == 0) ? Locale.ENGLISH : new Locale(language);
+      
+      isWeekly = (NotificationUtils.isWeekEnd(configuration.getDayOfWeekend()) && 
+                    userSetting.getWeeklyProviders().size() > 0);
+      //
+      if(isWeekly) {
+        pluginId = DigestWeeklyPlugin.ID;
+        periodType = "Weekly";
+        //
+        Calendar periodFrom = userSetting.getLastUpdateTime();
+        long t = System.currentTimeMillis() - 604800000;
+        if(t > periodFrom.getTimeInMillis()) {
+          periodFrom.setTimeInMillis(t);
+        }
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(TimeConvertUtils.getFormatDate(periodFrom.getTime(), "mmmm dd", locale))
+              .append(" - ")
+              .append(TimeConvertUtils.getFormatDate(Calendar.getInstance().getTime(), "mmmm dd, yyyy", locale));
+        fromTo = buffer.toString();
+      }
+    }
+
+    public String getFromTo() {
+      return fromTo;
+    }
+
+    public String getPeriodType() {
+      return periodType;
+    }
+
+    public String getPluginId() {
+      return pluginId;
+    }
+
+    public Locale getLocale() {
+      return locale;
+    }
+
+    public String getFirstName() {
+      return firstName;
+    }
+
+    public String getPortalName() {
+      return portalName;
+    }
+
+    public String getSendTo() {
+      return sendTo;
+    }
+
+    public String getFooterLink() {
+      return footerLink;
+    }
+
+  }
+  
 }

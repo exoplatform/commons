@@ -72,6 +72,7 @@ public class QueueMessageImpl implements QueueMessage {
     }
     //
     if (NotificationUtils.isValidEmailAddresses(message.getTo()) == false) {
+      LOG.warn(String.format("The email %s is not valid for sending notification", message.getTo()));
       return false;
     }
     messageQueue.add(message);
@@ -88,7 +89,7 @@ public class QueueMessageImpl implements QueueMessage {
         if (messageQueue.isEmpty() == false) {
           MessageInfo mailMessage = messageQueue.poll();
           mailService.sendMessage(mailMessage.makeEmailNotification());
-          LOG.info("Sent notification to user "+ mailMessage.getTo());
+          LOG.debug("Sent notification to user "+ mailMessage.getTo());
         } else {
           break;
         }
