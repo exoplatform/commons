@@ -129,7 +129,7 @@ public class TemplateTestCase extends TestCase {
     
     String got = digest.accept(visitor.with(context)).out();
     
-    assertEquals("root,demo,mary has joined intranet<br/>", got);
+    assertEquals("root,demo,mary has joined intranet", got);
   }
   
 

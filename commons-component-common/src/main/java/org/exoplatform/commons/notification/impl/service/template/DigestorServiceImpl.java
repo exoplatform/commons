@@ -71,6 +71,7 @@ public class DigestorServiceImpl implements DigestorService {
       List<String> activeProviders = pluginService.getActivePluginIds();
       NotificationContext nCtx = NotificationContextImpl.cloneInstance();
       Writer writer = new StringWriter();
+      writer.append("<ul style=\"margin: 0 0  40px; padding-left: 0; list-style-position: outside;\">");
       for (String providerId : activeProviders) {
         List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
         if (messages == null || messages.size() == 0){
@@ -81,6 +82,7 @@ public class DigestorServiceImpl implements DigestorService {
         nCtx.setNotificationInfos(messages);
         plugin.buildDigest(nCtx, writer);
       }
+      writer.append("</ul>");
 
       StringBuffer sb = ((StringWriter) writer).getBuffer();
       if (sb.length() == 0) {
