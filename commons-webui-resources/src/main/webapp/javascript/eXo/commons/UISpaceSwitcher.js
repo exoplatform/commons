@@ -283,6 +283,7 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
     container.innerHTML = "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     me.processContainerHeight(0, container);
     jQuery("#UISpaceSwitcher_spaceTitle").parent().hide();
+    jQuery(".spaceChooserPopup .spaceSearchText").parent().hide();
   }  
 }
 
