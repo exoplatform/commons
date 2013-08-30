@@ -79,8 +79,8 @@
           <groupId>xml-apis</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>xml-apis</artifactId>
-          <groupId>xml-apis-ext</groupId>
+          <artifactId>xml-apis-ext</artifactId>
+          <groupId>xml-apis</groupId>
         </exclusion>        
       </exclusions>
     </dependency>
