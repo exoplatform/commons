@@ -73,6 +73,16 @@
     <dependency>
       <groupId>org.owasp.antisamy</groupId>
       <artifactId>antisamy</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis-ext</groupId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
