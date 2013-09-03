@@ -26,14 +26,37 @@ import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugi
 
 public interface NotificationCommand {
 
+  /**
+   * Gets the plugin associated of the notification's command
+   * @return notification plugin
+   */
   AbstractNotificationPlugin getPlugin();
   
+  /**
+   * Get the notification key associated of the notification's command
+   * @return notification key
+   */
   NotificationKey getNotificationKey();
   
+  /**
+   * Build the message info from a notification's context
+   * @param ctx notification context
+   * @return message info
+   */
   MessageInfo processMessage(NotificationContext ctx);
   
+  /**
+   * Build the notification info from a notification's context
+   * @param ctx notification context
+   * @return notification info
+   */
   NotificationInfo processNotification(NotificationContext ctx);
   
+  /**
+   * Build the digest message to send daily or weekly
+   * @param ctx notification context
+   * @param writer to store the digest message
+   */
   void processDigest(NotificationContext ctx, Writer writer);
   
   

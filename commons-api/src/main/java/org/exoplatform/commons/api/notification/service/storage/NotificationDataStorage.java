@@ -26,10 +26,27 @@ import org.exoplatform.commons.api.notification.model.UserSetting;
 
 public interface NotificationDataStorage {
 
+  /**
+   * Save a notificationInfo
+   * 
+   * @param notification
+   * @throws Exception
+   */
   void save(NotificationInfo notification) throws Exception;
   
+  /**
+   * Gets the all notificationInfo of an user
+   * 
+   * @param userSetting notification setting of an user
+   * @return a map key-notificationInfo of an user
+   */
   Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting userSetting);
 
+  /**
+   * Remove all messages if they are sent
+   * 
+   * @throws Exception
+   */
   void removeMessageAfterSent() throws Exception;
   
 }

@@ -36,34 +36,47 @@ public interface PluginSettingService {
   void registerGroupConfig(GroupProviderPlugin groupConfig);
   
   /**
-   * @param pluginId
-   * @return
+   * Gets the plugin's config from a plugin's id 
+   * 
+   * @param pluginId id of the plugin
+   * @return plugin's config
    */
   PluginConfig getPluginConfig(String pluginId);
 
   /**
-   * @return
+   * Gets the list of all groups plugin
+   * 
+   * @return list of groups plugin
    */
   List<GroupProvider> getGroupPlugins();
 
   /**
-   * @param pluginId
-   * @param isActive
+   * Save a plugin
+   * 
+   * @param pluginId id of plugin to save
+   * @param isActive is this plugin active or inactive
    */
   void savePlugin(String pluginId, boolean isActive);
 
   /**
+   * Check if a plugin is active or inactive
+   * 
    * @param pluginId
    * @return
    */
   boolean isActive(String pluginId);
+  
   /**
-   * @return
+   * Gets all actives plugins id
+   * 
+   * @return list of plugin's id
    */
   List<String> getActivePluginIds();
 
   /**
-   * @return
+   * Get all actives plugins info
+   * 
+   * @return list of pluginInfo
    */
   List<PluginInfo> getActivePlugins();
 
