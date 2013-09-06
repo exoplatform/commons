@@ -234,7 +234,7 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
       + "' title='" + userSpaceName 
       + "' alt='" + userSpaceName 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + userSpaceId + "', '" + uicomponentId + "')\">" 
-        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/MyWiki.png' width='19' alt='" + userSpaceName + "'/>"
+       + "<i class='uiIconWikiMyWiki'></i>"
        + userSpaceName +
        "</a>";
   container.innerHTML = spaceDiv;
@@ -253,8 +253,8 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
   var spaceDiv = "<a class='spaceOption hover' id='UISpaceSwitcher_" + storage.portalSpaceId 
       + "' title='" + storage.portalSpaceLabel 
       + "' alt='" + storage.portalSpaceLabel 
-      + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">" 
-        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/CompanyWiki.png' width='19' alt='" + storage.portalSpaceLabel + "'/>"
+      + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">"
+         + "<i class='uiIconWikiWiki'></i>"
          + storage.portalSpaceLabel + 
        "</a>";
   container.innerHTML = spaceDiv;
@@ -268,7 +268,7 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
   var spaces = dataList.spaces;
   if (spaces) {
     var groupSpaces = '<ul>';
-    groupSpaces += "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_spaceTitle'>" + storage.spaceLabel + "</div>";
+    //groupSpaces += "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_spaceTitle'>" + storage.spaceLabel + "</div>";
     for (i = 0; i < spaces.length; i++) {
       var spaceId = spaces[i].groupId;
       var name = spaces[i].displayName;
@@ -278,9 +278,11 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
     groupSpaces += "</ul>";
     container.innerHTML = groupSpaces;
     me.processContainerHeight(spaces.length, container);
+    jQuery("#UISpaceSwitcher_spaceTitle").parent().show();
   } else {
     container.innerHTML = "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     me.processContainerHeight(0, container);
+    jQuery("#UISpaceSwitcher_spaceTitle").parent().hide();
   }  
 }
 
@@ -309,7 +311,7 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
   var container = jQuery(wikiSpaceSwitcher).find('li.' + containerClazz)[0];
   var spaces = dataList.jsonList;
   var groupSpaces = '<ul>';
-  groupSpaces += "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_spaceTitle'>" + storage.spaceLabel + "</div>";
+//  groupSpaces += "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_spaceTitle'>" + storage.spaceLabel + "</div>";
   var matchCount = 0;
   keyword = jQuery.trim(keyword);
 
@@ -332,8 +334,10 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
   if (matchCount > 0) {
     container.innerHTML = groupSpaces;
     me.processContainerHeight(matchCount, container);
+    jQuery("#UISpaceSwitcher_spaceTitle").parent().show();
   } else {
     container.innerHTML = "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    jQuery("#UISpaceSwitcher_spaceTitle").parent().hide();
     me.processContainerHeight(0, container);
   }
 };
