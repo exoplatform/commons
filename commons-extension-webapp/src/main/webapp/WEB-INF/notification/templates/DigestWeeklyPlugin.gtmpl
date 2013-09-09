@@ -40,7 +40,7 @@ import static java.util.Calendar.*;
                             <tr>
                                 <td align="left" bgcolor="#ffffff" style="background-color: #ffffff;padding: 10px 0;">
                                     <p style="margin: 10px 0;"><%=_ctx.appRes("Notification.label.SayHello")%> <%=FIRSTNAME%>,</p>
-                                    <p style="margin: 10px 0 15px;"><%=_ctx.appRes("Notification.message.DigestProvider", PORTAL_NAME)%>&nbsp;<strong style="color: #333; font-weight: bold; font-family: 'HelveticaNeue Bold', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 18px;"><%=_ctx.appRes("Notification.label.Weekly")%></strong>.
+                                    <p style="margin: 10px 0 15px;"><%=_ctx.appRes("Notification.message.DigestProvider", PORTAL_NAME)%>&nbsp;<strong style="color: #333; font-weight: bold; font-family: 'HelveticaNeue Bold', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 18px;"><%=_ctx.appRes("Notification.label.ThisWeek")%></strong>.
                                     </p>
                                     <%=DIGEST_MESSAGES_LIST%>
                                     <%
