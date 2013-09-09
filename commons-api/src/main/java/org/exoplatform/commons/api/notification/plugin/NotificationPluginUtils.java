@@ -102,16 +102,11 @@ public class NotificationPluginUtils {
   }
 
   public static String getFrom(String from) {
-    if (from != null && from.length() > 0 && from.indexOf("@") < 0) {
-      from = getEmailFormat(from);
+    if (from != null && from.length() > 0 && from.indexOf("@") > 0) {
+      return from;
     }
 
-    if (from == null || from.length() <= 0) {
-      from = getEmailFrom();
-      String senderName = getSenderName();
-      from = new StringBuffer(senderName).append("<").append(from).append(">").toString();
-    }
-    return from;
+    return new StringBuffer(getSenderName()).append("<").append(getEmailFrom()).append(">").toString();
   }
 
   public static String getEmailFrom() {
