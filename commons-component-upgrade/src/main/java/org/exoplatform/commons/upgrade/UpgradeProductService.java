@@ -20,6 +20,7 @@ public class UpgradeProductService implements Startable {
   private static final String PRODUCT_VERSION_ZERO = "0";
 
   private Set<UpgradeProductPlugin> upgradePlugins = new TreeSet<UpgradeProductPlugin>();
+  private Set<UpgradeProductPlugin> allUpgradePlugins= new TreeSet<UpgradeProductPlugin>();
   private ProductInformations productInformations = null;
   private boolean proceedUpgradeFirstRun = false;
 
@@ -51,6 +52,7 @@ public class UpgradeProductService implements Startable {
     // add only enabled plugins
     if (upgradeProductPlugin.isEnabled()) {
       upgradePlugins.add(upgradeProductPlugin);
+      allUpgradePlugins.add(upgradeProductPlugin);
     } else {
       LOG.info("UpgradePlugin: name = '" + upgradeProductPlugin.getName() + "' will be ignored, because it is not enabled.");
     }
@@ -164,5 +166,23 @@ public class UpgradeProductService implements Startable {
    * {@inheritDoc}
    */
   public void stop() {}
+  
+  /**
+   * Re-import all upgrade-plugins for service
+   */
+  public void resetService()
+  {
+    //Reset product information
+    productInformations.start();
+    
+    //Reload list Upgrade-Plugins
+    upgradePlugins.clear();
+    Iterator<UpgradeProductPlugin> iterator= allUpgradePlugins.iterator();
+    while(iterator.hasNext())
+    {
+      UpgradeProductPlugin upgradeProductPlugin= iterator.next();
+      upgradePlugins.add(upgradeProductPlugin);
+    }
+  }
 
 }

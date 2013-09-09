@@ -16,8 +16,6 @@
  */
 package org.exoplatform.webui.commons;
 
-import java.util.ResourceBundle;
-
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -37,6 +35,9 @@ import org.exoplatform.webui.core.UIPortletApplication;
 import org.exoplatform.webui.core.lifecycle.Lifecycle;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
+
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * Created by The eXo Platform SAS
@@ -101,9 +102,13 @@ public class UISpacesSwitcher extends UIContainer {
     if (!StringUtils.isEmpty(mySpaceLabel)) {
       return mySpaceLabel;
     }
-    
+    try{
     ResourceBundle bundle = RequestContext.getCurrentInstance().getApplicationResourceBundle();
     return bundle.getString("UISpaceSwitcher.title.my-space");
+    }catch(MissingResourceException ex){
+        return   "UISpaceSwitcher.title.my-space";
+
+      }
   }
   
   public void setMySpaceLabel(String mySpaceLabel) {
