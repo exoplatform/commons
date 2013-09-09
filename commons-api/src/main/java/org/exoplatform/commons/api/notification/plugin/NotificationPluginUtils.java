@@ -18,6 +18,10 @@ package org.exoplatform.commons.api.notification.plugin;
 
 import java.util.Locale;
 
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.organization.OrganizationService;
@@ -29,6 +33,12 @@ public class NotificationPluginUtils {
   public static final String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
 
   private static OrganizationService organizationService;
+  
+  private static SettingService settingService;
+  
+  public static final String NOTIFICATION_SENDER_NAME  = "exo:notificationSenderName";
+  
+  public static final String NOTIFICATION_SENDER_EMAIL = "exo:notificationSenderEmail";
 
   public static String getPortalName() {
     return getExoContainerContext().getPortalContainerName();
@@ -105,11 +115,13 @@ public class NotificationPluginUtils {
   }
 
   public static String getEmailFrom() {
-    return System.getProperty("gatein.email.smtp.from", "noreply@exoplatform.com");
+    SettingValue<?> mail = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, NOTIFICATION_SENDER_EMAIL);
+    return mail != null ? (String) mail.getValue() : System.getProperty("gatein.email.smtp.from", "noreply@exoplatform.com");
   }
 
   public static String getSenderName() {
-    return System.getProperty("exo.notifications.portalname", "eXo");
+    SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, NOTIFICATION_SENDER_NAME);
+    return name != null ? (String) name.getValue() : System.getProperty("exo.notifications.portalname", "eXo");
   }
 
   public static String getTo(String to) {
@@ -139,6 +151,14 @@ public class NotificationPluginUtils {
             .getComponentInstanceOfType(OrganizationService.class);
     }
     return organizationService;
+  }
+  
+  public static SettingService getSettingService() {
+    if (settingService == null) {
+      settingService = (SettingService) PortalContainer.getInstance()
+            .getComponentInstanceOfType(SettingService.class);
+    }
+    return settingService;
   }
   
 }
