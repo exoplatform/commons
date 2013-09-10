@@ -1,6 +1,6 @@
 .spaceChooserPopup {
   background: white;
-  border: 1px solid @tableBorder;
+  border: 1px solid @borderColor;
   left: 0px;
   min-width: 250px;
   position: absolute;
@@ -12,18 +12,18 @@
   	float: none; 
   	padding: 5px 10px;
   	display: block;
-  	color: #333333;
+  	color: @textColor;
   }
     a:hover { 
   	color: white;
   }
   .title {
 	  line-height: 30px; 
-	  border-bottom: 1px solid @tableBorder; 
+	  border-bottom: 1px solid @borderColor; 
 	  background: @grayWhiteSmoke; 
 	  padding: 0px 5px 0px 10px; 
 	  font-weight: bold; 
-	  color: #444;
+	  color: @textColor;
 	  border-radius: 4px 4px 0 0;
 	  height: 31px;
 	  .uiIconClose {
@@ -33,16 +33,16 @@
 	}
 	.spaceOption {
 	  line-height: 20px;  
-	  color: #333;
+	  color: @textColor;
 	}
 	
 	.spaceTitle {
-	  color: #333;
-	  background: #f7f7f7;
-	  border-top: 1px solid @tableBorder;
-	  border-bottom: 1px solid @tableBorder;
+	  color: @textColor;
+	  background: @grayLighter;
+	  border-top: 1px solid @borderColor;
+	  border-bottom: 1px solid @borderColor;
 	  font-weight: bold;
-	  box-shadow: 0 -15px 17px #F1F1F1 inset;
+	  box-shadow: 0 -15px 17px @grayWhiteSmoke inset;
 	  padding: 5px 0 5px 9px;
 	}
 				
@@ -54,31 +54,31 @@
 		  width: 100%; 
 		  height: 26px; 
 		  padding: 0px 5px; 
-		  border: 1px solid @tableBorder;
+		  border: 1px solid @borderColor;
 		  border-radius: @borderRadiusSmall;
 		  margin: 0px;
 		}
 	}
 	.focus {
-	  color: #696969;
+	  color: @textColor;
 	}
 	.lostFocus {
-	  color: #dedede;
+	  color: @grayLight;
 	}
 
 	.spaceList {
 	  overflow-y: auto;
-	  height: 311px !important;
+	  max-height: 311px;
 		img {
-			width: 19px;
+			.square(19px);
 			margin-right: 6px;
 		}
 	}
 	.hover:hover{
-		background-color: #517ABE;
-	    background-image: linear-gradient(to bottom, #628ACC, #3763AA);
+		background-color: @blue;
+	    background-image: linear-gradient(to bottom, @blueLighter, @blue);
 	    background-repeat: repeat-x;
-		color: white;
+		color: @white;
 		text-shadow: none;
 	}
 
