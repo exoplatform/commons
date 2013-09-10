@@ -168,7 +168,7 @@ UISpaceSwitcher.prototype.initConfigAfterReady = function(uicomponentId, isShowP
       var spacePopup = jQuery(spaceSwitcher).find("ul.spaceChooserPopup")[0];
       var dropDownButton = jQuery(spaceSwitcher).find("div.spaceChooser")[0];
   	  if (spacePopup && dropDownButton) {
-  	    spacePopup.style.width = dropDownButton.offsetWidth + "px";
+  	    spacePopup.style.width = dropDownButton.offsetWidth-2 + "px";
   	  }
     }
   }
