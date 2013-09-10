@@ -121,9 +121,10 @@ public class TestProductInformations extends BasicTestCase {
     Properties properties = new Properties();
     properties.load(new ByteArrayInputStream(binaries));
     String newVersionsContent = getPropertiesAsString(properties);
-
+    newVersionsContent = newVersionsContent.split(ProductInformations.PRODUCT_GROUP_ID)[1];
     Node plfVersionDeclarationContentNode = plfVersionDeclarationNode.getNode("jcr:content");
     String storedVersion = plfVersionDeclarationContentNode.getProperty("jcr:data").getString();
+    storedVersion = storedVersion.split(ProductInformations.PRODUCT_GROUP_ID)[1];
     assertEquals(newVersionsContent, storedVersion);
   }
 
@@ -146,6 +147,11 @@ public class TestProductInformations extends BasicTestCase {
 
     }
     return stringWriter.toString();
+  }
+
+  @Override
+  public void tearDown() throws Exception {
+   super.tearDown();
   }
 
 }
