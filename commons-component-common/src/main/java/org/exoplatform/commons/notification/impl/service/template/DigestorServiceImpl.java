@@ -95,6 +95,7 @@ public class DigestorServiceImpl implements DigestorService {
 
       ctx.put("FIRSTNAME", digestInfo.getFirstName());
       ctx.put("PORTAL_NAME", digestInfo.getPortalName());
+      ctx.put("PORTAL_HOME", digestInfo.getPortalHome());
       ctx.put("PERIOD", digestInfo.getPeriodType());
       ctx.put("FROM_TO", digestInfo.getFromTo());
       String subject = TemplateUtils.processSubject(ctx);
@@ -119,6 +120,8 @@ public class DigestorServiceImpl implements DigestorService {
     private String  firstName;
 
     private String  portalName;
+    
+    private String  portalHome;
 
     private String  sendTo;
 
@@ -138,6 +141,7 @@ public class DigestorServiceImpl implements DigestorService {
       firstName = NotificationPluginUtils.getFirstName(userSetting.getUserId());
       sendTo = NotificationPluginUtils.getTo(userSetting.getUserId());
       portalName = NotificationPluginUtils.getSenderName();
+      portalHome = NotificationPluginUtils.getPortalHome(portalName);
       footerLink = NotificationPluginUtils.getProfileUrl(userSetting.getUserId());
       String language = NotificationPluginUtils.getLanguage(userSetting.getUserId());
       locale = (language == null || language.length() == 0) ? Locale.ENGLISH : new Locale(language);
@@ -184,6 +188,10 @@ public class DigestorServiceImpl implements DigestorService {
 
     public String getPortalName() {
       return portalName;
+    }
+
+    public String getPortalHome() {
+      return portalHome;
     }
 
     public String getSendTo() {

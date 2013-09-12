@@ -118,6 +118,18 @@ public class NotificationPluginUtils {
     SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, NOTIFICATION_SENDER_NAME);
     return name != null ? (String) name.getValue() : System.getProperty("exo.notifications.portalname", "eXo");
   }
+  
+  public static String getPortalHome(String portalName) {
+    StringBuffer portalLink = new StringBuffer(getDomain());
+    portalLink.append("/")
+              .append(getExoContainerContext().getRestContextName())
+              .append("/")
+              .append("social/notifications/redirectUrl/portal_home")
+              .append("/")
+              .append(portalName);
+    
+    return "<a target=\"_blank\" href=\"" + portalLink.toString() + "\">" + portalName + "</a>";
+  }
 
   public static String getTo(String to) {
     if (to.indexOf("@") < 0) {
