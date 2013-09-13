@@ -105,7 +105,8 @@ public class DigestorServiceImpl implements DigestorService {
 
       String body = TemplateUtils.processGroovy(ctx);
 
-      messageInfo.body(body).subject(subject).to(digestInfo.getSendTo());
+      messageInfo.from(NotificationPluginUtils.getFrom(null)).subject(subject)
+                 .body(body).to(digestInfo.getSendTo());
     } catch (Exception e) {
       LOG.error("Can not build template of DigestorProviderImpl ", e);
       return null;
