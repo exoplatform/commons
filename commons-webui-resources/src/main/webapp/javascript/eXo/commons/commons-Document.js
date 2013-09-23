@@ -629,7 +629,7 @@ function UIDSUpload() {
 	};
 
 	UIDSUpload.prototype.createUploadEntryForFF = function(idoc, uploadId, isAutoUpload){
-	  var uploadAction = eXo.env.server.context + "/upload?" ;
+	  var uploadAction = _module.UIDSUpload.restContext + "/upload?" ;
 	  uploadAction += "uploadId=" + uploadId+"&action=upload" ; 
 	    
 	  var newDoctype = document.implementation.createDocumentType('html','-//W3C//DTD XHTML 1.0 Transitional//EN','http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'); 
@@ -738,8 +738,8 @@ function UIDSUpload() {
 	    	if (unit == "MB") realLimit *= 1024 * 1024;
 	    	if (unit == "GB") realLimit *= 1024 * 1024 * 1024;
 	    	if (realLimit < total) {
-	  	      this.abortUpload(elementId);
-		      //var message = eXo.core.DOMUtil.findFirstChildByClass(container, "div", "LimitMessage").innerHTML ;
+    		  this.abortUpload(elementId);
+    		  //var message = eXo.core.DOMUtil.findFirstChildByClass(container, "div", "LimitMessage").innerHTML ;
 		      var message = jQuery("div.LimitMessage:first-child").html();
 		      alert(message.replace("{0}", limit).replace("{1}", unit)) ;
 		      return;
