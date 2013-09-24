@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
@@ -169,6 +171,13 @@ public class TemplateUtils {
       subject = NotificationUtils.getSubject(templateConfig, ctx.getPluginId(), ctx.getLanguage()).addNewLine(false);
       cacheTemplate.put(key, subject);
     }
+    
+    //The title of activity is escaped on social, then we need to unescape it to process the send email
+    String value = (String) ctx.get("ACTIVITY");
+    if (value != null) {
+      ctx.put("ACTIVITY", StringEscapeUtils.unescapeHtml(value));
+    }
+    
     return subject.accept(SimpleElementVistior.instance().with(ctx)).out();
   }
 
