@@ -1,31 +1,10 @@
-<%
-import static java.util.Calendar.*;
-%>
 <table border="0" cellpadding="0" cellspacing="0" width="600" bgcolor="#ffffff" align="center" style="background-color: #ffffff; font-size: 13px;color:#333333;line-height: 18px;font-family: HelveticaNeue, Helvetica, Arial, sans-serif;">
     <tr>
         <td align="center"  valign="middle" >
             <table  cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" align="center" style="border:1px solid #d8d8d8;">
                 <tr>
                     <td  height="45" valign="middle" style="margin:0;height:45px;font-weight:bold;vertical-align:middle; background-color: #efefef; font-family: 'HelveticaNeue Bold', Helvetica, Arial, sans-serif;color:#2f5e92;font-size:18px;text-align:center">
-                        <% 
-                           def nowCal = Calendar.instance;
-                           def y = nowCal.get(Calendar.YEAR);
-                           Date nowDate = nowCal.time;
-                           def m = nowDate[Calendar.MONTH] + 1;
-                           def d = nowDate[Calendar.DATE];
-                           
-                           int cdow = nowCal.get(Calendar.DAY_OF_WEEK);
-                           Calendar lastFri = (Calendar) nowCal.clone();
-                           lastFri.add(Calendar.DATE, -7 - (cdow - Calendar.FRIDAY));
-                           
-                           def lastFriYear = lastFri.get(Calendar.YEAR);
-                           Date lastFriDate = lastFri.time;
-                           def lastFriMonth = lastFriDate[Calendar.MONTH] + 1;
-                           def lastFriDay = lastFriDate[Calendar.DATE];
-                           
-                           String dateTime =  lastFriMonth + "/" + lastFriDay + "/" + lastFriYear + " - " + m + "/" + d + "/" + y;
-                        %>
-                        <%=_ctx.appRes("Notification.title.DigestProvider", PORTAL_HOME, dateTime)%>
+                        <%=_ctx.appRes("Notification.title.DigestProvider", PORTAL_HOME, _ctx.appRes("Notification.label.ThisWeek"))%>
                     </td>
                 </tr>
             </table>
