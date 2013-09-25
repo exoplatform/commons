@@ -99,8 +99,7 @@ public class UpgradeProductService implements Startable {
           for (int i = 0; i < upgradePluginNames.length; i++) {
             if (upgradePlugins.size() > 0) {
               Iterator<UpgradeProductPlugin> iterator= upgradePlugins.iterator();
-              while(iterator.hasNext())
-              {
+              while(iterator.hasNext()) {
                 UpgradeProductPlugin upgradeProductPlugin= iterator.next();
                 if (upgradeProductPlugin.getName().equals(upgradePluginNames[i])) {
                   doUpgrade(upgradeProductPlugin, i);
@@ -108,11 +107,6 @@ public class UpgradeProductService implements Startable {
                   break;
                 }
               }
-            } else {
-              // If the upgradePluginNames array contains more elements
-              // than the upgradePlugins list, ignore these plugins.
-              LOG.warn(upgradePluginNames[i] + " will be ignored!. \"" + PLUGINS_ORDER
-                  + "\" property contains more elements than it should...");
             }
           }
           // If the upgradePluginNames array contains less elements than
