@@ -33,14 +33,19 @@ import org.exoplatform.services.mail.MailService;
 
 public class QueueMessageImpl implements QueueMessage {
   
-  private static final Log LOG = ExoLogger.getExoLogger(QueueMessageImpl.class);
+  private static final Log               LOG                   = ExoLogger.getExoLogger(QueueMessageImpl.class);
+
+  private static final String            MAX_TO_SEND_SYS_KEY   = "conf.notification.service.QueueMessage.maxToSend";
+  private static final String            MAX_TO_SEND_KEY       = "maxToSend";
+  private static final String            DELAY_TIME_SYS_KEY    = "conf.notification.service.QueueMessage.delayTime";
+  private static final String            DELAY_TIME_KEY        = "delayTime";
+  private static final String            INITIAL_DELAY_SYS_KEY = "conf.notification.service.QueueMessage.initialDelay";
+  private static final String            INITIAL_DELAY_KEY     = "initialDelay";
   
-  private final static Queue<MessageInfo> messageQueue = new ConcurrentLinkedQueue<MessageInfo>();
+  private final Queue<MessageInfo> messageQueue = new ConcurrentLinkedQueue<MessageInfo>();
   
   private int MAX_TO_SEND;
-  
   private int DELAY_TIME;
-  
   private int INITIAL_DELAY;
   
   private MailService mailService;
@@ -49,10 +54,9 @@ public class QueueMessageImpl implements QueueMessage {
   
   public QueueMessageImpl(InitParams params) {
     
-    MAX_TO_SEND = Integer.parseInt(params.getValueParam("maxToSend").getValue());
-    DELAY_TIME = Integer.parseInt(params.getValueParam("delayTime").getValue());
-    INITIAL_DELAY = Integer.parseInt(params.getValueParam("initialDelay").getValue());
-    
+    MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 50);
+    DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120);
+    INITIAL_DELAY = NotificationUtils.getSystemValue(params, INITIAL_DELAY_SYS_KEY, INITIAL_DELAY_KEY, 60);
     this.mailService = CommonsUtils.getService(MailService.class);
     
     scheduler.scheduleAtFixedRate(new Runnable() {

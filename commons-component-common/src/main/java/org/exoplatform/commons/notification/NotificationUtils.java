@@ -38,6 +38,7 @@ import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.notification.template.DigestTemplate;
 import org.exoplatform.commons.notification.template.SimpleElement;
 import org.exoplatform.commons.notification.template.TemplateUtils;
+import org.exoplatform.container.xml.InitParams;
 
 
 public class NotificationUtils {
@@ -140,6 +141,38 @@ public class NotificationUtils {
   
   public static boolean isInteger(String str) {
     return patternInteger.matcher(str).matches();
+  }
+
+  public static String getValueParam(InitParams params, String key, String defaultValue) {
+    try {
+      return params.getValueParam(key).getValue();
+    } catch (Exception e) {
+      return defaultValue;
+    }
+  }
+
+  public static int getValueParam(InitParams params, String key, int defaultValue) {
+    try {
+      return Integer.valueOf(params.getValueParam(key).getValue());
+    } catch (Exception e) {
+      return defaultValue;
+    }
+  }
+
+  public static String getSystemValue(InitParams params, String systemKey, String paramKey, String defaultValue) {
+    try {
+      String vl = System.getProperty(systemKey);
+      if (vl == null || vl.length() == 0) {
+        vl = getValueParam(params, paramKey, defaultValue);
+      }
+      return vl.trim();
+    } catch (Exception e) {
+      return defaultValue;
+    }
+  }
+  
+  public static int getSystemValue(InitParams params, String systemKey, String paramKey, int defaultValue) {
+    return Integer.valueOf(getSystemValue(params, systemKey, paramKey, String.valueOf(defaultValue)));
   }
 
   public static int getDayOfWeek(String dayName) {

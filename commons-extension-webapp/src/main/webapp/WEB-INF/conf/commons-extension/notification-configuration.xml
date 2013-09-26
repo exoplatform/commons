@@ -99,11 +99,13 @@
           <property name="job" value="org.exoplatform.commons.notification.job.NotificationJob"/>
           <property name="period" value="0"/>
           <property name="repeatCount" value="0"/>
-          <property name="repeatTime" value="1d"/><!-- repeat interval call make email notification -->
-                                                  <!-- The value is number of m/h/d or +time milliseconds (ex: +180000)-->
+          <!-- repeat interval call make email notification -->
+          <property name="repeatTime" value="${job.notification.NotificationPeriodJob.repeatTime:1d}"/>
+                                              <!-- The value is number of m/h/d or +time milliseconds (ex: +180000)-->
 
-          <property name="startAtTime" value="11:30PM"/><!-- The start time will call make email notification -->
-                                                        <!-- The value is number hours of a day: 23, 11:15AM, 11:20PM -->
+          <!-- The start time will call make email notification -->
+          <property name="startAtTime" value="${job.notification.NotificationPeriodJob.startAtTime:11:30PM}"/>
+                                              <!-- The value is number hours of a day: 23, 11:15AM, 11:20PM -->
           <property name="endTime" value=""/>               
         </properties-param>
       </init-params>

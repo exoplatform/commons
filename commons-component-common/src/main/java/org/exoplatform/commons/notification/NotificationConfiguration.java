@@ -25,6 +25,9 @@ import org.exoplatform.container.xml.InitParams;
 public class NotificationConfiguration implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  private static final String DAY_OF_WEEK_END_SYS_KEY   = "conf.notification.NotificationConfiguration.dayOfWeekend";
+  private static final String DAY_OF_WEEK_END_KEY       = "dayOfWeekend";
+
   private String            workspace        = AbstractService.DEFAULT_WORKSPACE_NAME;
 
   private int               dayOfWeekend     = 6;
@@ -32,9 +35,12 @@ public class NotificationConfiguration implements Serializable {
   private int               dayOfMonthend    = 28;
 
   public NotificationConfiguration(InitParams params) {
-    this.workspace = getValueParam(params, AbstractService.WORKSPACE_PARAM, AbstractService.DEFAULT_WORKSPACE_NAME);
-    this.dayOfWeekend = NotificationUtils.getDayOfWeek(getValueParam(params, "dayOfWeekend", String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK))));
-    this.dayOfMonthend = getValueParam(params, "dayOfMonthend", 28);
+    this.workspace = NotificationUtils.getValueParam(params, AbstractService.WORKSPACE_PARAM, AbstractService.DEFAULT_WORKSPACE_NAME);
+
+    String defaultDayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+    String dayOfWeekName = NotificationUtils.getSystemValue(params, DAY_OF_WEEK_END_SYS_KEY, DAY_OF_WEEK_END_KEY, defaultDayName);
+    this.dayOfWeekend = NotificationUtils.getDayOfWeek(dayOfWeekName);
+    this.dayOfMonthend = NotificationUtils.getValueParam(params, "dayOfMonthend", 28);
   }
 
   public String getWorkspace() {
@@ -57,22 +63,6 @@ public class NotificationConfiguration implements Serializable {
   
   public void setDayOfWeekend(int dayOfWeekend) {
     this.dayOfWeekend = dayOfWeekend;
-  }
-
-  private String getValueParam(InitParams params, String key, String defaultValue) {
-    try {
-      return params.getValueParam(key).getValue();
-    } catch (Exception e) {
-      return defaultValue;
-    }
-  }
-
-  private int getValueParam(InitParams params, String key, int defaultValue) {
-    try {
-      return Integer.valueOf(params.getValueParam(key).getValue());
-    } catch (Exception e) {
-      return defaultValue;
-    }
   }
 
 }

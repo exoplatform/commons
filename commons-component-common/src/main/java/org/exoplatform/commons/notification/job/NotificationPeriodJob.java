@@ -31,7 +31,6 @@ public class NotificationPeriodJob extends PeriodJob {
   public NotificationPeriodJob(InitParams params) throws Exception {
     super(params);
     ExoProperties props = params.getPropertiesParam("job.info").getProperties();
-
     String startAtTime = getValueParam(props, "startAtTime", "23:30");
     String period = getValueParam(props, "repeatTime", "1d");
     Date startTime = NotificationUtils.getStartTime(startAtTime);
