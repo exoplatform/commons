@@ -27,6 +27,13 @@ import javax.jcr.NodeIterator;
 import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
@@ -37,6 +44,9 @@ import org.exoplatform.services.deployment.Utils;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.Constants;
+import org.exoplatform.services.jcr.impl.util.ISO9075;
+import org.exoplatform.services.jcr.impl.util.NodeTypeRecognizer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -92,11 +102,26 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
         // sourcePath should start with: war:/, jar:/, classpath:/, file:/
         String versionHistoryPath = deploymentDescriptor.getVersionHistoryPath();
         Boolean cleanupPublication = deploymentDescriptor.getCleanupPublication();
-
+        String nodeName = getNodeName(configurationManager.getInputStream(sourcePath));
         InputStream inputStream = configurationManager.getInputStream(sourcePath);
+        
         Session session = sessionProvider.getSession(deploymentDescriptor.getTarget()
                                                                          .getWorkspace(),
                                                      repository);
+        Node tnode = (Node) session.getItem(deploymentDescriptor.getTarget().getNodePath());
+        if (tnode.hasNode(nodeName)) {
+        	LOG.info("Deleting nodes " + deploymentDescriptor.getTarget().getNodePath() + "/" + nodeName + " to be replaced by "
+    	            + deploymentDescriptor.getSourcePath());
+ 	        NodeIterator nodeIterator = tnode.getNodes(nodeName);
+	        while (nodeIterator.hasNext()) {
+	          Node targetNode = nodeIterator.nextNode();
+	          LOG.info(" - Remove " + targetNode.getPath());
+
+	          targetNode.remove();
+	          session.save();
+	        }
+	        }
+        
         session.importXML(deploymentDescriptor.getTarget().getNodePath(),
                           inputStream,
                           ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
@@ -155,5 +180,53 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
       throw ex;
     }
   }
+
+  private String getNodeName(InputStream stream) throws Exception {
+	    String nodeToImportName = null;
+	    XMLInputFactory factory = XMLInputFactory.newInstance();
+	    XMLEventReader reader = null;
+	    try {
+	      reader = factory.createXMLEventReader(stream);
+
+	      XMLEvent event = null;
+	      do {
+	        event = reader.nextEvent();
+	      } while (reader.hasNext() && (event.getEventType() != XMLStreamConstants.START_ELEMENT));
+	      if (event.getEventType() != XMLStreamConstants.START_ELEMENT) {
+	        throw new IllegalStateException("Content isn't lisible");
+	      }
+	      StartElement element = event.asStartElement();
+	      QName name = element.getName();
+	      switch (NodeTypeRecognizer.recognize(name.getNamespaceURI(), name.getPrefix() + ":" + name.getLocalPart())) {
+	        case DOCVIEW:
+	          if (name.getPrefix() == null || name.getPrefix().isEmpty()) {
+	            nodeToImportName = ISO9075.decode(name.getLocalPart());
+	          } else {
+	            nodeToImportName = ISO9075.decode(name.getPrefix() + ":" + name.getLocalPart());
+	          }
+	          break;
+	        case SYSVIEW:
+	          @SuppressWarnings("rawtypes")
+	          Iterator attributes = element.getAttributes();
+	          while (attributes.hasNext() && nodeToImportName == null) {
+	            Attribute attribute = (Attribute) attributes.next();
+	            if ((attribute.getName().getNamespaceURI() + ":" + attribute.getName().getLocalPart()).equals(Constants.SV_NAME_NAME
+	                .getNamespace() + ":" + Constants.SV_NAME_NAME.getName())) {
+	              nodeToImportName = attribute.getValue();
+	              break;
+	            }
+	          }
+	          break;
+	        default:
+	          throw new IllegalStateException("There was an error during ascertaining the " + "type of document. First element ");
+	      }
+	    } finally {
+	      if (reader != null) {
+	        reader.close();
+	        stream.close();
+	      }
+	    }
+	    return nodeToImportName;
+	  }
 
 }
