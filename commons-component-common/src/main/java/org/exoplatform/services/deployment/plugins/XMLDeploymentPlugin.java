@@ -38,6 +38,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ObjectParameter;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.deployment.DeploymentDescriptor;
 import org.exoplatform.services.deployment.DeploymentPlugin;
 import org.exoplatform.services.deployment.Utils;
@@ -102,13 +103,19 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
         // sourcePath should start with: war:/, jar:/, classpath:/, file:/
         String versionHistoryPath = deploymentDescriptor.getVersionHistoryPath();
         Boolean cleanupPublication = deploymentDescriptor.getCleanupPublication();
-        String nodeName = getNodeName(configurationManager.getInputStream(sourcePath));
+        ValueParam valueParam = initParams.getValueParam("override");
+        boolean overrideData = false;
+        if (valueParam != null) {
+            overrideData = "true".equals(valueParam.getValue());
+        }
         InputStream inputStream = configurationManager.getInputStream(sourcePath);
         
         Session session = sessionProvider.getSession(deploymentDescriptor.getTarget()
                                                                          .getWorkspace(),
                                                      repository);
-        Node tnode = (Node) session.getItem(deploymentDescriptor.getTarget().getNodePath());
+        if (overrideData){
+        	Node tnode = (Node) session.getItem(deploymentDescriptor.getTarget().getNodePath());
+            String nodeName = getNodeName(configurationManager.getInputStream(sourcePath));
         if (tnode.hasNode(nodeName)) {
         	LOG.info("Deleting nodes " + deploymentDescriptor.getTarget().getNodePath() + "/" + nodeName + " to be replaced by "
     	            + deploymentDescriptor.getSourcePath());
@@ -121,6 +128,7 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
 	          session.save();
 	        }
 	        }
+        }
         
         session.importXML(deploymentDescriptor.getTarget().getNodePath(),
                           inputStream,
