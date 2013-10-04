@@ -17,42 +17,42 @@
 package org.exoplatform.commons.api.settings.data;
 
 /**
- * This class allow a user to be able to save some settings linked to a scope.
+ * Saves some settings linked to a scope.
  * @LevelAPI Experimental
  */
 public enum Scope {   
   /**
-   * Settings for portlets or gadgets. 
+   * Settings of portlets or gadgets. 
    * @LevelAPI Experimental
    */
   WINDOWS,
   /**
-   * Settings for a page.
+   * Settings of pages.
    * @LevelAPI Experimental 
    */
   PAGE, 
   /**
-   * Settings for a space.
+   * Settings of spaces.
    * @LevelAPI Experimental 
    */
   SPACE, 
   /**
-   * Settings for one site in one portal.
+   * Settings of sites.
    * @LevelAPI Experimental
    */
   SITE, 
   /**
-   * Settings for the entire portal (and all these sites).
+   * Settings of the entire portal (and all its sites).
    * @LevelAPI Experimental 
    */
   PORTAL, 
   /**
-   * Settings for an application like Forum, Content, Social, etc.
+   * Settings of an application, like Forum, Content, or Social.
    * @LevelAPI Experimental 
    */
   APPLICATION, 
   /**
-   * Settings for the platform (for all sites and portals).
+   * Settings of the whole eXo Platform (all sites and portals).
    * @LevelAPI Experimental
    */
   GLOBAL;

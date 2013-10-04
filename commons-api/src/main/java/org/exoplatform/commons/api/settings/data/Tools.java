@@ -18,15 +18,15 @@ package org.exoplatform.commons.api.settings.data;
 
 
 /**
- * This class is useful to build the path of object saved in Jcr.
+ * This class is useful to build the object path saved in JCR.
  * @LevelAPI Experimental
  */
 public class Tools {
   /**
-   * Build the path to a specified scope in database
-   * @param context context with which the path is to be associated
-   * @param scope   scope with which the path is to be associated
-   * @return path to setting data zone of this scope in the database
+   * Builds a path of a specified scope in the database.
+   * @param context The context with which the path is associated.
+   * @param scope The scope with which the path is associated.
+   * @return The scope path.
    * @LevelAPI Experimental
    */
   public static String buildScopePath(Context context, Scope scope) {
@@ -39,9 +39,9 @@ public class Tools {
     return path.toString();
   }
   /**
-   * Build path to a specified context in database
-   * @param context context with which the path is to be associated
-   * @return path to setting data zone of specified context in the database
+   * Builds a path of a specified context in the database.
+   * @param context The context with which the path is associated.
+   * @return The context path.
    * @LevelAPI Experimental
    */
   public static String buildContextPath(Context context) {
@@ -53,11 +53,11 @@ public class Tools {
     return path.toString();
   }
   /**
-   * Build path of a specified setting property stored in database
-   * @param context associated context to setting property 
-   * @param scope   associated scope to setting property 
-   * @param key   associated key to setting property 
-   * @return path to a specified setting properties in the database
+   * Builds a path of a specified setting property stored in the database.
+   * @param context Context of the setting property. 
+   * @param scope Scope of the setting property.
+   * @param key Key of the setting property.
+   * @return The path of the specified setting property.
    * @LevelAPI Experimental
    */
   public static String buildFullPath(Context context, Scope scope, String key) {

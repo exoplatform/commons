@@ -1,4 +1,4 @@
 /**
- * Provides the class API that other connectors might implement for indexing business. So connector can communicate to indexing service side for any indexing operation itself
+ * Provides the API that connectors might implement for indexing business. Thus, the connectors can communicate with the indexing service for any indexing operation itself.
  */
 package org.exoplatform.commons.api.indexing;

@@ -21,77 +21,77 @@ import java.io.InputStream;
 import java.util.Date;
 
 /**
- * File object instance.
+ * An abstract representation of file.
  * @LevelAPI Experimental
  */
 public interface File extends BaseObject {
 
     /**
-     * Return the binary data of <code>File</code> instance
-     * @return The value of jcr:data property which stored inside jcr:content node.
+     * Gets the binary data of the <code>File</code> instance.
+     * @return Value of the jcr:data property which is stored inside the jcr:content node.
      * @LevelAPI Experimental
      */
     public InputStream getData();
 
     /**
-     * Return the MIMETYPE of <code>File</code> instance.
-     * @return The value of jcr:mimeType property which stored inside jcr:content node.
+     * Gets the MIMETYPE of the <code>File</code> instance.
+     * @return Value of the jcr:mimeType property which is stored inside the jcr:content node.
      * @LevelAPI Experimental
      */
     public String getMimeType();
     
     /**
-     * Return the last modified date of <code>File</code> instance.
-     * @return The value of jcr:lastModified property which stored inside jcr:content node.
+     * Gets the last modified date of the <code>File</code> instance.
+     * @return Value of the jcr:lastModified property which is stored inside the jcr:content node.
      * @LevelAPI Experimental
      */
     public Date getLastModified();
     
     /**
-     * Return the encoding type of <code>File</code> instance.
-     * @return The value of jcr:encoding property which stored inside jcr:content node.
+     * Gets the encoding type of the <code>File</code> instance.
+     * @return Value of the jcr:encoding property which is stored inside the jcr:content node.
      * @LevelAPI Experimental
      */
     public String getEncoding();
     
     /**
-     * Return the creator of <code>File</code> instance.
-     * @return The value of dc:creator property which stored inside dc:elementSet mix-in node type.
+     * Gets the creator of the <code>File</code> instance.
+     * @return Value of the dc:creator property which is stored inside the dc:elementSet mixin node type.
      * @LevelAPI Experimental
      */
     public String getDCCreator();
     
     /**
-     * Return the description of <code>File</code> instance.
-     * @return The value of dc:description property which stored inside dc:elementSet mix-in node type.
+     * Gets the description of the <code>File</code> instance.
+     * @return Value of the dc:description property which is stored inside the dc:elementSet mixin node type.
      * @LevelAPI Experimental
      */
     public String getDCDescription();
     
     /**
-     * Return the contributor of <code>File</code> instance.
-     * @return The value of dc:contributor property which stored inside dc:elementSet mix-in node type.
+     * Gets the contributor of the <code>File</code> instance.
+     * @return Value of the dc:contributor property which is stored inside the dc:elementSet mixin node type.
      * @LevelAPI Experimental
      */
     public String getDCContributor();
     
     /**
-     * Return the publisher of <code>File</code> instance.
-     * @return The value of dc:publisher property which stored inside dc:elementSet mix-in node type.
+     * Gets the publisher of the <code>File</code> instance.
+     * @return Value of the dc:publisher property which is stored inside the dc:elementSet mixin node type.
      * @LevelAPI Experimental
      */
     public String getDCPublisher();
     
     /**
-     * Return the subject of <code>File</code> instance.
-     * @return The value of dc:subject property which stored inside dc:elementSet mix-in node type.
+     * Gets the subject of the <code>File</code> instance.
+     * @return Value of the dc:subject property which is stored inside the dc:elementSet mixin node type.
      * @LevelAPI Experimental
      */
     public String getDCSubject();
     
     /**
-     * Return the last updated date of <code>File</code> instance.
-     * @return The value of dc:date property which stored inside dc:elementSet mix-in node type.
+     * Gets the last updated date of the <code>File</code> instance.
+     * @return Value of the dc:date property which is stored inside the dc:elementSet mixin node type.
      * @LevelAPI Experimental
      */
     public Date getDCDate();

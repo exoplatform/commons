@@ -23,60 +23,60 @@ import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 
 /**
- * This is the central point of the event system where listeners are registered (and/or unregistered) and events fired.
- * @param <S> This is a generic object of source, it can be a File/Folder/Content or something else 
- * which should be extended from <code>BaseObject</code>.
- * @param <D> This is a generic object of data. It can be an event type such as NODE_ADDED/PROPERTY_CHANGED/NODE_REMOVED
- * which corresponding with JCR events.
+ * Is the central point of the event system where listeners are registered (and/or unregistered) and events are fired.
+ * @param <S> This is a generic object of source. It can be a file/folder/content or something else 
+ * extended from <code>BaseObject</code>.
+ * @param <D> This is a generic object of data. It can be an event type, such as NODE_ADDED/PROPERTY_CHANGED/NODE_REMOVED
+ * which is corresponding to the JCR events.
  * @LevelAPI Experimental
  */
 public interface EventManager<S, D> {
 
     /**
-     * This will be used to register a listener to the event system.  
+     * Registers a listener into the event system.  
      * @param listener An instance of <code>Listener</code> object.
      * @LevelAPI Experimental
      */
     public void addEventListener(Listener<S, D> listener);
     
     /**
-     * This will be used to register a listener to the event system.  
+     * Registers a listener for a given event group in the event system.
      * @param listener An instance of <code>Listener</code> object.
-     * @param eventName Name of event which will be used to group listeners.
+     * @param eventName Name of the event group.
      * @LevelAPI Experimental
      */
     public void addEventListener(String eventName, Listener<S, D> listener);    
 
     /**
-     * This will be used to unregister a listener out of the event system.  
+     * Unregisters a listener out of the event system.  
      * @param listener An instance of <code>Listener</code> object.
      * @LevelAPI Experimental
      */
     public void removeEventListener(Listener<S, D> listener);
     
     /**
-     * This will be used to unregister a listener out of the event system.  
+     * Unregisters a listener out of a given event group in the event system.  
      * @param listener An instance of <code>Listener</code> object.
-     * @param eventName The event name which used to group listeners.
+     * @param eventName Name of the event group.
      * @LevelAPI Experimental
      */
     public void removeEventListener(String eventName, Listener<S, D> listener);    
 
     /**
-     * When an action triggered such as file created/updated then 
-     * it will be broadcast to the dedicated listener to dispatch the event.
-     * @param event The <code>Event</code> object which keep the information to be processed in the listeners.
+     * Broadcasts an event to a dedicated listener 
+	 * when an action (such as create or update) is triggered.
+     * @param event The <code>Event</code> object which keeps information to be processed in the listeners.
      * @LevelAPI Experimental
      */
     public void broadcastEvent(Event<S, D> event);
 
     /**
-     * Return a list of <code>Listener</code> which registered to the event system based on its object type.
-     * For example: If we want to get a list of listeners which registered to listen all the event on an instance of 
-     * <code>File</code> object then the type should be gotten from its method is getObjectType().
+     * Gets a list of listeners which are registered into the event system based on a given event group.
+     * For example: If you want to get a list of listeners which are registered for listening to all the events on an instance of 
+     * <code>File</code> object, the event group name will be <b>getObjectType()</b>.
      * 
-     * @param type Type of Object
-     * @return List of listeners which registered
+     * @param type Name of the event group.
+     * @return The list of listeners which are registered.
      * @LevelAPI Experimental
      */
     public List<Listener<S, D>> getEventListeners(String type);

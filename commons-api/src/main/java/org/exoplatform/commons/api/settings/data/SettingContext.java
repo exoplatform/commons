@@ -24,26 +24,29 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.jcr.RepositoryService;
 
 /**
- * SettingContext associates setting properties with a specified context (GLOBAL/USER).
- * Use SettingScope to specify context of setting properties in action with database, cache or in dispatching setting event.
+ * Associates setting properties with a specified context (GLOBAL/USER).
+ * This is used to specify context of setting properties at the Context level when working with database and cache or dispatching the setting event.
  * @LevelAPI Experimental
  */
 public class SettingContext implements Serializable {
 
   private static final long serialVersionUID = 437625857263645213L;
-
-  protected String          repositoryName;
-
-  protected Context         context;
-
   /**
-   * path of context in jcr
+   * Name of the repository in JCR.
+   */
+  protected String          repositoryName;
+  /**
+   * Context of the setting object.
+   */
+  protected Context         context;
+  /**
+   * Path of the context in JCR.
    */
   protected String          ContextPath;
 
   /**
-   * Create a setting context object with a specified context
-   * @param context context with which the specified value is to be associated
+   * Creates a SettingContext object with a specified context type.
+   * @param context The context type.
    * @LevelAPI Experimental
    */
   public SettingContext(Context context) {
@@ -52,7 +55,9 @@ public class SettingContext implements Serializable {
     this.repositoryName = getCurrentRepositoryName();
     this.ContextPath = Tools.buildContextPath(context);
   }
-
+  /**
+   * Compares a specified object with the SettingContext for equality.
+   */
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
@@ -69,7 +74,9 @@ public class SettingContext implements Serializable {
     }
     return false;
   }
-
+  /**
+   * Returns the hash code value for the SettingContext object.
+   */
   @Override
   public int hashCode() {
     int result = repositoryName.hashCode();
@@ -77,30 +84,32 @@ public class SettingContext implements Serializable {
     return result;
   }
   /**
-   * get path associated to this setting-context 
-   * @return path to setting data zone of this context in the database
+   * Gets path of the SettingContext object.
+   * @return The setting context path.
    * @LevelAPI Experimental
    */
   public String getContextPath() {
     return ContextPath;
   }
   /**
-   * get repository name associated to this setting-context
-   * @return repository name
+   * Gets a repository name associated with the SettingContext object.
+   * @return The repository name.
    * @LevelAPI Experimental
    */
   public String getRepositoryName() {
     return repositoryName;
   }
   /**
-   * get context object associated to this setting-context
-   * @return Context object
+   * Gets a context object associated with the SettingContext object.
+   * @return The context object.
    * @LevelAPI Experimental
    */
   public Context getContext() {
     return context;
   }
-
+  /**
+   * Gets the current repository name.
+   */
   public static String getCurrentRepositoryName() {
     RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
                                                                              .getComponentInstanceOfType(RepositoryService.class);
