@@ -24,60 +24,61 @@ import org.exoplatform.services.organization.User;
 public interface UserSettingService {
 
   /**
-   * Save notification setting of an user
+   * Saves the notification settings of a user.
    * 
-   * @param notificationSetting notification setting of user
+   * @param notificationSetting The notification settings.
    */
   void save(UserSetting notificationSetting);
 
   /**
-   * Gets the notification setting of an user by his remote id
+   * Gets the notification settings of a user by his remote Id.
    * 
-   * @param userId remote id of user
-   * @return notification setting
+   * @param userId The user's remote Id.
+   * @return The notification settings.
    */
   UserSetting get(String userId);
 
   /**
-   * Gets all user has config to receive notification daily
+   * Gets a list of user settings which are registered for daily notifications.
    * 
-   * @param offset
-   * @param limit
-   * @return list of user's notification setting
+   * @param offset The start point from which the user settings are got.
+   * @param limit The limited number of user settings.
+   * @return The list of user settings.
    */
   List<UserSetting> getDaily(int offset, int limit);
 
   /**
-   * @return numbers of user has config to receive notification daily
+   * Gets a number of users registering for daily notifications.
+   * @return The number of users.
    */
   long getNumberOfDaily();
   
   /**
-   * Gets all user has a default notification setting
+   * Gets all settings of users registering for default daily notifications.
    * 
-   * @return list of user's notification setting
+   * @return The list of user settings.
    */
   List<UserSetting> getDefaultDaily();
   
   /**
-   * Gets all user has a config to receive the notification of a plugin
+   * Gets all Ids of users registering for notifications by a given plugin.
    * 
-   * @param pluginId id of the plugin
-   * @return list of user's remote id
+   * @param pluginId Id of the plugin.
+   * @return The remote Ids of users.
    */
   List<String> getUserSettingByPlugin(String pluginId);
   
   /**
-   * Add mix:defaultSetting to the node of a user
+   * Adds the default settings to a user's node.
    * 
-   * @param userId remote id of user
+   * @param userId The user's remote Id.
    */
   void addMixin(String userId);
   
   /**
-   * Add mix:defaultSetting to the node of users
+   * Adds the default settings to a list of users.
    * 
-   * @param users list of users
+   * @param users The list of users.
    */
   void addMixin(User[] users);
 }

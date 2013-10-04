@@ -27,11 +27,11 @@ import org.exoplatform.commons.api.notification.model.UserSetting;
 public interface DigestorService {
 
   /**
-   * Build a message info from the list of notification's info of an user
+   * Builds information of a message from a list of notification messages.
    * 
-   * @param notificationData the list of notification info by key
-   * @param userSetting notification setting of an user
-   * @return mes
+   * @param notificationData The list of notification messages.
+   * @param userSetting The user's notification settings.
+   * @return The message.
    */
   public MessageInfo buildMessage(Map<NotificationKey, List<NotificationInfo>> notificationData, UserSetting userSetting);
 }

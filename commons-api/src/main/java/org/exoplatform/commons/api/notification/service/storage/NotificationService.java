@@ -23,24 +23,23 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 
 public interface NotificationService {
   /**
-   * Process notification message when have new a @NotificationMessage created.
+   * Processes information when a notification message is created.
    * 
-   * @param notification the new a @NotificationMessage
+   * @param notification The notification message.
    */
   void process(NotificationInfo  notification) throws Exception;
   
   /**
-   * Process daily
-   * 
-   * @param message
+   * Collects information of a digest message and sends it daily or weekly.
+   *
    * @throws Exception
    */
   void processDigest() throws Exception;
   
   /**
-   * Process the list notification message when have new list @NotificationMessage created.
+   * Processes information when a list of notification messages are created.
    * 
-   * @param notifications
+   * @param notifications The list of notification messages.
    */
   void process(Collection<NotificationInfo> notifications) throws Exception;
   

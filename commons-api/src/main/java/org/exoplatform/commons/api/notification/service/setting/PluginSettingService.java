@@ -26,57 +26,59 @@ import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 public interface PluginSettingService {
 
   /**
-   * @param pluginConfig
+   * Registers configuration of a plugin.
+   * @param pluginConfig The plugin configuration.
    */
   void registerPluginConfig(PluginConfig pluginConfig);
 
   /**
-   * @param pluginConfig
+   * Registers the plugin configuration of a group.
+   * @param pluginConfig The plugin configuration to be registered.
    */
   void registerGroupConfig(GroupProviderPlugin groupConfig);
   
   /**
-   * Gets the plugin's config from a plugin's id 
+   * Gets configuration of a plugin from its Id.
    * 
-   * @param pluginId id of the plugin
-   * @return plugin's config
+   * @param pluginId Id of the plugin.
+   * @return The plugin configuration.
    */
   PluginConfig getPluginConfig(String pluginId);
 
   /**
-   * Gets the list of all groups plugin
+   * Gets a list of groups containing plugins.
    * 
-   * @return list of groups plugin
+   * @return The list of groups.
    */
   List<GroupProvider> getGroupPlugins();
 
   /**
-   * Save a plugin
+   * Saves a plugin.
    * 
-   * @param pluginId id of plugin to save
-   * @param isActive is this plugin active or inactive
+   * @param pluginId Id of the saved plugin.
+   * @param isActive If "true", the plugin is active. If "false", the plugin is inactive.
    */
   void savePlugin(String pluginId, boolean isActive);
 
   /**
-   * Check if a plugin is active or inactive
+   * Checks if a plugin is active or inactive.
    * 
-   * @param pluginId
-   * @return
+   * @param pluginId Id of the plugin.
+   * @return The returned value is "true" if the plugin is active or "false" if the plugin is inactive.
    */
   boolean isActive(String pluginId);
   
   /**
-   * Gets all actives plugins id
+   * Gets all Ids of active plugins.
    * 
-   * @return list of plugin's id
+   * @return Ids of the active plugins.
    */
   List<String> getActivePluginIds();
 
   /**
-   * Get all actives plugins info
+   * Gets information of all active plugins.
    * 
-   * @return list of pluginInfo
+   * @return Information of the active plugins.
    */
   List<PluginInfo> getActivePlugins();
 
