@@ -19,15 +19,15 @@ package org.exoplatform.commons.api.settings.data;
 import org.exoplatform.services.security.ConversationState;
 
 /**
- * This class allow a user to be able to save some settings linked to a Context.
+ * Saves some settings linked to a Context.
  * @LevelAPI Experimental
  */
 
 public enum Context {
 
   /**
-   * USER : Each user should be able to save his own settings. GLOBAL : Settings
-   * should impact all users in the underlying scope.
+   * GLOBAL: Settings should impact all users in the underlying scope.
+   * USER: Each user should be able to save his own settings. 
    * @LevelAPI Experimental
    */
   GLOBAL, USER;
@@ -35,8 +35,8 @@ public enum Context {
   private String id;
 
   /**
-   * Create a context with an specify id
-   * @param id id represent as a username.
+   * Creates a context with a specified Id.
+   * @param id The Id that is displayed as username.
    * @LevelAPI Experimental
    */
   public Context id(String id) {
@@ -45,8 +45,8 @@ public enum Context {
   }
 
   /**
-   * Get context id
-   * @return return null if context is GLOBAL and return user's id if context is USER
+   * Gets a context Id.
+   * @return Returns "null" if the context is GLOBAL or user Id if the context is USER.
    * @LevelAPI Experimental
    */
   public String getId() {

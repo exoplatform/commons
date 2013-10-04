@@ -19,8 +19,8 @@ package org.exoplatform.commons.api.settings;
 import java.io.Serializable;
 
 /**
- * All possible value type stored in JCR 
- * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
+ * All possible value types are stored in JCR.
+ * @param T Type of the setting value object.
  * @LevelAPI Experimental
  */
 public class SettingValue<T extends Object> implements Serializable {
@@ -29,8 +29,8 @@ public class SettingValue<T extends Object> implements Serializable {
   T value;
 
   /**
-   * Create a setting value object with a specify value type
-   * @param value
+   * Creates a setting value object with a specified value type.
+   * @param value The value type.
    * @LevelAPI Experimental
    */
 public SettingValue(T value) {
@@ -39,8 +39,8 @@ public SettingValue(T value) {
 
 
   /**
-   * Get value object of setting value
-   * @return value in specified type
+   * Gets the value of the setting object.
+   * @return The value with the specified object type.
    * @LevelAPI Experimental
    */
   public T getValue() {
@@ -48,30 +48,30 @@ public SettingValue(T value) {
   }
 
   /**
-   * create setting value object of type String
-   * @param value String value of setting property will be created
-   * @return created SettingValue object of type String
+   * Creates a setting value object of the String type.
+   * @param value The String value.
+   * @return The setting value object of the String type.
    * @LevelAPI Experimental
    */
   public static SettingValue<String> create(String value) { return new SettingValue<String>(value); }
   /**
-   * create setting value object of type Long
-   * @param value Long value of setting property will be created
-   * @return created SettingValue object of type Long
+   * Creates a setting value object of the Long type.
+   * @param value The Long value.
+   * @return The setting value object of the Long type.
    * @LevelAPI Experimental
    */  
   public static SettingValue<Long> create(Long value) { return new SettingValue<Long>(value); }
   /**
-   * create setting value object of type Double
-   * @param value Double value of setting property will be created
-   * @return created SettingValue object of type Double
+   * Creates a setting value object of the Double type.
+   * @param value The Double value.
+   * @return The setting value object of the Double type.
    * @LevelAPI Experimental
    */
   public static SettingValue<Double> create(Double value) { return new SettingValue<Double>(value); }
   /**
-   * create setting value object of type Boolean
-   * @param value Boolean value of setting property will be created
-   * @return created SettingValue object of type Boolean
+   * Creates a setting value object of the Boolean type.
+   * @param value The Boolean value.
+   * @return The setting value object of the Boolean type.
    * @LevelAPI Experimental
    */ 
   public static SettingValue<Boolean> create(Boolean value) { return new SettingValue<Boolean>(value); }

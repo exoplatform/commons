@@ -18,8 +18,9 @@ package org.exoplatform.commons.api.settings.data;
 
 
 /**
- * SettingKey is composed by [context,scope,key], associates with a specified setting property value.
- * Use SettingKey to specify context of setting property in action with database, cache or in dispatching setting event.
+ * Associates setting properties with a specified key.
+ * SettingKey is composed by [context, scope, key], and is used to
+ * specify context of setting properties at the Key level when working with database, cache or dispatching the setting event.
  * @LevelAPI Experimental
  */
 public class SettingKey extends SettingScope {
@@ -29,10 +30,10 @@ public class SettingKey extends SettingScope {
   private String            key;
 
   /**
-   * Create setting key with composite key [context,scope,key]
-   * @param context context with which the specified value is to be associated
-   * @param scope scope with which the specified value is to be associated
-   * @param key key with which the specified value is to be associated
+   * Creates a SettingKey with a composite value [context, scope, key].
+   * @param context The context value.
+   * @param scope The scope value.
+   * @param key The key value.
    * @LevelAPI Experimental
    */
   public SettingKey(Context context, Scope scope, String key) {
@@ -41,8 +42,8 @@ public class SettingKey extends SettingScope {
   }
 
   /**
-   * get key value of setting-key
-   * @return value of key
+   * Gets a key value of the SettingKey object.
+   * @return The key value.
    * @LevelAPI Experimental
    */
   public String getKey() {
@@ -50,14 +51,16 @@ public class SettingKey extends SettingScope {
   }
 
   /**
-   * set key value to setting-key
-   * @param key
+   * Sets a key value of the SettingKey object.
+   * @param key The key value.
    * @LevelAPI Experimental
    */
   public void setKey(String key) {
     this.key = key;
   }
-
+  /**
+   * Compares a specified object with the SettingKey for equality.
+   */
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
@@ -75,7 +78,9 @@ public class SettingKey extends SettingScope {
     }
     return false;
   }
-
+  /**
+   * Returns the hash code value for the SettingKey object.
+   */
   @Override
   public int hashCode() {
     int result = super.repositoryName.hashCode();
