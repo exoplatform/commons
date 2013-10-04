@@ -18,8 +18,9 @@ package org.exoplatform.commons.api.settings.data;
 
 
 /**
- * SettingScope is composed by [context,scope], associates with setting properties in a specified scope.
- * Use SettingScope to specify context of setting properties in action with database, cache or in dispatching setting event.
+ * Associates setting properties with a specified scope (for example, GLOBAL/PORTAL/APPLICATION). 
+ * SettingScope is composed by [context, scope] and is used to
+ * specify context of setting properties at the Scope level when working with database, cache or dispatching the setting event.
  * @LevelAPI Experimental
  */
 public class SettingScope extends SettingContext {
@@ -34,9 +35,9 @@ public class SettingScope extends SettingContext {
   protected String          scopePath;
 
   /**
-   * Create setting scope object with composite key [context,scope]
-   * @param context context with which the specified value is to be associated
-   * @param scope scope with which the specified value is to be associated
+   * Creates a setting scope object with a composite key [context, scope].
+   * @param context The context value.
+   * @param scope The scope value.
    * @LevelAPI Experimental
    */
   public SettingScope(Context context, Scope scope) {
@@ -44,7 +45,9 @@ public class SettingScope extends SettingContext {
     this.scope = scope;
     scopePath = Tools.buildScopePath(context, scope);
   }
-
+  /**
+   * Compares a specified object with the SettingScope for equality.
+   */
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
@@ -63,7 +66,9 @@ public class SettingScope extends SettingContext {
     }
     return false;
   }
-
+  /**
+   * Returns the hash code value for the SettingScope object.
+   */
   @Override
   public int hashCode() {
     int result = super.repositoryName.hashCode();
@@ -71,16 +76,16 @@ public class SettingScope extends SettingContext {
     return result;
   }
   /**
-   * get scope value of setting-scope
-   * @return value of key
+   * Gets a scope value of the SettingScope object.
+   * @return The value of key.
    * @LevelAPI Experimental
    */
   public Scope getScope() {
     return scope;
   }
   /**
-   * get path associated to this setting-scope 
-   * @return path to setting data zone of this scope in the database
+   * Gets a path to the SettingScope object.
+   * @return The SettingScope path in the database.
    * @LevelAPI Experimental
    */
   public String getScopePath() {
