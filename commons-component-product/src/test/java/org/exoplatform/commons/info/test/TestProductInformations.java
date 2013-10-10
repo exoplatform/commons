@@ -148,10 +148,4 @@ public class TestProductInformations extends BasicTestCase {
     }
     return stringWriter.toString();
   }
-
-  @Override
-  public void tearDown() throws Exception {
-   super.tearDown();
-  }
-
 }

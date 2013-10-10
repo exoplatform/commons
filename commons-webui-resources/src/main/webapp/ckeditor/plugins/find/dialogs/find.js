@@ -1,9 +1,785 @@
-﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.html or http://ckeditor.com/license
-*/
+﻿/**
+ * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.html or http://ckeditor.com/license
+ */
 
-(function(){function a(h){return h.type==CKEDITOR.NODE_TEXT&&h.getLength()>0;};function b(h){return!(h.type==CKEDITOR.NODE_ELEMENT&&h.isBlockBoundary(CKEDITOR.tools.extend({},CKEDITOR.dtd.$empty,CKEDITOR.dtd.$nonEditable)));};var c=function(){var h=this;return{textNode:h.textNode,offset:h.offset,character:h.textNode?h.textNode.getText().charAt(h.offset):null,hitMatchBoundary:h._.matchBoundary};},d=['find','replace'],e=[['txtFindFind','txtFindReplace'],['txtFindCaseChk','txtReplaceCaseChk'],['txtFindWordChk','txtReplaceWordChk'],['txtFindCyclic','txtReplaceCyclic']];function f(h){var i,j,k,l;i=h==='find'?1:0;j=1-i;var m,n=e.length;for(m=0;m<n;m++){k=this.getContentElement(d[i],e[m][i]);l=this.getContentElement(d[j],e[m][j]);l.setValue(k.getValue());}};var g=function(h,i){var j=new CKEDITOR.style(CKEDITOR.tools.extend({fullMatch:true,childRule:function(){return false;}},h.config.find_highlight)),k=function(w,x){var y=new CKEDITOR.dom.walker(w);y.guard=x?b:null;y.evaluator=a;y.breakOnFalse=true;this._={matchWord:x,walker:y,matchBoundary:false};};k.prototype={next:function(){return this.move();},back:function(){return this.move(true);},move:function(w){var y=this;var x=y.textNode;if(x===null)return c.call(y);y._.matchBoundary=false;if(x&&w&&y.offset>0){y.offset--;return c.call(y);}else if(x&&y.offset<x.getLength()-1){y.offset++;return c.call(y);}else{x=null;while(!x){x=y._.walker[w?'previous':'next'].call(y._.walker);if(y._.matchWord&&!x||y._.walker._.end)break;if(!x&&!b(y._.walker.current))y._.matchBoundary=true;}y.textNode=x;if(x)y.offset=w?x.getLength()-1:0;else y.offset=0;}return c.call(y);}};var l=function(w,x){this._={walker:w,cursors:[],rangeLength:x,highlightRange:null,isMatched:false};};l.prototype={toDomRange:function(){var w=new CKEDITOR.dom.range(h.document),x=this._.cursors;if(x.length<1){var y=this._.walker.textNode;if(y)w.setStartAfter(y);else return null;}else{var z=x[0],A=x[x.length-1];w.setStart(z.textNode,z.offset);w.setEnd(A.textNode,A.offset+1);}return w;},updateFromDomRange:function(w){var z=this;var x,y=new k(w);z._.cursors=[];do{x=y.next();if(x.character)z._.cursors.push(x);}while(x.character)z._.rangeLength=z._.cursors.length;},setMatched:function(){this._.isMatched=true;},clearMatched:function(){this._.isMatched=false;},isMatched:function(){return this._.isMatched;},highlight:function(){var y=this;if(y._.cursors.length<1)return;if(y._.highlightRange)y.removeHighlight();var w=y.toDomRange();j.applyToRange(w);y._.highlightRange=w;var x=w.startContainer;
-if(x.type!=CKEDITOR.NODE_ELEMENT)x=x.getParent();x.scrollIntoView();y.updateFromDomRange(w);},removeHighlight:function(){var w=this;if(!w._.highlightRange)return;j.removeFromRange(w._.highlightRange);w.updateFromDomRange(w._.highlightRange);w._.highlightRange=null;},moveBack:function(){var y=this;var w=y._.walker.back(),x=y._.cursors;if(w.hitMatchBoundary)y._.cursors=x=[];x.unshift(w);if(x.length>y._.rangeLength)x.pop();return w;},moveNext:function(){var y=this;var w=y._.walker.next(),x=y._.cursors;if(w.hitMatchBoundary)y._.cursors=x=[];x.push(w);if(x.length>y._.rangeLength)x.shift();return w;},getEndCharacter:function(){var w=this._.cursors;if(w.length<1)return null;return w[w.length-1].character;},getNextCharacterRange:function(w){var x,y,z=this._.cursors;if((x=z[z.length-1])&&x.textNode)y=new k(m(x));else y=this._.walker;return new l(y,w);},getCursors:function(){return this._.cursors;}};function m(w,x){var y=new CKEDITOR.dom.range();y.setStart(w.textNode,x?w.offset:w.offset+1);y.setEndAt(h.document.getBody(),CKEDITOR.POSITION_BEFORE_END);return y;};function n(w){var x=new CKEDITOR.dom.range();x.setStartAt(h.document.getBody(),CKEDITOR.POSITION_AFTER_START);x.setEnd(w.textNode,w.offset);return x;};var o=0,p=1,q=2,r=function(w,x){var y=[-1];if(x)w=w.toLowerCase();for(var z=0;z<w.length;z++){y.push(y[z]+1);while(y[z+1]>0&&w.charAt(z)!=w.charAt(y[z+1]-1))y[z+1]=y[y[z+1]-1]+1;}this._={overlap:y,state:0,ignoreCase:!!x,pattern:w};};r.prototype={feedCharacter:function(w){var x=this;if(x._.ignoreCase)w=w.toLowerCase();for(;;){if(w==x._.pattern.charAt(x._.state)){x._.state++;if(x._.state==x._.pattern.length){x._.state=0;return q;}return p;}else if(!x._.state)return o;else x._.state=x._.overlap[x._.state];}return null;},reset:function(){this._.state=0;}};var s=/[.,"'?!;: \u0085\u00a0\u1680\u280e\u2028\u2029\u202f\u205f\u3000]/,t=function(w){if(!w)return true;var x=w.charCodeAt(0);return x>=9&&x<=13||x>=8192&&x<=8202||s.test(w);},u={searchRange:null,matchRange:null,find:function(w,x,y,z,A,B){var K=this;if(!K.matchRange)K.matchRange=new l(new k(K.searchRange),w.length);else{K.matchRange.removeHighlight();K.matchRange=K.matchRange.getNextCharacterRange(w.length);}var C=new r(w,!x),D=o,E='%';while(E!==null){K.matchRange.moveNext();while(E=K.matchRange.getEndCharacter()){D=C.feedCharacter(E);if(D==q)break;if(K.matchRange.moveNext().hitMatchBoundary)C.reset();}if(D==q){if(y){var F=K.matchRange.getCursors(),G=F[F.length-1],H=F[0],I=new k(n(H),true),J=new k(m(G),true);if(!(t(I.back().character)&&t(J.next().character)))continue;
-}K.matchRange.setMatched();if(A!==false)K.matchRange.highlight();return true;}}K.matchRange.clearMatched();K.matchRange.removeHighlight();if(z&&!B){K.searchRange=v(true);K.matchRange=null;return arguments.callee.apply(K,Array.prototype.slice.call(arguments).concat([true]));}return false;},replaceCounter:0,replace:function(w,x,y,z,A,B,C){var H=this;var D=false;if(H.matchRange&&H.matchRange.isMatched()&&!H.matchRange._.isReplaced){H.matchRange.removeHighlight();var E=H.matchRange.toDomRange(),F=h.document.createText(y);if(!C){var G=h.getSelection();G.selectRanges([E]);h.fire('saveSnapshot');}E.deleteContents();E.insertNode(F);if(!C){G.selectRanges([E]);h.fire('saveSnapshot');}H.matchRange.updateFromDomRange(E);if(!C)H.matchRange.highlight();H.matchRange._.isReplaced=true;H.replaceCounter++;D=true;}else D=H.find(x,z,A,B,!C);return D;}};function v(w){var x,y=h.getSelection(),z=h.document.getBody();if(y&&!w){x=y.getRanges()[0].clone();x.collapse(true);}else{x=new CKEDITOR.dom.range();x.setStartAt(z,CKEDITOR.POSITION_AFTER_START);}x.setEndAt(z,CKEDITOR.POSITION_BEFORE_END);return x;};return{title:h.lang.findAndReplace.title,resizable:CKEDITOR.DIALOG_RESIZE_NONE,minWidth:350,minHeight:165,buttons:[CKEDITOR.dialog.cancelButton],contents:[{id:'find',label:h.lang.findAndReplace.find,title:h.lang.findAndReplace.find,accessKey:'',elements:[{type:'hbox',widths:['230px','90px'],children:[{type:'text',id:'txtFindFind',label:h.lang.findAndReplace.findWhat,isChanged:false,labelLayout:'horizontal',accessKey:'F'},{type:'button',align:'left',style:'width:100%',label:h.lang.findAndReplace.find,onClick:function(){var w=this.getDialog();if(!u.find(w.getValueOf('find','txtFindFind'),w.getValueOf('find','txtFindCaseChk'),w.getValueOf('find','txtFindWordChk'),w.getValueOf('find','txtFindCyclic')))alert(h.lang.findAndReplace.notFoundMsg);}}]},{type:'vbox',padding:0,children:[{type:'checkbox',id:'txtFindCaseChk',isChanged:false,style:'margin-top:28px',label:h.lang.findAndReplace.matchCase},{type:'checkbox',id:'txtFindWordChk',isChanged:false,label:h.lang.findAndReplace.matchWord},{type:'checkbox',id:'txtFindCyclic',isChanged:false,'default':true,label:h.lang.findAndReplace.matchCyclic}]}]},{id:'replace',label:h.lang.findAndReplace.replace,accessKey:'M',elements:[{type:'hbox',widths:['230px','90px'],children:[{type:'text',id:'txtFindReplace',label:h.lang.findAndReplace.findWhat,isChanged:false,labelLayout:'horizontal',accessKey:'F'},{type:'button',align:'left',style:'width:100%',label:h.lang.findAndReplace.replace,onClick:function(){var w=this.getDialog();
-if(!u.replace(w,w.getValueOf('replace','txtFindReplace'),w.getValueOf('replace','txtReplace'),w.getValueOf('replace','txtReplaceCaseChk'),w.getValueOf('replace','txtReplaceWordChk'),w.getValueOf('replace','txtReplaceCyclic')))alert(h.lang.findAndReplace.notFoundMsg);}}]},{type:'hbox',widths:['230px','90px'],children:[{type:'text',id:'txtReplace',label:h.lang.findAndReplace.replaceWith,isChanged:false,labelLayout:'horizontal',accessKey:'R'},{type:'button',align:'left',style:'width:100%',label:h.lang.findAndReplace.replaceAll,isChanged:false,onClick:function(){var w=this.getDialog(),x;u.replaceCounter=0;u.searchRange=v(true);if(u.matchRange){u.matchRange.removeHighlight();u.matchRange=null;}h.fire('saveSnapshot');while(u.replace(w,w.getValueOf('replace','txtFindReplace'),w.getValueOf('replace','txtReplace'),w.getValueOf('replace','txtReplaceCaseChk'),w.getValueOf('replace','txtReplaceWordChk'),false,true)){}if(u.replaceCounter){alert(h.lang.findAndReplace.replaceSuccessMsg.replace(/%1/,u.replaceCounter));h.fire('saveSnapshot');}else alert(h.lang.findAndReplace.notFoundMsg);}}]},{type:'vbox',padding:0,children:[{type:'checkbox',id:'txtReplaceCaseChk',isChanged:false,label:h.lang.findAndReplace.matchCase},{type:'checkbox',id:'txtReplaceWordChk',isChanged:false,label:h.lang.findAndReplace.matchWord},{type:'checkbox',id:'txtReplaceCyclic',isChanged:false,'default':true,label:h.lang.findAndReplace.matchCyclic}]}]}],onLoad:function(){var w=this,x,y,z=false;this.on('hide',function(){z=false;});this.on('show',function(){z=true;});this.selectPage=CKEDITOR.tools.override(this.selectPage,function(A){return function(B){A.call(w,B);var C=w._.tabs[B],D,E,F;E=B==='find'?'txtFindFind':'txtFindReplace';F=B==='find'?'txtFindWordChk':'txtReplaceWordChk';x=w.getContentElement(B,E);y=w.getContentElement(B,F);if(!C.initialized){D=CKEDITOR.document.getById(x._.inputId);C.initialized=true;}if(z)f.call(this,B);};});},onShow:function(){u.searchRange=v();this.selectPage(i);},onHide:function(){var w;if(u.matchRange&&u.matchRange.isMatched()){u.matchRange.removeHighlight();h.focus();w=u.matchRange.toDomRange();if(w)h.getSelection().selectRanges([w]);}delete u.matchRange;},onFocus:function(){if(i=='replace')return this.getContentElement('replace','txtFindReplace');else return this.getContentElement('find','txtFindFind');}};};CKEDITOR.dialog.add('find',function(h){return g(h,'find');});CKEDITOR.dialog.add('replace',function(h){return g(h,'replace');});})();
+(function() {
+	var isReplace;
+
+	function findEvaluator( node ) {
+		return node.type == CKEDITOR.NODE_TEXT && node.getLength() > 0 && ( !isReplace || !node.isReadOnly() );
+	}
+
+	// Elements which break characters been considered as sequence.
+	function nonCharactersBoundary( node ) {
+		return !( node.type == CKEDITOR.NODE_ELEMENT && node.isBlockBoundary( CKEDITOR.tools.extend( {}, CKEDITOR.dtd.$empty, CKEDITOR.dtd.$nonEditable ) ) );
+	}
+
+	// Get the cursor object which represent both current character and it's dom
+	// position thing.
+	var cursorStep = function() {
+			return {
+				textNode: this.textNode,
+				offset: this.offset,
+				character: this.textNode ? this.textNode.getText().charAt( this.offset ) : null,
+				hitMatchBoundary: this._.matchBoundary
+			};
+		};
+
+	var pages = [ 'find', 'replace' ],
+		fieldsMapping = [
+			[ 'txtFindFind', 'txtFindReplace' ],
+			[ 'txtFindCaseChk', 'txtReplaceCaseChk' ],
+			[ 'txtFindWordChk', 'txtReplaceWordChk' ],
+			[ 'txtFindCyclic', 'txtReplaceCyclic' ] ];
+
+	// Synchronize corresponding filed values between 'replace' and 'find' pages.
+	// @param {String} currentPageId	The page id which receive values.
+	function syncFieldsBetweenTabs( currentPageId ) {
+		var sourceIndex, targetIndex, sourceField, targetField;
+
+		sourceIndex = currentPageId === 'find' ? 1 : 0;
+		targetIndex = 1 - sourceIndex;
+		var i,
+			l = fieldsMapping.length;
+		for ( i = 0; i < l; i++ ) {
+			sourceField = this.getContentElement( pages[ sourceIndex ], fieldsMapping[ i ][ sourceIndex ] );
+			targetField = this.getContentElement( pages[ targetIndex ], fieldsMapping[ i ][ targetIndex ] );
+
+			targetField.setValue( sourceField.getValue() );
+		}
+	}
+
+	var findDialog = function( editor, startupPage ) {
+			// Style object for highlights: (#5018)
+			// 1. Defined as full match style to avoid compromising ordinary text color styles.
+			// 2. Must be apply onto inner-most text to avoid conflicting with ordinary text color styles visually.
+			var highlightStyle = new CKEDITOR.style( CKEDITOR.tools.extend({
+				attributes: { 'data-cke-highlight':1 },
+				fullMatch: 1, ignoreReadonly: 1, childRule: function() {
+					return 0;
+				} }, editor.config.find_highlight, true ) );
+
+			// Iterator which walk through the specified range char by char. By
+			// default the walking will not stop at the character boundaries, until
+			// the end of the range is encountered.
+			// @param { CKEDITOR.dom.range } range
+			// @param {Boolean} matchWord Whether the walking will stop at character boundary.
+			var characterWalker = function( range, matchWord ) {
+					var self = this;
+					var walker = new CKEDITOR.dom.walker( range );
+					walker.guard = matchWord ? nonCharactersBoundary : function( node ) {
+						!nonCharactersBoundary( node ) && ( self._.matchBoundary = true );
+					};
+					walker[ 'evaluator' ] = findEvaluator;
+					walker.breakOnFalse = 1;
+
+					if ( range.startContainer.type == CKEDITOR.NODE_TEXT ) {
+						this.textNode = range.startContainer;
+						this.offset = range.startOffset - 1;
+					}
+
+					this._ = {
+						matchWord: matchWord,
+						walker: walker,
+						matchBoundary: false
+					};
+				};
+
+			characterWalker.prototype = {
+				next: function() {
+					return this.move();
+				},
+
+				back: function() {
+					return this.move( true );
+				},
+
+				move: function( rtl ) {
+					var currentTextNode = this.textNode;
+					// Already at the end of document, no more character available.
+					if ( currentTextNode === null )
+						return cursorStep.call( this );
+
+					this._.matchBoundary = false;
+
+					// There are more characters in the text node, step forward.
+					if ( currentTextNode && rtl && this.offset > 0 ) {
+						this.offset--;
+						return cursorStep.call( this );
+					} else if ( currentTextNode && this.offset < currentTextNode.getLength() - 1 ) {
+						this.offset++;
+						return cursorStep.call( this );
+					} else {
+						currentTextNode = null;
+						// At the end of the text node, walking foward for the next.
+						while ( !currentTextNode ) {
+							currentTextNode = this._.walker[ rtl ? 'previous' : 'next' ].call( this._.walker );
+
+							// Stop searching if we're need full word match OR
+							// already reach document end.
+							if ( this._.matchWord && !currentTextNode || this._.walker._.end )
+								break;
+						}
+						// Found a fresh text node.
+						this.textNode = currentTextNode;
+						if ( currentTextNode )
+							this.offset = rtl ? currentTextNode.getLength() - 1 : 0;
+						else
+							this.offset = 0;
+					}
+
+					return cursorStep.call( this );
+				}
+
+			};
+
+			/**
+			 * A range of cursors which represent a trunk of characters which try to
+			 * match, it has the same length as the pattern  string.
+			 *
+			 * **Note:** This class isn't accessible from global scope.
+			 *
+			 * @private
+			 * @class CKEDITOR.plugins.find.characterRange
+			 * @constructor Creates a characterRange class instance.
+			 */
+			var characterRange = function( characterWalker, rangeLength ) {
+					this._ = {
+						walker: characterWalker,
+						cursors: [],
+						rangeLength: rangeLength,
+						highlightRange: null,
+						isMatched: 0
+					};
+				};
+
+			characterRange.prototype = {
+				/**
+				 * Translate this range to {@link CKEDITOR.dom.range}.
+				 */
+				toDomRange: function() {
+					var range = editor.createRange();
+					var cursors = this._.cursors;
+					if ( cursors.length < 1 ) {
+						var textNode = this._.walker.textNode;
+						if ( textNode )
+							range.setStartAfter( textNode );
+						else
+							return null;
+					} else {
+						var first = cursors[ 0 ],
+							last = cursors[ cursors.length - 1 ];
+
+						range.setStart( first.textNode, first.offset );
+						range.setEnd( last.textNode, last.offset + 1 );
+					}
+
+					return range;
+				},
+
+				/**
+				 * Reflect the latest changes from dom range.
+				 */
+				updateFromDomRange: function( domRange ) {
+					var cursor,
+						walker = new characterWalker( domRange );
+					this._.cursors = [];
+					do {
+						cursor = walker.next();
+						if ( cursor.character ) this._.cursors.push( cursor );
+					}
+					while ( cursor.character );
+					this._.rangeLength = this._.cursors.length;
+				},
+
+				setMatched: function() {
+					this._.isMatched = true;
+				},
+
+				clearMatched: function() {
+					this._.isMatched = false;
+				},
+
+				isMatched: function() {
+					return this._.isMatched;
+				},
+
+				/**
+				 * Hightlight the current matched chunk of text.
+				 */
+				highlight: function() {
+					// Do not apply if nothing is found.
+					if ( this._.cursors.length < 1 )
+						return;
+
+					// Remove the previous highlight if there's one.
+					if ( this._.highlightRange )
+						this.removeHighlight();
+
+					// Apply the highlight.
+					var range = this.toDomRange(),
+						bookmark = range.createBookmark();
+					highlightStyle.applyToRange( range );
+					range.moveToBookmark( bookmark );
+					this._.highlightRange = range;
+
+					// Scroll the editor to the highlighted area.
+					var element = range.startContainer;
+					if ( element.type != CKEDITOR.NODE_ELEMENT )
+						element = element.getParent();
+					element.scrollIntoView();
+
+					// Update the character cursors.
+					this.updateFromDomRange( range );
+				},
+
+				/**
+				 * Remove highlighted find result.
+				 */
+				removeHighlight: function() {
+					if ( !this._.highlightRange )
+						return;
+
+					var bookmark = this._.highlightRange.createBookmark();
+					highlightStyle.removeFromRange( this._.highlightRange );
+					this._.highlightRange.moveToBookmark( bookmark );
+					this.updateFromDomRange( this._.highlightRange );
+					this._.highlightRange = null;
+				},
+
+				isReadOnly: function() {
+					if ( !this._.highlightRange )
+						return 0;
+
+					return this._.highlightRange.startContainer.isReadOnly();
+				},
+
+				moveBack: function() {
+					var retval = this._.walker.back(),
+						cursors = this._.cursors;
+
+					if ( retval.hitMatchBoundary )
+						this._.cursors = cursors = [];
+
+					cursors.unshift( retval );
+					if ( cursors.length > this._.rangeLength )
+						cursors.pop();
+
+					return retval;
+				},
+
+				moveNext: function() {
+					var retval = this._.walker.next(),
+						cursors = this._.cursors;
+
+					// Clear the cursors queue if we've crossed a match boundary.
+					if ( retval.hitMatchBoundary )
+						this._.cursors = cursors = [];
+
+					cursors.push( retval );
+					if ( cursors.length > this._.rangeLength )
+						cursors.shift();
+
+					return retval;
+				},
+
+				getEndCharacter: function() {
+					var cursors = this._.cursors;
+					if ( cursors.length < 1 )
+						return null;
+
+					return cursors[ cursors.length - 1 ].character;
+				},
+
+				getNextCharacterRange: function( maxLength ) {
+					var lastCursor, nextRangeWalker,
+						cursors = this._.cursors;
+
+					if ( ( lastCursor = cursors[ cursors.length - 1 ] ) && lastCursor.textNode )
+						nextRangeWalker = new characterWalker( getRangeAfterCursor( lastCursor ) );
+					// In case it's an empty range (no cursors), figure out next range from walker (#4951).
+					else
+						nextRangeWalker = this._.walker;
+
+					return new characterRange( nextRangeWalker, maxLength );
+				},
+
+				getCursors: function() {
+					return this._.cursors;
+				}
+			};
+
+
+			// The remaining document range after the character cursor.
+			function getRangeAfterCursor( cursor, inclusive ) {
+				var range = editor.createRange();
+				range.setStart( cursor.textNode, ( inclusive ? cursor.offset : cursor.offset + 1 ) );
+				range.setEndAt( editor.editable(), CKEDITOR.POSITION_BEFORE_END );
+				return range;
+			}
+
+			// The document range before the character cursor.
+			function getRangeBeforeCursor( cursor ) {
+				var range = editor.createRange();
+				range.setStartAt( editor.editable(), CKEDITOR.POSITION_AFTER_START );
+				range.setEnd( cursor.textNode, cursor.offset );
+				return range;
+			}
+
+			var KMP_NOMATCH = 0,
+				KMP_ADVANCED = 1,
+				KMP_MATCHED = 2;
+
+			// Examination the occurrence of a word which implement KMP algorithm.
+			var kmpMatcher = function( pattern, ignoreCase ) {
+					var overlap = [ -1 ];
+					if ( ignoreCase )
+						pattern = pattern.toLowerCase();
+					for ( var i = 0; i < pattern.length; i++ ) {
+						overlap.push( overlap[ i ] + 1 );
+						while ( overlap[ i + 1 ] > 0 && pattern.charAt( i ) != pattern.charAt( overlap[ i + 1 ] - 1 ) )
+							overlap[ i + 1 ] = overlap[ overlap[ i + 1 ] - 1 ] + 1;
+					}
+
+					this._ = {
+						overlap: overlap,
+						state: 0,
+						ignoreCase: !!ignoreCase,
+						pattern: pattern
+					};
+				};
+
+			kmpMatcher.prototype = {
+				feedCharacter: function( c ) {
+					if ( this._.ignoreCase )
+						c = c.toLowerCase();
+
+					while ( true ) {
+						if ( c == this._.pattern.charAt( this._.state ) ) {
+							this._.state++;
+							if ( this._.state == this._.pattern.length ) {
+								this._.state = 0;
+								return KMP_MATCHED;
+							}
+							return KMP_ADVANCED;
+						} else if ( !this._.state )
+							return KMP_NOMATCH;
+						else
+							this._.state = this._.overlap[ this._.state ];
+					}
+
+					return null;
+				},
+
+				reset: function() {
+					this._.state = 0;
+				}
+			};
+
+			var wordSeparatorRegex = /[.,"'?!;: \u0085\u00a0\u1680\u280e\u2028\u2029\u202f\u205f\u3000]/;
+
+			var isWordSeparator = function( c ) {
+					if ( !c )
+						return true;
+					var code = c.charCodeAt( 0 );
+					return ( code >= 9 && code <= 0xd ) || ( code >= 0x2000 && code <= 0x200a ) || wordSeparatorRegex.test( c );
+				};
+
+			var finder = {
+				searchRange: null,
+				matchRange: null,
+				find: function( pattern, matchCase, matchWord, matchCyclic, highlightMatched, cyclicRerun ) {
+					if ( !this.matchRange )
+						this.matchRange = new characterRange( new characterWalker( this.searchRange ), pattern.length );
+					else {
+						this.matchRange.removeHighlight();
+						this.matchRange = this.matchRange.getNextCharacterRange( pattern.length );
+					}
+
+					var matcher = new kmpMatcher( pattern, !matchCase ),
+						matchState = KMP_NOMATCH,
+						character = '%';
+
+					while ( character !== null ) {
+						this.matchRange.moveNext();
+						while ( ( character = this.matchRange.getEndCharacter() ) ) {
+							matchState = matcher.feedCharacter( character );
+							if ( matchState == KMP_MATCHED )
+								break;
+							if ( this.matchRange.moveNext().hitMatchBoundary )
+								matcher.reset();
+						}
+
+						if ( matchState == KMP_MATCHED ) {
+							if ( matchWord ) {
+								var cursors = this.matchRange.getCursors(),
+									tail = cursors[ cursors.length - 1 ],
+									head = cursors[ 0 ];
+
+								var rangeBefore = getRangeBeforeCursor( head ),
+									rangeAfter = getRangeAfterCursor( tail );
+
+								// The word boundary checks requires to trim the text nodes. (#9036)
+								rangeBefore.trim();
+								rangeAfter.trim();
+
+								var headWalker = new characterWalker( rangeBefore, true ),
+									tailWalker = new characterWalker( rangeAfter, true );
+
+								if ( !( isWordSeparator( headWalker.back().character ) && isWordSeparator( tailWalker.next().character ) ) )
+									continue;
+							}
+							this.matchRange.setMatched();
+							if ( highlightMatched !== false )
+								this.matchRange.highlight();
+							return true;
+						}
+					}
+
+					this.matchRange.clearMatched();
+					this.matchRange.removeHighlight();
+					// Clear current session and restart with the default search
+					// range.
+					// Re-run the finding once for cyclic.(#3517)
+					if ( matchCyclic && !cyclicRerun ) {
+						this.searchRange = getSearchRange( 1 );
+						this.matchRange = null;
+						return arguments.callee.apply( this, Array.prototype.slice.call( arguments ).concat( [ true ] ) );
+					}
+
+					return false;
+				},
+
+				// Record how much replacement occurred toward one replacing.
+				replaceCounter: 0,
+
+				replace: function( dialog, pattern, newString, matchCase, matchWord, matchCyclic, isReplaceAll ) {
+					isReplace = 1;
+
+					// Successiveness of current replace/find.
+					var result = 0;
+
+					// 1. Perform the replace when there's already a match here.
+					// 2. Otherwise perform the find but don't replace it immediately.
+					if ( this.matchRange && this.matchRange.isMatched() && !this.matchRange._.isReplaced && !this.matchRange.isReadOnly() ) {
+						// Turn off highlight for a while when saving snapshots.
+						this.matchRange.removeHighlight();
+						var domRange = this.matchRange.toDomRange();
+						var text = editor.document.createText( newString );
+						if ( !isReplaceAll ) {
+							// Save undo snaps before and after the replacement.
+							var selection = editor.getSelection();
+							selection.selectRanges( [ domRange ] );
+							editor.fire( 'saveSnapshot' );
+						}
+						domRange.deleteContents();
+						domRange.insertNode( text );
+						if ( !isReplaceAll ) {
+							selection.selectRanges( [ domRange ] );
+							editor.fire( 'saveSnapshot' );
+						}
+						this.matchRange.updateFromDomRange( domRange );
+						if ( !isReplaceAll )
+							this.matchRange.highlight();
+						this.matchRange._.isReplaced = true;
+						this.replaceCounter++;
+						result = 1;
+					} else
+						result = this.find( pattern, matchCase, matchWord, matchCyclic, !isReplaceAll );
+
+					isReplace = 0;
+
+					return result;
+				}
+			};
+
+			// The range in which find/replace happened, receive from user
+			// selection prior.
+			function getSearchRange( isDefault ) {
+				var searchRange,
+					sel = editor.getSelection(),
+					editable = editor.editable();
+
+				if ( sel && !isDefault ) {
+					searchRange = sel.getRanges()[ 0 ].clone();
+					searchRange.collapse( true );
+				} else {
+					searchRange = editor.createRange();
+					searchRange.setStartAt( editable, CKEDITOR.POSITION_AFTER_START );
+				}
+				searchRange.setEndAt( editable, CKEDITOR.POSITION_BEFORE_END );
+				return searchRange;
+			}
+
+			var lang = editor.lang.find;
+			return {
+				title: lang.title,
+				resizable: CKEDITOR.DIALOG_RESIZE_NONE,
+				minWidth: 350,
+				minHeight: 170,
+				buttons: [ CKEDITOR.dialog.cancelButton ], // Cancel button only.
+				contents: [
+					{
+					id: 'find',
+					label: lang.find,
+					title: lang.find,
+					accessKey: '',
+					elements: [
+						{
+						type: 'hbox',
+						widths: [ '230px', '90px' ],
+						children: [
+							{
+							type: 'text',
+							id: 'txtFindFind',
+							label: lang.findWhat,
+							isChanged: false,
+							labelLayout: 'horizontal',
+							accessKey: 'F'
+						},
+							{
+							type: 'button',
+							id: 'btnFind',
+							align: 'left',
+							style: 'width:100%',
+							label: lang.find,
+							onClick: function() {
+								var dialog = this.getDialog();
+								if ( !finder.find( dialog.getValueOf( 'find', 'txtFindFind' ), dialog.getValueOf( 'find', 'txtFindCaseChk' ), dialog.getValueOf( 'find', 'txtFindWordChk' ), dialog.getValueOf( 'find', 'txtFindCyclic' ) ) )
+									alert( lang.notFoundMsg );
+							}
+						}
+						]
+					},
+						{
+						type: 'fieldset',
+						label: CKEDITOR.tools.htmlEncode( lang.findOptions ),
+						style: 'margin-top:29px',
+						children: [
+							{
+							type: 'vbox',
+							padding: 0,
+							children: [
+								{
+								type: 'checkbox',
+								id: 'txtFindCaseChk',
+								isChanged: false,
+								label: lang.matchCase
+							},
+								{
+								type: 'checkbox',
+								id: 'txtFindWordChk',
+								isChanged: false,
+								label: lang.matchWord
+							},
+								{
+								type: 'checkbox',
+								id: 'txtFindCyclic',
+								isChanged: false,
+								'default': true,
+								label: lang.matchCyclic
+							}
+							]
+						}
+						]
+					}
+					]
+				},
+					{
+					id: 'replace',
+					label: lang.replace,
+					accessKey: 'M',
+					elements: [
+						{
+						type: 'hbox',
+						widths: [ '230px', '90px' ],
+						children: [
+							{
+							type: 'text',
+							id: 'txtFindReplace',
+							label: lang.findWhat,
+							isChanged: false,
+							labelLayout: 'horizontal',
+							accessKey: 'F'
+						},
+							{
+							type: 'button',
+							id: 'btnFindReplace',
+							align: 'left',
+							style: 'width:100%',
+							label: lang.replace,
+							onClick: function() {
+								var dialog = this.getDialog();
+								if ( !finder.replace( dialog, dialog.getValueOf( 'replace', 'txtFindReplace' ), dialog.getValueOf( 'replace', 'txtReplace' ), dialog.getValueOf( 'replace', 'txtReplaceCaseChk' ), dialog.getValueOf( 'replace', 'txtReplaceWordChk' ), dialog.getValueOf( 'replace', 'txtReplaceCyclic' ) ) )
+									alert( lang.notFoundMsg );
+							}
+						}
+						]
+					},
+						{
+						type: 'hbox',
+						widths: [ '230px', '90px' ],
+						children: [
+							{
+							type: 'text',
+							id: 'txtReplace',
+							label: lang.replaceWith,
+							isChanged: false,
+							labelLayout: 'horizontal',
+							accessKey: 'R'
+						},
+							{
+							type: 'button',
+							id: 'btnReplaceAll',
+							align: 'left',
+							style: 'width:100%',
+							label: lang.replaceAll,
+							isChanged: false,
+							onClick: function() {
+								var dialog = this.getDialog();
+								var replaceNums;
+
+								finder.replaceCounter = 0;
+
+								// Scope to full document.
+								finder.searchRange = getSearchRange( 1 );
+								if ( finder.matchRange ) {
+									finder.matchRange.removeHighlight();
+									finder.matchRange = null;
+								}
+								editor.fire( 'saveSnapshot' );
+								while ( finder.replace( dialog, dialog.getValueOf( 'replace', 'txtFindReplace' ), dialog.getValueOf( 'replace', 'txtReplace' ), dialog.getValueOf( 'replace', 'txtReplaceCaseChk' ), dialog.getValueOf( 'replace', 'txtReplaceWordChk' ), false, true ) ) {
+									/*jsl:pass*/
+								}
+
+								if ( finder.replaceCounter ) {
+									alert( lang.replaceSuccessMsg.replace( /%1/, finder.replaceCounter ) );
+									editor.fire( 'saveSnapshot' );
+								} else
+									alert( lang.notFoundMsg );
+							}
+						}
+						]
+					},
+						{
+						type: 'fieldset',
+						label: CKEDITOR.tools.htmlEncode( lang.findOptions ),
+						children: [
+							{
+							type: 'vbox',
+							padding: 0,
+							children: [
+								{
+								type: 'checkbox',
+								id: 'txtReplaceCaseChk',
+								isChanged: false,
+								label: lang.matchCase
+							},
+								{
+								type: 'checkbox',
+								id: 'txtReplaceWordChk',
+								isChanged: false,
+								label: lang.matchWord
+							},
+								{
+								type: 'checkbox',
+								id: 'txtReplaceCyclic',
+								isChanged: false,
+								'default': true,
+								label: lang.matchCyclic
+							}
+							]
+						}
+						]
+					}
+					]
+				}
+				],
+				onLoad: function() {
+					var dialog = this;
+
+					// Keep track of the current pattern field in use.
+					var patternField, wholeWordChkField;
+
+					// Ignore initial page select on dialog show
+					var isUserSelect = 0;
+					this.on( 'hide', function() {
+						isUserSelect = 0;
+					});
+					this.on( 'show', function() {
+						isUserSelect = 1;
+					});
+
+					this.selectPage = CKEDITOR.tools.override( this.selectPage, function( originalFunc ) {
+						return function( pageId ) {
+							originalFunc.call( dialog, pageId );
+
+							var currPage = dialog._.tabs[ pageId ];
+							var patternFieldInput, patternFieldId, wholeWordChkFieldId;
+							patternFieldId = pageId === 'find' ? 'txtFindFind' : 'txtFindReplace';
+							wholeWordChkFieldId = pageId === 'find' ? 'txtFindWordChk' : 'txtReplaceWordChk';
+
+							patternField = dialog.getContentElement( pageId, patternFieldId );
+							wholeWordChkField = dialog.getContentElement( pageId, wholeWordChkFieldId );
+
+							// Prepare for check pattern text filed 'keyup' event
+							if ( !currPage.initialized ) {
+								patternFieldInput = CKEDITOR.document.getById( patternField._.inputId );
+								currPage.initialized = true;
+							}
+
+							// Synchronize fields on tab switch.
+							if ( isUserSelect )
+								syncFieldsBetweenTabs.call( this, pageId );
+						};
+					});
+
+				},
+				onShow: function() {
+					// Establish initial searching start position.
+					finder.searchRange = getSearchRange();
+
+					// Fill in the find field with selected text.
+					var selectedText = this.getParentEditor().getSelection().getSelectedText(),
+						patternFieldId = ( startupPage == 'find' ? 'txtFindFind' : 'txtFindReplace' );
+
+					var field = this.getContentElement( startupPage, patternFieldId );
+					field.setValue( selectedText );
+					field.select();
+
+					this.selectPage( startupPage );
+
+					this[ ( startupPage == 'find' && this._.editor.readOnly ? 'hide' : 'show' ) + 'Page' ]( 'replace' );
+				},
+				onHide: function() {
+					var range;
+					if ( finder.matchRange && finder.matchRange.isMatched() ) {
+						finder.matchRange.removeHighlight();
+						editor.focus();
+
+						range = finder.matchRange.toDomRange();
+						if ( range )
+							editor.getSelection().selectRanges( [ range ] );
+					}
+
+					// Clear current session before dialog close
+					delete finder.matchRange;
+				},
+				onFocus: function() {
+					if ( startupPage == 'replace' )
+						return this.getContentElement( 'replace', 'txtFindReplace' );
+					else
+						return this.getContentElement( 'find', 'txtFindFind' );
+				}
+			};
+		};
+
+	CKEDITOR.dialog.add( 'find', function( editor ) {
+		return findDialog( editor, 'find' );
+	});
+
+	CKEDITOR.dialog.add( 'replace', function( editor ) {
+		return findDialog( editor, 'replace' );
+	});
+})();

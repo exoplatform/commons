@@ -23,7 +23,6 @@
     <module>commons-component-product</module>
     <module>commons-component-upgrade</module>
     <module>commons-extension-webapp</module>
-    <module>commons-fck</module>
     <module>commons-gifbackport</module>
     <module>commons-juzu</module>
     <module>commons-juzu-ajax-sample</module>
@@ -154,19 +153,7 @@
         <artifactId>commons-extension-webapp</artifactId>
         <version>${project.version}</version>
         <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.commons</groupId>
-        <artifactId>commons-fck</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.commons</groupId>
-        <artifactId>commons-fck</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-      </dependency>
+      </dependency>      
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-gifbackport</artifactId>
