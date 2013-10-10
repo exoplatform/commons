@@ -72,6 +72,8 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
   }
   
   public void testNormalGetByUserAndRemoveMessagesSent() throws Exception {
+    NotificationConfiguration configuration = getService(NotificationConfiguration.class);
+    configuration.setSendWeekly(false);
     NotificationInfo notification = saveNotification();
     UserSetting userSetting = UserSetting.getInstance();
     userSetting.setUserId("root")
@@ -92,6 +94,7 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     
     assertEquals(0, notification2.getSendToDaily().length);
     
+    configuration.setSendWeekly(true);
     userSetting.setUserId("demo").addProvider("TestPlugin", FREQUENCY.WEEKLY);
     map = notificationDataStorage.getByUser(userSetting);
     list = map.get(new NotificationKey("TestPlugin"));
@@ -106,7 +109,6 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
 
   public void testSpecialGetByUserAndRemoveMessagesSent() throws Exception {
     NotificationConfiguration configuration = getService(NotificationConfiguration.class);
-    int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
     NotificationInfo notification = NotificationInfo.instance();
     Map<String, String> params = new HashMap<String, String>();
     params.put("objectId", "idofobject");
@@ -118,7 +120,7 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     userSetting.setUserId("root").addProvider("TestPlugin", FREQUENCY.DAILY);
     userSetting.setActive(true);
     // Test send to daily
-    configuration.setDayOfWeekend(currentDay + 1);
+    configuration.setSendWeekly(false);
     Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(userSetting);
     
     List<NotificationInfo> list = map.get(new NotificationKey("TestPlugin"));
@@ -138,7 +140,7 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     assertEquals(0, fillModel(node).getSendToDaily().length);
     
     // Test send to weekly
-    configuration.setDayOfWeekend(currentDay);
+    configuration.setSendWeekly(true);
     userSetting.setUserId("demo").addProvider("TestPlugin", FREQUENCY.WEEKLY);
     map = notificationDataStorage.getByUser(userSetting);
     list = map.get(new NotificationKey("TestPlugin"));

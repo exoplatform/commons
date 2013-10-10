@@ -17,7 +17,6 @@
 package org.exoplatform.commons.notification;
 
 import java.io.Serializable;
-import java.util.Calendar;
 
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.container.xml.InitParams;
@@ -25,22 +24,12 @@ import org.exoplatform.container.xml.InitParams;
 public class NotificationConfiguration implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private static final String DAY_OF_WEEK_END_SYS_KEY   = "conf.notification.NotificationConfiguration.dayOfWeekend";
-  private static final String DAY_OF_WEEK_END_KEY       = "dayOfWeekend";
-
   private String            workspace        = AbstractService.DEFAULT_WORKSPACE_NAME;
 
-  private int               dayOfWeekend     = 6;
-
-  private int               dayOfMonthend    = 28;
+  private boolean          isSendWeekly     = false;
 
   public NotificationConfiguration(InitParams params) {
     this.workspace = NotificationUtils.getValueParam(params, AbstractService.WORKSPACE_PARAM, AbstractService.DEFAULT_WORKSPACE_NAME);
-
-    String defaultDayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
-    String dayOfWeekName = NotificationUtils.getSystemValue(params, DAY_OF_WEEK_END_SYS_KEY, DAY_OF_WEEK_END_KEY, defaultDayName);
-    this.dayOfWeekend = NotificationUtils.getDayOfWeek(dayOfWeekName);
-    this.dayOfMonthend = NotificationUtils.getValueParam(params, "dayOfMonthend", 28);
   }
 
   public String getWorkspace() {
@@ -48,21 +37,23 @@ public class NotificationConfiguration implements Serializable {
   }
 
   /**
-   * @return the dayOfWeekend
+   * @return the isSendWeekly
    */
-  public int getDayOfWeekend() {
-    return dayOfWeekend;
+  public boolean isSendWeekly() {
+    return isSendWeekly;
   }
 
   /**
-   * @return the dayOfMonthend
+   * @param isSendWeekly the isSendWeekly to set
    */
-  public int getDayOfMonthend() {
-    return dayOfMonthend;
-  }
-  
-  public void setDayOfWeekend(int dayOfWeekend) {
-    this.dayOfWeekend = dayOfWeekend;
+  public void setSendWeekly(boolean isSendWeekly) {
+    this.isSendWeekly = isSendWeekly;
   }
 
+  /**
+   * @param workspace the workspace to set
+   */
+  public void setWorkspace(String workspace) {
+    this.workspace = workspace;
+  }
 }

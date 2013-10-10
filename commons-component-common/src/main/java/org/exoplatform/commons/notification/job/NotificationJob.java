@@ -16,7 +16,6 @@
  */
 package org.exoplatform.commons.notification.job;
 
-import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
@@ -25,20 +24,19 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class NotificationJob implements Job {
-  private static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
+public abstract class NotificationJob implements Job {
+  protected static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
 
   public NotificationJob() {}
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    LOG.debug("Starting run job to send email notification ... ");
     if (isValid() == false) {
       return;
     }
 
     try {
-      CommonsUtils.getService(NotificationService.class).processDigest();
+      processSendNotification();
     } catch (Exception e) {
       LOG.error("Failed to running NotificationJob", e);
     }
@@ -52,4 +50,6 @@ public class NotificationJob implements Job {
       return false;
     }
   }
+  
+  protected abstract void processSendNotification() throws Exception;
 }

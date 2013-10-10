@@ -16,17 +16,10 @@
  */
 package org.exoplatform.commons.notification;
 
-import java.text.DateFormatSymbols;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.jcr.Value;
 import javax.mail.internet.AddressException;
@@ -55,11 +48,6 @@ public class NotificationUtils {
 
   public static final String FEATURE_NAME              = "notification";
   
-  public static Pattern patternInteger = Pattern.compile("^[0-9]+$");
-  
-  private static Map<String, Integer> dataDayOfWeek = new HashMap<String, Integer>();
-  
-
   public static String getDefaultKey(String key, String providerId) {
     return MessageFormat.format(key, providerId);
   }
@@ -139,10 +127,6 @@ public class NotificationUtils {
     return list;
   }
   
-  public static boolean isInteger(String str) {
-    return patternInteger.matcher(str).matches();
-  }
-
   public static String getValueParam(InitParams params, String key, String defaultValue) {
     try {
       return params.getValueParam(key).getValue();
@@ -173,110 +157,6 @@ public class NotificationUtils {
   
   public static int getSystemValue(InitParams params, String systemKey, String paramKey, int defaultValue) {
     return Integer.valueOf(getSystemValue(params, systemKey, paramKey, String.valueOf(defaultValue)));
-  }
-
-  public static int getDayOfWeek(String dayName) {
-    if (dataDayOfWeek.size() == 0) {
-      DateFormatSymbols dateFormat = DateFormatSymbols.getInstance(Locale.ENGLISH);
-      String symbolDayNames[] = dateFormat.getWeekdays();
-      for (int countDayname = 0; countDayname < symbolDayNames.length; countDayname++) {
-        dataDayOfWeek.put(symbolDayNames[countDayname].toLowerCase(), countDayname);
-      }
-    }
-    if (dayName == null || dayName.length() == 0) {
-      return Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-    }
-    dayName = dayName.toLowerCase().trim();
-    if (isInteger(dayName)) {
-      return Integer.parseInt(dayName);
-    } else {
-      Integer dayOfWeek = dataDayOfWeek.get(dayName.toLowerCase());
-      return (dayOfWeek == null) ? 0 : dayOfWeek;
-    }
-  }
-  
-  public static boolean isWeekEnd(int number) {
-    Calendar calendar = Calendar.getInstance();
-    return (calendar.get(Calendar.DAY_OF_WEEK) == number) ? true : false;
-  }
-  
-  public static boolean isMonthEnd(int number) {
-    Calendar calendar = Calendar.getInstance();
-    return (calendar.get(Calendar.DAY_OF_MONTH) == number) ? true : false;
-  }
-  
-  public static Date getStartTime(String stime) {
-    //
-    if (stime == null || stime.trim().length() == 0 || stime.trim().indexOf("-") == 0) {
-      return new Date(System.currentTimeMillis() + 120000);
-    }
-    //
-    if (stime.startsWith("+")) {
-      return new Date(System.currentTimeMillis() + Long.parseLong(stime.substring(1)));
-    }
-    //
-    stime = stime.toLowerCase();
-    int m = 0, h;
-    int p = (stime.indexOf("pm") > 0) ? 12 : 0;
-
-    stime = stime.replace("am", "").replace("pm", "").trim();
-    if(stime.indexOf(":") > 0) {
-      String []strs = stime.split(":");
-      h = Integer.parseInt(strs[0].trim());
-      m = Integer.parseInt(strs[1].trim());
-    } else {
-      h = Integer.parseInt(stime);
-    }
-    if (h < 12) {
-      h += p;
-    }
-    //
-    h = h % 24;
-
-    return getDateByHours(h, m);
-  }
-
-  /**
-   * Parsers the hours and minutes  value from configuration to date value
-   * 
-   * @param h
-   * @param m
-   * @return
-   */
-  public static Date getDateByHours(int h, int m) {
-    Calendar calendar = GregorianCalendar.getInstance();
-    int crh = calendar.get(Calendar.HOUR_OF_DAY);
-    calendar.set(Calendar.MINUTE, m);
-    if (h >= crh) {
-      calendar.set(Calendar.HOUR_OF_DAY, h);
-    } else {
-      int delta = (24 - crh + h);
-      calendar.setTimeInMillis(calendar.getTimeInMillis() + 3600000 * delta);
-    }
-    return calendar.getTime();
-  }
-
-  /**
-   * Parsers the repeat interval value from configuration to long value
-   * @param period
-   * @return
-   */
-  public static long getRepeatInterval(String period) {
-    period = period.toLowerCase().replace("+", "");
-
-    if (period.indexOf("m") > 0) {
-      return 60000 * Integer.parseInt(period.replace("m", "").trim());
-    }
-
-    if (period.indexOf("h") > 0) {
-      return 3600000 * Integer.parseInt(period.replace("h", "").trim());
-    }
-
-    if (period.indexOf("d") > 0) {
-      return 86400000 * Integer.parseInt(period.replace("d", "").trim());
-    }
-
-    return Long.parseLong(period.trim());
   }
   
   public static boolean isValidEmailAddresses(String addressList){

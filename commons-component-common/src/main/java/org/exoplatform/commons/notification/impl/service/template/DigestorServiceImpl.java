@@ -34,7 +34,6 @@ import org.exoplatform.commons.api.notification.service.setting.PluginSettingSer
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.NotificationConfiguration;
-import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
@@ -147,8 +146,7 @@ public class DigestorServiceImpl implements DigestorService {
       String language = NotificationPluginUtils.getLanguage(userSetting.getUserId());
       locale = (language == null || language.length() == 0) ? Locale.ENGLISH : new Locale(language);
       
-      isWeekly = (NotificationUtils.isWeekEnd(configuration.getDayOfWeekend()) && 
-                    userSetting.getWeeklyProviders().size() > 0);
+      isWeekly = (configuration.isSendWeekly() && userSetting.getWeeklyProviders().size() > 0);
       //
       if(isWeekly) {
         pluginId = DigestWeeklyPlugin.ID;

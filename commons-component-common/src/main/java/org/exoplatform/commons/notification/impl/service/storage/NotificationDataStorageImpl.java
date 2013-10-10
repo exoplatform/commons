@@ -82,13 +82,14 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
     try {
-      // for daily
-      for (String pluginId : setting.getDailyProviders()) {
-        putMap(notificationData, NotificationKey.key(pluginId), getNotificationMessages(sProvider, pluginId, NTF_SEND_TO_DAILY, setting.getUserId()));
-      }
 
-      // for weekly
-      if (NotificationUtils.isWeekEnd(configuration.getDayOfWeekend())) {
+      if (configuration.isSendWeekly() == false) {
+        // for daily
+        for (String pluginId : setting.getDailyProviders()) {
+          putMap(notificationData, NotificationKey.key(pluginId), getNotificationMessages(sProvider, pluginId, NTF_SEND_TO_DAILY, setting.getUserId()));
+        }
+      } else {
+        // for weekly
         for (String pluginId : setting.getWeeklyProviders()) {
           putMap(notificationData, NotificationKey.key(pluginId), getNotificationMessages(sProvider, pluginId, NTF_SEND_TO_WEEKLY, setting.getUserId()));
         }
@@ -247,7 +248,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
         }
       }
       // remove node weekly for case send all.
-      if (NotificationUtils.isWeekEnd(configuration.getDayOfWeekend())) {
+      if (configuration.isSendWeekly()) {
         Node messageHomeNode = notificationHome.getNode(MESSAGE_HOME_NODE);
         NodeIterator iterator = getNotificationNodeMessages(messageHomeNode, NTF_SEND_TO_WEEKLY, NotificationInfo.FOR_ALL_USER);
         String nodePath;

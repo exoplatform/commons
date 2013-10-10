@@ -201,7 +201,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     queryBuffer.append("@").append(EXO_IS_ACTIVE).append("='true' and (")
                .append("@").append(EXO_DAILY).append("!=").append("''");
     //
-    if (NotificationUtils.isWeekEnd(configuration.getDayOfWeekend())) {
+    if (configuration.isSendWeekly()) {
       queryBuffer.append("or @").append(EXO_WEEKLY).append("!=").append("''");
     }
 

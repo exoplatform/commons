@@ -45,7 +45,7 @@
 		<type>org.exoplatform.commons.notification.impl.service.QueueMessageImpl</type>
 		<init-params>
 			<value-param>
-				<name>maxToSend</name> <!-- Max number of mails to send in period time -->
+				<name>numberOfMailPerBatch</name> <!-- Max number of mails to send in period time -->
 				<value>50</value>
 			</value-param>
 			<value-param>
@@ -53,7 +53,7 @@
 				<value>120</value>
 			</value-param>
 			<value-param>
-				<name>delayTime</name><!-- The time to repeat interval call send email notification -->
+				<name>period</name><!-- The time to repeat interval call send email notification -->
 				<value>60</value>
 			</value-param>
 		</init-params>
@@ -65,11 +65,6 @@
       <value-param>
         <name>workspace</name>
         <value>portal-system</value>
-      </value-param>
-
-      <value-param>
-        <name>dayOfWeekend</name><!-- The day of week to send weekly notification-->
-        <value>6</value><!-- The value is number lest than 7 and more than 0 or name day of week (Monday, Tuesday, Wednesday...)-->
       </value-param>
     </init-params>
   </component>
@@ -84,29 +79,40 @@
   </component>
   
   <external-component-plugins>
-    <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
-    <component-plugin>
-      <name>SendNotificationJob</name>
-      <set-method>addPeriodJob</set-method>
-      <type>org.exoplatform.commons.notification.job.NotificationPeriodJob</type>
-      <description>add a send notification job to the JobSchedulerService</description>
+     <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>    
+     <component-plugin>
+     <name>AddCronJob</name>
+     <set-method>addCronJob</set-method>
+     <type>org.exoplatform.services.scheduler.CronJob</type>
+      <description>add a send daily notification job to the JobSchedulerService</description>
       <init-params>
         <properties-param>
-          <name>job.info</name>
-          <description>save the monitor data  periodically</description>
-          <property name="jobName" value="NotificationJob"/>
+          <name>cronjob.info</name>
+          <description>Configuration for daily send notification</description>
+          <property name="jobName" value="NotificationDailyJob"/>
           <property name="groupName" value="Notification"/>
-          <property name="job" value="org.exoplatform.commons.notification.job.NotificationJob"/>
-          <property name="period" value="0"/>
-          <property name="repeatCount" value="0"/>
-          <!-- repeat interval call make email notification -->
-          <property name="repeatTime" value="${job.notification.NotificationPeriodJob.repeatTime:1d}"/>
-                                              <!-- The value is number of m/h/d or +time milliseconds (ex: +180000)-->
+          <property name="job" value="org.exoplatform.commons.notification.job.NotificationDailyJob"/>
+          <property name="expression" value="${cronJob.notification.NotificationDailyJob.expression:0 0 23 ? * *}"/><!-- Run at 11:00pm every day -->
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
 
-          <!-- The start time will call make email notification -->
-          <property name="startAtTime" value="${job.notification.NotificationPeriodJob.startAtTime:11:30PM}"/>
-                                              <!-- The value is number hours of a day: 23, 11:15AM, 11:20PM -->
-          <property name="endTime" value=""/>               
+  <external-component-plugins>
+     <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>    
+     <component-plugin>
+     <name>AddCronJob</name>
+     <set-method>addCronJob</set-method>
+     <type>org.exoplatform.services.scheduler.CronJob</type>
+      <description>add a send weekly notification job to the JobSchedulerService</description>
+      <init-params>
+        <properties-param>
+          <name>cronjob.info</name>
+          <description>Configuration for weekly send notification</description>
+          <property name="jobName" value="NotificationWeeklyJob"/>
+          <property name="groupName" value="Notification"/>
+          <property name="job" value="org.exoplatform.commons.notification.job.NotificationWeeklyJob"/>
+          <property name="expression" value="${cronJob.notification.NotificationWeeklyJob.expression:0 0 11 ? * SUN}"/><!-- Run at 11:00am every Sunday in every month -->
         </properties-param>
       </init-params>
     </component-plugin>

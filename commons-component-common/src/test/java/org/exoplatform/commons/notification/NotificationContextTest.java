@@ -16,11 +16,11 @@
  */
 package org.exoplatform.commons.notification;
 
+import junit.framework.TestCase;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-
-import junit.framework.TestCase;
 
 public class NotificationContextTest extends TestCase {
 

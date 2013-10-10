@@ -35,10 +35,10 @@ public class QueueMessageImpl implements QueueMessage {
   
   private static final Log               LOG                   = ExoLogger.getExoLogger(QueueMessageImpl.class);
 
-  private static final String            MAX_TO_SEND_SYS_KEY   = "conf.notification.service.QueueMessage.maxToSend";
-  private static final String            MAX_TO_SEND_KEY       = "maxToSend";
-  private static final String            DELAY_TIME_SYS_KEY    = "conf.notification.service.QueueMessage.delayTime";
-  private static final String            DELAY_TIME_KEY        = "delayTime";
+  private static final String            MAX_TO_SEND_SYS_KEY   = "conf.notification.service.QueueMessage.numberOfMailPerBatch";
+  private static final String            MAX_TO_SEND_KEY       = "numberOfMailPerBatch";
+  private static final String            DELAY_TIME_SYS_KEY    = "conf.notification.service.QueueMessage.period";
+  private static final String            DELAY_TIME_KEY        = "period";
   private static final String            INITIAL_DELAY_SYS_KEY = "conf.notification.service.QueueMessage.initialDelay";
   private static final String            INITIAL_DELAY_KEY     = "initialDelay";
   
