@@ -48,11 +48,15 @@ public abstract class AbstractService {
 
   public static final String NTF_MESSAGE              = "ntf:message";
 
+  public static final String NTF_MESSAGE_INFO         = "ntf:messageInfo";
+
   public static final String NTF_SEND_TO_DAILY        = "ntf:sendToDaily";
 
   public static final String NTF_SEND_TO_WEEKLY       = "ntf:sendToWeekly";
 
   public static final String NTF_MESSAGE_HOME         = "ntf:messageHome";
+
+  public static final String NTF_MESSAGE_INFO_HOME    = "ntf:messageInfoHome";
 
   public static final String NTF_NOTIFICATION         = "ntf:notification";
 
@@ -80,7 +84,7 @@ public abstract class AbstractService {
   
   public static final String MESSAGE_HOME_NODE        = "messageHome";
   
-  public static final String PROVIDER_HOME_NODE       = "providerHome";
+  public static final String MESSAGE_INFO_HOME_NODE   = "messageInfoHome";
 
   public static final String SETTING_NODE             = "settings";
 
@@ -110,6 +114,24 @@ public abstract class AbstractService {
   }
 
   /**
+   * Get the home node of MessageInfo node
+   * 
+   * @param sProvider
+   * @param workspace
+   * @return
+   * @throws Exception
+   */
+  protected Node getMessageInfoHomeNode(SessionProvider sProvider, String workspace) throws Exception {
+    Node ntfHomeNode = getNotificationHomeNode(sProvider, workspace);
+    if (ntfHomeNode.hasNode(MESSAGE_INFO_HOME_NODE) == false) {
+      Node messageHome = ntfHomeNode.addNode(MESSAGE_INFO_HOME_NODE, NTF_MESSAGE_INFO_HOME);
+      sessionSave(ntfHomeNode);
+      return messageHome;
+    }
+    return ntfHomeNode.getNode(MESSAGE_INFO_HOME_NODE);
+  }
+
+  /**
    * Makes the node path for MessageHome node
    * "/eXoNotification/messageHome/<pluginId>/<DAY_OF_MONTH>/<HOUR_OF_DAY>/"
    * 
@@ -121,9 +143,9 @@ public abstract class AbstractService {
   protected Node getOrCreateMessageParent(SessionProvider sProvider, String workspace, String pluginId) throws Exception {
     Node providerNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
     String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-    Node dayNode = getOrCreateNode(providerNode, DAY + dayName);
+    Node dayNode = getOrCreateMessageNode(providerNode, DAY + dayName);
     String hourName = String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-    Node messageParentNode = getOrCreateNode(dayNode, HOUR + hourName);
+    Node messageParentNode = getOrCreateMessageNode(dayNode, HOUR + hourName);
     return messageParentNode;
   }
 
@@ -139,12 +161,12 @@ public abstract class AbstractService {
   protected Node getMessageNodeByPluginId(SessionProvider sProvider, String workspace, String pluginId) throws Exception {
     Node root = getNotificationHomeNode(sProvider, workspace);
     // rootPath = "/eXoNotification/messageHome/"
-    Node messageHome = getOrCreateNode(root, MESSAGE_HOME_NODE);
+    Node messageHome = getOrCreateMessageNode(root, MESSAGE_HOME_NODE);
     // pluginPath = /eXoNotification/messageHome/<pluginId>/
-    return getOrCreateNode(messageHome, pluginId);
+    return getOrCreateMessageNode(messageHome, pluginId);
   }
   
-  private Node getOrCreateNode(Node parent, String nodeName) throws Exception {
+  private Node getOrCreateMessageNode(Node parent, String nodeName) throws Exception {
     if (parent.hasNode(nodeName) == false) {
       Node messageHome = parent.addNode(nodeName, NTF_MESSAGE_HOME);
       messageHome.addMixin(MIX_SUB_MESSAGE_HOME);

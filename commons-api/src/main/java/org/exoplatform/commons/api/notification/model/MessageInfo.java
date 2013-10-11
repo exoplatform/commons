@@ -16,9 +16,13 @@
  */
 package org.exoplatform.commons.api.notification.model;
 
+import org.exoplatform.services.jcr.util.IdGenerator;
 import org.exoplatform.services.mail.Message;
+import org.json.JSONObject;
 
 public class MessageInfo {
+  private String id;
+
   private String from;
 
   private String to;
@@ -32,15 +36,30 @@ public class MessageInfo {
   private String pluginId = "";
 
   public MessageInfo() {
+    id = "messageInfo" + IdGenerator.generate();
   }
-  
+
+  /**
+   * @param id the pluginId to set
+   */
+  public MessageInfo setId(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * @return the id
+   */
+  public String getId() {
+    return id;
+  }
+
   /**
    * @return the pluginId
    */
   public String getPluginId() {
     return pluginId;
   }
-
 
   /**
    * @param pluginId the pluginId to set
@@ -160,6 +179,10 @@ public class MessageInfo {
            .append("body: '").append(body.replaceAll("'", "&#39;")).append("' ")
            .append("}");
     return builder.toString();
+  }
+
+  public String toJSON() {
+    return new JSONObject(this).toString();
   }
 
 }

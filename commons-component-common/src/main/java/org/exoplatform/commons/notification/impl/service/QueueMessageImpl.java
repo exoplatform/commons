@@ -16,23 +16,37 @@
  */
 package org.exoplatform.commons.notification.impl.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
+import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
+import org.json.JSONObject;
+import org.picocontainer.Startable;
 
-public class QueueMessageImpl implements QueueMessage {
-  
+public class QueueMessageImpl extends AbstractService implements QueueMessage, Startable {
   private static final Log               LOG                   = ExoLogger.getExoLogger(QueueMessageImpl.class);
 
   private static final String            MAX_TO_SEND_SYS_KEY   = "conf.notification.service.QueueMessage.numberOfMailPerBatch";
@@ -41,31 +55,43 @@ public class QueueMessageImpl implements QueueMessage {
   private static final String            DELAY_TIME_KEY        = "period";
   private static final String            INITIAL_DELAY_SYS_KEY = "conf.notification.service.QueueMessage.initialDelay";
   private static final String            INITIAL_DELAY_KEY     = "initialDelay";
-  
+  private static final int               BUFFER_SIZE           = 32;
+
+  private int                            MAX_TO_SEND;
+  private int                            DELAY_TIME;
+  private int                            INITIAL_DELAY;
+
+  private MailService                    mailService;
+  private NotificationConfiguration      configuration;
+
   private final Queue<MessageInfo> messageQueue = new ConcurrentLinkedQueue<MessageInfo>();
-  
-  private int MAX_TO_SEND;
-  private int DELAY_TIME;
-  private int INITIAL_DELAY;
-  
-  private MailService mailService;
-  
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
   
   public QueueMessageImpl(InitParams params) {
-    
+    this.mailService = CommonsUtils.getService(MailService.class);
+    this.configuration = CommonsUtils.getService(NotificationConfiguration.class);
+
     MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 50);
     DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120);
     INITIAL_DELAY = NotificationUtils.getSystemValue(params, INITIAL_DELAY_SYS_KEY, INITIAL_DELAY_KEY, 60);
-    this.mailService = CommonsUtils.getService(MailService.class);
-    
+
     scheduler.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
         send();
       }
     }, INITIAL_DELAY, DELAY_TIME, TimeUnit.SECONDS);
-    
+
+  }
+
+  @Override
+  public void start() {
+    //
+    setBackMessageInfos();
+  }
+
+  @Override
+  public void stop() {
   }
 
   @Override
@@ -80,28 +106,125 @@ public class QueueMessageImpl implements QueueMessage {
       return false;
     }
     messageQueue.add(message);
-
+    //
+    saveMessageInfo(message);
     return true;
+  }
+  
+  private void saveMessageInfo(MessageInfo message) {
+    SessionProvider sProvider = getSystemProvider();
+    try {
+      Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
+      Node messageInfoNode = messageInfoHome.addNode(message.getId(), NTF_MESSAGE_INFO);
+      //
+      saveData(messageInfoNode, compress(message.toJSON()));
+
+      sessionSave(messageInfoHome);
+    } catch (Exception e) {
+      LOG.warn("Failed to storage MessageInfo: " + message.toJSON(), e );
+    }
+  }
+
+  private void setBackMessageInfos() {
+    SessionProvider sProvider = getSystemProvider();
+    try {
+      Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
+      NodeIterator iter = messageInfoHome.getNodes();
+      MessageInfo info;
+      while (iter.hasNext()) {
+
+        Node messageInfoNode = iter.nextNode();
+        try {
+          String messageJson = getDataJson(messageInfoNode);
+          JSONObject object = new JSONObject(messageJson);
+          info = new MessageInfo();
+          info.setId(object.getString("id"))
+              .pluginId(object.optString("pluginId"))
+              .from(object.getString("from"))
+              .to(object.getString("to"))
+              .subject(object.getString("subject"))
+              .body(object.getString("body"))
+              .footer(object.optString("footer"));
+          //
+          messageQueue.add(info);
+          LOG.debug("Set back MessageInfo after stop server " + info.getId());
+        } catch (Exception e) {
+          LOG.warn("Failed to set back MessageInfo " + messageInfoNode.getName(), e);
+        }
+      }
+    } catch (Exception e) {
+      LOG.warn("Failed to set back MessageInfo from database ", e);
+    }
+  }
+
+  private void removeMessageInfo(MessageInfo message) {
+    SessionProvider sProvider = getSystemProvider();
+    try {
+      Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
+      messageInfoHome.getNode(message.getId()).remove();
+      sessionSave(messageInfoHome);
+      LOG.debug("remove MessageInfo " + message.getId());
+    } catch (Exception e) {
+      LOG.error("Failed to remove MessageInfo " + message.getId(), e);
+    }
   }
 
   @Override
   public void send() {
-    
+
     for (int i = 0; i < MAX_TO_SEND; i++) {
-      try {
-        
-        if (messageQueue.isEmpty() == false) {
-          MessageInfo mailMessage = messageQueue.poll();
-          mailService.sendMessage(mailMessage.makeEmailNotification());
-          LOG.debug("Sent notification to user "+ mailMessage.getTo());
-        } else {
-          break;
+      if (messageQueue.isEmpty() == false) {
+        try {
+          MessageInfo messageInfo = messageQueue.poll();
+          mailService.sendMessage(messageInfo.makeEmailNotification());
+          LOG.debug("\nSent notification to user " + messageInfo.getTo());
+          removeMessageInfo(messageInfo);
+        } catch (Exception e) {
+          LOG.error("Failed to send notification.", e);
         }
-        
-      } catch (Exception e) {
-        LOG.error("Failed to send notification.", e);
+      } else {
+        break;
       }
     }
+  }
+
+  private void saveData(Node node, InputStream is) throws Exception {
+    Node fileNode = node.addNode("datajson", "nt:file");
+    Node nodeContent = fileNode.addNode("jcr:content", "nt:resource");
+    //
+    nodeContent.setProperty("jcr:mimeType", "application/gzip");
+    nodeContent.setProperty("jcr:data", is);
+    nodeContent.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());
+  }
+
+  private String getDataJson(Node node) throws Exception {
+    Node fileNode = node.getNode("datajson");
+    Node nodeContent = fileNode.getNode("jcr:content");
+    InputStream stream = nodeContent.getProperty("jcr:data").getStream();
+    return decompress(stream);
+  }
+
+  public static InputStream compress(String string) throws IOException {
+    ByteArrayOutputStream os = new ByteArrayOutputStream(string.length());
+    GZIPOutputStream gos = new GZIPOutputStream(os);
+    gos.write(string.getBytes());
+    ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+    gos.close();
+    os.close();
+    return is;
+  }
+
+  public static String decompress(InputStream is) throws IOException {
+    GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
+    StringBuilder string = new StringBuilder();
+    byte[] data = new byte[BUFFER_SIZE];
+    int bytesRead;
+    while ((bytesRead = gis.read(data)) != -1) {
+      string.append(new String(data, 0, bytesRead));
+    }
+    gis.close();
+    is.close();
+    return string.toString();
   }
 
 }
