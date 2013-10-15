@@ -115,7 +115,7 @@ public class PluginConfig {
     if (groupConfig == null) {
       return null;
     }
-    return groupConfig.addProvider(pluginId).setId(groupId);
+    return groupConfig.addProvider(pluginId);
   }
 
   /**
