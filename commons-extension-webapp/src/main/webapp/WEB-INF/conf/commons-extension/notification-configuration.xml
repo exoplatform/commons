@@ -58,10 +58,6 @@
 				<value>50</value>
 			</value-param>
 			<value-param>
-				<name>initialDelay</name><!-- The start time will call send email notification -->
-				<value>120</value>
-			</value-param>
-			<value-param>
 				<name>period</name><!-- The time to repeat interval call send email notification -->
 				<value>60</value>
 			</value-param>

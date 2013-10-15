@@ -168,6 +168,10 @@ public class MessageInfo {
     return toString();
   }
 
+  public String toJSON() {
+    return new JSONObject(this).toString();
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
@@ -181,8 +185,11 @@ public class MessageInfo {
     return builder.toString();
   }
 
-  public String toJSON() {
-    return new JSONObject(this).toString();
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof MessageInfo && getId().equals(((MessageInfo) obj).getId())) {
+      return true;
+    }
+    return super.equals(obj);
   }
-
 }

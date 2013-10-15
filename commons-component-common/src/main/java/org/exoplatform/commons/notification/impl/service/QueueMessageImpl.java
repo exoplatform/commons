@@ -25,6 +25,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -40,13 +41,16 @@ import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.management.annotations.ManagedBy;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
+import org.exoplatform.services.mail.Message;
 import org.json.JSONObject;
 import org.picocontainer.Startable;
 
+@ManagedBy(SendEmailService.class)
 public class QueueMessageImpl extends AbstractService implements QueueMessage, Startable {
   private static final Log               LOG                   = ExoLogger.getExoLogger(QueueMessageImpl.class);
 
@@ -54,41 +58,60 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private static final String            MAX_TO_SEND_KEY       = "numberOfMailPerBatch";
   private static final String            DELAY_TIME_SYS_KEY    = "conf.notification.service.QueueMessage.period";
   private static final String            DELAY_TIME_KEY        = "period";
-  private static final String            INITIAL_DELAY_SYS_KEY = "conf.notification.service.QueueMessage.initialDelay";
-  private static final String            INITIAL_DELAY_KEY     = "initialDelay";
   private static final int               BUFFER_SIZE           = 32;
 
   private int                            MAX_TO_SEND;
   private int                            DELAY_TIME;
-  private int                            INITIAL_DELAY;
+  
+  ScheduledFuture<?>                      future                = null;
 
+  private SendEmailService               sendEmailService;
   private MailService                    mailService;
   private NotificationConfiguration      configuration;
-
+  
   private final Queue<MessageInfo> messageQueue = new ConcurrentLinkedQueue<MessageInfo>();
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
   
   public QueueMessageImpl(InitParams params) {
-    this.mailService = CommonsUtils.getService(MailService.class);
     this.configuration = CommonsUtils.getService(NotificationConfiguration.class);
+    this.mailService = CommonsUtils.getService(MailService.class);
 
     MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 50);
-    DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120);
-    INITIAL_DELAY = NotificationUtils.getSystemValue(params, INITIAL_DELAY_SYS_KEY, INITIAL_DELAY_KEY, 60);
-
-    scheduler.scheduleAtFixedRate(new Runnable() {
-      @Override
-      public void run() {
-        send();
+    DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120) * 1000;
+  }
+  
+  public void setManagementView(SendEmailService managementView) {
+    this.sendEmailService = managementView;
+  }
+  
+  /**
+   * @param delayTime
+   */
+  public void runnable(int delayTime) {
+    if (delayTime > 0) {
+      if (future != null) {
+        future.cancel(false);
       }
-    }, INITIAL_DELAY, DELAY_TIME, TimeUnit.SECONDS);
-
+      future = scheduler.scheduleAtFixedRate(new Runnable() {
+        @Override
+        public void run() {
+          send();
+        }
+      }, 10000, delayTime, TimeUnit.MILLISECONDS);
+    }
+    if (DELAY_TIME != delayTime) {
+      MAX_TO_SEND = 1;
+    }
   }
 
   @Override
   public void start() {
     //
     setBackMessageInfos();
+    //
+    runnable(DELAY_TIME);
+    //
+    sendEmailService.registerManager(this);
   }
 
   @Override
@@ -170,21 +193,33 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     }
   }
 
+  private boolean sendMessage(Message message) {
+    if (sendEmailService.isOn()) {
+      try {
+        mailService.sendMessage(message);
+        sendEmailService.counter();
+        return true;
+      } catch (Exception e) {
+        LOG.error("Failed to send notification.", e);
+        return false;
+      }
+    }
+    // if service is off, removed message.
+    return true;
+  }
+
   @Override
   public void send() {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     for (int i = 0; i < MAX_TO_SEND; i++) {
       if (messageQueue.isEmpty() == false) {
-        try {
-          MessageInfo messageInfo = messageQueue.poll();
-          mailService.sendMessage(messageInfo.makeEmailNotification());
+        MessageInfo messageInfo = messageQueue.peek();
+        if (sendMessage(messageInfo.makeEmailNotification()) == true) {
+          messageQueue.remove(messageInfo);
           if (stats) {
             NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
           }
-          LOG.debug("\nSent notification to user " + messageInfo.getTo());
           removeMessageInfo(messageInfo);
-        } catch (Exception e) {
-          LOG.error("Failed to send notification.", e);
         }
       } else {
         break;
