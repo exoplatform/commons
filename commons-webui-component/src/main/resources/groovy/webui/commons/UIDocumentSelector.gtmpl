@@ -46,7 +46,7 @@
                   " msg_select_drive=\"" + _ctx.appRes(uicomponent.id + '.label.require-drive') + "\"" +
                   " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +
                   " msg_invalid_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.invalid-folder-name') + "\"" +
-                  " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\"><i class=\"uiIconPlus uiIconLightGray\"></i></a>";
+                  " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\"><i class=\"uiIconEcmsAddFolder uiIconEcmsLightGrey\"></i></a>";
 
      %>
 	<div class="clearfix">
@@ -64,7 +64,7 @@
   <div  style="display: none;" class="center progressBarFrame clearfix">
       <span class="deleteFileLabel pull-right">
         <a href="#" class="actionIcon" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIFormUploadInput.label.Cancel")%>">
-        <i class="uiIconRemove"></i>
+        <i class="uiIconRemove uiIconLightGray"></i>
         </a>
       </span>
   <div class="fileNameLabel pull-left"></div>
