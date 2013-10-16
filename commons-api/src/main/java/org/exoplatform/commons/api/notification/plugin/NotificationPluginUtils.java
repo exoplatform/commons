@@ -39,6 +39,8 @@ public class NotificationPluginUtils {
   public static final String NOTIFICATION_SENDER_NAME  = "exo:notificationSenderName";
   
   public static final String NOTIFICATION_SENDER_EMAIL = "exo:notificationSenderEmail";
+  
+  public static final String BRANDING_PORTAL_NAME = "exo:brandingPortalName";
 
   public static String getPortalName() {
     return getExoContainerContext().getPortalContainerName();
@@ -117,6 +119,15 @@ public class NotificationPluginUtils {
   public static String getSenderName() {
     SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, NOTIFICATION_SENDER_NAME);
     return name != null ? (String) name.getValue() : System.getProperty("exo.notifications.portalname", "eXo");
+  }
+  
+  /**
+   * Get branding Portal Name 
+   * @return
+   */
+  public static String getBrandingPortalName() {
+    SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, BRANDING_PORTAL_NAME);
+    return name != null ? (String) name.getValue() : "eXo";
   }
   
   public static String getPortalHome(String portalName) {

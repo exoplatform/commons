@@ -140,7 +140,7 @@ public class DigestorServiceImpl implements DigestorService {
     public DigestInfo(NotificationConfiguration configuration, UserSetting userSetting) {
       firstName = NotificationPluginUtils.getFirstName(userSetting.getUserId());
       sendTo = NotificationPluginUtils.getTo(userSetting.getUserId());
-      portalName = NotificationPluginUtils.getSenderName();
+      portalName = NotificationPluginUtils.getBrandingPortalName();
       portalHome = NotificationPluginUtils.getPortalHome(portalName);
       footerLink = NotificationPluginUtils.getProfileUrl(userSetting.getUserId());
       String language = NotificationPluginUtils.getLanguage(userSetting.getUserId());
