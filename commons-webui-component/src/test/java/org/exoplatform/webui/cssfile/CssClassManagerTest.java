@@ -20,11 +20,12 @@ import junit.framework.TestCase;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ObjectParameter;
+import org.json.JSONArray;
 
 public class CssClassManagerTest extends TestCase {
   private CssClassManager cssClassManager ;
 
-  public CssClassManagerTest() {
+  public CssClassManagerTest() throws Exception {
     cssClassManager = new CssClassManager(null);
     //
     InitParams params = makeInitParams();
@@ -34,6 +35,15 @@ public class CssClassManagerTest extends TestCase {
     cssClassManager.initCssClassIconFile();
   }
   
+  public void testGetDataJson() throws Exception {
+    String jsonData = cssClassManager.getClassIconJsonData();
+    try {
+      new JSONArray(jsonData).toString();
+      assertTrue(true);
+    } catch (Exception e) {
+      assertTrue(e.toString(), false);
+    }
+  }
   
   public void testGetCSSClassByFileName() {
     String actual = cssClassManager.getCSSClassByFileName("", CssClassManager.ICON_SIZE.ICON_16);
@@ -90,16 +100,16 @@ public class CssClassManagerTest extends TestCase {
   private InitParams makeInitParams() {
     
     InitParams params = new InitParams();
-    ObjectParameter objectParameter = makeObjectParameter("mp3", "FileAudio", "typemp3,typeaudio,typewav");
+    ObjectParameter objectParameter = makeObjectParameter("mp3", "FileAudio", "typemp3, typeaudio, typewav");
     params.put(objectParameter.getName(), objectParameter);
 
-    objectParameter = makeObjectParameter("pdf", "FilePDF", "typepdf,typepdd");
+    objectParameter = makeObjectParameter("pdf", "FilePDF", "typepdf, typepdd");
     params.put(objectParameter.getName(), objectParameter);
 
-    objectParameter = makeObjectParameter("mpg", "FileVideo", "typempg,typempeg,typeavi");
+    objectParameter = makeObjectParameter("mpg", "FileVideo", "typempg, typempeg, typeavi");
     params.put(objectParameter.getName(), objectParameter);
 
-    objectParameter = makeObjectParameter("jpg", "FileJpg", "typejpg,typejpeg,typejpng");
+    objectParameter = makeObjectParameter("jpg", "FileJpg", "typejpg, typejpeg, typejpng");
     params.put(objectParameter.getName(), objectParameter);
 
     objectParameter = makeObjectParameter("css", "FileCss", "typecss, FileLess");

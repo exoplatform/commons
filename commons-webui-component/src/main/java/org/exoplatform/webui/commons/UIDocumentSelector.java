@@ -32,6 +32,7 @@ import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.core.UIDropDownControl;
 import org.exoplatform.webui.core.lifecycle.Lifecycle;
 import org.exoplatform.webui.core.model.SelectItemOption;
+import org.exoplatform.webui.cssfile.CssClassUtils;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
 
@@ -144,6 +145,10 @@ public class UIDocumentSelector extends UIContainer {
 
   public void setSeletedFolder(String seletedFolder) {
     this.seletedFolder = seletedFolder;
+  }
+  
+  protected String getDataJsonIconFileType() {
+    return CssClassUtils.getCssClassManager().getClassIconJsonData();
   }
 
   protected String getRestContext() {

@@ -86,6 +86,10 @@ public class CssClassIconFile {
    * @return the groupFileTypes
    */
   public String getGroupFileTypes() {
+    if(groupFileTypes == null) {
+      groupFileTypes = "";
+    }
+    groupFileTypes = groupFileTypes.replaceAll("\\s", "");
     return groupFileTypes;
   }
 
@@ -104,11 +108,7 @@ public class CssClassIconFile {
   }
 
   private void setListGroupFileTypes() {
-    if(groupFileTypes == null) {
-      groupFileTypes = "";
-    }
-    String groupFileTypes = this.groupFileTypes.replaceAll("\\s", "");
-    listGroupFileTypes = new ArrayList<String>(Arrays.asList(groupFileTypes.split(",")));
+    listGroupFileTypes = new ArrayList<String>(Arrays.asList(getGroupFileTypes().split(",")));
   }
 
   /**
@@ -152,7 +152,9 @@ public class CssClassIconFile {
 
   @Override
   public String toString() {
-    return "[type=" + type + ", cssClass=" + cssClass + ", groupFileTypes=" + groupFileTypes + "]";
+    return new StringBuilder("{type:'").append(type)
+        .append("', cssClass:'").append(cssClass).append("', groupFileTypes:'")
+        .append(getGroupFileTypes()).append("'}").toString();
   }
 
 }

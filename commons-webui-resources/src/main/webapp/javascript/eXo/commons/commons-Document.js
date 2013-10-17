@@ -1,4 +1,4 @@
-(function(jQuery,gtnbase){
+(function(CssIconFile, jQuery, gtnbase){
 	var _module = {};
 	
 /********** Document Selector ***********/
@@ -48,6 +48,7 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext){
   documentItem.driveType = this.defaultDriveType;
   me.resetDropDownBox();
   me.renderDetails(documentItem);
+  CssIconFile.init();
 };
 
 DocumentSelector.prototype.resetDropDownBox = function() {
@@ -131,7 +132,7 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
    var nodeType = folderList[i].getAttribute("nodeType");
    var workspaceName = folderList[i].getAttribute("workspaceName");
    var canAddChild = folderList[i].getAttribute("canAddChild");
-   var uiIconFolder = "uiIcon16x16FolderDefault " + me.getClazzIcon(folderList[i].getAttribute("nodeType"))
+   var uiIconFolder = "uiIcon16x16FolderDefault " + CssIconFile.getCssClassByType(nodeType);
    var iconEl = jQuery('<i/>', {
                               'class' : uiIconFolder
                             });
@@ -191,12 +192,12 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
   }
 
 	for ( var i = 0; i < folderList.length; i++) { // render folders
-	  var folderIcon = "uiIcon16x16FolderDefault " + me.getClazzIcon(folderList[i].getAttribute("nodeType"));
 	  var jcrPath = folderList[i].getAttribute("path");
 	  var nodeType = folderList[i].getAttribute("folderType");
 	  var name = folderList[i].getAttribute("name");
 	  var title = folderList[i].getAttribute("title");
 	  var titlePath = folderList[i].getAttribute("titlePath");
+	  var folderIcon = "uiIcon16x16FolderDefault " + CssIconFile.getCssClassByType(folderList[i].getAttribute("nodeType"));
 
 	  var childFolder = folderList[i].getAttribute("currentFolder");
 	  var canRemove = folderList[i].getAttribute("canRemove");
@@ -247,7 +248,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
         size += '&nbsp;MB';
       }
       
-      var fileIcon = "uiIcon16x16FileDefault " + me.getClazzIcon(fileList[j].getAttribute("nodeType"));
+      var fileIcon = CssIconFile.getCssClassByNameAndType(node, nodeType);
     
     
 	    var iconEl = jQuery('<i/>', {
@@ -522,19 +523,6 @@ function BreadCrumbs() {
   };
 };
 
-DocumentSelector.prototype.getClazzIcon = function(nodeType){
-  var strClassIcon = '';
-  if (!nodeType) {
-    strClassIcon = "uiIcon16x16Default";
-    return strClassIcon;
-  }
-  nodeType = nodeType.replace(/\//g,"").replace(/:/g, "_");  
-  strClassIcon = "uiIcon16x16" + nodeType;
-  return strClassIcon;
-};
-
-
-
 DocumentSelector.prototype.request = function(url){
   var res;
   jQuery.ajax({
@@ -546,7 +534,7 @@ DocumentSelector.prototype.request = function(url){
     }
   });
  return res;
-}
+};
 
 String.prototype.trunc = function(n, useWordBoundary){
   var toLong = this.length > n, s_ = toLong ? this.substr(0, n - 1) : this;
@@ -967,4 +955,4 @@ window.eXo.commons.UIDSUpload = _module.UIDSUpload;
 
 return _module;
 
-})(jQuery,gtnbase)
+})(CssIconFile, jQuery, gtnbase)

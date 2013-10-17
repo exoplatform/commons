@@ -38,6 +38,8 @@ public class CssClassManager implements Startable {
 
   private Map<String, CssClassIconFile> cssClassIconFileData  = new HashMap<String, CssClassIconFile>();
 
+  private String dataJsonIconFileType = null;
+
   public enum ICON_SIZE {
     ICON_16("16x16"), ICON_24("24x24"),
     ICON_48("48x48"), ICON_64("64x64");
@@ -149,4 +151,10 @@ public class CssClassManager implements Startable {
     return String.format("%s%s%s %s%s%s", UI_ICON, size.getName(), cssFile.getCssClass(), UI_ICON, size.getName(), DEFAULT_CSS_ICON_FILE);
   }
   
+  public String getClassIconJsonData() {
+    if (dataJsonIconFileType == null) {
+      dataJsonIconFileType = cssClassIconFileData.values().toString();
+    }
+    return dataJsonIconFileType;
+  }
 }

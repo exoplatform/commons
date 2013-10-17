@@ -20,7 +20,7 @@ import org.exoplatform.container.PortalContainer;
 
 public class CssClassUtils {
 
-  private static CssClassManager getCssClassManager() {
+  public static CssClassManager getCssClassManager() {
     return (CssClassManager) PortalContainer.getInstance().getComponentInstanceOfType(CssClassManager.class);
   }
 

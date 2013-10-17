@@ -717,7 +717,7 @@
               <string>FilePpt</string>
             </field>
             <field name="groupFileTypes">
-              <string><![CDATA[applicationppt,applicationvndopenxmlformats-officedocumentpresentationmlpresentation]]></string>
+              <string><![CDATA[applicationppt,applicationvndopenxmlformats-officedocumentpresentationmlpresentation,FilePptx]]></string>
             </field>
           </object>
         </object-param>
@@ -765,7 +765,7 @@
               <string>FileExcel</string>
             </field>
             <field name="groupFileTypes">
-              <string><![CDATA[applicationxls,applicationxlt,applicationvndopenxmlformats-officedocumentspreadsheetmlsheet,FileXls]]></string>
+              <string><![CDATA[applicationxls,applicationxlt,applicationvndopenxmlformats-officedocumentspreadsheetmlsheet,FileXlsx]]></string>
             </field>
           </object>
         </object-param>
