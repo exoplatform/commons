@@ -650,15 +650,16 @@ function UIDSUpload() {
 	  var uploadIframe = jQuery("#"+uploadId+"UploadIframe",container);
 	  var uploadText = uploadIframe.title;
 	  
-	  var uploadHTML = "";  
-	  uploadHTML += "  <form id='"+uploadId+"' class='UIDSUploadForm' style='margin: 0px; padding: 0px' action='"+uploadAction+"' enctype='multipart/form-data' method='post'>";
-	  uploadHTML += "    <div class='BrowseDiv'>";
-	  uploadHTML += "      <a class='BrowseLink'>";
-	  uploadHTML += "        <input type='file' name='file' size='1' id='file' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
-	  uploadHTML += "      </a>";
-	  uploadHTML += "    </div>";
-	  uploadHTML += "  </form>";
-	  return uploadHTML;
+    var idFile = 'File' + new Date().getTime();
+    var uploadHTML = "";  
+    uploadHTML += "  <form id='"+uploadId+"' class='UIDSUploadForm' style='margin: 0px; padding: 0px' action='"+uploadAction+"' enctype='multipart/form-data' method='post'>";
+    uploadHTML += "    <div class='BrowseDiv'>";
+    uploadHTML += "      <a class=\"BrowseLink\" onclick=\"(function(elm) { document.getElementById('" + idFile + "').click();})(this)\">";
+    uploadHTML += "        <input type='file' name='file' size='1' style='display:none' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
+    uploadHTML += "      </a>";
+    uploadHTML += "    </div>";
+    uploadHTML += "  </form>";
+    return uploadHTML;
 	}
 
 	UIDSUpload.prototype.getStyleSheetContent = function(){
@@ -880,16 +881,13 @@ function UIDSUpload() {
 
 	  var form = uploadFrame.contentWindow.document.getElementById(id);
 
-	  //var file  = DOMUtil.findDescendantById(form, "file");
-	  var file  = jQuery("#file",form);
+	  var file  = jQuery(clickEle ,form);
 	  if(file.attr("value") == null || file.attr("value") == '') return;  
-  	  jQuery(".fileNameLabel").html(file.attr("value"));
-      jQuery(".fileNameLabel").attr("title", file.attr("value"));
- 	 //var progressBarFrame = DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
+	  jQuery(".fileNameLabel").html(file.attr("value"));
+    jQuery(".fileNameLabel").attr("title", file.attr("value"));
 	  var progressBarFrame = jQuery("div.progressBarFrame:first");
 	  progressBarFrame.show() ;  
 	  
-	  //var progressBarLabel = DOMUtil.findFirstChildByClass(progressBarFrame, "div", "ProgressBarLabel") ;
 	  var progressBarLabel = jQuery("div.pull-left percent:first-child",progressBarFrame);
 	  progressBarLabel.html("0%") ;
 	  
@@ -912,7 +910,7 @@ function UIDSUpload() {
 
 	  if(list.length == 0) {
 	    me.listUpload.push(form.id);
-	    setTimeout("eXo.commons.UIDSUpload.refeshProgress('" + id + "');", 1000);
+	    setTimeout("parent.window.eXo.commons.UIDSUpload.refeshProgress('" + id + "');", 1000);
 	  } else {
 	    me.listUpload.push(form.id);  
 	  }
