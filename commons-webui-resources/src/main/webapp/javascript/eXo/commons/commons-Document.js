@@ -260,6 +260,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	      'name' : node,
 	      'title' : title,
 	      'jcrPath' : jcrPath,
+	      'data-file-type':nodeType,
 	      'href' : 'javascript:void(0);'
 	     }).on('click', function() {
 	      _module.DocumentSelector.submitSelectedFile(this);
@@ -279,12 +280,14 @@ DocumentSelector.prototype.submitSelectedFile = function(item){
   var me = _module.DocumentSelector;   
   var nodePath = jQuery(item).attr("jcrPath");
   var fileName = jQuery(item).attr("title");
+  var fileType = jQuery(item).attr("data-file-type");
     
   if (me.selectFileLink) {
     var link = me.selectFileLink.attr("href");
     var endParamIndex = link.lastIndexOf("')");
-    if (endParamIndex > 0)
-      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + encodeURI(nodePath) + "')";
+    if (endParamIndex > 0) {
+      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + encodeURI(nodePath) + "&filetype=" + encodeURI(fileType) +"')";
+    }
     window.location = link;
   }
   if (me.selectFile) {

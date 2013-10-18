@@ -94,11 +94,16 @@ public class UIDocumentSelector extends UIContainer {
 
   protected static final String DATA_ID               = "dataId";
 
+  protected static final String DATA_TYPE             = "filetype";
+
   protected String              seletedFile           = "";
+
+  protected String              seletedFileType       = "";
 
   protected String              seletedFolder         = "";
   
   private boolean               isShowUpload          = true;
+
   
   private static final String GENERAL_DRIVE = "general";
   private static final String GROUP_DRIVE = "group";
@@ -133,6 +138,10 @@ public class UIDocumentSelector extends UIContainer {
 
   public String getSeletedFile() {
     return seletedFile;
+  }
+
+  public String getSeletedFileType() {
+    return seletedFileType;
   }
 
   public void setSeletedFile(String seletedFile) {
@@ -172,6 +181,7 @@ public class UIDocumentSelector extends UIContainer {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
       component.seletedFile = event.getRequestContext().getRequestParameter(DATA_ID);
+      component.seletedFileType = event.getRequestContext().getRequestParameter(DATA_TYPE);
       component.seletedFolder = StringUtils.EMPTY;
       ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
     }
