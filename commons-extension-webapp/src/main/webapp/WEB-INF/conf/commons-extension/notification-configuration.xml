@@ -34,6 +34,15 @@
     <key>org.exoplatform.commons.api.notification.command.NotificationCommand</key>
     <type>org.exoplatform.commons.notification.impl.command.NotificationCommandImpl</type>
   </component>
+  
+  <component>
+    <key>org.exoplatform.commons.notification.impl.StatisticsService</key>
+    <type>org.exoplatform.commons.notification.impl.StatisticsService</type>
+  </component>
+  
+  <component>
+    <type>org.exoplatform.commons.notification.NotificationContextFactory</type>
+  </component>
 
   <component>
     <key>org.exoplatform.commons.api.notification.service.template.DigestorService</key>

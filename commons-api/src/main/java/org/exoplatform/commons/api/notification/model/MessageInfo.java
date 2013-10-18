@@ -33,7 +33,7 @@ public class MessageInfo {
 
   private String footer;
 
-  private String pluginId = "";
+  private String pluginId = "digest";
 
   public MessageInfo() {
     id = "messageInfo" + IdGenerator.generate();

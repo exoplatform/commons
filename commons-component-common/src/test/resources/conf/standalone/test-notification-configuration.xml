@@ -10,9 +10,17 @@
     <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
   </component>
 
- <component>
+  <component>
     <key>org.exoplatform.services.mail.MailService</key>
     <type>org.exoplatform.commons.notification.mock.MockMailService</type>
+  </component>
+  
+  <component>
+    <type>org.exoplatform.commons.notification.impl.StatisticsService</type>
+  </component>
+  
+  <component>
+    <type>org.exoplatform.commons.notification.NotificationContextFactory</type>
   </component>
 
   <component>

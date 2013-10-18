@@ -35,6 +35,7 @@ import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -72,6 +73,12 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       messageNode.setProperty(NTF_SEND_TO_DAILY, message.getSendToDaily());
       messageNode.setProperty(NTF_SEND_TO_WEEKLY, message.getSendToWeekly());
       messageHomeNode.getSession().save();
+      
+      //record statistics insert entity
+      if (NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled()) {
+        NotificationContextFactory.getInstance().getStatisticsCollector().insertEntity(NTF_MESSAGE);
+      }
+      
     } catch (Exception e) {
       LOG.error("Failed to save the NotificationMessage", e);
     }
@@ -143,6 +150,10 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   }
   
   private NodeIterator getNotificationNodeMessages(Node messageHomeNode, String property, String userId) throws Exception {
+    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    long startTime = 0;
+    if ( stats ) startTime = System.currentTimeMillis();
+    
     StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
     queryBuffer.append(messageHomeNode.getPath()).append("//element(*,").append(NTF_MESSAGE).append(")")
                .append("[").append("(@").append(property).append("='").append(userId).append("' or @")
@@ -153,7 +164,13 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
     QueryManager qm = messageHomeNode.getSession().getWorkspace().getQueryManager();
     Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
-    return query.execute().getNodes();
+    NodeIterator it = query.execute().getNodes();
+    
+    //record statistics insert entity
+    if (stats) {
+      NotificationContextFactory.getInstance().getStatisticsCollector().queryExecuted(queryBuffer.toString(), it.getSize(), System.currentTimeMillis() - startTime);
+    }
+    return it;
   }
 
   private NotificationInfo fillModel(Node node) throws Exception {
@@ -203,6 +220,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   }
 
   private void removeProperty(Session session, String path, String property, String value) {
+    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    
     try {
       Node node = (Node) session.getItem(path);
       List<String> values = NotificationUtils.valuesToList(node.getProperty(property).getValues());
@@ -213,6 +232,11 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
         }
         node.setProperty(property, values.toArray(new String[values.size()]));
         node.save();
+        
+        //record entity update here
+        if (stats) {
+          NotificationContextFactory.getInstance().getStatisticsCollector().updateEntity(NTF_MESSAGE);
+        }
       }
     } catch (Exception e) {
       LOG.warn(String.format("Failed to remove property %s of value %s on node ", property, value));
@@ -221,6 +245,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public void removeMessageAfterSent() throws Exception {
+    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Node notificationHome = getNotificationHomeNode(sProvider, workspace);
@@ -232,6 +258,12 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
         for (String nodePath : listPaths) {
           try {
             session.getItem(nodePath).remove();
+            
+            //record entity delete here
+            if (stats) {
+              NotificationContextFactory.getInstance().getStatisticsCollector().deleteEntity(NTF_MESSAGE);
+            }
+            
             LOG.debug("Remove NotificationMessage " + nodePath);
           } catch (Exception e) {
             LOG.warn("Failed to remove node of NotificationMessage " + nodePath, e);
@@ -256,6 +288,11 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
           Node node = iterator.nextNode();
           nodePath = node.getPath();
           node.remove();
+          
+          //record entity delete here
+          if (stats) {
+            NotificationContextFactory.getInstance().getStatisticsCollector().deleteEntity(NTF_MESSAGE);
+          }
           LOG.debug("Remove NotificationMessage " + nodePath);
         }
         session.save();

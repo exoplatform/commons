@@ -35,6 +35,7 @@ import javax.jcr.NodeIterator;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -171,12 +172,15 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
   @Override
   public void send() {
-
+    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     for (int i = 0; i < MAX_TO_SEND; i++) {
       if (messageQueue.isEmpty() == false) {
         try {
           MessageInfo messageInfo = messageQueue.poll();
           mailService.sendMessage(messageInfo.makeEmailNotification());
+          if (stats) {
+            NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
+          }
           LOG.debug("\nSent notification to user " + messageInfo.getTo());
           removeMessageInfo(messageInfo);
         } catch (Exception e) {

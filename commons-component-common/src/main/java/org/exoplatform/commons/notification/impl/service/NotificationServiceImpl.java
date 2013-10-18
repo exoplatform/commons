@@ -34,6 +34,7 @@ import org.exoplatform.commons.api.notification.service.setting.UserSettingServi
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
+import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -46,11 +47,16 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   public NotificationServiceImpl(NotificationDataStorage storage) {
     this.storage = storage;
   }
-
+  
   @Override
   public void process(NotificationInfo notification) throws Exception {
 
     String pluginId = notification.getKey().getId();
+    
+    //create notification here
+    if (NotificationContextFactory.getInstance().getStatisticsService().isStatisticsEnabled()) {
+      NotificationContextFactory.getInstance().getStatisticsCollector().createNotificationInfoCount(pluginId);
+    }
     // if the provider is not active, do nothing
     if (CommonsUtils.getService(PluginSettingService.class).isActive(pluginId) == false) {
       return;
@@ -93,14 +99,25 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
    * @param notification
    */
   private void sendInstantly(NotificationInfo notification) {
-
+    
+    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    
     NotificationContext nCtx = NotificationContextImpl.cloneInstance();
     AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notification.getKey());
     if (plugin != null) {
       nCtx.setNotificationInfo(notification);
       MessageInfo info = plugin.buildMessage(nCtx);
+      if (stats) {
+        NotificationContextFactory.getInstance().getStatisticsCollector().createMessageInfoCount(info.getPluginId());
+      }
+      
       if (info != null) {
         CommonsUtils.getService(QueueMessage.class).put(info);
+        
+        //record put queue here
+        if (stats) {
+          NotificationContextFactory.getInstance().getStatisticsCollector().putQueue(info.getPluginId());
+        }
       }
     }
   }
@@ -157,6 +174,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   }
   
   private void send(DigestorService digest, MailService mail, List<UserSetting> userSettings, boolean isDefault) {
+    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
       if (isDefault) {
@@ -169,6 +187,11 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         if (messageInfo != null) {
           //
           CommonsUtils.getService(QueueMessage.class).put(messageInfo);
+          
+          if (stats) {
+            NotificationContextFactory.getInstance().getStatisticsCollector().createMessageInfoCount(messageInfo.getPluginId());
+            NotificationContextFactory.getInstance().getStatisticsCollector().putQueue(messageInfo.getPluginId());
+          }
         }
       }
     }
