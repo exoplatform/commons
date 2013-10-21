@@ -19,7 +19,7 @@ package org.exoplatform.commons.notification;
 import org.exoplatform.commons.api.notification.stat.Statistics;
 import org.exoplatform.commons.api.notification.stat.StatisticsCollector;
 import org.exoplatform.commons.notification.impl.StatisticsService;
-import org.exoplatform.services.deployment.Utils;
+import org.exoplatform.commons.utils.CommonsUtils;
 
 /**
  * Created by The eXo Platform SAS
@@ -51,7 +51,7 @@ public class NotificationContextFactory {
 
   public static NotificationContextFactory getInstance() {
     if (instance == null) {
-      instance = Utils.getService(NotificationContextFactory.class);
+      instance = CommonsUtils.getService(NotificationContextFactory.class);
     }
     return instance;
   }

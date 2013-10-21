@@ -26,9 +26,10 @@ import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 
 @Managed
-@ManagedDescription("Application statistic service")
+@ManagedDescription("Mock mail service")
 @NameTemplate({ 
-  @Property(key = "service", value = "sendEmailNotification")
+  @Property(key = "service", value = "notification"), 
+  @Property(key = "view", value = "mockmail")
 })
 public class SendEmailService implements ManagementAware {
   private boolean     isOn           = true;
