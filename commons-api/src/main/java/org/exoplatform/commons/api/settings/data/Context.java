@@ -26,11 +26,15 @@ import org.exoplatform.services.security.ConversationState;
 public enum Context {
 
   /**
-   * GLOBAL: Settings should impact all users in the underlying scope.
+   * GLOBAL: Settings should impact all users in the underlying scope. 
+   * @LevelAPI Experimental
+   */
+  GLOBAL, 
+  /**
    * USER: Each user should be able to save his own settings. 
    * @LevelAPI Experimental
    */
-  GLOBAL, USER;
+  USER;
 
   private String id;
 
