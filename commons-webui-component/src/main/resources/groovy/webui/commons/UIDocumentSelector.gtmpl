@@ -1,6 +1,4 @@
 <%
-  import org.gatein.portal.controller.resource.ResourceScope;
-  import org.exoplatform.web.application.RequireJS;
   import org.exoplatform.webui.core.UIDropDownControl;
   
   def rcontext = _ctx.getRequestContext();  
@@ -14,23 +12,24 @@
   //portal's problem, workaround for uicomponent.event() --> loaded programmatically
   //jsManager.loadScriptResource(ResourceScope.SHARED, "base");
  
-  requireJs.require("SHARED/commons-document", "document");    
-  requireJs.require("SHARED/jquery", "jQuery");
+  requireJs.require("SHARED/commons-document", "commonDocument");    
+  requireJs.require("SHARED/jquery", "jq");
   
-  requireJs.addScripts("document.DocumentSelector.getDrives = '" + uicomponent.GET_DRIVES + "';");
-  requireJs.addScripts("document.DocumentSelector.getFoldersAndFiles = '" + uicomponent.GET_FOLDERS_AND_FILES + "';");
-  requireJs.addScripts("document.DocumentSelector.deleteFolderOrFile = '" + uicomponent.DELETE_FOLDER_OR_FILE + "';");
-  requireJs.addScripts("document.DocumentSelector.createFolder = '" + uicomponent.CREATE_FOLDER + "';");
-  requireJs.addScripts("document.DocumentSelector.isFolderOnlyParam = '" + uicomponent.PARAM_IS_FOLDER_ONLY + "';");
-  requireJs.addScripts("document.DocumentSelector.folderNameParam = '" + uicomponent.PARAM_FOLDER_NAME + "';");
-  requireJs.addScripts("document.DocumentSelector.driveTypeParam = '" + uicomponent.PARAM_DRIVE_TYPE + "';");
-  requireJs.addScripts("document.DocumentSelector.driveNameParam = '" + uicomponent.PARAM_DRIVE_NAME + "';");
-  requireJs.addScripts("document.DocumentSelector.workspaceNameParam = '" + uicomponent.PARAM_WORKSPACE_NAME + "';");
-  requireJs.addScripts("document.DocumentSelector.currentFolderParam = '" + uicomponent.PARAM_CURRENT_FOLDER + "';");
-  requireJs.addScripts("document.DocumentSelector.itemPathParam = '" + uicomponent.PARAM_ITEM_PATH + "';");  
-  requireJs.addScripts("document.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
-  requireJs.addScripts("document.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
-  requireJs.addScripts("jQuery('#createNew').click(function() {document.DocumentSelector.newFolder(this);});");
+  requireJs.addScripts("(function() { window.eXo = window.eXo || {}; window.eXo.fileIconsJsonData = " + uicomponent.getDataJsonIconFileType()+ ";})();");
+  requireJs.addScripts("commonDocument.DocumentSelector.getDrives = '" + uicomponent.GET_DRIVES + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.getFoldersAndFiles = '" + uicomponent.GET_FOLDERS_AND_FILES + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.deleteFolderOrFile = '" + uicomponent.DELETE_FOLDER_OR_FILE + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.createFolder = '" + uicomponent.CREATE_FOLDER + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.isFolderOnlyParam = '" + uicomponent.PARAM_IS_FOLDER_ONLY + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.folderNameParam = '" + uicomponent.PARAM_FOLDER_NAME + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.driveTypeParam = '" + uicomponent.PARAM_DRIVE_TYPE + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.driveNameParam = '" + uicomponent.PARAM_DRIVE_NAME + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.workspaceNameParam = '" + uicomponent.PARAM_WORKSPACE_NAME + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.currentFolderParam = '" + uicomponent.PARAM_CURRENT_FOLDER + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.itemPathParam = '" + uicomponent.PARAM_ITEM_PATH + "';");  
+  requireJs.addScripts("commonDocument.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
+  requireJs.addScripts("jq('#createNew').click(function() {commonDocument.DocumentSelector.newFolder(this);});");
 %>
 <div class="uiDocumentSelector" id="$uicomponent.id">
   <a style="display:none;" href="$selectFileLink" class="selectFile"></a>
@@ -46,7 +45,7 @@
                   " msg_select_drive=\"" + _ctx.appRes(uicomponent.id + '.label.require-drive') + "\"" +
                   " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +
                   " msg_invalid_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.invalid-folder-name') + "\"" +
-                  " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\"><i class=\"uiIconPlus uiIconLightGray\"></i></a>";
+                  " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\"><i class=\"uiIconEcmsAddFolder uiIconEcmsLightGrey\"></i></a>";
 
      %>
 	<div class="clearfix">
@@ -64,7 +63,7 @@
   <div  style="display: none;" class="center progressBarFrame clearfix">
       <span class="deleteFileLabel pull-right">
         <a href="#" class="actionIcon" rel="tooltip" data-placement="bottom" title="<%=_ctx.appRes("UIFormUploadInput.label.Cancel")%>">
-        <i class="uiIconRemove"></i>
+        <i class="uiIconRemove uiIconLightGray"></i>
         </a>
       </span>
   <div class="fileNameLabel pull-left"></div>

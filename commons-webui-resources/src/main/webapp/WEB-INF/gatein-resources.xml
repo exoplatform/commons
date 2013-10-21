@@ -17,14 +17,25 @@
 			<path>/javascript/eXo/commons/commons-Document.js</path>
 		</script>
 		<depends>
+			<module>commons-CssIconFile</module>	
+			<as>CssIconFile</as>	
+		</depends>
+		<depends>
 			<module>jquery</module>	
 			<as>jQuery</as>	
 		</depends>
 		<depends>
-			<!-- need Browser.js -->
 			<module>base</module>
 			<as>gtnbase</as>
 		</depends>
+	</module>
+
+	<module>
+		<name>commons-CssIconFile</name>
+		<as>ckeditor</as>
+		<script>
+			<path>/javascript/eXo/commons/CssClassIconFile.js</path>
+		</script>
 	</module>
 
 	<module>

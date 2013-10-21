@@ -7,16 +7,16 @@
 	boolean isAutoUpload = uicomponent.isAutoUpload();
 	
 	  def requireJS = rcontext.getJavascriptManager().getRequireJS();	
-  	requireJS.require("SHARED/commons-document","document");  
-  	requireJS.require("SHARED/jquery", "jQuery");	
-  	requireJS.addScripts("document.UIDSUpload.initUploadEntry('" +uploadId+ "'," +isAutoUpload+ ");");
-    requireJS.addScripts("jQuery('span.deleteFileLabel').click(function(){document.UIDSUpload.abortUpload("+uploadId+");});");
+  	requireJS.require("SHARED/commons-document","commonDocument");  
+  	requireJS.require("SHARED/jquery", "jq");	
+  	requireJS.addScripts("commonDocument.UIDSUpload.initUploadEntry('" +uploadId+ "'," +isAutoUpload+ ");");
+    requireJS.addScripts("jq('span.deleteFileLabel').click(function(){commonDocument.UIDSUpload.abortUpload("+uploadId+");});");
 %>
 
 <div class="UIDSUploadInput" id="$uploadId" upload_failed="<%= _ctx.appRes("UIFormUploadInput.msg.upload_failed"); %>">
 	<div class="LimitMessage" style="display: none;"><%= _ctx.appRes("UIFormUploadInput.msg.limit"); %></div>
 	<input type="hidden" id="input$uploadId" name="<%=uicomponent.getName();%>" value="false"/>
-	<div id="<%=uploadId;%>UploadIframe" class="UploadIframe" select_drive="<%= _ctx.appRes("UIDSUploadInput.msg.select-drive"); %>" permission_required="<%= _ctx.appRes("UIDSUploadInput.msg.permission-required"); %>" title="<%=_ctx.appRes("UIDSUploadInput.label.Upload");%>">
+	<div id="<%=uploadId;%>UploadIframe" class="UploadIframe" select_drive="<%= _ctx.appRes("UIDSUploadInput.msg.select-drive"); %>" permission_required="<%= _ctx.appRes("UIDSUploadInput.msg.permission-required"); %>">
 		<iframe width="100%" allowTransparency="true" scrolling="no" frameborder="0" framespacing="0" id="<%=uploadId;%>uploadFrame"></iframe>
 	</div>
 	<div id="<%=uploadId;%>ProgressIframe" class="ProgressIframe" style="display: none;"></div>			
