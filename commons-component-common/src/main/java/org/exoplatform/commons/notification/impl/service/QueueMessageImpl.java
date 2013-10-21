@@ -20,9 +20,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -69,7 +69,6 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private MailService                    mailService;
   private NotificationConfiguration      configuration;
   
-  private final Queue<MessageInfo> messageQueue = new ConcurrentLinkedQueue<MessageInfo>();
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
   
   public QueueMessageImpl(InitParams params) {
@@ -107,8 +106,6 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   @Override
   public void start() {
     //
-    setBackMessageInfos();
-    //
     runnable(DELAY_TIME);
     //
     sendEmailService.registerManager(this);
@@ -129,7 +126,6 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       LOG.warn(String.format("The email %s is not valid for sending notification", message.getTo()));
       return false;
     }
-    messageQueue.add(message);
     //
     saveMessageInfo(message);
     return true;
@@ -149,48 +145,47 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     }
   }
 
-  private void setBackMessageInfos() {
+  private void removeMessageInfo(String messageId) {
     SessionProvider sProvider = getSystemProvider();
     try {
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
-      NodeIterator iter = messageInfoHome.getNodes();
-      MessageInfo info;
-      while (iter.hasNext()) {
-
-        Node messageInfoNode = iter.nextNode();
-        try {
-          String messageJson = getDataJson(messageInfoNode);
-          JSONObject object = new JSONObject(messageJson);
-          info = new MessageInfo();
-          info.setId(object.getString("id"))
-              .pluginId(object.optString("pluginId"))
-              .from(object.getString("from"))
-              .to(object.getString("to"))
-              .subject(object.getString("subject"))
-              .body(object.getString("body"))
-              .footer(object.optString("footer"));
-          //
-          messageQueue.add(info);
-          LOG.debug("Set back MessageInfo after stop server " + info.getId());
-        } catch (Exception e) {
-          LOG.warn("Failed to set back MessageInfo " + messageInfoNode.getName(), e);
-        }
-      }
+      messageInfoHome.getNode(messageId).remove();
+      sessionSave(messageInfoHome);
+      LOG.debug("remove MessageInfo " + messageId);
     } catch (Exception e) {
-      LOG.warn("Failed to set back MessageInfo from database ", e);
+      LOG.error("Failed to remove MessageInfo " + messageId, e);
     }
   }
 
-  private void removeMessageInfo(MessageInfo message) {
+  private NodeIterator getMessageInfoNodes() {
     SessionProvider sProvider = getSystemProvider();
     try {
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
-      messageInfoHome.getNode(message.getId()).remove();
-      sessionSave(messageInfoHome);
-      LOG.debug("remove MessageInfo " + message.getId());
+      return messageInfoHome.getNodes();
     } catch (Exception e) {
-      LOG.error("Failed to remove MessageInfo " + message.getId(), e);
+      LOG.error("Failed to getMessageInfos", e);
     }
+    return null;
+  }
+
+  private MessageInfo getMessageInfo(Node messageInfoNode) {
+    try {
+      String messageJson = getDataJson(messageInfoNode);
+      JSONObject object = new JSONObject(messageJson);
+      MessageInfo info = new MessageInfo();
+      info.setId(object.getString("id"))
+          .pluginId(object.optString("pluginId"))
+          .from(object.getString("from"))
+          .to(object.getString("to"))
+          .subject(object.getString("subject"))
+          .body(object.getString("body"))
+          .footer(object.optString("footer"));
+      //
+      return info;
+    } catch (Exception e) {
+      LOG.warn("Failed to set back MessageInfo: ", e);
+    }
+    return null;
   }
 
   private boolean sendMessage(Message message) {
@@ -211,18 +206,23 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   @Override
   public void send() {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
-    for (int i = 0; i < MAX_TO_SEND; i++) {
-      if (messageQueue.isEmpty() == false) {
-        MessageInfo messageInfo = messageQueue.peek();
-        if (sendMessage(messageInfo.makeEmailNotification()) == true) {
-          messageQueue.remove(messageInfo);
+    NodeIterator iterator = getMessageInfoNodes();
+    long size = 0;
+    List<String> msgInfoRemove = new ArrayList<String>();
+    if (iterator != null && (size = iterator.getSize()) > 0) {
+
+      for (int i = 0; i < MAX_TO_SEND && i < size; i++) {
+        MessageInfo messageInfo = getMessageInfo(iterator.nextNode());
+        if (messageInfo != null && sendMessage(messageInfo.makeEmailNotification()) == true) {
+          msgInfoRemove.add(messageInfo.getId());
           if (stats) {
             NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
           }
-          removeMessageInfo(messageInfo);
         }
-      } else {
-        break;
+      }
+      //
+      for (String messageId : msgInfoRemove) {
+        removeMessageInfo(messageId);
       }
     }
   }
@@ -231,7 +231,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     Node fileNode = node.addNode("datajson", "nt:file");
     Node nodeContent = fileNode.addNode("jcr:content", "nt:resource");
     //
-    nodeContent.setProperty("jcr:mimeType", "application/gzip");
+    nodeContent.setProperty("jcr:mimeType", "application/x-gzip");
     nodeContent.setProperty("jcr:data", is);
     nodeContent.setProperty("jcr:lastModified", Calendar.getInstance().getTimeInMillis());
   }
@@ -247,10 +247,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     ByteArrayOutputStream os = new ByteArrayOutputStream(string.length());
     GZIPOutputStream gos = new GZIPOutputStream(os);
     gos.write(string.getBytes());
-    ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
     gos.close();
+    byte[] compressed = os.toByteArray();
     os.close();
-    return is;
+    return new ByteArrayInputStream(compressed);
   }
 
   public static String decompress(InputStream is) throws IOException {
