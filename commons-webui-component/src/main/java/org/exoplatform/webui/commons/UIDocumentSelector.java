@@ -32,6 +32,7 @@ import org.exoplatform.webui.core.UIContainer;
 import org.exoplatform.webui.core.UIDropDownControl;
 import org.exoplatform.webui.core.lifecycle.Lifecycle;
 import org.exoplatform.webui.core.model.SelectItemOption;
+import org.exoplatform.webui.cssfile.CssClassUtils;
 import org.exoplatform.webui.event.Event;
 import org.exoplatform.webui.event.EventListener;
 
@@ -93,11 +94,16 @@ public class UIDocumentSelector extends UIContainer {
 
   protected static final String DATA_ID               = "dataId";
 
+  protected static final String DATA_TYPE             = "filetype";
+
   protected String              seletedFile           = "";
+
+  protected String              seletedFileType       = "";
 
   protected String              seletedFolder         = "";
   
   private boolean               isShowUpload          = true;
+
   
   private static final String GENERAL_DRIVE = "general";
   private static final String GROUP_DRIVE = "group";
@@ -134,6 +140,10 @@ public class UIDocumentSelector extends UIContainer {
     return seletedFile;
   }
 
+  public String getSeletedFileType() {
+    return seletedFileType;
+  }
+
   public void setSeletedFile(String seletedFile) {
     this.seletedFile = seletedFile;
   }
@@ -144,6 +154,10 @@ public class UIDocumentSelector extends UIContainer {
 
   public void setSeletedFolder(String seletedFolder) {
     this.seletedFolder = seletedFolder;
+  }
+  
+  protected String getDataJsonIconFileType() {
+    return CssClassUtils.getCssClassManager().getClassIconJsonData();
   }
 
   protected String getRestContext() {
@@ -167,6 +181,7 @@ public class UIDocumentSelector extends UIContainer {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
       component.seletedFile = event.getRequestContext().getRequestParameter(DATA_ID);
+      component.seletedFileType = event.getRequestContext().getRequestParameter(DATA_TYPE);
       component.seletedFolder = StringUtils.EMPTY;
       ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
     }
