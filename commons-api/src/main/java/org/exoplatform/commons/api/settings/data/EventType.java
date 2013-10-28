@@ -17,28 +17,28 @@
 package org.exoplatform.commons.api.settings.data;
 
 /**
- * All possible value type of event
+ * All possible value types of an event.
  * @LevelAPI Experimental
  */
 public enum EventType {
 	
   /**
-   * Type of dispatched event when a setting property is saved successfully
+   * Type of the dispatched event when a setting property is saved successfully.
    * @LevelAPI Experimental
    */
   SETTING_SET,
   /**
-   * Type of dispatched event when removing all setting properties in a context (GLOBAL/USER context)
+   * Type of the dispatched event when all setting properties are removed from a context (GLOBAL/USER context).
    * @LevelAPI Experimental
    */
   SETTING_REMOVE_CONTEXT,
   /**
-   * Type of dispatched event when removing all setting properties in a specified scope
+   * Type of the dispatched event when all setting properties are removed from a specified scope.
    * @LevelAPI Experimental
    */
   SETTING_REMOVE_SCOPE, 
   /**
-   * Type of dispatched event when removing a setting property
+   * Type of the dispatched event when a setting property is removed.
    * @LevelAPI Experimental
    */
   SETTING_REMOVE_KEY
