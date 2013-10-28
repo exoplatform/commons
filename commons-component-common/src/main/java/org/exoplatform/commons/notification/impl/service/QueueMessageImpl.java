@@ -136,6 +136,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     }
     //
     saveMessageInfo(message);
+    //
+    sendEmailService.addCurrentCapacity();
     return true;
   }
 
@@ -159,6 +161,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       //
       for (String messageId : msgInfoRemove) {
         removeMessageInfo(messageId);
+        //
+        sendEmailService.removeCurrentCapacity();
       }
     }
   }

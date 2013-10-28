@@ -247,7 +247,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   public void removeMessageAfterSent() throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
-    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       Node notificationHome = getNotificationHomeNode(sProvider, workspace);
       Session session = notificationHome.getSession();
@@ -266,7 +266,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
             
             LOG.debug("Remove NotificationMessage " + nodePath);
           } catch (Exception e) {
-            LOG.warn("Failed to remove node of NotificationMessage " + nodePath, e);
+            LOG.warn("Failed to remove node of NotificationMessage " + nodePath + "\n" + e.getMessage());
           }
         }
         session.save();
@@ -299,6 +299,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       }
     } catch (Exception e) {
       LOG.warn("Failed to remove message after sent email notification", e);
+    } finally {
+      sProvider.close();
     }
   }
 

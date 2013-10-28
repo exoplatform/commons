@@ -34,9 +34,11 @@ import org.exoplatform.management.jmx.annotations.Property;
 public class SendEmailService implements ManagementAware {
   private boolean     isOn           = true;
 
-  private long        emailSent      = 0;
+  private long        sentCounter       = 0;
 
-  private int         emailPerMinute = 0;
+  private long        currentCapacity = 0;
+
+  private int         emailPerMinute  = 0;
 
   private ManagementContext context;
   
@@ -59,9 +61,26 @@ public class SendEmailService implements ManagementAware {
   }
 
   public void counter() {
-    ++emailSent;
+    ++sentCounter;
   }
 
+  public void addCurrentCapacity() {
+    ++currentCapacity;
+  }
+
+  public void removeCurrentCapacity() {
+    if (currentCapacity > 0) {
+      --currentCapacity;
+    }
+  }
+
+  @Managed
+  @ManagedDescription("Current mail service capacity should be available.")
+  @Impact(ImpactType.READ)
+  public long getCurrentCapacity() {
+    return currentCapacity;
+  }
+  
   @Managed
   @ManagedDescription("Turn on the mail service.")
   @Impact(ImpactType.READ)
@@ -88,15 +107,15 @@ public class SendEmailService implements ManagementAware {
   @Managed
   @ManagedDescription("Number emails sent")
   @Impact(ImpactType.READ)
-  public long sentCounter() {
-    return emailSent;
+  public long getSentCounter() {
+    return sentCounter;
   }
 
   @Managed
   @ManagedDescription("Reset email countet.")
   @Impact(ImpactType.READ)
   public void resetCounter() {
-    emailSent = 0;
+    sentCounter = 0;
   }
 
   @Managed
