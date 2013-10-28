@@ -32,9 +32,9 @@ import org.exoplatform.management.jmx.annotations.Property;
   @Property(key = "view", value = "mockmail")
 })
 public class SendEmailService implements ManagementAware {
-  private boolean     isOn           = true;
+  private boolean     isOn           = false;
 
-  private long        sentCounter       = 0;
+  private long        sentCounter     = 0;
 
   private long        currentCapacity = 0;
 

@@ -86,7 +86,6 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   }
 
   public void makeJob(long interval) {
-    LOG.info("makeJob: " + interval);
     if (interval > 0) {
       JobSchedulerService schedulerService = CommonsUtils.getService(JobSchedulerService.class);
       Calendar cal = new GregorianCalendar();
@@ -227,15 +226,16 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   }
 
   private boolean sendMessage(Message message) {
-    if (sendEmailService.isOn()) {
+    if (sendEmailService.isOn() == false) {
       try {
         mailService.sendMessage(message);
-        sendEmailService.counter();
         return true;
       } catch (Exception e) {
         LOG.error("Failed to send notification.", e);
         return false;
       }
+    } else {
+      sendEmailService.counter();
     }
     // if service is off, removed message.
     return true;
