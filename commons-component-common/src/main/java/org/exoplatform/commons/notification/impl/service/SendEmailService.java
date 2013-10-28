@@ -101,10 +101,17 @@ public class SendEmailService implements ManagementAware {
 
   @Managed
   @ManagedDescription("Set number send emails per minute.")
-  @Impact(ImpactType.WRITE)
+  @Impact(ImpactType.READ)
   public void setNumberEmailPerMinute(int emailPerMinute) {
     this.emailPerMinute = emailPerMinute;
-    this.queueMessage.runnable(timeSendingPerEmail());
+    this.queueMessage.makeJob(timeSendingPerEmail());
+  }
+
+  @Managed
+  @ManagedDescription("Number send emails per minute.")
+  @Impact(ImpactType.READ)
+  public int getNumberEmailPerMinute() {
+    return this.emailPerMinute;
   }
 
   /**
