@@ -274,7 +274,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<UserSetting> getDaily(int offset, int limit) {
-    SessionProvider sProvider = getSystemProvider();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
       NodeIterator iter = getDailyIterator(sProvider, offset, limit, null);
@@ -284,6 +284,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get all daily users have notification messages", e);
+    } finally {
+      sProvider.close();
     }
 
     return models;
@@ -334,7 +336,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public List<UserSetting> getDefaultDaily() {
-    SessionProvider sProvider = getSystemProvider();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
@@ -355,6 +357,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get default daily users have notification messages", e);
+    } finally {
+      sProvider.close();
     }
 
     return users;

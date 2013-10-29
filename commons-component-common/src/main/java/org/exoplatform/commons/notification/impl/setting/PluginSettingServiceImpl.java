@@ -175,13 +175,15 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   }
 
   private void createParentNodeOfPlugin(String pluginId) {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
-      SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
       NotificationConfiguration configuration = CommonsUtils.getService(NotificationConfiguration.class);
       Node node = getOrCreateMessageParent(sProvider, configuration.getWorkspace(), pluginId);
       sessionSave(node);
     } catch (Exception e) {
       LOG.error("Failed to create parent Node for plugin " + pluginId);
+    } finally {
+      sProvider.close();
     }
   }
 

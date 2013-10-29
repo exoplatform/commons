@@ -20,10 +20,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -143,31 +143,37 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   @Override
   public void send() {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
-    NodeIterator iterator = getMessageInfoNodes();
-    long size = 0;
-    List<String> msgInfoRemove = new ArrayList<String>();
-    if (iterator != null && (size = iterator.getSize()) > 0) {
-
-      for (int i = 0; i < MAX_TO_SEND && i < size; i++) {
-        MessageInfo messageInfo = getMessageInfo(iterator.nextNode());
-        if (messageInfo != null && sendMessage(messageInfo.makeEmailNotification()) == true) {
-          msgInfoRemove.add(messageInfo.getId());
-          if (stats) {
-            NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
+    Set<String> msgInfoRemove = new HashSet<String>();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      NodeIterator iterator = getMessageInfoNodes(sProvider);
+      long size = 0;
+      if (iterator != null && (size = iterator.getSize()) > 0) {
+        for (int i = 0; i < MAX_TO_SEND && i < size; i++) {
+          MessageInfo messageInfo = getMessageInfo(iterator.nextNode());
+          if (messageInfo != null && sendMessage(messageInfo.makeEmailNotification()) == true) {
+            msgInfoRemove.add(messageInfo.getId());
+            if (stats) {
+              NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
+            }
           }
         }
       }
       //
       for (String messageId : msgInfoRemove) {
-        removeMessageInfo(messageId);
+        removeMessageInfo(sProvider, messageId);
         //
         sendEmailService.removeCurrentCapacity();
       }
+    } catch (Exception e) {
+      LOG.warn("Failed to sendding MessageInfos: ", e);
+    } finally {
+      sProvider.close();
     }
   }
 
   private void saveMessageInfo(MessageInfo message) {
-    SessionProvider sProvider = getSystemProvider();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
       Node messageInfoNode = messageInfoHome.addNode(message.getId(), NTF_MESSAGE_INFO);
@@ -176,12 +182,13 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
       sessionSave(messageInfoHome);
     } catch (Exception e) {
-      LOG.warn("Failed to storage MessageInfo: " + message.toJSON(), e );
+      LOG.warn("Failed to storage MessageInfo: " + message.toJSON(), e);
+    } finally {
+      sProvider.close();
     }
   }
 
-  private void removeMessageInfo(String messageId) {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
+  private void removeMessageInfo(SessionProvider sProvider, String messageId) {
     try {
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
       messageInfoHome.getNode(messageId).remove();
@@ -189,13 +196,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       LOG.debug("remove MessageInfo " + messageId);
     } catch (Exception e) {
       LOG.error("Failed to remove MessageInfo " + messageId, e);
-    } finally {
-      sProvider.close();
     }
   }
 
-  private NodeIterator getMessageInfoNodes() {
-    SessionProvider sProvider = getSystemProvider();
+  private NodeIterator getMessageInfoNodes(SessionProvider sProvider) {
     try {
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
       return messageInfoHome.getNodes();
