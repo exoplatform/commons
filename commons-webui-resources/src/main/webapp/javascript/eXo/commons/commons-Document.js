@@ -886,8 +886,11 @@ function UIDSUpload() {
 
 	  var file  = jQuery(clickEle ,form);
 	  if(file.attr("value") == null || file.attr("value") == '') return;  
-	  jQuery(".fileNameLabel").html(file.attr("value"));
-    jQuery(".fileNameLabel").attr("title", file.attr("value"));
+	  var fileName = file.attr("value");
+	  jQuery(".fileNameLabel").html(fileName)
+                            .attr({'rel':'tooltip', 'data-placement':'bottom', 'data-original-title' : fileName})
+                            .tooltip();
+    
 	  var progressBarFrame = jQuery("div.progressBarFrame:first");
 	  progressBarFrame.show() ;  
 	  

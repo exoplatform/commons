@@ -21,108 +21,109 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * This Object will be used to get information from a JCR node instead of open a direct access 
- * to <code>javax.jcr.Node</code> object.
- * However, it just provide the basic information of an object which could be used in search result or somewhere else.
+ * Gets information from a JCR node instead of opening a direct access
+ * to the <code>javax.jcr.Node</code> object.
+ * However, the BaseObject just provides basic information of an object that could be used in search result or somewhere else.
  * @LevelAPI Experimental
  */
 public interface BaseObject {
 
     /**
-     * Return the name of Object. The name of an object is the
-     * last element in its path, minus any square-bracket index that may exist.
-     * @return The name of this Object.
+     * Gets name of an object. The name is the
+     * last element in its path, excluding any square-bracket index (if any).
+     * @return The object name.
      * @LevelAPI Experimental
      */
     public String getName();
 
     /**
-     * * Returns the absolute path to this item.  
-     * @return The path of this Object.
+     * Gets the absolute path of the BaseObject.
+     * @return The BaseObject path.
      * @LevelAPI Experimental
      */
     public String getPath();
 
     /**
-     * Return the title value on this Object.
+     * Gets title of the BaseObject.
      * @return The value of exo:title property.
      * @LevelAPI Experimental
      */
     public String getTitle();
 
     /**
-     * Return the value of the created date on this Object.
+     * Gets the created date of the BaseObject.
      * @return The value of exo:dateCreated property.
      * @LevelAPI Experimental
      */
     public Calendar getCreatedDate();
 
     /**
-     * Return the value of the last modified date on this Object.
+     * Gets the last modified date of the BaseObject.
      * @return The value of exo:lastModifiedDate property.
      * @LevelAPI Experimental
      */
     public Calendar getLastModifiedDate();
 
     /**
-     * Return the name of last person who edited this Object. 
+     * Gets name of the user who did the last modification on the BaseObject.
      * @return The value of exo:lastModifier property.
      * @LevelAPI Experimental
      */
     public String getLastModifier();
 
     /**
-     * Return the name of who created this Object.
-     * @return The value of exo:owner property
+     * Gets name of the user who created the BaseObject.
+     * @return The value of exo:owner property.
      * @LevelAPI Experimental
      */
     public String getOwner();
 
     /**
-     * Return the primary type of current Object
-     * For example: nt:file, exo:webContent,...
+     * Gets the primary type of the BaseObject.
+     * For example: nt:file, exo:webContent.
      * @return The value of jcr:primartyType property.
      * @LevelAPI Experimental
      */
     public String getPrimaryType();
 
     /**
-     * Return a list of node type name which added to this Object as the mix-in.
-     * @return List<String> A list contains the mix-in name.
+     * Gets a list of node type names which are added to the BaseObject as mixin.
+     * @return The list of mixin names.
      * @LevelAPI Experimental
      */
     public List<String> getMixinTypes();
 
     /**
-     * Return the workspace name where stored current object.
-     * @return The name of current workspace
+     * Gets the workspace name where the BaseObject is stored.
+     * @return The workspace name.
      * @LevelAPI Experimental
      */
     public String getWorkspace();
     
     /**
-     * Return a list of tags name which added to this Object
-     * @return A list of tagged value.
+     * Gets a list of tag names which are added to the BaseObject.
+     * @return The list of tag names.
      * @LevelAPI Experimental
      */
     public List<String> getTags();
     
     /**
-     * Return the rate value for this Object
-     * @return The rating number
+     * Gets the rating value for the BaseObject.
+     * @return The rating value.
      * @LevelAPI Experimental
      */
     public String getRating();
 
     /**
-     * Return the UUID value of this Object. This one just available when already added the mix:referenceable mix-in node type.
-     * @return The value of exo:uuid property
+     * Gets the UUID value of the BaseObject. 
+	 * This is just available when the mix:referenceable mixin node type has already been added.
+     * @return Value of the exo:uuid property.
      * @LevelAPI Experimental
      */
     public String getUUID();
 
     /**
-     * This function used to store all the information to the database.
+     * Stores all information to the database.
      * @LevelAPI Experimental
      */
     public void save();

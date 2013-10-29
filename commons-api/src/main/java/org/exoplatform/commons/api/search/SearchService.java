@@ -24,14 +24,14 @@ import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 
 /** 
- * These class defines the Search API that a driver can implement and provides add/get methods on the connector.  
+ * Defines a Search API that a driver can implement, and provides the add/get methods to the connector.  
  */
 public abstract class SearchService {
   private LinkedList<SearchServiceConnector> connectors = new LinkedList<SearchServiceConnector>();
   
   /**
-   * Get all connectors currently
-   * @return Collection of connectors
+   * Gets all current connectors.
+   * @return Connectors.
    * @LevelAPI Experimental 
    */
   public LinkedList<SearchServiceConnector> getConnectors() {
@@ -39,8 +39,8 @@ public abstract class SearchService {
   }
 
   /**
-   * Add a connector that implemented search API
-   * @param connector
+   * Adds a connector which is implemented by the Search API.
+   * @param connector The connector to be added.
    * @LevelAPI Experimental 
    */
   public void addConnector(SearchServiceConnector connector) {
@@ -48,16 +48,16 @@ public abstract class SearchService {
   }
   
   /**
-   * This search method aggregates search results from all connectors
-   * @param context Search context
-   * @param query The user-input query to search for
-   * @param sites Search on these specified sites only (e.g acme, intranet...)
-   * @param types Search for these specified content types only (e.g people, discussion, event, task, wiki, activity, social, file, document...)
-   * @param offset Start offset of the result set
-   * @param limit Maximum size of the result set 
-   * @param sort The field to sort the result set 
-   * @param order Sort order (ASC, DESC)
-   * @return a map of connector with their search result
+   * Aggregates search results from all connectors.
+   * @param context The search context.
+   * @param query The query statement.
+   * @param sites Specified sites where the search is performed (for example, Acme, or Intranet).
+   * @param types Specified types by which the search is performed (for example, people, discussion, event, task, wiki, activity, social, file, document).
+   * @param offset The start point from which the search results are returned.
+   * @param limit The limitation number of search results.
+   * @param sort The sorting criteria (title, relevancy and date).
+   * @param order The sorting order (ascending and descending).
+   * @return A map of connectors with search results.
    * @LevelAPI Experimental 
    */
   public abstract Map<String, Collection<SearchResult>> search(SearchContext context, String query, Collection<String> sites, Collection<String> types, int offset, int limit, String sort, String order);  

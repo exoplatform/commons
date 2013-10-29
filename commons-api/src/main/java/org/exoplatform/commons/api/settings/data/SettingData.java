@@ -19,7 +19,7 @@ package org.exoplatform.commons.api.settings.data;
 import org.exoplatform.commons.api.settings.SettingValue;
 
 /**
- * Class support the setting event management, SettingData contains all information of event to listen. 
+ * Supports the setting event management that contains all information of event. 
  * @LevelAPI Experimental
  */
 public class SettingData {
@@ -31,9 +31,10 @@ public class SettingData {
   SettingValue<?> settingValue;
   
   /**
-   * Create setting data with specified event type and context. The context could be USER/GLOBAL context or a specified scope or a specified setting property.  
-   * @param eventType	event type has been dispatched
-   * @param settingContext setting context data information
+   * Creates the setting data with the specified event type and context.
+   * The context could be USER/GLOBAL context or a specified scope or a specified setting property.  
+   * @param eventType The event type that has been dispatched.
+   * @param settingContext The event setting context.
    * @LevelAPI Experimental
    */
   public SettingData(EventType eventType, SettingContext settingContext) {
@@ -43,10 +44,10 @@ public class SettingData {
   }
 
   /**
-   * Create setting data with specified event type and setting property  
-   * @param eventType	event type has been dispatched
-   * @param settingContext setting property's context
-   * @param settingValue setting property's value
+   * Creates the setting data with the specified event type and setting properties.
+   * @param eventType The event type that has been dispatched.
+   * @param settingContext The event setting context.
+   * @param settingValue The event setting value.
    * @LevelAPI Experimental
    */
   public SettingData(EventType eventType,
@@ -59,8 +60,8 @@ public class SettingData {
   }
 
   /**
-   * get event type associated to this setting data
-   * @return event type
+   * Gets an event type associated with the setting data.
+   * @return The event type.
    * @LevelAPI Experimental
    */
   public EventType getEventType() {
@@ -68,7 +69,7 @@ public class SettingData {
   }
 
   /**
-   * set event type associated to this setting data
+   * Sets an event type associated with the setting data.
    * @LevelAPI Experimental
    */ 
   public void setEventType(EventType eventType) {
@@ -76,8 +77,8 @@ public class SettingData {
   }
 
   /**
-   * get setting context associated to this setting data
-   * @return setting context
+   * Gets a setting context associated with the setting data.
+   * @return The setting context.
    * @LevelAPI Experimental
    */
   public SettingContext getSettingContext() {
@@ -85,7 +86,7 @@ public class SettingData {
   }
 
   /**
-   * set setting context associated to this setting data
+   * Sets a setting context associated with the setting data.
    * @LevelAPI Experimental
    */
   public void setSettingContext(SettingContext settingContext) {
@@ -93,8 +94,8 @@ public class SettingData {
   }
 
   /**
-   * get setting value of setting property associated to this setting data, return null in case of context at level Context and Scope
-   * @return setting value object, null if context at level Context and Scope
+   * Gets a setting value of setting property associated with the setting data.
+   * @return The setting value object, or "null" if context is at the Context or Scope level.
    * @LevelAPI Experimental
    */
   public SettingValue<?> getSettingValue() {
@@ -103,7 +104,7 @@ public class SettingData {
   }
 
   /**
-   * set setting value of setting property (SettingKey) associated to this setting data
+   * Sets a setting value of setting property (SettingKey) associated with the setting data.
    * @LevelAPI Experimental
    */
   public void setSettingValue(SettingValue<?> settingValue) {

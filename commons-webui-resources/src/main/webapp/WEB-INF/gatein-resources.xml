@@ -21,6 +21,9 @@
 			<as>CssIconFile</as>	
 		</depends>
 		<depends>
+      <module>bts_tooltip</module>
+    </depends>
+		<depends>
 			<module>jquery</module>	
 			<as>jQuery</as>	
 		</depends>
