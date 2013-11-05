@@ -144,11 +144,16 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
       'workspaceName' : workspaceName,
       'name' : name,
       'canAddChild' : canAddChild,
-      'href' : 'javascript:void(0);'      
+      'href' : 'javascript:void(0);',
+      'rel' : 'tooltip', 
+      'data-placement' : 'bottom', 
+      'data-original-title' : name
     }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
     }).append(iconEl).append(name);
     
+    link.tooltip();
+
     var item = jQuery('<li/>', {
                               'class' : 'listItem'
                             }).append(link);
@@ -210,7 +215,6 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
     var link = jQuery('<a/>',{
       'class' : 'Item',
       'name' : name,
-      'title' : title,
       'driveType' : driveType,
       'driveName' : driveName,
       'workspaceName' : workspaceName,
@@ -218,12 +222,15 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
       'canAddChild' : canAddChild,
       'titlePath' : titlePath,
       'jcrPath' : jcrPath,
-      'href' : 'javascript:void(0);'      
+      'href' : 'javascript:void(0);',
+      'rel':'tooltip',
+      'data-placement':'bottom',
+      'data-original-title' : title
      }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
      }).append(iconEl).append(title);
 
-    
+     link.tooltip();
      var item = jQuery('<li/>', {
                               'class' : 'listItem'
                             }).append(link);
@@ -258,16 +265,17 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	    var link = jQuery('<a/>',{
 	      'class' : 'Item',
 	      'name' : node,
-	      'title' : title,
 	      'jcrPath' : jcrPath,
 	      'data-file-type':nodeType,
-	      'href' : 'javascript:void(0);'
+	      'href' : 'javascript:void(0);',
+	      'rel':'tooltip',
+	      'data-placement':'bottom',
+	      'data-original-title' : title
 	     }).on('click', function() {
 	      _module.DocumentSelector.submitSelectedFile(this);
 	     }).append(iconEl);
-	     link.html(link.html() + title);	
 
-
+	     link.tooltip().append(title);
 	     var item = jQuery('<li/>', {
 	                              'class' : 'listItem'
 	                            }).append(link);
