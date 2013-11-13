@@ -6,7 +6,6 @@ import java.util.Date;
 import junit.framework.TestCase;
 
 import org.exoplatform.commons.testing.AssertUtils;
-import org.exoplatform.commons.testing.mock.SimpleMockOrganizationService;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.Membership;
@@ -104,6 +103,7 @@ public class TestSimpleMockOrganizationService extends TestCase {
 			public void setUserName(String s) {}
       public String getDisplayName() {return null;}
       public void setDisplayName(String displayName) {}
+            public boolean isEnabled() { return true;}
 		});
 		
 		
@@ -147,7 +147,7 @@ public class TestSimpleMockOrganizationService extends TestCase {
 		return new SimpleMockOrganizationService.SimpleMembership(parts[0], mparts[1], mparts[0]);
 	}
 
-	private Object[] memberships(String... ids) {
+	private Membership[] memberships(String... ids) {
 		SimpleMockOrganizationService.SimpleMembership[] result = new SimpleMockOrganizationService.SimpleMembership[ids.length];
 		int i = 0;
 
@@ -179,7 +179,7 @@ public class TestSimpleMockOrganizationService extends TestCase {
 		return  new SimpleMockOrganizationService.SimpleGroup(id);
 	}
 	
-	private Object [] groups(String... groupNames) {
+	private Group [] groups(String... groupNames) {
 		
 		SimpleMockOrganizationService.SimpleGroup [] result = new SimpleMockOrganizationService.SimpleGroup [groupNames.length]; 
 		int i = 0;
