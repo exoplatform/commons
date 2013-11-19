@@ -182,12 +182,6 @@ public class SimpleMockOrganizationService implements OrganizationService {
     public void removeGroupEventListener(GroupEventListener listener) {
       
     }
-    @Override
-    public Collection<Group> resolveGroupByMembership(String userName, String membershipType) throws Exception {
-        return null;
-    }
-
-
   }
 
   class MockMembershipHandler implements MembershipHandler {
@@ -321,11 +315,6 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return new ObjectPageList(Arrays.asList(userSet.toArray()), 10);
     }
     @SuppressWarnings("unchecked")
-    public ListAccess<User> findUsersByGroupId(String groupId, boolean enabledOnly) throws Exception {
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
     public PageList<User> findUsers(Query query) throws Exception {
       Iterator<SimpleMembership> mbIt = storage.iterator();
       HashSet<User> userSet = new HashSet<User>();
@@ -349,9 +338,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
       }
       return null;
     }
-    public User findUserByName(String userName, boolean enabledOnly) throws Exception {
-        return null;
-    }
+
     public User createUserInstance(String username) {
       return null;
     }
@@ -375,9 +362,6 @@ public class SimpleMockOrganizationService implements OrganizationService {
     public ListAccess<User> findAllUsers() throws Exception {
       return null;
     }
-    public ListAccess<User> findAllUsers(boolean enabledOnly) throws Exception {
-        return null;
-    }
 
     public ListAccess<User> findUsersByGroupId(String groupId) throws Exception {
       return null;
@@ -386,16 +370,10 @@ public class SimpleMockOrganizationService implements OrganizationService {
     public ListAccess<User> findUsersByQuery(Query query) throws Exception {
       return null;
     }
-    @Override
-    public ListAccess<User> findUsersByQuery(Query query, boolean enabledOnly) throws Exception {
-        return null;
-    }
+
     @Override
     public void removeUserEventListener(UserEventListener listener) {
       
-    }
-    public User setEnabled(String userName, boolean enabled, boolean broadcast) throws Exception, UnsupportedOperationException {
-        return null;
     }
 
   }
@@ -503,10 +481,6 @@ public class SimpleMockOrganizationService implements OrganizationService {
 
     public void setDisplayName(String displayName) {
    
-    }
-    public boolean isEnabled() {
-
-        return true;
     }
   }
 
