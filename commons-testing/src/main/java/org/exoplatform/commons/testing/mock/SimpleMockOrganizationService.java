@@ -182,7 +182,6 @@ public class SimpleMockOrganizationService implements OrganizationService {
     public void removeGroupEventListener(GroupEventListener listener) {
       
     }
-
   }
 
   class MockMembershipHandler implements MembershipHandler {
@@ -315,7 +314,6 @@ public class SimpleMockOrganizationService implements OrganizationService {
       }
       return new ObjectPageList(Arrays.asList(userSet.toArray()), 10);
     }
-
     @SuppressWarnings("unchecked")
     public PageList<User> findUsers(Query query) throws Exception {
       Iterator<SimpleMembership> mbIt = storage.iterator();
