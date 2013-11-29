@@ -4,17 +4,11 @@
    xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
    xmlns="http://www.exoplaform.org/xml/ns/kernel_1_2.xsd">
 
-<!-- 
-	<component>
-		<type>org.exoplatform.component.product.ProductInformations</type>
-		<init-params>
-			<value-param>
-				<name>product.versions.declaration.file</name>
-				<value>jar:/conf/commons.properties</value>
-			</value-param>
-		</init-params>
-	</component>
--->
+  <!-- PLF-5551 : fix the categories creation : Listener should be declared explicitly-->
+  <component>
+      <key>org.exoplatform.services.listener.ListenerService</key>
+      <type>org.exoplatform.services.listener.ListenerService</type>
+  </component>
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>      
