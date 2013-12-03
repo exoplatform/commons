@@ -34,12 +34,15 @@ public class MessageInfo {
   private String footer;
 
   private String pluginId = "digest";
+  
+  private long createdTime;
 
   public MessageInfo() {
-    id = "messageInfo" + IdGenerator.generate();
+    this.createdTime = System.currentTimeMillis();
   }
 
   /**
+   * Sets the uuid of messageInfo node
    * @param id the pluginId to set
    */
   public MessageInfo setId(String id) {
@@ -48,6 +51,7 @@ public class MessageInfo {
   }
 
   /**
+   * Gets the uuid of messageInfo node
    * @return the id
    */
   public String getId() {
@@ -172,6 +176,18 @@ public class MessageInfo {
     return new JSONObject(this).toString();
   }
 
+  /**
+   * Gets time to create MessageInfo and use it as node name
+   * @return
+   */
+  public long getCreatedTime() {
+    return createdTime;
+  }
+
+  public void setCreatedTime(long createdTime) {
+    this.createdTime = createdTime;
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
@@ -192,4 +208,10 @@ public class MessageInfo {
     }
     return super.equals(obj);
   }
+  
+  @Override
+  public int hashCode() {
+    return id.hashCode();
+  }
+  
 }

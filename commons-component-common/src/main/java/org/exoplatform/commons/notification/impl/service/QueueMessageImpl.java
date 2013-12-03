@@ -23,13 +23,17 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.jcr.Session;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
@@ -63,15 +67,24 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private static final String            DELAY_TIME_KEY        = "period";
   private static final String            CACHE_REPO_NAME       = "repositoryName";
   private static final int               BUFFER_SIZE           = 32;
+  private static long                    INTERVAL              = 1000;
+  private static int                     LIMIT                 = 20;
+  private static long                    sinceTime             = 0;
 
   private int                            MAX_TO_SEND;
   private long                           DELAY_TIME;
-  
-  ScheduledFuture<?>                      future                = null;
-
+  /** .. */
   private SendEmailService               sendEmailService;
+  /** .. */
   private MailService                    mailService;
+  /** .. */
   private NotificationConfiguration      configuration;
+  /** The lock protecting all mutators */
+  transient final ReentrantLock lock = new ReentrantLock();
+  /** .. */
+  private static List<MessageInfo> messages = new CopyOnWriteArrayList<MessageInfo>();
+  /** .. */
+  private static ThreadLocal<Set<String>> idsRemovingLocal = new ThreadLocal<Set<String>>();
   
   public QueueMessageImpl(InitParams params) {
     this.configuration = CommonsUtils.getService(NotificationConfiguration.class);
@@ -87,11 +100,12 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
   public void makeJob(long interval) {
     if (interval > 0) {
+      INTERVAL = interval;
       JobSchedulerService schedulerService = CommonsUtils.getService(JobSchedulerService.class);
       Calendar cal = new GregorianCalendar();
       //
       try {
-        PeriodInfo periodInfo = new PeriodInfo(cal.getTime(), null, -1, interval);
+        PeriodInfo periodInfo = new PeriodInfo(cal.getTime(), null, -1, INTERVAL);
         JobInfo info = new JobInfo("SendEmailNotificationJob", "Notification", SendEmailNotificationJob.class);
         info.setDescription("Send email notification job.");
         //
@@ -105,7 +119,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         LOG.warn("Failed to add send email notification jobs ", e);
       }
     }
-    if (Long.valueOf(DELAY_TIME) != interval) {
+    if (Long.valueOf(DELAY_TIME) != INTERVAL) {
       MAX_TO_SEND = 1;
     }
   }
@@ -143,32 +157,57 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   @Override
   public void send() {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
-    Set<String> msgInfoRemove = new HashSet<String>();
     SessionProvider sProvider = SessionProvider.createSystemProvider();
+    
     try {
-      NodeIterator iterator = getMessageInfoNodes(sProvider);
-      long size = 0;
-      if (iterator != null && (size = iterator.getSize()) > 0) {
-        for (int i = 0; i < MAX_TO_SEND && i < size; i++) {
-          MessageInfo messageInfo = getMessageInfo(iterator.nextNode());
-          if (messageInfo != null && sendMessage(messageInfo.makeEmailNotification()) == true) {
-            msgInfoRemove.add(messageInfo.getId());
-            if (stats) {
-              NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
-            }
+      //
+      load(sProvider);
+      
+      idsRemovingLocal.set(new HashSet<String>());
+      for (MessageInfo messageInfo : messages) {
+        if (messageInfo != null && sendMessage(messageInfo.makeEmailNotification()) == true) {
+          idsRemovingLocal.get().add(messageInfo.getId());
+          if (stats) {
+            NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
           }
         }
       }
-      //
-      for (String messageId : msgInfoRemove) {
-        removeMessageInfo(sProvider, messageId);
-        //
-        sendEmailService.removeCurrentCapacity();
+    } catch (Exception e) {
+      LOG.warn("Failed to sending MessageInfos: ", e);
+    } finally {
+      sProvider.close();
+      removeMessageInfo();
+    }
+  }
+  /**
+   * Loading the messageInfo as buffer with Limit
+   * and sinceTime
+   * @param sProvider
+   */
+  private void load(SessionProvider sProvider) {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    int index = 0;
+    try {
+      NodeIterator iterator = getMessageInfoNodes(sProvider);
+      while (iterator.hasNext()) {
+        Node node = iterator.nextNode();
+        long createdTime = Long.parseLong(node.getName());
+        if ((sinceTime == 0 || sinceTime > createdTime) && index < LIMIT) {
+          MessageInfo messageInfo = getMessageInfo(node);
+          messageInfo.setId(node.getUUID());
+          messages.add(messageInfo);
+
+          sinceTime = createdTime;
+          index++;
+        } else {
+          break;
+        }
       }
     } catch (Exception e) {
       LOG.warn("Failed to sendding MessageInfos: ", e);
     } finally {
-      sProvider.close();
+      lock.unlock();
     }
   }
 
@@ -176,7 +215,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
-      Node messageInfoNode = messageInfoHome.addNode(message.getId(), NTF_MESSAGE_INFO);
+      Node messageInfoNode = messageInfoHome.addNode("" + message.getCreatedTime(), NTF_MESSAGE_INFO);
+      if(messageInfoNode.canAddMixin("mix:referenceable")) {
+        messageInfoNode.addMixin("mix:referenceable");
+      }
       //
       saveData(messageInfoNode, compress(message.toJSON()));
 
@@ -188,14 +230,25 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     }
   }
 
-  private void removeMessageInfo(SessionProvider sProvider, String messageId) {
+  private void removeMessageInfo() {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    Session session = getSession(sProvider, configuration.getWorkspace());
     try {
-      Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
-      messageInfoHome.getNode(messageId).remove();
-      sessionSave(messageInfoHome);
-      LOG.debug("remove MessageInfo " + messageId);
+      Set<String> ids = idsRemovingLocal.get();
+      for (String messageId : ids) {
+        session.getNodeByUUID(messageId);
+        //
+        sendEmailService.removeCurrentCapacity();
+        LOG.debug("remove MessageInfo " + messageId);
+      }
+      session.save();
     } catch (Exception e) {
-      LOG.error("Failed to remove MessageInfo " + messageId, e);
+      LOG.error("Failed to remove MessageInfo ", e);
+    } finally {
+      sProvider.close();
+      lock.unlock();
     }
   }
 
@@ -214,13 +267,13 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       String messageJson = getDataJson(messageInfoNode);
       JSONObject object = new JSONObject(messageJson);
       MessageInfo info = new MessageInfo();
-      info.setId(object.getString("id"))
-          .pluginId(object.optString("pluginId"))
+      info.pluginId(object.optString("pluginId"))
           .from(object.getString("from"))
           .to(object.getString("to"))
           .subject(object.getString("subject"))
           .body(object.getString("body"))
-          .footer(object.optString("footer"));
+          .footer(object.optString("footer"))
+          .setCreatedTime(object.getLong("createdTime"));
       //
       return info;
     } catch (Exception e) {
@@ -232,6 +285,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private boolean sendMessage(Message message) {
     if (sendEmailService.isOn() == false) {
       try {
+        //ensure the message is valid
+        if (message.getFrom() == null) {
+          return false;
+        }
         mailService.sendMessage(message);
         return true;
       } catch (Exception e) {

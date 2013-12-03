@@ -2,10 +2,12 @@
 
   <nodeType name="mix:defaultSetting" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
   </nodeType>
+  
 
   <nodeType name="ntf:message" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
     <supertypes>
       <supertype>nt:base</supertype>
+      <supertype>mix:referenceable</supertype>
     </supertypes>
     <propertyDefinitions>
       <propertyDefinition name="ntf:providerType" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
@@ -35,6 +37,7 @@
   <nodeType name="ntf:messageHome" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
     <supertypes>
       <supertype>nt:base</supertype>
+      <supertype>mix:referenceable</supertype>
     </supertypes>
     <childNodeDefinitions>
       <childNodeDefinition name="*" defaultPrimaryType="ntf:message" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" sameNameSiblings="false">
@@ -55,9 +58,10 @@
     </childNodeDefinitions>
   </nodeType>
 
-  <nodeType name="ntf:messageInfo" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
+  <nodeType name="ntf:messageInfo" isMixin="false" hasOrderableChildNodes="true" primaryItemName="">
     <supertypes>
       <supertype>nt:base</supertype>
+      <supertype>mix:referenceable</supertype>
     </supertypes>
 		<childNodeDefinitions>
 			<childNodeDefinition name="*" defaultPrimaryType="nt:file" autoCreated="false" mandatory="false" onParentVersion="VERSION" protected="false" sameNameSiblings="true">
@@ -71,6 +75,7 @@
   <nodeType name="ntf:messageInfoHome" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
     <supertypes>
       <supertype>nt:base</supertype>
+      <supertype>mix:referenceable</supertype>
     </supertypes>
     <childNodeDefinitions>
       <childNodeDefinition name="*" defaultPrimaryType="ntf:message" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" sameNameSiblings="false">
