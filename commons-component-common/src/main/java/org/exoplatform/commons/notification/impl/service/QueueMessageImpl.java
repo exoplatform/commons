@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -193,7 +192,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       while (iterator.hasNext()) {
         Node node = iterator.nextNode();
         long createdTime = Long.parseLong(node.getName());
-        if ((sinceTime == 0 || sinceTime > createdTime) && index < LIMIT) {
+        if ((sinceTime == 0 || sinceTime < createdTime) && index < LIMIT) {
           MessageInfo messageInfo = getMessageInfo(node);
           messageInfo.setId(node.getUUID());
           messages.add(messageInfo);
@@ -238,7 +237,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     try {
       Set<String> ids = idsRemovingLocal.get();
       for (String messageId : ids) {
-        session.getNodeByUUID(messageId);
+        session.getNodeByUUID(messageId).remove();
         //
         sendEmailService.removeCurrentCapacity();
         LOG.debug("remove MessageInfo " + messageId);
@@ -247,6 +246,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     } catch (Exception e) {
       LOG.error("Failed to remove MessageInfo ", e);
     } finally {
+      messages.clear();
       sProvider.close();
       lock.unlock();
     }
