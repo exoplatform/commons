@@ -27,8 +27,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
@@ -51,6 +54,8 @@ public class TemplateUtils {
   private static final String SIMPLE_TEMPLATE_KEY = "Simple.{0}.{1}";
   private static final Log LOG = ExoLogger.getLogger(TemplateUtils.class);
   private static Map<String, Element> cacheTemplate = new ConcurrentHashMap<String, Element>();
+  
+  public static final int MAX_SUBJECT_LENGTH = 50;
   
   /**
    * Process the Groovy template ascossiate with Template context to generate
@@ -161,14 +166,14 @@ public class TemplateUtils {
    * @return
    */
   public static String processSubject(TemplateContext ctx) {
-    Element subject = null;
+    Element subjectElement = null;
     String key = makeTemplateKey(SIMPLE_TEMPLATE_KEY, ctx.getPluginId(), ctx.getLanguage());
     if (cacheTemplate.containsKey(key)) {
-      subject = cacheTemplate.get(key);
+      subjectElement = cacheTemplate.get(key);
     } else {
       TemplateConfig templateConfig = getTemplateConfig(ctx.getPluginId());
-      subject = NotificationUtils.getSubject(templateConfig, ctx.getPluginId(), ctx.getLanguage()).addNewLine(false);
-      cacheTemplate.put(key, subject);
+      subjectElement = NotificationUtils.getSubject(templateConfig, ctx.getPluginId(), ctx.getLanguage()).addNewLine(false);
+      cacheTemplate.put(key, subjectElement);
     }
     
     //The title of activity is escaped on social, then we need to unescape it to process the send email
@@ -176,8 +181,60 @@ public class TemplateUtils {
     if (value != null) {
       ctx.put("ACTIVITY", StringEscapeUtils.unescapeHtml(value));
     }
-    
-    return subject.accept(SimpleElementVistior.instance().with(ctx)).out();
+
+    String subject = String.valueOf(ctx.get("SUBJECT"));
+    if (subject != null && subject.length() > 0) {
+      ctx.put("SUBJECT", getExcerptSubject(subject));
+      return subjectElement.accept(SimpleElementVistior.instance().with(ctx)).out();
+    }
+    //
+    subject = subjectElement.accept(SimpleElementVistior.instance().with(ctx)).out();
+    return getExcerptSubject(subject);
+  }
+  
+  /**
+   * Get the excerpt subject of notification mail from origin string
+   *  - Just contains plain text
+   *  - Limit number of characters
+   * @param subject the origin string
+   * @return the excerpt of subject
+   * @since 4.1.x
+   */
+  public static String getExcerptSubject(String subject) {
+    subject = StringEscapeUtils.unescapeHtml(cleanHtmlTags(subject));
+    if (subject != null && subject.length() > MAX_SUBJECT_LENGTH) {
+      subject = subject.substring(0, MAX_SUBJECT_LENGTH);
+      int lastSpace = subject.lastIndexOf(" ");
+      return subject.substring(0, lastSpace) + "...";
+    }
+
+    return subject;
+  }
+  
+  /**
+   * Clean all HTML tags on string
+   *  
+   * @param str
+   * @return The string has not contain HTML tags.
+   */
+  public static String cleanHtmlTags(String str) {
+    //
+    if (str == null || str.trim().length() == 0) {
+      return "";
+    }
+    str = StringUtils.replace(str, "\n", " ");
+    // Clean tags HTML
+    String scriptregex = "<(script|style)[^>]*>[^<]*</(script|style)>";
+    Pattern p1 = Pattern.compile(scriptregex, Pattern.CASE_INSENSITIVE);
+    Matcher m1 = p1.matcher(str);
+    str = m1.replaceAll("");
+    String tagregex = "<[^>]*>";
+    Pattern p2 = Pattern.compile(tagregex);
+    Matcher m2 = p2.matcher(str);
+    str = m2.replaceAll("");
+    String multiplenewlines = "(\\n{1,2})(\\s*\\n)+";
+    str = str.replaceAll(multiplenewlines, "$1");
+    return str.trim();
   }
 
   /**
