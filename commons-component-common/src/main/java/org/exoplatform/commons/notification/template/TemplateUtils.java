@@ -27,7 +27,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -50,12 +49,15 @@ import org.exoplatform.services.resources.ResourceBundleService;
 import org.gatein.common.io.IOTools;
 
 public class TemplateUtils {
+  private static final Log LOG = ExoLogger.getLogger(TemplateUtils.class);
   private static final String DIGEST_TEMPLATE_KEY = "Digest.{0}.{1}";
   private static final String SIMPLE_TEMPLATE_KEY = "Simple.{0}.{1}";
-  private static final Log LOG = ExoLogger.getLogger(TemplateUtils.class);
+  private static final Pattern SCRIPT_REMOVE_PATTERN = Pattern.compile("<(script|style)[^>]*>[^<]*</(script|style)>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern TAGS_REMOVE_PATTERN = Pattern.compile("<[^>]*>", Pattern.CASE_INSENSITIVE);
+
   private static Map<String, Element> cacheTemplate = new ConcurrentHashMap<String, Element>();
   
-  public static final int MAX_SUBJECT_LENGTH = 50;
+  private static final int MAX_SUBJECT_LENGTH = 50;
   
   /**
    * Process the Groovy template ascossiate with Template context to generate
@@ -182,7 +184,7 @@ public class TemplateUtils {
       ctx.put("ACTIVITY", StringEscapeUtils.unescapeHtml(value));
     }
 
-    String subject = String.valueOf(ctx.get("SUBJECT"));
+    String subject = (String) ctx.get("SUBJECT");
     if (subject != null && subject.length() > 0) {
       ctx.put("SUBJECT", getExcerptSubject(subject));
       return subjectElement.accept(SimpleElementVistior.instance().with(ctx)).out();
@@ -201,40 +203,35 @@ public class TemplateUtils {
    * @since 4.1.x
    */
   public static String getExcerptSubject(String subject) {
-    subject = StringEscapeUtils.unescapeHtml(cleanHtmlTags(subject));
-    if (subject != null && subject.length() > MAX_SUBJECT_LENGTH) {
-      subject = subject.substring(0, MAX_SUBJECT_LENGTH);
-      int lastSpace = subject.lastIndexOf(" ");
-      return subject.substring(0, lastSpace) + "...";
+    String newSubject = StringEscapeUtils.unescapeHtml(cleanHtmlTags(subject));
+    if (newSubject.length() > MAX_SUBJECT_LENGTH) {
+      newSubject = newSubject.substring(0, MAX_SUBJECT_LENGTH);
+      int lastSpace = newSubject.lastIndexOf(" ");
+      return newSubject.substring(0, lastSpace) + "...";
     }
 
-    return subject;
+    return newSubject;
   }
   
   /**
    * Clean all HTML tags on string
    *  
-   * @param str
+   * @param str the origin string
    * @return The string has not contain HTML tags.
+   * @since 4.1.x
    */
   public static String cleanHtmlTags(String str) {
     //
     if (str == null || str.trim().length() == 0) {
       return "";
     }
-    str = StringUtils.replace(str, "\n", " ");
-    // Clean tags HTML
-    String scriptregex = "<(script|style)[^>]*>[^<]*</(script|style)>";
-    Pattern p1 = Pattern.compile(scriptregex, Pattern.CASE_INSENSITIVE);
-    Matcher m1 = p1.matcher(str);
-    str = m1.replaceAll("");
-    String tagregex = "<[^>]*>";
-    Pattern p2 = Pattern.compile(tagregex);
-    Matcher m2 = p2.matcher(str);
-    str = m2.replaceAll("");
-    String multiplenewlines = "(\\n{1,2})(\\s*\\n)+";
-    str = str.replaceAll(multiplenewlines, "$1");
-    return str.trim();
+    // clean multi-lines
+    String newSubject = StringUtils.replace(str, "\n", " ");
+    // clean script
+    newSubject = SCRIPT_REMOVE_PATTERN.matcher(newSubject).replaceAll("");
+    // clean tags HTML
+    newSubject = TAGS_REMOVE_PATTERN.matcher(newSubject).replaceAll(" ");
+    return newSubject.replaceAll("\\s+", " ").trim();
   }
 
   /**
