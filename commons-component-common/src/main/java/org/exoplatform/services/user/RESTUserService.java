@@ -35,12 +35,7 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
- * Dec 16, 2013  
- */
+
 @Path("/state/")
 public class RESTUserService implements ResourceContainer{
   private static final Log LOG = ExoLogger.getLogger(RESTUserService.class);
@@ -52,10 +47,10 @@ public class RESTUserService implements ResourceContainer{
   
     
   @GET
-  @Path("/ping/{userID}/")
+  @Path("/ping/{userId}/")
   @RolesAllowed("users")
-  public Response updateState(@PathParam("userID") String userID) {
-    userService.updateUserTime(userID);
+  public Response updateState(@PathParam("userId") String userId) {
+    userService.updateUserTime(userId);
     return Response.ok().build();
   }
   
@@ -81,11 +76,11 @@ public class RESTUserService implements ResourceContainer{
   }
   
   @GET
-  @Path("/online/{targetUserID}/")
+  @Path("/online/{userId}/")
   @RolesAllowed("users")
-  public Response online(@PathParam("targetUserID") String targetUserID) {
+  public Response online(@PathParam("userId") String userId) {
     String status = "offline";
-    Boolean b = userService.getUserStattus(targetUserID);
+    Boolean b = userService.getUserStatus(userId);
     if(b) status = "available";
     return Response.ok(status.toString()).build();
   }

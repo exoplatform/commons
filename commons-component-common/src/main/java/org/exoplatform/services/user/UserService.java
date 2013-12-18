@@ -24,20 +24,36 @@ import java.util.List;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 
-/**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
- * Dec 13, 2013  
- */
+
 public class UserService {
   
   private static ExoCache<Serializable, Date> usersCache;
   private static List<String> users = new ArrayList<String>();
   
+  private static UserService instance = null;
+  
+  /* Need the following object to synchronize a block */
+  private static Object syncObject_;
+  
+  /* Prevent direct access to the constructor*/
+  private UserService() {
+    super();
+  }
   
   public UserService(CacheService cacheService) {
     usersCache = cacheService.getCacheInstance(UserService.class.getName()) ;
+  }
+  
+  public static UserService getInstance(CacheService cacheService)
+  {
+    if (instance == null) {
+      synchronized(syncObject_) {
+        if (instance == null) {
+          instance = new UserService(cacheService);
+        }
+      }      
+    }
+    return instance;
   }
   
   public void updateUserTime(String userKey) {
@@ -46,7 +62,7 @@ public class UserService {
     if(!users.contains(userKey)) users.add(userKey);
   }
   
-  public boolean getUserStattus(String userKey) {
+  public boolean getUserStatus(String userKey) {
     Date userDate = usersCache.get(userKey);
     if(userDate == null) return false;
     long diffInSeconds = Math.abs(System.currentTimeMillis() - userDate.getTime()) / 1000;
