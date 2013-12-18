@@ -41,6 +41,16 @@
   </component>
   
   <component>
+    <key>org.exoplatform.commons.notification.job.mbeans.DailyService</key>
+    <type>org.exoplatform.commons.notification.job.mbeans.DailyService</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.commons.notification.job.mbeans.WeeklyService</key>
+    <type>org.exoplatform.commons.notification.job.mbeans.WeeklyService</type>
+  </component>
+  
+  <component>
     <type>org.exoplatform.commons.notification.NotificationContextFactory</type>
   </component>
 

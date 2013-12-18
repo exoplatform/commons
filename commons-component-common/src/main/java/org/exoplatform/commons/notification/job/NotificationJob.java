@@ -21,28 +21,13 @@ import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 public abstract class NotificationJob implements Job {
   protected static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
-
+  
   public NotificationJob() {}
 
-  @Override
-  public void execute(JobExecutionContext context) throws JobExecutionException {
-    if (isValid() == false) {
-      return;
-    }
-
-    try {
-      processSendNotification();
-    } catch (Exception e) {
-      LOG.error("Failed to running NotificationJob", e);
-    }
-  }
- 
-  private boolean isValid() {
+  protected boolean isValid() {
     try {
       return CommonsUtils.getRepository().getState() != 0 && CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME);
     } catch (Exception e) {

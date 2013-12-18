@@ -18,9 +18,26 @@ package org.exoplatform.commons.notification.job;
 
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.job.mbeans.WeeklyService;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 public class NotificationWeeklyJob extends NotificationJob {
+  
+  @Override
+  public void execute(JobExecutionContext context) throws JobExecutionException {
+    if (isValid() == false) {
+      return;
+    }
+    if (WeeklyService.isStarted() == false) {
+      try {
+        processSendNotification();
+      } catch (Exception e) {
+        LOG.error("Failed to running NotificationJob", e);
+      }
+    }
+  }
 
   @Override
   protected void processSendNotification() throws Exception {
@@ -28,5 +45,5 @@ public class NotificationWeeklyJob extends NotificationJob {
     CommonsUtils.getService(NotificationConfiguration.class).setSendWeekly(true);
     CommonsUtils.getService(NotificationService.class).processDigest();
   }
-
+  
 }
