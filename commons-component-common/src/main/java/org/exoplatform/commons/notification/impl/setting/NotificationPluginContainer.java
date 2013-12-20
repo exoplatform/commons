@@ -16,12 +16,15 @@
  */
 package org.exoplatform.commons.notification.impl.setting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
@@ -32,12 +35,18 @@ import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
 
 public class NotificationPluginContainer implements PluginContainer, Startable {
+
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
-  private PluginSettingService pSettingService;
-  private ResourceBundleConfigDeployer deployer;
-  
+
+  // parent key and list child key
+  private final Map<NotificationKey, List<NotificationKey>>      parentChildrenKeysMap;
+
+  private PluginSettingService                                   pSettingService;
+  private ResourceBundleConfigDeployer                           deployer;
+
   public NotificationPluginContainer() {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
+    parentChildrenKeysMap = new HashMap<NotificationKey, List<NotificationKey>>();
     pSettingService = CommonsUtils.getService(PluginSettingService.class);
     deployer = new ResourceBundleConfigDeployer();
   }
@@ -45,13 +54,16 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   @Override
   public void start() {
     Set<String> datas = new HashSet<String>();
+    // register plugin
     for (AbstractNotificationPlugin plugin : pluginMap.values()) {
+      boolean isChild = (plugin instanceof AbstractNotificationChildPlugin);
       for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
-        pSettingService.registerPluginConfig(pluginConfig);
+        pSettingService.registerPluginConfig(pluginConfig.isChildPlugin(isChild));
         datas.add(pluginConfig.getTemplateConfig().getBundlePath());
       }
     }
-    if(ServletContainerFactory.getServletContainer().addWebAppListener(deployer)) {
+    //
+    if (ServletContainerFactory.getServletContainer().addWebAppListener(deployer)) {
       deployer.initBundlePath(datas);
     }
   }
@@ -67,8 +79,38 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   }
 
   @Override
-  public void add(AbstractNotificationPlugin plugin) {
+  public List<NotificationKey> getChildPluginKeys(NotificationKey parentKey) {
+    List<NotificationKey> keys = parentChildrenKeysMap.get(parentKey);
+    if (keys != null) {
+      return keys;
+    }
+    return new ArrayList<NotificationKey>();
+  }
+
+  @Override
+  public void addPlugin(AbstractNotificationPlugin plugin) {
     pluginMap.put(plugin.getKey(), plugin);
+  }
+
+  @Override
+  public void addChildPlugin(AbstractNotificationChildPlugin plugin) {
+    pluginMap.put(plugin.getKey(), plugin);
+    //
+    List<String> parentIds = plugin.getParentPluginIds();
+    NotificationKey parentKey;
+    List<NotificationKey> childrenKeys;
+    for (String parentId : parentIds) {
+      parentKey = new NotificationKey(parentId);
+      if (parentChildrenKeysMap.containsKey(parentKey)) {
+        childrenKeys = parentChildrenKeysMap.get(parentKey);
+      } else {
+        childrenKeys = new ArrayList<NotificationKey>();
+      }
+      //
+      childrenKeys.add(plugin.getKey());
+      parentChildrenKeysMap.put(parentKey, childrenKeys);
+    }
+
   }
 
   @Override
@@ -76,6 +118,5 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
     pluginMap.remove(key);
     return true;
   }
-
 
 }

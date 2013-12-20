@@ -21,6 +21,8 @@ import java.util.List;
 
 public class PluginConfig {
 
+  private boolean       isChildPlugin = false;
+
   private String         pluginId;
 
   private String         resourceBundleKey;
@@ -106,6 +108,22 @@ public class PluginConfig {
    */
   public void setGroupId(String groupId) {
     this.groupId = groupId;
+  }
+
+  /**
+   * @return the isChildPlugin
+   */
+  public boolean isChildPlugin() {
+    return isChildPlugin;
+  }
+
+  /**
+   * @param isChildPlugin the isChildPlugin to set
+   * return the PluginConfig
+   */
+  public PluginConfig isChildPlugin(boolean isChildPlugin) {
+    this.isChildPlugin = isChildPlugin;
+    return this;
   }
 
   /**
