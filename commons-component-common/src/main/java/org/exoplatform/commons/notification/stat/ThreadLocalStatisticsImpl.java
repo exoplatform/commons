@@ -26,6 +26,7 @@ import org.exoplatform.commons.api.notification.stat.QueryStatistics;
 import org.exoplatform.commons.api.notification.stat.QueueStatistics;
 import org.exoplatform.commons.api.notification.stat.Statistics;
 import org.exoplatform.commons.api.notification.stat.StatisticsCollector;
+import org.exoplatform.commons.notification.impl.PluginStatisticService;
 import org.hibernate.internal.util.collections.ArrayHelper;
 
 /**
@@ -55,6 +56,9 @@ public class ThreadLocalStatisticsImpl implements Statistics, StatisticsCollecto
   private AtomicLong queryExecutionMaxTime = new AtomicLong();
   private volatile String queryExecutionMaxTimeQueryString;
   
+  //
+  private final PluginStatisticService pluginStatistic;
+  
   
   /**
    * plugin statistics per name
@@ -75,8 +79,9 @@ public class ThreadLocalStatisticsImpl implements Statistics, StatisticsCollecto
    */
   private final ConcurrentMap<String, QueryStatistics> queryStatistics = new ConcurrentHashMap<String, QueryStatistics>();
   
-  public ThreadLocalStatisticsImpl() {
+  public ThreadLocalStatisticsImpl(PluginStatisticService pluginStatistic) {
     clear();
+    this.pluginStatistic = pluginStatistic;
   }
   
   @Override
@@ -101,18 +106,21 @@ public class ThreadLocalStatisticsImpl implements Statistics, StatisticsCollecto
   @Override
   public void createMessageInfoCount(String pluginId) {
     messageCreatedCount.incrementAndGet();
+    pluginStatistic.increaseCreatedMessageCount(pluginId);
     getPluginStatistics(pluginId).incrementCreateMessageCount();
   }
 
   @Override
   public void createNotificationInfoCount(String pluginId) {
     notificationCreatedCount.incrementAndGet();
+    pluginStatistic.increaseCreatedNotifCount(pluginId);
     getPluginStatistics(pluginId).incrementCreateNotificationCount();
   }
 
   @Override
   public void createDigestCount(String pluginId) {
     digestCreatedCount.incrementAndGet();
+    pluginStatistic.increaseCreatedDigestCount(pluginId);
     getPluginStatistics(pluginId).incrementCreateDigestCount();
   }
 

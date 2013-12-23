@@ -36,6 +36,11 @@
   </component>
   
   <component>
+    <key>org.exoplatform.commons.notification.impl.PluginStatisticService</key>
+    <type>org.exoplatform.commons.notification.impl.PluginStatisticService</type>
+  </component>
+  
+  <component>
     <key>org.exoplatform.commons.notification.impl.StatisticsService</key>
     <type>org.exoplatform.commons.notification.impl.StatisticsService</type>
   </component>
