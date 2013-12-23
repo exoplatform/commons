@@ -230,6 +230,61 @@ public class StatisticsService implements Startable {
   public String[] getPluginNames() {
     return stats.getPluginNames();
   }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by ActivityCommentPlugin")
+  public PluginStatistics getActivityCommenStatistics() {
+    return stats.getPluginStatistics("ActivityCommentPlugin");
+  }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by ActivityMentionPlugin")
+  public PluginStatistics getActivityMentionStatistics() {
+    return stats.getPluginStatistics("ActivityMentionPlugin");
+  }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by LikePlugin")
+  public PluginStatistics getLikeStatistics() {
+    return stats.getPluginStatistics("LikePlugin");
+  }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by NewUserPlugin")
+  public PluginStatistics getNewUserStatistics() {
+    return stats.getPluginStatistics("NewUserPlugin");
+  }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by PostActivityPlugin")
+  public PluginStatistics getPostActivityStatistics() {
+    return stats.getPluginStatistics("PostActivityPlugin");
+  }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by PostActivitySpaceStreamPlugin")
+  public PluginStatistics getPostActivitySpaceStreamStatistics() {
+    return stats.getPluginStatistics("PostActivitySpaceStreamPlugin");
+  }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by RelationshipRecievedRequestPlugin")
+  public PluginStatistics getRelationshipRecievedRequestStatistics() {
+    return stats.getPluginStatistics("RelationshipRecievedRequestPlugin");
+  }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by RequestJoinSpacePlugin")
+  public PluginStatistics getRequestJoinSpaceStatistics() {
+    return stats.getPluginStatistics("RequestJoinSpacePlugin");
+  }
+  
+  @Managed
+  @ManagedDescription("Gets plugin statistics by SpaceInvitationPlugin")
+  public PluginStatistics getSpaceInvitationStatistics() {
+    return stats.getPluginStatistics("SpaceInvitationPlugin");
+  }
+  
   @Managed
   @ManagedDescription("Gets start time of statistics.")
   public long getStartTime() {
