@@ -32,6 +32,10 @@ import javax.xml.transform.dom.DOMSource;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.security.ConversationState;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -41,15 +45,19 @@ public class RESTUserService implements ResourceContainer{
   private static final Log LOG = ExoLogger.getLogger(RESTUserService.class);
   private final UserService userService;
   
+  protected static final String ACTIVITY  = "activity";
+  protected static final String STATUS    = "status";
+  
   public RESTUserService(UserService userService) {
     this.userService = userService;
   }
   
     
   @GET
-  @Path("/ping/{userId}/")
+  @Path("/ping/")
   @RolesAllowed("users")
-  public Response updateState(@PathParam("userId") String userId) {
+  public Response updateState() {
+    String userId = ConversationState.getCurrent().getIdentity().getUserId();
     userService.updateUserTime(userId);
     return Response.ok().build();
   }
@@ -58,31 +66,26 @@ public class RESTUserService implements ResourceContainer{
   @Path("/online/")
   @RolesAllowed("users")
   public Response online() throws ParserConfigurationException {
-    List<String> usersOnline = userService.getUsersOnline();
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder = factory.newDocumentBuilder();
-    Document document = builder.newDocument();
-    
-    Element rootElement = document.createElement("Users");
-    document.appendChild(rootElement);
-    
+    List<String> usersOnline = userService.getUsersOnline();  
+    JSONArray json = new JSONArray();    
     for(int i=0; i< usersOnline.size(); i++) {
-      String user = usersOnline.get(i);
-      Element newChild = document.createElement("User");
-      newChild.setAttribute("userName", user);
-      rootElement.appendChild(newChild);
+      json.put(usersOnline.get(i));
     }
-    return Response.ok(new DOMSource(document), MediaType.TEXT_XML).build();
+    return Response.ok(json.toString(), MediaType.APPLICATION_JSON).build();
   }
   
   @GET
-  @Path("/online/{userId}/")
+  @Path("/status/{userId}/")
   @RolesAllowed("users")
-  public Response online(@PathParam("userId") String userId) {
-    String status = "offline";
+  public Response online(@PathParam("userId") String userId) throws JSONException {
+    String activity = "offline";
     Boolean b = userService.getUserStatus(userId);
-    if(b) status = "available";
-    return Response.ok(status.toString()).build();
+    if(b) activity = "online";
+    JSONObject json = new JSONObject();
+    json.put(ACTIVITY, activity);
+    json.put(STATUS, "");
+    
+    return Response.ok(json.toString(), MediaType.APPLICATION_JSON).build();
   }
   
   

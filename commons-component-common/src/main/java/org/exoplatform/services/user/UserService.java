@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 
@@ -41,7 +42,7 @@ public class UserService {
   }
   
   public UserService(CacheService cacheService) {
-    usersCache = cacheService.getCacheInstance(UserService.class.getName()) ;
+    usersCache = cacheService.getCacheInstance(UserService.class.getName() + CommonsUtils.getRepository().getConfiguration().getName()) ;
   }
   
   public static UserService getInstance(CacheService cacheService)
