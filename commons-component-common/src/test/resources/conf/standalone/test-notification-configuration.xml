@@ -14,7 +14,11 @@
     <key>org.exoplatform.services.mail.MailService</key>
     <type>org.exoplatform.commons.notification.mock.MockMailService</type>
   </component>
-  
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.PluginStatisticService</type>
+  </component>
+
   <component>
     <type>org.exoplatform.commons.notification.impl.StatisticsService</type>
   </component>
