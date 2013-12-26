@@ -55,7 +55,7 @@ public final class NotificationContextImpl implements NotificationContext {
   private NotificationContextImpl() {
     //TODO apply static method for Notification
     //Create the pluginConttext for operation-per-session such as transaction 
-    executor = NotificationExecutorImpl.getInstance();
+    executor = new NotificationExecutorImpl();
     pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
     settingService = CommonsUtils.getService(PluginSettingService.class);
   }

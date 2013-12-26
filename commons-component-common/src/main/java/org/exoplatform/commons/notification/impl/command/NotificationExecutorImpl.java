@@ -37,7 +37,7 @@ public class NotificationExecutorImpl implements NotificationExecutor {
 
   private final List<NotificationCommand>  commands;
   
-  private NotificationExecutorImpl() {
+  public NotificationExecutorImpl() {
     commands = new CopyOnWriteArrayList<NotificationCommand>();
   }
   

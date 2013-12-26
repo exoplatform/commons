@@ -33,6 +33,9 @@ import java.util.zip.GZIPOutputStream;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Session;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
@@ -45,6 +48,7 @@ import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.management.annotations.ManagedBy;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
@@ -89,7 +93,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     this.configuration = CommonsUtils.getService(NotificationConfiguration.class);
     this.mailService = CommonsUtils.getService(MailService.class);
 
-    MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 50);
+    MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 20);
     DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120) * 1000;
   }
   
@@ -119,7 +123,9 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       }
     }
     if (Long.valueOf(DELAY_TIME) != INTERVAL) {
-      MAX_TO_SEND = 1;
+      LIMIT = 1;
+    } else {
+      LIMIT = MAX_TO_SEND;
     }
   }
 
@@ -200,6 +206,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
           sinceTime = createdTime;
           index++;
         } else {
+          sinceTime = 0;
+          messages.clear();
           break;
         }
       }
@@ -218,6 +226,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       if(messageInfoNode.canAddMixin("mix:referenceable")) {
         messageInfoNode.addMixin("mix:referenceable");
       }
+      
       //
       saveData(messageInfoNode, compress(message.toJSON()));
 
@@ -255,7 +264,14 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private NodeIterator getMessageInfoNodes(SessionProvider sProvider) {
     try {
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
-      return messageInfoHome.getNodes();
+      QueryManager qm = messageInfoHome.getSession().getWorkspace().getQueryManager();
+      StringBuffer stringBuffer = new StringBuffer();
+      stringBuffer.append("SELECT * FROM ntf:messageInfo ")
+      .append("ORDER BY exo:name");
+      QueryImpl query = (QueryImpl) qm.createQuery(stringBuffer.toString(), Query.SQL);
+      query.setLimit(LIMIT);
+      QueryResult result = query.execute();
+      return result.getNodes();
     } catch (Exception e) {
       LOG.error("Failed to getMessageInfos", e);
     }
