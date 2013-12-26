@@ -4,11 +4,7 @@
 	xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
 	xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
 
-	<portal-skin>
-		<skin-name>Default</skin-name>
-		<skin-module>DocumentSelector</skin-module>
-		<css-path>/skin/css/commons.css</css-path>
-	</portal-skin>
+	
 
 	<module>
 		<name>commons-document</name>
