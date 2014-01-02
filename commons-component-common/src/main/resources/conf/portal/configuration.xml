@@ -22,11 +22,9 @@
 	
 	<component>
 	    <key>org.exoplatform.services.user.UserService</key>
-     	<type>org.exoplatform.services.user.UserService</type>
     </component>
     <component>
     	<key>org.exoplatform.services.user.RESTUserService</key>
-     	<type>org.exoplatform.services.user.RESTUserService</type>
     </component>
 
   <component>
