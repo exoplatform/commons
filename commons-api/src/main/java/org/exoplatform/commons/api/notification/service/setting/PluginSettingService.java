@@ -38,12 +38,6 @@ public interface PluginSettingService {
   void registerGroupConfig(GroupProviderPlugin groupConfig);
   
   /**
-   * Registers the child plugin configuration.
-   * @param pluginConfig The chid plugin configuration to be registered.
-   */
-  void registerChildPluginConfig(PluginConfig chidPluginConfig);
-  
-  /**
    * Gets configuration of a plugin from its Id.
    * 
    * @param pluginId Id of the plugin.
