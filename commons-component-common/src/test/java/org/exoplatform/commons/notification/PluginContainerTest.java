@@ -16,8 +16,16 @@
  */
 package org.exoplatform.commons.notification;
 
+import java.util.List;
+
+import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 
@@ -40,6 +48,40 @@ public class PluginContainerTest extends BaseCommonsTestCase {
     super.tearDown();
   }
   
+  public void testPlugin() {
+    // check existing plugin
+    NotificationKey pluginKey = new NotificationKey("Test_ID");
+    AbstractNotificationPlugin plugin = container.getPlugin(pluginKey);
+    assertNotNull(plugin);
+    // get child
+    List<NotificationKey> chikdKeys = container.getChildPluginKeys(pluginKey);
+    assertEquals(1, chikdKeys.size());
+    assertEquals("Child_Plugin", chikdKeys.get(0).getId());
+    
+    //
+    NotificationContext ctx = NotificationContextImpl.cloneInstance();
+    NotificationInfo notificationInfo = plugin.buildNotification(ctx);
+    assertNotNull(notificationInfo);
+    assertEquals("demo", notificationInfo.getSendToUserIds().get(0));
+    assertEquals("Test_ID", notificationInfo.getKey().getId());
+    //
+    ctx.setNotificationInfo(notificationInfo);
+    MessageInfo messageInfo = plugin.buildMessage(ctx);
+
+    // check subject
+    assertEquals("The subject Test plugin notification", messageInfo.getSubject());
+    // check content
+    assertTrue(messageInfo.getBody().indexOf("root") > 0);
+    assertTrue(messageInfo.getBody().indexOf("Test value") > 0);
+
+    // check process resource-bundle on plugin
+    assertTrue(messageInfo.getBody().indexOf("The test plugin") > 0);
+    // check child plugin content
+    assertTrue(messageInfo.getBody().indexOf("The content of child plugin") > 0);
+    // check process resource-bundle on plugin
+    assertTrue(messageInfo.getBody().indexOf("The test child plugin") > 0);
+  }
+
   public void testRenderPlugin() throws Exception {
     TemplateContext ctx = new TemplateContext("DigestDailyPlugin", null);
     ctx.put("FIRSTNAME", "User ROOT");
