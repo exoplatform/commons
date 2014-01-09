@@ -70,7 +70,6 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private static final String            DELAY_TIME_KEY        = "period";
   private static final String            CACHE_REPO_NAME       = "repositoryName";
   private static final int               BUFFER_SIZE           = 32;
-  private static long                    INTERVAL              = 1000;
   private static int                     LIMIT                 = 20;
   private static long                    sinceTime             = 0;
 
@@ -101,14 +100,15 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     this.sendEmailService = managementView;
   }
 
-  public void makeJob(long interval) {
+  public void makeJob(int limit, long interval) {
     if (interval > 0) {
-      INTERVAL = interval;
+      LIMIT = limit;
+      //
       JobSchedulerService schedulerService = CommonsUtils.getService(JobSchedulerService.class);
       Calendar cal = new GregorianCalendar();
       //
       try {
-        PeriodInfo periodInfo = new PeriodInfo(cal.getTime(), null, -1, INTERVAL);
+        PeriodInfo periodInfo = new PeriodInfo(cal.getTime(), null, -1, interval);
         JobInfo info = new JobInfo("SendEmailNotificationJob", "Notification", SendEmailNotificationJob.class);
         info.setDescription("Send email notification job.");
         //
@@ -122,17 +122,16 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         LOG.warn("Failed to add send email notification jobs ", e);
       }
     }
-    if (Long.valueOf(DELAY_TIME) != INTERVAL) {
-      LIMIT = 1;
-    } else {
-      LIMIT = MAX_TO_SEND;
-    }
+  }
+
+  public void resetDefaultConfigJob() {
+    makeJob(MAX_TO_SEND, DELAY_TIME);
   }
 
   @Override
   public void start() {
     //
-    makeJob(DELAY_TIME);
+    resetDefaultConfigJob();
     //
     sendEmailService.registerManager(this);
   }
@@ -184,6 +183,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       removeMessageInfo();
     }
   }
+
   /**
    * Loading the messageInfo as buffer with Limit
    * and sinceTime
@@ -273,6 +273,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       stringBuffer.append("SELECT * FROM ntf:messageInfo ")
       .append("ORDER BY exo:name");
       QueryImpl query = (QueryImpl) qm.createQuery(stringBuffer.toString(), Query.SQL);
+      query.setOffset(0);
       query.setLimit(LIMIT);
       QueryResult result = query.execute();
       return result.getNodes();

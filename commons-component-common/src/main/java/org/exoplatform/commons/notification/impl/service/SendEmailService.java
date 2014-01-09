@@ -38,7 +38,9 @@ public class SendEmailService implements ManagementAware {
 
   private long        currentCapacity = 0;
 
-  private int         emailPerMinute  = 0;
+  private int         emailPerSend  = 0;
+
+  private int         interval  = 0;
 
   private ManagementContext context;
   
@@ -85,8 +87,11 @@ public class SendEmailService implements ManagementAware {
   @ManagedDescription("Turn on the mail service.")
   @Impact(ImpactType.READ)
   public void on() {
-    isOn = true;
     resetCounter();
+    isOn = true;
+    emailPerSend = 120;
+    interval = 120;
+    makeJob();
   }
 
   @Managed
@@ -101,6 +106,7 @@ public class SendEmailService implements ManagementAware {
   @Impact(ImpactType.READ)
   public void off() {
     resetCounter();
+    this.queueMessage.resetDefaultConfigJob();
     isOn = false;
   }
 
@@ -119,30 +125,38 @@ public class SendEmailService implements ManagementAware {
   }
 
   @Managed
-  @ManagedDescription("Set number send emails per minute.")
+  @ManagedDescription("Set number emails send per one time.")
   @Impact(ImpactType.READ)
-  public void setNumberEmailPerMinute(int emailPerMinute) {
-    this.emailPerMinute = emailPerMinute;
-    this.queueMessage.makeJob(timeSendingPerEmail());
+  public void setNumberEmailPerSend(int emailPerSend) {
+    this.emailPerSend = emailPerSend;
+    makeJob();
   }
 
   @Managed
-  @ManagedDescription("Number send emails per minute.")
+  @ManagedDescription("Number emails send per one time.")
   @Impact(ImpactType.READ)
-  public int getNumberEmailPerMinute() {
-    return this.emailPerMinute;
+  public int getNumberEmailPerSend() {
+    return this.emailPerSend;
   }
 
-  /**
-   * The millisecond to sending one email.
-   * 
-   * @return
-   */
-  private int timeSendingPerEmail() {
-    if (emailPerMinute <= 0) {
-      return 0;
+  @Managed
+  @ManagedDescription("Set number emails send per one time.(seconds)")
+  @Impact(ImpactType.READ)
+  public void setInterval(int interval) {
+    this.interval = interval;
+    makeJob();
+  }
+  
+  @Managed
+  @ManagedDescription("Number emails send per one time.")
+  @Impact(ImpactType.READ)
+  public int getInterval() {
+    return this.interval;
+  }
+  
+  private void makeJob() {
+    if (isOn) {
+      this.queueMessage.makeJob(emailPerSend, interval*1000);
     }
-    return 60000 / emailPerMinute;
   }
-
 }

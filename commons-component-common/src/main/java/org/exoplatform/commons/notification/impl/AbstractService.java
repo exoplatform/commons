@@ -170,6 +170,7 @@ public abstract class AbstractService {
     if (parent.hasNode(nodeName) == false) {
       Node messageHome = parent.addNode(nodeName, NTF_MESSAGE_HOME);
       messageHome.addMixin(MIX_SUB_MESSAGE_HOME);
+      sessionSave(messageHome);
       return messageHome;
     }
     return parent.getNode(nodeName);

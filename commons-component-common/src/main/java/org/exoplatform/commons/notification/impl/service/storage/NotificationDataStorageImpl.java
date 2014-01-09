@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -51,6 +52,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   private String                    workspace;
 
   private NotificationConfiguration configuration    = null;
+  
+  private final ReentrantLock lock = new ReentrantLock();
 
   private Map<String, Set<String>>  removeByCallBack = new ConcurrentHashMap<String, Set<String>>();
 
@@ -61,9 +64,10 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public void save(NotificationInfo message) throws Exception {
-    LOG.debug("saveNotificationMessage to jcr " + message.toString());
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    final ReentrantLock localLock = lock;
     try {
+      localLock.lock();
       Node messageHomeNode = getOrCreateMessageParent(sProvider, workspace, message.getKey().getId());
       Node messageNode = messageHomeNode.addNode(message.getId(), NTF_MESSAGE);
       messageNode.setProperty(NTF_FROM, message.getFrom());
@@ -81,6 +85,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       
     } catch (Exception e) {
       LOG.error("Failed to save the NotificationMessage", e);
+    } finally {
+      localLock.unlock();
     }
   }
 
