@@ -219,8 +219,11 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   }
 
   private void saveMessageInfo(MessageInfo message) {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
+      message.setCreatedTime(System.nanoTime());
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
       Node messageInfoNode = messageInfoHome.addNode("" + message.getCreatedTime(), NTF_MESSAGE_INFO);
       if(messageInfoNode.canAddMixin("mix:referenceable")) {
@@ -235,6 +238,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       LOG.warn("Failed to storage MessageInfo: " + message.toJSON(), e);
     } finally {
       sProvider.close();
+      lock.unlock();
     }
   }
 

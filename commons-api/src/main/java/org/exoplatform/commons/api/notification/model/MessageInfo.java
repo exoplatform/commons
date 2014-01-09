@@ -38,7 +38,6 @@ public class MessageInfo {
   private long createdTime;
 
   public MessageInfo() {
-    this.createdTime = System.currentTimeMillis();
   }
 
   /**
