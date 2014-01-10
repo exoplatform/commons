@@ -18,6 +18,7 @@ package org.exoplatform.commons.notification.job;
 
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.quartz.Job;
@@ -25,7 +26,11 @@ import org.quartz.Job;
 public abstract class NotificationJob implements Job {
   protected static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
   
-  public NotificationJob() {}
+  public NotificationJob() {
+    try {
+      new GroovyTemplate("");
+    } catch (Exception e) {}
+  }
 
   protected boolean isValid() {
     try {
