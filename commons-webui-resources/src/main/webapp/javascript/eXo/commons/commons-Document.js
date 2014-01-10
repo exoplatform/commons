@@ -894,7 +894,7 @@ function UIDSUpload() {
 
 	  var file  = jQuery(clickEle ,form);
 	  if(file.attr("value") == null || file.attr("value") == '') return;  
-	  var fileName = file.attr("value");
+	  var fileName = file.attr("value").replace(/C:\\fakepath\\/i, '');
 	  jQuery(".fileNameLabel").html(fileName)
                             .attr({'rel':'tooltip', 'data-placement':'bottom', 'data-original-title' : fileName})
                             .tooltip();
