@@ -149,31 +149,50 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   
   @Override
   public void processDigest() throws Exception {
-    
     /**
-     * TODO
      * 1. just implements for daily
      * 2. apply Strategy pattern and Factory Pattern
-     * 3. Rename method as processDigest
      */
     UserSettingService userService = CommonsUtils.getService(UserSettingService.class);
     DigestorService digest = CommonsUtils.getService(DigestorService.class);
     MailService mailService = CommonsUtils.getService(MailService.class);
+    long time = System.currentTimeMillis();
+    //process for users used setting
     int offset = 0;
     int limit = 20;
-    
-    List<UserSetting> userSettings = userService.getDaily(offset, limit);
-    send(digest, mailService, userSettings, false);
-
-    //
-    List<UserSetting> usersDefaultSettings = userService.getDefaultDaily();
-    send(digest, mailService, usersDefaultSettings, true);
-    
-    //Clear all stored message
-    storage.removeMessageAfterSent();
+    boolean isF = true;
+    while (true) {
+      List<UserSetting> userSettings = userService.getDaily(offset, limit);
+      if(isF) {
+        System.out.println("Fisrt getDaily time: " + (System.currentTimeMillis() - time) + " ms.");
+        isF = false;
+      }
+      if(userSettings.size() == 0) {
+        break;
+      }
+      send(digest, mailService, userSettings, false);
+      offset += limit;
+    }
+    System.out.println("Time to process getDaily: " + (System.currentTimeMillis() - time) + " ms.");
+    time = System.currentTimeMillis();
+    //process for users used default setting
+    offset = 0;isF = true;
+    while (true) {
+      List<UserSetting> usersDefaultSettings = userService.getDefaultDaily(offset, limit);
+      if(isF) {
+        System.out.println("Fisrt getDefaultDaily time: " + (System.currentTimeMillis() - time) + " ms.");
+        isF = false;
+      }
+      if(usersDefaultSettings.size() == 0) {
+        break;
+      }
+      send(digest, mailService, usersDefaultSettings, true);
+      offset += limit;
+    }
+    System.out.println("Time to process getDefaultDaily: " + (System.currentTimeMillis() - time) + " ms.");
   }
   
-  private void send(DigestorService digest, MailService mail, List<UserSetting> userSettings, boolean isDefault) {
+  private void send(DigestorService digest, MailService mail, List<UserSetting> userSettings, boolean isDefault) throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
@@ -195,6 +214,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         }
       }
     }
+    //Clear all stored message
+    storage.removeMessageAfterSent();
   }
   
   private UserSetting getDefaultUserNotificationSetting(UserSetting setting) {

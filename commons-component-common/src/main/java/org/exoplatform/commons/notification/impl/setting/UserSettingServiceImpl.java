@@ -196,13 +196,13 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     }
   }
   
-  private StringBuffer buildQuery() {
-    StringBuffer queryBuffer = new StringBuffer();
-    queryBuffer.append("@").append(EXO_IS_ACTIVE).append("='true' and (")
-               .append("@").append(EXO_DAILY).append("!=").append("''");
+  private StringBuilder buildQuery() {
+    StringBuilder queryBuffer = new StringBuilder();
+    queryBuffer.append(EXO_IS_ACTIVE).append("='true' AND (")
+               .append(EXO_DAILY).append("<>''");
     //
     if (configuration.isSendWeekly()) {
-      queryBuffer.append("or @").append(EXO_WEEKLY).append("!=").append("''");
+      queryBuffer.append(" OR ").append(EXO_WEEKLY).append("<>''");
     }
 
     //
@@ -211,17 +211,17 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     return queryBuffer;
   }
   
-  private StringBuffer buildQuery(String pluginId) {
+  private StringBuilder buildQuery(String pluginId) {
     if (pluginId == null) {
       return buildQuery();
     }
-    StringBuffer queryBuffer = new StringBuffer();
-    queryBuffer.append("@").append(EXO_IS_ACTIVE).append("='true' and (")
+    StringBuilder queryBuffer = new StringBuilder();
+    queryBuffer.append(EXO_IS_ACTIVE).append("='true' AND (")
                 //if user wants to receive this kind of notification instantly
-               .append("@").append(EXO_INSTANTLY).append("=").append("'").append(pluginId).append("'")
-               .append(" or jcr:like(").append(EXO_INSTANTLY).append(", '%,").append(pluginId).append(",%')")
-               .append(" or jcr:like(").append(EXO_INSTANTLY).append(", '%,").append(pluginId).append("')")
-               .append(" or jcr:like(").append(EXO_INSTANTLY).append(", '").append(pluginId).append(",%')")
+               .append(EXO_INSTANTLY).append("='").append(pluginId).append("'")
+               .append(" OR ").append(EXO_INSTANTLY).append(" LIKE '%,").append(pluginId).append(",%'")
+               .append(" OR ").append(EXO_INSTANTLY).append(" LIKE '%,").append(pluginId).append("'")
+               .append(" OR ").append(EXO_INSTANTLY).append(" LIKE '").append(pluginId).append(",%'")
                .append(")");
 
     return queryBuffer;
@@ -258,13 +258,12 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
       return null;
     }
-    Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
-
-    StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
-    queryBuffer.append(userHomeNode.getPath()).append("//element(*,").append(STG_SCOPE).append(")");
-    queryBuffer.append("[").append(buildQuery(pluginId)).append("]");
+    
+    StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
+    strQuery.append(" WHERE ").append(buildQuery(pluginId));
+    
     QueryManager qm = session.getWorkspace().getQueryManager();
-    QueryImpl query = (QueryImpl) qm.createQuery(queryBuffer.toString(), Query.XPATH);
+    QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
     if (limit > 0) {
       query.setLimit(limit);
       query.setOffset(offset);
@@ -333,21 +332,31 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       return 0l;
     }
   }
+  
+  private NodeIterator getDefaultDailyIterator(SessionProvider sProvider, int offset, int limit) throws Exception {
+    Session session = getSession(sProvider, workspace);
+    StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(MIX_DEFAULT_SETTING);
+    strQuery.append(" WHERE jcr:path LIKE '/").append(SETTING_USER_PATH)
+            .append("/%' AND NOT jcr:path LIKE '/").append(SETTING_USER_PATH).append("/%/%'");
+
+    QueryManager qm = session.getWorkspace().getQueryManager();
+    QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
+    if (limit > 0) {
+      query.setLimit(limit);
+      query.setOffset(offset);
+    }
+    return query.execute().getNodes();
+  }
 
   @Override
-  public List<UserSetting> getDefaultDaily() {
+  public List<UserSetting> getDefaultDaily(int offset, int limit) {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
       if (session.getRootNode().hasNode(SETTING_USER_PATH)) {
-        Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
 
-        StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
-        queryBuffer.append(userHomeNode.getPath()).append("//element(*,").append(MIX_DEFAULT_SETTING).append(")");
-        QueryManager qm = session.getWorkspace().getQueryManager();
-        Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
-        NodeIterator iter = query.execute().getNodes();
+        NodeIterator iter = getDefaultDailyIterator(sProvider, offset, limit);
         while (iter.hasNext()) {
           Node node = iter.nextNode();
           users.add(UserSetting.getDefaultInstance()
@@ -362,5 +371,23 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     }
 
     return users;
+  }
+
+  @Override
+  public long getNumberOfDefaultDaily() {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      Session session = getSession(sProvider, workspace);
+      if (session.getRootNode().hasNode(SETTING_USER_PATH)) {
+
+        NodeIterator iter = getDefaultDailyIterator(sProvider, 0, 0);
+        return iter.getSize();
+      }
+    } catch (Exception e) {
+      LOG.error("Failed to get default daily users have notification messages", e);
+    } finally {
+      sProvider.close();
+    }
+    return 0;
   }
 }

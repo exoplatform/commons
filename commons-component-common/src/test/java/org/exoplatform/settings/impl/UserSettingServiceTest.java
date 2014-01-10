@@ -42,7 +42,7 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
     
     addLastUpdateTime("root");
     
-    List<UserSetting> list = userSettingService.getDefaultDaily();
+    List<UserSetting> list = userSettingService.getDefaultDaily(0, 0);
     assertEquals(1, list.size());
   }
   

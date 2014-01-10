@@ -55,10 +55,17 @@ public interface UserSettingService {
   
   /**
    * Gets all settings of users registering for default daily notifications.
-   * 
+   * @param offset The start point from which the user settings are got.
+   * @param limit The limited number of user settings.
    * @return The list of user settings.
    */
-  List<UserSetting> getDefaultDaily();
+  List<UserSetting> getDefaultDaily(int offset, int limit);
+  
+  /**
+   * Gets a number of users used default configuration notifications.
+   * @return The number of users.
+   */
+  long getNumberOfDefaultDaily();
   
   /**
    * Gets all Ids of users registering for notifications by a given plugin.

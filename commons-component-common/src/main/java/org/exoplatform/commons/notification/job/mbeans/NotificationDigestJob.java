@@ -19,6 +19,7 @@ package org.exoplatform.commons.notification.job.mbeans;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.quartz.Job;
@@ -32,13 +33,18 @@ public class NotificationDigestJob implements Job {
   
   private final Log LOG = ExoLogger.getLogger(NotificationDigestJob.class);
   
+  public NotificationDigestJob() {
+    try {
+      new GroovyTemplate("");
+    } catch (Exception e) {}
+  }
+
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     try {
       long startTime = System.currentTimeMillis();
       //
       JobDataMap data = context.getJobDetail().getJobDataMap();
-      
       String digestType = data.getString(AbstractNotificationJobManager.DIGEST_TYPE);
       if ("daily".equals(digestType)) {
         LOG.info("Starting run DailyJob to send daily email notification ... ");
