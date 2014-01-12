@@ -17,6 +17,7 @@
 		<type>org.exoplatform.settings.impl.SettingServiceImpl</type>
 	</component>
 
+    <!-- configuration unused : please check why it's declared here -->
 	<component>
 		<key>org.exoplatform.services.cache.CacheService</key>
 		<jmx-name>cache:type=CacheService</jmx-name>
