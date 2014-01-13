@@ -18,15 +18,22 @@ package org.exoplatform.commons.notification.job;
 
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 public class SendEmailNotificationJob implements Job {
+  private static final Log LOG = ExoLogger.getLogger(SendEmailNotificationJob.class);
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    CommonsUtils.getService(QueueMessage.class).send();
+    try {
+      CommonsUtils.getService(QueueMessage.class).send();
+    } catch (Exception e) {
+      LOG.error("Failed to running NotificationJob", e);
+    }
   }
 
 }

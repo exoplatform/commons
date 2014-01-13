@@ -17,19 +17,33 @@
 package org.exoplatform.commons.notification.job;
 
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 public abstract class NotificationJob implements Job {
   protected static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
   
   public NotificationJob() {
+  }
+
+  @Override
+  public void execute(JobExecutionContext context) throws JobExecutionException {
+    if (isValid() == false) {
+      return;
+    }
     try {
-      new GroovyTemplate("");
-    } catch (Exception e) {}
+      NotificationSessionManager.createSystemProvider();
+      processSendNotification();
+    } catch (Exception e) {
+      LOG.error("Failed to running NotificationJob", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider();
+    }
   }
 
   protected boolean isValid() {

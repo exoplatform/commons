@@ -16,7 +16,6 @@
  */
 package org.exoplatform.commons.api.notification.model;
 
-import org.exoplatform.services.jcr.util.IdGenerator;
 import org.exoplatform.services.mail.Message;
 import org.json.JSONObject;
 

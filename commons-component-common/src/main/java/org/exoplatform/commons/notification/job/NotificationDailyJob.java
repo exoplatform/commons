@@ -20,30 +20,16 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.job.mbeans.DailyService;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 public class NotificationDailyJob extends NotificationJob {
   
   @Override
-  public void execute(JobExecutionContext context) throws JobExecutionException {
-    if (isValid() == false) {
-      return;
-    }
-    if (DailyService.isStarted() == false) {
-      try {
-        processSendNotification();
-      } catch (Exception e) {
-        LOG.error("Failed to running NotificationJob", e);
-      }
-    }
-  }
-
-  @Override
   protected void processSendNotification() throws Exception {
-    LOG.info("Starting run job to send daily email notification ... ");
-    CommonsUtils.getService(NotificationConfiguration.class).setSendWeekly(false);
-    CommonsUtils.getService(NotificationService.class).processDigest();
+    if (DailyService.isStarted() == false) {
+      LOG.info("Starting run job to send daily email notification ... ");
+      CommonsUtils.getService(NotificationConfiguration.class).setSendWeekly(false);
+      CommonsUtils.getService(NotificationService.class).processDigest();
+    }
   }
   
 }

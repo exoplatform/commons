@@ -41,7 +41,7 @@ public class SendEmailService implements ManagementAware {
   private int         emailPerSend  = 0;
 
   private int         interval  = 0;
-
+  
   private ManagementContext context;
   
   private QueueMessageImpl queueMessage;
@@ -140,7 +140,7 @@ public class SendEmailService implements ManagementAware {
   }
 
   @Managed
-  @ManagedDescription("Set number emails send per one time.(seconds)")
+  @ManagedDescription("Set period of time (in seconds) for each sending notification execution.")
   @Impact(ImpactType.READ)
   public void setInterval(int interval) {
     this.interval = interval;
@@ -148,15 +148,27 @@ public class SendEmailService implements ManagementAware {
   }
   
   @Managed
-  @ManagedDescription("Number emails send per one time.")
+  @ManagedDescription("Period of time (in seconds) between each sending notification execution.")
   @Impact(ImpactType.READ)
   public int getInterval() {
     return this.interval;
   }
+
+  @Managed
+  @ManagedDescription("Removes all notification data that stored in database.")
+  @Impact(ImpactType.READ)
+  public String resetTestMail() {
+    currentCapacity = 0;
+    resetCounter();
+    isOn = true;
+    emailPerSend = 120;
+    interval = 120;
+    return queueMessage.removeAll();
+  }
   
   private void makeJob() {
     if (isOn) {
-      this.queueMessage.makeJob(emailPerSend, interval*1000);
+      this.queueMessage.makeJob(emailPerSend, interval * 1000);
     }
   }
 }
