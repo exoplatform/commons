@@ -36,6 +36,7 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
+import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
@@ -273,7 +274,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<UserSetting> getDaily(int offset, int limit) {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
+//    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
       NodeIterator iter = getDailyIterator(sProvider, offset, limit, null);
@@ -284,7 +286,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     } catch (Exception e) {
       LOG.error("Failed to get all daily users have notification messages", e);
     } finally {
-      sProvider.close();
+//      sProvider.close();
     }
 
     return models;
@@ -324,7 +326,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public long getNumberOfDaily() {
-    SessionProvider sProvider = getSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     try {
       NodeIterator iter = getDailyIterator(sProvider, 0, 0, null);
       return (iter == null) ? 0l : iter.getSize();
@@ -350,7 +352,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public List<UserSetting> getDefaultDaily(int offset, int limit) {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
+//    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
@@ -359,7 +362,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         NodeIterator iter = getDefaultDailyIterator(sProvider, offset, limit);
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          users.add(UserSetting.getDefaultInstance()
+          users.add(UserSetting.getInstance()
                     .setUserId(node.getName())
                     .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
         }
@@ -367,7 +370,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     } catch (Exception e) {
       LOG.error("Failed to get default daily users have notification messages", e);
     } finally {
-      sProvider.close();
+//      sProvider.close();
     }
 
     return users;
@@ -375,18 +378,17 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public long getNumberOfDefaultDaily() {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     try {
       Session session = getSession(sProvider, workspace);
       if (session.getRootNode().hasNode(SETTING_USER_PATH)) {
-
         NodeIterator iter = getDefaultDailyIterator(sProvider, 0, 0);
         return iter.getSize();
       }
     } catch (Exception e) {
       LOG.error("Failed to get default daily users have notification messages", e);
     } finally {
-      sProvider.close();
+//      sProvider.close();
     }
     return 0;
   }

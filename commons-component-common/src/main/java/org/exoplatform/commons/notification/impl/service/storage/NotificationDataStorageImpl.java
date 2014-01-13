@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.impl.service.storage;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,6 +40,7 @@ import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
+import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
@@ -92,7 +94,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting setting) {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
+//    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
     try {
 
@@ -111,7 +114,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     } catch (Exception e) {
       LOG.error("Failed to get the NotificationMessage by user: " + setting.getUserId(), e);
     } finally {
-      sProvider.close();
+//      sProvider.close();
     }
 
     return notificationData;
@@ -153,30 +156,40 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       messages.add(model.setTo(userId));
       processRemove(session, model, property, node.getPath());
     }
-
     return messages;
   }
-  
+
   private NodeIterator getNotificationNodeMessages(Node messageHomeNode, String property, String userId) throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     long startTime = 0;
     if ( stats ) startTime = System.currentTimeMillis();
     
-    StringBuffer queryBuffer = new StringBuffer(JCR_ROOT);
-    queryBuffer.append(messageHomeNode.getPath()).append("//element(*,").append(NTF_MESSAGE).append(")")
-               .append("[").append("(@").append(property).append("='").append(userId).append("' or @")
-               .append(property).append("='").append(NotificationInfo.FOR_ALL_USER).append("') and (@")
-               .append(NTF_FROM).append("!='").append(userId).append("')")
-               .append("]  order by @").append(NTF_ORDER).append(ASCENDING)
-               .append(", @").append("exo:dateCreated").append(DESCENDING);
+    StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(NTF_MESSAGE).append(" WHERE ");
+    
+    if (NTF_SEND_TO_DAILY.equals(property)) {
+      String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+      strQuery.append(" (jcr:path LIKE '").append(messageHomeNode.getPath()).append("/").append(DAY).append(dayName).append("/%'")
+              .append(" AND NOT jcr:path LIKE '").append(messageHomeNode.getPath()).append("/").append(DAY).append(dayName).append("/%/%')");
+    } else {
+      strQuery.append(" jcr:path LIKE '").append(messageHomeNode.getPath()).append("/%'");
+    }
+
+    strQuery.append(" AND (").append(property).append("='").append(userId).append("'");
+    if(NotificationInfo.FOR_ALL_USER.equals(userId) == false) {
+      strQuery.append(" OR ").append(property).append("='").append(NotificationInfo.FOR_ALL_USER).append("') AND ")
+              .append(NTF_FROM).append("<>'").append(userId).append("'");
+      strQuery.append(" order by ").append(NTF_ORDER).append(ASCENDING).append(", exo:dateCreated").append(DESCENDING);
+    } else {
+      strQuery.append(")");
+    }
 
     QueryManager qm = messageHomeNode.getSession().getWorkspace().getQueryManager();
-    Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
+    Query query = qm.createQuery(strQuery.toString(), Query.SQL);
     NodeIterator it = query.execute().getNodes();
     
     //record statistics insert entity
     if (stats) {
-      NotificationContextFactory.getInstance().getStatisticsCollector().queryExecuted(queryBuffer.toString(), it.getSize(), System.currentTimeMillis() - startTime);
+      NotificationContextFactory.getInstance().getStatisticsCollector().queryExecuted(strQuery.toString(), it.getSize(), System.currentTimeMillis() - startTime);
     }
     return it;
   }
@@ -255,7 +268,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   public void removeMessageAfterSent() throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
+//    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     try {
       Node notificationHome = getNotificationHomeNode(sProvider, workspace);
       Session session = notificationHome.getSession();
@@ -308,7 +322,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     } catch (Exception e) {
       LOG.warn("Failed to remove message after sent email notification", e);
     } finally {
-      sProvider.close();
+//      sProvider.close();
     }
   }
 

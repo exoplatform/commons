@@ -38,10 +38,12 @@ import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 
 public class NotificationServiceImpl extends AbstractService implements NotificationService {
-
+  private static final Log         LOG              = ExoLogger.getLogger(NotificationServiceImpl.class);
   private final NotificationDataStorage storage;
 
   public NotificationServiceImpl(NotificationDataStorage storage) {
@@ -129,9 +131,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     }
   }
   
-  private void setValueSendbyFrequency(NotificationInfo message,
-                                             UserSetting userNotificationSetting,
-                                             String userId) {
+  private void setValueSendbyFrequency(NotificationInfo message, UserSetting userNotificationSetting, String userId) {
     if (message.isSendAll()) {
       return;
     }
@@ -156,48 +156,51 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     UserSettingService userService = CommonsUtils.getService(UserSettingService.class);
     DigestorService digest = CommonsUtils.getService(DigestorService.class);
     MailService mailService = CommonsUtils.getService(MailService.class);
-    long time = System.currentTimeMillis();
+    
+    PluginSettingService settingService = CommonsUtils.getService(PluginSettingService.class);
+    UserSetting defaultSetting = getDefaultUserSetting(settingService.getActivePluginIds());
     //process for users used setting
+    /**
+     * Tested with 5000 users:
+     * 
+     * + limit = 20 time lost: 58881ms user settings 128992ms default user settings.
+     * + limit = 50 time lost: 44873ms user settings 70630ms default user settings.
+     * + limit = 100 time lost: 26997ms user settings 60051ms default user settings.
+    */
+    long startTime = System.currentTimeMillis();
+    int limit = 100;
     int offset = 0;
-    int limit = 20;
-    boolean isF = true;
     while (true) {
       List<UserSetting> userSettings = userService.getDaily(offset, limit);
-      if(isF) {
-        System.out.println("Fisrt getDaily time: " + (System.currentTimeMillis() - time) + " ms.");
-        isF = false;
-      }
       if(userSettings.size() == 0) {
         break;
       }
-      send(digest, mailService, userSettings, false);
+      send(digest, mailService, userSettings, null);
       offset += limit;
     }
-    System.out.println("Time to process getDaily: " + (System.currentTimeMillis() - time) + " ms.");
-    time = System.currentTimeMillis();
+    LOG.debug("Time to run process users have settings: " + (System.currentTimeMillis() - startTime) + "ms.");
+    startTime = System.currentTimeMillis();
     //process for users used default setting
-    offset = 0;isF = true;
+    offset = 0;
     while (true) {
       List<UserSetting> usersDefaultSettings = userService.getDefaultDaily(offset, limit);
-      if(isF) {
-        System.out.println("Fisrt getDefaultDaily time: " + (System.currentTimeMillis() - time) + " ms.");
-        isF = false;
-      }
       if(usersDefaultSettings.size() == 0) {
         break;
       }
-      send(digest, mailService, usersDefaultSettings, true);
+      send(digest, mailService, usersDefaultSettings, defaultSetting);
       offset += limit;
     }
-    System.out.println("Time to process getDefaultDaily: " + (System.currentTimeMillis() - time) + " ms.");
+    LOG.debug("Time to run process users used default settings: " + (System.currentTimeMillis() - startTime) + "ms.");
   }
   
-  private void send(DigestorService digest, MailService mail, List<UserSetting> userSettings, boolean isDefault) throws Exception {
+  private void send(DigestorService digest, MailService mail, List<UserSetting> userSettings, UserSetting defaultSetting) throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
-      if (isDefault) {
-        userSetting = getDefaultUserNotificationSetting(userSetting);
+      if (defaultSetting != null) {
+        userSetting = defaultSetting.clone()
+                                    .setUserId(userSetting.getUserId())
+                                    .setLastUpdateTime(userSetting.getLastUpdateTime());
       }
       Map<NotificationKey, List<NotificationInfo>> notificationMessageMap = storage.getByUser(userSetting);
 
@@ -218,18 +221,17 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     storage.removeMessageAfterSent();
   }
   
-  private UserSetting getDefaultUserNotificationSetting(UserSetting setting) {
-    UserSetting notificationSetting = UserSetting.getInstance();
-    PluginSettingService settingService = CommonsUtils.getService(PluginSettingService.class);
-    List<String> activesProvider = settingService.getActivePluginIds();
+  private UserSetting getDefaultUserSetting(List<String> activesProvider) {
+    UserSetting setting = UserSetting.getInstance();
+    UserSetting defaultSetting = UserSetting.getDefaultInstance();
     for (String string : activesProvider) {
-      if(setting.isInWeekly(string)) {
-        notificationSetting.addProvider(string, FREQUENCY.WEEKLY);
-      } else if(setting.isInDaily(string)) {
-        notificationSetting.addProvider(string, FREQUENCY.DAILY);
+      if (defaultSetting.isInWeekly(string)) {
+        setting.addProvider(string, FREQUENCY.WEEKLY);
+      } else if (defaultSetting.isInDaily(string)) {
+        setting.addProvider(string, FREQUENCY.DAILY);
       }
     }
 
-    return notificationSetting.setUserId(setting.getUserId()).setLastUpdateTime(setting.getLastUpdateTime());
+    return setting;
   }
 }

@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -43,6 +44,7 @@ import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
+import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.notification.job.SendEmailNotificationJob;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
@@ -118,6 +120,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         jdatamap.put(CACHE_REPO_NAME, CommonsUtils.getRepository().getConfiguration().getName());
         //
         schedulerService.addPeriodJob(info, periodInfo, jdatamap);
+        LOG.info("Make job send notification interval: " + interval);
       } catch (Exception e) {
         LOG.warn("Failed to add send email notification jobs ", e);
       }
@@ -130,6 +133,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
   @Override
   public void start() {
+    
     //
     resetDefaultConfigJob();
     //
@@ -162,14 +166,18 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   public void send() {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     SessionProvider sProvider = SessionProvider.createSystemProvider();
-    
     try {
       //
       load(sProvider);
-      
-      idsRemovingLocal.set(new HashSet<String>());
+      if (idsRemovingLocal.get() == null) {
+        idsRemovingLocal.set(new HashSet<String>());
+      }
+      //
+      LOG.info("Send notification size: " + messages.size());
       for (MessageInfo messageInfo : messages) {
-        if (messageInfo != null && sendMessage(messageInfo.makeEmailNotification()) == true) {
+        if (messageInfo != null && idsRemovingLocal.get().contains(messageInfo.getId()) == false &&
+              sendMessage(messageInfo.makeEmailNotification()) == true) {
+          //
           idsRemovingLocal.get().add(messageInfo.getId());
           if (stats) {
             NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
@@ -190,21 +198,19 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
    * @param sProvider
    */
   private void load(SessionProvider sProvider) {
-    final ReentrantLock lock = this.lock;
-    lock.lock();
-    int index = 0;
+//    final ReentrantLock lock = this.lock;
+//    lock.lock();
     try {
       NodeIterator iterator = getMessageInfoNodes(sProvider);
       while (iterator.hasNext()) {
         Node node = iterator.nextNode();
         long createdTime = Long.parseLong(node.getName());
-        if ((sinceTime == 0 || sinceTime < createdTime) && index < LIMIT) {
+        if ((sinceTime == 0 || sinceTime < createdTime)) {
           MessageInfo messageInfo = getMessageInfo(node);
           messageInfo.setId(node.getUUID());
           messages.add(messageInfo);
 
           sinceTime = createdTime;
-          index++;
         } else {
           sinceTime = 0;
           messages.clear();
@@ -214,41 +220,42 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     } catch (Exception e) {
       LOG.warn("Failed to sendding MessageInfos: ", e);
     } finally {
-      lock.unlock();
+//      lock.unlock();
     }
   }
 
   private void saveMessageInfo(MessageInfo message) {
     final ReentrantLock lock = this.lock;
-    lock.lock();
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
+//    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     try {
-      message.setCreatedTime(System.nanoTime());
+      lock.lock();
+      message.setCreatedTime(System.currentTimeMillis());
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
-      Node messageInfoNode = messageInfoHome.addNode("" + message.getCreatedTime(), NTF_MESSAGE_INFO);
-      if(messageInfoNode.canAddMixin("mix:referenceable")) {
+      Node messageInfoNode = messageInfoHome.addNode(String.valueOf(message.getCreatedTime()), NTF_MESSAGE_INFO);
+      if (messageInfoNode.canAddMixin("mix:referenceable")) {
         messageInfoNode.addMixin("mix:referenceable");
       }
-      
+
       //
       saveData(messageInfoNode, compress(message.toJSON()));
-
       sessionSave(messageInfoHome);
+
     } catch (Exception e) {
       LOG.warn("Failed to storage MessageInfo: " + message.toJSON(), e);
     } finally {
-      sProvider.close();
+//      sProvider.close();
       lock.unlock();
     }
   }
 
   private void removeMessageInfo() {
-    final ReentrantLock lock = this.lock;
-    lock.lock();
     SessionProvider sProvider = SessionProvider.createSystemProvider();
-    Session session = getSession(sProvider, configuration.getWorkspace());
+    final ReentrantLock lock = this.lock;
+    List<String> ids = new ArrayList<String>(idsRemovingLocal.get()) ;
     try {
-      Set<String> ids = idsRemovingLocal.get();
+      lock.lock();
+      Session session = getSession(sProvider, configuration.getWorkspace());
       for (String messageId : ids) {
         session.getNodeByUUID(messageId).remove();
         //
@@ -260,8 +267,9 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       LOG.error("Failed to remove MessageInfo ", e);
     } finally {
       messages.clear();
-      sProvider.close();
+      idsRemovingLocal.get().removeAll(ids);
       lock.unlock();
+      sProvider.close();
     }
   }
 
@@ -269,10 +277,12 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     try {
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
       QueryManager qm = messageInfoHome.getSession().getWorkspace().getQueryManager();
-      StringBuffer stringBuffer = new StringBuffer();
-      stringBuffer.append("SELECT * FROM ntf:messageInfo ")
-      .append("ORDER BY exo:name");
-      QueryImpl query = (QueryImpl) qm.createQuery(stringBuffer.toString(), Query.SQL);
+      StringBuilder sqlQuery = new StringBuilder();
+      sqlQuery.append("SELECT * FROM ").append(NTF_MESSAGE_INFO)
+              .append(" WHERE jcr:path LIKE '").append(messageInfoHome.getPath()).append("/%' AND NOT jcr:path LIKE '")
+              .append(messageInfoHome.getPath()).append("/%/%'")
+              .append(" ORDER BY exo:name");
+      QueryImpl query = (QueryImpl) qm.createQuery(sqlQuery.toString(), Query.SQL);
       query.setOffset(0);
       query.setLimit(LIMIT);
       QueryResult result = query.execute();
@@ -339,7 +349,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     return decompress(stream);
   }
 
-  public static InputStream compress(String string) throws IOException {
+  private static InputStream compress(String string) throws IOException {
     ByteArrayOutputStream os = new ByteArrayOutputStream(string.length());
     GZIPOutputStream gos = new GZIPOutputStream(os);
     gos.write(string.getBytes());
@@ -349,7 +359,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     return new ByteArrayInputStream(compressed);
   }
 
-  public static String decompress(InputStream is) throws IOException {
+  private static String decompress(InputStream is) throws IOException {
     GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
     StringBuilder string = new StringBuilder();
     byte[] data = new byte[BUFFER_SIZE];
@@ -362,4 +372,60 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     return string.toString();
   }
 
+  public String removeAll() {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    int t = 0, j = 0;
+    String pli="";
+    try {
+      Session session = getSession(sProvider, configuration.getWorkspace());
+      Node root = session.getRootNode();
+      //
+      LOG.trace("Removing messages... ");
+      if (root.hasNode("eXoNotification/messageInfoHome")) {
+        root.getNode("eXoNotification/messageInfoHome").remove();
+        session.save();
+      }
+      LOG.trace("Done to removed messages! ");
+      //
+      LOG.trace("Removing notification info... ");
+      NodeIterator it = root.getNode("eXoNotification/messageHome").getNodes();
+      List<String> pluginPaths = new ArrayList<String>();
+      while (it.hasNext()) {
+        pluginPaths.add(it.nextNode().getPath());
+      }
+      session.logout();
+      for (String string : pluginPaths) {
+        pli = string;
+        LOG.trace("Remove notification info on plugin: " + pli);
+        //
+        j = 0;
+        session = getSession(sProvider, configuration.getWorkspace());
+        it = ((Node) session.getItem(string)).getNodes();
+        while (it.hasNext()) {
+          NodeIterator hIter = it.nextNode().getNodes();
+          while (hIter.hasNext()) {
+            hIter.nextNode().remove();
+            ++j;
+            if (j % 200 == 0) {
+              session.save();
+            }
+            System.out.print(".");
+          }
+          session.save();
+        }
+        LOG.trace("Removed " + j + " nodes info on plugin: " + pli);
+        t += j;
+        session.logout();
+      }
+
+      return "Done to removed " + t + " nodes!";
+    } catch (Exception e) {
+      LOG.trace("Removed " + j + " nodes info on plugin: " + pli);
+      LOG.trace("Removed all " + t + " nodes.");
+      LOG.debug("Failed to remove all data of feature notification." + e.getMessage());
+    } finally {
+      sProvider.close();
+    }
+    return "Failed to remove all. Please, try again !";
+  }
 }

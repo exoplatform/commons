@@ -72,9 +72,9 @@ public abstract class AbstractService {
 
   public static final String JCR_ROOT                 = "/jcr:root";
 
-  public static final String ASCENDING                = " ascending";
+  public static final String ASCENDING                = " ASC";
 
-  public static final String DESCENDING               = " descending";
+  public static final String DESCENDING               = " DESC";
 
   public static final String WORKSPACE_PARAM          = "workspace";
 
@@ -94,21 +94,18 @@ public abstract class AbstractService {
 
   public static final String NOTIFICATION_PARENT_PATH = "/";
 
-  private static final String DAY                     = "d";
+  public static final String DAY                      = "d";
 
-  private static final String HOUR                    = "h";
+  public static final String HOUR                     = "h";
   
   protected static Node getNotificationHomeNode(SessionProvider sProvider, String workspace) throws Exception {
-    Node homeNode = getSession(sProvider, workspace).getRootNode();
-    if (NOTIFICATION_PARENT_PATH.equals(homeNode.getPath()) == false) {
-      homeNode = homeNode.getNode(NOTIFICATION_PARENT_PATH);
-    }
-    Node notificationHome;
-    try {
-      notificationHome = homeNode.getNode(NOTIFICATION_HOME_NODE);
-    } catch (Exception e) {
-      notificationHome = homeNode.addNode(NOTIFICATION_HOME_NODE, NTF_NOTIFICATION);
-      homeNode.getSession().save();
+    Session session = getSession(sProvider, workspace);
+    Node notificationHome, rootNode = session.getRootNode();
+    if (rootNode.hasNode(NOTIFICATION_HOME_NODE)) {
+      notificationHome = rootNode.getNode(NOTIFICATION_HOME_NODE);
+    } else {
+      notificationHome = rootNode.addNode(NOTIFICATION_HOME_NODE, NTF_NOTIFICATION);
+      session.save();
     }
     return notificationHome;
   }
@@ -144,9 +141,10 @@ public abstract class AbstractService {
     Node providerNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
     String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
     Node dayNode = getOrCreateMessageNode(providerNode, DAY + dayName);
-    String hourName = String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-    Node messageParentNode = getOrCreateMessageNode(dayNode, HOUR + hourName);
-    return messageParentNode;
+//    String hourName = String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+//    Node messageParentNode = getOrCreateMessageNode(dayNode, HOUR + hourName);
+//    return messageParentNode;
+    return dayNode;
   }
 
   /**
