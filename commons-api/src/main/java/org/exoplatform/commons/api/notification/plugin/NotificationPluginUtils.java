@@ -139,7 +139,7 @@ public class NotificationPluginUtils {
               .append("/")
               .append(portalName);
     
-    return "<a target=\"_blank\" href=\"" + portalLink.toString() + "\">" + portalName + "</a>";
+    return "<a target=\"_blank\" style=\"text-decoration: none; font-weight: bold; color: #2F5E92; \" href=\"" + portalLink.toString() + "\">" + portalName + "</a>";
   }
 
   public static String getTo(String to) {

@@ -35,7 +35,6 @@ import org.exoplatform.commons.api.notification.service.template.DigestorService
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationContextFactory;
-import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
@@ -71,14 +70,30 @@ public class DigestorServiceImpl implements DigestorService {
       
       List<String> activeProviders = pluginService.getActivePluginIds();
       NotificationContext nCtx = NotificationContextImpl.cloneInstance();
-      Writer writer = new StringWriter();
-      writer.append("<ul style=\"margin: 0 0  40px; padding-left: 0; list-style-position: outside;\">");
+      
+      int totalDigestMsg = 0;
       for (String providerId : activeProviders) {
         List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
         if (messages == null || messages.size() == 0){
           continue;
         }
-
+        totalDigestMsg += messages.size();
+      }
+      
+      Writer writer = new StringWriter();
+      if (totalDigestMsg < 1) {
+        return null;
+      } else if (totalDigestMsg == 1) {
+        writer.append("<ul style=\"margin: 0 0  40px -13px; list-style-type: none; padding-left: 0; color: #2F5E92; \">");
+      } else {
+        writer.append("<ul style=\"margin: 0 0  40px; padding-left: 0; color: #2F5E92; list-style-position: outside;  list-style: disc; \">");
+      }
+      for (String providerId : activeProviders) {
+        List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
+        if (messages == null || messages.size() == 0){
+          continue;
+        }
+        
         AbstractNotificationPlugin plugin = containerService.getPlugin(NotificationKey.key(providerId));
         nCtx.setNotificationInfos(messages);
         plugin.buildDigest(nCtx, writer);

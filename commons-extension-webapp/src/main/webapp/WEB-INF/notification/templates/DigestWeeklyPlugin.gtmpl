@@ -4,7 +4,7 @@
             <table  cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" align="center" style="border:1px solid #d8d8d8;">
                 <tr>
                     <td  height="45" valign="middle" style="margin:0;height:45px;font-weight:bold;vertical-align:middle; background-color: #efefef; font-family: 'HelveticaNeue Bold', Helvetica, Arial, sans-serif;color:#2f5e92;font-size:18px;text-align:center">
-                        <%=_ctx.appRes("Notification.title.DigestProvider", PORTAL_HOME, _ctx.appRes("Notification.label.ThisWeek"))%>
+                        <%=_ctx.appRes("Notification.title.DigestWeeklyPlugin", PORTAL_HOME)%>
                     </td>
                 </tr>
             </table>
@@ -23,7 +23,7 @@
                                     </p>
                                     <%=DIGEST_MESSAGES_LIST%>
                                     <%
-                                      String footerLink = "<a href=\"" + FOOTER_LINK + "\">" + _ctx.appRes("Notification.label.ClickHere") + "</a>";
+                                      String footerLink = "<a style=\"text-decoration: none; color: #2F5E92; \" href=\"" + FOOTER_LINK + "\">" + _ctx.appRes("Notification.label.ClickHere") + "</a>";
                                     %>
                                     <p style="margin: 10px 0; color: #999999; font-family: HelveticaNeue, Helvetica, Arial, sans-serif;">
                                         <%=_ctx.appRes("Notification.footer.DigestProvider", footerLink)%>
