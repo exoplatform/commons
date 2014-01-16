@@ -17,7 +17,11 @@
 package org.exoplatform.commons.notification.impl.command;
 
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
@@ -37,8 +41,19 @@ public class NotificationExecutorImpl implements NotificationExecutor {
 
   private final List<NotificationCommand>  commands;
   
+  //The executor to execute multiple threads
+  private ThreadPoolExecutor executorService; 
+  
+  //store runnable to process notification
+  private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
+  
+  private NotificationService notificationService;
+  
   public NotificationExecutorImpl() {
     commands = new CopyOnWriteArrayList<NotificationCommand>();
+    notificationService = CommonsUtils.getService(NotificationService.class);
+    this.executorService = new ThreadPoolExecutor(5, 5, 10, TimeUnit.SECONDS, workQueue);
+    executorService.allowCoreThreadTimeOut(true);
   }
   
   public static NotificationExecutor getInstance() {
@@ -48,13 +63,24 @@ public class NotificationExecutorImpl implements NotificationExecutor {
     return executor;
   }
   
-  private boolean process(NotificationContext ctx, NotificationCommand command) {
+  private boolean process(final NotificationContext ctx, final NotificationCommand command) {
     try {
       if (command.getPlugin().isValid(ctx) == false) {
         return false;
       }
-      NotificationService service = CommonsUtils.getService(NotificationService.class);
-      service.process(create(ctx, command));
+      Runnable task = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            notificationService.process(create(ctx, command));
+          } catch (Exception e) {
+            LOG.warn("Process NotificationInfo is failed: " + e.getMessage());
+            LOG.debug(e.getMessage(), e);
+          }
+        }
+      };
+      this.executorService.submit(task);
+      
       return true;
     } catch (Exception e) {
       ctx.setException(e);
