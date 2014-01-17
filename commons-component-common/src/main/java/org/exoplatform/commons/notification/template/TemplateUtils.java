@@ -60,7 +60,7 @@ public class TemplateUtils {
   private static final int MAX_SUBJECT_LENGTH = 50;
   
   /**
-   * Process the Groovy template associate with Template context to generate
+   * Process the Groovy template ascossiate with Template context to generate
    * It will be use for digest mail
    * @param ctx
    * @return
@@ -73,31 +73,25 @@ public class TemplateUtils {
     String content = visitor.with(ctx).visit(groovyElement).out();
     return content;
   }
-
+  
   /**
    * Generate the Groovy Template
-   * 
-   * @param context The template context
-   * @param element The GroovyElemt
-   * @param out The Writer to writer template
+   * @param context
+   * @param template
    * @return
    */
   public static void loadGroovy(TemplateContext context, Element element, Writer out) {
+    
     try {
       String groovyTemplate = element.getTemplate();
       if (groovyTemplate == null) {
         groovyTemplate = loadGroovyTemplate(element.getTemplateConfig().getTemplatePath());
         element.template(groovyTemplate);
       }
+      GroovyTemplate gTemplate = new GroovyTemplate(groovyTemplate);
       //
-      if (groovyTemplate != null && groovyTemplate.length() > 0) {
-        GroovyTemplate gTemplate = new GroovyTemplate(groovyTemplate);
-        gTemplate.render(out, context);
-      }
-    } catch (ClassCastException e) {
-      throw new IllegalArgumentException("The function only load groovy with GroovyElement type.");
+      gTemplate.render(out, context);
     } catch (Exception e) {
-      LOG.warn("Failed to load groovy template of plugin " + context.getPluginId() + "\n" + e.getMessage());
     }
   }
   
@@ -157,17 +151,17 @@ public class TemplateUtils {
   }
 
   /**
-   * Load the Groovy template element.
+   * Load the groovy template element.
    * 
-   * @param pluginId The plugin's id
-   * @param language The language's id.
-   * @return The Groovy element
+   * @param key
+   * @param language
+   * @return the groovy element
    */
   public static Element loadGroovyElement(String pluginId, String language) {
     TemplateConfig templateConfig = getTemplateConfig(pluginId);
     return new GroovyElement().language(language).config(templateConfig);
   }
-
+  
   /**
    * Render for Subject template
    * @param ctx
@@ -298,7 +292,7 @@ public class TemplateUtils {
     ResourceBundle res = bundleService.getResourceBundle(resourcePath, locale);
     
     if (res == null || res.containsKey(key) == false) {
-      LOG.warn("Resource Bundle key not found. " + key + " in source path: " + resourcePath);
+      LOG.warn("Resource Bundle key not found. " + key);
       return key;
     }
 
