@@ -17,16 +17,14 @@
 package org.exoplatform.commons.notification.impl.command;
 
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -42,18 +40,14 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   private final List<NotificationCommand>  commands;
   
   //The executor to execute multiple threads
-  private ThreadPoolExecutor executorService; 
-  
-  //store runnable to process notification
-  private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
+  private NotificationCompletionService completionService; 
   
   private NotificationService notificationService;
   
   public NotificationExecutorImpl() {
     commands = new CopyOnWriteArrayList<NotificationCommand>();
     notificationService = CommonsUtils.getService(NotificationService.class);
-    this.executorService = new ThreadPoolExecutor(5, 5, 10, TimeUnit.SECONDS, workQueue);
-    executorService.allowCoreThreadTimeOut(true);
+    completionService = CommonsUtils.getService(NotificationCompletionService.class);
   }
   
   public static NotificationExecutor getInstance() {
@@ -68,19 +62,22 @@ public class NotificationExecutorImpl implements NotificationExecutor {
       if (command.getPlugin().isValid(ctx) == false) {
         return false;
       }
-      Runnable task = new Runnable() {
+      Callable<Boolean> task = new Callable<Boolean>() {
         @Override
-        public void run() {
+        public Boolean call() throws Exception {
           try {
             notificationService.process(create(ctx, command));
           } catch (Exception e) {
             LOG.warn("Process NotificationInfo is failed: " + e.getMessage());
             LOG.debug(e.getMessage(), e);
+            return false;
           }
+          //
+          return true;
         }
       };
-      this.executorService.submit(task);
-      
+      completionService.addTask(task);
+
       return true;
     } catch (Exception e) {
       ctx.setException(e);

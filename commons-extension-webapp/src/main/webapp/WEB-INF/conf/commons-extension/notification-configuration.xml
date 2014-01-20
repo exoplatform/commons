@@ -90,6 +90,25 @@
   </component>
   
   <component>
+    <key>org.exoplatform.commons.api.notification.service.NotificationCompletionService</key>
+    <type>org.exoplatform.commons.api.notification.service.NotificationCompletionService</type>
+    <init-params>
+      <value-param>
+        <name>async-execution</name>
+        <value>false</value>
+      </value-param>
+      <value-param>
+        <name>thread-number</name>
+        <value>5</value>
+      </value-param>
+      <value-param>
+        <name>keepAliveTime</name> <!-- Time in seconds -->
+        <value>10</value>
+      </value-param>
+    </init-params>
+  </component>
+  
+  <component>
     <key>org.exoplatform.commons.api.notification.service.setting.PluginContainer</key>
     <type>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</type>
   </component>
