@@ -21,7 +21,7 @@
     </childNodeDefinitions>
   </nodeType>
   
-  <!-- Node type generated for the class org.exoplatform.settings.chromattic.ContextEntity -->
+  <!--  Node type generated for the class org.exoplatform.settings.chromattic.ContextEntity  -->
   <nodeType name="stg:context" isMixin="false" hasOrderableChildNodes="false">
     <supertypes>
       <supertype>nt:base</supertype>
