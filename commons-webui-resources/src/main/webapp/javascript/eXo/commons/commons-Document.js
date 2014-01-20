@@ -665,9 +665,17 @@ function UIDSUpload() {
     var uploadHTML = "";  
     uploadHTML += "  <form id='"+uploadId+"' class='UIDSUploadForm' style='margin: 0px; padding: 0px' action='"+uploadAction+"' enctype='multipart/form-data' method='post'>";
     uploadHTML += "    <div class='BrowseDiv'>";
-    uploadHTML += "      <a class=\"BrowseLink\" onclick=\"(function(elm) { document.getElementById('" + idFile + "').click();})(this)\">";
-    uploadHTML += "        <input type='file' name='file' size='1' style='display:none' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
-    uploadHTML += "      </a>";
+    if(gtnbase.Browser.isIE()) {
+          uploadHTML += "      <a class='BrowseLink' href='javascript:void(0);'>";
+          uploadHTML += "        <label for='" + idFile + "' style='width: 26px; height: 26px; display:block'>";
+          uploadHTML += "          <input style=\"position:absolute; left:-5000px;\" type='file' name='" + idFile + "' size='1' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
+          uploadHTML += "        </label>";
+          uploadHTML += "      </a>";
+        } else {
+          uploadHTML += "      <a class=\"BrowseLink\" onclick=\"(function(elm) { document.getElementById('" + idFile + "').click();})(this)\">";
+          uploadHTML += "        <input type='file' name='file' size='1' style='display:none' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
+          uploadHTML += "      </a>";
+        }
     uploadHTML += "    </div>";
     uploadHTML += "  </form>";
     return uploadHTML;
