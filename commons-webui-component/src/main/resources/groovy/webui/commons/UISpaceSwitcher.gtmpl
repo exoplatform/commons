@@ -11,7 +11,11 @@
   String noSpaceLabel = _ctx.appRes("UISpaceSwitcher.msg.no-space");
   String spaceLabel = _ctx.appRes("UISpaceSwitcher.title.space");
   def invalidingCacheTime = uicomponent.invalidingCacheTime;
-  String selectSpaceAction = URLEncoder.encode(uicomponent.event(uicomponent.SELECT_SPACE_ACTION), "utf-8");
+  String selectSpaceAction =
+      URLEncoder.encode(
+                        org.apache.commons.lang.StringEscapeUtils.unescapeHtml(
+                                           uicomponent.event(uicomponent.SELECT_SPACE_ACTION)),
+                        "utf-8");
   boolean isShowPortalSpace = uicomponent.isShowPortalSpace();
   boolean isShowUserSpace = uicomponent.isShowUserSpace();
   boolean isAutoResize = uicomponent.isAutoResize();
