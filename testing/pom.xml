@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.exoplatform.commons</groupId>
     <artifactId>exo.platform.commons</artifactId>
-    <version>1.1.14-SNAPSHOT</version>
+    <version>1.1.14</version>
   </parent>
   <artifactId>exo.platform.commons.testing</artifactId>
   <packaging>jar</packaging>
