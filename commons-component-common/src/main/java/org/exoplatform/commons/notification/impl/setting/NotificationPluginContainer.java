@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.notification.impl.setting;
 
+import groovy.text.GStringTemplateEngine;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +32,7 @@ import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.notification.template.ResourceBundleConfigDeployer;
+import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
@@ -43,12 +46,14 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   private PluginSettingService                                   pSettingService;
   private ResourceBundleConfigDeployer                           deployer;
+  private GStringTemplateEngine gTemplateEngine;
 
   public NotificationPluginContainer() {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
     parentChildrenKeysMap = new HashMap<NotificationKey, List<NotificationKey>>();
     pSettingService = CommonsUtils.getService(PluginSettingService.class);
     deployer = new ResourceBundleConfigDeployer();
+    gTemplateEngine = new GStringTemplateEngine();
   }
 
   @Override
@@ -66,6 +71,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
     if (ServletContainerFactory.getServletContainer().addWebAppListener(deployer)) {
       deployer.initBundlePath(datas);
     }
+    System.out.println("\n All time to register plugins: " + l + "ms");
   }
 
   @Override
@@ -89,12 +95,12 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   @Override
   public void addPlugin(AbstractNotificationPlugin plugin) {
-    pluginMap.put(plugin.getKey(), plugin);
+    registerPlugin(plugin);
   }
 
   @Override
   public void addChildPlugin(AbstractNotificationChildPlugin plugin) {
-    pluginMap.put(plugin.getKey(), plugin);
+    registerPlugin(plugin);
     //
     List<String> parentIds = plugin.getParentPluginIds();
     NotificationKey parentKey;
@@ -111,6 +117,21 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
       parentChildrenKeysMap.put(parentKey, childrenKeys);
     }
 
+  }
+  private long l = 0;
+  private void registerPlugin(AbstractNotificationPlugin plugin) {
+    long t = System.currentTimeMillis();
+    try {
+      String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
+      String template = TemplateUtils.loadGroovyTemplate(templatePath);
+      plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    long k = System.currentTimeMillis() - t;
+    System.out.println("\n Time to register plugin: " + plugin.getId() + " lost " + k + "ms");
+    l += k;
+    pluginMap.put(plugin.getKey(), plugin);
   }
 
   @Override

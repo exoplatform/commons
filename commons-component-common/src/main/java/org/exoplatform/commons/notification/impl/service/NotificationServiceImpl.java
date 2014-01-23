@@ -101,7 +101,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
    * @param notification
    */
   private void sendInstantly(NotificationInfo notification) {
-    
+    long t = System.currentTimeMillis();
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     NotificationContext nCtx = NotificationContextImpl.cloneInstance();
@@ -120,7 +120,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         if (stats) {
           NotificationContextFactory.getInstance().getStatisticsCollector().putQueue(info.getPluginId());
         }
-      }
+      }System.out.println("\n\n time to send instantly " + notification.getKey().getId() + " for user " + notification.getTo() + " " + (System.currentTimeMillis() - t) + "ms");
     }
   }
 

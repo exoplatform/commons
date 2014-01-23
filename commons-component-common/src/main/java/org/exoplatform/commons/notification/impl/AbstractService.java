@@ -19,6 +19,7 @@ package org.exoplatform.commons.notification.impl;
 import java.util.Calendar;
 
 import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -175,13 +176,18 @@ public abstract class AbstractService {
   }
 
   public static Session getSession(SessionProvider sProvider, String workspace) {
+    if (workspace == null || workspace.length() == 0) {
+      workspace = DEFAULT_WORKSPACE_NAME;
+    }
     try {
-      if (workspace == null || workspace.length() == 0) {
-        workspace = DEFAULT_WORKSPACE_NAME;
-      }
       return sProvider.getSession(workspace, CommonsUtils.getRepository());
-    } catch (Exception e) {
-      return null;
+    } catch (RepositoryException e) {
+      e.printStackTrace();
+      try {
+        return NotificationSessionManager.createSystemProvider().getSession(workspace, CommonsUtils.getRepository());
+      } catch (Exception e2) {
+        return null;
+      }
     }
   }
 

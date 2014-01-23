@@ -95,7 +95,7 @@
     <init-params>
       <value-param>
         <name>async-execution</name>
-        <value>false</value>
+        <value>true</value>
       </value-param>
       <value-param>
         <name>thread-number</name>

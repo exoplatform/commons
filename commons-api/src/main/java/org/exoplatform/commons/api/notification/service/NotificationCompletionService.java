@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -53,50 +54,54 @@ public class NotificationCompletionService {
   private int keepAliveTime;
 
   private boolean configAsyncExecution;
-
+  
   public NotificationCompletionService(InitParams params) {
 
     //
-    ValueParam threadNumber = params.getValueParam(THREAD_NUMBER_KEY);
+    ValueParam threadNumberValue = params.getValueParam(THREAD_NUMBER_KEY);
     ValueParam asyncExecution = params.getValueParam(ASYNC_EXECUTION_KEY);
     ValueParam aliveTime = params.getValueParam(KEEP_ALIVE_TIME);
 
     //
     try {
-      this.configThreadNumber = Integer.valueOf(threadNumber.getValue());
+      configThreadNumber = Integer.valueOf(threadNumberValue.getValue());
+    } catch (Exception e) {
+      configThreadNumber = DEFAULT_THREAD_NUMBER;
     }
-    catch (Exception e) {
-      this.configThreadNumber = DEFAULT_THREAD_NUMBER;
+
+    //
+    try {
+      keepAliveTime = Integer.valueOf(aliveTime.getValue());
+    } catch (Exception e) {
+      keepAliveTime = 10;
+    }
+
+    //
+    try {
+      configAsyncExecution = Boolean.valueOf(asyncExecution.getValue());
+    } catch (Exception e) {
+      configAsyncExecution = DEFAULT_ASYNC_EXECUTION;
     }
     
-    //
-    try {
-      this.keepAliveTime = Integer.valueOf(aliveTime.getValue());
-    }
-    catch (Exception e) {
-      this.keepAliveTime = 10;
-    }
+    int threadNumber = configThreadNumber <= 0 ? configThreadNumber : Runtime.getRuntime().availableProcessors();
 
-    //
-    try {
-      this.configAsyncExecution = Boolean.valueOf(asyncExecution.getValue());
-    }
-    catch (Exception e) {
-      this.configAsyncExecution = DEFAULT_ASYNC_EXECUTION;
-    }
-
+    ThreadFactory threadFactory = new ThreadFactory() {
+      public Thread newThread(Runnable runable) {
+        Thread t = new Thread(runable, "Notification-Thread");
+        t.setPriority(Thread.MIN_PRIORITY);
+        return t;
+      }
+    };
     //
     if (configAsyncExecution) {
-      this.executor = new ThreadPoolExecutor(this.configThreadNumber, this.configThreadNumber, keepAliveTime, TimeUnit.SECONDS, workQueue);
-      ((ThreadPoolExecutor)this.executor).allowCoreThreadTimeOut(true);
+      executor = new ThreadPoolExecutor(threadNumber, threadNumber, keepAliveTime, 
+                                              TimeUnit.SECONDS, workQueue, threadFactory);
+      ((ThreadPoolExecutor) executor).allowCoreThreadTimeOut(true);
+    } else {
+      executor = new DirectExecutor();
     }
-    else {
-      this.executor = new DirectExecutor();
-    }
-
     //
-    this.ecs = new ExecutorCompletionService(executor);
-
+    ecs = new ExecutorCompletionService(executor);
   }
 
   public void addTask(Callable callable) {
@@ -115,7 +120,7 @@ public class NotificationCompletionService {
   }
 
   public boolean isAsync() {
-    return this.configAsyncExecution;
+    return configAsyncExecution;
   }
 
   private class DirectExecutor implements Executor {
