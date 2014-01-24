@@ -35,6 +35,7 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationData
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.notification.NotificationContextFactory;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -101,7 +102,6 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
    * @param notification
    */
   private void sendInstantly(NotificationInfo notification) {
-    long t = System.currentTimeMillis();
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     NotificationContext nCtx = NotificationContextImpl.cloneInstance();
@@ -109,18 +109,17 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     if (plugin != null) {
       nCtx.setNotificationInfo(notification);
       MessageInfo info = plugin.buildMessage(nCtx);
-      if (stats) {
-        NotificationContextFactory.getInstance().getStatisticsCollector().createMessageInfoCount(info.getPluginId());
-      }
       
       if (info != null) {
-        CommonsUtils.getService(QueueMessage.class).put(info);
-        
-        //record put queue here
-        if (stats) {
-          NotificationContextFactory.getInstance().getStatisticsCollector().putQueue(info.getPluginId());
+        if (NotificationUtils.isValidEmailAddresses(info.getTo()) == true) {
+          CommonsUtils.getService(QueueMessageImpl.class).sendMessage(info.makeEmailNotification());
+        } else {
+          LOG.warn(String.format("The email %s is not valid for sending notification", info.getTo()));
         }
-      }System.out.println("\n\n time to send instantly " + notification.getKey().getId() + " for user " + notification.getTo() + " " + (System.currentTimeMillis() - t) + "ms");
+        if (stats) {
+          NotificationContextFactory.getInstance().getStatisticsCollector().createMessageInfoCount(info.getPluginId());
+        }
+      }
     }
   }
 

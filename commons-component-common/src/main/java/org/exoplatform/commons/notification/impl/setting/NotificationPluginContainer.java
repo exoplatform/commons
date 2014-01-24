@@ -34,10 +34,13 @@ import org.exoplatform.commons.api.notification.service.setting.PluginSettingSer
 import org.exoplatform.commons.notification.template.ResourceBundleConfigDeployer;
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
 
 public class NotificationPluginContainer implements PluginContainer, Startable {
+  private static final Log LOG = ExoLogger.getLogger(NotificationPluginContainer.class);
 
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
 
@@ -71,7 +74,6 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
     if (ServletContainerFactory.getServletContainer().addWebAppListener(deployer)) {
       deployer.initBundlePath(datas);
     }
-    System.out.println("\n All time to register plugins: " + l + "ms");
   }
 
   @Override
@@ -118,19 +120,15 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
     }
 
   }
-  private long l = 0;
+
   private void registerPlugin(AbstractNotificationPlugin plugin) {
-    long t = System.currentTimeMillis();
     try {
       String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
       String template = TemplateUtils.loadGroovyTemplate(templatePath);
       plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.debug("Failed to register notification plugin " + plugin.getId());
     }
-    long k = System.currentTimeMillis() - t;
-    System.out.println("\n Time to register plugin: " + plugin.getId() + " lost " + k + "ms");
-    l += k;
     pluginMap.put(plugin.getKey(), plugin);
   }
 

@@ -313,7 +313,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     return null;
   }
 
-  private boolean sendMessage(Message message) {
+  public boolean sendMessage(Message message) {
     if (sendEmailService.isOn() == false) {
       try {
         //ensure the message is valid
