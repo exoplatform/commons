@@ -1,0 +1,148 @@
+/*
+ * Copyright (C) 2003-2014 eXo Platform SAS.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.exoplatform.services.user;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.jcr.Node;
+import javax.jcr.Session;
+
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.cache.CacheService;
+import org.exoplatform.services.cache.ExoCache;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.ConversationState;
+
+
+public class UserStateService {
+  private static final Log LOG = ExoLogger.getLogger(UserStateService.class.getName());
+  protected static final String WORKSPACE_NAME = "collaboration";
+  public static String BASE_PATH = "exo:applications";
+  public static String VIDEOCALLS_BASE_PATH = "VideoCalls";
+  public static String USER_STATATUS_NODETYPE = "exo:userState";
+  public static String USER_ID_PROP = "exo:userId";
+  public static String LAST_ACTIVITY_PROP = "exo:lastActivity";
+  public static String STATUS_PROP = "exo:status";
+  public static String DEFAULT_STATUS = "available";
+  public static int frequency = 15;
+  public static int delay = 60;
+  
+  private static ExoCache<Serializable, UserStateModel> userStateCache;
+  
+  public UserStateService(CacheService cacheService) {
+    userStateCache = cacheService.getCacheInstance(UserStateService.class.getName() + CommonsUtils.getRepository().getConfiguration().getName()) ;
+    if(System.getProperty("user.status.ping.frequency") != null ) {
+      frequency = Integer.parseInt(System.getProperty("user.status.ping.frequency"));
+    }
+    if(System.getProperty("user.status.offline.delay") != null ) {
+      delay = Integer.parseInt(System.getProperty("user.status.offline.delay"));
+    }
+  }
+  // Add or update a userState
+  public void save(UserStateModel model) {
+    String userId = model.getUserId();
+    String status = model.getStatus();
+    int lastActivity = model.getLastActivity();
+    
+    SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
+    try {
+      RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
+          .getComponentInstanceOfType(RepositoryService.class);
+      Session session = sessionProvider.getSession(WORKSPACE_NAME, repositoryService.getCurrentRepository());
+      String repoName = repositoryService.getCurrentRepository().getConfiguration().getName();
+      Node rootNode = session.getRootNode();
+      Node baseNode = rootNode.getNode(BASE_PATH);
+      if(!baseNode.hasNode(VIDEOCALLS_BASE_PATH)) {
+        baseNode.addNode(VIDEOCALLS_BASE_PATH);
+        baseNode.save();
+      }
+      Node videoCallsDir = baseNode.getNode(VIDEOCALLS_BASE_PATH);
+      String nodeName = repoName + "_" + userId;      
+      if(!videoCallsDir.hasNode(nodeName)) {
+        videoCallsDir.addNode(nodeName, USER_STATATUS_NODETYPE);  
+        videoCallsDir.save();
+      }
+      Node userState = videoCallsDir.getNode(nodeName);
+      userState.setProperty(USER_ID_PROP, userId);
+      userState.setProperty(LAST_ACTIVITY_PROP, lastActivity);
+      userState.setProperty(STATUS_PROP, status);
+      session.save();
+      userStateCache.put(nodeName, model);
+    } catch(Exception ex) {
+      if (LOG.isErrorEnabled()) {
+        LOG.error("save() failed because of ", ex);
+      }
+    }
+  }
+  
+  //Get userState for a user
+  public UserStateModel getUserState(String userId) {
+    UserStateModel model = null;
+    String repoName = CommonsUtils.getRepository().getConfiguration().getName();
+    String userKey = repoName + "_" + userId;
+    if(userStateCache != null && userStateCache.get(userKey) != null) {
+      model = userStateCache.get(userKey);
+    } else {
+      SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
+      try{
+        RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
+            .getComponentInstanceOfType(RepositoryService.class);
+        Session session = sessionProvider.getSession(WORKSPACE_NAME, repositoryService.getCurrentRepository());
+        Node rootNode = session.getRootNode();
+        Node baseNode = rootNode.getNode(BASE_PATH);
+        if(!baseNode.hasNode(VIDEOCALLS_BASE_PATH)) return null;
+        Node videoCallsDir = baseNode.getNode(VIDEOCALLS_BASE_PATH);        
+        if(!videoCallsDir.hasNode(userKey)) return null;
+        Node userState = videoCallsDir.getNode(userKey);
+        model = new UserStateModel();
+        model.setUserId(userState.getProperty(USER_ID_PROP).getString());
+        model.setLastActivity(Integer.parseInt(userState.getProperty(LAST_ACTIVITY_PROP).getString()));
+        model.setStatus(userState.getProperty(STATUS_PROP).getString());
+        
+        userStateCache.put(userKey, model);
+      } catch(Exception ex) {
+        if (LOG.isErrorEnabled()) {
+          LOG.error("getUserState() failed because of ", ex);
+        }
+      }
+    }
+    return model;
+  }
+  
+  //Ping to update last activity
+  public void ping(String userId) {
+    String status = DEFAULT_STATUS;
+    String repoName = CommonsUtils.getRepository().getConfiguration().getName();
+    String userKey = repoName + "_" + userId;
+    if(userStateCache != null && userStateCache.get(userKey) != null) {
+      userStateCache.get(userKey).getStatus();
+    }
+    UserStateModel model = new UserStateModel();
+    model.setStatus(status);
+    model.setUserId(userKey);
+    int iDate = (int) (new Date().getTime()/1000);
+    model.setLastActivity(iDate);
+    userStateCache.put(userKey, model);
+  }
+  
+  //Get all users online
+}
