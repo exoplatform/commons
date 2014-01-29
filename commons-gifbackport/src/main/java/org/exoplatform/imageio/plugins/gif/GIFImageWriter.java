@@ -294,7 +294,7 @@ public class GIFImageWriter extends ImageWriter {
         Node root = inData.getAsTree(formatName);
         outData.mergeTree(formatName, root);
       } catch (IIOInvalidTreeException e) {
-        // ignore
+          LOG.debug("Invalid Tree exception ",e);
       }
     }
   }
