@@ -16,20 +16,6 @@
  */
 package org.exoplatform.commons.testing.jcr;
 
-//import static org.testng.AssertJUnit.assertEquals;
-//import static org.testng.AssertJUnit.assertTrue;
-//import static org.testng.AssertJUnit.fail;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Calendar;
-
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 
 import org.exoplatform.commons.testing.AbstractExoContainerTestCase;
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -40,10 +26,15 @@ import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import static org.junit.Assert.*;
-
 import org.junit.Before;
-import org.junit.BeforeClass;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import java.io.*;
+import java.util.Calendar;
+
+import static org.junit.Assert.*;
 
 
 /**
