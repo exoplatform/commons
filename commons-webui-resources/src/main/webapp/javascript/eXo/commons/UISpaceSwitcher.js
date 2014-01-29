@@ -234,7 +234,7 @@ UISpaceSwitcher.prototype.renderUserSpace = function(uicomponentId, containerCla
       + "' title='" + userSpaceName 
       + "' alt='" + userSpaceName 
       + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + userSpaceId + "', '" + uicomponentId + "')\">" 
-        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/MyWiki.png' width='19' alt='" + userSpaceName + "'/>"
+       + "<i class='uiIconWikiMyWiki'></i>"
        + userSpaceName +
        "</a>";
   container.innerHTML = spaceDiv;
@@ -253,8 +253,8 @@ UISpaceSwitcher.prototype.renderPortalSpace = function(uicomponentId, containerC
   var spaceDiv = "<a class='spaceOption hover' id='UISpaceSwitcher_" + storage.portalSpaceId 
       + "' title='" + storage.portalSpaceLabel 
       + "' alt='" + storage.portalSpaceLabel 
-      + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">" 
-        + "<image src='/CommonsResources/skin/less/SpaceSwitcher/images/CompanyWiki.png' width='19' alt='" + storage.portalSpaceLabel + "'/>"
+      + "' onclick=\"eXo.commons.UISpaceSwitcher.onChooseSpace('" + storage.portalSpaceId + "', '" + uicomponentId +"')\">"
+         + "<i class='uiIconWikiWiki'></i>"
          + storage.portalSpaceLabel + 
        "</a>";
   container.innerHTML = spaceDiv;
