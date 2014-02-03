@@ -226,19 +226,12 @@
         <object-param>
           <name>cache.config.SettingService</name>
           <description>The JBoss Cache configuration for the navigation service</description>
-          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
-            <field name="name">
-              <string>SettingService</string>
-            </field>
-            <field name="expirationTimeout">
-              <long>${cache.exo.commons.SettingService.ExpirationTimeout:600000}</long>
-            </field>
-            <field name="maxNodes">
-              <int>${cache.exo.commons.SettingService.MaxNodes:5000}</int>
-            </field>
-            <field name="distributed">
-              <boolean>true</boolean>
-            </field>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>SettingService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <fieldname="maxEntries"><int>${cache.exo.commons.SettingService.MaxNodes:5000}</int></field>
+            <field name="lifespan"><long>-1</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
           </object>
         </object-param>
         <object-param>

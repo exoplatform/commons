@@ -8,7 +8,7 @@
       <!-- System --> 
       <workspaces>
         <workspace name="system">
-          <container class="org.exoplatform.services.jcr.impl.storage.jdbc.JDBCWorkspaceDataContainer">
+          <container class="org.exoplatform.services.jcr.impl.storage.jdbc.optimisation.CQJDBCWorkspaceDataContainer">
             <properties>
               <property name="source-name" value="jdbcexo"/>
               <property name="dialect" value="hsqldb"/>
@@ -35,12 +35,12 @@
               <property name="index-dir" value="target/temp/jcrlucenedb/system"/>
             </properties>
           </query-handler>
-          <lock-manager class="org.exoplatform.services.jcr.impl.core.lock.jbosscache.CacheableLockManagerImpl">
+          <lock-manager class="org.exoplatform.services.jcr.impl.core.lock.infinispan.ISPNCacheableLockManagerImpl">
               <properties>
 	            <property name="time-out" value="15m" /><!-- 15min -->
                 <property name="path" value="target/temp/lock/portal-test"/>
-                <property name="jbosscache-configuration" value="conf/jcr/jcr-jbosscache-lock-config.xml" />
-                  <property name="jbosscache-cl-cache.jdbc.datasource" value="jdbcexo"/>
+                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcexo" />
+                <property name="infinispan-configuration" value="conf/jcr/jcr-infinispan-lock-config.xml" />
               </properties>
           </lock-manager>
         </workspace>
@@ -74,12 +74,12 @@
               <property name="index-dir" value="target/temp/jcrlucenedb/portal-test"/>
             </properties>
           </query-handler>
-          <lock-manager class="org.exoplatform.services.jcr.impl.core.lock.jbosscache.CacheableLockManagerImpl">
+          <lock-manager class="org.exoplatform.services.jcr.impl.core.lock.infinispan.ISPNCacheableLockManagerImpl">
               <properties>
-	            <property name="time-out" value="15m" /><!-- 15min -->
+                <property name="time-out" value="15m" /><!-- 15min -->
                 <property name="path" value="target/temp/lock/portal-test"/>
-                <property name="jbosscache-configuration" value="conf/jcr/jcr-jbosscache-lock-config.xml" />
-                  <property name="jbosscache-cl-cache.jdbc.datasource" value="jdbcexo"/>
+                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcexo" />
+                <property name="infinispan-configuration" value="conf/jcr/jcr-infinispan-lock-config.xml" />
               </properties>
           </lock-manager>
           
