@@ -17,10 +17,19 @@
 package org.exoplatform.services.user;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.jcr.LoginException;
+import javax.jcr.NoSuchWorkspaceException;
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
@@ -28,6 +37,7 @@ import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -36,7 +46,6 @@ import org.exoplatform.services.security.ConversationState;
 public class UserStateService {
   private static final Log LOG = ExoLogger.getLogger(UserStateService.class.getName());
   protected static final String WORKSPACE_NAME = "collaboration";
-  public static String BASE_PATH = "exo:applications";
   public static String VIDEOCALLS_BASE_PATH = "VideoCalls";
   public static String USER_STATATUS_NODETYPE = "exo:userState";
   public static String USER_ID_PROP = "exo:userId";
@@ -61,32 +70,29 @@ public class UserStateService {
   public void save(UserStateModel model) {
     String userId = model.getUserId();
     String status = model.getStatus();
-    int lastActivity = model.getLastActivity();
+    int lastActivity = model.getLastActivity();  
     
     SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
+    NodeHierarchyCreator nodeHierarchyCreator = CommonsUtils.getService(NodeHierarchyCreator.class);    
+    
     try {
       RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
           .getComponentInstanceOfType(RepositoryService.class);
       Session session = sessionProvider.getSession(WORKSPACE_NAME, repositoryService.getCurrentRepository());
-      String repoName = repositoryService.getCurrentRepository().getConfiguration().getName();
-      Node rootNode = session.getRootNode();
-      Node baseNode = rootNode.getNode(BASE_PATH);
-      if(!baseNode.hasNode(VIDEOCALLS_BASE_PATH)) {
-        baseNode.addNode(VIDEOCALLS_BASE_PATH);
-        baseNode.save();
+      String repoName = repositoryService.getCurrentRepository().getConfiguration().getName(); 
+      
+      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);     
+      String userKey = repoName + "_" + userId;      
+      if(!userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) {
+        userNodeApp.addNode(VIDEOCALLS_BASE_PATH, USER_STATATUS_NODETYPE);  
+        userNodeApp.save();
       }
-      Node videoCallsDir = baseNode.getNode(VIDEOCALLS_BASE_PATH);
-      String nodeName = repoName + "_" + userId;      
-      if(!videoCallsDir.hasNode(nodeName)) {
-        videoCallsDir.addNode(nodeName, USER_STATATUS_NODETYPE);  
-        videoCallsDir.save();
-      }
-      Node userState = videoCallsDir.getNode(nodeName);
+      Node userState = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
       userState.setProperty(USER_ID_PROP, userId);
       userState.setProperty(LAST_ACTIVITY_PROP, lastActivity);
       userState.setProperty(STATUS_PROP, status);
       session.save();
-      userStateCache.put(nodeName, model);
+      userStateCache.put(userKey, model);
     } catch(Exception ex) {
       if (LOG.isErrorEnabled()) {
         LOG.error("save() failed because of ", ex);
@@ -103,21 +109,15 @@ public class UserStateService {
       model = userStateCache.get(userKey);
     } else {
       SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
+      NodeHierarchyCreator nodeHierarchyCreator = CommonsUtils.getService(NodeHierarchyCreator.class);
       try{
-        RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
-            .getComponentInstanceOfType(RepositoryService.class);
-        Session session = sessionProvider.getSession(WORKSPACE_NAME, repositoryService.getCurrentRepository());
-        Node rootNode = session.getRootNode();
-        Node baseNode = rootNode.getNode(BASE_PATH);
-        if(!baseNode.hasNode(VIDEOCALLS_BASE_PATH)) return null;
-        Node videoCallsDir = baseNode.getNode(VIDEOCALLS_BASE_PATH);        
-        if(!videoCallsDir.hasNode(userKey)) return null;
-        Node userState = videoCallsDir.getNode(userKey);
+        Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);        
+        if(!userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) return null;        
+        Node userState = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
         model = new UserStateModel();
         model.setUserId(userState.getProperty(USER_ID_PROP).getString());
         model.setLastActivity(Integer.parseInt(userState.getProperty(LAST_ACTIVITY_PROP).getString()));
-        model.setStatus(userState.getProperty(STATUS_PROP).getString());
-        
+        model.setStatus(userState.getProperty(STATUS_PROP).getString());        
         userStateCache.put(userKey, model);
       } catch(Exception ex) {
         if (LOG.isErrorEnabled()) {
@@ -136,13 +136,55 @@ public class UserStateService {
     if(userStateCache != null && userStateCache.get(userKey) != null) {
       userStateCache.get(userKey).getStatus();
     }
-    UserStateModel model = new UserStateModel();
-    model.setStatus(status);
-    model.setUserId(userKey);
-    int iDate = (int) (new Date().getTime()/1000);
-    model.setLastActivity(iDate);
+    int lastActivity = (int) (new Date().getTime()/1000);
+    UserStateModel model = getUserState(userId);
+    if(model != null) {
+      model.setLastActivity(lastActivity);
+    } else {
+      model = new UserStateModel();
+      model.setStatus(status);
+      model.setUserId(userId);      
+      model.setLastActivity(lastActivity);      
+    }
+    save(model);
     userStateCache.put(userKey, model);
   }
   
   //Get all users online
+  public List<UserStateModel> online() {
+    List<UserStateModel> onlineUsers = new ArrayList<UserStateModel>();
+    SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
+    RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
+        .getComponentInstanceOfType(RepositoryService.class);
+    try {
+      Session session = sessionProvider.getSession(WORKSPACE_NAME, repositoryService.getCurrentRepository());
+      int iDate = (int) (new Date().getTime()/1000);
+      QueryManager queryManager = session.getWorkspace().getQueryManager();
+      //String queryStatement = "SELECT * FROM exo:userState WHERE jcr:path like '/Users/' AND exo:lastActivity > " + (iDate-60) + 
+      //    " order by exo:userId";
+      String queryStatement = "SELECT * FROM exo:userState WHERE jcr:path like '/Users/%' AND exo:lastActivity > " + (iDate-60) + 
+          " order by exo:userId";
+      System.out.println(" TRUY VAN == " + queryStatement);
+      Query query = queryManager.createQuery(queryStatement, Query.SQL);
+      QueryResult results = query.execute();
+      NodeIterator iter = results.getNodes();
+      while (iter.hasNext()) {
+        Node node = iter.nextNode();
+        UserStateModel model = new UserStateModel();
+        model.setUserId(node.getProperty(USER_ID_PROP).getString());
+        model.setStatus(node.getProperty(STATUS_PROP).getString());
+        model.setLastActivity(Integer.parseInt(node.getProperty(LAST_ACTIVITY_PROP).getString()));
+        onlineUsers.add(model);
+      }
+      
+    } catch (LoginException e) {
+      e.printStackTrace();
+    } catch (NoSuchWorkspaceException e) {
+      e.printStackTrace();
+    } catch (RepositoryException e) {
+      e.printStackTrace();
+    }
+    
+    return onlineUsers;
+  } 
 }

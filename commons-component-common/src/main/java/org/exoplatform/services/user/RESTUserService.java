@@ -16,6 +16,7 @@
  */
 package org.exoplatform.services.user;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -24,11 +25,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.dom.DOMSource;
-
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -36,19 +33,18 @@ import org.exoplatform.services.security.ConversationState;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
 
 
 @Path("/state/")
 public class RESTUserService implements ResourceContainer{
   private static final Log LOG = ExoLogger.getLogger(RESTUserService.class);
-  private final UserService userService;
+  private final UserStateService userService;
   
   protected static final String ACTIVITY  = "activity";
   protected static final String STATUS    = "status";
   
-  public RESTUserService(UserService userService) {
+  public RESTUserService(UserStateService userService) {
     this.userService = userService;
   }
   
@@ -58,18 +54,30 @@ public class RESTUserService implements ResourceContainer{
   @RolesAllowed("users")
   public Response updateState() {
     String userId = ConversationState.getCurrent().getIdentity().getUserId();
-    userService.updateUserTime(userId);
+    userService.ping(userId);
     return Response.ok().build();
   }
   
   @GET
   @Path("/online/")
   @RolesAllowed("users")
-  public Response online() throws ParserConfigurationException {
-    List<String> usersOnline = userService.getUsersOnline();  
+  public Response online() throws ParserConfigurationException, JSONException {
+    List<UserStateModel> usersOnline = userService.online();  
     JSONArray json = new JSONArray();    
     for(int i=0; i< usersOnline.size(); i++) {
-      json.put(usersOnline.get(i));
+      UserStateModel model = usersOnline.get(i);
+      JSONObject object = new JSONObject();      
+      object.put("userId", model.getUserId());
+      object.put("lastActivity", model.getLastActivity());
+      object.put("status", model.getStatus());
+      int iDate = (int) (new Date().getTime()/1000);
+      int lastActivity = model.getLastActivity();
+      if(lastActivity >= (iDate - UserStateService.delay)) {
+        object.put("activity", "online");
+      } else {
+        object.put("activity", "offline");
+      }
+      json.put(object);
     }
     return Response.ok(json.toString(), MediaType.APPLICATION_JSON).build();
   }
@@ -78,14 +86,19 @@ public class RESTUserService implements ResourceContainer{
   @Path("/status/{userId}/")
   @RolesAllowed("users")
   public Response online(@PathParam("userId") String userId) throws JSONException {
-    String activity = "offline";
-    Boolean b = userService.getUserStatus(userId);
-    if(b) activity = "online";
-    JSONObject json = new JSONObject();
-    json.put(ACTIVITY, activity);
-    json.put(STATUS, "");
-    
-    return Response.ok(json.toString(), MediaType.APPLICATION_JSON).build();
+    UserStateModel model = userService.getUserState(userId);
+    JSONObject object = new JSONObject();
+    object.put("userId", model.getUserId());
+    object.put("lastActivity", model.getLastActivity());
+    object.put("status", model.getStatus());
+    int iDate = (int) (new Date().getTime()/1000);
+    int lastActivity = model.getLastActivity();
+    if(lastActivity >= (iDate - UserStateService.delay)) {
+      object.put("activity", "online");
+    } else {
+      object.put("activity", "offline");
+    }   
+    return Response.ok(object.toString(), MediaType.APPLICATION_JSON).build();
   }
   
   
