@@ -52,16 +52,12 @@ public class UserStateService {
   public static String LAST_ACTIVITY_PROP = "exo:lastActivity";
   public static String STATUS_PROP = "exo:status";
   public static String DEFAULT_STATUS = "available";
-  public static int frequency = 15;
   public static int delay = 60;
   
   private static ExoCache<Serializable, UserStateModel> userStateCache;
   
   public UserStateService(CacheService cacheService) {
-    userStateCache = cacheService.getCacheInstance(UserStateService.class.getName() + CommonsUtils.getRepository().getConfiguration().getName()) ;
-    if(System.getProperty("user.status.ping.frequency") != null ) {
-      frequency = Integer.parseInt(System.getProperty("user.status.ping.frequency"));
-    }
+    userStateCache = cacheService.getCacheInstance(UserStateService.class.getName() + CommonsUtils.getRepository().getConfiguration().getName()) ;   
     if(System.getProperty("user.status.offline.delay") != null ) {
       delay = Integer.parseInt(System.getProperty("user.status.offline.delay"));
     }
@@ -134,7 +130,7 @@ public class UserStateService {
     String repoName = CommonsUtils.getRepository().getConfiguration().getName();
     String userKey = repoName + "_" + userId;
     if(userStateCache != null && userStateCache.get(userKey) != null) {
-      userStateCache.get(userKey).getStatus();
+      status = userStateCache.get(userKey).getStatus();
     }
     int lastActivity = (int) (new Date().getTime()/1000);
     UserStateModel model = getUserState(userId);
@@ -162,7 +158,7 @@ public class UserStateService {
       QueryManager queryManager = session.getWorkspace().getQueryManager();
       //String queryStatement = "SELECT * FROM exo:userState WHERE jcr:path like '/Users/' AND exo:lastActivity > " + (iDate-60) + 
       //    " order by exo:userId";
-      String queryStatement = "SELECT * FROM exo:userState WHERE jcr:path like '/Users/%' AND exo:lastActivity > " + (iDate-60) + 
+      String queryStatement = "SELECT * FROM exo:userState WHERE jcr:path like '/Users/%' AND exo:lastActivity > " + (iDate-delay) + 
           " order by exo:userId";
       System.out.println(" TRUY VAN == " + queryStatement);
       Query query = queryManager.createQuery(queryStatement, Query.SQL);

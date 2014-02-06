@@ -21,11 +21,15 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -85,7 +89,7 @@ public class RESTUserService implements ResourceContainer{
   @GET
   @Path("/status/{userId}/")
   @RolesAllowed("users")
-  public Response online(@PathParam("userId") String userId) throws JSONException {
+  public Response getStatus(@PathParam("userId") String userId) throws JSONException {
     UserStateModel model = userService.getUserState(userId);
     JSONObject object = new JSONObject();
     object.put("userId", model.getUserId());
@@ -99,6 +103,19 @@ public class RESTUserService implements ResourceContainer{
       object.put("activity", "offline");
     }   
     return Response.ok(object.toString(), MediaType.APPLICATION_JSON).build();
+  }
+  
+  @PUT
+  @Path("/status/{userId}/")
+  @RolesAllowed("users")
+  public Response setStatus(@PathParam("userId") String userId, @QueryParam("status") String status) throws JSONException {
+    UserStateModel model = userService.getUserState(userId);
+    if(StringUtils.isNotEmpty(status)) {
+      model.setStatus(status);
+      userService.save(model); 
+      return Response.ok().build();
+    }
+    return Response.notModified().build();
   }
   
   
