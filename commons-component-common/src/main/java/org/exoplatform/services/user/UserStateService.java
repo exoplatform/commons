@@ -53,6 +53,7 @@ public class UserStateService {
   public static String STATUS_PROP = "exo:status";
   public static String DEFAULT_STATUS = "available";
   public static int delay = 60;
+  public static int pingCounter = 0;
   
   private static ExoCache<Serializable, UserStateModel> userStateCache;
   
@@ -93,6 +94,8 @@ public class UserStateService {
       if (LOG.isErrorEnabled()) {
         LOG.error("save() failed because of ", ex);
       }
+    } finally {
+      sessionProvider.close();
     }
   }
   
@@ -119,6 +122,8 @@ public class UserStateService {
         if (LOG.isErrorEnabled()) {
           LOG.error("getUserState() failed because of ", ex);
         }
+      } finally {
+        sessionProvider.close();
       }
     }
     return model;
@@ -141,8 +146,12 @@ public class UserStateService {
       model.setStatus(status);
       model.setUserId(userId);      
       model.setLastActivity(lastActivity);      
-    }
-    save(model);
+    }    
+    pingCounter++;
+    if(pingCounter == 10) {
+      pingCounter = 0;
+      save(model);
+    }    
     userStateCache.put(userKey, model);
   }
   
@@ -160,7 +169,6 @@ public class UserStateService {
       //    " order by exo:userId";
       String queryStatement = "SELECT * FROM exo:userState WHERE jcr:path like '/Users/%' AND exo:lastActivity > " + (iDate-delay) + 
           " order by exo:userId";
-      System.out.println(" TRUY VAN == " + queryStatement);
       Query query = queryManager.createQuery(queryStatement, Query.SQL);
       QueryResult results = query.execute();
       NodeIterator iter = results.getNodes();
@@ -179,6 +187,8 @@ public class UserStateService {
       e.printStackTrace();
     } catch (RepositoryException e) {
       e.printStackTrace();
+    } finally {
+      sessionProvider.close();
     }
     
     return onlineUsers;
