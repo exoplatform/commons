@@ -127,7 +127,7 @@ public class CacheSettingServiceImpl implements SettingService {
     try {
       settingCache.select(new SettingCacheSelector(settingScope));
     } catch (Exception e) {
-      LOG.error(e);
+      LOG.error("Cannot get setting cache",e);
     }
     service.remove(context, scope);
   }
@@ -142,7 +142,7 @@ public class CacheSettingServiceImpl implements SettingService {
     try {
       settingCache.select(new SettingCacheSelector(settingContext));
     } catch (Exception e) {
-      LOG.error(e);
+      LOG.error("cannot get setting context",e);
     }
     service.remove(context);
   }
