@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.notification.impl.setting;
 
+import groovy.text.GStringTemplateEngine;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,19 +29,27 @@ import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.notification.template.ResourceBundleConfigDeployer;
+import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
 
 public class NotificationPluginContainer implements PluginContainer, Startable {
+  private static final Log LOG = ExoLogger.getLogger(NotificationPluginContainer.class);
+
   private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
-  private PluginSettingService pSettingService;
-  private ResourceBundleConfigDeployer deployer;
-  
+
+  private PluginSettingService                                   pSettingService;
+  private ResourceBundleConfigDeployer                           deployer;
+  private GStringTemplateEngine gTemplateEngine;
+
   public NotificationPluginContainer() {
     pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
     pSettingService = CommonsUtils.getService(PluginSettingService.class);
     deployer = new ResourceBundleConfigDeployer();
+    gTemplateEngine = new GStringTemplateEngine();
   }
 
   @Override
@@ -68,6 +78,17 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   @Override
   public void add(AbstractNotificationPlugin plugin) {
+    registerPlugin(plugin);
+  }
+
+  private void registerPlugin(AbstractNotificationPlugin plugin) {
+    try {
+      String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
+      String template = TemplateUtils.loadGroovyTemplate(templatePath);
+      plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
+    } catch (Exception e) {
+      LOG.debug("Failed to register notification plugin " + plugin.getId());
+    }
     pluginMap.put(plugin.getKey(), plugin);
   }
 

@@ -103,6 +103,17 @@
       </value-param>
     </init-params>
   </component>
+  
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.NotificationCompletionService</key>
+    <type>org.exoplatform.commons.api.notification.service.NotificationCompletionService</type>
+    <init-params>
+      <value-param>
+        <name>async-execution</name>
+        <value>false</value>
+      </value-param>
+    </init-params>
+  </component>
 
   <component>
     <key>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</key>

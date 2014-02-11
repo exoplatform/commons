@@ -17,12 +17,14 @@
 package org.exoplatform.commons.notification.impl.command;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -37,8 +39,15 @@ public class NotificationExecutorImpl implements NotificationExecutor {
 
   private final List<NotificationCommand>  commands;
   
+  //The executor to execute multiple threads
+  private NotificationCompletionService completionService; 
+  
+  private NotificationService notificationService;
+  
   public NotificationExecutorImpl() {
     commands = new CopyOnWriteArrayList<NotificationCommand>();
+    notificationService = CommonsUtils.getService(NotificationService.class);
+    completionService = CommonsUtils.getService(NotificationCompletionService.class);
   }
   
   public static NotificationExecutor getInstance() {
@@ -48,13 +57,27 @@ public class NotificationExecutorImpl implements NotificationExecutor {
     return executor;
   }
   
-  private boolean process(NotificationContext ctx, NotificationCommand command) {
+  private boolean process(final NotificationContext ctx, final NotificationCommand command) {
     try {
       if (command.getPlugin().isValid(ctx) == false) {
         return false;
       }
-      NotificationService service = CommonsUtils.getService(NotificationService.class);
-      service.process(create(ctx, command));
+      Callable<Boolean> task = new Callable<Boolean>() {
+        @Override
+        public Boolean call() throws Exception {
+          try {
+            notificationService.process(create(ctx, command));
+          } catch (Exception e) {
+            LOG.warn("Process NotificationInfo is failed: " + e.getMessage());
+            LOG.debug(e.getMessage(), e);
+            return false;
+          }
+          //
+          return true;
+        }
+      };
+      completionService.addTask(task);
+
       return true;
     } catch (Exception e) {
       ctx.setException(e);

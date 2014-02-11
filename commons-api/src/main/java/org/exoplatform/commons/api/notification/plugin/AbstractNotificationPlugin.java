@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
+import groovy.text.Template;
+
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ import org.exoplatform.services.organization.OrganizationService;
 
 public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
   List<PluginConfig> pluginConfig = new ArrayList<PluginConfig>();
+  
+  private Template engine;
   
   public AbstractNotificationPlugin(InitParams initParams) {
     pluginConfig = initParams.getObjectParamValues(PluginConfig.class);
@@ -142,6 +146,22 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
   
   protected OrganizationService getOrganizationService() {
     return NotificationPluginUtils.getOrganizationService();
+  }
+
+  /**
+   * Get TemplateEngine of plugin
+   * @return the TemplateEngine
+   */
+  public Template getTemplateEngine() {
+    return engine;
+  }
+
+  /**
+   * Set TemplateEngine for plugin
+   * @param engine the TemplateEngine to set
+   */
+  public void setTemplateEngine(Template engine) {
+    this.engine = engine;
   }
 
 }

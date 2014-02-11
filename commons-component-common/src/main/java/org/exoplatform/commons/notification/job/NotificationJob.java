@@ -16,6 +16,9 @@
  */
 package org.exoplatform.commons.notification.job;
 
+import java.util.concurrent.Callable;
+
+import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -36,14 +39,23 @@ public abstract class NotificationJob implements Job {
     if (isValid() == false) {
       return;
     }
-    try {
-      NotificationSessionManager.createSystemProvider();
-      processSendNotification();
-    } catch (Exception e) {
-      LOG.error("Failed to running NotificationJob", e);
-    } finally {
-      NotificationSessionManager.closeSessionProvider();
-    }
+    Callable<Boolean> task = new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        try {
+          NotificationSessionManager.createSystemProvider();
+          processSendNotification();
+        } catch (Exception e) {
+          LOG.error("Failed to running NotificationJob", e);
+          return false;
+        } finally {
+          NotificationSessionManager.closeSessionProvider();
+        }
+        return true;
+      }
+    };
+    //
+    CommonsUtils.getService(NotificationCompletionService.class).addTask(task);
   }
 
   protected boolean isValid() {
