@@ -157,40 +157,12 @@ public class UserStateService {
   
   //Get all users online
   public List<UserStateModel> online() {
-    List<UserStateModel> onlineUsers = new ArrayList<UserStateModel>();
-    SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
-    RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
-        .getComponentInstanceOfType(RepositoryService.class);
+    List<UserStateModel> onlineUsers = null;
     try {
-      Session session = sessionProvider.getSession(WORKSPACE_NAME, repositoryService.getCurrentRepository());
-      int iDate = (int) (new Date().getTime()/1000);
-      QueryManager queryManager = session.getWorkspace().getQueryManager();
-      //String queryStatement = "SELECT * FROM exo:userState WHERE jcr:path like '/Users/' AND exo:lastActivity > " + (iDate-60) + 
-      //    " order by exo:userId";
-      String queryStatement = "SELECT * FROM exo:userState WHERE jcr:path like '/Users/%' AND exo:lastActivity > " + (iDate-delay) + 
-          " order by exo:userId";
-      Query query = queryManager.createQuery(queryStatement, Query.SQL);
-      QueryResult results = query.execute();
-      NodeIterator iter = results.getNodes();
-      while (iter.hasNext()) {
-        Node node = iter.nextNode();
-        UserStateModel model = new UserStateModel();
-        model.setUserId(node.getProperty(USER_ID_PROP).getString());
-        model.setStatus(node.getProperty(STATUS_PROP).getString());
-        model.setLastActivity(Integer.parseInt(node.getProperty(LAST_ACTIVITY_PROP).getString()));
-        onlineUsers.add(model);
-      }
-      
-    } catch (LoginException e) {
+      onlineUsers = (List<UserStateModel>) userStateCache.getCachedObjects();     
+    } catch (Exception e) {
       e.printStackTrace();
-    } catch (NoSuchWorkspaceException e) {
-      e.printStackTrace();
-    } catch (RepositoryException e) {
-      e.printStackTrace();
-    } finally {
-      sessionProvider.close();
-    }
-    
+    }     
     return onlineUsers;
   } 
 }

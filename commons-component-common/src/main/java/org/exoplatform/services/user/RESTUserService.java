@@ -67,6 +67,7 @@ public class RESTUserService implements ResourceContainer{
   @RolesAllowed("users")
   public Response online() throws ParserConfigurationException, JSONException {
     List<UserStateModel> usersOnline = userService.online();  
+    if(usersOnline == null) return Response.ok().build();
     JSONArray json = new JSONArray();    
     for(int i=0; i< usersOnline.size(); i++) {
       UserStateModel model = usersOnline.get(i);
