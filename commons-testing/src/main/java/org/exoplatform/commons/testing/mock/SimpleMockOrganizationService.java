@@ -34,6 +34,7 @@ import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.exoplatform.services.organization.idm.UserImpl;
+import org.exoplatform.services.organization.*;
 
 /**
  * A partial implementation of OrganizationService for use in tests of classes
@@ -387,7 +388,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return new ObjectPageList(Arrays.asList(userSet.toArray()), 10);
     }
     @SuppressWarnings("unchecked")
-    public ListAccess<User> findUsersByGroupId(String groupId, boolean enabledOnly) throws Exception {
+    public ListAccess<User> findUsersByGroupId(String groupId, UserStatus status) throws Exception {
         return null;
     }
 
@@ -415,7 +416,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
       }
       return null;
     }
-    public User findUserByName(String userName, boolean enabledOnly) throws Exception {
+    public User findUserByName(String userName, UserStatus status) throws Exception {
         return null;
     }
     public User createUserInstance(String username) {
@@ -449,7 +450,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
       //
       return new ListAccessImpl<User>(User.class, new ArrayList<User>(users));
     }
-    public ListAccess<User> findAllUsers(boolean enabledOnly) throws Exception {
+    public ListAccess<User> findAllUsers(UserStatus status) throws Exception {
         return null;
     }
 
@@ -481,7 +482,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return new ListAccessImpl<User>(User.class, new ArrayList<User>(users));
     }
     @Override
-    public ListAccess<User> findUsersByQuery(Query query, boolean enabledOnly) throws Exception {
+    public ListAccess<User> findUsersByQuery(Query query, UserStatus status) throws Exception {
         return null;
     }
     @Override
