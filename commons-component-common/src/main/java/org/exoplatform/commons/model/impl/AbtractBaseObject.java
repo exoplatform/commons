@@ -17,33 +17,22 @@
  **************************************************************************/
 package org.exoplatform.commons.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-
-import javax.jcr.AccessDeniedException;
-import javax.jcr.InvalidItemStateException;
-import javax.jcr.ItemExistsException;
-import javax.jcr.LoginException;
-import javax.jcr.NoSuchWorkspaceException;
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.UnsupportedRepositoryOperationException;
-import javax.jcr.ValueFormatException;
-import javax.jcr.lock.LockException;
-import javax.jcr.nodetype.ConstraintViolationException;
-import javax.jcr.nodetype.NoSuchNodeTypeException;
-import javax.jcr.version.VersionException;
-
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.event.data.BaseObject;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.impl.core.NodeImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
+import javax.jcr.*;
+import javax.jcr.lock.LockException;
+import javax.jcr.nodetype.ConstraintViolationException;
+import javax.jcr.nodetype.NoSuchNodeTypeException;
+import javax.jcr.version.VersionException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by The eXo Platform SARL
@@ -54,7 +43,7 @@ import org.exoplatform.services.log.Log;
  */
 public abstract class AbtractBaseObject implements BaseObject {
 
-    protected static final Log LOG = ExoLogger.getLogger(BaseObject.class); 
+    protected static final Log LOG = ExoLogger.getLogger(AbtractBaseObject.class);
     protected String workspace;
     protected String path;
     protected String UUID;

@@ -1,12 +1,12 @@
 package org.exoplatform.commons.api.search.data;
 
-import java.util.Map;
-
 import org.apache.commons.collections.map.HashedMap;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.Router;
-import org.exoplatform.services.log.Log; 
+
+import java.util.Map;
 
 /**
  * Search Context contains a set of data needed for SearchService and all connectors.
@@ -15,7 +15,7 @@ import org.exoplatform.services.log.Log;
  */
 public class SearchContext {
   
-  private static Log log = ExoLogger.getExoLogger(SearchContext.class);
+  private static Log LOG = ExoLogger.getExoLogger(SearchContext.class);
   
   public static enum RouterParams {
    SITE_TYPE("sitetype"),
@@ -165,17 +165,17 @@ public class SearchContext {
     
     //
     if (qualifiedName.containsKey(RouterParams.HANDLER.create()) == false) {
-      log.warn("Handler of QualifiedName not found!");
+      LOG.warn("Handler of QualifiedName not found!");
     }
     
     //
     if (qualifiedName.containsKey(RouterParams.SITE_NAME.create()) == false) {
-      log.warn("SiteName of QualifiedName not found!");
+      LOG.warn("SiteName of QualifiedName not found!");
     }
     
     //
     if (qualifiedName.containsKey(RouterParams.SITE_TYPE.create()) == false) {
-      log.warn("SiteType of QualifiedName not found!");
+      LOG.warn("SiteType of QualifiedName not found!");
     }
     
     //

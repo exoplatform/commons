@@ -80,9 +80,7 @@ public class PropertyChangeSupport implements java.io.Serializable {
     }
     synchronized(lock) {
       PropertyChangeEvent results[] = new PropertyChangeEvent[changeEvents.length + 1];
-      for (int i = 0; i < changeEvents.length; i++) {
-        results[i] = changeEvents[i];
-      }
+      System.arraycopy(changeEvents,0,results,0,changeEvents.length);
       //Add the PropertyChangeListener to the new position.
       results[changeEvents.length] = evt;
       changeEvents = results;
