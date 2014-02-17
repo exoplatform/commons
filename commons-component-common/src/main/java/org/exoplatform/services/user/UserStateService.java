@@ -157,9 +157,16 @@ public class UserStateService {
   
   //Get all users online
   public List<UserStateModel> online() {
-    List<UserStateModel> onlineUsers = null;
+    List<UserStateModel> onlineUsers = new ArrayList<UserStateModel>();
+    List<UserStateModel> users = null;
     try {
-      onlineUsers = (List<UserStateModel>) userStateCache.getCachedObjects();     
+      users = (List<UserStateModel>) userStateCache.getCachedObjects();
+      for (UserStateModel userStateModel : users) {
+        int iDate = (int) (new Date().getTime()/1000);
+        if(userStateModel.getLastActivity() >= (iDate - delay)) {
+          onlineUsers.add(userStateModel);
+        }
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }     
