@@ -93,16 +93,18 @@ public class RESTUserService implements ResourceContainer{
   public Response getStatus(@PathParam("userId") String userId) throws JSONException {
     UserStateModel model = userService.getUserState(userId);
     JSONObject object = new JSONObject();
-    object.put("userId", model.getUserId());
-    object.put("lastActivity", model.getLastActivity());
-    object.put("status", model.getStatus());
-    int iDate = (int) (new Date().getTime()/1000);
-    int lastActivity = model.getLastActivity();
-    if(lastActivity >= (iDate - UserStateService.delay)) {
-      object.put("activity", "online");
-    } else {
-      object.put("activity", "offline");
-    }   
+    if(model != null) {
+      object.put("userId", model.getUserId());
+      object.put("lastActivity", model.getLastActivity());
+      object.put("status", model.getStatus());
+      int iDate = (int) (new Date().getTime()/1000);
+      int lastActivity = model.getLastActivity();
+      if(lastActivity >= (iDate - UserStateService.delay)) {
+        object.put("activity", "online");
+      } else {
+        object.put("activity", "offline");
+      }   
+    }
     return Response.ok(object.toString(), MediaType.APPLICATION_JSON).build();
   }
   
