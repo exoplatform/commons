@@ -20,10 +20,7 @@
 		<type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
 	</component>
 	
-	<component>
-	    <key>org.exoplatform.services.user.UserService</key>
-     	<type>org.exoplatform.services.user.UserService</type>
-    </component>
+	
     <component>
 	    <key>org.exoplatform.services.user.UserStateService</key>
      	<type>org.exoplatform.services.user.UserStateService</type>

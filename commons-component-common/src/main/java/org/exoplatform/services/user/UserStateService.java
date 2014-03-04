@@ -120,7 +120,7 @@ public class UserStateService {
         userStateCache.put(userKey, model);
       } catch(Exception ex) {
         if (LOG.isErrorEnabled()) {
-          LOG.error("getUserState() failed because of ", ex);
+          LOG.error("getUserState() failed because of ", ex.getMessage());
         }
       } finally {
         sessionProvider.close();

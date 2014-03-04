@@ -92,7 +92,9 @@ public class RESTUserService implements ResourceContainer{
   @RolesAllowed("users")
   public Response getStatus(@PathParam("userId") String userId) throws JSONException {
     UserStateModel model = userService.getUserState(userId);
+    if(model == null) return Response.noContent().build();
     JSONObject object = new JSONObject();
+    object.put("activity", "offline");
     if(model != null) {
       object.put("userId", model.getUserId());
       object.put("lastActivity", model.getLastActivity());
@@ -101,9 +103,7 @@ public class RESTUserService implements ResourceContainer{
       int lastActivity = model.getLastActivity();
       if(lastActivity >= (iDate - UserStateService.delay)) {
         object.put("activity", "online");
-      } else {
-        object.put("activity", "offline");
-      }   
+      } 
     }
     return Response.ok(object.toString(), MediaType.APPLICATION_JSON).build();
   }
