@@ -53,12 +53,13 @@ public class UserStateService {
   public static String STATUS_PROP = "exo:status";
   public static String DEFAULT_STATUS = "available";
   public static int delay = 60;
+  public static final int _delay_update_DB = 3*60; //3 mins
   public static int pingCounter = 0;
   
-  private static ExoCache<Serializable, UserStateModel> userStateCache;
-  
+  private static CacheService cacheService;
+   
   public UserStateService(CacheService cacheService) {
-    userStateCache = cacheService.getCacheInstance(UserStateService.class.getName() + CommonsUtils.getRepository().getConfiguration().getName()) ;   
+    this.cacheService = cacheService;
     if(System.getProperty("user.status.offline.delay") != null ) {
       delay = Integer.parseInt(System.getProperty("user.status.offline.delay"));
     }
@@ -79,7 +80,7 @@ public class UserStateService {
       String repoName = repositoryService.getCurrentRepository().getConfiguration().getName(); 
       
       Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);     
-      String userKey = repoName + "_" + userId;      
+      String userKey = repoName + "_" + userId;
       if(!userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) {
         userNodeApp.addNode(VIDEOCALLS_BASE_PATH, USER_STATATUS_NODETYPE);  
         userNodeApp.save();
@@ -89,7 +90,12 @@ public class UserStateService {
       userState.setProperty(LAST_ACTIVITY_PROP, lastActivity);
       userState.setProperty(STATUS_PROP, status);
       session.save();
-      userStateCache.put(userKey, model);
+      ExoCache<Serializable, UserStateModel> cache = getUserStateCache();      
+      if (cache == null){
+        LOG.warn("Cant save user state of {} to cache",userId);
+      }else{
+        cache.put(userKey, model);
+      }
     } catch(Exception ex) {
       if (LOG.isErrorEnabled()) {
         LOG.error("save() failed because of ", ex);
@@ -103,7 +109,8 @@ public class UserStateService {
   public UserStateModel getUserState(String userId) {
     UserStateModel model = null;
     String repoName = CommonsUtils.getRepository().getConfiguration().getName();
-    String userKey = repoName + "_" + userId;
+    String userKey = repoName + "_" + userId;    
+    ExoCache<Serializable, UserStateModel> userStateCache = getUserStateCache();
     if(userStateCache != null && userStateCache.get(userKey) != null) {
       model = userStateCache.get(userKey);
     } else {
@@ -134,25 +141,24 @@ public class UserStateService {
     String status = DEFAULT_STATUS;
     String repoName = CommonsUtils.getRepository().getConfiguration().getName();
     String userKey = repoName + "_" + userId;
+    
+    ExoCache<Serializable, UserStateModel> userStateCache = getUserStateCache();
     if(userStateCache != null && userStateCache.get(userKey) != null) {
       status = userStateCache.get(userKey).getStatus();
-    }
-    int lastActivity = (int) (new Date().getTime()/1000);
+    }          
     UserStateModel model = getUserState(userId);
-    if(model != null) {
+    
+    int lastActivity = (int) (new Date().getTime()/1000);        
+    if((model != null) && (lastActivity - model.getLastActivity() > _delay_update_DB)) {
       model.setLastActivity(lastActivity);
+      save(model);
     } else {
       model = new UserStateModel();
-      model.setStatus(status);
-      model.setUserId(userId);      
-      model.setLastActivity(lastActivity);      
-    }    
-    pingCounter++;
-    if(pingCounter == 10) {
-      pingCounter = 0;
-      save(model);
-    }    
-    userStateCache.put(userKey, model);
+      model.setLastActivity(lastActivity);
+      model.setUserId(userId);
+      model.setStatus(status);      
+      userStateCache.put(userKey, model);
+    }        
   }
   
   //Get all users online
@@ -160,16 +166,25 @@ public class UserStateService {
     List<UserStateModel> onlineUsers = new ArrayList<UserStateModel>();
     List<UserStateModel> users = null;
     try {
-      users = (List<UserStateModel>) userStateCache.getCachedObjects();
+      ExoCache<Serializable, UserStateModel> userStateCache = getUserStateCache();
+      if (userStateCache == null){
+        LOG.warn("Cant get online users list from cache. Will return an empty list.");
+        return new ArrayList<UserStateModel>();
+      }
+      users = (List<UserStateModel>) userStateCache.getCachedObjects();     
       for (UserStateModel userStateModel : users) {
         int iDate = (int) (new Date().getTime()/1000);
         if(userStateModel.getLastActivity() >= (iDate - delay)) {
           onlineUsers.add(userStateModel);
-        }
+        }        
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Exception when getting online user: {}",e);
     }     
     return onlineUsers;
-  } 
+  }
+  
+  private ExoCache<Serializable, UserStateModel> getUserStateCache(){
+    return cacheService.getCacheInstance(UserStateService.class.getName() + CommonsUtils.getRepository().getConfiguration().getName()) ;     
+  }
 }
