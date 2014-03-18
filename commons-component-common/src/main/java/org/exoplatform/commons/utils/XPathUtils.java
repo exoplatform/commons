@@ -18,27 +18,32 @@
 
 package org.exoplatform.commons.utils;
 
+import org.exoplatform.services.jcr.impl.util.ISO9075;
+
 public class XPathUtils {
   
   /**
-   * Avoid the illegal xPath when user name starts with number or user name is an email 
+   * Avoid the illegal xPath 
    * @param path original path
-   * @return Escaped string by converting '@' character and/or the first number of user name to hexa character
+   * @return Escaped string by ISO9075
    */
   public static String escapeIllegalXPathName (String path) {
     if (path == null) return null;
     if (path.length() == 0) return "";
-    StringBuilder buffer = new StringBuilder();
+    StringBuilder encoded = new StringBuilder();
+    StringBuilder currentItem = new StringBuilder();
     for (int i = 0; i < path.length(); i++) {
-      char ch = path.charAt(i);
-      if ((Character.isDigit(ch) && (i == 0 || (i > 0 && path.charAt(i - 1) == '/'))) || ch == '@' ) {
-        buffer.append("_x");
-        buffer.append(String.format("%04x", (int) ch));
-        buffer.append("_");
+      if (path.charAt(i) == '/') {
+        if (currentItem != null && currentItem.length() > 0) {
+          encoded.append(ISO9075.encode(currentItem.toString()));
+          currentItem = new StringBuilder();
+        }
+        encoded.append('/');
       } else {
-      buffer.append(ch);
+        currentItem.append(path.charAt(i));
       }
     }
-    return buffer.toString();
+    if (currentItem != null && currentItem.length() > 0) encoded.append(ISO9075.encode(currentItem.toString()));
+    return encoded.toString();
   }
 }
