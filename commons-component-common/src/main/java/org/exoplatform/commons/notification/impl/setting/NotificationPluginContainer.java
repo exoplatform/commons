@@ -99,7 +99,8 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   @Override
   public void addChildPlugin(AbstractNotificationChildPlugin plugin) {
-    pluginMap.put(plugin.getKey(), plugin);
+    registerPlugin(plugin);
+    
     //
     List<String> parentIds = plugin.getParentPluginIds();
     NotificationKey parentKey;
