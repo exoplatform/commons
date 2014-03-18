@@ -62,40 +62,37 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   }
 
   @Override
-  public void registerChildPluginConfig(PluginConfig chidPluginConfig) {
-    pluginConfigs.add(chidPluginConfig);
-  }
-
-  @Override
   public void registerPluginConfig(PluginConfig pluginConfig) {
     pluginConfigs.add(pluginConfig);
-    PluginInfo providerData = new PluginInfo();
-    providerData.setType(pluginConfig.getPluginId())
-                .setOrder(Integer.valueOf(pluginConfig.getOrder()))
-                .setActive(isActive(pluginConfig.getPluginId(), true))
-                .setResourceBundleKey(pluginConfig.getResourceBundleKey())
-                .setBundlePath(pluginConfig.getTemplateConfig().getBundlePath())
-                .setDefaultConfig(pluginConfig.getDefaultConfig());
-    //
-    String groupId = pluginConfig.getGroupId();
-    GroupConfig gConfig = pluginConfig.getGroupConfig();
-    if(gConfig != null) {
-      groupId = gConfig.getId();
-    }
-    //
-    if (groupProviderMap.containsKey(groupId)) {
-      groupProviderMap.get(groupId).addProviderData(providerData);
-    } else if (groupId != null && groupId.length() > 0) {
-      GroupProvider groupProvider = new GroupProvider(groupId);
-      groupProvider.addProviderData(providerData);
-      if (gConfig != null) {
-        groupProvider.setOrder(Integer.valueOf(gConfig.getOrder()));
-        groupProvider.setResourceBundleKey(gConfig.getResourceBundleKey());
+    if(pluginConfig.isChildPlugin() == false) {
+      PluginInfo providerData = new PluginInfo();
+      providerData.setType(pluginConfig.getPluginId())
+                  .setOrder(Integer.valueOf(pluginConfig.getOrder()))
+                  .setActive(isActive(pluginConfig.getPluginId(), true))
+                  .setResourceBundleKey(pluginConfig.getResourceBundleKey())
+                  .setBundlePath(pluginConfig.getTemplateConfig().getBundlePath())
+                  .setDefaultConfig(pluginConfig.getDefaultConfig());
+      //
+      String groupId = pluginConfig.getGroupId();
+      GroupConfig gConfig = pluginConfig.getGroupConfig();
+      if(gConfig != null) {
+        groupId = gConfig.getId();
       }
-      groupProviderMap.put(groupId, groupProvider);
+      //
+      if (groupProviderMap.containsKey(groupId)) {
+        groupProviderMap.get(groupId).addProviderData(providerData);
+      } else if (groupId != null && groupId.length() > 0) {
+        GroupProvider groupProvider = new GroupProvider(groupId);
+        groupProvider.addProviderData(providerData);
+        if (gConfig != null) {
+          groupProvider.setOrder(Integer.valueOf(gConfig.getOrder()));
+          groupProvider.setResourceBundleKey(gConfig.getResourceBundleKey());
+        }
+        groupProviderMap.put(groupId, groupProvider);
+      }
+      
+      createParentNodeOfPlugin(pluginConfig.getPluginId());
     }
-    //
-    createParentNodeOfPlugin(pluginConfig.getPluginId());
   }
   
   @Override
