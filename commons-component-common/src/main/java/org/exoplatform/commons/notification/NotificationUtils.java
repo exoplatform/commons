@@ -31,7 +31,9 @@ import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.notification.template.DigestTemplate;
 import org.exoplatform.commons.notification.template.SimpleElement;
 import org.exoplatform.commons.notification.template.TemplateUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.organization.OrganizationService;
 
 
 public class NotificationUtils {
@@ -175,5 +177,13 @@ public class NotificationUtils {
       return false;
     }
     return true;
+  }
+  
+  public static boolean isDeletedMember(String userName) {
+    try {
+      return CommonsUtils.getService(OrganizationService.class).getUserHandler().findUserByName(userName) == null;
+    } catch (Exception e) {
+      return false;
+    }
   }
 }
