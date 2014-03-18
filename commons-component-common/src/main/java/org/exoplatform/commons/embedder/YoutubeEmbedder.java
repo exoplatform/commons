@@ -97,11 +97,24 @@ public class YoutubeEmbedder extends AbstractEmbedder {
       if (mediaGroupObject.has("media$description") == true) {
         description = mediaGroupObject.getJSONObject("media$description").getString("$t");
       }
+      String thumbnailURL = "";
+      String thumbnailWidth = "";
+      String thumbnailHeight = "";
+      if (mediaGroupObject.has("media$thumbnail") == true) {
+        JSONObject thumbnail = mediaGroupObject.getJSONArray("media$thumbnail").getJSONObject(0);
+        thumbnailURL = thumbnail.getString("url");
+        thumbnailWidth = thumbnail.getString("width");
+        thumbnailHeight = thumbnail.getString("height");
+      }
+
       //
       ExoMedia mediaObject = new ExoMedia();
       mediaObject.setTitle(title);
       mediaObject.setHtml(html);
       mediaObject.setDescription(description);
+      mediaObject.setThumbnailUrl(thumbnailURL);
+      mediaObject.setThumbnailHeight(thumbnailHeight);
+      mediaObject.setThumbnailWidth(thumbnailWidth);
 
       return mediaObject;    
     } catch (JSONException e) {

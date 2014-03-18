@@ -29,6 +29,9 @@ public class ExoMedia {
   private String html;
   // name of provider: youtube, vimeo,...
   private String provider;
+  private String thumbnailUrl;
+  private String thumbnailWidth;
+  private String thumbnailHeight;
   
   public void setTitle(String title) {
     this.title = title;
@@ -77,5 +80,45 @@ public class ExoMedia {
   public String getProvider() {
     return provider;
   }
+  /**
+   * @return the thumbnailUrl
+   */
+  public String getThumbnailUrl() {
+    return thumbnailUrl;
+  }
 
+  /**
+   * @param thumbnailUrl the thumbnailUrl to set
+   */
+  public void setThumbnailUrl(String thumbnailUrl) {
+    this.thumbnailUrl = thumbnailUrl;
+  }
+
+  /**
+   * @return the thumbnailWidth
+   */
+  public String getThumbnailWidth() {
+    return thumbnailWidth;
+  }
+
+  /**
+   * @param thumbnailWidth the thumbnailWidth to set
+   */
+  public void setThumbnailWidth(String thumbnailWidth) {
+    this.thumbnailWidth = thumbnailWidth;
+  }
+
+  /**
+   * @return the thumbnailHeight
+   */
+  public String getThumbnailHeight() {
+    return thumbnailHeight;
+  }
+
+  /**
+   * @param thumbnailHeight the thumbnailHeight to set
+   */
+  public void setThumbnailHeight(String thumbnailHeight) {
+    this.thumbnailHeight = thumbnailHeight;
+  }
 }
