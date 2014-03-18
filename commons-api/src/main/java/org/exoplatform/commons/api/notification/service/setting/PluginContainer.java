@@ -16,7 +16,10 @@
  */
 package org.exoplatform.commons.api.notification.service.setting;
 
+import java.util.List;
+
 import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 
 /**
@@ -33,12 +36,26 @@ public interface PluginContainer {
    * @return
    */
   AbstractNotificationPlugin getPlugin(NotificationKey key);
+  
+  /**
+   * Gets all children plugin keys in plugin
+   * 
+   * @param plugin The list of children plugins
+   */
+  List<NotificationKey> getChildPluginKeys(NotificationKey parentKey);
+  
 
   /**
    * Register plugin in Container
    * @param plugin
    */
-  void add(AbstractNotificationPlugin plugin);
+  void addPlugin(AbstractNotificationPlugin plugin);
+  
+  /**
+   * Register child plugin in Container
+   * @param childPlugin
+   */
+  void addChildPlugin(AbstractNotificationChildPlugin childPlugin);
 
   /**
    * Removes plugin in Container

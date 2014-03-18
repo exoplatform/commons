@@ -388,7 +388,7 @@
     <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
     <component-plugin>
       <name>notification.plugins</name>
-      <set-method>add</set-method>
+      <set-method>addPlugin</set-method>
       <type>org.exoplatform.commons.notification.impl.DigestDailyPlugin</type>
       <description>Initial information for plugin.</description>
       <init-params>
@@ -422,7 +422,7 @@
     <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
     <component-plugin>
       <name>notification.plugins</name>
-      <set-method>add</set-method>
+      <set-method>addPlugin</set-method>
       <type>org.exoplatform.commons.notification.impl.DigestWeeklyPlugin</type>
       <description>Initial information for plugin.</description>
       <init-params>

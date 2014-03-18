@@ -62,6 +62,11 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   }
 
   @Override
+  public void registerChildPluginConfig(PluginConfig chidPluginConfig) {
+    pluginConfigs.add(chidPluginConfig);
+  }
+
+  @Override
   public void registerPluginConfig(PluginConfig pluginConfig) {
     pluginConfigs.add(pluginConfig);
     PluginInfo providerData = new PluginInfo();
@@ -146,7 +151,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
     if(activeProviderIds.size() == 0) {
       Collections.sort(pluginConfigs, new ComparatorASC());
       for (PluginConfig pluginConfig : pluginConfigs) {
-        if (isActive(pluginConfig.getPluginId())) {
+        if (pluginConfig.isChildPlugin() == false && isActive(pluginConfig.getPluginId())) {
           activeProviderIds.add(pluginConfig.getPluginId());
         }
       }

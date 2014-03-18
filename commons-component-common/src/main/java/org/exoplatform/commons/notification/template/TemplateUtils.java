@@ -60,7 +60,7 @@ public class TemplateUtils {
   private static final int MAX_SUBJECT_LENGTH = 50;
   
   /**
-   * Process the Groovy template ascossiate with Template context to generate
+   * Process the Groovy template associate with Template context to generate
    * It will be use for digest mail
    * @param ctx
    * @return
@@ -76,8 +76,9 @@ public class TemplateUtils {
   
   /**
    * Generate the Groovy Template
-   * @param context
-   * @param template
+   * @param context The template context
+   * @param element The GroovyElemt
+   * @param out The Writer to writer template
    * @return
    */
   public static void loadGroovy(TemplateContext context, Element element, Writer out) {
@@ -88,10 +89,14 @@ public class TemplateUtils {
         groovyTemplate = loadGroovyTemplate(element.getTemplateConfig().getTemplatePath());
         element.template(groovyTemplate);
       }
-      GroovyTemplate gTemplate = new GroovyTemplate(groovyTemplate);
-      //
-      gTemplate.render(out, context);
+      if (groovyTemplate != null && groovyTemplate.length() > 0) {
+        GroovyTemplate gTemplate = new GroovyTemplate(groovyTemplate);
+        gTemplate.render(out, context);
+      }
+    } catch (ClassCastException e) {
+      throw new IllegalArgumentException("The function only load groovy with GroovyElement type.");
     } catch (Exception e) {
+      LOG.warn("Failed to load groovy template of plugin " + context.getPluginId() + "\n" + e.getMessage());
     }
   }
   
@@ -151,11 +156,11 @@ public class TemplateUtils {
   }
 
   /**
-   * Load the groovy template element.
+   * Load the Groovy template element.
    * 
-   * @param key
-   * @param language
-   * @return the groovy element
+   * @param pluginId The plugin's id
+   * @param language The language's id.
+   * @return The Groovy element
    */
   public static Element loadGroovyElement(String pluginId, String language) {
     TemplateConfig templateConfig = getTemplateConfig(pluginId);
@@ -292,7 +297,7 @@ public class TemplateUtils {
     ResourceBundle res = bundleService.getResourceBundle(resourcePath, locale);
     
     if (res == null || res.containsKey(key) == false) {
-      LOG.warn("Resource Bundle key not found. " + key);
+      LOG.warn("Resource Bundle key not found. " + key + " in source path: " + resourcePath);
       return key;
     }
 

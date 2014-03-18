@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
@@ -17,37 +18,34 @@ import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class NotificationServiceTest extends BaseCommonsTestCase {
   
-  private NotificationService notificationService;
-  
-  private NotificationDataStorage notificationDataStorage;
+  private NotificationService       notificationService;
+  private NotificationDataStorage   notificationDataStorage;
+  private NotificationConfiguration configuration;
   
   @Override
   public void setUp() throws Exception {
     super.setUp();
     notificationService = getService(NotificationService.class);
-    assertNotNull(notificationService);
+    configuration = getService(NotificationConfiguration.class);
     
     notificationDataStorage = getService(NotificationDataStorage.class);
-    assertNotNull(notificationDataStorage);
   }
   
   @Override
   public void tearDown() throws Exception {
-    // remove all notification node
-    Node homeNode = (Node) session.getItem("/eXoNotification/messageHome");
-    NodeIterator iterator = homeNode.getNodes();
-    while (iterator.hasNext()) {
-      Node node = (iterator.nextNode());
-      System.out.println("\n remove " + node.getPath());
-      node.remove();
-    }
-    session.save();
     super.tearDown();
   }
   
+  private Session getSession(SessionProvider sProvider) throws Exception {
+    ManageableRepository repository = repositoryService.getRepository(REPO_NAME);
+    return sProvider.getSession(WORKSPACE_NAME, repository);
+  }
+
   private NotificationInfo saveNotification() throws Exception {
     NotificationInfo notification = NotificationInfo.instance();
     Map<String, String> params = new HashMap<String, String>();
@@ -58,26 +56,29 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     addMixin(notification.getId());
     return notification;
   }
+  
+  public void testServiceNotNull() throws Exception {
+    assertNotNull(notificationService);
+    assertNotNull(configuration);
+    assertNotNull(notificationDataStorage);
+    saveNotification();
+  }
 
   public void testSave() throws Exception {
     NotificationInfo notification = saveNotification();
-    //
-    Node node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
-    assertNotNull(node);
     
-    NotificationInfo notification2 = fillModel(node);
+    NotificationInfo notification2 = getNotificationInfoByKeyIdAndParam("TestPlugin", "objectId=idofobject");
+    assertNotNull(notification2);
     
     assertTrue(notification2.equals(notification));
     
   }
   
   public void testNormalGetByUserAndRemoveMessagesSent() throws Exception {
-    NotificationConfiguration configuration = getService(NotificationConfiguration.class);
     configuration.setSendWeekly(false);
     NotificationInfo notification = saveNotification();
     UserSetting userSetting = UserSetting.getInstance();
-    userSetting.setUserId("root")
-               .addProvider("TestPlugin", FREQUENCY.DAILY);
+    userSetting.setUserId("root").addProvider("TestPlugin", FREQUENCY.DAILY);
     userSetting.setActive(true);
     
     Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(userSetting);
@@ -87,10 +88,8 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     
     assertTrue(list.get(0).equals(notification));
     // after sent, user demo will auto remove from property daily
-    Node node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
-    assertNotNull(node);
-    
-    NotificationInfo notification2 = fillModel(node);
+    NotificationInfo notification2 = getNotificationInfoByKeyIdAndParam("TestPlugin", "objectId=idofobject");
+    assertNotNull(notification2);
     
     assertEquals(0, notification2.getSendToDaily().length);
     
@@ -103,17 +102,15 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     
     notificationDataStorage.removeMessageAfterSent();
     
-    node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
-    assertNull(node);
+    notification2 = getNotificationInfoByKeyIdAndParam("TestPlugin", "objectId=idofobject");
+    assertNull(notification2);
   }
 
   public void testSpecialGetByUserAndRemoveMessagesSent() throws Exception {
-    NotificationConfiguration configuration = getService(NotificationConfiguration.class);
     NotificationInfo notification = NotificationInfo.instance();
     Map<String, String> params = new HashMap<String, String>();
     params.put("objectId", "idofobject");
-    notification.key("TestPlugin").setSendAll(true)
-                .setOwnerParameter(params).setOrder(1);
+    notification.key("TestPlugin").setSendAll(true).setOwnerParameter(params).setOrder(1);
     notificationDataStorage.save(notification);
     
     UserSetting userSetting = UserSetting.getInstance();
@@ -128,16 +125,16 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     
     assertTrue(list.get(0).equals(notification));
     // check value from node
-    Node node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
-    assertNotNull(node);
-    
-    assertEquals(NotificationInfo.FOR_ALL_USER, fillModel(node).getSendToDaily()[0]);
+    NotificationInfo notification2 = getNotificationInfoByKeyIdAndParam("TestPlugin", "objectId=idofobject");
+    assertNotNull(notification2);
+
+    assertEquals(NotificationInfo.FOR_ALL_USER, notification2.getSendToDaily()[0]);
     // remove value on property sendToDaily
     notificationDataStorage.removeMessageAfterSent();
 
     // after sent, the value on on property sendToDaily will auto removed
-    node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
-    assertEquals(0, fillModel(node).getSendToDaily().length);
+    notification2 = getNotificationInfoByKeyIdAndParam("TestPlugin", "objectId=idofobject");
+    assertEquals(0, notification2.getSendToDaily().length);
     
     // Test send to weekly
     configuration.setSendWeekly(true);
@@ -148,17 +145,23 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     
     notificationDataStorage.removeMessageAfterSent();
     
-    node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
-    assertNull(node);
+    notification2 = getNotificationInfoByKeyIdAndParam("TestPlugin", "objectId=idofobject");
+    assertNull(notification2);
   }
   
   
   private void addMixin(String msgId) throws Exception {
-    Node msgNode = getMessageNodeById(msgId);
-    if (msgNode != null) {
-      msgNode.addMixin("exo:datetime");
-      msgNode.setProperty("exo:dateCreated", Calendar.getInstance());
-      session.save();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      Session session = getSession(sProvider);
+      Node msgNode = getMessageNodeById(session, msgId);
+      if (msgNode != null) {
+        msgNode.addMixin("exo:datetime");
+        msgNode.setProperty("exo:dateCreated", Calendar.getInstance());
+        session.save();
+      }
+    } finally {
+      sProvider.close();
     }
   }
   
@@ -176,21 +179,30 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     return message;
   }
   
-  private Node getMessageNodeById(String msgId) throws Exception {
-    return getMessageNode(new StringBuffer("[fn:name() = '").append(msgId).append("']").toString(), "");
+  private Node getMessageNodeById(Session session, String msgId) throws Exception {
+    return getMessageNode(session, new StringBuffer("exo:name = '").append(msgId).append("'").toString(), "");
   }
 
-  private Node getMessageNodeByKeyIdAndParam(String key, String param) throws Exception {
-    key = "/" + key;
-    return getMessageNode(new StringBuffer("[jcr:like(@ntf:ownerParameter, '%").append(param).append("%')]").toString(), key);
+  private NotificationInfo getNotificationInfoByKeyIdAndParam(String key, String param) throws Exception {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      Session session = getSession(sProvider);
+      Node node = getMessageNode(session, new StringBuffer("ntf:ownerParameter LIKE '%").append(param).append("%'").toString(), key);
+      return fillModel(node);
+    } finally {
+      sProvider.close();
+    }
   }
   
-  private Node getMessageNode(String strQuery, String key) throws Exception {
-    StringBuffer queryBuffer = new StringBuffer("/jcr:root");
-    queryBuffer.append("/eXoNotification/messageHome").append(key).append("//element(*,").append("ntf:message").append(")").append(strQuery);
+  private Node getMessageNode(Session session, String strQuery, String key) throws Exception {
+    StringBuilder sqlQuery = new StringBuilder("SELECT * FROM ntf:message WHERE ");
+    if (key != null && key.length() > 0) {
+      sqlQuery.append(" jcr:path LIKE '").append("/eXoNotification/messageHome/").append(key).append("/%' AND ");
+    }
+    sqlQuery.append(strQuery);
 
     QueryManager qm = session.getWorkspace().getQueryManager();
-    Query query = qm.createQuery(queryBuffer.toString(), Query.XPATH);
+    Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
     NodeIterator iter = query.execute().getNodes();
     return (iter.getSize() > 0) ? iter.nextNode() : null;
   }

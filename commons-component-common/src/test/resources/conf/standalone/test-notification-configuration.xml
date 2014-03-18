@@ -33,6 +33,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.services.scheduler.JobSchedulerService</key>
+    <type>org.exoplatform.commons.notification.mock.MockJobSchedulerService</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.commons.api.notification.service.storage.NotificationService</key>
     <type>org.exoplatform.commons.notification.impl.service.NotificationServiceImpl</type>
   </component>
@@ -116,7 +121,7 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</key>
+    <key>org.exoplatform.commons.api.notification.service.setting.PluginContainer</key>
     <type>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</type>
   </component>
 
@@ -260,10 +265,10 @@
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</target-component>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
     <component-plugin>
       <name>notification.plugins</name>
-      <set-method>add</set-method>
+      <set-method>addPlugin</set-method>
       <type>org.exoplatform.commons.notification.impl.DigestDailyPlugin</type>
       <description>Initial information for plugin.</description>
       <init-params>
@@ -280,10 +285,10 @@
             <field name="templateConfig">
               <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
                 <field name="bundlePath">
-                  <string>locale.notification.template.CommonsNotification</string>
+                  <string>locale.notification.template.Notification</string>
                 </field>
                 <field name="templatePath">
-                  <string>war:/notification/templates/DigestDailyPlugin.gtmpl</string>
+                  <string>classpath:/groovy/notification/template/provider1.gtmpl</string>
                 </field>
               </object>
             </field>
@@ -294,10 +299,10 @@
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</target-component>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
     <component-plugin>
       <name>notification.plugins</name>
-      <set-method>add</set-method>
+      <set-method>addPlugin</set-method>
       <type>org.exoplatform.commons.notification.impl.DigestWeeklyPlugin</type>
       <description>Initial information for plugin.</description>
       <init-params>
@@ -314,10 +319,10 @@
             <field name="templateConfig">
               <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
                 <field name="bundlePath">
-                  <string>locale.notification.template.CommonsNotification</string>
+                  <string>locale.notification.template.Notification</string>
                 </field>
                 <field name="templatePath">
-                  <string>war:/notification/templates/DigestWeeklyPlugin.gtmpl</string>
+                  <string>classpath:/groovy/notification/template/provider1.gtmpl</string>
                 </field>
               </object>
             </field>
