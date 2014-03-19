@@ -49,5 +49,10 @@ public class TestNotificationUtils extends TestCase {
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
   }
 
+  public void testProcessLinkInActivityTitle() throws Exception {
+    String title = "<a href=\"www.yahoo.com\">Yahoo Site</a> is better than <a href=\"www.hotmail.com\">Hotmail Site</a>";
+    title = NotificationUtils.processLinkTitle(title);
+    assertEquals("<a href=\"www.yahoo.com\" style=\"text-decoration: none;\">Yahoo Site</a> is better than <a href=\"www.hotmail.com\" style=\"text-decoration: none;\">Hotmail Site</a>", title);
+  }
   
 }

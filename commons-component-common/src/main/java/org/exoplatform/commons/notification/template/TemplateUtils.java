@@ -66,8 +66,7 @@ public class TemplateUtils {
    * @return
    */
   public static String processGroovy(TemplateContext ctx) {
-    ElementCacheKey cacheKey = new ElementCacheKey(ctx.getPluginId(), ctx.getLanguage());
-    Element groovyElement = CommonsUtils.getService(TemplateCaching.class).getTemplateElement(cacheKey);
+    Element groovyElement = loadGroovyElement(ctx.getPluginId(), ctx.getLanguage());
     
     ElementVisitor visitor = new GroovyElementVisitor();
     String content = visitor.with(ctx).visit(groovyElement).out();

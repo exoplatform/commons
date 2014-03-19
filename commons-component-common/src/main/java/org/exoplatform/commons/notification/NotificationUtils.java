@@ -20,6 +20,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jcr.Value;
 import javax.mail.internet.AddressException;
@@ -49,6 +51,9 @@ public class NotificationUtils {
   public static final String DEFAULT_DIGEST_MORE_KEY   = "Notification.digest.more.{0}";
 
   public static final String FEATURE_NAME              = "notification";
+  
+  private static final Pattern LINK_PATTERN = Pattern.compile("<a ([^>]+)>([^<]+)</a>");
+  private static final String styleCSS = " style=\"color: #2f5e92; text-decoration: none;\"";
   
   public static String getDefaultKey(String key, String providerId) {
     return MessageFormat.format(key, providerId);
@@ -185,5 +190,20 @@ public class NotificationUtils {
     } catch (Exception e) {
       return false;
     }
+  }
+  
+  /**
+   * Add the style css for a link in the activity title to display a link without underline
+   * 
+   * @param title activity title
+   * @return activity title after process all link
+   */
+  public static String processLinkTitle(String title) {
+    Matcher matcher = LINK_PATTERN.matcher(title);
+    while (matcher.find()) {
+      String result = matcher.group(1);
+      title = title.replace(result, result + styleCSS);
+    }
+    return title;
   }
 }
