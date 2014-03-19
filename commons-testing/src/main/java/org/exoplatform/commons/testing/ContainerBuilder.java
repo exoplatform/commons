@@ -16,24 +16,17 @@
  */
 package org.exoplatform.commons.testing;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Vector;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import junit.framework.AssertionFailedError;
-
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.util.*;
 
 
 /**

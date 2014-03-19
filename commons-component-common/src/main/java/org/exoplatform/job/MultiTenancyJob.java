@@ -16,11 +16,6 @@
  */
 package org.exoplatform.job;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
@@ -34,13 +29,18 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.impl.JobDetailImpl;
 
+import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Created by The eXo Platform SAS Author : Lai Trung Hieu
  * hieult@exoplatform.com Aug 5, 2011
  */
 public abstract class MultiTenancyJob implements Job {
 
-  private static Log         LOG  = ExoLogger.getLogger(MultiTenancyJob.class);
+  private static final Log LOG  = ExoLogger.getLogger(MultiTenancyJob.class);
 
   public static final String COLON = ":".intern();
 

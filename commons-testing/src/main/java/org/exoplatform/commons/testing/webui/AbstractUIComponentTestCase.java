@@ -17,7 +17,6 @@
 package org.exoplatform.commons.testing.webui;
 
 import org.exoplatform.web.application.AbstractApplicationMessage;
-import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.core.UIApplication;
 import org.exoplatform.webui.core.UIComponent;
 
