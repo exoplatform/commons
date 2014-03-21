@@ -46,6 +46,14 @@
 	  </depends>
 	</module>
 
+        <module>
+          <name>xss-utils</name>
+          <script>
+            <path>/javascript/eXo/commons/XSSUtils.js</path>
+          </script>
+        </module>
+
+
 	<module>
 		<name>juzu-ajax</name>
 		<as>jzAjax</as>
