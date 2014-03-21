@@ -9,4 +9,5 @@
   <import>war:/conf/commons-extension/upgrade-configuration.xml</import>
   <import>war:/conf/commons-extension/webui-configuration.xml</import>
   <import>war:/conf/commons-extension/css-class-configuration.xml</import>
+  <import>war:/conf/commons-extension/notification-configuration.xml</import>
 </configuration>

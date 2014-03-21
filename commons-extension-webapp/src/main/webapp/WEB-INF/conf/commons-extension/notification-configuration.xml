@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+  xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+  
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.commons.api.settings.ExoFeatureService</key>
+    <type>org.exoplatform.settings.impl.ExoFeatureServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.storage.NotificationService</key>
+    <type>org.exoplatform.commons.notification.impl.service.NotificationServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
+    <type>org.exoplatform.commons.notification.impl.setting.UserSettingServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</key>
+    <type>org.exoplatform.commons.notification.impl.setting.PluginSettingServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.command.NotificationCommand</key>
+    <type>org.exoplatform.commons.notification.impl.command.NotificationCommandImpl</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.commons.notification.impl.PluginStatisticService</key>
+    <type>org.exoplatform.commons.notification.impl.PluginStatisticService</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.commons.notification.impl.StatisticsService</key>
+    <type>org.exoplatform.commons.notification.impl.StatisticsService</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.commons.notification.job.mbeans.DailyService</key>
+    <type>org.exoplatform.commons.notification.job.mbeans.DailyService</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.commons.notification.job.mbeans.WeeklyService</key>
+    <type>org.exoplatform.commons.notification.job.mbeans.WeeklyService</type>
+  </component>
+  
+  <component>
+    <type>org.exoplatform.commons.notification.NotificationContextFactory</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.template.DigestorService</key>
+    <type>org.exoplatform.commons.notification.impl.service.template.DigestorServiceImpl</type>
+  </component>
+
+	<component>
+		<key>org.exoplatform.commons.api.notification.service.QueueMessage</key>
+		<type>org.exoplatform.commons.notification.impl.service.QueueMessageImpl</type>
+		<init-params>
+			<value-param>
+				<name>numberOfMailPerBatch</name> <!-- Max number of mails to send in period time -->
+				<value>50</value>
+			</value-param>
+			<value-param>
+				<name>period</name><!-- The time to repeat interval call send email notification -->
+				<value>60</value>
+			</value-param>
+		</init-params>
+	</component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.NotificationConfiguration</type>
+    <init-params>
+      <value-param>
+        <name>workspace</name>
+        <value>portal-system</value>
+      </value-param>
+    </init-params>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.NotificationCompletionService</key>
+    <type>org.exoplatform.commons.api.notification.service.NotificationCompletionService</type>
+    <init-params>
+      <value-param>
+        <name>async-execution</name>
+        <value>true</value>
+      </value-param>
+      <value-param>
+        <name>thread-number</name>
+        <value>5</value>
+      </value-param>
+      <value-param>
+        <name>keepAliveTime</name> <!-- Time in seconds -->
+        <value>10</value>
+      </value-param>
+    </init-params>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.setting.PluginContainer</key>
+    <type>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.cache.TemplateCaching</type>
+  </component>
+  
+  <external-component-plugins>
+     <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>    
+     <component-plugin>
+     <name>AddCronJob</name>
+     <set-method>addCronJob</set-method>
+     <type>org.exoplatform.services.scheduler.CronJob</type>
+      <description>add a send daily notification job to the JobSchedulerService</description>
+      <init-params>
+        <properties-param>
+          <name>cronjob.info</name>
+          <description>Configuration for daily send notification</description>
+          <property name="jobName" value="NotificationDailyJob"/>
+          <property name="groupName" value="Notification"/>
+          <property name="job" value="org.exoplatform.commons.notification.job.NotificationDailyJob"/>
+          <property name="expression" value="${cronJob.notification.NotificationDailyJob.expression:0 0 23 ? * *}"/><!-- Run at 11:00pm every day -->
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+     <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>    
+     <component-plugin>
+     <name>AddCronJob</name>
+     <set-method>addCronJob</set-method>
+     <type>org.exoplatform.services.scheduler.CronJob</type>
+      <description>add a send weekly notification job to the JobSchedulerService</description>
+      <init-params>
+        <properties-param>
+          <name>cronjob.info</name>
+          <description>Configuration for weekly send notification</description>
+          <property name="jobName" value="NotificationWeeklyJob"/>
+          <property name="groupName" value="Notification"/>
+          <property name="job" value="org.exoplatform.commons.notification.job.NotificationWeeklyJob"/>
+          <property name="expression" value="${cronJob.notification.NotificationWeeklyJob.expression:0 0 11 ? * SUN}"/><!-- Run at 11:00am every Sunday in every month -->
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</target-component>
+    <component-plugin>
+      <name>notification.groups</name>
+      <set-method>registerGroupConfig</set-method>
+      <type>org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin</type>
+      <description>Initial the default groups.</description>
+      <init-params>
+        <object-param>
+          <name>group.general</name>
+          <description>The information of group general</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
+            <field name="id">
+              <string>general</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.group.General</string>
+            </field>
+            <field name="order">
+              <string>1</string>
+            </field>
+          </object>
+        </object-param>
+       
+        <object-param>
+          <name>group.connections</name>
+          <description>The information of group connections</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
+            <field name="id">
+              <string>connections</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.group.Connections</string>
+            </field>
+            <field name="order">
+              <string>2</string>
+            </field>
+          </object>
+        </object-param>
+       
+        <object-param>
+          <name>group.spaces</name>
+          <description>The information of group spaces</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
+            <field name="id">
+              <string>spaces</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.group.Spaces</string>
+            </field>
+            <field name="order">
+              <string>3</string>
+            </field>
+          </object>
+        </object-param>
+       
+        <object-param>
+          <name>group.activity.stream</name>
+          <description>The information of group activity stream</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
+            <field name="id">
+              <string>activity_stream</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.group.ActivityStream</string>
+            </field>
+            <field name="order">
+              <string>4</string>
+            </field>
+          </object>
+        </object-param>
+       
+        <object-param>
+          <name>group.other</name>
+          <description>The information of group activity other</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
+            <field name="id">
+              <string>other</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.group.Other</string>
+            </field>
+            <field name="order">
+              <string>99</string>
+            </field>
+          </object>
+        </object-param>
+       
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator</target-component>
+    <component-plugin>
+      <name>addPaths</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.jcr.ext.hierarchy.impl.AddPathPlugin</type>
+      <init-params>
+        <object-param>
+          <name>notification.configuration</name>
+          <description>configuration for the notification path</description>
+          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
+            <field name="workspaces">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <string>portal-system</string>
+                </value>
+              </collection>
+            </field>
+            <field name="jcrPaths">
+              <collection type="java.util.ArrayList">
+                <value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>stgSettings</string></field>
+                    <field  name="path"><string>/settings</string></field>
+                    <field name="nodeType"><string>stg:settings</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">               
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>                
+                            <field name="addNode"><string>true</string></field>                
+                            <field name="setProperty"><string>true</string></field>                
+                            <field name="remove"><string>true</string></field>                
+                          </object>  
+                        </value>                        
+                      </collection>
+                    </field>                       
+                  </object>
+                </value>
+                <value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>stgUsers</string></field>
+                    <field  name="path"><string>/settings/user</string></field>
+                    <field name="nodeType"><string>stg:subcontext</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">               
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>                
+                            <field name="addNode"><string>true</string></field>                
+                            <field name="setProperty"><string>true</string></field>                
+                            <field name="remove"><string>true</string></field>                
+                          </object>  
+                        </value>                        
+                      </collection>
+                    </field>                       
+                  </object>
+                </value>
+                <value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>stgGlobal</string></field>
+                    <field  name="path"><string>/settings/global</string></field>
+                    <field name="nodeType"><string>stg:simplecontext</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">               
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>                
+                            <field name="addNode"><string>true</string></field>                
+                            <field name="setProperty"><string>true</string></field>                
+                            <field name="remove"><string>true</string></field>                
+                          </object>  
+                        </value>                        
+                      </collection>
+                    </field>                       
+                  </object>
+                </value>
+
+                <value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>eXoNotification</string></field>
+                    <field  name="path"><string>/eXoNotification</string></field>
+                    <field name="nodeType"><string>ntf:notification</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">               
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>                
+                            <field name="addNode"><string>true</string></field>                
+                            <field name="setProperty"><string>true</string></field>                
+                            <field name="remove"><string>true</string></field>                
+                          </object>  
+                        </value>                        
+                      </collection>
+                    </field>                       
+                  </object>
+                </value>
+                <value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>ntfMessageHome</string></field>
+                    <field  name="path"><string>/eXoNotification/messageHome</string></field>
+                    <field name="nodeType"><string>ntf:messageHome</string></field>
+                    <field name="mixinTypes">
+                      <collection type="java.util.ArrayList">
+                        <value><string>mix:subMessageHome</string></value>
+                      </collection>
+                    </field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">               
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>                
+                            <field name="addNode"><string>true</string></field>                
+                            <field name="setProperty"><string>true</string></field>                
+                            <field name="remove"><string>true</string></field>                
+                          </object>  
+                        </value>                        
+                      </collection>
+                    </field>                       
+                  </object>
+                </value>
+
+              </collection>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
+    <component-plugin>
+      <name>notification.plugins</name>
+      <set-method>add</set-method>
+      <type>org.exoplatform.commons.notification.impl.DigestDailyPlugin</type>
+      <description>Initial information for plugin.</description>
+      <init-params>
+        <object-param>
+          <name>template.DigestDailyPlugin</name>
+          <description>The template of DigestDailyPlugin</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
+            <field name="pluginId">
+              <string>DigestDailyPlugin</string>
+            </field>
+            <field name="groupId">
+              <string></string>
+            </field>
+            <field name="templateConfig">
+              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
+                <field name="bundlePath">
+                  <string>locale.notification.template.CommonsNotification</string>
+                </field>
+                <field name="templatePath">
+                  <string>war:/notification/templates/DigestDailyPlugin.gtmpl</string>
+                </field>
+              </object>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
+    <component-plugin>
+      <name>notification.plugins</name>
+      <set-method>add</set-method>
+      <type>org.exoplatform.commons.notification.impl.DigestWeeklyPlugin</type>
+      <description>Initial information for plugin.</description>
+      <init-params>
+        <object-param>
+          <name>template.DigestWeeklyPlugin</name>
+          <description>The template of DigestWeeklyPlugin</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
+            <field name="pluginId">
+              <string>DigestWeeklyPlugin</string>
+            </field>
+            <field name="groupId">
+              <string></string>
+            </field>
+            <field name="templateConfig">
+              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
+                <field name="bundlePath">
+                  <string>locale.notification.template.CommonsNotification</string>
+                </field>
+                <field name="templatePath">
+                  <string>war:/notification/templates/DigestWeeklyPlugin.gtmpl</string>
+                </field>
+              </object>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  
+</configuration>

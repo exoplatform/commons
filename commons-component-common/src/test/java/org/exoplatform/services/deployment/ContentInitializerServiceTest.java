@@ -15,18 +15,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.exoplatform.services.deployment;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import java.util.List;
+
 import javax.jcr.Node;
+
+import junit.framework.TestCase;
+
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import junit.framework.TestCase;
-import static org.mockito.Mockito.*;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform annb@exoplatform.com May

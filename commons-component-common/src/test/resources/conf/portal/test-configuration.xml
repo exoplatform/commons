@@ -105,5 +105,7 @@
 		</component-plugin>
 	</external-component-plugins>
 
+	<import>classpath:/conf/standalone/test-commons-configuration.xml</import>
+	<import>classpath:/conf/standalone/test-notification-configuration.xml</import>
 	<import>classpath:/conf/standalone/test-conteninitializerservice-configuration.xml</import>
 </configuration>

@@ -1,5 +1,6 @@
 package org.exoplatform.commons.utils;
 
+import org.exoplatform.commons.api.settings.ExoFeatureService;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
@@ -96,4 +97,8 @@ public class CommonsUtils {
         return portalContainerConfig.getRestContextName(containerInfo.getContainerName());
       }    
 
+    public static boolean isFeatureActive(String featureName) {
+      ExoFeatureService featureService = getService(ExoFeatureService.class);
+      return featureService.isActiveFeature(featureName);
+    }
 }
