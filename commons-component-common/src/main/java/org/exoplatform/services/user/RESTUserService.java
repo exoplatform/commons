@@ -16,9 +16,10 @@
  */
 package org.exoplatform.services.user;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -28,10 +29,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 import org.json.JSONArray;
@@ -42,7 +40,6 @@ import org.json.JSONObject;
 
 @Path("/state/")
 public class RESTUserService implements ResourceContainer{
-  private static final Log LOG = ExoLogger.getLogger(RESTUserService.class);
   private final UserStateService userService;
   
   protected static final String ACTIVITY  = "activity";
@@ -63,7 +60,7 @@ public class RESTUserService implements ResourceContainer{
   }
   
   @GET
-  @Path("/online/")
+  @Path("/status/")
   @RolesAllowed("users")
   public Response online() throws ParserConfigurationException, JSONException {
     List<UserStateModel> usersOnline = userService.online();  
@@ -73,10 +70,13 @@ public class RESTUserService implements ResourceContainer{
       UserStateModel model = usersOnline.get(i);
       JSONObject object = new JSONObject();      
       object.put("userId", model.getUserId());
-      object.put("lastActivity", model.getLastActivity());
+      Date date = new Date(model.getLastActivity());
+      DateFormat ISO_8601_DATE_TIME = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+      String lastActivityDate = ISO_8601_DATE_TIME.format(date);
+      object.put("lastActivityDate", lastActivityDate);
       object.put("status", model.getStatus());
-      int iDate = (int) (new Date().getTime()/1000);
-      int lastActivity = model.getLastActivity();
+      long iDate = new Date().getTime();
+      long lastActivity = model.getLastActivity();
       if(lastActivity >= (iDate - UserStateService.delay)) {
         object.put("activity", "online");
       } else {
@@ -97,10 +97,13 @@ public class RESTUserService implements ResourceContainer{
     object.put("activity", "offline");
     if(model != null) {
       object.put("userId", model.getUserId());
-      object.put("lastActivity", model.getLastActivity());
+      Date date = new Date(model.getLastActivity());
+      DateFormat ISO_8601_DATE_TIME = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+      String lastActivityDate = ISO_8601_DATE_TIME.format(date);
+      object.put("lastActivityDate", lastActivityDate);
       object.put("status", model.getStatus());
-      int iDate = (int) (new Date().getTime()/1000);
-      int lastActivity = model.getLastActivity();
+      long iDate = new Date().getTime();
+      long lastActivity = model.getLastActivity();
       if(lastActivity >= (iDate - UserStateService.delay)) {
         object.put("activity", "online");
       } 
@@ -119,7 +122,5 @@ public class RESTUserService implements ResourceContainer{
       return Response.ok().build();
     }
     return Response.notModified().build();
-  }
-  
-  
+  } 
 }

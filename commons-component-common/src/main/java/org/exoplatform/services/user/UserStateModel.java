@@ -21,7 +21,7 @@ public class UserStateModel {
   
   private String userId = null;
       
-  private int lastActivity = 0;
+  private long lastActivity = 0;
   
   private String status = null;
   
@@ -33,11 +33,11 @@ public class UserStateModel {
     this.userId = userId;
   }
   
-  public int getLastActivity() {
+  public long getLastActivity() {
     return this.lastActivity;
   }
   
-  public void setLastActivity(int lastActivity) {
+  public void setLastActivity(long lastActivity) {
     this.lastActivity = lastActivity;
   }
   

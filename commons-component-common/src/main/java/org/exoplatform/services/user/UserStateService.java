@@ -52,8 +52,8 @@ public class UserStateService {
   public static String LAST_ACTIVITY_PROP = "exo:lastActivity";
   public static String STATUS_PROP = "exo:status";
   public static String DEFAULT_STATUS = "available";
-  public static int delay = 60;
-  public static final int _delay_update_DB = 3*60; //3 mins
+  public static int delay = 60*1000;
+  public static final int _delay_update_DB = 3*60*1000; //3 mins
   public static int pingCounter = 0;
   
   private static CacheService cacheService;
@@ -68,7 +68,7 @@ public class UserStateService {
   public void save(UserStateModel model) {
     String userId = model.getUserId();
     String status = model.getStatus();
-    int lastActivity = model.getLastActivity();  
+    long lastActivity = model.getLastActivity();  
     
     SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
     NodeHierarchyCreator nodeHierarchyCreator = CommonsUtils.getService(NodeHierarchyCreator.class);    
@@ -148,7 +148,7 @@ public class UserStateService {
     }          
     UserStateModel model = getUserState(userId);
     
-    int lastActivity = (int) (new Date().getTime()/1000);        
+    long lastActivity = new Date().getTime();        
     if((model != null) && (lastActivity - model.getLastActivity() > _delay_update_DB)) {
       model.setLastActivity(lastActivity);
       save(model);
@@ -173,7 +173,7 @@ public class UserStateService {
       }
       users = (List<UserStateModel>) userStateCache.getCachedObjects();     
       for (UserStateModel userStateModel : users) {
-        int iDate = (int) (new Date().getTime()/1000);
+        int iDate = (int) (new Date().getTime());
         if(userStateModel.getLastActivity() >= (iDate - delay)) {
           onlineUsers.add(userStateModel);
         }        
