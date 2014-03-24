@@ -4,7 +4,6 @@
 	xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
 
-
 	<component>
 		<key>org.exoplatform.commons.api.event.EventManager</key>
 		<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
@@ -51,8 +50,7 @@
   </component>
 
 	<external-component-plugins>
-		<target-component>org.exoplatform.commons.chromattic.ChromatticManager
-		</target-component>
+		<target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
 		<component-plugin>
 			<name>chromattic</name>
 			<set-method>addLifeCycle</set-method>
@@ -79,11 +77,8 @@
 		</component-plugin>
 	</external-component-plugins>
 
-
-
 	<external-component-plugins>
-		<target-component>org.exoplatform.services.jcr.RepositoryService
-		</target-component>
+		<target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
 		<component-plugin>
 			<name>add.nodeType</name>
 			<set-method>addPlugin</set-method>
@@ -93,6 +88,7 @@
 					<name>autoCreatedInNewRepository</name>
 					<description>Node types configuration file</description>
 					<value>jar:/conf/settings-nodetypes.xml</value>
+					<value>jar:/conf/notification-nodetypes.xml</value>
 				</values-param>
 			</init-params>
 		</component-plugin>
@@ -104,11 +100,12 @@
 				<properties-param>
 					<name>namespaces</name>
 					<property name="stg" value="http://www.gatein.org/jcr/stg/1.0/" />
+					<property name="ntf" value="http://www.gatein.org/jcr/ntf/1.0/" />
 				</properties-param>
 			</init-params>
 		</component-plugin>
 	</external-component-plugins>
-	 <external-component-plugins>
+	<external-component-plugins>
     <target-component>org.exoplatform.services.cache.CacheService</target-component>
     <!-- SettingService configuration -->
     <component-plugin>
@@ -128,7 +125,25 @@
               <int>${cache.exo.commons.SettingService.Capacity:2000}</int>
             </field>
             <field name="liveTime">
-              <long>${cache.exo.commons.SettingService.TimeToLive:60000}</long>
+              <long>${cache.exo.commons.SettingService.TimeToLive:30000}</long>
+            </field>
+            <field name="implementation">
+              <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
+            </field>
+          </object>
+        </object-param>
+        <object-param>
+          <name>cache.config.TemplateGenerator</name>
+          <description>The JBoss Cache configuration for the template generator</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name">
+              <string>TemplateGenerator</string>
+            </field>
+            <field name="maxSize">
+              <int>${cache.exo.commons.TemplateGenerator.Capacity:2000}</int>
+            </field>
+            <field name="liveTime">
+              <long>${cache.exo.commons.TemplateGenerator.TimeToLive:600000}</long>
             </field>
             <field name="implementation">
               <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
@@ -155,6 +170,24 @@
             </field>
             <field name="maxNodes">
               <int>${cache.exo.commons.SettingService.MaxNodes:5000}</int>
+            </field>
+            <field name="distributed">
+              <boolean>true</boolean>
+            </field>
+          </object>
+        </object-param>
+        <object-param>
+          <name>cache.config.TemplateGenerator</name>
+          <description>The JBoss Cache configuration for the navigation service</description>
+          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
+            <field name="name">
+              <string>TemplateGenerator</string>
+            </field>
+            <field name="expirationTimeout">
+              <long>${cache.exo.commons.TemplateGenerator.ExpirationTimeout:600000}</long>
+            </field>
+            <field name="maxNodes">
+              <int>${cache.exo.commons.TemplateGenerator.MaxNodes:5000}</int>
             </field>
             <field name="distributed">
               <boolean>true</boolean>

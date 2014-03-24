@@ -7,11 +7,10 @@ import javax.jcr.Session;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ObjectParameter;
-import org.exoplatform.services.jcr.ext.app.SessionProviderService;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
-
 import org.exoplatform.services.deployment.DeploymentDescriptor;
 import org.exoplatform.services.deployment.DeploymentDescriptor.Target;
+import org.exoplatform.services.jcr.ext.app.SessionProviderService;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 /*
  * JUnit test suite for org.exoplatform.services.deployment.plugins.XMLDeploymentPluginTest, 
