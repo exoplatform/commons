@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -28,6 +29,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -37,14 +39,18 @@ import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.UserImpl;
+import org.picocontainer.Startable;
 
-public class UserSettingServiceImpl extends AbstractService implements UserSettingService {
+public class UserSettingServiceImpl extends AbstractService implements UserSettingService, Startable {
   private static final Log        LOG                = ExoLogger.getLogger(UserSettingServiceImpl.class);
 
   /** Setting Scope on Common Setting **/
@@ -56,10 +62,15 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   private NotificationConfiguration configuration;
 
+  private NotificationCompletionService completeService;
+  
+  protected static final int MAX_LIMIT = 30;
+  
   public UserSettingServiceImpl(SettingService settingService, NotificationConfiguration configuration) {
     this.settingService = settingService;
     this.configuration = configuration;
     this.workspace = configuration.getWorkspace();
+    this.completeService = CommonsUtils.getService(NotificationCompletionService.class);
   }
 
   private Node getUserSettingHome(Session session) throws Exception {
@@ -73,6 +84,59 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     }
     return userHomeNode;
   }
+
+  @Override
+  public void start() {
+    Callable<Boolean> callable = new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        try {
+          SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+          if (hasUserToUpgrade(sProvider)) {
+            processUpgrade();
+          }
+        } catch (Exception e) {
+          return false;
+        } finally {
+          NotificationSessionManager.closeSessionProvider();
+        }
+        return true;
+      }
+
+      private boolean hasUserToUpgrade(SessionProvider sProvider) {
+        try {
+          Session session = getSession(sProvider, workspace);
+          return session.getRootNode().getNode(SETTING_USER_PATH).getNodes().hasNext() == false;
+        } catch (Exception e) {
+          LOG.error("Cannot get node of users.", e);
+          return false;
+        }
+      }
+    };
+
+    this.completeService.addTask(callable);
+  }
+
+  @Override
+  public void stop() {
+  }
+  
+  private void processUpgrade() {
+    OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
+    try {
+      ListAccess<User> list = organizationService.getUserHandler().findAllUsers();
+      int offset = 0, size = list.getSize();
+      //
+      SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+      while (offset < size) {
+        addMixin(sProvider, list.load(offset, MAX_LIMIT));
+        offset += MAX_LIMIT;
+      }
+    } catch (Exception e) {
+      LOG.error("Upgrade old users to use notification default setting failed", e);
+    }
+  }
+
 
   @Override
   public void save(UserSetting model) {
@@ -153,10 +217,23 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   public void addMixin(User[] users) {
     SessionProvider sProvider = getSystemProvider();
     try {
+      addMixin(sProvider, users);
+    } catch (Exception e) {
+      LOG.error("Failed to add mixin for default setting of users", e);
+    }
+  }
+
+  private void addMixin(SessionProvider sProvider, User[] users) {
+    try {
+      //
       Session session = getSession(sProvider, workspace);
       Node userHomeNode = getUserSettingHome(session);
       Node userNode;
-      for (User user : users) {
+      for (int i = 0; i < users.length; ++i) {
+        User user = users[i];
+        if (user == null || user.getUserName() == null) {
+          continue;
+        }
         if (userHomeNode.hasNode(user.getUserName())) {
           userNode = userHomeNode.getNode(user.getUserName());
         } else {
@@ -169,7 +246,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
       session.save();
     } catch (Exception e) {
-      LOG.error("Failed to add mixin for default setting of users", e);
+      LOG.error("Failed to upgrade user notification setting", e);
     }
   }
 
@@ -342,6 +419,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
             .append("/%' AND NOT jcr:path LIKE '/").append(SETTING_USER_PATH).append("/%/%'");
 
     QueryManager qm = session.getWorkspace().getQueryManager();
+    System.out.println(strQuery.toString());
     QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
     if (limit > 0) {
       query.setLimit(limit);
@@ -392,4 +470,5 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     }
     return 0;
   }
+
 }
