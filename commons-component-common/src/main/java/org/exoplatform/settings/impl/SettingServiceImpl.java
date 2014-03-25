@@ -29,15 +29,8 @@ import org.exoplatform.settings.chromattic.SynchronizationTask;
  */
 public class SettingServiceImpl implements SettingService {
 
-  private final static ChromatticLifeCycle chromatticLifeCycle;
-  static {
-    PortalContainer container = PortalContainer.getInstance();
-    ChromatticManager manager = (ChromatticManager) container.getComponentInstanceOfType(ChromatticManager.class);
-     chromatticLifeCycle = (ChromatticLifeCycle) manager.getLifeCycle("setting");
-    if (chromatticLifeCycle == null) {
-      throw new NullPointerException("Lifecycle Setting null");
-    }
-  }
+  private final ChromatticLifeCycle chromatticLifeCycle;
+
   private final EventManagerImpl<SettingServiceImpl, SettingData> eventManager;
   
   /**
@@ -46,8 +39,12 @@ public class SettingServiceImpl implements SettingService {
    * @throws NullPointerException
    * @LevelAPI Experimental
    */
-  public SettingServiceImpl(EventManagerImpl<SettingServiceImpl, SettingData> eventManager) throws NullPointerException {
-    this.eventManager = eventManager;
+  public SettingServiceImpl(EventManagerImpl<SettingServiceImpl, SettingData> eventManager, ChromatticManager chromatticManager) throws NullPointerException {
+      chromatticLifeCycle = (ChromatticLifeCycle) chromatticManager.getLifeCycle("setting");
+      if (chromatticLifeCycle == null) {
+          throw new NullPointerException("Lifecycle Setting null");
+      }
+      this.eventManager = eventManager;
   }
 
   public void set(final Context context, final Scope scope, final String key, final SettingValue<?> value) {
@@ -240,7 +237,7 @@ public class SettingServiceImpl implements SettingService {
     
   }
 
-  public static boolean startSynchronization() {
+  public boolean startSynchronization() {
     if (chromatticLifeCycle.getManager().getSynchronization() == null) {
       chromatticLifeCycle.getManager().beginRequest();
       return true;
@@ -248,7 +245,7 @@ public class SettingServiceImpl implements SettingService {
     return false;
   }
 
-  public static void stopSynchronization(boolean requestClose) {
+  public void stopSynchronization(boolean requestClose) {
     if (requestClose) {
       chromatticLifeCycle.getManager().endRequest(true);
     }

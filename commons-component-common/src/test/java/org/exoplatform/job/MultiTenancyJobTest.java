@@ -16,11 +16,11 @@
  */
 package org.exoplatform.job;
 
+import static org.easymock.EasyMock.createNiceMock;
+
 import java.util.Date;
 
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
-import static org.easymock.EasyMock.createNiceMock;
-
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;

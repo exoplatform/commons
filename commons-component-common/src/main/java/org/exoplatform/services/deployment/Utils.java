@@ -33,11 +33,8 @@ import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.configuration.ConfigurationManager;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.impl.core.NodeImpl;
 import org.exoplatform.services.jcr.util.VersionHistoryImporter;
@@ -223,7 +220,7 @@ public class Utils {
   
   public static String sanitize(String value) {
     try {
-      ConfigurationManager configMan = getService(ConfigurationManager.class);
+      ConfigurationManager configMan = CommonsUtils.getService(ConfigurationManager.class);
       Policy policy = Policy.getInstance(configMan.getResource(POLICY_FILE_LOCATION));
       AntiSamy as = new AntiSamy();
       CleanResults cr = as.scan(value, policy);
@@ -244,26 +241,17 @@ public class Utils {
   }
   
   /**
-   * Gets the service.
-   *
-   * @param clazz the clazz
-   *
-   * @return the service
+   * @deprecated use {@link CommonsUtils#getService(Class)}
    */
   public static <T> T getService(Class<T> clazz) {
-    return getService(clazz, null);
+    return CommonsUtils.getService(clazz);
   }
   
+  /**
+   * @deprecated use {@link CommonsUtils#getService(Class, String)}
+   */
   public static <T> T getService(Class<T> clazz, String containerName) {
-    ExoContainer container = ExoContainerContext.getCurrentContainer();
-    if (containerName != null) {
-      container = RootContainer.getInstance().getPortalContainer(containerName);
-    }
-    if (container.getComponentInstanceOfType(clazz)==null) {
-      containerName = PortalContainer.getCurrentPortalContainerName();
-      container = RootContainer.getInstance().getPortalContainer(containerName);
-    }
-    return clazz.cast(container.getComponentInstanceOfType(clazz));
+    return CommonsUtils.getService(clazz, containerName);
   }
   
 }

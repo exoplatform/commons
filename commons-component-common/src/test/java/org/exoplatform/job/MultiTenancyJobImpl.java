@@ -16,7 +16,6 @@
  */
 package org.exoplatform.job;
 
-import org.exoplatform.job.MultiTenancyJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 

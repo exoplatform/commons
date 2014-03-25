@@ -54,11 +54,10 @@ public enum Context {
    * @LevelAPI Experimental
    */
   public String getId() {
+    if (id != null)
+      return id;
     ConversationState state = ConversationState.getCurrent();
-    String userId = (state != null) ? state.getIdentity().getUserId() : null;
-    id = (userId != null) ? userId : id;
-    //TODO: throws NullPointException if id is null
-    return id;
+    return (state != null) ? state.getIdentity().getUserId() : null;
   }
 
 }

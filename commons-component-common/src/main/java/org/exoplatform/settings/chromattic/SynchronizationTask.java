@@ -18,6 +18,7 @@ package org.exoplatform.settings.chromattic;
   
   import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
   import org.exoplatform.commons.chromattic.SessionContext;
+  import org.exoplatform.container.PortalContainer;
   import org.exoplatform.settings.impl.SettingServiceImpl;
   
   /**
@@ -38,12 +39,14 @@ package org.exoplatform.settings.chromattic;
       * @return a value
       */
     public final V executeWith(ChromatticLifeCycle lifeCycle) {
-      boolean created = SettingServiceImpl.startSynchronization();
+        PortalContainer container = PortalContainer.getInstance();
+        SettingServiceImpl settingServiceImpl = (SettingServiceImpl) container.getComponentInstanceOfType(SettingServiceImpl.class);
+      boolean created = settingServiceImpl.startSynchronization();
       try {
         return execute(lifeCycle.getContext());
       }
       finally {
-        SettingServiceImpl.stopSynchronization(created);
+          settingServiceImpl.stopSynchronization(created);
       }
     }
   
