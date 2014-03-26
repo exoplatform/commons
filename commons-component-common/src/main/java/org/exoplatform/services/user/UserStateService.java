@@ -116,9 +116,14 @@ public class UserStateService {
     } else {
       SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
       NodeHierarchyCreator nodeHierarchyCreator = CommonsUtils.getService(NodeHierarchyCreator.class);
-      try{
-        Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);        
-        if(!userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) return null;        
+      Node userNodeApp = null;
+      try {
+        userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
+      } catch (Exception e) {
+        //Do nothing
+      } 
+      try{               
+        if(userNodeApp == null || !userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) return null;        
         Node userState = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
         model = new UserStateModel();
         model.setUserId(userState.getProperty(USER_ID_PROP).getString());
