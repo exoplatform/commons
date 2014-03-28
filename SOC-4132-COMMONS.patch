@@ -1,0 +1,187 @@
+diff --git a/commons-component-common/src/main/java/org/exoplatform/commons/notification/NotificationUtils.java b/commons-component-common/src/main/java/org/exoplatform/commons/notification/NotificationUtils.java
+index ff5d555..4e99e1d 100644
+--- a/commons-component-common/src/main/java/org/exoplatform/commons/notification/NotificationUtils.java
++++ b/commons-component-common/src/main/java/org/exoplatform/commons/notification/NotificationUtils.java
+@@ -31,9 +31,7 @@ import org.exoplatform.commons.api.notification.template.Element;
+ import org.exoplatform.commons.notification.template.DigestTemplate;
+ import org.exoplatform.commons.notification.template.SimpleElement;
+ import org.exoplatform.commons.notification.template.TemplateUtils;
+-import org.exoplatform.commons.utils.CommonsUtils;
+ import org.exoplatform.container.xml.InitParams;
+-import org.exoplatform.services.organization.OrganizationService;
+ 
+ 
+ public class NotificationUtils {
+@@ -178,12 +176,4 @@ public class NotificationUtils {
+     }
+     return true;
+   }
+-  
+-  public static boolean isDeletedMember(String userName) {
+-    try {
+-      return CommonsUtils.getService(OrganizationService.class).getUserHandler().findUserByName(userName) == null;
+-    } catch (Exception e) {
+-      return false;
+-    }
+-  }
+ }
+diff --git a/commons-component-common/src/main/java/org/exoplatform/commons/notification/impl/service/NotificationServiceImpl.java b/commons-component-common/src/main/java/org/exoplatform/commons/notification/impl/service/NotificationServiceImpl.java
+index 7fde944..4d0165d 100644
+--- a/commons-component-common/src/main/java/org/exoplatform/commons/notification/impl/service/NotificationServiceImpl.java
++++ b/commons-component-common/src/main/java/org/exoplatform/commons/notification/impl/service/NotificationServiceImpl.java
+@@ -35,7 +35,6 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationData
+ import org.exoplatform.commons.api.notification.service.storage.NotificationService;
+ import org.exoplatform.commons.api.notification.service.template.DigestorService;
+ import org.exoplatform.commons.notification.NotificationContextFactory;
+-import org.exoplatform.commons.notification.NotificationUtils;
+ import org.exoplatform.commons.notification.impl.AbstractService;
+ import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+ import org.exoplatform.commons.utils.CommonsUtils;
+@@ -179,7 +178,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
+     
+     for (UserSetting userSetting : userSettings) {
+       
+-      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
++      if (!userSetting.isActive()) {
+         continue;
+       }
+       
+diff --git a/commons-component-common/src/main/java/org/exoplatform/settings/listeners/impl/CommonsUserSettingEventListenerImpl.java b/commons-component-common/src/main/java/org/exoplatform/settings/listeners/impl/CommonsUserSettingEventListenerImpl.java
+new file mode 100644
+index 0000000..1b2e52a
+--- /dev/null
++++ b/commons-component-common/src/main/java/org/exoplatform/settings/listeners/impl/CommonsUserSettingEventListenerImpl.java
+@@ -0,0 +1,31 @@
++package org.exoplatform.settings.listeners.impl;
++
++import org.exoplatform.commons.api.notification.model.UserSetting;
++import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
++import org.exoplatform.commons.utils.CommonsUtils;
++import org.exoplatform.services.log.ExoLogger;
++import org.exoplatform.services.log.Log;
++import org.exoplatform.services.organization.User;
++import org.exoplatform.services.organization.UserEventListener;
++
++/**
++ * This listener is called when an user was deleted from the system
++ * This will set this user as inactive
++ *
++ */
++public class CommonsUserSettingEventListenerImpl extends UserEventListener {
++
++  private static Log LOG = ExoLogger.getLogger(CommonsUserSettingEventListenerImpl.class);
++  
++  @Override
++  public void postDelete(User user) throws Exception {
++    UserSettingService userSettingService = CommonsUtils.getService(UserSettingService.class);
++    try {
++      UserSetting userSetting = userSettingService.get(user.getUserName());
++      userSetting.setActive(false);
++      userSettingService.save(userSetting);
++    } catch (Exception e) {
++      LOG.warn("Failed to set user inactive : ", e);
++    }
++  }
++}
+diff --git a/commons-component-common/src/test/java/org/exoplatform/settings/impl/MockOrganizationService.java b/commons-component-common/src/test/java/org/exoplatform/settings/impl/MockOrganizationService.java
+new file mode 100644
+index 0000000..20eb919
+--- /dev/null
++++ b/commons-component-common/src/test/java/org/exoplatform/settings/impl/MockOrganizationService.java
+@@ -0,0 +1,36 @@
++package org.exoplatform.settings.impl;
++
++import java.util.ArrayList;
++import java.util.List;
++
++import org.exoplatform.services.organization.User;
++import org.exoplatform.services.organization.UserEventListener;
++import org.exoplatform.services.organization.impl.mock.DummyOrganizationService;
++import org.exoplatform.settings.listeners.impl.CommonsUserSettingEventListenerImpl;
++
++public class MockOrganizationService extends DummyOrganizationService {
++  
++  static List<UserEventListener> listeners = new ArrayList<UserEventListener>();
++
++  public MockOrganizationService() {
++    super();
++    this.userDAO_ = new MockUserHandlerImpl();
++  }
++  
++  
++  public static class MockUserHandlerImpl extends UserHandlerImpl {
++    @Override
++    public User removeUser(String userName, boolean broadcast) throws Exception {
++      
++      User user = findUserByName(userName);
++      listeners.add(new CommonsUserSettingEventListenerImpl());
++      for (UserEventListener listener : listeners)
++      {
++         listener.postDelete(user);
++      }
++      //
++      return user;
++    }
++  }
++  
++}
+diff --git a/commons-component-common/src/test/java/org/exoplatform/settings/impl/UserSettingServiceTest.java b/commons-component-common/src/test/java/org/exoplatform/settings/impl/UserSettingServiceTest.java
+index 161bf29..ecdb19d 100644
+--- a/commons-component-common/src/test/java/org/exoplatform/settings/impl/UserSettingServiceTest.java
++++ b/commons-component-common/src/test/java/org/exoplatform/settings/impl/UserSettingServiceTest.java
+@@ -9,6 +9,8 @@ import javax.jcr.Node;
+ import org.exoplatform.commons.api.notification.model.UserSetting;
+ import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
+ import org.exoplatform.commons.testing.BaseCommonsTestCase;
++import org.exoplatform.commons.utils.CommonsUtils;
++import org.exoplatform.services.organization.OrganizationService;
+ 
+ public class UserSettingServiceTest extends BaseCommonsTestCase {
+   
+@@ -46,6 +48,15 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
+     assertEquals(1, list.size());
+   }
+   
++  public void testDisabledUser() throws Exception {
++    userSettingService.save(createUserSetting("root", null, null, null));
++    UserSetting userSetting = userSettingService.get("root");
++    assertTrue(userSetting.isActive());
++    CommonsUtils.getService(OrganizationService.class).getUserHandler().removeUser("root", true);
++    userSetting = userSettingService.get("root");
++    assertFalse(userSetting.isActive());
++  }
++  
+   private UserSetting createUserSetting(String userId, List<String> instantly, List<String> daily, List<String> weekly) {
+     UserSetting model = new UserSetting();
+     model.setUserId(userId);
+diff --git a/commons-component-common/src/test/resources/conf/standalone/test-conteninitializerservice-configuration.xml b/commons-component-common/src/test/resources/conf/standalone/test-conteninitializerservice-configuration.xml
+index fc4d846..878ec1f 100644
+--- a/commons-component-common/src/test/resources/conf/standalone/test-conteninitializerservice-configuration.xml
++++ b/commons-component-common/src/test/resources/conf/standalone/test-conteninitializerservice-configuration.xml
+@@ -12,7 +12,7 @@
+ 	</component>
+ 	<component>
+ 		<key>org.exoplatform.services.organization.OrganizationService</key>
+-		<type>org.exoplatform.services.organization.impl.mock.DummyOrganizationService</type>
++		<type>org.exoplatform.settings.impl.MockOrganizationService</type>
+ 	</component>
+ 	<component>
+ 		<type>org.exoplatform.services.deployment.ContentInitializerService</type>
+diff --git a/commons-extension-webapp/src/main/webapp/WEB-INF/conf/commons-extension/common-configuration.xml b/commons-extension-webapp/src/main/webapp/WEB-INF/conf/commons-extension/common-configuration.xml
+index 2934518..57d4599 100644
+--- a/commons-extension-webapp/src/main/webapp/WEB-INF/conf/commons-extension/common-configuration.xml
++++ b/commons-extension-webapp/src/main/webapp/WEB-INF/conf/commons-extension/common-configuration.xml
+@@ -13,4 +13,12 @@
+ 	<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
+   </component>
+ 
++  <external-component-plugins>
++    <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
++    <component-plugin>
++      <name>commons.user.setting.event.listener</name>
++      <set-method>addListenerPlugin</set-method>
++      <type>org.exoplatform.settings.listeners.impl.CommonsUserSettingEventListenerImpl</type>
++    </component-plugin>
++  </external-component-plugins>
+ </configuration>
+\ No newline at end of file
