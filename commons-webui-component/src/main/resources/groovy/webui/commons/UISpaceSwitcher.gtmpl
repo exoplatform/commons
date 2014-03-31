@@ -46,6 +46,7 @@
     <li style="display:block" class="spaceSearch"><input type="text" class="spaceSearchText lostFocus"></input></li>
     <li style="display:block" class="portalSpace"></li>
     <li style="display:block" class="userSpace"></li>
+    <li style="display:block" class="spaceOption"><div class='spaceOption spaceTitle' id='UISpaceSwitcher_spaceTitle'><%=spaceLabel%></div></li>
     <li style="display:block" class="spaceList"></li>
   </ul>
 </div>
