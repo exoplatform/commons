@@ -290,7 +290,7 @@ UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, contai
   if (resultLength > 10) {
     container.style.height = (32 * 11) + "px";
   } else {
-    container.style.height = (32 * (resultLength + 1)) + "px";
+    container.style.height = (32 * (resultLength + 0.2)) + "px";
   }
 }
 
