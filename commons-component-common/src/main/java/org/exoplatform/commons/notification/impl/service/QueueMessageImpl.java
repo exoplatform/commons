@@ -120,9 +120,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         jdatamap.put(CACHE_REPO_NAME, CommonsUtils.getRepository().getConfiguration().getName());
         //
         schedulerService.addPeriodJob(info, periodInfo, jdatamap);
-        LOG.info("Make job send notification interval: " + interval);
+        LOG.debug("Job executes interval: " + interval);
       } catch (Exception e) {
-        LOG.warn("Failed to add send email notification jobs ", e);
+        LOG.warn("Executes the Send Notification is not successfully.");
+        LOG.debug("Executes the Send Notification is not successfully.", e);
       }
     }
   }
@@ -173,10 +174,15 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         idsRemovingLocal.set(new HashSet<String>());
       }
       //
-      LOG.info("Send notification size: " + messages.size());
+      if (messages.size() > 0) {
+        LOG.info(messages.size() + ": massage(s) will be sent.");
+      }
+      
       for (MessageInfo messageInfo : messages) {
-        if (messageInfo != null && idsRemovingLocal.get().contains(messageInfo.getId()) == false &&
-              sendMessage(messageInfo.makeEmailNotification()) == true) {
+        if (messageInfo != null && !idsRemovingLocal.get().contains(messageInfo.getId())
+            && sendMessage(messageInfo.makeEmailNotification())) {
+          
+          LOG.debug("Message sent:" + messageInfo.toString());
           //
           idsRemovingLocal.get().add(messageInfo.getId());
           if (stats) {
@@ -185,7 +191,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         }
       }
     } catch (Exception e) {
-      LOG.warn("Failed to sending MessageInfos: ", e);
+      LOG.warn("Message sending is not successfully.");
+      LOG.debug("Message sending is not successfully.", e);
     } finally {
       sProvider.close();
       removeMessageInfo();
@@ -198,8 +205,6 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
    * @param sProvider
    */
   private void load(SessionProvider sProvider) {
-//    final ReentrantLock lock = this.lock;
-//    lock.lock();
     try {
       NodeIterator iterator = getMessageInfoNodes(sProvider);
       while (iterator.hasNext()) {
@@ -218,15 +223,13 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         }
       }
     } catch (Exception e) {
-      LOG.warn("Failed to sendding MessageInfos: ", e);
-    } finally {
-//      lock.unlock();
+      LOG.warn("Message loading is not successfully.");
+      LOG.debug("Message loading is not successfully.", e);
     }
   }
 
   private void saveMessageInfo(MessageInfo message) {
     final ReentrantLock lock = this.lock;
-//    SessionProvider sProvider = SessionProvider.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     try {
       lock.lock();
@@ -242,9 +245,9 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       sessionSave(messageInfoHome);
 
     } catch (Exception e) {
-      LOG.warn("Failed to storage MessageInfo: " + message.toJSON(), e);
+      LOG.warn("Persist message to storage is not successfuly.");
+      LOG.debug("Persist message to storage is not successfuly: " + message.toJSON(), e);
     } finally {
-//      sProvider.close();
       lock.unlock();
     }
   }
@@ -260,11 +263,12 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         session.getNodeByUUID(messageId).remove();
         //
         sendEmailService.removeCurrentCapacity();
-        LOG.debug("remove MessageInfo " + messageId);
+        LOG.debug("Removing messageId: " + messageId);
       }
       session.save();
     } catch (Exception e) {
-      LOG.error("Failed to remove MessageInfo ", e);
+      LOG.warn("Message removing in storage is not sucessfully.");
+      LOG.debug("Message removing in storage is not sucessfully.", e);
     } finally {
       messages.clear();
       idsRemovingLocal.get().removeAll(ids);
@@ -288,7 +292,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       QueryResult result = query.execute();
       return result.getNodes();
     } catch (Exception e) {
-      LOG.error("Failed to getMessageInfos", e);
+      LOG.warn("Message loading is not sucessfully.");
+      LOG.debug("Message loading is not sucessfully.", e);
     }
     return null;
   }
@@ -308,7 +313,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       //
       return info;
     } catch (Exception e) {
-      LOG.warn("Failed to set back MessageInfo: ", e);
+      LOG.warn("Message mapping between node and model is not sucessfully.");
+      LOG.debug("Message mapping between node and model is not sucessfully.", e);
     }
     return null;
   }
@@ -323,7 +329,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         mailService.sendMessage(message);
         return true;
       } catch (Exception e) {
-        LOG.error("Failed to send notification.", e);
+        LOG.warn("Message sending is not sucessfully.");
+        LOG.debug("Message sending is not sucessfully.", e);
         return false;
       }
     } else {
@@ -409,7 +416,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
             if (j % 200 == 0) {
               session.save();
             }
-            System.out.print(".");
+            LOG.info(".");
           }
           session.save();
         }
