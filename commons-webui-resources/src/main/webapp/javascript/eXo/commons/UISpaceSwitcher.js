@@ -184,17 +184,17 @@ UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
   textField.value = storage.defaultValueForTextSearch;
   
   // Init data
-  me.getRecentlyVisitedSpace(uicomponentId, 10);
+  me.getRecentlyVisitedSpace(uicomponentId);
   me.renderPortalSpace(uicomponentId, "portalSpace");
   me.renderUserSpace(uicomponentId, "userSpace");
 }
 
-UISpaceSwitcher.prototype.getRecentlyVisitedSpace = function(uicomponentId, numberOfResults) {
+UISpaceSwitcher.prototype.getRecentlyVisitedSpace = function(uicomponentId) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   jQuery.ajax({
     async : false,
-    url : storage.recentlyVisitedSpaceRestUrl + "?appId=Wiki&offset=0&limit=" + numberOfResults,
+    url : storage.recentlyVisitedSpaceRestUrl + "?appId=Wiki&offset=0",
     type : 'GET',
     data : '',
     success : function(data) {
