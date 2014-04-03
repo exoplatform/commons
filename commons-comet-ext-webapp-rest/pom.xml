@@ -4,7 +4,7 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>4.1.x-commons-stabilization-SNAPSHOT</version>
+    <version>4.1.x-commons-translation-SNAPSHOT</version>
   </parent>
   <artifactId>commons-comet-ext-webapp-rest</artifactId>
   <packaging>war</packaging>

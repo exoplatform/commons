@@ -4,10 +4,10 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>4.1.x-commons-stabilization-SNAPSHOT</version>
+    <version>4.1.x-commons-translation-SNAPSHOT</version>
   </parent>
   <artifactId>commons-gifbackport</artifactId>
-  <version>4.1.x-commons-stabilization-SNAPSHOT</version>
+  <version>4.1.x-commons-translation-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>eXo Commons - Component GIF plugin backport</name>
   <description>eXo javax.imageio GIF plugin backport</description>
