@@ -242,6 +242,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
     
     for ( var j = 0; j < fileList.length; j++) { // render files
       var jcrPath = fileList[j].getAttribute("path");
+      jcrPath = encodeURIComponent(jcrPath);
       var nodeType = fileList[j].getAttribute("nodeType");
       var nodeTypeIcon = nodeType.replace(":", "_") + "48x48Icon Folder";
       var node = fileList[j].getAttribute("name");
