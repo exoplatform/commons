@@ -12,7 +12,7 @@
 	</component>
 	<component>
 		<key>org.exoplatform.services.organization.OrganizationService</key>
-		<type>org.exoplatform.commons.testing.mock.SimpleMockOrganizationService</type>
+		<type>org.exoplatform.settings.impl.MockOrganizationService</type>
 	</component>
 	<component>
 		<type>org.exoplatform.services.deployment.ContentInitializerService</type>

@@ -73,6 +73,31 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     list = userSettingService.getDigestDefaultSettingForAllUser(0, 0);
     assertTrue(list.size() > size);
   }
+  
+  public void testDisabledUser() throws Exception {
+    User u = CommonsUtils.getService(OrganizationService.class).getUserHandler().createUserInstance("binh");
+    u.setEmail("email@test");
+    u.setFirstName("first");
+    u.setLastName("last");
+    u.setPassword("pwdADDSomeSaltToBeCompliantWithSomeIS00");
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().createUser(u, true);
+    
+    userSettingService.save(createUserSetting("binh", null, null, null));
+    UserSetting userSetting = userSettingService.get("binh");
+    assertTrue(userSetting.isActive());
+    
+    //disable user "root"
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", false, true);
+    userSetting = userSettingService.get("binh");
+    assertFalse(userSetting.isActive());
+    
+    //enable user "root"
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", true, true);
+    userSetting = userSettingService.get("binh");
+    assertTrue(userSetting.isActive());
+    
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().removeUser("binh", true);
+  }
 
   public void test_2_GetUsersSetting() throws Exception {
     runUpgrade();

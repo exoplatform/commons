@@ -40,6 +40,7 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -232,7 +233,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
-      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+      if (!userSetting.isChannelActive(MailChannel.ID) || NotificationUtils.isDeletedMember(userSetting.getUserId())) {
         continue;
       }
       
