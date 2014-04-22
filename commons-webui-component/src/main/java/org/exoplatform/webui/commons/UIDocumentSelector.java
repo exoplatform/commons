@@ -114,9 +114,11 @@ public class UIDocumentSelector extends UIContainer {
     
     UIDropDownControl uiDropDownControl = addChild(UIDropDownControl.class, "DriveTypeDropDown", null);
     uiDropDownControl.setOptions(driveTypes);
-    
+    String requestURL = getRequestUrl();
     uiDropDownControl.setValue(PERSONAL_DRIVE);
-    
+    if (requestURL.contains("g/:spaces:")) {
+      uiDropDownControl.setValue(GROUP_DRIVE);
+    }
     addChild(uiDropDownControl);
     
     addChild(UIUploadArea.class, null, UPLOAD_AREA);
@@ -156,6 +158,14 @@ public class UIDocumentSelector extends UIContainer {
       .append(restContextName);
     return sb.toString();
   }
+ 
+  protected String getRequestUrl() {
+    WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+    if (!(context instanceof PortalRequestContext)) {
+      context = (WebuiRequestContext) context.getParentAppRequestContext();
+    }
+    return ((PortalRequestContext) context).getRequest().getRequestURL().toString();
+  }	  
 
   static public class SelectFileActionListener extends EventListener<UIDocumentSelector> {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
