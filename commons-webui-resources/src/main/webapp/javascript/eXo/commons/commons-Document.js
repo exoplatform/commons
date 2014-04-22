@@ -4,7 +4,7 @@
 /********** Document Selector ***********/
 	
 function DocumentSelector(){
-  this.defaultDriveType = "personal";
+  this.defaultDriveType = document.location.href.indexOf("g/:spaces:") > -1 ? "group" : "personal";
   this.getDrives = "";
   this.getFoldersAndFiles = "";
   this.deleteFolderOrFile = "";
@@ -46,6 +46,8 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext){
   this.createFolderURL = restContext + this.createFolder;
   var documentItem = new DocumentItem();
   documentItem.driveType = this.defaultDriveType;
+  documentItem.driveName = document.location.href.indexOf("g/:spaces:") > -1 ? ".spaces." + document.location.href.split("g/:spaces:")[1].split("/")[0] : null;
+  documentItem.workspaceName = document.location.href.indexOf("g/:spaces:") > -1 ? "collaboration" : null;
   me.resetDropDownBox();
   me.renderDetails(documentItem);
 };
@@ -70,6 +72,10 @@ DocumentSelector.prototype.changeDrive = function(selectedDrive) {
   _module.DocumentSelector.resetDropDownBox();
   var documentItem = new DocumentItem();
   documentItem.driveType = selectedDrive;
+  if (selectedDrive == "group") {
+    documentItem.driveName = document.location.href.indexOf("g/:spaces:") > -1 ? ".spaces." + document.location.href.split("g/:spaces:")[1].split("/")[0] : null;
+    documentItem.workspaceName = document.location.href.indexOf("g/:spaces:") > -1 ? "collaboration" : null;
+  }
   eXo.commons.DocumentSelector.renderDetails(documentItem);
 };
 
