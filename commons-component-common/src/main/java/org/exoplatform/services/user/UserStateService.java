@@ -21,15 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.jcr.LoginException;
-import javax.jcr.NoSuchWorkspaceException;
 import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-import javax.jcr.query.QueryResult;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
@@ -52,7 +45,7 @@ public class UserStateService {
   public static String LAST_ACTIVITY_PROP = "exo:lastActivity";
   public static String STATUS_PROP = "exo:status";
   public static String DEFAULT_STATUS = "available";
-  public static int delay = 60*1000;
+  public int delay = 60*1000;
   public static final int _delay_update_DB = 3*60*1000; //3 mins
   public static int pingCounter = 0;
   
@@ -112,7 +105,7 @@ public class UserStateService {
     String userKey = repoName + "_" + userId;    
     ExoCache<Serializable, UserStateModel> userStateCache = getUserStateCache();
     if(userStateCache != null && userStateCache.get(userKey) != null) {
-      model = userStateCache.get(userKey);
+      model = userStateCache.get(userKey).clone();
     } else {
       SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
       NodeHierarchyCreator nodeHierarchyCreator = CommonsUtils.getService(NodeHierarchyCreator.class);

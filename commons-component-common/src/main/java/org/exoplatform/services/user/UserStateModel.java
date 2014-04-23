@@ -25,6 +25,14 @@ public class UserStateModel {
   
   private String status = null;
   
+  public UserStateModel() {}
+  
+  public UserStateModel(String userId, long lastActivity, String status) {
+    this.userId = userId;
+    this.lastActivity = lastActivity;
+    this.status = status;
+  }
+  
   public String getUserId() {
     return this.userId;
   }
@@ -47,5 +55,9 @@ public class UserStateModel {
   
   public void setStatus(String status) {
     this.status = status;
+  }
+  
+  public UserStateModel clone() {
+    return new UserStateModel(this.getUserId(), this.getLastActivity(), this.getStatus());
   }
 }

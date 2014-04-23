@@ -77,7 +77,7 @@ public class RESTUserService implements ResourceContainer{
       object.put("status", model.getStatus());
       long iDate = new Date().getTime();
       long lastActivity = model.getLastActivity();
-      if(lastActivity >= (iDate - UserStateService.delay)) {
+      if(lastActivity >= (iDate - userService.delay)) {
         object.put("activity", "online");
       } else {
         object.put("activity", "offline");
@@ -104,7 +104,7 @@ public class RESTUserService implements ResourceContainer{
       object.put("status", model.getStatus());
       long iDate = new Date().getTime();
       long lastActivity = model.getLastActivity();
-      if(lastActivity >= (iDate - UserStateService.delay)) {
+      if(lastActivity >= (iDate - userService.delay)) {
         object.put("activity", "online");
       } 
     }
