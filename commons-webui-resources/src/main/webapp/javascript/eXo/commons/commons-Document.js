@@ -491,26 +491,30 @@ function BreadCrumbs() {
     
     
     var appendedNode = jQuery('<li/>');
-    
+
+
     var className = 'normal';
     if (name ==null){
-      name ='';
-      className= 'uiIconTree uiIconLightGray';
+        name='';
+        jQuery("#rootFolder").attr('driveType', documentItem.driveType);  
+        jQuery("#rootFolder").on('click', function() {
+            eXo.commons.DocumentSelector.actionBreadcrumbs(this);
+    	});
     } else {
-      name = "" + name;
+        name = "" + name;
+        var anchorEl = jQuery('<a/>',{
+            'class' : className,
+            'driveType' : documentItem.driveType,
+            'driveName' : documentItem.driveName,
+            'workspaceName' : documentItem.workspaceName,
+            'currentFolder' : documentItem.currentFolder,
+            'titlePath' : (documentItem.titlePath) ?  documentItem.titlePath : "",
+            'href' : 'javascript:void(0);',
+            'text' : name
+        }).on('click', function() {
+            eXo.commons.DocumentSelector.actionBreadcrumbs(this);
+        });
     }
-    var anchorEl = jQuery('<a/>',{
-      'class' : className,
-      'driveType' : documentItem.driveType,
-      'driveName' : documentItem.driveName,
-      'workspaceName' : documentItem.workspaceName,
-      'currentFolder' : documentItem.currentFolder,
-      'titlePath' : (documentItem.titlePath) ?  documentItem.titlePath : "",
-      'href' : 'javascript:void(0);',
-      'text' : name
-    }).on('click', function() {
-      eXo.commons.DocumentSelector.actionBreadcrumbs(this);
-    });
     
     if ( (name.length > 0) && ((appendedNode.find('span.uiIconMiniArrowRight')).length == 0) ) {
 	var iconEl = "";
