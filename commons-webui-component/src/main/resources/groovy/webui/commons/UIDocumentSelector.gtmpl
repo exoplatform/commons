@@ -58,6 +58,11 @@
 	       %>
 	    </div>
 	  </div>
+    <ul class="pull-left" id="BreadcumbsRoot">
+        <li>
+            <a class="uiIconTree uiIconLightGray" href="javascript:void(0);" rel="tooltip" data-placement="bottom" data-original-title="<%=_ctx.appRes(uicomponent.id+".label.root-folder")%>" id="rootFolder"></a>
+	</li>
+    </ul>
     <ul class="breadcrumb pull-left" id="BreadcumbsContainer"></ul>  
 	</div>
   <div  style="display: none;" class="center progressBarFrame clearfix">
