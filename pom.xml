@@ -60,6 +60,7 @@
     <org.gatein.portal.version>3.5.10.Final-SNAPSHOT</org.gatein.portal.version>
     <!-- Platform Project Dependencies -->
     <org.exoplatform.platform-ui.version>4.0.x-SNAPSHOT</org.exoplatform.platform-ui.version>
+	<org.exoplatform.ecms.version>4.0.x-SNAPSHOT</org.exoplatform.ecms.version>
   </properties>
   <dependencyManagement>
     <!-- ### NEVER CHANGE THIS ORDER OF DEPMGT ### -->
@@ -259,6 +260,11 @@
         <artifactId>exo.portal.webui.portlet</artifactId>
         <version>${org.gatein.portal.version}</version>
       </dependency>
+	  <dependency>
+        <groupId>org.exoplatform.ecms</groupId>
+        <artifactId>ecms-core-connector</artifactId>
+		<version>${org.exoplatform.ecms.version}</version>
+      </dependency>	  
       <!-- Import versions of jcr modules to use -->
       <dependency>
         <groupId>org.exoplatform.jcr</groupId>

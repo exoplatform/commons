@@ -20,8 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.xml.transform.dom.DOMSource;
+
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.ecm.connector.platform.ManageDocumentService;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.web.application.JavascriptManager;
 import org.exoplatform.webui.application.WebuiRequestContext;
@@ -107,10 +110,20 @@ public class UIDocumentSelector extends UIContainer {
     super();
     
     ResourceBundle resourceBundle = WebuiRequestContext.getCurrentInstance().getApplicationResourceBundle();
+    ManageDocumentService manageDriveService = (ManageDocumentService) PortalContainer.getInstance().getComponentInstanceOfType(ManageDocumentService.class);
     List<SelectItemOption<String>> driveTypes = new ArrayList<SelectItemOption<String>>(3);
-    driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.general-drives"), GENERAL_DRIVE));
-    driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.group-drives"), GROUP_DRIVE));
-    driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.personal-drives"), PERSONAL_DRIVE));
+    DOMSource generalDrivesEntity = (DOMSource) manageDriveService.getDrives(GENERAL_DRIVE, "false", "false").getEntity();
+    if (generalDrivesEntity.getNode().getFirstChild().getFirstChild().getChildNodes().getLength() > 0) {
+      driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.general-drives"), GENERAL_DRIVE));
+    }
+    DOMSource groupDrivesEntity = (DOMSource) manageDriveService.getDrives(GROUP_DRIVE, "false", "false").getEntity();
+    if (groupDrivesEntity.getNode().getFirstChild().getFirstChild().getChildNodes().getLength() > 0) {
+      driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.group-drives"), GROUP_DRIVE));
+    }
+    DOMSource personalDrivesEntity = (DOMSource) manageDriveService.getDrives(PERSONAL_DRIVE, "false", "false").getEntity();
+    if (personalDrivesEntity.getNode().getFirstChild().getFirstChild().getChildNodes().getLength() > 0) {
+      driveTypes.add(new SelectItemOption<String>(resourceBundle.getString("UIDocumentSelector.label.personal-drives"), PERSONAL_DRIVE));
+    }
     
     UIDropDownControl uiDropDownControl = addChild(UIDropDownControl.class, "DriveTypeDropDown", null);
     uiDropDownControl.setOptions(driveTypes);
