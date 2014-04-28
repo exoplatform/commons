@@ -60,7 +60,7 @@
     <org.gatein.portal.version>3.5.10.Final-SNAPSHOT</org.gatein.portal.version>
     <!-- Platform Project Dependencies -->
     <org.exoplatform.platform-ui.version>4.0.x-SNAPSHOT</org.exoplatform.platform-ui.version>
-	<org.exoplatform.ecms.version>4.0.x-SNAPSHOT</org.exoplatform.ecms.version>
+    <org.exoplatform.ecms.version>4.0.x-SNAPSHOT</org.exoplatform.ecms.version>
   </properties>
   <dependencyManagement>
     <!-- ### NEVER CHANGE THIS ORDER OF DEPMGT ### -->
