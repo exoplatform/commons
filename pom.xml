@@ -260,10 +260,10 @@
         <artifactId>exo.portal.webui.portlet</artifactId>
         <version>${org.gatein.portal.version}</version>
       </dependency>
-	  <dependency>
+      <dependency>
         <groupId>org.exoplatform.ecms</groupId>
         <artifactId>ecms-core-connector</artifactId>
-		<version>${org.exoplatform.ecms.version}</version>
+        <version>${org.exoplatform.ecms.version}</version>
       </dependency>	  
       <!-- Import versions of jcr modules to use -->
       <dependency>
