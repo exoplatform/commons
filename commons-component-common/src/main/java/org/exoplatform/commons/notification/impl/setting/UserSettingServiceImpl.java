@@ -151,7 +151,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     saveUserSetting(userId, EXO_DAILY, dailys);
     saveUserSetting(userId, EXO_WEEKLY, weeklys);
 
-    //
     removeMixin(userId);
   }
 
@@ -170,7 +169,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   public UserSetting get(String userId) {
     UserSetting model = UserSetting.getInstance();
 
-    //
     List<String> instantlys = getArrayListValue(userId, EXO_INSTANTLY, null);
     if (instantlys != null) {
       model.setUserId(userId);
@@ -180,7 +178,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       model.setWeeklyProviders(getArrayListValue(userId, EXO_WEEKLY, Collections.<String> emptyList()));
     } else {
       model = UserSetting.getDefaultInstance().setUserId(userId);
-      //
       addMixin(userId);
     }
     return model;
@@ -225,7 +222,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   private void addMixin(SessionProvider sProvider, User[] users) {
     try {
-      //
       Session session = getSession(sProvider, workspace);
       Node userHomeNode = getUserSettingHome(session);
       Node userNode;
@@ -239,7 +235,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         } else {
           userNode = userHomeNode.addNode(user.getUserName(), STG_SIMPLE_CONTEXT);
         }
-        //
         if (userNode.canAddMixin(MIX_DEFAULT_SETTING)) {
           userNode.addMixin(MIX_DEFAULT_SETTING);
         }
@@ -265,7 +260,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         Node userNode = userHomeNode.getNode(userId);
         if (userNode.isNodeType(MIX_DEFAULT_SETTING)) {
           userNode.removeMixin(MIX_DEFAULT_SETTING);
-          //
           sessionSave(userNode);
         }
       }
@@ -278,12 +272,10 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     StringBuilder queryBuffer = new StringBuilder();
     queryBuffer.append(EXO_IS_ACTIVE).append("='true' AND (")
                .append(EXO_DAILY).append("<>''");
-    //
     if (configuration.isSendWeekly()) {
       queryBuffer.append(" OR ").append(EXO_WEEKLY).append("<>''");
     }
 
-    //
     queryBuffer.append(")");
 
     return queryBuffer;
@@ -351,7 +343,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<UserSetting> getDaily(int offset, int limit) {
-//    SessionProvider sProvider = SessionProvider.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
@@ -362,8 +353,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get all daily users have notification messages", e);
-    } finally {
-//      sProvider.close();
     }
 
     return models;
@@ -419,7 +408,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
             .append("/%' AND NOT jcr:path LIKE '/").append(SETTING_USER_PATH).append("/%/%'");
 
     QueryManager qm = session.getWorkspace().getQueryManager();
-    System.out.println(strQuery.toString());
     QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
     if (limit > 0) {
       query.setLimit(limit);
@@ -430,7 +418,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public List<UserSetting> getDefaultDaily(int offset, int limit) {
-//    SessionProvider sProvider = SessionProvider.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
@@ -447,9 +434,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get default daily users have notification messages", e);
-    } finally {
-//      sProvider.close();
-    }
+    } 
 
     return users;
   }
@@ -465,8 +450,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get default daily users have notification messages", e);
-    } finally {
-//      sProvider.close();
     }
     return 0;
   }
