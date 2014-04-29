@@ -44,6 +44,7 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext){
   this.getFoldersAndFilesURL = restContext + this.getFoldersAndFiles;
   this.deleteFolderOrFileURL = restContext + this.deleteFolderOrFile;
   this.createFolderURL = restContext + this.createFolder;
+  me.removeOptionDropDownBox();
   var documentItem = new DocumentItem();
   documentItem.driveType = this.defaultDriveType;
   documentItem.driveName = document.location.href.indexOf("g/:spaces:") > -1 ? ".spaces." + document.location.href.split("g/:spaces:")[1].split("/")[0] : null;
@@ -52,6 +53,19 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext){
   me.renderDetails(documentItem);
   CssIconFile.init();
 };
+
+DocumentSelector.prototype.removeOptionDropDownBox = function() {
+    var me = _module.DocumentSelector;
+    var url = this.getDrivesURL;
+    url += "?" + this.driveTypeParam + "=general";
+    var data = me.request(url);
+    var folderContainer = jQuery("Folders:first", data);
+    var folderList = jQuery("Folder", folderContainer);
+	if (!folderList || folderList.length <= 0) {
+	  var dropDownBox = jQuery('#DriveTypeDropDown'); 
+	  jQuery(dropDownBox).find('ul>li:first').remove();
+	}
+}
 
 DocumentSelector.prototype.resetDropDownBox = function() {
 	var dropDownBox = jQuery('#DriveTypeDropDown'); 
