@@ -151,7 +151,7 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
                             if (LOG.isInfoEnabled()) {
                                 LOG.info("\"" + node.getName() + "\" publication lifecycle has been cleaned up");
                             }
-                            node.setProperty("publication:liveRevision", "");
+                            node.setProperty("publication:liveRevision", (javax.jcr.Value)null);
                             node.setProperty("publication:currentState", "published");
                         }
 
