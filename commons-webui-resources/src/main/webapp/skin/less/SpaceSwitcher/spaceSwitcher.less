@@ -7,22 +7,25 @@
   top: 28px;
   border-radius: @baseBorderRadius;
   box-shadow: 0px 2px 3px rgba(0,0,0,.1);
-  a { 
+  z-index: 1000;
+  overflow: hidden;
+  a {
   	max-width: 100%;
-  	float: none; 
+  	float: none;
   	padding: 5px 10px;
   	display: block;
   	color: @textColor;
   }
-    a:hover { 
+  a:hover {
   	color: white;
+  	cursor: pointer;
   }
   .title {
-	  line-height: 30px; 
-	  border-bottom: 1px solid @borderColor; 
-	  background: @grayWhiteSmoke; 
-	  padding: 0px 5px 0px 10px; 
-	  font-weight: bold; 
+	  line-height: 30px;
+	  border-bottom: 1px solid @borderColor;
+	  background: @grayWhiteSmoke;
+	  padding: 0px 5px 0px 10px;
+	  font-weight: bold;
 	  color: @textColor;
 	  border-radius: 4px 4px 0 0;
 	  height: 31px;
@@ -32,10 +35,10 @@
 		}
 	}
 	.spaceOption {
-	  line-height: 20px;  
+	  line-height: 20px;
 	  color: @textColor;
 	}
-	
+
 	.spaceTitle {
 	  color: @textColor;
 	  background: @grayLighter;
@@ -48,15 +51,16 @@
 	.noSpace {
 		padding: 5px 10px;
 		color: @grayLight;
-	}			
+		text-align: center;
+	}
 	.spaceSearch {
-	  line-height: 20px; 
-	  padding: 10px 10px 5px 10px; 
-	  
+	  line-height: 20px;
+	  padding: 10px 10px 5px 10px;
+
 	  input {
-		  width: 100%; 
-		  height: 26px; 
-		  padding: 0px 5px; 
+		  width: 100%;
+		  height: 26px;
+		  padding: 0px 5px;
 		  border: 1px solid @borderColor;
 		  border-radius: @borderRadiusSmall;
 		  margin: 0px;
@@ -68,14 +72,17 @@
 	.lostFocus {
 	  color: @grayLight;
 	}
-
+	.noSpace {
+	}
 	.spaceList {
+		min-height: 30px;
 	  overflow-y: auto;
-	  max-height: 311px;
+	  max-height: 300px;
 		img {
 			.square(19px);
 			 .border-radius(2px);
 			margin-right: 6px;
+			vertical-align: -4px;
 		}
 	}
 	.hover:hover{
@@ -88,8 +95,20 @@
 
 }
 
-
 .spaceSwitcher {
   line-height: 29px;
   padding: 0 15px;
+}
+
+.spaceList {
+	> ul {
+		> li {
+			> a{
+				height: 20px;
+			}
+			&:last-child, &:last-child > a {
+				.border-bottom-radius(4px);
+			}
+		}
+	}
 }
