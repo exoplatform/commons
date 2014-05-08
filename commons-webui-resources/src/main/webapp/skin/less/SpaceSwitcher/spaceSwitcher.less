@@ -48,7 +48,11 @@
 	  box-shadow: 0 -15px 17px #F1F1F1 inset;
 	  padding: 5px 0 5px 9px;
 	}
-				
+	.noSpace {
+		text-align: center;
+		padding: 5px 10px;
+ 		color: @grayLight;
+	}
 	.spaceSearch {
 	  line-height: 20px;
 	  padding: 10px 10px 5px 10px;
@@ -70,7 +74,8 @@
 	}
 	.spaceList {
 	  overflow-y: auto;
-	  height: 311px;
+	  height: 300px;
+	  min-height: 30px;
 		img {
 			.square(19px);
 			 .border-radius(2px);
