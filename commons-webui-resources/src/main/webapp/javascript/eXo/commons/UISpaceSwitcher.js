@@ -281,7 +281,7 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
   } else {
     container.innerHTML = "<div class='spaceOption noSpace' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     me.processContainerHeight(0, container);
-    jQuery("#UISpaceSwitcher_spaceTitle").parent().hide();
+    //jQuery("#UISpaceSwitcher_spaceTitle").parent().hide();
   }  
 
 }
@@ -290,7 +290,7 @@ UISpaceSwitcher.prototype.processContainerHeight = function(resultLength, contai
   if (resultLength > 10) {
     container.style.height = (30 * 10) + "px";
   } else {
-    container.style.height = (32 * (resultLength + 0.2)) + "px";
+    container.style.height = (30 * resultLength) + "px";
   }
 }
 
