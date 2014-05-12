@@ -189,6 +189,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       send(digest, mailService, usersDefaultSettings, defaultSetting);
       offset += limit;
     }
+    //Clear all stored message
+    storage.removeMessageAfterSent();
     LOG.debug("Time to run process users used default settings: " + (System.currentTimeMillis() - startTime) + "ms.");
   }
   
@@ -216,8 +218,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         }
       }
     }
-    //Clear all stored message
-    storage.removeMessageAfterSent();
+    
   }
   
   private UserSetting getDefaultUserSetting(List<String> activesProvider) {
