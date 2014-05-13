@@ -16,18 +16,17 @@
  */
 package org.exoplatform.services.user;
 
-import java.util.Date;
-
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.testing.BaseResourceTestCase;
 import org.exoplatform.services.jcr.core.ManageableRepository;
-import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.rest.impl.ContainerResponse;
 import org.exoplatform.services.rest.wadl.research.HTTPMethods;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.junit.Ignore;
+
+import javax.ws.rs.core.Response;
+import java.util.Date;
 
 /**
  * Created by The eXo Platform SAS
@@ -39,14 +38,14 @@ import org.exoplatform.services.security.Identity;
 //  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test-configuration.xml"),
 //  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml")
 //  })
+@Ignore
 public class RESTUserServiceTest extends BaseResourceTestCase {
   
   private UserStateService userStateService;
   private RESTUserService restUserService;
-  private NodeHierarchyCreator nodeHierarchyCreator;
-  
+
   private String defaultWorkspace;
-  
+
   public void setUp() throws Exception {
     super.setUp();
     ConversationState c = new ConversationState(new Identity(session.getUserID()));
@@ -54,13 +53,12 @@ public class RESTUserServiceTest extends BaseResourceTestCase {
 
     userStateService = getService(UserStateService.class);
     restUserService = getService(RESTUserService.class);
-    nodeHierarchyCreator = getService(NodeHierarchyCreator.class);
-    
+
     ManageableRepository repo  = repositoryService.getRepository(REPO_NAME);
-    
+
     defaultWorkspace = repo.getConfiguration().getDefaultWorkspaceName();
-    repo.getConfiguration().setDefaultWorkspaceName(UserStateService.WORKSPACE_NAME);
-    
+    repo.getConfiguration().setDefaultWorkspaceName("collaboration");
+
     this.resourceBinder.addResource(restUserService, null);
   }
   
@@ -69,7 +67,7 @@ public class RESTUserServiceTest extends BaseResourceTestCase {
     repo.getConfiguration().setDefaultWorkspaceName(defaultWorkspace);
     super.tearDown();
   }
-  
+
   public void testUpdateState() throws Exception {
     String restPath = "/state/ping";
 
@@ -84,7 +82,7 @@ public class RESTUserServiceTest extends BaseResourceTestCase {
     assertTrue(userModel.getLastActivity() != userStateService.getUserState(session.getUserID()).getLastActivity());    
     System.out.println("Response entity: " + response.getEntity());
   }
-  
+
   public void testOnline() throws Exception {
     String restPath = "/state/status";
 
@@ -142,9 +140,9 @@ public class RESTUserServiceTest extends BaseResourceTestCase {
     
     assertFalse(userStateService.getUserState(userModel.getUserId()).getStatus().equals(UserStateService.DEFAULT_STATUS));
     assertTrue(userStateService.getUserState(userModel.getUserId()).getStatus().equals("offline"));
-    
+
     System.out.println("Response entity: " + response.getEntity());
     System.out.println("new status: " + userStateService.getUserState(session.getUserID()).getStatus());
   }
-  
+
 }

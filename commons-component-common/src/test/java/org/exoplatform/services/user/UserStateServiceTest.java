@@ -16,20 +16,18 @@
  */
 package org.exoplatform.services.user;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import javax.jcr.Node;
-
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
-import org.junit.Ignore;
+
+import javax.jcr.Node;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created by The eXo Platform SAS
@@ -61,11 +59,11 @@ public class UserStateServiceTest extends BaseCommonsTestCase {
     nodeHierarchyCreator = getService(NodeHierarchyCreator.class);
     
     ManageableRepository repo  = repositoryService.getRepository(REPO_NAME);
-    session = repo.getSystemSession(UserStateService.WORKSPACE_NAME);
+    session = repo.getSystemSession(WORKSPACE_NAME);
     root = session.getRootNode();
     
     defaultWorkspace = repo.getConfiguration().getDefaultWorkspaceName();
-    repo.getConfiguration().setDefaultWorkspaceName(UserStateService.WORKSPACE_NAME);
+    repo.getConfiguration().setDefaultWorkspaceName("collaboration");
   }
   
   protected void tearDown() throws Exception {

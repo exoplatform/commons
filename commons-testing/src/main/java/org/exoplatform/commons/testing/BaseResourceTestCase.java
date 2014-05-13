@@ -16,19 +16,6 @@
  */
 package org.exoplatform.commons.testing;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
-import javax.jcr.Node;
-import javax.jcr.Session;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MultivaluedMap;
-
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -46,6 +33,14 @@ import org.exoplatform.services.rest.impl.ProviderBinder;
 import org.exoplatform.services.rest.impl.RequestHandlerImpl;
 import org.exoplatform.services.rest.impl.ResourceBinder;
 import org.exoplatform.services.rest.tools.DummyContainerResponseWriter;
+
+import javax.jcr.Node;
+import javax.jcr.Session;
+import javax.ws.rs.core.MultivaluedMap;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 //import org.exoplatform.services.test.mock.MockHttpServletRequest;
 
 /**

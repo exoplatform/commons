@@ -16,14 +16,6 @@
  */
 package org.exoplatform.services.user;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.jcr.Node;
-import javax.jcr.Session;
-
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.cache.CacheService;
@@ -35,10 +27,16 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
 
+import javax.jcr.Node;
+import javax.jcr.Session;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 
 public class UserStateService {
   private static final Log LOG = ExoLogger.getLogger(UserStateService.class.getName());
-  protected static final String WORKSPACE_NAME = "collaboration";
   public static String VIDEOCALLS_BASE_PATH = "VideoCalls";
   public static String USER_STATATUS_NODETYPE = "exo:userState";
   public static String USER_ID_PROP = "exo:userId";
@@ -69,7 +67,9 @@ public class UserStateService {
     try {
       RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
           .getComponentInstanceOfType(RepositoryService.class);
-      Session session = sessionProvider.getSession(WORKSPACE_NAME, repositoryService.getCurrentRepository());
+      Session session =
+        sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
+                                   repositoryService.getCurrentRepository());
       String repoName = repositoryService.getCurrentRepository().getConfiguration().getName(); 
       
       Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);     
