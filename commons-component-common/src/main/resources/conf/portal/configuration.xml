@@ -18,6 +18,16 @@
 		<key>org.exoplatform.commons.api.settings.SettingService</key>
 		<type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
 	</component>
+	
+	
+    <component>
+	    <key>org.exoplatform.services.user.UserStateService</key>
+     	<type>org.exoplatform.services.user.UserStateService</type>
+    </component>
+    <component>
+    	<key>org.exoplatform.services.user.RESTUserService</key>
+     	<type>org.exoplatform.services.user.RESTUserService</type>
+    </component>
 
   <component>
     <key>org.exoplatform.commons.embedder.OembedEmbedder</key>
@@ -196,5 +206,61 @@
         </object-param>
       </init-params>
     </component-plugin>
+    
+    
+    <component-plugin profiles="cluster">
+      <name>addExoCacheConfig</name>
+      <set-method>addExoCacheConfig</set-method>
+      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
+      <description>The JBoss Cache configuration for the setting service</description>
+      <init-params>
+        <object-param>
+          <name>org.exoplatform.services.user.UserService</name>
+          <description>The JBoss Cache configuration for the navigation service</description>
+          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
+            <field name="name">
+              <string>UserService</string>
+            </field>
+            <field name="expirationTimeout">
+              <long>${cache.exo.commons.UserService.ExpirationTimeout:600000}</long>
+            </field>
+            <field name="maxNodes">
+              <int>${cache.exo.commons.UserService.MaxNodes:5000}</int>
+            </field>
+            <field name="distributed">
+              <boolean>true</boolean>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+    
+    <component-plugin profiles="cluster">
+      <name>addExoCacheConfig</name>
+      <set-method>addExoCacheConfig</set-method>
+      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
+      <description>The JBoss Cache configuration for the setting service</description>
+      <init-params>
+        <object-param>
+          <name>org.exoplatform.services.user.UserStateService</name>
+          <description>The JBoss Cache configuration for the navigation service</description>
+          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
+            <field name="name">
+              <string>UserStateService</string>
+            </field>
+            <field name="expirationTimeout">
+              <long>${cache.exo.commons.UserService.ExpirationTimeout:600000}</long>
+            </field>
+            <field name="maxNodes">
+              <int>${cache.exo.commons.UserStateService.MaxNodes:5000}</int>
+            </field>
+            <field name="distributed">
+              <boolean>true</boolean>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+    
   </external-component-plugins>
 </configuration>
