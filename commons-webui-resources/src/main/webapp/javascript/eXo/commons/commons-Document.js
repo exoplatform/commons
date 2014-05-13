@@ -240,6 +240,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
     
     for ( var j = 0; j < fileList.length; j++) { // render files
       var jcrPath = fileList[j].getAttribute("path");
+      jcrPath = encodeURIComponent(jcrPath);
       var nodeType = fileList[j].getAttribute("nodeType");
       var nodeTypeIcon = nodeType.replace(":", "_") + "48x48Icon Folder";
       var node = fileList[j].getAttribute("name");
@@ -657,7 +658,7 @@ function UIDSUpload() {
 	}
 
 	UIDSUpload.prototype.getUploadContent = function(uploadId, uploadAction, isAutoUpload) {
-	  var container = parent.document.getElementById(uploadId);
+	  var container = window.document.getElementById(uploadId);
 	  var uploadIframe = jQuery("#"+uploadId+"UploadIframe",container);
 	  var uploadText = uploadIframe.title;
 	  
@@ -722,7 +723,7 @@ function UIDSUpload() {
 	  else {
 	  return;
 	  }
-	    var container = parent.document.getElementById(elementId);
+	    var container = window.document.getElementById(elementId);
 	    if (!data) {
 	      this.abortUpload(elementId);
 	      //var message = eXo.core.DOMUtil.findFirstChildByClass(container, "div", "LimitMessage").innerHTML ;
@@ -807,7 +808,7 @@ function UIDSUpload() {
 	 */
 	UIDSUpload.prototype.showUploaded = function(id) {
 	  _module.UIDSUpload.listUpload.remove(id);
-	  var container = parent.document.getElementById(id);
+	  var container = window.document.getElementById(id);
 	  var element = document.getElementById(id+"ProgressIframe");
 	  element.innerHTML =  "<span></span>";
 	  
@@ -825,7 +826,7 @@ function UIDSUpload() {
 	  var tmp = element.parent();
 	  var temp = tmp.parent();
 	  // TODO: dang.tung - always return true even we reload browser
-	  var  input = parent.document.getElementById('input' + id);
+	  var  input = window.document.getElementById('input' + id);
 	  input.value = "true" ;  
 	};
 	/**
@@ -839,7 +840,7 @@ function UIDSUpload() {
 	  var idUpload=jQuery("div.uiUploadArea .UIDSUploadInput").attr("id");
 	  me.listUpload.remove(idUpload);
 	  
-	  var container = jQuery(parent.document.getElementById(idUpload));
+	  var container = jQuery(window.document.getElementById(idUpload));
 	  var uploadIframe = container.find("#"+idUpload+"UploadIframe");
 	  uploadIframe.show();
 	  me.createUploadEntry(idUpload, me.isAutoUpload);
@@ -866,7 +867,7 @@ function UIDSUpload() {
 	  var selectFileFrame = jQuery("div.SelectFileFrame:first",container);
 	  selectFileFrame.hide() ;
 	   
-	  var  input = parent.document.getElementById('input' + idUpload);
+	  var  input = window.document.getElementById('input' + idUpload);
 	  input.value = "false";
 	};
 
@@ -882,9 +883,9 @@ function UIDSUpload() {
 	  //var DOMUtil = eXo.core.DOMUtil;
 	  var me = _module.UIDSUpload;
 	  var selectedItem = _module.DocumentSelector.selectedItem;
-	  var container = parent.document.getElementById(id);
-	  var uploadIFrame = parent.document.getElementById(id+"UploadIframe");
-	  var uploadFrame = parent.document.getElementById(id+"uploadFrame");
+	  var container = window.document.getElementById(id);
+	  var uploadIFrame = window.document.getElementById(id+"UploadIframe");
+	  var uploadFrame = window.document.getElementById(id+"uploadFrame");
 	  if (!selectedItem || !selectedItem.driveName) {
 	    alert(uploadIFrame.getAttribute("select_drive"));
 	    file.value == '';
@@ -913,7 +914,7 @@ function UIDSUpload() {
 	  var progressBarLabel = jQuery("div.pull-left percent:first-child",progressBarFrame);
 	  progressBarLabel.html("0%") ;
 	  
-	  var  input = parent.document.getElementById('input' + id);
+	  var  input = window.document.getElementById('input' + id);
 	  input.value = "true";
 	  
 	
