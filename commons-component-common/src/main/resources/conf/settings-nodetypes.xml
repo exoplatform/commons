@@ -76,4 +76,24 @@
       </childNodeDefinition>
     </childNodeDefinitions>
   </nodeType>
+  
+  <nodeType name="exo:userState" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
+    <supertypes>
+      <supertype>nt:base</supertype>
+    </supertypes>    
+    <propertyDefinitions>
+      <propertyDefinition name="exo:userId" requiredType="String" autoCreated="false" mandatory="false"
+        onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+      <propertyDefinition name="exo:lastActivity" requiredType="Long" autoCreated="false" mandatory="false"
+        onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+      <propertyDefinition name="exo:status" requiredType="String" autoCreated="false" mandatory="false"
+        onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>    
+    </propertyDefinitions>     
+  </nodeType>
 </nodeTypes>
