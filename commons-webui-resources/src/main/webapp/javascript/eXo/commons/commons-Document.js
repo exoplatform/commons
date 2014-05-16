@@ -522,20 +522,24 @@ function BreadCrumbs() {
           eXo.commons.DocumentSelector.actionBreadcrumbs(this);
       });
     } else {
-      name = "" + name;
-      var anchorEl = jQuery('<a/>',{
-          'class' : className,
-          'driveType' : documentItem.driveType,
-          'driveName' : documentItem.driveName,
-          'workspaceName' : documentItem.workspaceName,
-          'currentFolder' : documentItem.currentFolder,
-          'titlePath' : (documentItem.titlePath) ?  documentItem.titlePath : "",
-          'href' : 'javascript:void(0);',
-          'text' : name
-      }).on('click', function() {
-          eXo.commons.DocumentSelector.actionBreadcrumbs(this);
-      });
+        name = "" + jQuery("<div/>").html(name).text();;
     }
+    var title= "";
+    if (documentItem.titlePath) {
+        title = jQuery("<div/>").html(documentItem.titlePath).text();
+    }
+    var anchorEl = jQuery('<a/>',{
+        'class' : className,
+        'driveType' : documentItem.driveType,
+        'driveName' : documentItem.driveName,
+        'workspaceName' : documentItem.workspaceName,
+        'currentFolder' : documentItem.currentFolder,
+        'titlePath' : title,
+        'href' : 'javascript:void(0);',
+        'text' : name
+      }).on('click', function() {
+        eXo.commons.DocumentSelector.actionBreadcrumbs(this);
+      });
     
     if ( (name.length > 0) && ((appendedNode.find('span.uiIconMiniArrowRight')).length == 0) ) {
 	var iconEl = "";
