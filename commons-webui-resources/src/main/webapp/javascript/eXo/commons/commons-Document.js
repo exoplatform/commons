@@ -206,8 +206,8 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var nodeType = folderList[i].getAttribute("folderType");
 	  var name = folderList[i].getAttribute("name");
 	  var title = folderList[i].getAttribute("title");
+	  title = jQuery("<div/>").html(title).text();  
 	  var titlePath = folderList[i].getAttribute("titlePath");
-
 	  var childFolder = folderList[i].getAttribute("currentFolder");
 	  var canRemove = folderList[i].getAttribute("canRemove");
 	  var canAddChild = folderList[i].getAttribute("canAddChild");
@@ -493,11 +493,15 @@ function BreadCrumbs() {
     var appendedNode = jQuery('<li/>');
     
     var className = 'normal';
-    if (name ==null){
+   if (name ==null){
       name ='';
       className= 'uiIconTree uiIconLightGray';
     } else {
-      name = "" + name;
+      name = "" + jQuery("<div/>").html(name).text();
+    }
+    var title= "";
+    if (documentItem.titlePath) {
+        title = jQuery("<div/>").html(documentItem.titlePath).text();
     }
     var anchorEl = jQuery('<a/>',{
       'class' : className,
@@ -505,7 +509,7 @@ function BreadCrumbs() {
       'driveName' : documentItem.driveName,
       'workspaceName' : documentItem.workspaceName,
       'currentFolder' : documentItem.currentFolder,
-      'titlePath' : (documentItem.titlePath) ?  documentItem.titlePath : "",
+      'titlePath' : title,
       'href' : 'javascript:void(0);',
       'text' : name
     }).on('click', function() {
