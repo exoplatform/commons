@@ -163,11 +163,10 @@ public class UIDocumentSelector extends UIContainer {
   }
 
   protected String getRestContext() {
-    String requestURL = getRequestUrl();
     String portalName = PortalContainer.getCurrentPortalContainerName();
     String restContextName = PortalContainer.getCurrentRestContextName();
     StringBuilder sb = new StringBuilder();
-    sb.append(requestURL.substring(0, requestURL.indexOf(portalName)))
+    sb.append("/")
       .append(portalName)
       .append("/")
       .append(restContextName);
