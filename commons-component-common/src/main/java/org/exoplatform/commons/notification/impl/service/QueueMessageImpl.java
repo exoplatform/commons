@@ -47,7 +47,6 @@ import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.notification.job.SendEmailNotificationJob;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.management.annotations.ManagedBy;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
@@ -80,10 +79,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private long                           DELAY_TIME;
   /** .. */
   private SendEmailService               sendEmailService;
-  /** defines the default mail service provided by kernel */
-  private MailService                    defaultMailService;
-  /** define the alternative mail service */
-  private MailService                    mailServicePlugin = null;
+  /** .. */
+  private MailService                    mailService;
   /** .. */
   private NotificationConfiguration      configuration;
   /** The lock protecting all mutators */
@@ -93,29 +90,13 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   /** .. */
   private static ThreadLocal<Set<String>> idsRemovingLocal = new ThreadLocal<Set<String>>();
   
-  public QueueMessageImpl(InitParams params, MailService mailService, NotificationConfiguration notificationConfiguration) {
-    this.configuration = notificationConfiguration;
-    this.defaultMailService = mailService;
+  public QueueMessageImpl(InitParams params) {
+    this.configuration = CommonsUtils.getService(NotificationConfiguration.class);
+    this.mailService = CommonsUtils.getService(MailService.class);
 
     MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 20);
     DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120) * 1000;
   }
-  
-  @Override
-  public void addMailServicePlugin(BaseComponentPlugin mailServicePlugin) {
-    if (mailServicePlugin instanceof MailService) {
-      this.mailServicePlugin = (MailService) mailServicePlugin;
-    }
-  }
-  
-  /**
-   * Return mail service to send mail
-   * @return
-   */
-  private MailService getMailService() {
-    return this.mailServicePlugin != null ? mailServicePlugin : defaultMailService;
-  }
-  
   
   public void setManagementView(SendEmailService managementView) {
     this.sendEmailService = managementView;
@@ -339,7 +320,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         if (message.getFrom() == null) {
           return false;
         }
-        getMailService().sendMessage(message);
+        mailService.sendMessage(message);
         return true;
       } catch (Exception e) {
         LOG.error("Failed to send notification.", e);

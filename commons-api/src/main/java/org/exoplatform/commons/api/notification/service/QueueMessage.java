@@ -17,7 +17,6 @@
 package org.exoplatform.commons.api.notification.service;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.container.component.BaseComponentPlugin;
 
 public interface QueueMessage {
 
@@ -32,10 +31,4 @@ public interface QueueMessage {
    * Peek the message from queue and send
    */
   void send() ;
-  
-  /**
-   * Add mail service plugin
-   * @param mailServicePlugin the provide mail service plugin
-   */
-  void addMailServicePlugin(BaseComponentPlugin mailServicePlugin);
 }
