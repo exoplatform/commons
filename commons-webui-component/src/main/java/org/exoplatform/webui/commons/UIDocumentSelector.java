@@ -147,16 +147,10 @@ public class UIDocumentSelector extends UIContainer {
   }
 
   protected String getRestContext() {
-    WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-    if (!(context instanceof PortalRequestContext)) {
-      context = (WebuiRequestContext) context.getParentAppRequestContext();
-    }
-
-    String requestURL = ((PortalRequestContext) context).getRequest().getRequestURL().toString();
     String portalName = PortalContainer.getCurrentPortalContainerName();
     String restContextName = PortalContainer.getCurrentRestContextName();
     StringBuilder sb = new StringBuilder();
-    sb.append(requestURL.substring(0, requestURL.indexOf(portalName)))
+    sb.append("/")
       .append(portalName)
       .append("/")
       .append(restContextName);
