@@ -221,9 +221,9 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var nodeType = folderList[i].getAttribute("folderType");
 	  var name = folderList[i].getAttribute("name");
 	  var title = folderList[i].getAttribute("title");
+	  title = jQuery("<div/>").html(title).text();  
 	  var titlePath = folderList[i].getAttribute("titlePath");
 	  var folderIcon = "uiIcon16x16FolderDefault " + CssIconFile.getCssClassByType(folderList[i].getAttribute("nodeType"));
-
 	  var childFolder = folderList[i].getAttribute("currentFolder");
 	  var canRemove = folderList[i].getAttribute("canRemove");
 	  var canAddChild = folderList[i].getAttribute("canAddChild");
@@ -522,7 +522,7 @@ function BreadCrumbs() {
           eXo.commons.DocumentSelector.actionBreadcrumbs(this);
       });
     } else {
-        name = "" + jQuery("<div/>").html(name).text();;
+      name = "" + jQuery("<div/>").html(name).text();
     }
     var title= "";
     if (documentItem.titlePath) {
