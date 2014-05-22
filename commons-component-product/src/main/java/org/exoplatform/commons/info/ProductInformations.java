@@ -20,14 +20,18 @@ package org.exoplatform.commons.info;
 
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.access.PermissionType;
 import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
+import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.IdentityConstants;
 import org.picocontainer.Startable;
 
 import javax.jcr.*;
@@ -35,6 +39,8 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import java.io.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Calendar;
@@ -108,11 +114,14 @@ public class ProductInformations implements Startable {
 
   private RepositoryService repositoryService = null;
   private SessionProviderService sessionProviderService = null;
+  private UserACL userAcl;
 
   public ProductInformations(RepositoryService repositoryService, SessionProviderService sessionProviderService,
-                             NodeHierarchyCreator nodeHierarchyCreator, ConfigurationManager cmanager, InitParams initParams) {
+                             NodeHierarchyCreator nodeHierarchyCreator, ConfigurationManager cmanager, InitParams initParams,
+                             UserACL userAcl) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
+    this.userAcl = userAcl;
     if (!initParams.containsKey(PRODUCT_VERSIONS_DECLARATION_FILE)) {
       if (LOG.isErrorEnabled()) {
         LOG.error("Couldn't find the init value param: " + PRODUCT_VERSIONS_DECLARATION_FILE);
@@ -352,6 +361,12 @@ public class ProductInformations implements Startable {
         if (!productVersionDeclarationNode.isNodeType(MIX_VERSIONABLE)) {
           productVersionDeclarationNode.addMixin(MIX_VERSIONABLE);
         }
+        //set permission: only allow __system and admin to access this node
+        productVersionDeclarationNode.addMixin("exo:privilegeable");
+        Map<String, String[]> perms = new HashMap<String, String[]>();
+        perms.put(IdentityConstants.SYSTEM, PermissionType.ALL);
+        perms.put("*:" + userAcl.getAdminGroups(), PermissionType.ALL);
+        ((ExtendedNode)productVersionDeclarationNode).setPermissions(perms);
         session.save();
         session.refresh(true);
         previousProductInformationProperties = (Properties)productInformationProperties.clone();
