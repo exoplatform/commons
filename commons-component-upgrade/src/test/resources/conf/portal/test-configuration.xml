@@ -22,12 +22,6 @@
 				<description>administrator</description>
 				<value>root</value>
 			</value-param>
-
-			<value-param>
-				<name>portal.administrator.groups</name>
-				<description>administrator</description>
-				<value>/platform/administrators</value>
-			</value-param>
 		</init-params>
 	</component>
 
