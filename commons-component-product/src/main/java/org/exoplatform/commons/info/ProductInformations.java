@@ -361,10 +361,11 @@ public class ProductInformations implements Startable {
         if (!productVersionDeclarationNode.isNodeType(MIX_VERSIONABLE)) {
           productVersionDeclarationNode.addMixin(MIX_VERSIONABLE);
         }
-        //set permission: only allow __system to access this node
+        //set permission: only allow __system and admin to access this node
         productVersionDeclarationNode.addMixin("exo:privilegeable");
         Map<String, String[]> perms = new HashMap<String, String[]>();
         perms.put(IdentityConstants.SYSTEM, PermissionType.ALL);
+        perms.put("*:" + userAcl.getAdminGroups(), PermissionType.ALL);
         ((ExtendedNode)productVersionDeclarationNode).setPermissions(perms);
         session.save();
         session.refresh(true);
