@@ -75,7 +75,14 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- Our own project modules -->
+      <!-- Declare our own artifacts -->
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons</artifactId>
+        <version>${project.version}</version>
+        <classifier>source-release</classifier>
+        <type>zip</type>
+      </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-api</artifactId>
