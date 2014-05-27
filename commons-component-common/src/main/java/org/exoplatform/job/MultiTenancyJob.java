@@ -16,11 +16,6 @@
  */
 package org.exoplatform.job;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
@@ -33,6 +28,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.impl.JobDetailImpl;
+
+import java.lang.reflect.Constructor;
+import java.util.List;
 
 /**
  * Created by The eXo Platform SAS Author : Lai Trung Hieu
@@ -51,16 +49,18 @@ public abstract class MultiTenancyJob implements Job {
     RepositoryService repoService = (RepositoryService) ExoContainerContext.getCurrentContainer()
                                                                            .getComponentInstanceOfType(RepositoryService.class);
     List<RepositoryEntry> entries = repoService.getConfig().getRepositoryConfigurations();
-    ExecutorService executor = Executors.newFixedThreadPool(entries.size());
     for (RepositoryEntry repositoryEntry : entries) {
       try {
-        Constructor constructor = getTask().getConstructor(this.getClass(), JobExecutionContext.class, String.class);
-        executor.execute((Runnable) constructor.newInstance(this, context, repositoryEntry.getName()));
+        @SuppressWarnings("unchecked")
+        Constructor<MultiTenancyTask> constructor = (Constructor<MultiTenancyTask>)getTask()
+                                                                                   .getConstructor(this.getClass(), 
+                                                                                                   JobExecutionContext.class, 
+                                                                                                   String.class);
+        constructor.newInstance(this, context, repositoryEntry.getName()).run();
       } catch (Exception e) {
         LOG.error("Exception when looking for multi-tenancy task", e);
       }
     }
-    executor.shutdown();
   }
 
   public class MultiTenancyTask implements Runnable {
