@@ -92,6 +92,8 @@ public abstract class MultiTenancyJob implements Job {
           LOG.error("Could not get the name of the current tenant: " + e.getMessage());
           LOG.debug("Could not get the name of the current tenant", e);
         }
+        // We don't go any further even if we met an exception to avoid calling twice the task
+        return;
       }
     }
     List<RepositoryEntry> entries = repoService.getConfig().getRepositoryConfigurations();
