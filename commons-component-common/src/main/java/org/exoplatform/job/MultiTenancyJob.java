@@ -16,6 +16,7 @@
  */
 package org.exoplatform.job;
 
+import org.exoplatform.commons.utils.ClassLoading;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
@@ -51,7 +52,7 @@ public abstract class MultiTenancyJob implements Job {
     Method m1 = null;
     Method m2 = null;
     try {
-      c = Class.forName("org.exoplatform.container.multitenancy.TenantsService");
+      c = ClassLoading.forName("org.exoplatform.container.multitenancy.TenantsService", MultiTenancyJob.class);
       LOG.debug("Could find the class TenantsService, so we assume that we are in multitenant mode");
       m1 = c.getMethod("getCurrentTanant");
       LOG.debug("Could find the method allowing to get the current tenant");
@@ -78,7 +79,6 @@ public abstract class MultiTenancyJob implements Job {
   public void execute(JobExecutionContext context) throws JobExecutionException {
     ExoContainer container = ExoContainerContext.getCurrentContainer();
     RepositoryService repoService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
-    String tenantName = null;
     if (TENANT_MODE) {
       Object tenantsService = container.getComponentInstanceOfType(TENANTS_SERVICE_CLASS);
       if (tenantsService == null)
@@ -86,7 +86,8 @@ public abstract class MultiTenancyJob implements Job {
       else {
         try {
           Object o = GET_CURRENT_TENANT_METHOD.invoke(tenantsService);
-          tenantName = (String)GET_NAME_METHOD.invoke(o);
+          String tenantName = (String)GET_NAME_METHOD.invoke(o);
+          callMultiTenancyJob(context, tenantName);
         } catch (Exception e) {
           LOG.error("Could not get the name of the current tenant: " + e.getMessage());
           LOG.debug("Could not get the name of the current tenant", e);
@@ -95,18 +96,20 @@ public abstract class MultiTenancyJob implements Job {
     }
     List<RepositoryEntry> entries = repoService.getConfig().getRepositoryConfigurations();
     for (RepositoryEntry repositoryEntry : entries) {
-      if (tenantName != null && !tenantName.equals(repositoryEntry.getName()))
-        continue;
-      try {
-        @SuppressWarnings("unchecked")
-        Constructor<MultiTenancyTask> constructor = (Constructor<MultiTenancyTask>)getTask()
-                                                                                   .getConstructor(this.getClass(), 
-                                                                                                   JobExecutionContext.class, 
-                                                                                                   String.class);
-        constructor.newInstance(this, context, repositoryEntry.getName()).run();
-      } catch (Exception e) {
-        LOG.error("Exception when looking for multi-tenancy task", e);
-      }
+      callMultiTenancyJob(context, repositoryEntry.getName());
+    }
+  }
+
+  private void callMultiTenancyJob(JobExecutionContext context, String repositoryName) {
+    try {
+      @SuppressWarnings("unchecked")
+      Constructor<MultiTenancyTask> constructor = (Constructor<MultiTenancyTask>)getTask()
+                                                                                .getConstructor(this.getClass(), 
+                                                                                                JobExecutionContext.class, 
+                                                                                                String.class);
+      constructor.newInstance(this, context, repositoryName).run();
+    } catch (Exception e) {
+      LOG.error("Exception when looking for multi-tenancy task", e);
     }
   }
 
