@@ -163,6 +163,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     long startTime = 0;
     if ( stats ) startTime = System.currentTimeMillis();
+    //
+    userId = userId.replace("'", "''");
     
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(NTF_MESSAGE).append(" WHERE ");
     

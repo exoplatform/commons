@@ -48,19 +48,19 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     super.tearDown();
   }
   
-  private NotificationInfo saveNotification() throws Exception {
+  private NotificationInfo saveNotification(String userDaily, String userWeekly) throws Exception {
     NotificationInfo notification = NotificationInfo.instance();
     Map<String, String> params = new HashMap<String, String>();
     params.put("objectId", "idofobject");
-    notification.key("TestPlugin").setSendToDaily("root")
-                .setSendToWeekly("demo").setOwnerParameter(params).setOrder(1);
+    notification.key("TestPlugin").setSendToDaily(userDaily)
+                .setSendToWeekly(userWeekly).setOwnerParameter(params).setOrder(1);
     notificationDataStorage.save(notification);
     addMixin(notification.getId());
     return notification;
   }
 
   public void testSave() throws Exception {
-    NotificationInfo notification = saveNotification();
+    NotificationInfo notification = saveNotification("root", "demo");
     //
     Node node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
     assertNotNull(node);
@@ -74,7 +74,7 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
   public void testNormalGetByUserAndRemoveMessagesSent() throws Exception {
     NotificationConfiguration configuration = getService(NotificationConfiguration.class);
     configuration.setSendWeekly(false);
-    NotificationInfo notification = saveNotification();
+    NotificationInfo notification = saveNotification("root", "demo");
     UserSetting userSetting = UserSetting.getInstance();
     userSetting.setUserId("root")
                .addProvider("TestPlugin", FREQUENCY.DAILY);
@@ -151,7 +151,25 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     node = getMessageNodeByKeyIdAndParam("TestPlugin", "objectId=idofobject");
     assertNull(node);
   }
-  
+
+  public void testWithUserNameContainSpecialCharacter() throws Exception {
+    String userNameSpecial = "Rabe'e \"AbdelWahabô";
+    NotificationConfiguration configuration = getService(NotificationConfiguration.class);
+    configuration.setSendWeekly(false);
+    NotificationInfo notification = saveNotification(userNameSpecial, "demo");
+    getService(NotificationConfiguration.class).setSendWeekly(false);
+    //
+    UserSetting userSetting = UserSetting.getInstance();
+    userSetting.setUserId(userNameSpecial).addProvider("TestPlugin", FREQUENCY.DAILY);
+    userSetting.setActive(true);
+    //
+    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(userSetting);
+    System.out.println(map);
+    List<NotificationInfo> list = map.get(new NotificationKey("TestPlugin"));
+    //
+    assertEquals(1, list.size());
+    assertTrue(list.get(0).equals(notification));
+  }
   
   private void addMixin(String msgId) throws Exception {
     Node msgNode = getMessageNodeById(msgId);
@@ -161,7 +179,7 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
       session.save();
     }
   }
-  
+
   private NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
     NotificationInfo message = NotificationInfo.instance()
