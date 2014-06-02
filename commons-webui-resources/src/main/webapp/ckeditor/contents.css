@@ -21,7 +21,7 @@ body
 .cke_editable
 {
 	font-size: 13px;
-	line-height: 1.6em;
+	line-height: 1.6;
 }
 
 blockquote
@@ -48,6 +48,10 @@ blockquote
 	border-right-width: 5px;
 }
 
+.cke_panel_list > li {
+    line-height: 1;
+}
+
 a
 {
 	color: #0782C1;
@@ -64,7 +68,7 @@ ol,ul,dl
 h1,h2,h3,h4,h5,h6
 {
 	font-weight: normal;
-	line-height: 1.2em;
+	line-height: 1.2;
 }
 
 hr
