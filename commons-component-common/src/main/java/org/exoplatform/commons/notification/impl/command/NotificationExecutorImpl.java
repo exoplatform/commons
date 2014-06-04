@@ -27,6 +27,7 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -71,6 +72,8 @@ public class NotificationExecutorImpl implements NotificationExecutor {
             LOG.warn("Process NotificationInfo is failed: " + e.getMessage());
             LOG.debug(e.getMessage(), e);
             return false;
+          } finally {
+            NotificationSessionManager.closeSessionProvider();
           }
           //
           return true;

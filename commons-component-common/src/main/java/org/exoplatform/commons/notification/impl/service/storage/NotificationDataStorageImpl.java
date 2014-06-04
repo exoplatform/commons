@@ -41,7 +41,6 @@ import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -66,7 +65,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public void save(NotificationInfo message) throws Exception {
-    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     final ReentrantLock localLock = lock;
     try {
       localLock.lock();
@@ -94,7 +93,6 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting setting) {
-//    SessionProvider sProvider = SessionProvider.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
     Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
     try {
