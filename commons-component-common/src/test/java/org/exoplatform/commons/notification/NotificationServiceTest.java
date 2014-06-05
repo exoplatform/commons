@@ -41,7 +41,6 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     NodeIterator iterator = homeNode.getNodes();
     while (iterator.hasNext()) {
       Node node = (iterator.nextNode());
-      System.out.println("\n remove " + node.getPath());
       node.remove();
     }
     session.save();
@@ -164,7 +163,6 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     userSetting.setActive(true);
     //
     Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(userSetting);
-    System.out.println(map);
     List<NotificationInfo> list = map.get(new NotificationKey("TestPlugin"));
     //
     assertEquals(1, list.size());
