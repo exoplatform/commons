@@ -24,7 +24,13 @@ public class CommonsUtilsTest extends BaseCommonsTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    
+    System.clearProperty(CommonsUtils.CONFIGURED_DOMAIN_URL_KEY);
+  }
+
+  @Override
+  public void tearDown() throws Exception {
+    super.tearDown();
+    System.setProperty(CommonsUtils.CONFIGURED_DOMAIN_URL_KEY, "http://localhost:8080");
   }
   
   public void testGetService() {
@@ -54,5 +60,7 @@ public class CommonsUtilsTest extends BaseCommonsTestCase {
     System.setProperty(CommonsUtils.CONFIGURED_TENANT_MASTER_HOST_KEY, "exoplatfom.net");
     //
     assertEquals("http://repository.exoplatfom.net", CommonsUtils.getCurrentDomain());
+    //
+    System.clearProperty(CommonsUtils.CONFIGURED_TENANT_MASTER_HOST_KEY);
   }
 }
