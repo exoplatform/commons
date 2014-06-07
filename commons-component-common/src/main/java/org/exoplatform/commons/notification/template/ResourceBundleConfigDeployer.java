@@ -108,6 +108,7 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
 
   private boolean initBundle(ServletContext servletCtx, String path) {
     Set<String> paths = servletCtx.getResourcePaths(getPathFile(path));
+    boolean isOK = false;
     if (paths != null) {
       for (String rsLocation : paths) {
         if (rsLocation == null || rsLocation.indexOf(path.replace(".", "/")) < 0) {
@@ -118,13 +119,13 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
           String lang = getLang(rsLocation.replace(FILE_EXTENSION_PROPERTIES, ""));
           //
           addResourceBundle(is, lang, path);
-          return true;
+          isOK = true;
         } catch (IOException e) {
           LOG.warn("Error when initializing resource bundle: " + path, e);
         }
       }
     }
-    return false;
+    return isOK;
   }
 
   private void addResourceBundleByPlugin(String path) {
@@ -157,6 +158,8 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
           value.append("\n").append(dataResourceBundle.get(key));
         }
         dataResourceBundle.put(key, value.toString());
+      } else {
+        LOG.warn("Notification add resource bundle is unsuccessfully, resourceLocale: " + resourceLocale);
       }
     } catch (Exception e) {
       LOG.debug("Error when initializing resource bundle: " + resourceLocale, e);
@@ -186,7 +189,6 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
   }
 
   private void addAllResourcebundle() {
-
     for (String key : dataResourceBundle.keySet()) {
       ResourceBundleData bundleData = new ResourceBundleData(dataResourceBundle.get(key));
       bundleData.setLanguage(getLang(key));
