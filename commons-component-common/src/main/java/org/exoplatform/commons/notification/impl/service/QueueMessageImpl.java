@@ -123,7 +123,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         LOG.debug("Job executes interval: " + interval);
       } catch (Exception e) {
         LOG.warn("Executes the Send Notification is not successfully.");
-        LOG.debug("Executes the Send Notification is not successfully.", e);
+        LOG.debug(e.getMessage(), e);
       }
     }
   }
@@ -182,7 +182,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         if (messageInfo != null && !idsRemovingLocal.get().contains(messageInfo.getId())
             && sendMessage(messageInfo.makeEmailNotification())) {
           
-          LOG.debug("Message sent:" + messageInfo.toString());
+          LOG.debug("Message sent to user: " + messageInfo.getTo());
           //
           idsRemovingLocal.get().add(messageInfo.getId());
           if (stats) {
@@ -192,7 +192,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       }
     } catch (Exception e) {
       LOG.warn("Message sending is not successfully.");
-      LOG.debug("Message sending is not successfully.", e);
+      LOG.debug(e.getMessage(), e);
     } finally {
       sProvider.close();
       removeMessageInfo();
@@ -224,7 +224,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       }
     } catch (Exception e) {
       LOG.warn("Message loading is not successfully.");
-      LOG.debug("Message loading is not successfully.", e);
+      LOG.debug(e.getMessage(), e);
     }
   }
 
@@ -246,7 +246,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
     } catch (Exception e) {
       LOG.warn("Persist message to storage is not successfuly.");
-      LOG.debug("Persist message to storage is not successfuly: " + message.toJSON(), e);
+      LOG.debug(e.getMessage() + message.toJSON(), e);
     } finally {
       lock.unlock();
     }
@@ -268,7 +268,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       session.save();
     } catch (Exception e) {
       LOG.warn("Message removing in storage is not sucessfully.");
-      LOG.debug("Message removing in storage is not sucessfully.", e);
+      LOG.debug(e.getMessage(), e);
     } finally {
       messages.clear();
       idsRemovingLocal.get().removeAll(ids);
@@ -293,7 +293,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       return result.getNodes();
     } catch (Exception e) {
       LOG.warn("Message loading is not sucessfully.");
-      LOG.debug("Message loading is not sucessfully.", e);
+      LOG.debug(e.getMessage(), e);
     }
     return null;
   }
@@ -314,7 +314,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       return info;
     } catch (Exception e) {
       LOG.warn("Message mapping between node and model is not sucessfully.");
-      LOG.debug("Message mapping between node and model is not sucessfully.", e);
+      LOG.debug(e.getMessage(), e);
     }
     return null;
   }
@@ -330,7 +330,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         return true;
       } catch (Exception e) {
         LOG.warn("Message sending is not sucessfully.");
-        LOG.debug("Message sending is not sucessfully.", e);
+        LOG.debug(e.getMessage(), e);
         return false;
       }
     } else {
@@ -387,10 +387,11 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       Session session = getSession(sProvider, configuration.getWorkspace());
       Node root = session.getRootNode();
       //
-      LOG.trace("Removing messages... ");
+      LOG.trace("Removing messages: ");
       if (root.hasNode("eXoNotification/messageInfoHome")) {
-        root.getNode("eXoNotification/messageInfoHome").remove();
-        session.save();
+        NodeIterator it = root.getNode("eXoNotification/messageInfoHome").getNodes();
+        //
+        removeNodes(session, it);
       }
       LOG.trace("Done to removed messages! ");
       //
@@ -405,29 +406,56 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         pli = string;
         LOG.trace("Remove notification info on plugin: " + pli);
         //
-        j = 0;
         session = getSession(sProvider, configuration.getWorkspace());
         it = ((Node) session.getItem(string)).getNodes();
         while (it.hasNext()) {
           NodeIterator hIter = it.nextNode().getNodes();
-          while (hIter.hasNext()) {
-            hIter.nextNode().remove();
-            ++j;
-            if (j % 200 == 0) {
-              session.save();
-            }
-            LOG.info(".");
-          }
-          session.save();
+          j = removeNodes(session, hIter);
+          t += j;
         }
         LOG.trace("Removed " + j + " nodes info on plugin: " + pli);
-        t += j;
         session.logout();
       }
 
       return "Done to removed " + t + " nodes!";
     } catch (Exception e) {
       LOG.trace("Removed " + j + " nodes info on plugin: " + pli);
+      LOG.trace("Removed all " + t + " nodes.");
+      LOG.debug("Failed to remove all data of feature notification." + e.getMessage());
+    } finally {
+      sProvider.close();
+    }
+    return "Failed to remove all. Please, try again !";
+  }
+  
+  private int removeNodes(Session session, NodeIterator it) throws Exception {
+    int i = 0, size = Integer.valueOf(System.getProperty("sizePersiter", "200"));
+    while (it.hasNext()) {
+      it.nextNode().remove();
+      ++i;
+      if (i % size == 0) {
+        session.save();
+      }
+      System.out.print(".");
+    }
+    session.save();
+    return i;
+  }
+  
+  public String removeUsersSetting() {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    int t = 0;
+    try {
+      Session session = getSession(sProvider, configuration.getWorkspace());
+      Node root = session.getRootNode();
+      LOG.trace("Removing all user settings: ");
+      if (root.hasNode("settings/user")) {
+        NodeIterator it = root.getNode("settings/user").getNodes();
+        //
+        t = removeNodes(session, it);
+      }
+      return "Done to removed " + t + " users!";
+    } catch (Exception e) {
       LOG.trace("Removed all " + t + " nodes.");
       LOG.debug("Failed to remove all data of feature notification." + e.getMessage());
     } finally {
