@@ -17,7 +17,10 @@ import org.exoplatform.services.log.Log;
 public class CommonsUtils {
 	
 	private static final Log LOG = ExoLogger.getLogger(CommonsUtils.class.getName());
-	
+
+	public static final String CONFIGURED_TENANT_MASTER_HOST_KEY = "tenant.masterhost";
+	public static final String CONFIGURED_DOMAIN_URL_KEY = "gatein.email.domain.url";
+
     /**
      * Gets the system session provider.
      *
@@ -100,5 +103,26 @@ public class CommonsUtils {
     public static boolean isFeatureActive(String featureName) {
       ExoFeatureService featureService = getService(ExoFeatureService.class);
       return featureService.isActiveFeature(featureName);
+    }
+
+    /**
+     * Get the current domain name by configuration
+     * 
+     * @return the current domain name.
+     */
+    public static String getCurrentDomain() {
+      String sysDomain = System.getProperty(CONFIGURED_DOMAIN_URL_KEY);
+      if (sysDomain == null || sysDomain.length() == 0) {
+        throw new NullPointerException("Get the domain is unsuccessfully. Please, add configuration domain on configuration.properties file with key: " +
+                                         CONFIGURED_DOMAIN_URL_KEY);
+      }
+      // multiple tenant
+      String masterHost = System.getProperty(CONFIGURED_TENANT_MASTER_HOST_KEY);
+      if (masterHost != null && masterHost.length() > 0) {
+        String currentTenant = getRepository().getConfiguration().getName();
+        return sysDomain.replace(masterHost, currentTenant + "." + masterHost);
+      }
+      //
+      return sysDomain;
     }
 }

@@ -199,10 +199,6 @@ public abstract class AbstractService {
     }
   }
 
-  protected static SessionProvider getSystemProvider() {
-    return CommonsUtils.getSystemSessionProvider();
-  }
-
   protected static void sessionSave(Node node) throws Exception {
     node.getSession().save();
   }

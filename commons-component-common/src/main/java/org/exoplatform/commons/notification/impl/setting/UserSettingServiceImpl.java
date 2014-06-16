@@ -212,7 +212,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public void addMixin(User[] users) {
-    SessionProvider sProvider = getSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     try {
       addMixin(sProvider, users);
     } catch (Exception e) {
@@ -252,7 +252,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * @param userId the userId for removing
    */
   private void removeMixin(String userId) {
-    SessionProvider sProvider = getSystemProvider();
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Session session = getSession(sProvider, workspace);
       Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
@@ -299,7 +299,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<String> getUserSettingByPlugin(String pluginId) {
-    SessionProvider sProvider = getSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();;
     List<String> userIds = new ArrayList<String>();
     try {
       NodeIterator iter = getDailyIterator(sProvider, 0, 0, pluginId);
@@ -343,7 +343,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<UserSetting> getDaily(int offset, int limit) {
-    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
       NodeIterator iter = getDailyIterator(sProvider, offset, limit, null);
@@ -392,7 +392,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public long getNumberOfDaily() {
-    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     try {
       NodeIterator iter = getDailyIterator(sProvider, 0, 0, null);
       return (iter == null) ? 0l : iter.getSize();
@@ -418,7 +418,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public List<UserSetting> getDefaultDaily(int offset, int limit) {
-    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
@@ -441,7 +441,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public long getNumberOfDefaultDaily() {
-    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     try {
       Session session = getSession(sProvider, workspace);
       if (session.getRootNode().hasNode(SETTING_USER_PATH)) {

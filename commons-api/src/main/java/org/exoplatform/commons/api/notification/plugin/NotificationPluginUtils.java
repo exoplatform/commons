@@ -30,6 +30,7 @@ import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserProfile;
 
 public class NotificationPluginUtils {
+
   public static final String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
 
   private static OrganizationService organizationService;
@@ -46,10 +47,6 @@ public class NotificationPluginUtils {
     return getExoContainerContext().getPortalContainerName();
   }
 
-  public static String getDomain() {
-    return System.getProperty("gatein.email.domain.url", "http://localhost:8080");
-  }
-
   public static String getFirstName(String userName) {
     User user = null;
     try {
@@ -63,13 +60,6 @@ public class NotificationPluginUtils {
   
   private static ExoContainerContext getExoContainerContext() {
     return (ExoContainerContext) PortalContainer.getInstance().getComponentInstanceOfType(ExoContainerContext.class);
-  }
-
-  public static String getProfileUrl(String userId) {
-    StringBuffer footerLink = new StringBuffer(getDomain());
-    return footerLink.append("/").append(getExoContainerContext().getRestContextName())
-            .append("/").append("social/notifications/redirectUrl/notification_settings")
-            .append("/").append(userId).toString();
   }
 
   public static String getFullName(String userId) {
@@ -130,18 +120,6 @@ public class NotificationPluginUtils {
     return name != null ? (String) name.getValue() : "eXo";
   }
   
-  public static String getPortalHome(String portalName) {
-    StringBuffer portalLink = new StringBuffer(getDomain());
-    portalLink.append("/")
-              .append(getExoContainerContext().getRestContextName())
-              .append("/")
-              .append("social/notifications/redirectUrl/portal_home")
-              .append("/")
-              .append(portalName);
-    
-    return "<a target=\"_blank\" style=\"text-decoration: none; font-weight: bold; color: #2F5E92; \" href=\"" + portalLink.toString() + "\">" + portalName + "</a>";
-  }
-
   public static String getTo(String to) {
     if (to.indexOf("@") < 0) {
       return getEmailFormat(to);
@@ -178,5 +156,4 @@ public class NotificationPluginUtils {
     }
     return settingService;
   }
-  
 }

@@ -51,6 +51,7 @@ public abstract class BaseCommonsTestCase extends BasicTestCase {
 
     session = repositoryService.getRepository(REPO_NAME).getSystemSession(WORKSPACE_NAME);
     root = session.getRootNode();
+    System.setProperty("gatein.email.domain.url", "http://localhost:8080");
   }
 
   protected void tearDown() throws Exception {
