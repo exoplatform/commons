@@ -288,7 +288,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 DocumentSelector.prototype.submitSelectedFile = function(item){
   var me = _module.DocumentSelector;   
   var nodePath = jQuery(item).attr("jcrPath");
-  var fileName = jQuery(item).attr("title");
+  var fileName = jQuery(item).attr("name");
   var fileType = jQuery(item).attr("data-file-type");
     
   if (me.selectFileLink) {

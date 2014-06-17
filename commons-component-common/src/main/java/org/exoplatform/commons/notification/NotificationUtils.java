@@ -206,4 +206,23 @@ public class NotificationUtils {
     }
     return title;
   }
+  
+  public static String getProfileUrl(String userId) {
+    StringBuffer footerLink = new StringBuffer(CommonsUtils.getCurrentDomain());
+    return footerLink.append("/").append(CommonsUtils.getRestContextName())
+            .append("/").append("social/notifications/redirectUrl/notification_settings")
+            .append("/").append(userId).toString();
+  }
+  
+  public static String getPortalHome(String portalName) {
+    StringBuffer portalLink = new StringBuffer(CommonsUtils.getCurrentDomain());
+    portalLink.append("/")
+              .append(CommonsUtils.getRestContextName())
+              .append("/")
+              .append("social/notifications/redirectUrl/portal_home")
+              .append("/")
+              .append(portalName);
+    
+    return "<a target=\"_blank\" style=\"text-decoration: none; font-weight: bold; color: #2F5E92; \" href=\"" + portalLink.toString() + "\">" + portalName + "</a>";
+  }
 }
