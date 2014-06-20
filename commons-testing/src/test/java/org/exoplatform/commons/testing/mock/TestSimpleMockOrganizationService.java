@@ -111,6 +111,18 @@ public class TestSimpleMockOrganizationService extends TestCase {
 		
 		assertEquals("foo", user("foo").getUserName());
 		assertEquals("foo", group("foo").getId());
+		//
+		assertEquals("foo@user.com", user("foo").getEmail());
+		User user = user("foo");
+		user.setEmail("test@email.com");
+		user.setFirstName("ABC");
+		user.setLastName("BAZ");
+		user.setDisplayName("USER FOO");
+		//
+		assertEquals("test@email.com", user.getEmail());
+		assertEquals("ABC", user.getFirstName());
+		assertEquals("BAZ", user.getLastName());
+		assertEquals("USER FOO", user.getDisplayName());
 	}
 	
 	

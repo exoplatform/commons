@@ -474,6 +474,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
   }
 
   static class SimpleUser extends UserImpl {
+    private static final long serialVersionUID = 1L;
     String name = null;
     String displayName = null;
 
@@ -496,6 +497,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return name.hashCode();
     }
 
+    @Override
     public String toString() {
       return name;
     }
@@ -505,14 +507,23 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public String getEmail() {
-      return name;
+      if (super.getEmail() != null) {
+        return super.getEmail();
+      }
+      return name + "@user.com";
     }
 
     public String getFirstName() {
+      if (super.getFirstName() != null) {
+        return super.getFirstName();
+      }
       return name;
     }
 
     public String getFullName() {
+      if (super.getFullName() != null) {
+        return super.getFullName();
+      }
       return name;
     }
 
@@ -521,6 +532,9 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public String getLastName() {
+      if (super.getLastName() != null) {
+        return super.getLastName();
+      }
       return name;
     }
 
@@ -536,48 +550,16 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return name;
     }
 
-    public void setCreatedDate(Date t) {
-
-    }
-
-    public void setEmail(String s) {
-
-    }
-
-    public void setFirstName(String s) {
-
-    }
-
-    public void setFullName(String s) {
-
-    }
-
-    public void setLastLoginTime(Date t) {
-
-    }
-
-    public void setLastName(String s) {
-
-    }
-
-    public void setOrganizationId(String organizationId) {
-
-    }
-
-    public void setPassword(String s) {
-
-    }
-
     public void setUserName(String s) {
+      super.setUserName(s);
       this.name = s;
     }
 
-    public String getDisplayName() {      
-      return null;
-    }
-
-    public void setDisplayName(String displayName) {
-   
+    public String getDisplayName() {
+      if (super.getDisplayName() != null) {
+        return super.getDisplayName();
+      }
+      return name;
     }
   }
 
