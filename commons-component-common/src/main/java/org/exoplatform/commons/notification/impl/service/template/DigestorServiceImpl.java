@@ -133,7 +133,7 @@ public class DigestorServiceImpl implements DigestorService {
       return null;
     }
     
-    LOG.info("End build template of DigestorProviderImpl ... " + (System.currentTimeMillis() - startTime) + " ms");
+    LOG.debug("End build template of DigestorProviderImpl ... " + (System.currentTimeMillis() - startTime) + " ms");
     
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     if (stats) {

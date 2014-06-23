@@ -212,6 +212,34 @@ public class UserSetting {
     return setting;
   }
   
+  @Override
+  public boolean equals(Object obj) {
+    if (super.equals(obj)) {
+      return true;
+    }
+    if (!(obj instanceof UserSetting)) {
+      return false;
+    }
+    UserSetting that = (UserSetting) obj;
+    if (userId != null && userId.equals(that.userId)) {
+      return true;
+    }
+    return false;
+  }
+  
+  @Override
+  public int hashCode() {
+    if (userId != null) {
+      return userId.hashCode();
+    }
+    return super.hashCode();
+  }
+  
+  @Override
+  public String toString() {
+    return "UserSetting : {userId : "+userId+"}";
+  }
+  
   public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
       PluginSettingService settingService = (PluginSettingService) PortalContainer.getInstance()

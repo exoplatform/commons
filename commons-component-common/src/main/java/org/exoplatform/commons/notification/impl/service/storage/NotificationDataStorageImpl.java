@@ -93,7 +93,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting setting) {
-    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
     try {
 
@@ -111,8 +111,6 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
     } catch (Exception e) {
       LOG.error("Failed to get the NotificationMessage by user: " + setting.getUserId(), e);
-    } finally {
-//      sProvider.close();
     }
 
     return notificationData;

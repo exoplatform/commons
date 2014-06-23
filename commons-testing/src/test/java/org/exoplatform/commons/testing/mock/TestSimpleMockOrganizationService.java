@@ -1,12 +1,13 @@
 package org.exoplatform.commons.testing.mock;
 
 
+import java.util.Arrays;
 import java.util.Date;
 
 import junit.framework.TestCase;
 
 import org.exoplatform.commons.testing.AssertUtils;
-import org.exoplatform.commons.testing.mock.SimpleMockOrganizationService;
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.Membership;
@@ -23,6 +24,7 @@ public class TestSimpleMockOrganizationService extends TestCase {
 	
 	public void setUp() {
 		 a = new SimpleMockOrganizationService();
+		 a.destroy();
 	}
 	
 	public void testSimpleGroup() {
@@ -109,6 +111,18 @@ public class TestSimpleMockOrganizationService extends TestCase {
 		
 		assertEquals("foo", user("foo").getUserName());
 		assertEquals("foo", group("foo").getId());
+		//
+		assertEquals("foo@user.com", user("foo").getEmail());
+		User user = user("foo");
+		user.setEmail("test@email.com");
+		user.setFirstName("ABC");
+		user.setLastName("BAZ");
+		user.setDisplayName("USER FOO");
+		//
+		assertEquals("test@email.com", user.getEmail());
+		assertEquals("ABC", user.getFirstName());
+		assertEquals("BAZ", user.getLastName());
+		assertEquals("USER FOO", user.getDisplayName());
 	}
 	
 	
@@ -121,6 +135,14 @@ public class TestSimpleMockOrganizationService extends TestCase {
 		a.addMemberships("user1", "*:/foo", "admin:/bar", "member:/baz");
 		AssertUtils.assertContains(userHandler.findUsersByGroup("/foo").getAll(), user("user1"));
 		AssertUtils.assertNotContains(userHandler.findUsersByGroup("/platform/administrators").getAll(), user("user2"));
+		//
+		AssertUtils.assertContains(Arrays.asList(userHandler.findUsersByGroupId("/foo").load(0, 2)), user("user1"));
+		AssertUtils.assertNotContains(Arrays.asList(userHandler.findUsersByGroupId("/platform/administrators").load(0, 1)), user("user2"));
+    ListAccess<User> listAccess = userHandler.findAllUsers();
+    AssertUtils.assertContains(Arrays.asList(listAccess.load(0, listAccess.getSize())), user("user2"));
+    //
+    userHandler.createUser(user("user3"), false);
+    assertEquals(3, userHandler.findAllUsers().getSize());
 	}
 	
 	public void testMembershipHandler() throws Exception {

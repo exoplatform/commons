@@ -3,6 +3,7 @@
  */
 package org.exoplatform.commons.testing.mock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -10,7 +11,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.ListAccessImpl;
 import org.exoplatform.commons.utils.ObjectPageList;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.component.ComponentPlugin;
@@ -28,6 +31,7 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserProfileHandler;
+import org.exoplatform.services.organization.idm.UserImpl;
 
 /**
  * A partial implementation of OrganizationService for use in tests of classes
@@ -69,6 +73,46 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
   }
 
+  public SimpleMockOrganizationService() {
+
+    try {
+      User usr = new UserImpl("exo");
+      getUserHandler().createUser(usr, false);
+      usr = new UserImpl("admin");
+      getUserHandler().createUser(usr, false);
+
+      usr = new UserImpl("weblogic");
+      getUserHandler().createUser(usr, false);
+
+      usr = new UserImpl("__anonim");
+      getUserHandler().createUser(usr, false);
+
+      // webos users
+      usr = new UserImpl("root");
+      getUserHandler().createUser(usr, false);
+
+      usr = new UserImpl("john");
+      getUserHandler().createUser(usr, false);
+
+      usr = new UserImpl("james");
+      getUserHandler().createUser(usr, false);
+
+      usr = new UserImpl("mary");
+      getUserHandler().createUser(usr, false);
+
+      usr = new UserImpl("marry");
+      getUserHandler().createUser(usr, false);
+
+      usr = new UserImpl("demo");
+      getUserHandler().createUser(usr, false);
+    } catch (Exception e) {
+    }
+  }
+  
+  public void destroy() {
+    storage = new HashSet<SimpleMembership>();
+  }
+  
   public GroupHandler getGroupHandler() {
     return new MockGroupHandler();
   }
@@ -261,6 +305,17 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return null;
     }
 
+    public SimpleMembership getMembershipByUser(String userName) throws Exception {
+      Iterator<SimpleMembership> mbIt = storage.iterator();
+      while (mbIt.hasNext()) {
+        SimpleMembership membership = (SimpleMembership) mbIt.next();
+        if (membership.getUserName().equals(userName)) {
+          return membership;
+        }
+      }
+      return null;
+    }
+
     public Membership createMembershipInstance() {
       return null;
     }
@@ -288,7 +343,15 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public User removeUser(String userName, boolean broadcast) throws Exception {
-      return null;
+      User user = findUserByName(userName);
+      if (user != null) {
+        //
+        SimpleMembership mb = ((MockMembershipHandler) getMembershipHandler()).getMembershipByUser(userName);
+        if (mb != null) {
+          storage.remove(mb);
+        }
+      }
+      return user;
     }
 
     @SuppressWarnings("unchecked")
@@ -340,15 +403,15 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public User createUserInstance(String username) {
-      return null;
+      return new SimpleUser(username);
     }
 
     public User createUserInstance() {
-      return null;
+      return new SimpleUser(null);
     }
 
     public void createUser(User user, boolean broadcast) throws Exception {
-
+      addMemberships(user.getUserName(), new String[]{"member:/platform/user"});
     }
 
     public boolean authenticate(String username, String password) throws Exception {
@@ -360,25 +423,58 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public ListAccess<User> findAllUsers() throws Exception {
-      return null;
+      Iterator<SimpleMembership> mbIt = storage.iterator();
+      //
+      Set<User> users = new HashSet<User>();
+      while (mbIt.hasNext()) {
+        SimpleMembership membership = (SimpleMembership) mbIt.next();
+        users.add(user(membership.getUserName()));
+      }
+      //
+      return new ListAccessImpl<User>(User.class, new ArrayList<User>(users));
     }
 
     public ListAccess<User> findUsersByGroupId(String groupId) throws Exception {
-      return null;
+      Iterator<SimpleMembership> mbIt = storage.iterator();
+      //
+      HashSet<User> users = new HashSet<User>();
+      while (mbIt.hasNext()) {
+        SimpleMembership membership = (SimpleMembership) mbIt.next();
+        if (membership.getGroupId().equals(groupId)) {
+          users.add(user(membership.getUserName()));
+        }
+      }
+      //
+      return new ListAccessImpl<User>(User.class, new ArrayList<User>(users));
     }
 
     public ListAccess<User> findUsersByQuery(Query query) throws Exception {
-      return null;
+      Iterator<SimpleMembership> mbIt = storage.iterator();
+      //
+      HashSet<User> users = new HashSet<User>();
+      while (mbIt.hasNext()) {
+        SimpleMembership membership = (SimpleMembership) mbIt.next();
+        if (StringUtils.containsIgnoreCase(membership.getUserName(), query.getUserName())) {
+          users.add(user(membership.getUserName()));
+        }
+      }
+      //
+      return new ListAccessImpl<User>(User.class, new ArrayList<User>(users));
     }
 
     @Override
     public void removeUserEventListener(UserEventListener listener) {
       
     }
+    
+    private User user(String id) {
+      return new SimpleUser(id);
+    }
 
   }
 
-  static class SimpleUser implements User {
+  static class SimpleUser extends UserImpl {
+    private static final long serialVersionUID = 1L;
     String name = null;
     String displayName = null;
 
@@ -386,6 +482,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
       this.name = name;
     }
 
+    @Override
     public boolean equals(Object obj) {
       if (obj == null)
         return false;
@@ -395,10 +492,12 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return (name.equals(other.getUserName()));
     }
 
+    @Override
     public int hashCode() {
-      return super.hashCode();
+      return name.hashCode();
     }
 
+    @Override
     public String toString() {
       return name;
     }
@@ -408,14 +507,23 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public String getEmail() {
-      return name;
+      if (super.getEmail() != null) {
+        return super.getEmail();
+      }
+      return name + "@user.com";
     }
 
     public String getFirstName() {
+      if (super.getFirstName() != null) {
+        return super.getFirstName();
+      }
       return name;
     }
 
     public String getFullName() {
+      if (super.getFullName() != null) {
+        return super.getFullName();
+      }
       return name;
     }
 
@@ -424,6 +532,9 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public String getLastName() {
+      if (super.getLastName() != null) {
+        return super.getLastName();
+      }
       return name;
     }
 
@@ -432,55 +543,23 @@ public class SimpleMockOrganizationService implements OrganizationService {
     }
 
     public String getPassword() {
-      return name;
+      return "exo";
     }
 
     public String getUserName() {
       return name;
     }
 
-    public void setCreatedDate(Date t) {
-
-    }
-
-    public void setEmail(String s) {
-
-    }
-
-    public void setFirstName(String s) {
-
-    }
-
-    public void setFullName(String s) {
-
-    }
-
-    public void setLastLoginTime(Date t) {
-
-    }
-
-    public void setLastName(String s) {
-
-    }
-
-    public void setOrganizationId(String organizationId) {
-
-    }
-
-    public void setPassword(String s) {
-
-    }
-
     public void setUserName(String s) {
-
+      super.setUserName(s);
+      this.name = s;
     }
 
-    public String getDisplayName() {      
-      return null;
-    }
-
-    public void setDisplayName(String displayName) {
-   
+    public String getDisplayName() {
+      if (super.getDisplayName() != null) {
+        return super.getDisplayName();
+      }
+      return name;
     }
   }
 
