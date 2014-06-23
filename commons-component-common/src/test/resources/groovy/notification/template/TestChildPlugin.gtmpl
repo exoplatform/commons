@@ -1,0 +1,4 @@
+<div class="template-child-plugin">
+<p><%=_ctx.appRes("Notification.title.TestChildPlugin")%></p>
+ The content $CONTENT
+</div>

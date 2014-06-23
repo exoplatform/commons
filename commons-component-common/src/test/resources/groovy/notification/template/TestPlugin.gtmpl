@@ -1,0 +1,6 @@
+<div class="the-test-plugin">
+<p><%=_ctx.appRes("Notification.title.TestPlugin")%></p>
+ Hello $USER,<br>
+ the test plugin: $VALUE<br/>
+ The childrent: $CHILD_CONTENT<br/>
+</div>

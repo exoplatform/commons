@@ -21,7 +21,12 @@
                                     <p style="margin: 10px 0;"><%=_ctx.appRes("Notification.label.SayHello")%> <%=FIRSTNAME%>,</p>
                                     <p style="margin: 10px 0 15px;"><%=_ctx.appRes("Notification.message.DigestProvider", PORTAL_HOME)%>&nbsp;<strong style="color: #333; font-weight: bold; font-family: 'HelveticaNeue Bold', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 18px;"><%=_ctx.appRes("Notification.label.ThisWeek")%></strong>.
                                     </p>
-                                    <%=DIGEST_MESSAGES_LIST%>
+                                    <% if (HAS_ONE_MESSAGE) { %>
+																		   <ul style="list-style-type: none; padding-left: 0; color: #2F5E92;"><%=DIGEST_MESSAGES_LIST%></ul>
+																		<% } else { %>
+																		   <ul style="margin: 0 0  40px; padding-left: 0; color: #2F5E92; list-style-position: outside;  list-style: disc;"><%=DIGEST_MESSAGES_LIST%></ul>
+																		<% } %> 
+																		                                    
                                     <%
                                       String footerLink = "<a style=\"text-decoration: none; color: #2F5E92; \" href=\"" + FOOTER_LINK + "\">" + _ctx.appRes("Notification.label.ClickHere") + "</a>";
                                     %>
