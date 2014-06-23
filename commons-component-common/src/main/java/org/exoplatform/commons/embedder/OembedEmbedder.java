@@ -47,6 +47,14 @@ public class OembedEmbedder extends AbstractEmbedder {
 
   private static final String  EMBED_TYPE     = "type";
 
+  private static final String  EMBED_THUMBNAIL_URL  = "thumbnail_url";
+
+  private static final String  EMBED_THUMBNAIL_WIDTH  = "thumbnail_width";
+
+  private static final String  EMBED_THUMBNAIL_HEIGHT  = "thumbnail_height";
+
+  private static final String  EMBED_THUMBNAIL  = "thumbnail";
+
   /**
    * constructor
    * 
@@ -103,6 +111,18 @@ public class OembedEmbedder extends AbstractEmbedder {
       mediaObject.setProvider(jsonObject.getString(EMBED_PROVIDER));
       mediaObject.setDescription(jsonObject.has(EMBED_DESC) ? jsonObject.getString(EMBED_DESC) : "");
       mediaObject.setUrl(jsonObject.has(EMBED_URL) ? jsonObject.getString(EMBED_URL) : "");
+      if (jsonObject.has(EMBED_THUMBNAIL_URL)) {
+        mediaObject.setThumbnailUrl(jsonObject.getString(EMBED_THUMBNAIL_URL));
+      } else if (jsonObject.has(EMBED_THUMBNAIL)) {
+        mediaObject.setThumbnailUrl(jsonObject.getString(EMBED_THUMBNAIL));
+      }
+      if (jsonObject.has(EMBED_THUMBNAIL_HEIGHT)) {
+        mediaObject.setThumbnailHeight(jsonObject.getString(EMBED_THUMBNAIL_HEIGHT));
+      }
+      if (jsonObject.has(EMBED_THUMBNAIL_WIDTH)) {
+        mediaObject.setThumbnailWidth(jsonObject.getString(EMBED_THUMBNAIL_WIDTH));
+      }
+
       return mediaObject;
     } catch (JSONException e) {
       LOG.warn("Can't convert JSONObject to ExoMedia object", e);

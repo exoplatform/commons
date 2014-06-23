@@ -18,6 +18,8 @@ package org.exoplatform.commons.notification.template;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +30,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValuesParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.ResourceBundleData;
 import org.exoplatform.services.resources.ResourceBundleService;
+import org.exoplatform.services.resources.impl.BaseResourceBundlePlugin;
+import org.exoplatform.services.resources.impl.SimpleResourceBundleService;
+
 import org.gatein.wci.WebApp;
 import org.gatein.wci.WebAppEvent;
 import org.gatein.wci.WebAppLifeCycleEvent;
@@ -82,8 +89,14 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
   public void initBundlePath(Collection<String> list) {
     try {
       for (String path : list) {
+        boolean result = false;
         for (WebApp app : contexts.values()) {
-          initBundle(app.getServletContext(), path);
+          if (initBundle(app.getServletContext(), path.trim()) == true) {
+            result = true;
+          }
+        }
+        if(result == false) {
+          addResourceBundleByPlugin(path);
         }
       }
     } catch (Exception e) {
@@ -93,8 +106,9 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
     }
   }
 
-  private void initBundle(ServletContext servletCtx, String path) {
+  private boolean initBundle(ServletContext servletCtx, String path) {
     Set<String> paths = servletCtx.getResourcePaths(getPathFile(path));
+    boolean isOK = false;
     if (paths != null) {
       for (String rsLocation : paths) {
         if (rsLocation == null || rsLocation.indexOf(path.replace(".", "/")) < 0) {
@@ -105,11 +119,30 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
           String lang = getLang(rsLocation.replace(FILE_EXTENSION_PROPERTIES, ""));
           //
           addResourceBundle(is, lang, path);
+          isOK = true;
         } catch (IOException e) {
-          LOG.debug("Error when initializing resource bundle: " + path, e);
+          LOG.warn("Error when initializing resource bundle: " + path, e);
         }
       }
     }
+    return isOK;
+  }
+
+  private void addResourceBundleByPlugin(String path) {
+    InitParams params = new InitParams();
+
+    ValuesParam classPathParam = new ValuesParam();
+    classPathParam.setName("classpath.resources");
+    classPathParam.setValues(new ArrayList<String>(Arrays.asList(path)));
+    params.addParameter(classPathParam);
+
+    ValuesParam portalParam = new ValuesParam();
+    portalParam.setName("portal.resource.names");
+    portalParam.setValues(new ArrayList<String>(Arrays.asList(path)));
+    params.addParameter(portalParam);
+
+    BaseResourceBundlePlugin bundlePlugin = new BaseResourceBundlePlugin(params);
+    ((SimpleResourceBundleService) bundleService).addResourceBundle(bundlePlugin);
   }
 
   private String getPathFile(String path) {
@@ -125,6 +158,8 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
           value.append("\n").append(dataResourceBundle.get(key));
         }
         dataResourceBundle.put(key, value.toString());
+      } else {
+        LOG.warn("Notification add resource bundle is unsuccessfully, resourceLocale: " + resourceLocale);
       }
     } catch (Exception e) {
       LOG.debug("Error when initializing resource bundle: " + resourceLocale, e);
@@ -154,7 +189,6 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
   }
 
   private void addAllResourcebundle() {
-
     for (String key : dataResourceBundle.keySet()) {
       ResourceBundleData bundleData = new ResourceBundleData(dataResourceBundle.get(key));
       bundleData.setLanguage(getLang(key));

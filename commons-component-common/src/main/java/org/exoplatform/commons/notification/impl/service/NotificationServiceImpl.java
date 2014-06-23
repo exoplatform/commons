@@ -253,6 +253,10 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
+      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+        continue;
+      }
+
       if (defaultSetting != null) {
         userSetting = defaultSetting.clone()
                                     .setUserId(userSetting.getUserId())

@@ -22,6 +22,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
@@ -49,7 +51,7 @@ import org.exoplatform.webui.utils.TimeConvertUtils;
 public class DigestorServiceImpl implements DigestorService {
   
   private static final Log LOG = ExoLogger.getLogger(DigestorServiceImpl.class);
-
+  private static final Pattern LI_PATTERN = Pattern.compile("<li([^>]+)>(.+?)</li>");
 
   public DigestorServiceImpl() {
   }
@@ -72,23 +74,8 @@ public class DigestorServiceImpl implements DigestorService {
       List<String> activeProviders = pluginService.getActivePluginIds();
       NotificationContext nCtx = NotificationContextImpl.cloneInstance();
       
-      int totalDigestMsg = 0;
-      for (String providerId : activeProviders) {
-        List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
-        if (messages == null || messages.size() == 0){
-          continue;
-        }
-        totalDigestMsg += messages.size();
-      }
-      
       Writer writer = new StringWriter();
-      if (totalDigestMsg < 1) {
-        return null;
-      } else if (totalDigestMsg == 1) {
-        writer.append("<ul style=\"margin: 0 0  40px -13px; list-style-type: none; padding-left: 0; color: #2F5E92; \">");
-      } else {
-        writer.append("<ul style=\"margin: 0 0  40px; padding-left: 0; color: #2F5E92; list-style-position: outside;  list-style: disc; \">");
-      }
+
       for (String providerId : activeProviders) {
         List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
         if (messages == null || messages.size() == 0){
@@ -99,11 +86,27 @@ public class DigestorServiceImpl implements DigestorService {
         nCtx.setNotificationInfos(messages);
         plugin.buildDigest(nCtx, writer);
       }
-      writer.append("</ul>");
 
       StringBuffer sb = ((StringWriter) writer).getBuffer();
       if (sb.length() == 0) {
         return null;
+      }
+
+      String digestMessageList = sb.toString();
+      int totalDigestMsg = 0;
+      Matcher matcher = LI_PATTERN.matcher(digestMessageList);
+      String li_attribute = null;
+      while (matcher.find()) {
+        totalDigestMsg += 1;
+        li_attribute = matcher.group(1);
+      }
+
+      if (totalDigestMsg == 1) {
+        int beginIndex = li_attribute.indexOf("margin");
+        int endIndex = li_attribute.indexOf(";", beginIndex) + 1;
+        String replacedStr = li_attribute.substring(beginIndex, endIndex);
+        digestMessageList = digestMessageList
+            .replace(replacedStr, "margin: 0; background-color: #F9F9F9; padding: 15px 20px;");
       }
 
       DigestInfo digestInfo = new DigestInfo(configuration, userSetting);
@@ -118,7 +121,8 @@ public class DigestorServiceImpl implements DigestorService {
       String subject = TemplateUtils.processSubject(ctx);
       
       ctx.put("FOOTER_LINK", digestInfo.getFooterLink());
-      ctx.put("DIGEST_MESSAGES_LIST", sb.toString());
+      ctx.put("DIGEST_MESSAGES_LIST", digestMessageList);
+      ctx.put("HAS_ONE_MESSAGE", (totalDigestMsg == 1));
 
       String body = TemplateUtils.processGroovy(ctx);
 
