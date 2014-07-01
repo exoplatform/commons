@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -58,6 +59,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   private NotificationConfiguration configuration;
 
   protected static final int MAX_LIMIT = 30;
+  
+  transient final ReentrantLock lock = new ReentrantLock();
   
   public UserSettingServiceImpl(SettingService settingService, NotificationConfiguration configuration) {
     this.settingService = settingService;
@@ -160,10 +163,12 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   }
 
   private void addMixin(SessionProvider sProvider, User[] users) {
+    final ReentrantLock lock = this.lock;
     try {
       Session session = getSession(sProvider, workspace);
       Node userHomeNode = getUserSettingHome(session);
       Node userNode;
+      lock.lock();
       for (int i = 0; i < users.length; ++i) {
         User user = users[i];
         if (user == null || user.getUserName() == null) {
@@ -185,6 +190,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       session.save();
     } catch (Exception e) {
       LOG.error("Failed to addMixin for user notification setting", e);
+    } finally {
+      lock.unlock();
     }
   }
 
