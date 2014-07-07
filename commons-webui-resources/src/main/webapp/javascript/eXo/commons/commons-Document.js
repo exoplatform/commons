@@ -367,7 +367,7 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
   var msg_empty_folder_name = inputFolderName.getAttribute("msg_empty_folder_name");
   var msg_invalid_folder_name = inputFolderName.getAttribute("msg_invalid_folder_name");
-  var folder_name_standard = /^[\w.\s-]+$/;
+  var folder_name_standard = /^[\w\u00C0-\u017F.\s-]+$/;
   
   if (!me.selectedItem || !me.selectedItem.driveName) {
     alert(msg_select_folder);
@@ -394,6 +394,7 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
     alert(msg_new_folder_not_allow);
     return;
   }
+  folderName=encodeURIComponent(folderName);
   var driveName = me.selectedItem.driveName;
   var workspaceName = me.selectedItem.workspaceName;
   var url = me.createFolderURL;
