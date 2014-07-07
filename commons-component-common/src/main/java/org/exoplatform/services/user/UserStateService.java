@@ -31,6 +31,7 @@ import javax.jcr.Node;
 import javax.jcr.Session;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class UserStateService {
   public static final int _delay_update_DB = 3*60*1000; //3 mins
   public static int pingCounter = 0;
   
-  private static CacheService cacheService;
+  private final CacheService cacheService;
    
   public UserStateService(CacheService cacheService) {
     this.cacheService = cacheService;
@@ -171,8 +172,7 @@ public class UserStateService {
       }
       users = (List<UserStateModel>) userStateCache.getCachedObjects();     
       for (UserStateModel userStateModel : users) {
-        int iDate = (int) (new Date().getTime());
-        if(userStateModel.getLastActivity() >= (iDate - delay)) {
+        if(isOnline(userStateModel)) {
           onlineUsers.add(userStateModel);
         }        
       }
@@ -180,6 +180,24 @@ public class UserStateService {
       LOG.error("Exception when getting online user: {}",e);
     }     
     return onlineUsers;
+  }
+  
+  public boolean isOnline(String userId) {
+    UserStateModel model = getUserState(userId);
+    if (model != null) {
+      return isOnline(model);
+    }
+    return false;
+  }
+
+  private boolean isOnline(UserStateModel model) {
+    if (model != null) {
+      long iDate = Calendar.getInstance().getTimeInMillis();
+      if (model.getLastActivity() >= (iDate - delay)) {
+        return true;
+      }
+    }
+    return false;
   }
   
   private ExoCache<Serializable, UserStateModel> getUserStateCache(){

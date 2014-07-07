@@ -155,4 +155,17 @@ public class UserStateServiceTest extends BaseCommonsTestCase {
     assertEquals(UserStateService.DEFAULT_STATUS, onlines.get(0).getStatus());
   }
 
+  public void testIsOnline() throws Exception {
+    long date = new Date().getTime();
+    UserStateModel userModel = 
+        new UserStateModel(session.getUserID(),
+                           date,
+                           UserStateService.DEFAULT_STATUS);
+    userStateService.save(userModel);
+    userStateService.ping(userModel.getUserId());
+    assertTrue(userStateService.isOnline(session.getUserID()));
+    //
+    assertFalse(userStateService.isOnline("demo"));
+  }
+
 }

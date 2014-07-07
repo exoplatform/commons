@@ -65,26 +65,28 @@ public class RESTUserService implements ResourceContainer{
   public Response online() throws ParserConfigurationException, JSONException {
     List<UserStateModel> usersOnline = userService.online();  
     if(usersOnline == null) return Response.ok().build();
-    JSONArray json = new JSONArray();    
-    for(int i=0; i< usersOnline.size(); i++) {
-      UserStateModel model = usersOnline.get(i);
-      JSONObject object = new JSONObject();      
-      object.put("userId", model.getUserId());
-      Date date = new Date(model.getLastActivity());
-      DateFormat ISO_8601_DATE_TIME = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-      String lastActivityDate = ISO_8601_DATE_TIME.format(date);
-      object.put("lastActivityDate", lastActivityDate);
-      object.put("status", model.getStatus());
-      long iDate = new Date().getTime();
-      long lastActivity = model.getLastActivity();
-      if(lastActivity >= (iDate - userService.delay)) {
-        object.put("activity", "online");
-      } else {
-        object.put("activity", "offline");
-      }
-      json.put(object);
+    JSONArray json = new JSONArray();
+    for (UserStateModel model : usersOnline) {
+      //
+      json.put(fillModelToJson(model));
     }
     return Response.ok(json.toString(), MediaType.APPLICATION_JSON).build();
+  }
+  
+  private JSONObject fillModelToJson(UserStateModel model) throws JSONException {
+    JSONObject object = new JSONObject();
+    object.put("activity", "offline");
+    object.put("userId", model.getUserId());
+    Date date = new Date(model.getLastActivity());
+    DateFormat ISO_8601_DATE_TIME = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    String lastActivityDate = ISO_8601_DATE_TIME.format(date);
+    object.put("lastActivityDate", lastActivityDate);
+    object.put("status", model.getStatus());
+    //
+    if (userService.isOnline(model.getUserId())) {
+      object.put("activity", "online");
+    }
+    return object;
   }
   
   @GET
@@ -93,21 +95,8 @@ public class RESTUserService implements ResourceContainer{
   public Response getStatus(@PathParam("userId") String userId) throws JSONException {
     UserStateModel model = userService.getUserState(userId);
     if(model == null) return Response.noContent().build();
-    JSONObject object = new JSONObject();
-    object.put("activity", "offline");
-    if(model != null) {
-      object.put("userId", model.getUserId());
-      Date date = new Date(model.getLastActivity());
-      DateFormat ISO_8601_DATE_TIME = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-      String lastActivityDate = ISO_8601_DATE_TIME.format(date);
-      object.put("lastActivityDate", lastActivityDate);
-      object.put("status", model.getStatus());
-      long iDate = new Date().getTime();
-      long lastActivity = model.getLastActivity();
-      if(lastActivity >= (iDate - userService.delay)) {
-        object.put("activity", "online");
-      } 
-    }
+    //
+    JSONObject object = fillModelToJson(model);
     return Response.ok(object.toString(), MediaType.APPLICATION_JSON).build();
   }
   
