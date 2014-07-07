@@ -3,6 +3,9 @@ package org.exoplatform.settings.impl;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import javax.jcr.Node;
 
@@ -20,6 +23,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserSettingServiceTest extends BaseCommonsTestCase {
   private UserSettingServiceImpl userSettingService;
+  private ExecutorService executor;
   
   public UserSettingServiceTest() {
   }
@@ -32,6 +36,14 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
     addCreateDateForUser();
     // init setting home
     initSettingHome();
+    //
+    ThreadFactory threadFactory = new ThreadFactory() {
+      public Thread newThread(Runnable arg0) {
+        return new Thread(arg0, "UserProfile thread");
+      }
+    };
+
+    executor = Executors.newFixedThreadPool(20, threadFactory);
   }
 
   @Override
@@ -117,5 +129,28 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
         users[i].setCreatedDate(Calendar.getInstance().getTime());
       }
     }
+  }
+  
+  public void testAddMixingMultiThreads() throws Exception {
+    for (int i = 0; i < 500; i++) {
+      executor.execute(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
+            ListAccess<User> list = organizationService.getUserHandler().findAllUsers();
+            //
+            User[] users = list.load(0, list.getSize());
+            for (int i = 0; i < users.length; i++) {
+              userSettingService.addMixin(users[i].getUserName());
+            }
+          } catch (Exception e) {
+            assertFalse(true);
+          }
+        }
+      });
+    }
+    //
+    Thread.sleep(1000);
   }
 }

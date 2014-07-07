@@ -53,6 +53,9 @@ public class NotificationUtils {
   public static final String FEATURE_NAME              = "notification";
   
   private static final Pattern LINK_PATTERN = Pattern.compile("<a ([^>]+)>([^<]+)</a>");
+
+  private static final Pattern EMAIL_PATTERN = Pattern.compile("^[_a-z0-9-+]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,5})$");
+  
   private static final String styleCSS = " style=\"color: #2f5e92; text-decoration: none;\"";
   
   public static String getDefaultKey(String key, String providerId) {
@@ -173,9 +176,9 @@ public class NotificationUtils {
     addressList = StringUtils.replace(addressList, ";", ",");
     try {
       InternetAddress[] iAdds = InternetAddress.parse(addressList, true);
-      String emailRegex = "[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[_A-Za-z0-9-.]+\\.[A-Za-z]{2,5}";
       for (int i = 0; i < iAdds.length; i++) {
-        if (!iAdds[i].getAddress().matches(emailRegex))
+        Matcher matcher = EMAIL_PATTERN.matcher(iAdds[i].getAddress());
+        if (! matcher.find())
           return false;
       }
     } catch (AddressException e) {

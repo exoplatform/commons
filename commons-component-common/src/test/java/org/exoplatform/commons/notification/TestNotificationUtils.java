@@ -47,6 +47,8 @@ public class TestNotificationUtils extends TestCase {
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
     emails = "test@test.com, demo@demo.com, ";
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
+    emails = "test+test@test.com, demo+aaa@demo.com, ";
+    assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
   }
 
   public void testProcessLinkInActivityTitle() throws Exception {
