@@ -16,24 +16,24 @@
  */
 package org.exoplatform.services.user;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.jcr.Node;
+import javax.jcr.Session;
+
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
-import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
-
-import javax.jcr.Node;
-import javax.jcr.Session;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import org.exoplatform.services.security.IdentityConstants;
 
 
 public class UserStateService {
@@ -52,45 +52,42 @@ public class UserStateService {
    
   public UserStateService(CacheService cacheService) {
     this.cacheService = cacheService;
-    if(System.getProperty("user.status.offline.delay") != null ) {
+    if (System.getProperty("user.status.offline.delay") != null) {
       delay = Integer.parseInt(System.getProperty("user.status.offline.delay"));
     }
   }
+
   // Add or update a userState
   public void save(UserStateModel model) {
     String userId = model.getUserId();
-    String status = model.getStatus();
-    long lastActivity = model.getLastActivity();  
-    
+
     SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
-    NodeHierarchyCreator nodeHierarchyCreator = CommonsUtils.getService(NodeHierarchyCreator.class);    
-    
+    NodeHierarchyCreator nodeHierarchyCreator = CommonsUtils.getService(NodeHierarchyCreator.class);
+
     try {
-      RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
-          .getComponentInstanceOfType(RepositoryService.class);
-      Session session =
-        sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
-                                   repositoryService.getCurrentRepository());
-      String repoName = repositoryService.getCurrentRepository().getConfiguration().getName(); 
-      
-      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);     
+      ManageableRepository repository = CommonsUtils.getRepository();
+      Session session = sessionProvider.getSession(repository.getConfiguration().getDefaultWorkspaceName(), repository);
+      String repoName = repository.getConfiguration().getName();
+
+      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
       String userKey = repoName + "_" + userId;
-      if(!userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) {
-        userNodeApp.addNode(VIDEOCALLS_BASE_PATH, USER_STATATUS_NODETYPE);  
-        userNodeApp.save();
+      Node userState;
+      if (userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) {
+        userState = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
+      } else {
+        userState = userNodeApp.addNode(VIDEOCALLS_BASE_PATH, USER_STATATUS_NODETYPE);
       }
-      Node userState = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
       userState.setProperty(USER_ID_PROP, userId);
-      userState.setProperty(LAST_ACTIVITY_PROP, lastActivity);
-      userState.setProperty(STATUS_PROP, status);
+      userState.setProperty(LAST_ACTIVITY_PROP, model.getLastActivity());
+      userState.setProperty(STATUS_PROP, model.getStatus());
       session.save();
-      ExoCache<Serializable, UserStateModel> cache = getUserStateCache();      
-      if (cache == null){
-        LOG.warn("Cant save user state of {} to cache",userId);
-      }else{
+      ExoCache<Serializable, UserStateModel> cache = getUserStateCache();
+      if (cache == null) {
+        LOG.warn("Cant save user state of {} to cache", userId);
+      } else {
         cache.put(userKey, model);
       }
-    } catch(Exception ex) {
+    } catch (Exception ex) {
       if (LOG.isErrorEnabled()) {
         LOG.error("save() failed because of ", ex);
       }
@@ -103,7 +100,7 @@ public class UserStateService {
   public UserStateModel getUserState(String userId) {
     UserStateModel model = null;
     String repoName = CommonsUtils.getRepository().getConfiguration().getName();
-    String userKey = repoName + "_" + userId;    
+    String userKey = repoName + "_" + userId;
     ExoCache<Serializable, UserStateModel> userStateCache = getUserStateCache();
     if(userStateCache != null && userStateCache.get(userKey) != null) {
       model = userStateCache.get(userKey).clone();
@@ -137,27 +134,26 @@ public class UserStateService {
   
   //Ping to update last activity
   public void ping(String userId) {
-    String status = DEFAULT_STATUS;
-    String repoName = CommonsUtils.getRepository().getConfiguration().getName();
-    String userKey = repoName + "_" + userId;
-    
-    ExoCache<Serializable, UserStateModel> userStateCache = getUserStateCache();
-    if(userStateCache != null && userStateCache.get(userKey) != null) {
-      status = userStateCache.get(userKey).getStatus();
-    }          
+    if (userId == null || IdentityConstants.ANONIM.equals(userId)) {
+      return;
+    }
     UserStateModel model = getUserState(userId);
-    
-    long lastActivity = new Date().getTime();        
-    if((model != null) && (lastActivity - model.getLastActivity() > _delay_update_DB)) {
-      model.setLastActivity(lastActivity);
-      save(model);
+
+    long lastActivity = Calendar.getInstance().getTimeInMillis();
+
+    boolean isSave = (model == null || (lastActivity - model.getLastActivity()) > _delay_update_DB);
+
+    if (model == null) {
+      model = new UserStateModel(userId, lastActivity, DEFAULT_STATUS);
     } else {
-      model = new UserStateModel();
       model.setLastActivity(lastActivity);
-      model.setUserId(userId);
-      model.setStatus(status);      
-      userStateCache.put(userKey, model);
-    }        
+      String repoName = CommonsUtils.getRepository().getConfiguration().getName();
+      String userKey = repoName + "_" + userId;
+      getUserStateCache().put(userKey, model);
+    }
+    if (isSave) {
+      save(model);
+    }
   }
   
   //Get all users online
