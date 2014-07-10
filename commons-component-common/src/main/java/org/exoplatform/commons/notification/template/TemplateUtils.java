@@ -208,10 +208,10 @@ public class TemplateUtils {
    */
   public static String getExcerptSubject(String subject) {
     String newSubject = StringEscapeUtils.unescapeHtml(cleanHtmlTags(subject));
-    if (newSubject.length() > MAX_SUBJECT_LENGTH) {
+    if (newSubject != null && newSubject.length() > MAX_SUBJECT_LENGTH) {
       newSubject = newSubject.substring(0, MAX_SUBJECT_LENGTH);
       int lastSpace = newSubject.lastIndexOf(" ");
-      return newSubject.substring(0, lastSpace) + "...";
+      return ((lastSpace > 0) ? newSubject.substring(0, lastSpace) : newSubject) + "...";
     }
 
     return newSubject;

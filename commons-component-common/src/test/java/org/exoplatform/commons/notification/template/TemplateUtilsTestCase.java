@@ -67,10 +67,15 @@ public class TemplateUtilsTestCase extends TestCase {
     input= "&#21487; &#20197; &#21578; &#35785; &#25105;";
     expected = "可 以 告 诉 我";
     assertEquals(expected, TemplateUtils.getExcerptSubject(input));
-    // 
+    // subject of more than 50 characters with space character
     input= "Lorem ipsum dolor sit amet, consectetuer elit adipiscing, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat." +
     		" Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit";
     expected = "Lorem ipsum dolor sit amet, consectetuer elit...";
+    assertEquals(expected, TemplateUtils.getExcerptSubject(input));
+
+    // subject of file name having more than 50 characters without space character
+    input = "File-Uploaded-To-Space-Document-And-Long-Name-With-More-Than-50-characters.pdf";
+    expected = "File-Uploaded-To-Space-Document-And-Long-Name-With...";
     assertEquals(expected, TemplateUtils.getExcerptSubject(input));
   }
   
