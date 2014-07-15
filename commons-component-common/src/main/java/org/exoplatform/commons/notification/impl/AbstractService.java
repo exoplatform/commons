@@ -25,7 +25,12 @@ import javax.jcr.Session;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
 public abstract class AbstractService {
+
+  private static final Log LOG = ExoLogger.getLogger(AbstractService.class);
 
   public static final String STG_SCOPE                = "stg:scope";
 
@@ -182,7 +187,7 @@ public abstract class AbstractService {
     try {
       return sProvider.getSession(workspace, CommonsUtils.getRepository());
     } catch (RepositoryException e) {
-      e.printStackTrace();
+      LOG.error("Failed to get session." + e);
       try {
         return NotificationSessionManager.createSystemProvider().getSession(workspace, CommonsUtils.getRepository());
       } catch (Exception e2) {

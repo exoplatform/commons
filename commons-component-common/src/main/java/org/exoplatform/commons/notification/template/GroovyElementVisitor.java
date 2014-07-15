@@ -29,6 +29,9 @@ import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.api.notification.template.ElementVisitor;
 import org.exoplatform.commons.utils.CommonsUtils;
 
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
@@ -36,7 +39,7 @@ import org.exoplatform.commons.utils.CommonsUtils;
  * Aug 8, 2013  
  */
 public class GroovyElementVisitor implements ElementVisitor {
-
+  private static final Log LOG = ExoLogger.getLogger(GroovyElementVisitor.class);
   private final Writer writer;
   private TemplateContext ctx;
   public GroovyElementVisitor() {
@@ -53,10 +56,8 @@ public class GroovyElementVisitor implements ElementVisitor {
       Writable writable = engine.make(getTemplateContext());
       writable.writeTo(writer);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Failed at visit().", e);
     }
-    // TemplateUtils.loadGroovy(this.getTemplateContext(), element,
-    // getWriter());
     return this;
   }
 
