@@ -44,7 +44,7 @@ import org.exoplatform.webui.core.model.SelectItemOption ;
   
   SelectItemCategory plugin = new SelectItemCategory("plugin") ; 
     plugin.addSelectItemOption(new SelectItemOption("pluginContainer",
-        "<container template=\"system:/groovy/portal/webui/container/UIContainer.gtmpl\">" +
+        "<container template=\"system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl\">" +
         "<name>AddOnContainer</name><factory-id>addonContainer</factory-id>" +
         "</container>",
         "PluginConntainerLayout"));
