@@ -64,4 +64,21 @@ public class UIAddOnContainer extends UIContainer {
         }
         return super.getChildren();
     }
+    
+    @Override
+    public ModelObject buildModelObject() {
+        Container model = new Container(getStorageId());
+        model.setId(getId());
+        model.setName(getName());
+        model.setTitle(getTitle());
+        model.setIcon(getIcon());
+        model.setDescription(getDescription());
+        model.setHeight(getHeight());
+        model.setWidth(getWidth());
+        model.setTemplate(getTemplate());
+        model.setFactoryId(getFactoryId());
+        model.setAccessPermissions(getAccessPermissions());
+        //Don't build children, we don't save them to database
+        return model;
+    }
 }
