@@ -4,6 +4,7 @@ package org.exoplatform.webui.form;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.webui.application.WebuiRequestContext;
 
 /**
@@ -154,7 +155,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
 
     builder.append("<script type=\"text/javascript\">\n");
     //fix issue INTEG-320
-    if(isIgnoreParserHTML()) {
+    if (isIgnoreParserHTML() && StringUtils.isNotEmpty(value_)) {
       String value = encodeURLComponent(value_);
       builder.append(" var textare = document.getElementById('").append(name).append("'); ")
              .append(" if(textare) {")
