@@ -22,21 +22,26 @@ package org.exoplatform.webui.container;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.exoplatform.commons.addons.AddOnService;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.webui.container.UIContainer;
-import org.exoplatform.portal.webui.container.UIContainerActionListener;
+import org.exoplatform.portal.webui.container.UIContainerForm;
 import org.exoplatform.portal.webui.portal.UIPortalComponentActionListener.DeleteComponentActionListener;
 import org.exoplatform.portal.webui.util.PortalDataMapper;
+import org.exoplatform.portal.webui.util.Util;
+import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
+import org.exoplatform.portal.webui.workspace.UIPortalApplication;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.UIComponent;
-import org.exoplatform.commons.addons.AddOnService;
+import org.exoplatform.webui.event.Event;
+import org.exoplatform.webui.event.EventListener;
 
-@ComponentConfig(events = { @EventConfig(listeners = UIContainerActionListener.EditContainerActionListener.class),
+@ComponentConfig(events = { @EventConfig(listeners = UIAddOnContainer.EditContainerActionListener.class),
         @EventConfig(listeners = DeleteComponentActionListener.class, confirm = "UIContainer.deleteContainer") })
 public class UIAddOnContainer extends UIContainer {
 
@@ -64,7 +69,7 @@ public class UIAddOnContainer extends UIContainer {
         }
         return super.getChildren();
     }
-    
+
     @Override
     public ModelObject buildModelObject() {
         Container model = new Container(getStorageId());
@@ -80,5 +85,18 @@ public class UIAddOnContainer extends UIContainer {
         model.setAccessPermissions(getAccessPermissions());
         //Don't build children, we don't save them to database
         return model;
+    }
+    
+    public static class EditContainerActionListener extends EventListener<UIContainer> {
+        public void execute(Event<UIContainer> event) throws Exception {
+            UIContainer uiContainer = event.getSource();
+            UIPortalApplication uiApp = Util.getUIPortalApplication();
+            UIMaskWorkspace uiMaskWS = uiApp.getChildById(UIPortalApplication.UI_MASK_WS_ID);
+            UIContainerForm containerForm = uiMaskWS.createUIComponent(UIAddOnContainerForm.class, "UIContainerForm", "UIContainerForm");
+            containerForm.setValues(uiContainer);
+            uiMaskWS.setUIComponent(containerForm);
+            uiMaskWS.setShow(true);
+            event.getRequestContext().addUIComponentToUpdateByAjax(uiMaskWS);
+        }
     }
 }
