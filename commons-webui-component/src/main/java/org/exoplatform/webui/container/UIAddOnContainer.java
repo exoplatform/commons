@@ -61,6 +61,9 @@ public class UIAddOnContainer extends UIContainer {
             try {
                 UIContainer tmp = new UIContainer();
                 PortalDataMapper.toUIContainer(tmp, model);
+                for (UIComponent comp : tmp.getChildren()) {
+                    comp.setParent(this);
+                }
                 this.setChildren(tmp.getChildren());
             } catch (Exception e) {
                 throw new RuntimeException(e);
