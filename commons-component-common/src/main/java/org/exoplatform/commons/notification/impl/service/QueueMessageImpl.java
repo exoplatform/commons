@@ -122,7 +122,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         schedulerService.addPeriodJob(info, periodInfo, jdatamap);
         LOG.debug("Job executes interval: " + interval);
       } catch (Exception e) {
-        LOG.warn("Executes the Send Notification is not successfully.");
+        LOG.warn("Failed at makeJob().");
         LOG.debug(e.getMessage(), e);
       }
     }
@@ -175,7 +175,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       }
       //
       if (messages.size() > 0) {
-        LOG.info(messages.size() + ": massage(s) will be sent.");
+        LOG.info(messages.size() + " message(s) will be sent.");
       }
       
       for (MessageInfo messageInfo : messages) {
@@ -191,7 +191,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         }
       }
     } catch (Exception e) {
-      LOG.warn("Message sending is not successfully.");
+      LOG.warn("Failed to send message.");
       LOG.debug(e.getMessage(), e);
     } finally {
       sProvider.close();
@@ -223,7 +223,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         }
       }
     } catch (Exception e) {
-      LOG.warn("Message loading is not successfully.");
+      LOG.warn("Failed to load message.");
       LOG.debug(e.getMessage(), e);
     }
   }
@@ -245,7 +245,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       sessionSave(messageInfoHome);
 
     } catch (Exception e) {
-      LOG.warn("Persist message to storage is not successfuly.");
+      LOG.warn("Failed to save message.");
       LOG.debug(e.getMessage() + message.toJSON(), e);
     } finally {
       lock.unlock();
@@ -267,7 +267,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       }
       session.save();
     } catch (Exception e) {
-      LOG.warn("Message removing in storage is not sucessfully.");
+      LOG.warn("Failed to remove message.");
       LOG.debug(e.getMessage(), e);
     } finally {
       messages.clear();
@@ -292,7 +292,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       QueryResult result = query.execute();
       return result.getNodes();
     } catch (Exception e) {
-      LOG.warn("Message loading is not sucessfully.");
+      LOG.warn("Failed to get message from node.");
       LOG.debug(e.getMessage(), e);
     }
     return null;
@@ -313,7 +313,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       //
       return info;
     } catch (Exception e) {
-      LOG.warn("Message mapping between node and model is not sucessfully.");
+      LOG.warn("Failed to map message between node and model.");
       LOG.debug(e.getMessage(), e);
     }
     return null;
@@ -329,7 +329,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         mailService.sendMessage(message);
         return true;
       } catch (Exception e) {
-        LOG.warn("Message sending is not sucessfully.");
+        LOG.warn("Failed at sendMessage().");
         LOG.debug(e.getMessage(), e);
         return false;
       }

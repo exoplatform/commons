@@ -1,6 +1,10 @@
 package org.exoplatform.webui.form;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.webui.application.WebuiRequestContext;
 
 /**
@@ -34,6 +38,8 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   
   private boolean isPasteAsPlainText = false;
 
+  private boolean isIgnoreParserHTML = false;
+
   public UIFormRichtextInput(String name, String bindingField, String value) {
     super(name, bindingField, String.class);
     this.value_ = value;
@@ -44,7 +50,6 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     this.value_ = value;
     this.enterMode = enterMode;
   }
-  
 
   public UIFormRichtextInput(String name, String bindingField, String value, String enterMode, String toolbar) {
     super(name, bindingField, String.class);
@@ -52,16 +57,15 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     this.enterMode = enterMode;
     this.toolbar = toolbar;
   }
-  
-  
+
   public UIFormRichtextInput(String name, String bindingField, String value, String enterMode, String toolbar, String css) {
     super(name, bindingField, String.class);
-	this.value_ = value;
-	this.enterMode = enterMode;
-	this.toolbar = toolbar;
-	this.css = css;
+    this.value_ = value;
+    this.enterMode = enterMode;
+    this.toolbar = toolbar;
+    this.css = css;
   }
-  
+
   public String getWidth() {
     return width;
   }
@@ -81,81 +85,122 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   public String getToolbar() {
     return toolbar;
   }
-  
+
   public String getEnterMode() {
-  	return enterMode;
+    return enterMode;
   }
 
   public void setToolbar(String toolbar) {
     this.toolbar = toolbar;
   }
-  
+
   public void setEnterMode(String enterMode) {
-  	this.enterMode = enterMode;
+    this.enterMode = enterMode;
   }
-  
-  public void setIsPasteAsPlainText(boolean isPasteAsPlainText) {
-	  this.isPasteAsPlainText = isPasteAsPlainText;
+
+  public UIFormRichtextInput setIsPasteAsPlainText(boolean isPasteAsPlainText) {
+    this.isPasteAsPlainText = isPasteAsPlainText;
+    return this;
   }
-  
+
   public boolean getIsPasteAsPlainText() {
-	  return this.isPasteAsPlainText;
+    return this.isPasteAsPlainText;
   }
-  
+
+  public boolean isIgnoreParserHTML() {
+    return isIgnoreParserHTML;
+  }
+
+  public UIFormRichtextInput setIgnoreParserHTML(boolean isIgnoreParserHTML) {
+    this.isIgnoreParserHTML = isIgnoreParserHTML;
+    return this;
+  }
+
   public void setCss(String css) {
-	  this.css = css;
+    this.css = css;
   }
-  
+
   public String getCss() {
-	  return css;
+    return css;
   }
 
-  public void processRender(WebuiRequestContext context) throws Exception {
+  private static String encodeURLComponent(String s) {
+    String result = null;
+    try {
+      result = URLEncoder.encode(s, "UTF-8")
+                         .replaceAll("\\+", "%20")
+                         .replaceAll("\\%21", "!")
+                         .replaceAll("\\%28", "(")
+                         .replaceAll("\\%29", ")")
+                         .replaceAll("\\%7E", "~");
+    } catch (UnsupportedEncodingException e) {
+      result = s;
+    }
+    return result;
+  }
 
+  private String buildEditorLayout() throws Exception {
     if (toolbar == null) toolbar = BASIC_TOOLBAR;
     if (width == null) width = "98%";
     if (height == null) height = "'200px'";
     if (enterMode == null) enterMode = "1";
-    if(css == null) css = "'/CommonsResources/ckeditor/contents.css'";
-     
+    if (css == null) css = "\"/CommonsResources/ckeditor/contents.css\"";
 
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("<div>");
-    buffer.append("<span style='float:left; width:"+width+";'>");
-    if (value_!=null) {
-      buffer.append("<textarea id='" + name + "' name='" + name + "'>" + value_ + "</textarea>\n");
-    }else {
-      buffer.append("<textarea id='" + name + "' name='" + name + "'></textarea>\n");
+    StringBuilder builder = new StringBuilder();
+    builder.append("<div class=\"clearfix\">");
+    builder.append("  <span style=\"float:left; width:").append(width).append(";\">");
+    //
+    builder.append("  <textarea id=\"").append(name).append("\" name=\"").append(name).append("\">")
+          .append(value_).append("</textarea>\n");
+
+    builder.append("<script type=\"text/javascript\">\n");
+    //fix issue INTEG-320
+    if (isIgnoreParserHTML() && StringUtils.isNotEmpty(value_)) {
+      String value = encodeURLComponent(value_);
+      builder.append(" var textare = document.getElementById('").append(name).append("'); ")
+             .append(" if(textare) {")
+             .append("   var isFirefox = typeof InstallTrigger !== 'undefined';")
+             .append("   var value = decodeURIComponent('").append(value).append("');")
+             .append("   if(isFirefox) { textare.value = value; } else { textare.innerText = value;}")
+             .append(" }");
     }
+    builder.append("    require(['/CommonsResources/ckeditor/ckeditor.js'], function() {")
+           .append("  //<![CDATA[\n")
+           .append("    var instance = CKEDITOR.instances['").append(name).append("'];")
+           .append("    if (instance) { CKEDITOR.remove(instance); instance = null;}\n");
     
-    buffer.append("<script type='text/javascript'>\n");
-    buffer.append("    require(['/CommonsResources/ckeditor/ckeditor.js'], function() {");
-    buffer.append("  //<![CDATA[\n");
-    buffer.append("    var instance = CKEDITOR.instances['" + name + "']; if (instance) { CKEDITOR.remove(instance); instance = null;}\n");
-    if(isPasteAsPlainText)
-    	buffer.append("    CKEDITOR.replace('" + name + "', {toolbar:'" + toolbar + "', height:"
-    		+ height + ", forcePasteAsPlainText: true, contentsCss:" + css + ", enterMode:" + enterMode + ", shiftEnterMode:" + enterMode + "});\n");
-    else
-    	buffer.append("    CKEDITOR.replace('" + name + "', {toolbar:'" + toolbar + "', height:"
-        	+ height + ", contentsCss:" + css + ", enterMode:" + enterMode + ", shiftEnterMode:" + enterMode + "});\n");
-    buffer.append("    instance = CKEDITOR.instances['" + name + "']; instance.on( 'change', function(e) { document.getElementById('"+name+"').value = instance.getData(); }); \n");
-    buffer.append("       });");
-    buffer.append("  //]]>\n");
-    buffer.append("</script>\n");
-    buffer.append("</span>");
+    builder.append("    CKEDITOR.replace('").append(name).append("', {toolbar:'").append(toolbar).append("', height:")
+           .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
+           .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
+           .append(", shiftEnterMode:").append(enterMode).append("});\n");
+
+    builder.append("    instance = CKEDITOR.instances['" + name + "'];")
+           .append("    instance.on( 'change', function(e) { document.getElementById('").append(name).append("').value = instance.getData(); });\n")
+           .append("  //]]>\n")
+           .append("});");
+
+    builder.append("</script>\n");
+
+    builder.append("  </span>");
+
     if (isMandatory()) {
-      buffer.append("<span style='float:left'> &nbsp;*</span>");
+      builder.append("  <span style=\"float:left\"> &nbsp;*</span>");
     }
-    
-    buffer.append("</div>");    
-    context.getWriter().write(buffer.toString());
+    builder.append("</div>");
+    //
+    return builder.toString();
+  }
+
+  public void processRender(WebuiRequestContext context) throws Exception {
+    //
+    context.getWriter().write(buildEditorLayout());
   }
 
   public void decode(Object input, WebuiRequestContext context) {
-    value_ = (String)input;
-    if (value_ != null && value_.length() == 0)
-       value_ = null;
+    value_ = (String) input;
+    if (value_ != null && value_.length() == 0) {
+      value_ = null;
+    }
   }
 
 }
-

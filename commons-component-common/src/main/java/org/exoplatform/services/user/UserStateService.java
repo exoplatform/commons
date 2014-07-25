@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
 import javax.jcr.Session;
 
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -53,7 +54,7 @@ public class UserStateService {
   public UserStateService(CacheService cacheService) {
     this.cacheService = cacheService;
     if (System.getProperty("user.status.offline.delay") != null) {
-      delay = Integer.parseInt(System.getProperty("user.status.offline.delay"));
+      delay = Integer.parseInt(System.getProperty("user.status.offline.delay", "1000"));
     }
   }
 
@@ -83,13 +84,13 @@ public class UserStateService {
       session.save();
       ExoCache<Serializable, UserStateModel> cache = getUserStateCache();
       if (cache == null) {
-        LOG.warn("Cant save user state of {} to cache", userId);
+        LOG.warn("Can't save user state of {} to cache", userId);
       } else {
         cache.put(userKey, model);
       }
-    } catch (Exception ex) {
-      if (LOG.isErrorEnabled()) {
-        LOG.error("save() failed because of ", ex);
+    } catch (Exception e) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Failed to save the user state of " + userId, e);
       }
     } finally {
       sessionProvider.close();
@@ -105,26 +106,27 @@ public class UserStateService {
     if(userStateCache != null && userStateCache.get(userKey) != null) {
       model = userStateCache.get(userKey).clone();
     } else {
-      SessionProvider sessionProvider = new SessionProvider(ConversationState.getCurrent());
+      ConversationState state = ConversationState.getCurrent();
+      if (state == null) {
+        return null;
+      }
       NodeHierarchyCreator nodeHierarchyCreator = CommonsUtils.getService(NodeHierarchyCreator.class);
-      Node userNodeApp = null;
+      SessionProvider sessionProvider = new SessionProvider(state);
       try {
-        userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
-      } catch (Exception e) {
-        //Do nothing
-      } 
-      try{               
-        if(userNodeApp == null || !userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) return null;        
+        Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
         Node userState = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
         model = new UserStateModel();
         model.setUserId(userState.getProperty(USER_ID_PROP).getString());
-        model.setLastActivity(Integer.parseInt(userState.getProperty(LAST_ACTIVITY_PROP).getString()));
-        model.setStatus(userState.getProperty(STATUS_PROP).getString());        
+        model.setLastActivity(userState.getProperty(LAST_ACTIVITY_PROP).getLong());
+        model.setStatus(userState.hasProperty(STATUS_PROP) ? userState.getProperty(STATUS_PROP).getString() : DEFAULT_STATUS);
         userStateCache.put(userKey, model);
-      } catch(Exception ex) {
-        if (LOG.isErrorEnabled()) {
-          LOG.error("getUserState() failed because of ", ex.getMessage());
+      } catch (PathNotFoundException e) {
+        return null;
+      } catch (Exception e) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Failed to get the user state of " + userId, e);
         }
+        return null;
       } finally {
         sessionProvider.close();
       }

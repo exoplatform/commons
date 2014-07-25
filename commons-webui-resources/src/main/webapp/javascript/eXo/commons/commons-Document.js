@@ -4,7 +4,7 @@
 /********** Document Selector ***********/
 	
 function DocumentSelector(){
-  this.defaultDriveType = "personal";
+  this.defaultDriveType = document.location.href.indexOf("g/:spaces:") > -1 ? "group" : "personal";
   this.getDrives = "";
   this.getFoldersAndFiles = "";
   this.deleteFolderOrFile = "";
@@ -44,12 +44,28 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext){
   this.getFoldersAndFilesURL = restContext + this.getFoldersAndFiles;
   this.deleteFolderOrFileURL = restContext + this.deleteFolderOrFile;
   this.createFolderURL = restContext + this.createFolder;
+  me.removeGeneralDrivesOption();
   var documentItem = new DocumentItem();
   documentItem.driveType = this.defaultDriveType;
+  documentItem.driveName = document.location.href.indexOf("g/:spaces:") > -1 ? ".spaces." + document.location.href.split("g/:spaces:")[1].split("/")[0] : null;
+  documentItem.workspaceName = document.location.href.indexOf("g/:spaces:") > -1 ? "collaboration" : null;
   me.resetDropDownBox();
   me.renderDetails(documentItem);
   CssIconFile.init();
 };
+
+DocumentSelector.prototype.removeGeneralDrivesOption = function() {
+  var me = _module.DocumentSelector;
+  var url = this.getDrivesURL;
+  url += "?" + this.driveTypeParam + "=general";
+  var data = me.request(url);
+  var folderContainer = jQuery("Folders:first", data);
+  var folderList = jQuery("Folder", folderContainer);
+  if (!folderList || folderList.length <= 0) {
+    var dropDownBox = jQuery('#DriveTypeDropDown'); 
+    jQuery(dropDownBox).find('ul>li:first').remove();
+  }
+}
 
 DocumentSelector.prototype.resetDropDownBox = function() {
 	var dropDownBox = jQuery('#DriveTypeDropDown'); 
@@ -71,6 +87,10 @@ DocumentSelector.prototype.changeDrive = function(selectedDrive) {
   _module.DocumentSelector.resetDropDownBox();
   var documentItem = new DocumentItem();
   documentItem.driveType = selectedDrive;
+  if (selectedDrive == "group") {
+    documentItem.driveName = document.location.href.indexOf("g/:spaces:") > -1 ? ".spaces." + document.location.href.split("g/:spaces:")[1].split("/")[0] : null;
+    documentItem.workspaceName = document.location.href.indexOf("g/:spaces:") > -1 ? "collaboration" : null;
+  }
   eXo.commons.DocumentSelector.renderDetails(documentItem);
 };
 
@@ -201,9 +221,9 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var nodeType = folderList[i].getAttribute("folderType");
 	  var name = folderList[i].getAttribute("name");
 	  var title = folderList[i].getAttribute("title");
+	  title = jQuery("<div/>").html(title).text();  
 	  var titlePath = folderList[i].getAttribute("titlePath");
 	  var folderIcon = "uiIcon16x16FolderDefault " + CssIconFile.getCssClassByType(folderList[i].getAttribute("nodeType"));
-
 	  var childFolder = folderList[i].getAttribute("currentFolder");
 	  var canRemove = folderList[i].getAttribute("canRemove");
 	  var canAddChild = folderList[i].getAttribute("canAddChild");
@@ -366,8 +386,6 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
   var msg_select_folder = inputFolderName.getAttribute("msg_select_drive");
   var msg_enter_folder_name = inputFolderName.getAttribute("msg_enter_folder_name");
   var msg_empty_folder_name = inputFolderName.getAttribute("msg_empty_folder_name");
-  var msg_invalid_folder_name = inputFolderName.getAttribute("msg_invalid_folder_name");
-  var folder_name_standard = /^[\w.\s-]+$/;
   
   if (!me.selectedItem || !me.selectedItem.driveName) {
     alert(msg_select_folder);
@@ -383,12 +401,7 @@ DocumentSelector.prototype.newFolder = function(inputFolderName){
     alert(msg_empty_folder_name);
     return;
   }
-  
-  if ( !folder_name_standard.test(folderName) ) {
-    alert(msg_invalid_folder_name);
-    return;
-  }
-  
+   
   var canAddChild = me.selectedItem.canAddChild;
   if (canAddChild == "false") {
     alert(msg_new_folder_not_allow);
@@ -502,20 +515,24 @@ function BreadCrumbs() {
           eXo.commons.DocumentSelector.actionBreadcrumbs(this);
       });
     } else {
-      name = "" + name;
-      var anchorEl = jQuery('<a/>',{
-          'class' : className,
-          'driveType' : documentItem.driveType,
-          'driveName' : documentItem.driveName,
-          'workspaceName' : documentItem.workspaceName,
-          'currentFolder' : documentItem.currentFolder,
-          'titlePath' : (documentItem.titlePath) ?  documentItem.titlePath : "",
-          'href' : 'javascript:void(0);',
-          'text' : name
-      }).on('click', function() {
-          eXo.commons.DocumentSelector.actionBreadcrumbs(this);
-      });
+      name = "" + jQuery("<div/>").html(name).text();
     }
+    var title= "";
+    if (documentItem.titlePath) {
+        title = jQuery("<div/>").html(documentItem.titlePath).text();
+    }
+    var anchorEl = jQuery('<a/>',{
+        'class' : className,
+        'driveType' : documentItem.driveType,
+        'driveName' : documentItem.driveName,
+        'workspaceName' : documentItem.workspaceName,
+        'currentFolder' : documentItem.currentFolder,
+        'titlePath' : title,
+        'href' : 'javascript:void(0);',
+        'text' : name
+      }).on('click', function() {
+        eXo.commons.DocumentSelector.actionBreadcrumbs(this);
+      });
     
     if ( (name.length > 0) && ((appendedNode.find('span.uiIconMiniArrowRight')).length == 0) ) {
 	var iconEl = "";
