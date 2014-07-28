@@ -56,36 +56,40 @@ public class AddOnPluginImpl extends AddOnPlugin {
       List<Application<?>> tmp = params.<Application<?>> getObjectParamValues((Class<Application<?>>) (Class<?>) Application.class);
       if (tmp != null) {
         for (Application<?> app : tmp) {
-          if (app instanceof PortletModel) {
-            PortletModel portletModel = (PortletModel) app;
-            PortletApplication pApp = new PortletApplication((ApplicationData) portletModel.build());
-
-            List<String> permissions = portletModel.getPermissions();
-            if (permissions != null) {
-              pApp.setAccessPermissions(permissions.toArray(new String[permissions.size()]));
-            }
-
-            TransientApplicationState<Portlet> state = new TransientApplicationState<Portlet>(portletModel.getContentId());
-            Map<String, Object> prefs = portletModel.getPortletPrefs();
-            if (prefs != null) {
-              PortletBuilder builder = new PortletBuilder();
-              for (String key : prefs.keySet()) {
-                Object val = prefs.get(key);
-                if (val instanceof String) {
-                  builder.add(key, (String) val);
-                } else if (val instanceof List) {
-                  builder.add(key, (List) val);
-                }
-              }
-              state.setContentState(builder.build());
-            }
-            pApp.setState(state);
-            apps.add(pApp);
-          } else {
-            apps.add(app);
-          }
+          apps.add(buildApp(app));
         }
       }
+    }
+  }
+
+  protected Application<?> buildApp(Application<?> app) {
+    if (app instanceof PortletModel) {
+      PortletModel portletModel = (PortletModel) app;
+      PortletApplication pApp = new PortletApplication((ApplicationData) portletModel.build());
+
+      List<String> permissions = portletModel.getPermissions();
+      if (permissions != null) {
+        pApp.setAccessPermissions(permissions.toArray(new String[permissions.size()]));
+      }
+
+      TransientApplicationState<Portlet> state = new TransientApplicationState<Portlet>(portletModel.getContentId());
+      Map<String, Object> prefs = portletModel.getPortletPrefs();
+      if (prefs != null) {
+        PortletBuilder builder = new PortletBuilder();
+        for (String key : prefs.keySet()) {
+          Object val = prefs.get(key);
+          if (val instanceof String) {
+            builder.add(key, (String) val);
+          } else if (val instanceof List) {
+            builder.add(key, (List) val);
+          }
+        }
+        state.setContentState(builder.build());
+      }
+      pApp.setState(state);
+      return pApp;
+    } else {
+      return app;
     }
   }
 
