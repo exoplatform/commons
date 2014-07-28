@@ -28,6 +28,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -103,8 +105,26 @@ public class RESTUserService implements ResourceContainer{
   @PUT
   @Path("/status/{userId}/")
   @RolesAllowed("users")
+  @Deprecated
   public Response setStatus(@PathParam("userId") String userId, @QueryParam("status") String status) throws JSONException {
+    String authenticated = ConversationState.getCurrent().getIdentity().getUserId();
+    if (!authenticated.equals(userId))
+      return Response.status(Status.FORBIDDEN).build();
     UserStateModel model = userService.getUserState(userId);
+    if(StringUtils.isNotEmpty(status)) {
+      model.setStatus(status);
+      userService.save(model);
+      return Response.ok().build();
+    }
+    return Response.notModified().build();
+  }
+
+  @PUT
+  @Path("/status")
+  @RolesAllowed("users")
+  public Response setStatus(@QueryParam("status") String status) throws JSONException {
+    String authenticated = ConversationState.getCurrent().getIdentity().getUserId();
+    UserStateModel model = userService.getUserState(authenticated);
     if(StringUtils.isNotEmpty(status)) {
       model.setStatus(status);
       userService.save(model); 
