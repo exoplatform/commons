@@ -19,72 +19,89 @@
 
 package org.exoplatform.commons.addons;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.config.serialize.PortletApplication;
+import org.exoplatform.portal.pom.data.ApplicationData;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 
 public class AddOnPluginImpl extends AddOnPlugin {
 
-    private String containerName;
-    private List<Application<?>> apps = new LinkedList<Application<?>>();
-    private int priority;
+  private String               containerName;
 
-    public AddOnPluginImpl(InitParams params) {
-        if (params != null) {
-            ValueParam containerParam = params.getValueParam("containerName");
-            if (containerParam != null) {
-                containerName = containerParam.getValue();
+  private List<Application<?>> apps     = new LinkedList<Application<?>>();
+
+  private int                  priority = 5;
+
+  public AddOnPluginImpl(InitParams params) {
+    if (params != null) {
+      ValueParam containerParam = params.getValueParam("containerName");
+      if (containerParam != null) {
+        containerName = containerParam.getValue();
+      }
+
+      ValueParam priorityParam = params.getValueParam("priority");
+      if (priorityParam != null) {
+        priority = Integer.parseInt(priorityParam.getValue());
+      }
+
+      List<Application<?>> tmp = params.<Application<?>> getObjectParamValues((Class<Application<?>>) (Class<?>) Application.class);
+      if (tmp != null) {
+        for (Application<?> app : tmp) {
+          if (app instanceof PortletModel) {
+            PortletModel portletModel = (PortletModel) app;
+            PortletApplication pApp = new PortletApplication((ApplicationData) portletModel.build());
+
+            List<String> permissions = portletModel.getPermissions();
+            if (permissions != null) {
+              pApp.setAccessPermissions(permissions.toArray(new String[permissions.size()]));
             }
 
-            ValueParam priorityParam = params.getValueParam("priority");
-            if (priorityParam != null) {
-                priority = Integer.parseInt(priorityParam.getValue());
-            }
-
-            List<Application<?>> tmp = params.<Application<?>>getObjectParamValues((Class<Application<?>>)(Class<?>)Application.class);
-            if (tmp != null) {
-                for (Application<?> app : tmp) {
-                    if (app.getState() instanceof TransientApplicationState) {
-                        TransientApplicationState state = (TransientApplicationState)app.getState();
-                        if (state != null && state.getContentState() != null) {
-                            PortletBuilder builder = new PortletBuilder();
-                            String prefs = state.getContentState().toString();                            
-                            for (String pref : prefs.trim().split(";")) {
-                                String[] p = pref.split("=");
-                                if (p.length == 2) {
-                                    String[] values = p[1].split(",");
-                                    builder.add(p[0], Arrays.asList(values));
-                                }
-                            }
-                            state.setContentState(builder.build());
-                        }                        
-                    }
+            TransientApplicationState<Portlet> state = new TransientApplicationState<Portlet>(portletModel.getContentId());
+            Map<String, Object> prefs = portletModel.getPortletPrefs();
+            if (prefs != null) {
+              PortletBuilder builder = new PortletBuilder();
+              for (String key : prefs.keySet()) {
+                Object val = prefs.get(key);
+                if (val instanceof String) {
+                  builder.add(key, (String) val);
+                } else if (val instanceof List) {
+                  builder.add(key, (List) val);
                 }
-                apps.addAll(tmp);
+              }
+              state.setContentState(builder.build());
             }
+            pApp.setState(state);
+            apps.add(pApp);
+          } else {
+            apps.add(app);
+          }
         }
+      }
     }
+  }
 
-    @Override
-    public List<Application<?>> getApplications() {
-        return Collections.unmodifiableList(apps);
-    }
+  @Override
+  public List<Application<?>> getApplications() {
+    return Collections.unmodifiableList(apps);
+  }
 
-    @Override
-    public int getPriority() {
-        return priority;
-    }
+  @Override
+  public int getPriority() {
+    return priority;
+  }
 
-    @Override
-    public String getContainerName() {
-        return containerName;
-    }
+  @Override
+  public String getContainerName() {
+    return containerName;
+  }
 
 }
