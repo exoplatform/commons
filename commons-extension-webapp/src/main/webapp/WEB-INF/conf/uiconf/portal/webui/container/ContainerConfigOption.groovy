@@ -40,16 +40,13 @@ import org.exoplatform.webui.core.model.SelectItemOption ;
         "  <container template=\"system:/groovy/portal/webui/container/UIContainer.gtmpl\"></container>" +          
         "</container>",
         "ThreeRowContainerLayout"));
-  templates.add(row);
-  
-  SelectItemCategory plugin = new SelectItemCategory("plugin") ; 
-    plugin.addSelectItemOption(new SelectItemOption("pluginContainer",
+     row.addSelectItemOption(new SelectItemOption("pluginContainer",
         "<container template=\"system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl\">" +
         "<name>AddOnContainer</name><factory-id>addonContainer</factory-id>" +
         "</container>",
-        "PluginConntainerLayout"));
-  templates.add(plugin);
-     
+        "PluginContainerLayout"));
+  templates.add(row);
+  
   SelectItemCategory column = new SelectItemCategory("column") ;
     column.addSelectItemOption(new SelectItemOption("oneColumns","" +
         "<container template=\"system:/groovy/portal/webui/container/UITableColumnContainer.gtmpl\">" +
