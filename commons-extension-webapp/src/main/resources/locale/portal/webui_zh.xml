@@ -8,11 +8,13 @@
   <ContainerOptions>
     <Item>
       <pluginContainer>Dynamic Row</pluginContainer>
+      <pluginColumnContainer>Dynamic Column</pluginColumnContainer>
     </Item>
   </ContainerOptions>
   <UIPortlet>
     <label>
       <AddOnContainer>Dynamic Row</AddOnContainer>
+      <AddOnColumnContainer>Dynamic Column</AddOnColumnContainer>
     </label>
   </UIPortlet>
 </bundle>

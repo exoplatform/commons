@@ -69,6 +69,11 @@ import org.exoplatform.webui.core.model.SelectItemOption ;
         "  <container template=\"system:/groovy/portal/webui/container/UIColumnContainer.gtmpl\"><factory-id>ColumnContainer</factory-id></container>" +
         "</container>",
         "ThreeColumnContainerLayout")) ;
+    column.addSelectItemOption(new SelectItemOption("pluginColumnContainer",
+       "<container template=\"system:/groovy/portal/webui/container/UIAddOnColumnContainer.gtmpl\">" +
+       "<name>Dynamic Column Container</name><factory-id>addonContainer</factory-id>" +
+       "</container>",
+       "PluginColumnContainerLayout"));
   templates.add(column);  
 
   SelectItemCategory autofitColumn = new SelectItemCategory("autofitColumn") ;
