@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+  <UIContainerForm>
+    <label>
+      <name>Container Name</name>
+    </label>
+  </UIContainerForm>
+  <ContainerOptions>
+    <Item>
+      <pluginContainer>Dynamic Row</pluginContainer>
+      <pluginColumnContainer>Dynamic Column</pluginColumnContainer>
+    </Item>
+  </ContainerOptions>
+  <UIPortlet>
+    <label>
+      <AddOnContainer>Dynamic Row</AddOnContainer>
+      <AddOnColumnContainer>Dynamic Column</AddOnColumnContainer>
+    </label>
+  </UIPortlet>
+</bundle>

@@ -1,7 +1,11 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" 
         xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
-
+  <component>
+    <key>org.exoplatform.commons.addons.AddOnService</key>
+    <type>org.exoplatform.commons.addons.AddOnServiceImpl</type>
+  </component>
+  
   <external-component-plugins>
     <!-- The full qualified name of the ResourceBundleService -->
     <target-component>org.exoplatform.services.resources.ResourceBundleService</target-component>
@@ -26,6 +30,5 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
-
 </configuration>
   
