@@ -249,11 +249,6 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
    * @throws Exception
    */
   private void removeDaily(Session session, NotificationInfo message, String path) throws Exception {
-    
-    if (message.isSendAll()) {
-      removeProperty(session, path, NTF_SEND_TO_DAILY, NotificationInfo.FOR_ALL_USER);
-    }
-    
     if (message.getSendToDaily().length == 1 && message.getSendToWeekly().length == 0) {
       putRemoveMap(REMOVE_ALL, path);
     } else {
