@@ -42,6 +42,8 @@ import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
+import org.exoplatform.commons.notification.job.NotificationJob;
+import org.exoplatform.commons.notification.job.mbeans.AbstractNotificationJobManager;
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
@@ -49,15 +51,13 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 
 public class DigestorServiceImpl implements DigestorService {
-  
   private static final Log LOG = ExoLogger.getLogger(DigestorServiceImpl.class);
   private static final Pattern LI_PATTERN = Pattern.compile("<li([^>]+)>(.+?)</li>");
 
-  public DigestorServiceImpl() {
-  }
+  public DigestorServiceImpl() {}
   
   
-  public MessageInfo buildMessage(Map<NotificationKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
+  public MessageInfo buildMessage(NotificationContext jobContext, Map<NotificationKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
     MessageInfo messageInfo = null;
 
     if (notificationData == null || notificationData.size() == 0) {
@@ -67,11 +67,9 @@ public class DigestorServiceImpl implements DigestorService {
     long startTime = System.currentTimeMillis();
     try {
       messageInfo = new MessageInfo();
-      PluginSettingService pluginService = CommonsUtils.getService(PluginSettingService.class);
       NotificationPluginContainer containerService = CommonsUtils.getService(NotificationPluginContainer.class);
-      NotificationConfiguration configuration = CommonsUtils.getService(NotificationConfiguration.class);
       
-      List<String> activeProviders = pluginService.getActivePluginIds();
+      List<String> activeProviders = jobContext.getPluginSettingService().getActivePluginIds();
       NotificationContext nCtx = NotificationContextImpl.cloneInstance();
       
       Writer writer = new StringWriter();
@@ -109,7 +107,7 @@ public class DigestorServiceImpl implements DigestorService {
             .replace(replacedStr, "margin: 0; background-color: #F9F9F9; padding: 15px 20px;");
       }
 
-      DigestInfo digestInfo = new DigestInfo(configuration, userSetting);
+      DigestInfo digestInfo = new DigestInfo(jobContext, userSetting);
 
       TemplateContext ctx = new TemplateContext(digestInfo.getPluginId(), digestInfo.getLocale().getLanguage());
 
@@ -162,9 +160,9 @@ public class DigestorServiceImpl implements DigestorService {
 
     private Locale  locale;
 
-    private boolean isWeekly;
+    private Boolean isWeekly;
 
-    public DigestInfo(NotificationConfiguration configuration, UserSetting userSetting) {
+    public DigestInfo(NotificationContext context, UserSetting userSetting) {
       firstName = NotificationPluginUtils.getFirstName(userSetting.getUserId());
       sendTo = NotificationPluginUtils.getTo(userSetting.getUserId());
       portalName = NotificationPluginUtils.getBrandingPortalName();
@@ -173,9 +171,9 @@ public class DigestorServiceImpl implements DigestorService {
       footerLink = NotificationUtils.getProfileUrl(userSetting.getUserId());
       locale = (language == null || language.length() == 0) ? Locale.ENGLISH : new Locale(language);
       
-      isWeekly = (configuration.isSendWeekly() && userSetting.getWeeklyProviders().size() > 0);
+      this.isWeekly = context.value(NotificationJob.JOB_WEEKLY);
       //
-      if(isWeekly) {
+      if(isWeekly && userSetting.getWeeklyProviders().size() > 0) {
         pluginId = DigestWeeklyPlugin.ID;
         periodType = "Weekly";
         //

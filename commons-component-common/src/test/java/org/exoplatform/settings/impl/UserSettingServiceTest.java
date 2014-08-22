@@ -9,9 +9,12 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.jcr.Node;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.impl.setting.UserSettingServiceImpl;
+import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
@@ -53,12 +56,12 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
 
   public void testGetDefautSetting() throws Exception {
     // before upgrade
-    List<UserSetting> list = userSettingService.getDefaultDaily(0, 0);
+    List<UserSetting> list = userSettingService.getDigestDefaultSettingForAllUser(0, 0);
     assertEquals(0, list.size());
     // run upgrade
     runUpgrade();
     // after upgrade
-    list = userSettingService.getDefaultDaily(0, 0);
+    list = userSettingService.getDigestDefaultSettingForAllUser(0, 0);
     assertEquals(10, list.size());
   }
 
@@ -76,7 +79,11 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
 
   private void runUpgrade() throws Exception {
     // run upgrade by run daily
-    getService(NotificationService.class).processDigest();
+    NotificationContext context = NotificationContextImpl.cloneInstance();
+    context.append(NotificationJob.JOB_DAILY, true);
+    context.append(NotificationJob.JOB_WEEKLY, false);
+    
+    getService(NotificationService.class).digest(context);
     //
     initModifiedDate();
   }

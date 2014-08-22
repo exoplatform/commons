@@ -32,6 +32,7 @@ import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
@@ -41,6 +42,7 @@ import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
+import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -92,24 +94,23 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   }
   
   @Override
-  public Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting setting) {
+  public Map<NotificationKey, List<NotificationInfo>> getByUser(NotificationContext context, UserSetting setting) {
     SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
     try {
-      
-      boolean isWeekly = this.configuration.isSendWeekly();
-      
+      boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
       if (isWeekly) {
         for (String pluginId : setting.getWeeklyProviders()) {
           putMap(notificationData, NotificationKey.key(pluginId), getWeeklyNotifs(sProvider, pluginId, setting.getUserId()));
         }
-      } else {
+      }
+      //
+      boolean isDaily = context.value(NotificationJob.JOB_DAILY);
+      if (isDaily) {
         for (String pluginId : setting.getDailyProviders()) {
           putMap(notificationData, NotificationKey.key(pluginId), getDailyNotifs(sProvider, pluginId, setting.getUserId()));
         }
       }
-      
-      
     } catch (Exception e) {
       LOG.error("Failed to get the NotificationMessage by user: " + setting.getUserId(), e);
     }

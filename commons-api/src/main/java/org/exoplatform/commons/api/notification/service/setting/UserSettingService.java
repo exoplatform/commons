@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.service.setting;
 
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.services.organization.User;
 
@@ -39,19 +40,15 @@ public interface UserSettingService {
   UserSetting get(String userId);
 
   /**
-   * Gets a list of user settings which are registered for daily notifications.
+   * Gets the list of user settings which has at least the plug-in to be configured by weekly or daily.
+   * the weekly or daily condition input by NotificationContext.
    * 
+   * @param context the weekly or daily condition
    * @param offset The start point from which the user settings are got.
    * @param limit The limited number of user settings.
    * @return The list of user settings.
    */
-  List<UserSetting> getDaily(int offset, int limit);
-
-  /**
-   * Gets a number of users registering for daily notifications.
-   * @return The number of users.
-   */
-  long getNumberOfDaily();
+  List<UserSetting> getDigestSettingForAllUser(NotificationContext context, int offset, int limit);
   
   /**
    * Gets all settings of users registering for default daily notifications.
@@ -59,13 +56,7 @@ public interface UserSettingService {
    * @param limit The limited number of user settings.
    * @return The list of user settings.
    */
-  List<UserSetting> getDefaultDaily(int offset, int limit);
-  
-  /**
-   * Gets a number of users used default configuration notifications.
-   * @return The number of users.
-   */
-  long getNumberOfDefaultDaily();
+  List<UserSetting> getDigestDefaultSettingForAllUser(int offset, int limit);
   
   /**
    * Gets all Ids of users registering for notifications by a given plugin.

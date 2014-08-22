@@ -18,6 +18,7 @@ package org.exoplatform.commons.notification.job;
 
 import java.util.concurrent.Callable;
 
+import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
@@ -29,10 +30,16 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 public abstract class NotificationJob implements Job {
+  /** Defines the Logger instance*/
   protected static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
   
-  public NotificationJob() {
-  }
+  /** Define the argument parameter for DAILY job with Boolean type */  
+  public final static ArgumentLiteral<Boolean> JOB_DAILY = new ArgumentLiteral<Boolean>(Boolean.class, "jobDaily");
+  
+  /** Define the argument parameter for WEEKLY job with Boolean type */
+  public final static ArgumentLiteral<Boolean> JOB_WEEKLY = new ArgumentLiteral<Boolean>(Boolean.class, "jobWeekly");
+  
+  public NotificationJob() {}
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -66,6 +73,10 @@ public abstract class NotificationJob implements Job {
       return false;
     }
   }
-  
+  /**
+   * Process the job to build the message and send to target.
+   * 
+   * @throws Exception
+   */
   protected abstract void processSendNotification() throws Exception;
 }

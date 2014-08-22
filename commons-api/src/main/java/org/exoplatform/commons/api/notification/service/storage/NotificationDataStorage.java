@@ -19,6 +19,7 @@ package org.exoplatform.commons.api.notification.service.storage;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
@@ -40,7 +41,7 @@ public interface NotificationDataStorage {
    * @param userSetting The notification settings of the user.
    * @return Information of notifications.
    */
-  Map<NotificationKey, List<NotificationInfo>> getByUser(UserSetting userSetting);
+  Map<NotificationKey, List<NotificationInfo>> getByUser(NotificationContext context, UserSetting userSetting);
 
   /**
    * Removes all messages after they have been sent.

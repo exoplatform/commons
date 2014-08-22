@@ -10,26 +10,26 @@ import javax.jcr.NodeIterator;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 
 public class NotificationServiceTest extends BaseCommonsTestCase {
   
   private NotificationService       notificationService;
   private NotificationDataStorage   notificationDataStorage;
-  private NotificationConfiguration configuration;
   
   @Override
   public void setUp() throws Exception {
     super.setUp();
     notificationService = getService(NotificationService.class);
-    configuration = getService(NotificationConfiguration.class);
-    
     notificationDataStorage = getService(NotificationDataStorage.class);
   }
   
@@ -58,7 +58,6 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
   
   public void testServiceNotNull() throws Exception {
     assertNotNull(notificationService);
-    assertNotNull(configuration);
     assertNotNull(notificationDataStorage);
     saveNotification("root", "demo");
   }
@@ -74,13 +73,14 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
   }
   
   public void testNormalGetByUserAndRemoveMessagesSent() throws Exception {
-    configuration.setSendWeekly(false);
     NotificationInfo notification = saveNotification("root", "demo");
     UserSetting userSetting = UserSetting.getInstance();
     userSetting.setUserId("root").addProvider("TestPlugin", FREQUENCY.DAILY);
     userSetting.setActive(true);
-    
-    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(userSetting);
+    NotificationContext context = NotificationContextImpl.cloneInstance();
+    context.append(NotificationJob.JOB_DAILY, true);
+    context.append(NotificationJob.JOB_WEEKLY, false);
+    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
     
     List<NotificationInfo> list = map.get(new NotificationKey("TestPlugin"));
     assertEquals(1, list.size());
@@ -92,9 +92,12 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     
     assertEquals(0, notification2.getSendToDaily().length);
     
-    configuration.setSendWeekly(true);
+    context = NotificationContextImpl.cloneInstance();
+    context.append(NotificationJob.JOB_DAILY, false);
+    context.append(NotificationJob.JOB_WEEKLY, true);
+    
     userSetting.setUserId("demo").addProvider("TestPlugin", FREQUENCY.WEEKLY);
-    map = notificationDataStorage.getByUser(userSetting);
+    map = notificationDataStorage.getByUser(context, userSetting);
     list = map.get(new NotificationKey("TestPlugin"));
     assertEquals(1, list.size());
     
@@ -116,8 +119,11 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     userSetting.setUserId("root").addProvider("TestPlugin", FREQUENCY.DAILY);
     userSetting.setActive(true);
     // Test send to daily
-    configuration.setSendWeekly(false);
-    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(userSetting);
+    NotificationContext context = NotificationContextImpl.cloneInstance();
+    context.append(NotificationJob.JOB_DAILY, true);
+    context.append(NotificationJob.JOB_WEEKLY, false);
+    
+    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
     
     List<NotificationInfo> list = map.get(new NotificationKey("TestPlugin"));
     assertEquals(1, list.size());
@@ -136,9 +142,11 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     assertEquals(1, notification2.getSendToDaily().length);
     
     // Test send to weekly
-    configuration.setSendWeekly(true);
+    context = NotificationContextImpl.cloneInstance();
+    context.append(NotificationJob.JOB_DAILY, false);
+    context.append(NotificationJob.JOB_WEEKLY, true);
     userSetting.setUserId("demo").addProvider("TestPlugin", FREQUENCY.WEEKLY);
-    map = notificationDataStorage.getByUser(userSetting);
+    map = notificationDataStorage.getByUser(context, userSetting);
     list = map.get(new NotificationKey("TestPlugin"));
     assertEquals(1, list.size());
     
@@ -150,16 +158,17 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
 
   public void testWithUserNameContainSpecialCharacter() throws Exception {
     String userNameSpecial = "Rabe'e \"AbdelWahabô";
-    NotificationConfiguration configuration = getService(NotificationConfiguration.class);
-    configuration.setSendWeekly(false);
+    NotificationContext context = NotificationContextImpl.cloneInstance();
+    context.append(NotificationJob.JOB_DAILY, true);
+    context.append(NotificationJob.JOB_WEEKLY, false);
+    
     NotificationInfo notification = saveNotification(userNameSpecial, "demo");
-    getService(NotificationConfiguration.class).setSendWeekly(false);
     //
     UserSetting userSetting = UserSetting.getInstance();
     userSetting.setUserId(userNameSpecial).addProvider("TestPlugin", FREQUENCY.DAILY);
     userSetting.setActive(true);
     //
-    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(userSetting);
+    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
     List<NotificationInfo> list = map.get(new NotificationKey("TestPlugin"));
     //
     assertEquals(1, list.size());

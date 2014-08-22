@@ -237,7 +237,7 @@ public class UserSetting {
   
   @Override
   public String toString() {
-    return "UserSetting : {userId : "+userId+"}";
+    return "UserSetting : {userId : " + userId + "}";
   }
   
   public static final UserSetting getDefaultInstance() {

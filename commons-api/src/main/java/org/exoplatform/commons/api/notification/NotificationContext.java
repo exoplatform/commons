@@ -77,17 +77,43 @@ public interface NotificationContext extends Cloneable {
    */
   List<NotificationInfo> getNotificationInfos();
   
-  
+  /**
+   * Gets the exception if have any when the done processing
+   * @return
+   */
   Exception getException();
   
+  /**
+   * Gets the exception if have any when the done processing
+   * @param type
+   * @return
+   */
   <T> T getException(Class<T> type);
   
+  /**
+   * Sets the exception if have any when the done processing
+   * @param t
+   */
   void setException(Throwable t);
   
+  /**
+   * The signal lets you know the processing is successfully or not
+   * @return
+   */
   boolean isFailed();
   
+  /**
+   * Gets the NotificationExceutor service
+   * @return
+   */
   NotificationExecutor getNotificationExecutor();
   
+  /**
+   * Makes the NotificationCommand by the NotificationKey
+   * 
+   * @param key
+   * @return
+   */
   NotificationCommand makeCommand(NotificationKey key);
 
   /**
@@ -99,6 +125,10 @@ public interface NotificationContext extends Cloneable {
    */
   NotificationContext clone();
   
+  /**
+   * Gets the PluginSettingService service
+   * @return
+   */
   PluginSettingService getPluginSettingService();
   
   /**
