@@ -16,8 +16,9 @@
  */
 package org.exoplatform.commons.notification.job;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
-import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.job.mbeans.DailyService;
 import org.exoplatform.commons.utils.CommonsUtils;
 
@@ -27,8 +28,10 @@ public class NotificationDailyJob extends NotificationJob {
   protected void processSendNotification() throws Exception {
     if (DailyService.isStarted() == false) {
       LOG.info("Starting run job to send daily email notification ... ");
-      CommonsUtils.getService(NotificationConfiguration.class).setSendWeekly(false);
-      CommonsUtils.getService(NotificationService.class).processDigest();
+      NotificationContext context = NotificationContextImpl.cloneInstance();
+      context.append(JOB_DAILY, true);
+      context.append(JOB_WEEKLY, false);
+      CommonsUtils.getService(NotificationService.class).digest(context);
     }
   }
   

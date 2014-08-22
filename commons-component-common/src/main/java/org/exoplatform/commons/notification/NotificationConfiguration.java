@@ -26,28 +26,12 @@ public class NotificationConfiguration implements Serializable {
 
   private String            workspace        = AbstractService.DEFAULT_WORKSPACE_NAME;
 
-  private boolean          isSendWeekly     = false;
-
   public NotificationConfiguration(InitParams params) {
     this.workspace = NotificationUtils.getValueParam(params, AbstractService.WORKSPACE_PARAM, AbstractService.DEFAULT_WORKSPACE_NAME);
   }
 
   public String getWorkspace() {
     return this.workspace;
-  }
-
-  /**
-   * @return the isSendWeekly
-   */
-  public boolean isSendWeekly() {
-    return isSendWeekly;
-  }
-
-  /**
-   * @param isSendWeekly the isSendWeekly to set
-   */
-  public void setSendWeekly(boolean isSendWeekly) {
-    this.isSendWeekly = isSendWeekly;
   }
 
   /**

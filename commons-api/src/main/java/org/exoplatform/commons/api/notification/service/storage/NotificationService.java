@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.service.storage;
 
 import java.util.Collection;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 
 
@@ -34,7 +35,7 @@ public interface NotificationService {
    *
    * @throws Exception
    */
-  void processDigest() throws Exception;
+  void digest(NotificationContext context) throws Exception;
   
   /**
    * Processes information when a list of notification messages are created.

@@ -102,7 +102,13 @@ public final class NotificationContextImpl implements NotificationContext {
     T got = null;
     
     try {
-      got = argument.getType().cast(value);
+      if (value != null) {
+        got = argument.getType().cast(value);  
+      } else {
+        if (argument.getType().equals(Boolean.class)) {
+          got = argument.getType().cast(new Boolean(false));
+        }
+      }
     } catch (Exception e) {
       return null;
     }

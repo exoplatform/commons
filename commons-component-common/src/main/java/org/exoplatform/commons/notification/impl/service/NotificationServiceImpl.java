@@ -43,15 +43,21 @@ import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 
 public class NotificationServiceImpl extends AbstractService implements NotificationService {
   private static final Log         LOG              = ExoLogger.getLogger(NotificationServiceImpl.class);
+  /** */
   private final NotificationDataStorage storage;
+  /** */
+  private final DigestorService digestorService;
+  /** */
+  private final UserSettingService userService;
 
-  public NotificationServiceImpl(NotificationDataStorage storage) {
+  public NotificationServiceImpl(UserSettingService userService, DigestorService digestorService, NotificationDataStorage storage) {
+    this.userService = userService;
+    this.digestorService = digestorService;
     this.storage = storage;
   }
   
@@ -150,17 +156,12 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   }
 
   @Override
-  public void processDigest() throws Exception {
+  public void digest(NotificationContext notifContext) throws Exception {
     /**
      * 1. just implements for daily
      * 2. apply Strategy pattern and Factory Pattern
      */
-    UserSettingService userService = CommonsUtils.getService(UserSettingService.class);
-    DigestorService digest = CommonsUtils.getService(DigestorService.class);
-    MailService mailService = CommonsUtils.getService(MailService.class);
-    
-    PluginSettingService settingService = CommonsUtils.getService(PluginSettingService.class);
-    UserSetting defaultSetting = getDefaultUserSetting(settingService.getActivePluginIds());
+    UserSetting defaultConfigPlugins = getDefaultUserSetting(notifContext.getPluginSettingService().getActivePluginIds());
     //process for users used setting
     /**
      * Tested with 5000 users:
@@ -169,48 +170,58 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
      * + limit = 50 time lost: 44873ms user settings 70630ms default user settings.
      * + limit = 100 time lost: 26997ms user settings 60051ms default user settings.
     */
-    List<UserSetting> doneUsers = new ArrayList<UserSetting>();
-    
+    List<UserSetting> sentUsers = new ArrayList<UserSetting>();
     long startTime = System.currentTimeMillis();
     int limit = 100;
     int offset = 0;
     while (true) {
-      List<UserSetting> userSettings = userService.getDaily(offset, limit);
-      if(userSettings.size() == 0) {
+      List<UserSetting> userDigestSettings = this.userService.getDigestSettingForAllUser(notifContext, offset, limit);
+      if(userDigestSettings.size() == 0) {
         break;
       }
-      send(digest, mailService, userSettings, null);
+      send(notifContext, userDigestSettings);
       offset += limit;
-      doneUsers.addAll(userSettings);
+      sentUsers.addAll(userDigestSettings);
     }
     LOG.debug("Time to run process users have settings: " + (System.currentTimeMillis() - startTime) + "ms.");
     long startTimeDefault = System.currentTimeMillis();
     //process for users used default setting
     offset = 0;
     while (true) {
-      List<UserSetting> usersDefaultSettings = userService.getDefaultDaily(offset, limit);
-      if (usersDefaultSettings.size() == 0) {
+      List<UserSetting> defaultMixinUsers = this.userService.getDigestDefaultSettingForAllUser(offset, limit);
+      if (defaultMixinUsers.size() == 0) {
         break;
       }
-      send(digest, mailService, usersDefaultSettings, defaultSetting);
+      sendDefault(notifContext, defaultMixinUsers, defaultConfigPlugins);
       offset += limit;
-      doneUsers.addAll(usersDefaultSettings);
+      sentUsers.addAll(defaultMixinUsers);
     }
-    //
-    processDedaultUserSetting(mailService, userService, digest, defaultSetting, doneUsers);
+    //provided the sentUser for excluding to process sending mail
+    sendUserWithNoSetting(notifContext, defaultConfigPlugins, sentUsers);
     
     //Clear all stored message
     storage.removeMessageAfterSent();
     LOG.debug("Time to run process users used default settings: " + (System.currentTimeMillis() - startTimeDefault) + "ms.");
   }
 
-  private void processDedaultUserSetting(MailService mailService, UserSettingService userService, DigestorService digest,
-                                         UserSetting defaultSetting, List<UserSetting> doneUsers) throws Exception {
+  /**
+   * Process these users who isn't existing any setting and default mixin type in the Setting.
+   * Must use the Organization service to get these users and excluded sentUsers
+   * 
+   * @param context
+   * @param defaultSetting
+   * @param sentUsers
+   * @throws Exception
+   */
+  private void sendUserWithNoSetting(NotificationContext context,
+                                         UserSetting defaultSetting,
+                                         List<UserSetting> sentUsers) throws Exception {
+    
     OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
     ListAccess<User> allUsers = organizationService.getUserHandler().findAllUsers();
     int size = allUsers.getSize(), limit = 200;
     int index = 0, length = Math.min(limit, size);
-    if (size > doneUsers.size()) {
+    if (size > sentUsers.size()) {
       List<User> addMixinUsers = new ArrayList<User>();
       List<UserSetting> usersDefaultSettings = new ArrayList<UserSetting>();
 
@@ -226,7 +237,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         Calendar cal = Calendar.getInstance();
         for (int i = 0; i < users.length; i++) {
           userSetting = UserSetting.getInstance().setUserId(users[i].getUserName());
-          if (!doneUsers.contains(userSetting)) {
+          if (!sentUsers.contains(userSetting)) {
             //
             cal.setTime(users[i].getCreatedDate());
             usersDefaultSettings.add(userSetting.setLastUpdateTime(cal));
@@ -235,7 +246,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
           }
         }
         //
-        send(digest, mailService, usersDefaultSettings, defaultSetting);
+        sendDefault(context, usersDefaultSettings, defaultSetting);
 
         index += length;
         length = Math.min(limit, size - index);
@@ -249,23 +260,18 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     }
   }
   
-  private void send(DigestorService digest, MailService mail, List<UserSetting> userSettings, UserSetting defaultSetting) {
+  private void send(NotificationContext context, List<UserSetting> userSettings) {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
       if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
         continue;
       }
-
-      if (defaultSetting != null) {
-        userSetting = defaultSetting.clone()
-                                    .setUserId(userSetting.getUserId())
-                                    .setLastUpdateTime(userSetting.getLastUpdateTime());
-      }
-      Map<NotificationKey, List<NotificationInfo>> notificationMessageMap = storage.getByUser(userSetting);
+      
+      Map<NotificationKey, List<NotificationInfo>> notificationMessageMap = storage.getByUser(context, userSetting);
 
       if (notificationMessageMap.size() > 0) {
-        MessageInfo messageInfo = digest.buildMessage(notificationMessageMap, userSetting);
+        MessageInfo messageInfo = this.digestorService.buildMessage(context, notificationMessageMap, userSetting);
         if (messageInfo != null) {
           //
           CommonsUtils.getService(QueueMessage.class).put(messageInfo);
@@ -279,10 +285,47 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     }
   }
   
-  private UserSetting getDefaultUserSetting(List<String> activesProvider) {
+  private void sendDefault(NotificationContext context, List<UserSetting> userSettings, UserSetting defaultConfigPlugins) {
+    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    
+    for (UserSetting userSetting : userSettings) {
+      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+        continue;
+      }
+
+      userSetting = defaultConfigPlugins.clone().setUserId(userSetting.getUserId()).setLastUpdateTime(userSetting.getLastUpdateTime());
+      Map<NotificationKey, List<NotificationInfo>> notificationMessageMap = storage.getByUser(context, userSetting);
+
+      if (notificationMessageMap.size() > 0) {
+        MessageInfo messageInfo = this.digestorService.buildMessage(context, notificationMessageMap, userSetting);
+        if (messageInfo != null) {
+          //
+          CommonsUtils.getService(QueueMessage.class).put(messageInfo);
+          
+          if (stats) {
+            NotificationContextFactory.getInstance().getStatisticsCollector().createMessageInfoCount(messageInfo.getPluginId());
+            NotificationContextFactory.getInstance().getStatisticsCollector().putQueue(messageInfo.getPluginId());
+          }
+        }
+      }
+    }
+  }
+  
+  /**
+   * The method uses to get the notification plugin's default setting.
+   * If it had been changed by the administrator then the setting must be followed by admin's setting.
+   * 
+   * For example: 
+   * 
+   * 
+   * @param activatedPluginsByAdminSetting The setting what set by administrator
+   * @return
+   */
+  private UserSetting getDefaultUserSetting(List<String> activatedPluginsByAdminSetting) {
     UserSetting setting = UserSetting.getInstance();
+    //default setting loaded from configuration xml file
     UserSetting defaultSetting = UserSetting.getDefaultInstance();
-    for (String string : activesProvider) {
+    for (String string : activatedPluginsByAdminSetting) {
       if (defaultSetting.isInWeekly(string)) {
         setting.addProvider(string, FREQUENCY.WEEKLY);
       } else if (defaultSetting.isInDaily(string)) {

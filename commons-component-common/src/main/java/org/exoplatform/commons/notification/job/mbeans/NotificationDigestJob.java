@@ -16,8 +16,10 @@
  */
 package org.exoplatform.commons.notification.job.mbeans;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
-import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.log.ExoLogger;
@@ -46,15 +48,15 @@ public class NotificationDigestJob implements Job {
       //
       JobDataMap data = context.getJobDetail().getJobDataMap();
       String digestType = data.getString(AbstractNotificationJobManager.DIGEST_TYPE);
+      NotificationContext notifContext = NotificationContextImpl.cloneInstance();
       if ("daily".equals(digestType)) {
         LOG.info("Starting run DailyJob to send daily email notification ... ");
-        CommonsUtils.getService(NotificationConfiguration.class).setSendWeekly(false);
-        CommonsUtils.getService(NotificationService.class).processDigest();
+        notifContext.append(NotificationJob.JOB_DAILY, true);
       } else if ("weekly".equals(digestType)) {
         LOG.info("Starting run WeeklyJob to send weekly email notification ... ");
-        CommonsUtils.getService(NotificationConfiguration.class).setSendWeekly(true);
-        CommonsUtils.getService(NotificationService.class).processDigest();
+        notifContext.append(NotificationJob.JOB_WEEKLY, true);
       }
+      CommonsUtils.getService(NotificationService.class).digest(notifContext);
       long endTime = System.currentTimeMillis();
       //last execution duration
       data.put(AbstractNotificationJobManager.LAST_EXECUTION_DURATION, (endTime - startTime)/1000);
