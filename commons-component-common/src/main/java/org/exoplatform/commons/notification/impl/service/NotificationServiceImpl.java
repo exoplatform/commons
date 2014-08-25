@@ -197,6 +197,9 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       sentUsers.addAll(defaultMixinUsers);
     }
     //provided the sentUser for excluding to process sending mail
+    //get list of user who has the isActivate = FALSE
+    sentUsers.addAll(this.userService.getUserSettingWithDeactivate());
+    //
     sendUserWithNoSetting(notifContext, defaultConfigPlugins, sentUsers);
     
     //Clear all stored message
@@ -221,6 +224,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     ListAccess<User> allUsers = organizationService.getUserHandler().findAllUsers();
     int size = allUsers.getSize(), limit = 200;
     int index = 0, length = Math.min(limit, size);
+    //only lazy adding mixin-type(defaultSetting) when the user's size > sent notification's size.
     if (size > sentUsers.size()) {
       List<User> addMixinUsers = new ArrayList<User>();
       List<UserSetting> usersDefaultSettings = new ArrayList<UserSetting>();
