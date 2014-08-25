@@ -2,25 +2,27 @@
  * Copyright (C) 2003-2013 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Affero General Public License
-* as published by the Free Software Foundation; either version 3
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, see<http://www.gnu.org/licenses/>.
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jcr.Node;
@@ -45,18 +47,14 @@ import org.exoplatform.services.log.Log;
 public class PluginSettingServiceImpl extends AbstractService implements PluginSettingService {
   private static final Log LOG = ExoLogger.getLogger(PluginSettingServiceImpl.class);
 
-  private List<PluginConfig>         pluginConfigs      = new ArrayList<PluginConfig>();
+  private List<PluginConfig> pluginConfigs = new ArrayList<PluginConfig>();
 
-  private Map<String, GroupProvider> groupProviderMap   = new ConcurrentHashMap<String, GroupProvider>();
+  private Map<String, GroupProvider> groupProviderMap = new ConcurrentHashMap<String, GroupProvider>();
 
-  private List<String>               activeProviderIds  = new ArrayList<String>();
+  private static final String NAME_SPACES = "exo:";
 
-  private List<PluginInfo>           activeProviders    = new ArrayList<PluginInfo>();
+  private SettingService settingService;
 
-  private static final String       NAME_SPACES        = "exo:";
-
-  private SettingService             settingService;
-  
   public PluginSettingServiceImpl(SettingService settingService) {
     this.settingService = settingService;
   }
@@ -64,7 +62,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   @Override
   public void registerPluginConfig(PluginConfig pluginConfig) {
     pluginConfigs.add(pluginConfig);
-    if(pluginConfig.isChildPlugin() == false) {
+    if (pluginConfig.isChildPlugin() == false) {
       PluginInfo providerData = new PluginInfo();
       providerData.setType(pluginConfig.getPluginId())
                   .setOrder(Integer.valueOf(pluginConfig.getOrder()))
@@ -75,7 +73,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       //
       String groupId = pluginConfig.getGroupId();
       GroupConfig gConfig = pluginConfig.getGroupConfig();
-      if(gConfig != null) {
+      if (gConfig != null) {
         groupId = gConfig.getId();
       }
       //
@@ -90,11 +88,11 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
         }
         groupProviderMap.put(groupId, groupProvider);
       }
-      
+
       createParentNodeOfPlugin(pluginConfig.getPluginId());
     }
   }
-  
+
   @Override
   public void registerGroupConfig(GroupProviderPlugin groupConfigPlg) {
     for (GroupConfig gconfig : groupConfigPlg.getGroupProviders()) {
@@ -134,10 +132,8 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   @Override
   public void savePlugin(String providerId, boolean isActive) {
     saveSetting(providerId, isActive);
-    activeProviderIds.clear();
-    activeProviders.clear();
   }
-  
+
   @Override
   public boolean isActive(String providerId) {
     return isActive(providerId, false);
@@ -145,35 +141,38 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
 
   @Override
   public List<String> getActivePluginIds() {
-    if(activeProviderIds.size() == 0) {
-      Collections.sort(pluginConfigs, new ComparatorASC());
-      for (PluginConfig pluginConfig : pluginConfigs) {
-        if (pluginConfig.isChildPlugin() == false && isActive(pluginConfig.getPluginId())) {
-          activeProviderIds.add(pluginConfig.getPluginId());
-        }
+    Set<String> activeProviderIds = new HashSet<String>();
+    Collections.sort(pluginConfigs, new ComparatorASC());
+    for (PluginConfig pluginConfig : pluginConfigs) {
+      if (pluginConfig.isChildPlugin() == false && isActive(pluginConfig.getPluginId())) {
+        activeProviderIds.add(pluginConfig.getPluginId());
       }
     }
 
-    return activeProviderIds;
+    LOG.info("Activied pluginIds:: " + activeProviderIds.toString());
+    return new ArrayList<String>(activeProviderIds);
   }
 
   @Override
   public List<PluginInfo> getActivePlugins() {
-    if(activeProviders.size() == 0) {
-      for (GroupProvider groupProvider : groupProviderMap.values()) {
-        for (PluginInfo providerData : groupProvider.getProviderDatas()) {
-          if(isActive(providerData.getType())) {
-            activeProviders.add(providerData);
-          }
+    Set<PluginInfo> activeProviders = new HashSet<PluginInfo>();
+    for (GroupProvider groupProvider : groupProviderMap.values()) {
+      for (PluginInfo providerData : groupProvider.getProviderDatas()) {
+        if (isActive(providerData.getType())) {
+          activeProviders.add(providerData);
         }
       }
     }
-    
-    return activeProviders;
+
+    LOG.info("Activied plugin info:: " + activeProviders.toString());
+    return new ArrayList<PluginInfo>(activeProviders);
   }
 
   private void saveSetting(String property, boolean value) {
-    settingService.set(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + property), SettingValue.create(value));
+    settingService.set(Context.GLOBAL,
+                       Scope.GLOBAL,
+                       (NAME_SPACES + property),
+                       SettingValue.create(value));
   }
 
   private void createParentNodeOfPlugin(String pluginId) {
@@ -193,7 +192,9 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
     if (providerId == null || providerId.length() == 0) {
       return false;
     }
-    SettingValue<?> sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + providerId));
+    SettingValue<?> sValue = settingService.get(Context.GLOBAL,
+                                                Scope.GLOBAL,
+                                                (NAME_SPACES + providerId));
     if (sValue != null) {
       return ((Boolean) sValue.getValue()) ? true : false;
     } else if (defaultValue == true) {

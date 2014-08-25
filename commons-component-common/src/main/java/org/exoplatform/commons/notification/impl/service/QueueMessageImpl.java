@@ -22,11 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -85,10 +85,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private NotificationConfiguration      configuration;
   /** The lock protecting all mutators */
   transient final ReentrantLock lock = new ReentrantLock();
+  /** using the set to keep the messages. */
+  private Set<MessageInfo> messages = Collections.synchronizedSet(new HashSet<MessageInfo>());
   /** .. */
-  private static List<MessageInfo> messages = new CopyOnWriteArrayList<MessageInfo>();
-  /** .. */
-  private static ThreadLocal<Set<String>> idsRemovingLocal = new ThreadLocal<Set<String>>();
+  private ThreadLocal<Set<String>> idsRemovingLocal = new ThreadLocal<Set<String>>();
   
   public QueueMessageImpl(InitParams params) {
     this.configuration = CommonsUtils.getService(NotificationConfiguration.class);

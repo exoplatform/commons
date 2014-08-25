@@ -59,6 +59,13 @@ public interface UserSettingService {
   List<UserSetting> getDigestDefaultSettingForAllUser(int offset, int limit);
   
   /**
+   * Gets all settings of users who deactivated is FALSE
+   * 
+   * @return
+   */
+  List<UserSetting> getUserSettingWithDeactivate();
+  
+  /**
    * Gets all Ids of users registering for notifications by a given plugin.
    * 
    * @param pluginId Id of the plugin.

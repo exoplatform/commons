@@ -49,7 +49,7 @@ import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.UserImpl;
 
 public class UserSettingServiceImpl extends AbstractService implements UserSettingService {
-  private static final Log        LOG                = ExoLogger.getLogger(UserSettingServiceImpl.class);
+  private static final Log LOG = ExoLogger.getLogger(UserSettingServiceImpl.class);
 
   /** Setting Scope on Common Setting **/
   private static final Scope      NOTIFICATION_SCOPE = Scope.GLOBAL;
@@ -219,19 +219,43 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   private StringBuilder buildQuery(NotificationContext context) {
     StringBuilder queryBuffer = new StringBuilder();
-
-      Boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
-      queryBuffer.append(EXO_IS_ACTIVE).append("='true' AND (")
-                 .append(EXO_DAILY).append("<>''");
-      if (isWeekly) {
-        queryBuffer.append(" OR ").append(EXO_WEEKLY).append("<>''");
+    queryBuffer.append(EXO_IS_ACTIVE).append("='true'");
+    Boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
+    if (isWeekly) {
+      queryBuffer.append(" AND ").append(EXO_WEEKLY).append("<>''");
+    } else {
+      queryBuffer.append(" AND ").append(EXO_DAILY).append("<>''");
+    }
+    return queryBuffer;
+  }
+  
+  @Override
+  public List<UserSetting> getUserSettingWithDeactivate() {
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();;
+    List<UserSetting> models = new ArrayList<UserSetting>();
+    try {
+      Session session = getSession(sProvider, workspace);
+      if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
+        return models;
       }
+      
+      StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
+      strQuery.append(" WHERE ").append(EXO_IS_ACTIVE).append("='false'");
+      
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
+      
+      NodeIterator iter = query.execute().getNodes();
+      while (iter != null && iter.hasNext()) {
+        Node node = iter.nextNode();
+        models.add(fillModel(node));
+      }
+      
+    } catch (Exception e) {
+      LOG.warn("Can not get the user setting with deactivated");
+    }
 
-      queryBuffer.append(")");
-
-      return queryBuffer;
-    
-    
+    return models;
   }
   
   @Override
@@ -348,9 +372,11 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    */
   private UserSetting fillModel(Node node) throws Exception {
     UserSetting model = UserSetting.getInstance();
+    model.setUserId(node.getParent().getName());
     model.setDailyProviders(getValues(node, EXO_DAILY));
     model.setWeeklyProviders(getValues(node, EXO_WEEKLY));
-    model.setUserId(node.getParent().getName());
+    model.setInstantlyProviders(getValues(node, EXO_INSTANTLY));
+    model.setActive(node.getProperty(EXO_IS_ACTIVE).getBoolean());
     model.setLastUpdateTime(node.getParent().getProperty(EXO_LAST_MODIFIED_DATE).getDate());
     return model;
   }
@@ -381,9 +407,12 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         NodeIterator iter = getDefaultDailyIterator(sProvider, offset, limit);
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          users.add(UserSetting.getInstance()
-                    .setUserId(node.getName())
-                    .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
+          //make sure that have the mixin-type defaultSetting and don't have child node for notification setting
+          if (!node.getNodes().hasNext()) {
+            users.add(UserSetting.getInstance()
+                      .setUserId(node.getName())
+                      .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
+          }
         }
       }
     } catch (Exception e) {
