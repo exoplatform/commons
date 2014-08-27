@@ -56,11 +56,13 @@
           <%if(hasPermission) {%>
             <div>               
               <div class="UIRowContainer <%=(portalMode != UIPortalApplication.NORMAL_MODE && uicomponent.getChildren().size() == 0) ? "EmptyContainer" : ""%>">
+                <%
                 if(portalMode != UIPortalApplication.NORMAL_MODE){
                    out.print("<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.AddOnColumnContainer")+"</div>");
                 } else {
                   uicomponent.renderChildren();                 
                 }
+                %>
               </div>
             </div>
             <%} else out.print("<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>");%>
