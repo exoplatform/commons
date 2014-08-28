@@ -147,6 +147,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
   @Override
   public boolean put(MessageInfo message) {
+    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     //
     if (message == null || message.getTo() == null || message.getTo().length() == 0) {
       return false;
@@ -157,6 +158,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       return false;
     }
     //
+    if (stats) {
+      LOG.info("Tenant Name:: " + CommonsUtils.getRepository().getConfiguration().getName());
+      LOG.info("Message::From: " + message.getFrom() + " To: " + message.getTo() + " body: " + message.getBody());
+    }
     saveMessageInfo(message);
     //
     sendEmailService.addCurrentCapacity();
