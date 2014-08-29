@@ -172,12 +172,11 @@ public class NotificationUtils {
   public static boolean isValidEmailAddresses(String addressList){
     if (addressList == null || addressList.length() < 0)
       return false;
-    addressList = StringUtils.remove(addressList, " ");
     addressList = StringUtils.replace(addressList, ";", ",");
     try {
       InternetAddress[] iAdds = InternetAddress.parse(addressList, true);
       for (int i = 0; i < iAdds.length; i++) {
-        Matcher matcher = EMAIL_PATTERN.matcher(iAdds[i].getAddress());
+        Matcher matcher = EMAIL_PATTERN.matcher(iAdds[i].getAddress().trim());
         if (! matcher.find())
           return false;
       }

@@ -40,12 +40,18 @@ public class TestNotificationUtils extends TestCase {
     // email have before '.' is number
     emails = "test@test.787";
     assertEquals(false, NotificationUtils.isValidEmailAddresses(emails));
+    
+    emails = "no reply aaa@xyz.com, demo+aaa@demo.com, ";
+    assertEquals(false, NotificationUtils.isValidEmailAddresses(emails));
+    
     // basic case
     emails = "test@test.com";
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
     emails = "test@test.com.vn";
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
     emails = "test@test.com, demo@demo.com, ";
+    assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
+    emails = "test@test.com ,  demo@demo.com, ";
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
     emails = "test+test@test.com, demo+aaa@demo.com, ";
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
