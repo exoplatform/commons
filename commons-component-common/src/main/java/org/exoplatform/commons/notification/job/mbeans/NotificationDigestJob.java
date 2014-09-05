@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.notification.job.mbeans;
 
+import java.util.Calendar;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
@@ -52,6 +54,8 @@ public class NotificationDigestJob implements Job {
       if ("daily".equals(digestType)) {
         LOG.info("Starting run DailyJob to send daily email notification ... ");
         notifContext.append(NotificationJob.JOB_DAILY, true);
+        String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+        notifContext.append(NotificationJob.DAY_OF_JOB, dayName);
       } else if ("weekly".equals(digestType)) {
         LOG.info("Starting run WeeklyJob to send weekly email notification ... ");
         notifContext.append(NotificationJob.JOB_WEEKLY, true);
