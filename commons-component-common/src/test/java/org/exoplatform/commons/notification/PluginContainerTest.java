@@ -26,6 +26,7 @@ import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugi
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.notification.plugin.PluginTest;
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 
@@ -50,7 +51,7 @@ public class PluginContainerTest extends BaseCommonsTestCase {
   
   public void testPlugin() {
     // check existing plugin
-    NotificationKey pluginKey = new NotificationKey("Test_ID");
+    NotificationKey pluginKey = new NotificationKey(PluginTest.ID);
     AbstractNotificationPlugin plugin = container.getPlugin(pluginKey);
     assertNotNull(plugin);
     // get child
@@ -63,7 +64,7 @@ public class PluginContainerTest extends BaseCommonsTestCase {
     NotificationInfo notificationInfo = plugin.buildNotification(ctx);
     assertNotNull(notificationInfo);
     assertEquals("demo", notificationInfo.getSendToUserIds().get(0));
-    assertEquals("Test_ID", notificationInfo.getKey().getId());
+    assertEquals(PluginTest.ID, notificationInfo.getKey().getId());
     //
     ctx.setNotificationInfo(notificationInfo);
     MessageInfo messageInfo = plugin.buildMessage(ctx);

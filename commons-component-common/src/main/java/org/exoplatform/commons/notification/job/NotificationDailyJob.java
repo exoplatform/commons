@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.notification.job;
 
+import java.util.Calendar;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
@@ -30,6 +32,8 @@ public class NotificationDailyJob extends NotificationJob {
       LOG.info("Starting run job to send daily email notification ... ");
       NotificationContext context = NotificationContextImpl.cloneInstance();
       context.append(JOB_DAILY, true);
+      String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+      context.append(DAY_OF_JOB, dayName);
       context.append(JOB_WEEKLY, false);
       CommonsUtils.getService(NotificationService.class).digest(context);
     }

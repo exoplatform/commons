@@ -345,7 +345,7 @@
 	        <description>The template of PluginTest</description>
 	        <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
 	          <field name="pluginId">
-	            <string>Test_ID</string>
+	            <string>TestPlugin</string>
 	          </field>
 	          <field name="resourceBundleKey">
 	            <string>UINotification.label.TestPlugin</string>
@@ -389,7 +389,7 @@
 	      <values-param>
 	        <name>parentIds</name>
 	        <description>Add parent of plugin</description>
-	        <value>Test_ID</value>
+	        <value>TestPlugin</value>
 	      </values-param>
 	      <object-param>
 	        <name>template.ChildPluginTest</name>

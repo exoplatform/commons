@@ -52,6 +52,9 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   private Map<String, GroupProvider> groupProviderMap = new ConcurrentHashMap<String, GroupProvider>();
 
   private static final String NAME_SPACES = "exo:";
+  
+  /** Defines the number of days in each month per plugin*/
+  private static final int DAYS_OF_MONTH = 31;
 
   private SettingService settingService;
 
@@ -179,8 +182,11 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       NotificationConfiguration configuration = CommonsUtils.getService(NotificationConfiguration.class);
-      Node node = getOrCreateMessageParent(sProvider, configuration.getWorkspace(), pluginId);
-      sessionSave(node);
+      Node node = getMessageNodeByPluginId(sProvider, configuration.getWorkspace(), pluginId);
+      for(int i = 1 ; i <= DAYS_OF_MONTH; i++) {
+        getOrCreateMessageNode(node, DAY + i);
+      }
+      
     } catch (Exception e) {
       LOG.error("Failed to create parent Node for plugin " + pluginId);
     } finally {
