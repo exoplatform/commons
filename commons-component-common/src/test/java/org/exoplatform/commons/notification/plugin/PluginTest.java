@@ -33,13 +33,15 @@ import org.exoplatform.container.xml.InitParams;
 
 public class PluginTest extends AbstractNotificationPlugin {
 
+  public final static String ID = "TestPlugin";
+  
   public PluginTest(InitParams initParams) {
     super(initParams);
   }
 
   @Override
   public String getId() {
-    return "Test_ID";
+    return ID;
   }
 
   @Override

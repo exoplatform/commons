@@ -36,6 +36,9 @@ public abstract class NotificationJob implements Job {
   /** Define the argument parameter for DAILY job with Boolean type */  
   public final static ArgumentLiteral<Boolean> JOB_DAILY = new ArgumentLiteral<Boolean>(Boolean.class, "jobDaily");
   
+  /** Define the argument parameter for DAY OF JOB job with String type */  
+  public final static ArgumentLiteral<String> DAY_OF_JOB = new ArgumentLiteral<String>(String.class, "dayOfJob");
+  
   /** Define the argument parameter for WEEKLY job with Boolean type */
   public final static ArgumentLiteral<Boolean> JOB_WEEKLY = new ArgumentLiteral<Boolean>(Boolean.class, "jobWeekly");
   

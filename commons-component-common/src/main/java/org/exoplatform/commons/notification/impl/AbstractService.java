@@ -100,10 +100,9 @@ public abstract class AbstractService {
 
   public static final String NOTIFICATION_PARENT_PATH = "/";
 
+  /** Defines the prefix of the parent message node such as d20 */
   public static final String DAY                      = "d";
 
-  public static final String HOUR                     = "h";
-  
   protected static Node getNotificationHomeNode(SessionProvider sProvider, String workspace) throws Exception {
     Session session = getSession(sProvider, workspace);
     Node notificationHome, rootNode = session.getRootNode();
@@ -147,11 +146,10 @@ public abstract class AbstractService {
     Node providerNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
     String dayName = String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
     Node dayNode = getOrCreateMessageNode(providerNode, DAY + dayName);
-//    String hourName = String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-//    Node messageParentNode = getOrCreateMessageNode(dayNode, HOUR + hourName);
-//    return messageParentNode;
     return dayNode;
   }
+  
+ 
 
   /**
    * Makes the node path for MessageHome node
@@ -170,7 +168,14 @@ public abstract class AbstractService {
     return getOrCreateMessageNode(messageHome, pluginId);
   }
   
-  private Node getOrCreateMessageNode(Node parent, String nodeName) throws Exception {
+  /**
+   * 
+   * @param parent
+   * @param nodeName
+   * @return
+   * @throws Exception
+   */
+  protected Node getOrCreateMessageNode(Node parent, String nodeName) throws Exception {
     if (parent.hasNode(nodeName) == false) {
       Node messageHome = parent.addNode(nodeName, NTF_MESSAGE_HOME);
       messageHome.addMixin(MIX_SUB_MESSAGE_HOME);
