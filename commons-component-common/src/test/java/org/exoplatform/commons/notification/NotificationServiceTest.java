@@ -144,9 +144,9 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     // remove value on property sendToDaily
     notificationDataStorage.removeMessageAfterSent();
 
-    // after sent, the value on on property sendToDaily will auto removed
+    //after sent daily, the message's sendToDaily property must be empty
     notification2 = getNotificationInfoByKeyIdAndParam(PluginTest.ID, "objectId=idofobject");
-    assertEquals(1, notification2.getSendToDaily().length);
+    assertEquals(0, notification2.getSendToDaily().length);
     
     // Test send to weekly
     context = NotificationContextImpl.cloneInstance();

@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.jcr.Item;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Session;
@@ -49,7 +50,9 @@ import org.exoplatform.services.log.Log;
 public class NotificationDataStorageImpl extends AbstractService implements NotificationDataStorage {
   private static final Log         LOG              = ExoLogger.getLogger(NotificationDataStorageImpl.class);
 
-  public static final String       REMOVE_ALL       = "removeAll";
+  private static final String       REMOVE_ALL       = "removeAll";
+  
+  private static final String       REMOVE_DAILY     = "removeDaily";
 
   private String                    workspace;
 
@@ -268,6 +271,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   private void removeDaily(Session session, NotificationInfo message, String path) throws Exception {
     if (message.getSendToDaily().length == 1 && message.getSendToWeekly().length == 0) {
       putRemoveMap(REMOVE_ALL, path);
+    } if (message.getSendToDaily().length > 0 &&  NotificationInfo.FOR_ALL_USER.equals(message.getSendToDaily()[0])) {
+      putRemoveMap(REMOVE_DAILY, path);
     } else {
       removeProperty(session, path, NTF_SEND_TO_DAILY, message.getTo());
     }
@@ -324,6 +329,25 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
             LOG.debug("Remove NotificationMessage " + nodePath);
           } catch (Exception e) {
             LOG.warn("Failed to remove node of NotificationMessage " + nodePath + "\n" + e.getMessage());
+            LOG.debug("Remove NotificationMessage " + nodePath, e);
+          }
+        }
+        session.save();
+      }
+      
+      listPaths = removeByCallBack.get(REMOVE_DAILY);
+      if (listPaths != null && listPaths.size() > 0) {
+        for (String nodePath : listPaths) {
+          try {
+            Item item = session.getItem(nodePath);
+            if (item.isNode()) {
+              Node node = (Node) item;
+              node.setProperty(NTF_SEND_TO_DAILY, new String[] { "" });
+            }
+            LOG.debug("Remove SendToDaily property " + nodePath);
+          } catch (Exception e) {
+            LOG.warn("Failed to remove SendToDaily property of " + nodePath + "\n" + e.getMessage());
+            LOG.debug("Remove SendToDaily property " + nodePath, e);
           }
         }
         session.save();
