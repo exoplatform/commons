@@ -37,8 +37,6 @@ import org.exoplatform.commons.api.notification.service.template.TemplateContext
 import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.api.notification.template.ElementVisitor;
 import org.exoplatform.commons.notification.NotificationUtils;
-import org.exoplatform.commons.notification.cache.ElementCacheKey;
-import org.exoplatform.commons.notification.cache.TemplateCaching;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.configuration.ConfigurationManager;
