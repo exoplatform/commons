@@ -169,7 +169,7 @@ public class DigestorServiceImpl implements DigestorService {
       String language = NotificationPluginUtils.getLanguage(userSetting.getUserId());
       portalHome = NotificationUtils.getPortalHome(portalName);
       footerLink = NotificationUtils.getProfileUrl(userSetting.getUserId());
-      locale = (language == null || language.length() == 0) ? Locale.ENGLISH : new Locale(language);
+      locale = NotificationUtils.getLocale(language);
       
       this.isWeekly = context.value(NotificationJob.JOB_WEEKLY);
       //

@@ -17,11 +17,35 @@
 package org.exoplatform.commons.notification;
 
 
+import java.util.Locale;
+
 import junit.framework.TestCase;
 
 public class TestNotificationUtils extends TestCase {
 
   public TestNotificationUtils() {
+  }
+  
+  public void testGetLocale() {
+    String language = null;
+    Locale actual = NotificationUtils.getLocale(language);
+    assertEquals(Locale.ENGLISH, actual);
+    
+    language = "";
+    actual = NotificationUtils.getLocale(language);
+    assertEquals(Locale.ENGLISH, actual);
+    
+    language = "fr";
+    actual = NotificationUtils.getLocale(language);
+    assertEquals(Locale.FRENCH, actual);
+    
+    language = "pt_BR";
+    actual = NotificationUtils.getLocale(language);
+    assertEquals(new Locale("pt", "BR"), actual);
+    
+    language = "pt_BR_BR";
+    actual = NotificationUtils.getLocale(language);
+    assertEquals(new Locale("pt", "BR", "BR"), actual);
   }
   
   public void testIsValidEmailAddresses() {

@@ -19,6 +19,7 @@ package org.exoplatform.commons.notification.template;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.notification.NotificationUtils;
 
 
 /**
@@ -30,11 +31,7 @@ import org.apache.commons.lang.StringUtils;
 public class GroovyElement extends SimpleElement {
 
   public String appRes(String key) {
-    Locale locale = Locale.ENGLISH;
-    if (getLanguage() != null && getLanguage().length() > 0) {
-      locale = new Locale(getLanguage());
-    }
-    return TemplateUtils.getResourceBundle(key, locale, getTemplateConfig().getBundlePath());
+    return TemplateUtils.getResourceBundle(key, NotificationUtils.getLocale(getLanguage()), getTemplateConfig().getBundlePath());
   }
 
   public String appRes(String key, String... strs) {

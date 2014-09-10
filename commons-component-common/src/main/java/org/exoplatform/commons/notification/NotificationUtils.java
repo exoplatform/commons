@@ -63,6 +63,23 @@ public class NotificationUtils {
   }
   
   /**
+   * Get locale by user's language
+   * 
+   * @param language the language of target user
+   * @return
+   */
+  public static Locale getLocale(String language) {
+    if (language == null || language.isEmpty()) {
+      return Locale.ENGLISH;
+    }
+    String[] infos = language.split("_");
+    String lang = infos[0];
+    String country = (infos.length > 1) ? infos[1] : "";
+    String variant = (infos.length > 2) ? infos[2] : "";
+    return new Locale(lang, country, variant);
+  }
+  
+  /**
    * Gets the digest's resource bundle
    * 
    * @param templateConfig
@@ -76,7 +93,7 @@ public class NotificationUtils {
     String digestThreeKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, pluginId));
     String digestMoreKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, pluginId));
     
-    Locale locale = new Locale(language);
+    Locale locale = getLocale(language);
     
     return new DigestTemplate().digestOne(TemplateUtils.getResourceBundle(digestOneKey, locale, srcResource))
                                .digestThree(TemplateUtils.getResourceBundle(digestThreeKey, locale, srcResource))
@@ -97,7 +114,7 @@ public class NotificationUtils {
     String bundlePath = templateConfig.getBundlePath();
     String subjectKey = templateConfig.getKeyValue(TemplateConfig.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, pluginId));
     
-    Locale locale = new Locale(language);
+    Locale locale = getLocale(language);
     
     return new SimpleElement().language(locale.getLanguage()).template(TemplateUtils.getResourceBundle(subjectKey, locale, bundlePath));
   }

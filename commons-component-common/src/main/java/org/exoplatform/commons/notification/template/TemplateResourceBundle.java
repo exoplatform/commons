@@ -23,6 +23,7 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.services.log.ExoLogger;
@@ -73,11 +74,7 @@ public class TemplateResourceBundle {
   }
 
   public String appRes(String key) {
-    Locale locale = Locale.ENGLISH;
-    if (language != null && language.length() > 0) {
-      locale = new Locale(language);
-    }
-    return getResourceBundle(key, locale, bundlePath);
+    return getResourceBundle(key, NotificationUtils.getLocale(language), bundlePath);
   }
 
   public String appRes(String key, String... strs) {
