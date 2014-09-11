@@ -13,12 +13,12 @@ CKEDITOR.eXoPath = CKEDITOR.basePath.substr(0, CKEDITOR.basePath.indexOf("ckedit
 (function() {CKEDITOR.plugins.addExternal('helpBBCode','/forumResources/eXoPlugins/helpBBCode/','plugin.js');})();
 
 CKEDITOR.editorConfig = function( config ){
-	config.extraPlugins = 'content,insertGadget,insertPortalLink,scayt,wsc,acceptInline,cancelInline,onchange,helpBBCode,syntaxhighlight';
+	config.extraPlugins = 'content,insertGadget,insertPortalLink,acceptInline,cancelInline,onchange,helpBBCode,syntaxhighlight';
+	config.removePlugins = 'scayt,wsc';
 	config.toolbarCanCollapse = false;
 	config.skin = 'moono';
 	config.allowedContent = true;
 	config.resize_enabled = true;
-	config.scayt_autoStartup = true;
 	config.language = eXo.env.portal.language || 'en';
 	config.pasteFromWordRemoveFontStyles = false;
 	config.pasteFromWordRemoveStyles = false;
@@ -28,7 +28,7 @@ CKEDITOR.editorConfig = function( config ){
 
 	config.toolbar_Default = [
 		['Source','Templates'],
-		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','Scayt'],
+		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll'],
 		['Undo','Redo','-','RemoveFormat'],
 		['Bold','Italic','Underline','Strike'],
 		['NumberedList','BulletedList'],
@@ -49,7 +49,7 @@ CKEDITOR.editorConfig = function( config ){
 
 	config.toolbar_CompleteWCM = [
 		['Source','Templates'],
-		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','Scayt','-','Undo','Redo'],
+		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','-','Undo','Redo'],
 		['insertGadget.btn','Flash','Table','SpecialChar', 'content.btn', 'Image'], 		['Bold','Italic','Underline','Strike','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','NumberedList','BulletedList','-','TextColor','BGColor','-','RemoveFormat'],
 		['Link','insertPortalLink.btn','Unlink','Anchor'],		
 		['Style','Format','Font','FontSize', '-' ,'Maximize']
@@ -70,7 +70,7 @@ CKEDITOR.editorConfig = function( config ){
 	] ;
 
 	config.toolbar_InlineEdit = [
-		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','Scayt','-','Undo','Redo'],
+		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','-','Undo','Redo'],
 		['insertGadget.btn','Flash','Table','SpecialChar', 'content.btn', 'Image'],
                 ['Bold','Italic','Underline','Strike','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 		'/',
