@@ -1,5 +1,6 @@
 <%
   import java.util.List;
+  import org.apache.commons.lang.StringEscapeUtils;
 
   String baseRestUrl = uicomponent.getBaseRestUrl();
   String socialBaseRestUrl = uicomponent.getSocialBaseRestUrl();
@@ -7,9 +8,9 @@
   String mySpaceLabel = uicomponent.getMySpaceLabel();
   String portalSpaceId = uicomponent.getPortalSpaceId();
   String portalSpaceLabel = uicomponent.getPortalSpaceLabel();
-  String defaultValueForTextSearch = _ctx.appRes("UISpaceSwitcher.msg.filter-spaces");
-  String noSpaceLabel = _ctx.appRes("UISpaceSwitcher.msg.no-space");
-  String spaceLabel = _ctx.appRes("UISpaceSwitcher.title.space");
+  String defaultValueForTextSearch = StringEscapeUtils.escapeJavaScript(_ctx.appRes("UISpaceSwitcher.msg.filter-spaces"));
+  String noSpaceLabel = StringEscapeUtils.escapeJavaScript(_ctx.appRes("UISpaceSwitcher.msg.no-space"));
+  String spaceLabel = StringEscapeUtils.escapeJavaScript(_ctx.appRes("UISpaceSwitcher.title.space"));
   def invalidingCacheTime = uicomponent.invalidingCacheTime;
   String selectSpaceAction =
       URLEncoder.encode(
