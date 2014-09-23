@@ -1,11 +1,11 @@
 package org.exoplatform.webui.form;
 
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.webui.application.WebuiRequestContext;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Created by The eXo Platform SAS
@@ -33,6 +33,8 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   private String toolbar;
   
   private String enterMode;
+
+  private String shiftEnterMode = ENTER_BR;
   
   private String css;
   
@@ -62,6 +64,15 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     super(name, bindingField, String.class);
     this.value_ = value;
     this.enterMode = enterMode;
+    this.toolbar = toolbar;
+    this.css = css;
+  }
+
+  public UIFormRichtextInput(String name, String bindingField, String value, String enterMode, String toolbar, String css, String shiftEnterMode) {
+    super(name, bindingField, String.class);
+    this.value_ = value;
+    this.enterMode = enterMode;
+    this.shiftEnterMode = shiftEnterMode;
     this.toolbar = toolbar;
     this.css = css;
   }
@@ -96,6 +107,16 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
 
   public void setEnterMode(String enterMode) {
     this.enterMode = enterMode;
+  }
+
+  public void setShiftEnterMode(String shiftEnterMode)
+  {
+    this.shiftEnterMode = shiftEnterMode;
+  }
+
+  public String getShiftEnterMode()
+  {
+    return shiftEnterMode;
   }
 
   public UIFormRichtextInput setIsPasteAsPlainText(boolean isPasteAsPlainText) {
@@ -172,7 +193,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     builder.append("    CKEDITOR.replace('").append(name).append("', {toolbar:'").append(toolbar).append("', height:")
            .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
            .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
-           .append(", shiftEnterMode:").append(enterMode).append("});\n");
+           .append(", shiftEnterMode:").append(shiftEnterMode).append("});\n");
 
     builder.append("    instance = CKEDITOR.instances['" + name + "'];")
            .append("    instance.on( 'change', function(e) { document.getElementById('").append(name).append("').value = instance.getData(); });\n")
