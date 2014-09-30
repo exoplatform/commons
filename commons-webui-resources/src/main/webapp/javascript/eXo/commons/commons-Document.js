@@ -307,7 +307,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 
 DocumentSelector.prototype.submitSelectedFile = function(item){
   var me = _module.DocumentSelector;   
-  var nodePath = jQuery(item).attr("jcrPath");
+  var nodePath = encodeURIComponent(jQuery(item).attr("jcrPath"));
   var fileName = jQuery(item).attr("title");
     
   if (me.selectFileLink) {
@@ -350,7 +350,7 @@ DocumentSelector.prototype.browseFolder = function(link){
   documentItem.driveName = jQuery(link).attr("driveName");
   documentItem.workspaceName = jQuery(link).attr("workspaceName");
   documentItem.currentFolder = jQuery(link).attr("currentFolder");
-  documentItem.jcrPath = jQuery(link).attr("jcrPath");
+  documentItem.jcrPath = encodeURIComponent(jQuery(link).attr("jcrPath"));
   documentItem.canAddChild = jQuery(link).attr("canAddChild");
   documentItem.titlePath = jQuery(link).attr("titlePath");
   me.renderDetails(documentItem);

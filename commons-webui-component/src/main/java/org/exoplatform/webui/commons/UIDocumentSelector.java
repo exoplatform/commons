@@ -16,6 +16,8 @@
  */
 package org.exoplatform.webui.commons;
 
+import java.net.URLDecoder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -170,7 +172,7 @@ public class UIDocumentSelector extends UIContainer {
   static public class SelectFileActionListener extends EventListener<UIDocumentSelector> {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
-      component.seletedFile = event.getRequestContext().getRequestParameter(DATA_ID);
+      component.seletedFile = URLDecoder.decode(event.getRequestContext().getRequestParameter(DATA_ID), "UTF-8");
       component.seletedFolder = StringUtils.EMPTY;
       ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
     }
@@ -179,7 +181,7 @@ public class UIDocumentSelector extends UIContainer {
   static public class SelectFolderActionListener extends EventListener<UIDocumentSelector> {
     public void execute(Event<UIDocumentSelector> event) throws Exception {
       UIDocumentSelector component = event.getSource();
-      component.seletedFolder = event.getRequestContext().getRequestParameter(DATA_ID);
+      component.seletedFolder = URLDecoder.decode(event.getRequestContext().getRequestParameter(DATA_ID),"UTF-8");
       component.seletedFile = StringUtils.EMPTY;
       ((PortalRequestContext) event.getRequestContext().getParentAppRequestContext()).ignoreAJAXUpdateOnPortlets(true);
     }
