@@ -165,6 +165,12 @@ public class UtilsTest extends BaseCommonsTestCase {
     assertTrue(importedNode.hasNode("subFolder2"));
   }
   
+  public void testSanitization() throws Exception {
+    assertEquals(Utils.sanitize("12345 78 0"), "12345 78 0");
+    assertEquals(Utils.sanitize("12345 78 012345 78 012345 78 012345 78 012345 78 012345 78 012345 78 012345 78 012345 78 0"), 
+    	  "12345 78 012345 78 012345 78 012345 78 012345 78 012345 78 012345 78 012345 78 012345 78 0");
+  }
+  
   /**
    * Export a node to XML with document view or system view
    * 
