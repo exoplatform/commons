@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.CacheControl;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -56,9 +57,11 @@ public class RESTUserService implements ResourceContainer{
   @Path("/ping/")
   @RolesAllowed("users")
   public Response updateState() {
+    CacheControl cacheControl = new CacheControl();
+    cacheControl.setNoCache(true);
     String userId = ConversationState.getCurrent().getIdentity().getUserId();
     userService.ping(userId);
-    return Response.ok().build();
+    return Response.ok().cacheControl(cacheControl).build();
   }
   
   @GET
