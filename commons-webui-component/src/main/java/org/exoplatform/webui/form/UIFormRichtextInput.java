@@ -171,8 +171,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     
     builder.append("    CKEDITOR.replace('").append(name).append("', {toolbar:'").append(toolbar).append("', height:")
            .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
-           .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
-           .append(", shiftEnterMode:").append(enterMode).append("});\n");
+           .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "").append("});\n");
 
     builder.append("    instance = CKEDITOR.instances['" + name + "'];")
            .append("    instance.on( 'change', function(e) { document.getElementById('").append(name).append("').value = instance.getData(); });\n")
