@@ -52,7 +52,7 @@
                   " msg_select_drive=\"" + _ctx.appRes(uicomponent.id + '.label.require-drive') + "\"" +
                   " msg_enter_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.enter-folder-name') + "\"" +
                   " msg_invalid_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.invalid-folder-name') + "\"" +
-                  " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\"><i class=\"uiIconEcmsAddFolder uiIconEcmsLightGrey\"></i></a>";
+				  " msg_empty_folder_name=\"" + _ctx.appRes(uicomponent.id + '.label.empty-folder-name') + "\"><i class=\"uiIconEcmsAddFolder uiIconEcmsLightGray\"></i></a>";
 
      %>
 	<div class="clearfix">

@@ -15,11 +15,11 @@
 			String label = _ctx.appRes(uicomponent.getId() + ".item." + uicomponent.getLabel());
 			if(label.length() > 25) {
 		%>
-			<i class="uiIconGeneralDrive"></i><span title="<%=label%>"><%=label.substring(0,22)%>...</span>
+			<i class="uiIconGeneralDrive uiIconLightGray"></i><span title="<%=label%>"><%=label.substring(0,22)%>...</span>
 		<% }else {%>
-			<i class="uiIconGeneralDrive"></i><span><%=label%></span>
+			<i class="uiIconGeneralDrive uiIconLightGray"></i><span><%=label%></span>
 		<% }}else {%>
-			<i class="uiIconGeneralDrive"></i><span><%=_ctx.appRes(uicomponent.getId() + ".title.Empty")%></span>
+			<i class="uiIconGeneralDrive uiIconLightGray"></i><span><%=_ctx.appRes(uicomponent.getId() + ".title.Empty")%></span>
 		<% } %>
 		 <span class="caret"></span>
 	</div>
