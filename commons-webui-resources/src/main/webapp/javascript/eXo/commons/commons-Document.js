@@ -23,6 +23,8 @@ function DocumentSelector(){
   this.allowDeleteItem = true;
   this.dataId = null;
   this.selectedItem = null;
+  this.noFolderOrFileLabel = "There is no folder or file.";
+  this.noDriveLabel = "There is no drive.";
 };
 
 function DocumentItem(){
@@ -140,7 +142,7 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
     var item = jQuery('<li/>', {
                               'class' : 'listItem'
                             });
-    item.html("There is no drive");
+    item.html(this.noDriveLabel);
     item.addClass("Item TRNoContent");
     listRecords.append(item);
     return;
@@ -210,7 +212,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var item = jQuery('<li/>', {
 	                      'class' : 'listItem'
 	                    });
-    item.html("There is no folder or file");
+    item.html(this.noFolderOrFileLabel);
     item.addClass("Item TRNoContent");
     listRecords.append(item);
     return;

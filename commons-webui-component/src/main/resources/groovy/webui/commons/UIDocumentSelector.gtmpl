@@ -11,7 +11,11 @@
   
   //portal's problem, workaround for uicomponent.event() --> loaded programmatically
   //jsManager.loadScriptResource(ResourceScope.SHARED, "base");
- 
+
+  // Define the labels for "No drive" and "No folder"
+  def noFolderOrFileLabel = _ctx.appRes(uicomponent.id + '.label.NoFolderOrFile');
+  def noDriveLabel = _ctx.appRes(uicomponent.id + '.label.NoDrive');
+
   requireJs.require("SHARED/commons-document", "commonDocument");    
   requireJs.require("SHARED/jquery", "jq");
   
@@ -28,6 +32,8 @@
   requireJs.addScripts("commonDocument.DocumentSelector.currentFolderParam = '" + uicomponent.PARAM_CURRENT_FOLDER + "';");
   requireJs.addScripts("commonDocument.DocumentSelector.itemPathParam = '" + uicomponent.PARAM_ITEM_PATH + "';");  
   requireJs.addScripts("commonDocument.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.noFolderOrFileLabel =\"" + noFolderOrFileLabel + "\";");
+  requireJs.addScripts("commonDocument.DocumentSelector.noDriveLabel =\"" + noDriveLabel + "\";");
   requireJs.addScripts("commonDocument.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
   requireJs.addScripts("jq('#createNew').click(function() {commonDocument.DocumentSelector.newFolder(this);});");
 %>
