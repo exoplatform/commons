@@ -152,7 +152,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       }
     }
 
-    LOG.info("Activied pluginIds:: " + activeProviderIds.toString());
+    LOG.info("Active pluginIds:: " + activeProviderIds.toString());
     return new ArrayList<String>(activeProviderIds);
   }
 
@@ -167,7 +167,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       }
     }
 
-    LOG.info("Activied plugin info:: " + activeProviders.toString());
+    LOG.info("Active plugin info:: " + activeProviders.toString());
     return new ArrayList<PluginInfo>(activeProviders);
   }
 
