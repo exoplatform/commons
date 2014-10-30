@@ -145,6 +145,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     if (height == null) height = "'200px'";
     if (enterMode == null) enterMode = "1";
     if (css == null) css = "\"/CommonsResources/ckeditor/contents.css\"";
+    if (value_ == null) value_ = "";
 
     StringBuilder builder = new StringBuilder();
     builder.append("<div class=\"clearfix\">");
