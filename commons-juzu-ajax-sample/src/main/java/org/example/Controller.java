@@ -20,7 +20,7 @@ public class Controller {
   
   @View
   public void index() throws IOException {
-    index.render();
+    index.ok();
   }
   
   @Resource @Ajax

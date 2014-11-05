@@ -29,13 +29,18 @@
       </exclusions>
     </dependency>
     <!-- Application dependencies-->
-    <dependency>
+    <!--<dependency>
       <groupId>org.juzu</groupId>
       <artifactId>juzu-bom-core</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>org.juzu</groupId>
       <artifactId>juzu-plugins-portlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.portlet</groupId>
+      <artifactId>portlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
