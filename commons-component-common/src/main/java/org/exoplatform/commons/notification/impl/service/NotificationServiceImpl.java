@@ -221,7 +221,13 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
                                          List<UserSetting> sentUsers) throws Exception {
     
     OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
-    ListAccess<User> allUsers = organizationService.getUserHandler().findAllUsers();
+    CommonsUtils.startRequest(organizationService);
+    ListAccess<User> allUsers = null;
+    try {
+      allUsers= organizationService.getUserHandler().findAllUsers();
+    } finally {
+      CommonsUtils.endRequest(organizationService);
+    }
     int size = allUsers.getSize(), limit = 200;
     int index = 0, length = Math.min(limit, size);
     //only lazy adding mixin-type(defaultSetting) when the user's size > sent notification's size.

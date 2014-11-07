@@ -205,9 +205,12 @@ public class NotificationUtils {
   
   public static boolean isDeletedMember(String userName) {
     try {
+      CommonsUtils.startRequest(CommonsUtils.getService(OrganizationService.class));
       return CommonsUtils.getService(OrganizationService.class).getUserHandler().findUserByName(userName) == null;
     } catch (Exception e) {
       return false;
+    } finally {
+      CommonsUtils.endRequest(CommonsUtils.getService(OrganizationService.class));
     }
   }
   
