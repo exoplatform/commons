@@ -5,6 +5,7 @@ import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.definition.PortalContainerConfig;
 import org.exoplatform.container.xml.PortalContainerInfo;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -125,4 +126,19 @@ public class CommonsUtils {
       //
       return sysDomain;
     }
+    
+    public static void startRequest(Object service)
+    {
+      if(service instanceof ComponentRequestLifecycle) {
+        ((ComponentRequestLifecycle) service).startRequest(ExoContainerContext.getCurrentContainer());
+      }
+    }
+
+    public static void endRequest(Object service) 
+    {
+      if(service instanceof ComponentRequestLifecycle) {
+        ((ComponentRequestLifecycle) service).endRequest(ExoContainerContext.getCurrentContainer());
+      }
+    }
+    
 }

@@ -24,6 +24,7 @@ import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
@@ -48,6 +49,7 @@ public class NotificationPluginUtils {
   }
 
   public static String getFirstName(String userName) {
+    startRequest(getOrganizationService());
     User user = null;
     try {
       UserHandler userHandler = getOrganizationService().getUserHandler();
@@ -55,6 +57,8 @@ public class NotificationPluginUtils {
       return user.getFirstName();
     } catch (Exception e) {
       return null;
+    } finally {
+      endRequest(getOrganizationService());
     }
   }
   
@@ -63,11 +67,14 @@ public class NotificationPluginUtils {
   }
 
   public static String getFullName(String userId) {
+    startRequest(getOrganizationService());    
     try {
       User user = getOrganizationService().getUserHandler().findUserByName(userId);
       return getFullName(user);
     } catch (Exception e) {
       return null;
+    } finally {
+      endRequest(getOrganizationService());
     }
   }
 
@@ -83,6 +90,7 @@ public class NotificationPluginUtils {
   }
 
   private static String getEmailFormat(String userId) {
+    startRequest(getOrganizationService());
     try {
       User user = getOrganizationService().getUserHandler().findUserByName(userId);
       StringBuilder userInfor = new StringBuilder(getFullName(user));
@@ -90,6 +98,8 @@ public class NotificationPluginUtils {
       return userInfor.toString();
     } catch (Exception e) {
       return null;
+    } finally {
+      endRequest(getOrganizationService());
     }
   }
 
@@ -132,12 +142,15 @@ public class NotificationPluginUtils {
    * @return
    */
   public static String getLanguage(String userId) {
+    startRequest(getOrganizationService());
     try {
       UserProfile profile = getOrganizationService().getUserProfileHandler().findUserProfileByName(userId);
       String lang = profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]);
       return (lang != null && lang.trim().length() > 0) ? lang : DEFAULT_LANGUAGE;
     } catch (Exception e) {
       return DEFAULT_LANGUAGE;
+    } finally {
+      endRequest(getOrganizationService());
     }
   }
 
@@ -156,4 +169,19 @@ public class NotificationPluginUtils {
     }
     return settingService;
   }
+  
+  private static void startRequest(Object service)
+  {
+    if(service instanceof ComponentRequestLifecycle) {
+      ((ComponentRequestLifecycle) service).startRequest(ExoContainerContext.getCurrentContainer());
+    }
+  }
+
+  private static void endRequest(Object service) 
+  {
+    if(service instanceof ComponentRequestLifecycle) {
+      ((ComponentRequestLifecycle) service).endRequest(ExoContainerContext.getCurrentContainer());
+    }
+  }
+  
 }
