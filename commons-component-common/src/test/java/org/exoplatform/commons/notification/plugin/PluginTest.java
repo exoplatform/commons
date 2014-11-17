@@ -91,4 +91,10 @@ public class PluginTest extends AbstractNotificationPlugin {
     return false;
   }
 
+  @Override
+  protected String makeUIMessage(NotificationContext ctx) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

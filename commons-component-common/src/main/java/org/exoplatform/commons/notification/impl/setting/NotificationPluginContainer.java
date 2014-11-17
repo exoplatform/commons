@@ -126,9 +126,14 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   private void registerPlugin(AbstractNotificationPlugin plugin) {
     try {
-      String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
+      PluginConfig config = plugin.getPluginConfigs().get(0);
+      String templatePath = config.getTemplateConfig().getTemplatePath();
       String template = TemplateUtils.loadGroovyTemplate(templatePath);
       plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
+      
+      String intranetNotificationTemplatePath = config.getTemplateConfig().getIntranetTemplatePath();
+      String intranetNotificationTemplate = TemplateUtils.loadGroovyTemplate(intranetNotificationTemplatePath);
+      plugin.setIntranetNotificationEngine(gTemplateEngine.createTemplate(intranetNotificationTemplate));
     } catch (Exception e) {
       LOG.debug("Failed to register notification plugin " + plugin.getId());
     }

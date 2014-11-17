@@ -72,6 +72,21 @@ public class TemplateUtils {
   }
   
   /**
+   * Process the Intranet Groovy template associate with Template context to generate
+   * It will be use for digest mail
+   * @param ctx
+   * @return
+   */
+  public static String processIntranetGroovy(TemplateContext ctx) {
+    TemplateConfig templateConfig = getTemplateConfig(ctx.getPluginId());
+    Element groovyElement =  new IntranetGroovyElement().language(ctx.getLanguage()).config(templateConfig);
+    
+    ElementVisitor visitor = new GroovyElementVisitor();
+    String content = visitor.with(ctx).visit(groovyElement).out();
+    return content;
+  }
+  
+  /**
    * Generate the Groovy Template
    * @param context The template context
    * @param element The GroovyElemt

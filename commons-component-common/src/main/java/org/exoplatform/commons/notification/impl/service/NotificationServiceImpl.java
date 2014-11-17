@@ -39,12 +39,15 @@ import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.notification.net.WebSocketBootstrap;
+import org.exoplatform.commons.notification.net.WebSocketServer;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
+import org.vertx.java.core.json.JsonObject;
 
 public class NotificationServiceImpl extends AbstractService implements NotificationService {
   private static final Log         LOG              = ExoLogger.getLogger(NotificationServiceImpl.class);
@@ -93,6 +96,10 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       if (userSetting.isInInstantly(pluginId)) {
         sendInstantly(notification.clone().setTo(userId));
       }
+      // send web notification
+      if (userSetting.isInInstantly(pluginId)) {
+        sendNotif(notification.clone().setTo(userId));
+      }
       //
       if (userSetting.isActiveWithoutInstantly(pluginId)) {
         userIdPendings.add(userId);
@@ -113,7 +120,6 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
    */
   private void sendInstantly(NotificationInfo notification) {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
-    
     NotificationContext nCtx = NotificationContextImpl.cloneInstance();
     AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notification.getKey());
     if (plugin != null) {
@@ -133,6 +139,23 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     }
   }
 
+  private void sendNotif(NotificationInfo notification) {
+    NotificationContext nCtx = NotificationContextImpl.cloneInstance();
+    AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notification.getKey());
+    if (plugin == null) {
+      return;
+    }
+    try {
+      nCtx.setNotificationInfo(notification);
+      String message = plugin.buildUIMessage(nCtx);
+      JsonObject jsonObject = new JsonObject();
+      jsonObject.putString("message", message);
+      WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER, notification.getTo(), jsonObject.encode());
+    } catch (Exception e) {
+      LOG.error("Failed to connect with server : " + e, e.getMessage());
+    }
+  }
+  
   @Override
   public void process(Collection<NotificationInfo> messages) throws Exception {
     for (NotificationInfo message : messages) {

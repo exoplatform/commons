@@ -23,6 +23,8 @@ public class TemplateConfig {
   public static final String  DEFAULT_SRC_RESOURCE_BUNDLE_KEY = "locale.notification.template.Notification";
   
   public static final String  DEFAULT_SRC_RESOURCE_TEMPLATE_KEY = "war:/notification/templates";
+  
+  public static final String  DEFAULT_SRC_RESOURCE_INTRANET_TEMPLATE_KEY = "war:/intranet-notification/templates";
 
   public static final String  SUBJECT_KEY              = "subject";
 
@@ -41,6 +43,8 @@ public class TemplateConfig {
   private String              bundlePath;
 
   private String              templatePath;
+
+  private String              intranetTemplatePath;
 
   private Map<String, String> keyMapping               = new HashMap<String, String>();
 
@@ -98,6 +102,18 @@ public class TemplateConfig {
    */
   public void setTemplatePath(String templatePath) {
     this.templatePath = templatePath;
+  }
+
+  public String getIntranetTemplatePath() {
+    if(intranetTemplatePath == null) {
+      intranetTemplatePath = new StringBuffer(DEFAULT_SRC_RESOURCE_INTRANET_TEMPLATE_KEY)
+                                .append("/").append(providerId).append(".gtmpl").toString();
+    }
+    return intranetTemplatePath;
+  }
+
+  public void setIntranetTemplatePath(String intranetTemplatePath) {
+    this.intranetTemplatePath = intranetTemplatePath;
   }
 
   /**

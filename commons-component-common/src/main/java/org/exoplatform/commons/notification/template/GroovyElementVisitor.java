@@ -52,7 +52,12 @@ public class GroovyElementVisitor implements ElementVisitor {
     //
     try {
       PluginKey key = new PluginKey(ctx.getPluginId());
-      Template engine = CommonsUtils.getService(PluginContainer.class).getPlugin(key).getTemplateEngine();
+      Template engine = null;
+      if (element instanceof IntranetGroovyElement) {
+        engine = CommonsUtils.getService(PluginContainer.class).getPlugin(key).getIntranetNotificationEngine();
+      } else {
+        engine = CommonsUtils.getService(PluginContainer.class).getPlugin(key).getTemplateEngine();
+      }
       Writable writable = engine.make(getTemplateContext());
       writable.writeTo(writer);
     } catch (Exception e) {

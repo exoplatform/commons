@@ -55,5 +55,10 @@ public class DigestWeeklyPlugin extends AbstractNotificationPlugin {
   public boolean isValid(NotificationContext ctx) {
     return true;
   }
+  
+  @Override
+  protected String makeUIMessage(NotificationContext ctx) {
+    return null;
+  }
 
 }
