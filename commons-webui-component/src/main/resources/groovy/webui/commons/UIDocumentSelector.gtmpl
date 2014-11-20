@@ -1,6 +1,7 @@
 <%
   import org.exoplatform.webui.core.UIDropDownControl;
-  
+  import org.apache.commons.lang.StringEscapeUtils;
+
   def rcontext = _ctx.getRequestContext();  
   String restContext = uicomponent.getRestContext();
   String selectFileLink =uicomponent.event(uicomponent.SELECT_FILE);
@@ -11,7 +12,11 @@
   
   //portal's problem, workaround for uicomponent.event() --> loaded programmatically
   //jsManager.loadScriptResource(ResourceScope.SHARED, "base");
- 
+
+  // Define the labels for "No drive" and "No folder"
+  def noFolderOrFileLabel = _ctx.appRes(uicomponent.id + '.label.NoFolderOrFile');
+  def noDriveLabel = _ctx.appRes(uicomponent.id + '.label.NoDrive');
+
   requireJs.require("SHARED/commons-document", "commonDocument");    
   requireJs.require("SHARED/jquery", "jq");
   
@@ -28,6 +33,8 @@
   requireJs.addScripts("commonDocument.DocumentSelector.currentFolderParam = '" + uicomponent.PARAM_CURRENT_FOLDER + "';");
   requireJs.addScripts("commonDocument.DocumentSelector.itemPathParam = '" + uicomponent.PARAM_ITEM_PATH + "';");  
   requireJs.addScripts("commonDocument.DocumentSelector.dataId ='" + uicomponent.DATA_ID + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.noFolderOrFileLabel ='" + StringEscapeUtils.escapeJavaScript(noFolderOrFileLabel) + "';");
+  requireJs.addScripts("commonDocument.DocumentSelector.noDriveLabel ='" + StringEscapeUtils.escapeJavaScript(noDriveLabel) + "';");
   requireJs.addScripts("commonDocument.DocumentSelector.init('" + uicomponent.id + "','" + restContext +"');");
   requireJs.addScripts("jq('#createNew').click(function() {commonDocument.DocumentSelector.newFolder(this);});");
 %>
