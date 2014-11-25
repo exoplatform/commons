@@ -99,14 +99,14 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     try {
       boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
       if (isWeekly) {
-        for (String pluginId : setting.getWeeklyProviders()) {
+        for (String pluginId : setting.getWeeklyPlugins()) {
           putMap(notificationData, PluginKey.key(pluginId), getWeeklyNotifs(sProvider, pluginId, setting.getUserId()));
         }
       }
       //
       boolean isDaily = context.value(NotificationJob.JOB_DAILY);
       if (isDaily) {
-        for (String pluginId : setting.getDailyProviders()) {
+        for (String pluginId : setting.getDailyPlugins()) {
           putMap(notificationData, PluginKey.key(pluginId), getDailyNotifs(sProvider, context, pluginId, setting.getUserId()));
         }
       }
@@ -245,6 +245,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       .setOwnerParameter(node.getProperty(NTF_OWNER_PARAMETER).getValues())
       .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_DAILY).getValues()))
       .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
+      .setLastModifiedDate(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate())
       .setId(node.getName());
 
     return message;

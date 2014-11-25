@@ -26,7 +26,7 @@ import java.util.List;
 
 import javax.jcr.Node;
 
-import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.jcr.core.ManageableRepository;
@@ -42,7 +42,7 @@ import org.exoplatform.services.security.MembershipEntry;
  *          exo@exoplatform.com
  * Apr 22, 2014  
  */
-public class UserStateServiceTest extends BaseCommonsTestCase {
+public class UserStateServiceTest extends BaseNotificationTestCase {
   private final String WORKSPACE_COLLABORATION = "collaboration";
   
   private static String VIDEOCALLS_BASE_PATH = "VideoCalls";

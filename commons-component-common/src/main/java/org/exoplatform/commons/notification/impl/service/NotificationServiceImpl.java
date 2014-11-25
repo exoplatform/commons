@@ -32,6 +32,7 @@ import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugi
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
+import org.exoplatform.commons.api.notification.service.storage.IntranetNotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
@@ -54,14 +55,18 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   /** */
   private final NotificationDataStorage storage;
   /** */
+  private final IntranetNotificationDataStorage dataStorage;
+  /** */
   private final DigestorService digestorService;
   /** */
   private final UserSettingService userService;
 
-  public NotificationServiceImpl(UserSettingService userService, DigestorService digestorService, NotificationDataStorage storage) {
+  public NotificationServiceImpl(UserSettingService userService, DigestorService digestorService,
+                                 NotificationDataStorage storage, IntranetNotificationDataStorage dataStorage) {
     this.userService = userService;
     this.digestorService = digestorService;
     this.storage = storage;
+    this.dataStorage = dataStorage;
   }
   
   @Override
@@ -73,8 +78,16 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     if (NotificationContextFactory.getInstance().getStatisticsService().isStatisticsEnabled()) {
       NotificationContextFactory.getInstance().getStatisticsCollector().createNotificationInfoCount(pluginId);
     }
-    // if the provider is not active, do nothing
-    if (CommonsUtils.getService(PluginSettingService.class).isActive(pluginId) == false) {
+    //
+    processEmailNotification(notification);
+    //
+    processChannelNotification(notification);
+  }
+  
+  private void processEmailNotification(NotificationInfo notification) throws Exception {
+    String pluginId = notification.getKey().getId();
+    // if the plugin is not active, do nothing
+    if (CommonsUtils.getService(PluginSettingService.class).isActive(UserSetting.EMAIL_CHANNEL, pluginId) == false) {
       return;
     }
     //
@@ -89,16 +102,12 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     for (String userId : userIds) {
       UserSetting userSetting = notificationService.get(userId);
       //
-      if (userSetting.isActive() == false) {
+      if (userSetting.isChannelActive(UserSetting.EMAIL_CHANNEL) == false) {
         continue;
       }
       // send instantly mail
       if (userSetting.isInInstantly(pluginId)) {
         sendInstantly(notification.clone().setTo(userId));
-      }
-      // send web notification
-      if (userSetting.isInInstantly(pluginId)) {
-        sendNotif(notification.clone().setTo(userId));
       }
       //
       if (userSetting.isActiveWithoutInstantly(pluginId)) {
@@ -112,6 +121,31 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       storage.save(notification);
     }
   }
+  
+  private void processChannelNotification(NotificationInfo notification) {
+    // for all channel
+    
+    String pluginId = notification.getKey().getId();
+    // if the plugin is not active, do nothing
+    if (CommonsUtils.getService(PluginSettingService.class).isActive(UserSetting.INTRANET_CHANNEL, pluginId) == false) {
+      return;
+    }
+    //
+    UserSettingService notificationService = CommonsUtils.getService(UserSettingService.class);
+    List<String> userIds = notification.getSendToUserIds();
+    //
+    if (notification.isSendAll()) {
+      userIds = notificationService.getUserHasNotifSetting(UserSetting.INTRANET_CHANNEL, pluginId);
+    }
+    for (String userId : userIds) {
+      UserSetting userSetting = notificationService.get(userId);
+      //
+      if (userSetting.isChannelActive(UserSetting.INTRANET_CHANNEL) && userSetting.isInChannel(UserSetting.INTRANET_CHANNEL, pluginId)) {
+        sendIntranetNotification(notification.clone().setTo(userId));
+      }
+    }
+  }
+  
   
   /**
    * Process to send instantly mail
@@ -139,18 +173,20 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     }
   }
 
-  private void sendNotif(NotificationInfo notification) {
+  private void sendIntranetNotification(NotificationInfo notification) {
     NotificationContext nCtx = NotificationContextImpl.cloneInstance();
     AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notification.getKey());
     if (plugin == null) {
       return;
     }
     try {
-      nCtx.setNotificationInfo(notification);
-      String message = plugin.buildUIMessage(nCtx);
-      JsonObject jsonObject = new JsonObject();
-      jsonObject.putString("message", message);
-      WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER, notification.getTo(), jsonObject.encode());
+      notification.setLastModifiedDate(Calendar.getInstance());
+      notification.setId(new NotificationInfo().getId());
+      String message = dataStorage.buildUIMessage(notification);
+      WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER, notification.getTo(),
+                                     new JsonObject().putString("message", message).encode());
+      //
+      dataStorage.save(notification);
     } catch (Exception e) {
       LOG.error("Failed to connect with server : " + e, e.getMessage());
     }
@@ -184,7 +220,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
      * 1. just implements for daily
      * 2. apply Strategy pattern and Factory Pattern
      */
-    UserSetting defaultConfigPlugins = getDefaultUserSetting(notifContext.getPluginSettingService().getActivePluginIds());
+    UserSetting defaultConfigPlugins = getDefaultUserSetting(notifContext.getPluginSettingService().getActivePluginIds(UserSetting.EMAIL_CHANNEL));
     //process for users used setting
     /**
      * Tested with 5000 users:
@@ -360,9 +396,9 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     UserSetting defaultSetting = UserSetting.getDefaultInstance();
     for (String string : activatedPluginsByAdminSetting) {
       if (defaultSetting.isInWeekly(string)) {
-        setting.addProvider(string, FREQUENCY.WEEKLY);
+        setting.addPlugin(string, FREQUENCY.WEEKLY);
       } else if (defaultSetting.isInDaily(string)) {
-        setting.addProvider(string, FREQUENCY.DAILY);
+        setting.addPlugin(string, FREQUENCY.DAILY);
       }
     }
 

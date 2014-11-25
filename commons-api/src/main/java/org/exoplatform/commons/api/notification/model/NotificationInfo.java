@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,10 @@ public class NotificationInfo {
   private String[]            sendToDaily;
 
   private String[]            sendToWeekly;
+
+  private boolean             hasRead        = false;
+
+  private Calendar            lastModifiedDate;
 
   public NotificationInfo() {
     this.id = PREFIX_ID + IdGenerator.generate();
@@ -219,6 +224,38 @@ public class NotificationInfo {
       }
 
     }
+    return this;
+  }
+
+  /**
+   * Get the status of notification has read or not.
+   * @return
+   */
+  public boolean isHasRead() {
+    return hasRead;
+  }
+
+  /**
+   * @param hasRead
+   */
+  public NotificationInfo setHasRead(boolean hasRead) {
+    this.hasRead = hasRead;
+    return this;
+  }
+
+  /**
+   * Get the last modified date
+   * @return
+   */
+  public Calendar getLastModifiedDate() {
+    return lastModifiedDate;
+  }
+
+  /**
+   * @param lastModifiedDate
+   */
+  public NotificationInfo setLastModifiedDate(Calendar lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
     return this;
   }
 

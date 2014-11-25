@@ -74,6 +74,14 @@ public interface UserSettingService {
   List<String> getUserSettingByPlugin(String pluginId);
   
   /**
+   * Gets all Ids of users registering for notifications by a given plugin.
+   * 
+   * @param pluginId Id of the plugin.
+   * @return The remote Ids of users.
+   */
+  List<String> getUserHasNotifSetting(String channelId, String pluginId);
+  
+  /**
    * Adds the default settings to a user's node.
    * 
    * @param userId The user's remote Id.

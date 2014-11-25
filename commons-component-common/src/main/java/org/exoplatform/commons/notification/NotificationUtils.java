@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,6 +133,15 @@ public class NotificationUtils {
       values.append(str);
     }
     return values.toString();
+  }
+  
+  public static List<String> stringToList(String value) {
+    StringTokenizer tokenizer = new StringTokenizer(value, ",");
+    List<String> result = new ArrayList<String>();
+    while (tokenizer.hasMoreTokens()) {
+      result.add(tokenizer.nextToken());
+    }
+    return result;
   }
 
   public static String[] valuesToArray(Value[] values) throws Exception {

@@ -28,9 +28,8 @@ import org.exoplatform.commons.api.notification.service.template.TemplateContext
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.plugin.PluginTest;
 import org.exoplatform.commons.notification.template.TemplateUtils;
-import org.exoplatform.commons.testing.BaseCommonsTestCase;
 
-public class PluginContainerTest extends BaseCommonsTestCase {
+public class PluginContainerTest extends BaseNotificationTestCase {
   
   private PluginContainer container;
   public PluginContainerTest() {

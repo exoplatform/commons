@@ -43,10 +43,12 @@ public abstract class AbstractService {
   public static final String EXO_IS_ACTIVE            = "exo:isActive";
 
   public static final String EXO_INSTANTLY            = "exo:instantly";
-
+  
   public static final String EXO_DAILY                = "exo:daily";
 
   public static final String EXO_WEEKLY               = "exo:weekly";
+
+  public static final String NTF_TO                   = "ntf:to";
 
   public static final String NTF_FROM                 = "ntf:from";
 
@@ -73,6 +75,8 @@ public abstract class AbstractService {
   public static final String MIX_DEFAULT_SETTING      = "mix:defaultSetting";
 
   public static final String NTF_OWNER_PARAMETER      = "ntf:ownerParameter";
+
+  public static final String NTF_HAS_READ             = "ntf:hasRead";
 
   public static final String EXO_LAST_MODIFIED_DATE   = "exo:lastModifiedDate";
 

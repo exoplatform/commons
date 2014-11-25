@@ -51,7 +51,7 @@ public class MessageDailyController {
     //AbstractNotificationPlugin plugin =  this.pluginService.getPlugin(key);
     //List<ProviderData> all = providerService.getAllProviders();
     
-    List<String> activeProviders = providerService.getActivePluginIds();
+    List<String> activeProviders = providerService.getActivePluginIds(UserSetting.EMAIL_CHANNEL);
     
     
     for(NotificationInfo notification : notifications) {

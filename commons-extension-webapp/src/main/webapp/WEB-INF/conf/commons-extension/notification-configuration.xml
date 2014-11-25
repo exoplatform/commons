@@ -47,6 +47,11 @@
     <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
     <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
   </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.storage.IntranetNotificationDataStorage</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.IntranetNotificationDataStorageImpl</type>
+  </component>
   
   <component>
     <key>org.exoplatform.commons.api.settings.ExoFeatureService</key>

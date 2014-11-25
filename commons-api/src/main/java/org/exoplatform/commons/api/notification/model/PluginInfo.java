@@ -30,12 +30,12 @@ public class PluginInfo {
   
   private String       bundlePath;
 
-  private boolean     isActive      = true;
+  private List<String> channelActives;
 
   private List<String> defaultConfig = new ArrayList<String>();
 
   public PluginInfo() {
-
+    channelActives = new ArrayList<String>();
   }
 
   /**
@@ -113,17 +113,32 @@ public class PluginInfo {
   }
 
   /**
-   * @return the isActive
+   * @return
    */
-  public boolean isActive() {
-    return isActive;
+  public List<String> getAllChannelActive() {
+    return channelActives;
   }
 
   /**
-   * @param isActive the isActive to set
+   * @return
    */
-  public PluginInfo setActive(boolean isActive) {
-    this.isActive = isActive;
+  public boolean isChannelActive(String channelId) {
+    return channelActives.contains(channelId);
+  }
+
+  /**
+   * @param channelId
+   */
+  public PluginInfo setChannelActive(String channelId) {
+    channelActives.add(channelId);
+    return this;
+  }
+  
+  /**
+   * @param channelActives
+   */
+  public PluginInfo setChannelActives(List<String> channelActives) {
+    this.channelActives = new ArrayList<String>(channelActives);
     return this;
   }
 

@@ -32,10 +32,8 @@ import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
-import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
-import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
@@ -43,7 +41,6 @@ import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.notification.job.NotificationJob;
-import org.exoplatform.commons.notification.job.mbeans.AbstractNotificationJobManager;
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
@@ -69,7 +66,7 @@ public class DigestorServiceImpl implements DigestorService {
       messageInfo = new MessageInfo();
       NotificationPluginContainer containerService = CommonsUtils.getService(NotificationPluginContainer.class);
       
-      List<String> activeProviders = jobContext.getPluginSettingService().getActivePluginIds();
+      List<String> activeProviders = jobContext.getPluginSettingService().getActivePluginIds(UserSetting.EMAIL_CHANNEL);
       NotificationContext nCtx = NotificationContextImpl.cloneInstance();
       
       Writer writer = new StringWriter();
@@ -173,7 +170,7 @@ public class DigestorServiceImpl implements DigestorService {
       
       this.isWeekly = context.value(NotificationJob.JOB_WEEKLY);
       //
-      if(isWeekly && userSetting.getWeeklyProviders().size() > 0) {
+      if(isWeekly && userSetting.getWeeklyPlugins().size() > 0) {
         pluginId = DigestWeeklyPlugin.ID;
         periodType = "Weekly";
         //

@@ -105,10 +105,10 @@ public class TemplateConfig {
   }
 
   public String getIntranetTemplatePath() {
-    if(intranetTemplatePath == null) {
-      intranetTemplatePath = new StringBuffer(DEFAULT_SRC_RESOURCE_INTRANET_TEMPLATE_KEY)
-                                .append("/").append(providerId).append(".gtmpl").toString();
-    }
+//    if(intranetTemplatePath == null) {
+//      intranetTemplatePath = new StringBuffer(DEFAULT_SRC_RESOURCE_INTRANET_TEMPLATE_KEY)
+//                                .append("/").append(providerId).append(".gtmpl").toString();
+//    }
     return intranetTemplatePath;
   }
 
