@@ -35,7 +35,7 @@
 	<div data-toggle="dropdown" class="btn dropdown-toggle">
 		<span>$currentSpaceName</span>
 		<span class="spiter"></span> 
-		<i class="uiIconArrowDown uiIconLightGray"></i>
+		<i class="uiIconMiniArrowDown uiIconLightGray"></i>
 	</div>
   </div>
   
