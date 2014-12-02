@@ -93,6 +93,18 @@ public class WebSocketBootstrap implements Startable {
       ws.sendMessage(identifierId, message);
     }
   }
+
+  /**
+   * @param identifierId
+   * @param message
+   */
+  public static void sendJsonMessage(String identifierId, String remoteId, String message) {
+    if (ws != null) {
+      JsonObject jsonObject = new JsonObject();
+      jsonObject.putString("message", message);
+      ws.sendMessage(identifierId, remoteId, jsonObject.encode());
+    }
+  }
   
   public static Map<String, Map<String, ServerWebSocket>> subscriptions() {
     return subscriptions;

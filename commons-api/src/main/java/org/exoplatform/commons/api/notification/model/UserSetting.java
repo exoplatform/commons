@@ -190,7 +190,10 @@ public class UserSetting {
    * @param pluginId
    */
   public void addChannelPlugin(String channelId, String pluginId) {
-    getPlugins(channelId).add(pluginId);
+    List<String> plugins = getPlugins(channelId);
+    if (!plugins.contains(pluginId)) {
+      plugins.add(pluginId);
+    }
   }
 
   /**
@@ -242,8 +245,10 @@ public class UserSetting {
   public void addPlugin(String pluginId, FREQUENCY frequencyType) {
     if (frequencyType.equals(FREQUENCY.DAILY)) {
       addProperty(dailyPlugins, pluginId);
+      weeklyPlugins.remove(pluginId);
     } else if (frequencyType.equals(FREQUENCY.WEEKLY)) {
       addProperty(weeklyPlugins, pluginId);
+      dailyPlugins.remove(pluginId);
     } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
       addProperty(instantlyPlugins, pluginId);
     }
@@ -262,7 +267,7 @@ public class UserSetting {
    * @return
    */
   public boolean isInChannel(String channelId, String pluginId) {
-    return (getPlugins(channelId).contains(pluginId));
+    return (EMAIL_CHANNEL.equals(channelId)) ? isInInstantly(pluginId) : (getPlugins(channelId).contains(pluginId));
   }
   
   /**

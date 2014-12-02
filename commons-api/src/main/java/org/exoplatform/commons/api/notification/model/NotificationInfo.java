@@ -333,11 +333,6 @@ public class NotificationInfo {
       if (m.getId().equals(this.id)) {
         return true;
       }
-
-      if (m.getTo() != null && m.getTo().length() > 0 && m.getTo().equals(to) 
-            && m.getKey() != null && m.getKey().equals(key)) {
-        return true;
-      }
     }
     return false;
   }

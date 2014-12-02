@@ -63,5 +63,10 @@ public abstract class AbstractNotificationChildPlugin extends AbstractNotificati
     throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeDigest.");
   }
   
+  @Override
+  protected String makeUIMessage(NotificationContext ctx) {
+    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeUIMessage.");
+  }
+  
   public abstract String makeContent(NotificationContext ctx);
 }

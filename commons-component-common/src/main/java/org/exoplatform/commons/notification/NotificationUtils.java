@@ -54,10 +54,14 @@ public class NotificationUtils {
   public static final String FEATURE_NAME              = "notification";
   
   private static final Pattern LINK_PATTERN = Pattern.compile("<a ([^>]+)>([^<]+)</a>");
+  
+  private static final Pattern HREF_PATTERN = Pattern.compile("<a (.*)href=\"(.*?)\"(.*)>([^<]+)</a>");
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile("^[_a-z0-9-+]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,5})$");
   
   private static final String styleCSS = " style=\"color: #2f5e92; text-decoration: none;\"";
+  
+  private static final String userClass = "class=\"user-name text-bold\"";
   
   public static String getDefaultKey(String key, String providerId) {
     return MessageFormat.format(key, providerId);
@@ -235,6 +239,28 @@ public class NotificationUtils {
     while (matcher.find()) {
       String result = matcher.group(1);
       title = title.replace(result, result + styleCSS);
+    }
+    return title;
+  }
+  
+  /**
+   * Remove all link in activity title and add user-name class
+   *  
+   * @param title
+   * @return
+   */
+  public static String removeLinkTitle(String title) {
+    Matcher matcher = HREF_PATTERN.matcher(title);
+    while (matcher.find()) {
+      String style = matcher.group(1);
+      if (style.trim().length() == 0) {
+        title = title.replace("href", userClass + " href");
+      } else {
+        title = title.replace(style, userClass + " " + style);
+      }
+      //
+      String url = matcher.group(2);
+      title = title.replace(url, "javascript:void(0)");
     }
     return title;
   }
