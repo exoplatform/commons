@@ -195,6 +195,18 @@ public class UserSetting {
       plugins.add(pluginId);
     }
   }
+  
+  /**
+   * remove the pluginId on channel
+   * @param channelId
+   * @param pluginId
+   */
+  public void removeChannelPlugin(String channelId, String pluginId) {
+    List<String> plugins = getPlugins(channelId);
+    if (plugins.contains(pluginId)) {
+      plugins.remove(pluginId);
+    }
+  }
 
   /**
    * @return the instantlyPlugins
@@ -251,6 +263,16 @@ public class UserSetting {
       dailyPlugins.remove(pluginId);
     } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
       addProperty(instantlyPlugins, pluginId);
+    }
+  }
+
+  public void removePlugin(String pluginId, FREQUENCY frequencyType) {
+    if (frequencyType.equals(FREQUENCY.DAILY)) {
+      weeklyPlugins.remove(pluginId);
+    } else if (frequencyType.equals(FREQUENCY.WEEKLY)) {
+      dailyPlugins.remove(pluginId);
+    } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
+      instantlyPlugins.remove(pluginId);
     }
   }
 
