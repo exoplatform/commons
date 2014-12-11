@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.channel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +113,7 @@ public class ChannelManagerImpl implements ChannelManager {
       }
       channels.add(channel);
     }
-    return channels;
+    return Collections.unmodifiableList(channels);
   }
 
 }

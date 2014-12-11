@@ -22,6 +22,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
@@ -103,6 +104,8 @@ public abstract class AbstractService {
   public static final String SETTING_USER_PATH        = "settings/user";
 
   public static final String NOTIFICATION_PARENT_PATH = "/";
+
+  public static final String VALUE_PATTERN            = "{VALUE}";
 
   /** Defines the prefix of the parent message node such as d20 */
   public static final String DAY                      = "d";
@@ -215,6 +218,20 @@ public abstract class AbstractService {
 
   protected static void sessionSave(Node node) throws Exception {
     node.getSession().save();
+  }
+  
+  protected static String getValue(String value) {
+    if (value == null || value.isEmpty()) {
+      return "";
+    }
+    return VALUE_PATTERN.replace("VALUE", value);
+  }
+
+  protected static String getValues(String values) {
+    if (values == null || values.isEmpty()) {
+      return "";
+    }
+    return values.replace("{", "").replace("}", "");
   }
 
 }

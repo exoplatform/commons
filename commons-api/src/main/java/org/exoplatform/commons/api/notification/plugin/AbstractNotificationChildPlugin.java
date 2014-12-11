@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
+import groovy.text.Template;
+
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +26,16 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.container.xml.ValuesParam;
 
 public abstract class AbstractNotificationChildPlugin extends AbstractNotificationPlugin {
   private static final String PARENT_ID_KEY = "parentIds";
+  private static final String TEMPLATE_PATH_KEY = "templatePath";
   private List<String> parentPluginIds = new ArrayList<String>();
+
+  private Template engine;
+  private String templatePath;
 
   public AbstractNotificationChildPlugin(InitParams initParams) {
     super(initParams);
@@ -36,6 +43,10 @@ public abstract class AbstractNotificationChildPlugin extends AbstractNotificati
     ValuesParam params = initParams.getValuesParam(PARENT_ID_KEY);
     if(params != null) {
       parentPluginIds.addAll(params.getValues());
+    }
+    ValueParam paramTemplatePath = initParams.getValueParam(TEMPLATE_PATH_KEY);
+    if(paramTemplatePath != null) {
+      templatePath = paramTemplatePath.getValue();
     }
   }
   
@@ -49,13 +60,13 @@ public abstract class AbstractNotificationChildPlugin extends AbstractNotificati
   }
 
   @Override
-  protected NotificationInfo makeNotification(NotificationContext ctx) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeNotification.");
+  protected MessageInfo makeMessage(NotificationContext ctx) {
+    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeMessage.");
   }
 
   @Override
-  protected MessageInfo makeMessage(NotificationContext ctx) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeMessage.");
+  protected NotificationInfo makeNotification(NotificationContext ctx) {
+    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeNotification.");
   }
 
   @Override
@@ -63,10 +74,29 @@ public abstract class AbstractNotificationChildPlugin extends AbstractNotificati
     throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeDigest.");
   }
   
-  @Override
-  protected String makeUIMessage(NotificationContext ctx) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeUIMessage.");
-  }
-  
   public abstract String makeContent(NotificationContext ctx);
+  
+  /**
+   * Get TemplateEngine of plugin
+   * @return the TemplateEngine
+   */
+  public Template getTemplateEngine() {
+    return engine;
+  }
+
+  /**
+   * Set TemplateEngine for plugin
+   * @param engine the TemplateEngine to set
+   */
+  public void setTemplateEngine(Template engine) {
+    this.engine = engine;
+  }
+
+  public String getTemplatePath() {
+    return templatePath;
+  }
+
+  public void setTemplatePath(String templatePath) {
+    this.templatePath = templatePath;
+  }
 }

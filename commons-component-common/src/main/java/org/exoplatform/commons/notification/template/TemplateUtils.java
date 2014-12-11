@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -32,7 +31,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
-import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.api.notification.template.ElementVisitor;
@@ -40,7 +38,6 @@ import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.configuration.ConfigurationManager;
-import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.ResourceBundleService;
@@ -69,47 +66,6 @@ public class TemplateUtils {
     ElementVisitor visitor = new GroovyElementVisitor();
     String content = visitor.with(ctx).visit(groovyElement).out();
     return content;
-  }
-  
-  /**
-   * Process the Intranet Groovy template associate with Template context to generate
-   * It will be use for digest mail
-   * @param ctx
-   * @return
-   */
-  public static String processIntranetGroovy(TemplateContext ctx) {
-    TemplateConfig templateConfig = getTemplateConfig(ctx.getPluginId());
-    Element groovyElement =  new IntranetGroovyElement().language(ctx.getLanguage()).config(templateConfig);
-    
-    ElementVisitor visitor = new GroovyElementVisitor();
-    String content = visitor.with(ctx).visit(groovyElement).out();
-    return content;
-  }
-  
-  /**
-   * Generate the Groovy Template
-   * @param context The template context
-   * @param element The GroovyElemt
-   * @param out The Writer to writer template
-   * @return
-   */
-  public static void loadGroovy(TemplateContext context, Element element, Writer out) {
-    
-    try {
-      String groovyTemplate = element.getTemplate();
-      if (groovyTemplate == null) {
-        groovyTemplate = loadGroovyTemplate(element.getTemplateConfig().getTemplatePath());
-        element.template(groovyTemplate);
-      }
-      if (groovyTemplate != null && groovyTemplate.length() > 0) {
-        GroovyTemplate gTemplate = new GroovyTemplate(groovyTemplate);
-        gTemplate.render(out, context);
-      }
-    } catch (ClassCastException e) {
-      throw new IllegalArgumentException("The function only load groovy with GroovyElement type.");
-    } catch (Exception e) {
-      LOG.warn("Failed to load groovy template of plugin " + context.getPluginId() + "\n" + e.getMessage());
-    }
   }
   
   /**
@@ -175,7 +131,7 @@ public class TemplateUtils {
    * @return The Groovy element
    */
   public static Element loadGroovyElement(String pluginId, String language) {
-    TemplateConfig templateConfig = getTemplateConfig(pluginId);
+    PluginConfig templateConfig = getPluginConfig(pluginId);
     return new GroovyElement().language(language).config(templateConfig);
   }
   
@@ -190,7 +146,7 @@ public class TemplateUtils {
     if (cacheTemplate.containsKey(key)) {
       subjectElement = cacheTemplate.get(key);
     } else {
-      TemplateConfig templateConfig = getTemplateConfig(ctx.getPluginId());
+      PluginConfig templateConfig = getPluginConfig(ctx.getPluginId());
       subjectElement = NotificationUtils.getSubject(templateConfig, ctx.getPluginId(), ctx.getLanguage()).addNewLine(false);
       cacheTemplate.put(key, subjectElement);
     }
@@ -262,7 +218,7 @@ public class TemplateUtils {
     if (cacheTemplate.containsKey(key)) {
       digest = (DigestTemplate) cacheTemplate.get(key);
     } else {
-      TemplateConfig templateConfig = getTemplateConfig(ctx.getPluginId());
+      PluginConfig templateConfig = getPluginConfig(ctx.getPluginId());
       digest = NotificationUtils.getDigest(templateConfig, ctx.getPluginId(), ctx.getLanguage());
       cacheTemplate.put(key, digest);
     }
@@ -280,14 +236,14 @@ public class TemplateUtils {
    * @param pluginId
    * @return
    */
-  private static TemplateConfig getTemplateConfig(String pluginId) {
+  private static PluginConfig getPluginConfig(String pluginId) {
     PluginConfig pluginConfig = NotificationContextImpl.cloneInstance().getPluginSettingService().getPluginConfig(pluginId);
     
     if(pluginConfig == null) {
       throw new IllegalStateException("PluginConfig is NULL with plugId = " + pluginId);
     }
     
-    return pluginConfig.getTemplateConfig();
+    return pluginConfig;
   }
   
   /**

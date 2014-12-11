@@ -18,7 +18,7 @@ package org.exoplatform.commons.notification.template;
 
 import java.util.Locale;
 
-import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
+import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.api.notification.template.ElementVisitor;
 
@@ -42,7 +42,7 @@ public class SimpleElement implements Element {
   /**
    * The template configure
    */
-  private TemplateConfig templateConfig;
+  private PluginConfig pluginConfig;
   
   /**
    * need add new line tag
@@ -81,8 +81,8 @@ public class SimpleElement implements Element {
   }
   
   @Override
-  public Element config(TemplateConfig templateConfig) {
-    this.templateConfig = templateConfig;
+  public Element config(PluginConfig templateConfig) {
+    this.pluginConfig = templateConfig;
     return this;
   }
   
@@ -93,8 +93,8 @@ public class SimpleElement implements Element {
   }
 
   @Override
-  public TemplateConfig getTemplateConfig() {
-    return this.templateConfig;
+  public PluginConfig getPluginConfig() {
+    return this.pluginConfig;
   }
 
   @Override

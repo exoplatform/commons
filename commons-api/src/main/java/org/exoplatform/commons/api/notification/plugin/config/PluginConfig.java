@@ -17,25 +17,42 @@
 package org.exoplatform.commons.api.notification.plugin.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PluginConfig {
+  public static final String  DEFAULT_SRC_RESOURCE_BUNDLE_KEY = "locale.notification.template.Notification";
 
-  private boolean        isChildPlugin = false;
+  public static final String SUBJECT_KEY      = "subject";
+
+  public static final String DIGEST_KEY       = "digest";
+
+  public static final String DIGEST_ONE_KEY   = "digest.one";
+
+  public static final String DIGEST_THREE_KEY = "digest.three";
+
+  public static final String DIGEST_MORE_KEY  = "digest.more";
+
+  public static final String FOOTER_KEY       = "footer";
+
+  private boolean      isChildPlugin = false;
+
+  private String       pluginId;
+
+  private String       resourceBundleKey;
+
+  private String       order         = "0";
+
+  private String       groupId       = "other";
+
+  private List<String> defaultConfig = new ArrayList<String>();
+
+  private GroupConfig  groupConfig;
+
+  private String       bundlePath;
   
-  private String         pluginId;
-
-  private String         resourceBundleKey;
-
-  private String         order = "0";
-
-  private String         groupId = "other";
-  
-  private List<String>   defaultConfig = new ArrayList<String>();
-
-  private GroupConfig    groupConfig;
-
-  private TemplateConfig templateConfig;
+  private Map<String, String> keyMapping = new HashMap<String, String>();
 
   public PluginConfig() {
   }
@@ -144,17 +161,42 @@ public class PluginConfig {
   }
 
   /**
-   * @return the templateConfig
+   * @return the bundlePath
    */
-  public TemplateConfig getTemplateConfig() {
-    return templateConfig.setProviderId(pluginId);
+  public String getBundlePath() {
+    return bundlePath;
   }
 
   /**
-   * @param templateConfig the templateConfig to set
+   * @param bundlePath the bundlePath to set
    */
-  public void setTemplateConfig(TemplateConfig templateConfig) {
-    this.templateConfig = templateConfig;
+  public void setBundlePath(String bundlePath) {
+    this.bundlePath = bundlePath;
+  }
+  
+  /**
+   * @return the keyMapping
+   */
+  public Map<String, String> getKeyMapping() {
+    return keyMapping;
   }
 
+  /**
+   * @param keyMapping the keyMapping to set
+   */
+  public void setKeyMapping(Map<String, String> keyMapping) {
+    this.keyMapping = keyMapping;
+  }
+
+  public PluginConfig addKeyMapping(String key, String value) {
+    this.keyMapping.put(key, value);
+    return this;
+  }
+
+  public String getKeyValue(String key, String defaultValue) {
+    if (keyMapping.containsKey(key)) {
+      return keyMapping.get(key);
+    }
+    return defaultValue;
+  }
 }

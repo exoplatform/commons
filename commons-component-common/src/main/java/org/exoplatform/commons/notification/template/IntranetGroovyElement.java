@@ -28,7 +28,7 @@ import org.exoplatform.commons.notification.NotificationUtils;
 public class IntranetGroovyElement extends SimpleElement {
   
   public String appRes(String key) {
-    return TemplateUtils.getResourceBundle(key, NotificationUtils.getLocale(getLanguage()), getTemplateConfig().getBundlePath());
+    return TemplateUtils.getResourceBundle(key, NotificationUtils.getLocale(getLanguage()), getPluginConfig().getBundlePath());
   }
 
   public String appRes(String key, String... strs) {
