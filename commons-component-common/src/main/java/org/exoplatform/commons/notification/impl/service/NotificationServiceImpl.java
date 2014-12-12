@@ -106,7 +106,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         continue;
       }
       // send instantly mail
-      if (userSetting.isInInstantly(pluginId)) {
+      if (userSetting.isInChannel(UserSetting.EMAIL_CHANNEL, pluginId)) {
         sendInstantly(notification.clone().setTo(userId));
       }
       //

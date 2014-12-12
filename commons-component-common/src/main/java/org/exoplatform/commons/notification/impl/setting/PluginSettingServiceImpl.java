@@ -148,11 +148,11 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
     if (isActive) {
       if (!current.contains(channelId)) {
         current.add(channelId);
-        saveActivePlugins(pluginId, NotificationUtils.listToString(current));
+        saveActivePlugins(pluginId, current);
       }
     } else if (current.contains(channelId)) {
       current.remove(channelId);
-      saveActivePlugins(pluginId, NotificationUtils.listToString(current));
+      saveActivePlugins(pluginId, current);
     }
   }
 

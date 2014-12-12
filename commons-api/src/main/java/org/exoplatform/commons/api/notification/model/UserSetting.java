@@ -61,8 +61,6 @@ public class UserSetting {
 
   private Map<String, List<String>> channelPlugins;
 
-  private List<String> instantlyPlugins;
-
   private List<String> dailyPlugins;
 
   private List<String> weeklyPlugins;
@@ -71,7 +69,6 @@ public class UserSetting {
     this.channelActives = new ArrayList<String>();
     this.channelPlugins = new HashMap<String, List<String>>();
     //
-    this.instantlyPlugins = new ArrayList<String>();
     this.dailyPlugins = new ArrayList<String>();
     this.weeklyPlugins = new ArrayList<String>();
     this.lastUpdateTime = Calendar.getInstance();
@@ -209,20 +206,6 @@ public class UserSetting {
   }
 
   /**
-   * @return the instantlyPlugins
-   */
-  public List<String> getInstantlyPlugins() {
-    return instantlyPlugins;
-  }
-
-  /**
-   * @param instantlyPlugins the instantlyPlugins to set
-   */
-  public void setInstantlyPlugins(List<String> instantlyPlugins) {
-    this.instantlyPlugins = instantlyPlugins;
-  }
-
-  /**
    * @return the dailyPlugins
    */
   public List<String> getDailyPlugins() {
@@ -262,7 +245,7 @@ public class UserSetting {
       addProperty(weeklyPlugins, pluginId);
       dailyPlugins.remove(pluginId);
     } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
-      addProperty(instantlyPlugins, pluginId);
+      addChannelPlugin(EMAIL_CHANNEL, pluginId);
     }
   }
 
@@ -272,7 +255,7 @@ public class UserSetting {
     } else if (frequencyType.equals(FREQUENCY.WEEKLY)) {
       dailyPlugins.remove(pluginId);
     } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
-      instantlyPlugins.remove(pluginId);
+      removeChannelPlugin(EMAIL_CHANNEL, pluginId);
     }
   }
 
@@ -280,16 +263,8 @@ public class UserSetting {
    * @param pluginId
    * @return
    */
-  public boolean isInInstantly(String pluginId) {
-    return (instantlyPlugins.contains(pluginId)) ? true : false;
-  }
-
-  /**
-   * @param pluginId
-   * @return
-   */
   public boolean isInChannel(String channelId, String pluginId) {
-    return (EMAIL_CHANNEL.equals(channelId)) ? isInInstantly(pluginId) : (getPlugins(channelId).contains(pluginId));
+    return (getPlugins(channelId).contains(pluginId));
   }
   
   /**
@@ -325,7 +300,6 @@ public class UserSetting {
     setting.setChannelActives(channelActives);
     setting.setDailyPlugins(dailyPlugins);
     setting.setWeeklyPlugins(weeklyPlugins);
-    setting.setInstantlyPlugins(instantlyPlugins);
     //
     setting.setAllChannelPlugins(channelPlugins);
     setting.setUserId(userId);
@@ -362,16 +336,16 @@ public class UserSetting {
   
   public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
-      PluginSettingService settingService = (PluginSettingService) PortalContainer.getInstance()
-                                              .getComponentInstanceOfType(PluginSettingService.class);
+      PluginSettingService settingService = (PluginSettingService) PortalContainer.getInstance().
+                                              getComponentInstanceOfType(PluginSettingService.class);
       List<PluginInfo> plugins = settingService.getAllPlugins();
-      
+
       defaultSetting = getInstance();
       //
       for (PluginInfo pluginInfo : plugins) {
         for (String defaultConf : pluginInfo.getDefaultConfig()) {
           for (String channelId : pluginInfo.getAllChannelActive()) {
-            if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY && !EMAIL_CHANNEL.equals(channelId)) {
+            if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY) {
               defaultSetting.addChannelPlugin(channelId, pluginInfo.getType());
             } else {
               defaultSetting.addPlugin(pluginInfo.getType(), FREQUENCY.getFrequecy(defaultConf));

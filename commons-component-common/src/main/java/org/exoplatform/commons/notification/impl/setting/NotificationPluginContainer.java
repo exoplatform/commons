@@ -96,7 +96,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   @Override
   public void addChildPlugin(AbstractNotificationChildPlugin plugin) {
-    addPlugin(plugin);
+    pluginMap.put(plugin.getKey(), plugin);
     //
     List<String> parentIds = plugin.getParentPluginIds();
     PluginKey parentKey;
@@ -122,11 +122,31 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
         ExoLogger.getExoLogger(getClass()).warn("Failed to build groovy template engine for: " + plugin.getId(), e);
       }
     }
+    
   }
 
   @Override
   public void addPlugin(AbstractNotificationPlugin plugin) {
     pluginMap.put(plugin.getKey(), plugin);
+    //
+    String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
+    if (templatePath != null && templatePath.length() > 0) {
+      try {
+        String template = TemplateUtils.loadGroovyTemplate(templatePath);
+        plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
+      } catch (Exception e) {
+        ExoLogger.getExoLogger(getClass()).warn("Failed to build groovy template engine for: " + plugin.getId(), e);
+      }
+    }
+    String intranetTemplatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getIntranetTemplatePath();
+    if (intranetTemplatePath != null && intranetTemplatePath.length() > 0) {
+      try {
+        String template = TemplateUtils.loadGroovyTemplate(intranetTemplatePath);
+        plugin.setIntranetNotificationEngine(gTemplateEngine.createTemplate(template));
+      } catch (Exception e) {
+        ExoLogger.getExoLogger(getClass()).warn("Failed to build groovy template engine for: " + plugin.getId(), e);
+      }
+    }
   }
 
   @Override

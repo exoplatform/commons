@@ -103,7 +103,7 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     model.setUserId(userId);
     model.setChannelActive(UserSetting.EMAIL_CHANNEL);
     model.setDailyPlugins(daily);
-    model.setInstantlyPlugins(instantly);
+    model.setChannelPlugins(UserSetting.EMAIL_CHANNEL, instantly);
     model.setWeeklyPlugins(weekly);
     return model;
   }
