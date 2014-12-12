@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.channel;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.notification.lifecycle.WebLifecycle;
 
 /**
@@ -36,5 +37,10 @@ public class WebChannel extends AbstractChannel {
   @Override
   public String getId() {
     return ID;
+  }
+  
+  @Override
+  public void dispatch(String userId, NotificationInfo notifInfo) {
+    
   }
 }

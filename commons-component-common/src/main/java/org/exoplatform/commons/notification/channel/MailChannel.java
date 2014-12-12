@@ -16,8 +16,16 @@
  */
 package org.exoplatform.commons.notification.channel;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.exoplatform.commons.api.notification.annotation.ChannelConfig;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.notification.lifecycle.MailLifecycle;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS
@@ -25,8 +33,13 @@ import org.exoplatform.commons.notification.lifecycle.MailLifecycle;
  *          thanhvc@exoplatform.com
  * Dec 12, 2014  
  */
+@ChannelConfig (
+  lifecycle = MailLifecycle.class
+)
 public class MailChannel extends AbstractChannel {
   private final static String ID = "MAIL_CHANNEL";
+  private static final Log LOG = ExoLogger.getLogger(MailChannel.class);
+  private Map<String, String> templateFilePaths = new HashMap<String, String>();
 
   public MailChannel() {
     super(new MailLifecycle());
@@ -36,4 +49,18 @@ public class MailChannel extends AbstractChannel {
   public String getId() {
     return ID;
   }
+  
+  @Override
+  public void registerTemplateProvider(TemplateProvider provider) {
+    this.templateFilePaths.putAll(provider.getTemplateConfigs());
+  }
+  
+  @Override
+  public void dispatch(String userId, NotificationInfo notifInfo) {
+    // TODO call MailSendService to send mail to receipts
+    String pluginId = notifInfo.getKey().getId();
+    String templateFilePath = this.templateFilePaths.get(pluginId);
+    LOG.info("Mail::{ userId:" + userId + ", pluginId: " + pluginId + ", templateFilePath: "+ templateFilePath + "}");
+  }
+  
 }

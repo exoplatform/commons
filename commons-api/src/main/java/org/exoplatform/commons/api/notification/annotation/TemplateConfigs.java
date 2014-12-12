@@ -14,11 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.channel;
-
-import org.exoplatform.commons.api.notification.channel.AbstractChannel;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
+package org.exoplatform.commons.api.notification.annotation;
 
 /**
  * Created by The eXo Platform SAS
@@ -26,20 +22,6 @@ import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
  *          thanhvc@exoplatform.com
  * Dec 12, 2014  
  */
-public class ConsoleChannel extends AbstractChannel {
-  private final static String ID = "CONSOLE_CHANNEL";
-
-  public ConsoleChannel() {
-    super(new SimpleLifecycle());
-  }
-  
-  @Override
-  public String getId() {
-    return ID;
-  }
-  
-  @Override
-  public void dispatch(String userId, NotificationInfo notifInfo) {
-    
-  }
+public @interface TemplateConfigs {
+  TemplateConfig[] templates()  default {};
 }

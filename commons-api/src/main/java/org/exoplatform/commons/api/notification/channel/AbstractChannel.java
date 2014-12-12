@@ -16,7 +16,9 @@
  */
 package org.exoplatform.commons.api.notification.channel;
 
+import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.container.component.BaseComponentPlugin;
 
 /**
@@ -46,6 +48,21 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
   public AbstractNotificationLifecycle getLifecycle() {
     return this.lifecycle;
   }
-
+  
+  /**
+   * Process the notification information for the specified user.
+   * 
+   * @param userId The userId
+   * @param notifInfo the notification info
+   */
+  public abstract void dispatch(String userId, NotificationInfo notifInfo);
+  
+  /**
+   * Process the notification info
+   * @param notifInfo the notification information
+   */
+  public void dispatch(NotificationInfo notifInfo) {}
+  
+  public void registerTemplateProvider(TemplateProvider provider) {}
   
 }
