@@ -53,7 +53,7 @@ public class GroovyElementVisitor implements ElementVisitor {
     try {
       PluginKey key = new PluginKey(ctx.getPluginId());
       Template engine = null;
-      if (element instanceof IntranetGroovyElement) {
+      if (Boolean.parseBoolean(String.valueOf(ctx.get("isIntranet")))) {
         engine = CommonsUtils.getService(PluginContainer.class).getPlugin(key).getIntranetNotificationEngine();
       } else {
         engine = CommonsUtils.getService(PluginContainer.class).getPlugin(key).getTemplateEngine();

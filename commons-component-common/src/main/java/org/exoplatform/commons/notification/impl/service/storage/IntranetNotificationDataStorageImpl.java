@@ -30,6 +30,7 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.storage.IntranetNotificationDataStorage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
@@ -182,4 +183,7 @@ public class IntranetNotificationDataStorageImpl extends AbstractService impleme
     return false;
   }
 
+  public String getChannelId() {
+    return WebChannel.ID;
+  }
 }

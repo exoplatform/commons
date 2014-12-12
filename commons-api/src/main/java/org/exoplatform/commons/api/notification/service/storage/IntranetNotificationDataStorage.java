@@ -83,4 +83,5 @@ public interface IntranetNotificationDataStorage {
    */
   boolean remove(int days) throws Exception;
   
+  public String getChannelId();
 }

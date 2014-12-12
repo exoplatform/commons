@@ -280,52 +280,15 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<String> getUserSettingByPlugin(String pluginId) {// only use for email channel
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();;
-    List<String> userIds = new ArrayList<String>();
-    try {
-      NodeIterator iter = getUserSettingByPluginIterator(sProvider, pluginId);
-      while (iter != null && iter.hasNext()) {
-        Node node = iter.nextNode();
-        userIds.add(node.getParent().getName());
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to get all users have the " + pluginId + " in settings", e);
-    }
-
-    return userIds;
+    return getUserHasSettingPlugin(UserSetting.EMAIL_CHANNEL, pluginId);
   }
   
-  /**
-   * Gets the all of the userId who has already plugin setting.
-   * 
-   * @param sProvider
-   * @param pluginId
-   * @return
-   * @throws Exception
-   */
-  private NodeIterator getUserSettingByPluginIterator(SessionProvider sProvider, String pluginId) throws Exception {
-    Session session = getSession(sProvider, workspace);
-    if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
-      return null;
-    }
-    
-    StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
-    strQuery.append(" WHERE")
-            .append(buildSQLLikeProperty(EXO_IS_ACTIVE, UserSetting.EMAIL_CHANNEL))
-            .append(" AND")
-            .append(buildSQLLikeProperty(EXO_INSTANTLY, pluginId));
-    
-    QueryManager qm = session.getWorkspace().getQueryManager();
-    QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
-    return query.execute().getNodes();
-  }
-
   @Override
-  public List<String> getUserHasNotifSetting(String channelId, String pluginId) {
+  public List<String> getUserHasSettingPlugin(String channelId, String pluginId) {
     SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();;
     List<String> userIds = new ArrayList<String>();
     try {
-      NodeIterator iter = getUserHasNotifSetting(sProvider, channelId, pluginId);
+      NodeIterator iter = getUserHasSettingPlugin(sProvider, channelId, pluginId);
       while (iter != null && iter.hasNext()) {
         Node node = iter.nextNode();
         userIds.add(node.getParent().getName());
@@ -337,19 +300,27 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     return userIds;
   }
 
-  private NodeIterator getUserHasNotifSetting(SessionProvider sProvider, String channelId, String pluginId) throws Exception {
+  private NodeIterator getUserHasSettingPlugin(SessionProvider sProvider, String channelId, String pluginId) throws Exception {
     Session session = getSession(sProvider, workspace);
     if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
       return null;
     }
     String property = getChannelProperty(channelId);
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
-    
+    String plugin = getValue(pluginId);
     strQuery.append(" WHERE")
             .append(buildSQLLikeProperty(EXO_IS_ACTIVE, channelId))
-            .append(" AND")
-            .append(buildSQLLikeProperty(property, pluginId));
-    
+            .append(" AND (");
+    //
+    if(UserSetting.EMAIL_CHANNEL.equals(channelId)) {
+      strQuery.append(buildSQLLikeProperty(property, plugin)).append(" OR")
+              .append(buildSQLLikeProperty(EXO_DAILY, plugin)).append(" OR")
+              .append(buildSQLLikeProperty(EXO_WEEKLY, plugin));
+    } else {
+      strQuery.append(buildSQLLikeProperty(property, plugin));
+    }
+    //
+    strQuery.append(" )");
     QueryManager qm = session.getWorkspace().getQueryManager();
     QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
     return query.execute().getNodes();
@@ -483,8 +454,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   private String buildSQLLikeProperty(String property, String value) {
     StringBuilder strQuery = new StringBuilder(" (")
-            .append(property).append("='true'").append(" OR ")
-            .append(property).append(" LIKE '%").append(getValue(value)).append("%'")
+            .append(property).append(" LIKE '%").append(value).append("%'")
             .append(")");
     return strQuery.toString();
   }

@@ -16,9 +16,9 @@
  */
 package org.exoplatform.commons.notification.channel;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -102,13 +102,13 @@ public class ChannelManagerImpl implements ChannelManager {
 
   @Override
   public List<AbstractChannel> getChannels() {
-    List<AbstractChannel> channels = new ArrayList<AbstractChannel>();
-    AbstractChannel emailChannel = this.getChannel(ChannelKey.key(MailChannel.ID));
+    List<AbstractChannel> channels = new LinkedList<AbstractChannel>();
+    AbstractChannel emailChannel = getChannel(ChannelKey.key(MailChannel.ID));
     if (emailChannel != null) {
       channels.add(emailChannel);
     }
     for (AbstractChannel channel : this.channels.values()) {
-      if ("email".equals(channel.getId())) {
+      if (MailChannel.ID.equals(channel.getId())) {
         continue;
       }
       channels.add(channel);

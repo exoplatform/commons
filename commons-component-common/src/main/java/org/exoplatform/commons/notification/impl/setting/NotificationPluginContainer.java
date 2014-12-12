@@ -29,6 +29,7 @@ import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
+import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.notification.template.ResourceBundleConfigDeployer;
@@ -96,7 +97,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   @Override
   public void addChildPlugin(AbstractNotificationChildPlugin plugin) {
-    pluginMap.put(plugin.getKey(), plugin);
+    addPlugin(plugin);
     //
     List<String> parentIds = plugin.getParentPluginIds();
     PluginKey parentKey;
@@ -128,8 +129,10 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   @Override
   public void addPlugin(AbstractNotificationPlugin plugin) {
     pluginMap.put(plugin.getKey(), plugin);
-    //
-    String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
+    //TODO: need remove after done channel.
+    PluginConfig cf = plugin.getPluginConfigs().get(0);
+    TemplateConfig tf = cf.getTemplateConfig();
+    String templatePath = tf.getTemplatePath();
     if (templatePath != null && templatePath.length() > 0) {
       try {
         String template = TemplateUtils.loadGroovyTemplate(templatePath);
@@ -138,7 +141,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
         ExoLogger.getExoLogger(getClass()).warn("Failed to build groovy template engine for: " + plugin.getId(), e);
       }
     }
-    String intranetTemplatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getIntranetTemplatePath();
+    String intranetTemplatePath = tf.getIntranetTemplatePath();
     if (intranetTemplatePath != null && intranetTemplatePath.length() > 0) {
       try {
         String template = TemplateUtils.loadGroovyTemplate(intranetTemplatePath);
@@ -147,6 +150,8 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
         ExoLogger.getExoLogger(getClass()).warn("Failed to build groovy template engine for: " + plugin.getId(), e);
       }
     }
+    //
+    cf.setBundlePath(tf.getBundlePath());
   }
 
   @Override

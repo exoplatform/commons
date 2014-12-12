@@ -36,10 +36,8 @@ import org.exoplatform.container.PortalContainer;
 public class UserSetting {
   private static UserSetting defaultSetting = null;
 
-  public static String EMAIL_CHANNEL = "email";
+  public static String EMAIL_CHANNEL = "MAIL_CHANNEL";
 
-  public static String INTRANET_CHANNEL = "intranet";
-  
   public enum FREQUENCY {
     INSTANTLY, DAILY, WEEKLY;
 
@@ -263,7 +261,7 @@ public class UserSetting {
    * @param pluginId
    * @return
    */
-  public boolean isInChannel(String channelId, String pluginId) {
+  public boolean isEnabled(String channelId, String pluginId) {
     return (getPlugins(channelId).contains(pluginId));
   }
   

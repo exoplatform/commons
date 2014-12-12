@@ -52,11 +52,4 @@ public class ChildPluginTest extends AbstractNotificationChildPlugin {
   public boolean isValid(NotificationContext ctx) {
     return false;
   }
-
-  @Override
-  protected String makeUIMessage(NotificationContext ctx) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 }

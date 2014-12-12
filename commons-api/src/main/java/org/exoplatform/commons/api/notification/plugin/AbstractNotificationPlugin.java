@@ -33,10 +33,10 @@ import org.exoplatform.services.organization.OrganizationService;
 
 public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
   List<PluginConfig> pluginConfig = new ArrayList<PluginConfig>();
-  
-  private Template engine;
-  
-  private Template intranetNotificationEngine;
+  // TODO: need remove after done channel.
+  private Template   engine;
+  // TODO: need remove after done channel.
+  private Template   intranetNotificationEngine;
   
   public AbstractNotificationPlugin(InitParams initParams) {
     pluginConfig = initParams.getObjectParamValues(PluginConfig.class);

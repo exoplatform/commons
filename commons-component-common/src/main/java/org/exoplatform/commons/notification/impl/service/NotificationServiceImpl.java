@@ -38,6 +38,7 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.net.WebSocketBootstrap;
@@ -95,7 +96,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     List<String> userIds = notification.getSendToUserIds();
     //
     if (notification.isSendAll()) {
-      userIds = notificationService.getUserSettingByPlugin(pluginId);
+      userIds = notificationService.getUserHasSettingPlugin(UserSetting.EMAIL_CHANNEL, pluginId);
     }
 
     List<String> userIdPendings = new ArrayList<String>();
@@ -106,7 +107,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         continue;
       }
       // send instantly mail
-      if (userSetting.isInChannel(UserSetting.EMAIL_CHANNEL, pluginId)) {
+      if (userSetting.isEnabled(UserSetting.EMAIL_CHANNEL, pluginId)) {
         sendInstantly(notification.clone().setTo(userId));
       }
       //
@@ -127,7 +128,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     
     String pluginId = notification.getKey().getId();
     // if the plugin is not active, do nothing
-    if (CommonsUtils.getService(PluginSettingService.class).isActive(UserSetting.INTRANET_CHANNEL, pluginId) == false) {
+    if (CommonsUtils.getService(PluginSettingService.class).isActive(WebChannel.ID, pluginId) == false) {
       return;
     }
     //
@@ -135,12 +136,12 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     List<String> userIds = notification.getSendToUserIds();
     //
     if (notification.isSendAll()) {
-      userIds = notificationService.getUserHasNotifSetting(UserSetting.INTRANET_CHANNEL, pluginId);
+      userIds = notificationService.getUserHasSettingPlugin(WebChannel.ID, pluginId);
     }
     for (String userId : userIds) {
       UserSetting userSetting = notificationService.get(userId);
       //
-      if (userSetting.isChannelActive(UserSetting.INTRANET_CHANNEL) && userSetting.isInChannel(UserSetting.INTRANET_CHANNEL, pluginId)) {
+      if (userSetting.isChannelActive(WebChannel.ID) && userSetting.isEnabled(WebChannel.ID, pluginId)) {
         sendIntranetNotification(notification.clone().setTo(userId));
       }
     }

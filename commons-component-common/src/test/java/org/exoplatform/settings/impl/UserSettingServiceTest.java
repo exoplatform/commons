@@ -77,13 +77,13 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
   public void test_2_GetUsersSetting() throws Exception {
     runUpgrade();
     //
-    userSettingService.save(createUserSetting("root", Arrays.asList("1,2"), Arrays.asList("3,4"), Arrays.asList("5,6")));
-    userSettingService.save(createUserSetting("john", Arrays.asList("4,5"), Arrays.asList("2,8"), Arrays.asList("6,7")));
-    userSettingService.save(createUserSetting("mary", Arrays.asList("32,5"), Arrays.asList("4,6"), Arrays.asList("1,9")));
-    userSettingService.save(createUserSetting("demo", Arrays.asList("2"), Arrays.asList("3,9"), Arrays.asList("2,7")));
+    userSettingService.save(createUserSetting("root", Arrays.asList("1","2"), Arrays.asList("3","4"), Arrays.asList("5","6")));
+    userSettingService.save(createUserSetting("john", Arrays.asList("4","5"), Arrays.asList("2","8"), Arrays.asList("6","7")));
+    userSettingService.save(createUserSetting("mary", Arrays.asList("32","5"), Arrays.asList("4","6"), Arrays.asList("1","9")));
+    userSettingService.save(createUserSetting("demo", Arrays.asList("2"), Arrays.asList("3","9"), Arrays.asList("2","7")));
     //
     List<String> list = userSettingService.getUserSettingByPlugin("2");
-    assertEquals(2, list.size());
+    assertEquals(3, list.size());// root, john, demo
   }
 
   private void runUpgrade() throws Exception {
