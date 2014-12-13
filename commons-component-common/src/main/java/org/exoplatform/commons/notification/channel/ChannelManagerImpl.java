@@ -16,10 +16,13 @@
  */
 package org.exoplatform.commons.notification.channel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
 import org.exoplatform.services.log.ExoLogger;
@@ -31,13 +34,13 @@ import org.exoplatform.services.log.Log;
  *          thanhvc@exoplatform.com
  * Dec 12, 2014  
  */
-public class ChannelManager {
+public class ChannelManagerImpl implements ChannelManager {
   /** logger */
-  private static final Log LOG = ExoLogger.getLogger(ChannelManager.class);
+  private static final Log LOG = ExoLogger.getLogger(ChannelManagerImpl.class);
   /** Defines the channels: key = channelId and Channel*/
   private final Map<String, AbstractChannel> channels;
   
-  public ChannelManager() {
+  public ChannelManagerImpl() {
     channels = new HashMap<String, AbstractChannel>();
   }
   
@@ -45,22 +48,27 @@ public class ChannelManager {
    * Register new channel
    * @param channel
    */
+  @Override
   public void register(AbstractChannel channel) {
     channels.put(channel.getId(), channel);
   }
-  
+
   /**
    * Unregister the specified channel
+   * 
    * @param channel
    */
+  @Override
   public void unregister(AbstractChannel channel) {
     channels.remove(channel.getId());
   }
-  
+
   /**
    * Register the new channel
+   * 
    * @param provider
    */
+  @Override
   public void registerTemplateProvider(TemplateProvider provider) {
     AbstractChannel channel = channels.get(provider.getChannelId());
     if (channel != null) {
@@ -68,24 +76,42 @@ public class ChannelManager {
     } else {
       LOG.warn("Register the new TemplateProvider is unsucessful");
     }
-    
-    
   }
-  
+
+  @Override
   public AbstractChannel getChannel(String channelId) {
     return channels.get(channelId);
   }
-  
+
+  @Override
   public AbstractNotificationLifecycle getLifecycle(String channelId) {
     return getChannel(channelId).getLifecycle();
   }
-  
+
   /**
    * Gets size of channels has been registered
+   * 
    * @return
    */
+  @Override
   public int sizeChannels() {
     return channels.size();
+  }
+
+  @Override
+  public List<AbstractChannel> getChannels() {
+    List<AbstractChannel> channels = new ArrayList<AbstractChannel>();
+    AbstractChannel emailChannel = this.getChannel("email");
+    if (emailChannel != null) {
+      channels.add(emailChannel);
+    }
+    for (AbstractChannel channel : this.channels.values()) {
+      if ("email".equals(channel.getId())) {
+        continue;
+      }
+      channels.add(channel);
+    }
+    return channels;
   }
 
 }

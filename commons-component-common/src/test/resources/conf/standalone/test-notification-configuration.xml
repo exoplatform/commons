@@ -6,8 +6,8 @@
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   
   <component>
-    <key>org.exoplatform.commons.notification.channel.ChannelManager</key>
-    <type>org.exoplatform.commons.notification.channel.ChannelManager</type>
+    <key>org.exoplatform.commons.api.notification.channel.ChannelManager</key>
+    <type>org.exoplatform.commons.notification.channel.ChannelManagerImpl</type>
   </component>
   
   <component>
@@ -136,7 +136,7 @@
   
   <!-- channel register -->
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.notification.channel.ChannelManager</target-component>
+    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
     <component-plugin>
       <name>mail.channel</name>
       <set-method>register</set-method>
@@ -153,7 +153,7 @@
 
   <!-- template channel register -->
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.notification.channel.ChannelManager</target-component>
+    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
     <component-plugin>
       <name>mail.channel.template</name>
       <set-method>registerTemplateProvider</set-method>

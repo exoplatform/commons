@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.channel;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
@@ -35,7 +36,7 @@ public class ChannelManagerTest extends BaseCommonsTestCase {
     super.setUp();
     manager = getService(ChannelManager.class);
   }
-  
+
   @Override
   public void tearDown() throws Exception {
     super.tearDown();
