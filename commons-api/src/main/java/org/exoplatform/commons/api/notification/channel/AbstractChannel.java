@@ -16,10 +16,12 @@
  */
 package org.exoplatform.commons.api.notification.channel;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.container.component.BaseComponentPlugin;
+import org.jboss.util.Strings;
 
 /**
  * Created by The eXo Platform SAS
@@ -34,6 +36,13 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
   public AbstractChannel(AbstractNotificationLifecycle lifecycle) {
     this.lifecycle = lifecycle;
   }
+  /**
+   * Initialize something when starts to work the channel
+   */
+  public void start(){};
+  
+  public void end(){};
+  
   
   /**
    * Gets ChannelId
@@ -52,10 +61,10 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
   /**
    * Process the notification information for the specified user.
    * 
-   * @param userId The userId
-   * @param notifInfo the notification info
+   * @param ctx The NotificationContext
+   * @param userId the user will be received the message.
    */
-  public abstract void dispatch(String userId, NotificationInfo notifInfo);
+  public abstract void dispatch(NotificationContext ctx, String userId);
   
   /**
    * Process the notification info
@@ -63,6 +72,18 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
    */
   public void dispatch(NotificationInfo notifInfo) {}
   
-  public void registerTemplateProvider(TemplateProvider provider) {}
+  /**
+   * Register the template provider to the channel.
+   * @param provider
+   */
+  public abstract void registerTemplateProvider(TemplateProvider provider);
+  
+  /**
+   * Gets the template by the specified pluginId
+   * @param pluginId
+   */
+  public String getTemplateFilePath(String pluginId) {
+    return Strings.EMPTY;
+  }
   
 }

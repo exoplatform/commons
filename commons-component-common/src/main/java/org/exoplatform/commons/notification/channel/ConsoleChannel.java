@@ -16,8 +16,9 @@
  */
 package org.exoplatform.commons.notification.channel;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
 
 /**
@@ -39,7 +40,10 @@ public class ConsoleChannel extends AbstractChannel {
   }
   
   @Override
-  public void dispatch(String userId, NotificationInfo notifInfo) {
-    
+  public void dispatch(NotificationContext ctx, String userId) {
+
   }
+  
+  @Override
+  public void registerTemplateProvider(TemplateProvider provider) {}
 }

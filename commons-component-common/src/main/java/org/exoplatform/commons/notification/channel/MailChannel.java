@@ -19,10 +19,11 @@ package org.exoplatform.commons.notification.channel;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.annotation.ChannelConfig;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.notification.lifecycle.MailLifecycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -36,10 +37,11 @@ import org.exoplatform.services.log.Log;
 @ChannelConfig (
   lifecycle = MailLifecycle.class
 )
-public class MailChannel extends AbstractChannel {
-  private final static String ID = "MAIL_CHANNEL";
+public final class MailChannel extends AbstractChannel {
+  public final static String ID = "MAIL_CHANNEL";
   private static final Log LOG = ExoLogger.getLogger(MailChannel.class);
-  private Map<String, String> templateFilePaths = new HashMap<String, String>();
+  private final Map<String, String> templateFilePaths = new HashMap<String, String>();
+  private final Map<String, AbstractTemplateBuilder> templateBuilders = new HashMap<String, AbstractTemplateBuilder>();
 
   public MailChannel() {
     super(new MailLifecycle());
@@ -52,15 +54,23 @@ public class MailChannel extends AbstractChannel {
   
   @Override
   public void registerTemplateProvider(TemplateProvider provider) {
-    this.templateFilePaths.putAll(provider.getTemplateConfigs());
+    this.templateFilePaths.putAll(provider.getTemplateFilePathConfigs());
+    this.templateBuilders.putAll(provider.getTemplateBuilder());
   }
   
   @Override
-  public void dispatch(String userId, NotificationInfo notifInfo) {
+  public void dispatch(NotificationContext ctx, String userId) {
     // TODO call MailSendService to send mail to receipts
-    String pluginId = notifInfo.getKey().getId();
+    String pluginId = ctx.getNotificationInfo().getKey().getId();
     String templateFilePath = this.templateFilePaths.get(pluginId);
     LOG.info("Mail::{ userId:" + userId + ", pluginId: " + pluginId + ", templateFilePath: "+ templateFilePath + "}");
   }
+  
+  @Override
+  public String getTemplateFilePath(String pluginId) {
+    return this.templateFilePaths.get(pluginId);
+  }
+  
+  
   
 }

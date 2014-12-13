@@ -22,6 +22,10 @@ import java.util.Map;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfig;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfigs;
 import org.exoplatform.container.component.BaseComponentPlugin;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS
@@ -30,10 +34,19 @@ import org.exoplatform.container.component.BaseComponentPlugin;
  * Dec 12, 2014  
  */
 public abstract class TemplateProvider extends BaseComponentPlugin {
-  private Map<String, String> templateFilePaths = new HashMap<String, String>();
-
-  public TemplateProvider() {
-    // parser the annotation and build the template map
+  /** logger */
+  private static final Log LOG = ExoLogger.getLogger(TemplateProvider.class);
+  /** */
+  private final static String CHANNEL_ID_KEY = "channel-id";
+  /** */
+  protected final  Map<String, String> templateFilePaths = new HashMap<String, String>();
+  /** */
+  protected final Map<String, AbstractTemplateBuilder> templateBuilders = new HashMap<String, AbstractTemplateBuilder>();
+  /** */
+  private String channelId = "";
+  
+  public TemplateProvider(InitParams initParams) {
+    //parser the annotation and build the template map
     TemplateConfigs templates = this.getClass().getAnnotation(TemplateConfigs.class);
     if (templates != null) {
       for (TemplateConfig config : templates.templates()) {
@@ -42,14 +55,42 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
         }
       }
     }
-
+    //
+    ValueParam channelIdParam = initParams.getValueParam(CHANNEL_ID_KEY);
+    //
+    try {
+      this.channelId = channelIdParam.getValue();
+    } catch (Exception e) {
+      LOG.error("Register the template provider must allow the channelId.", e);
+    }
   }
+  
+  private TemplateProvider() {}
+  
+  
   /**
    * Gets all of the template files
    * @return
    */
-  public Map<String, String> getTemplateConfigs() {
+  public Map<String, String> getTemplateFilePathConfigs() {
     return templateFilePaths;
   }
+  /**
+   * Gets all of the template builder what assigned the channel
+   * 
+   * @return
+   */
+  public Map<String, AbstractTemplateBuilder> getTemplateBuilder() {
+    return this.templateBuilders;
+  }
+  
+  /**
+   * Gets channelId
+   * @return
+   */
+  public String getChannelId() {
+    return channelId;
+  }
+  
 
 }

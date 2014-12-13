@@ -16,12 +16,19 @@
  */
 package org.exoplatform.commons.api.notification.annotation;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          thanhvc@exoplatform.com
  * Dec 12, 2014  
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE })
 public @interface TemplateConfigs {
   TemplateConfig[] templates()  default {};
 }

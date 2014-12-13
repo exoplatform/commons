@@ -19,6 +19,9 @@ package org.exoplatform.commons.notification.channel.template;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfig;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfigs;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
+import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
+import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
+import org.exoplatform.container.xml.InitParams;
 
 /**
  * Created by The eXo Platform SAS
@@ -26,12 +29,15 @@ import org.exoplatform.commons.api.notification.channel.template.TemplateProvide
  *          thanhvc@exoplatform.com
  * Dec 12, 2014  
  */
-@TemplateConfigs (
+@TemplateConfigs(
   templates = {
-      @TemplateConfig(pluginId = "", template = ""),
-      @TemplateConfig(pluginId = "", template = "")
+      @TemplateConfig(pluginId = DigestDailyPlugin.ID, template = "war:/notification/templates/DigestDailyPlugin.gtmpl"),
+      @TemplateConfig(pluginId = DigestWeeklyPlugin.ID, template = "war:/notification/templates/DigestWeeklyPlugin.gtmpl")
   }
 )
-public class MailTemplateProvider extends TemplateProvider {
+public class DigestMailTemplateProvider extends TemplateProvider {
 
+  public DigestMailTemplateProvider(InitParams initParams) {
+    super(initParams);
+  }
 }

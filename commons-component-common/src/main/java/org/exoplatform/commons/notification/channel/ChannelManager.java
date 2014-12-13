@@ -20,7 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS
@@ -29,7 +32,8 @@ import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLi
  * Dec 12, 2014  
  */
 public class ChannelManager {
-  
+  /** logger */
+  private static final Log LOG = ExoLogger.getLogger(ChannelManager.class);
   /** Defines the channels: key = channelId and Channel*/
   private final Map<String, AbstractChannel> channels;
   
@@ -51,6 +55,21 @@ public class ChannelManager {
    */
   public void unregister(AbstractChannel channel) {
     channels.remove(channel.getId());
+  }
+  
+  /**
+   * Register the new channel
+   * @param provider
+   */
+  public void registerTemplateProvider(TemplateProvider provider) {
+    AbstractChannel channel = channels.get(provider.getChannelId());
+    if (channel != null) {
+      channel.registerTemplateProvider(provider);
+    } else {
+      LOG.warn("Register the new TemplateProvider is unsucessful");
+    }
+    
+    
   }
   
   public AbstractChannel getChannel(String channelId) {

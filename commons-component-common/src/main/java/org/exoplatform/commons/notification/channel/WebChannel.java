@@ -16,9 +16,17 @@
  */
 package org.exoplatform.commons.notification.channel;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
+import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.notification.lifecycle.WebLifecycle;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS
@@ -27,11 +35,16 @@ import org.exoplatform.commons.notification.lifecycle.WebLifecycle;
  * Dec 12, 2014  
  */
 public class WebChannel extends AbstractChannel {
-
-  private final static String ID = "WEB_CHANNEL";
+  /** */
+  public final static String ID = "WEB_CHANNEL";
+  /** */
+  private static final Log LOG = ExoLogger.getLogger(WebChannel.class);
+  /** */
+  private final Map<String, AbstractTemplateBuilder> templateBuilders;
 
   public WebChannel() {
     super(new WebLifecycle());
+    templateBuilders = new HashMap<String, AbstractTemplateBuilder>();
   }
   
   @Override
@@ -40,7 +53,16 @@ public class WebChannel extends AbstractChannel {
   }
   
   @Override
-  public void dispatch(String userId, NotificationInfo notifInfo) {
-    
+  public void registerTemplateProvider(TemplateProvider provider) {
+    this.templateBuilders.putAll(provider.getTemplateBuilder());
+  }
+  
+  @Override
+  public void dispatch(NotificationContext ctx, String userId) {
+    // TODO call WebSendService to send mail to receipts
+    String pluginId = ctx.getNotificationInfo().getKey().getId();
+    AbstractTemplateBuilder builder = templateBuilders.get(pluginId);
+    MessageInfo msg = builder.buildMessage(ctx);
+    LOG.info("Web::{ userId:" + userId + ", pluginId: " + pluginId + ", message: "+ msg.getBody() + "}");
   }
 }
