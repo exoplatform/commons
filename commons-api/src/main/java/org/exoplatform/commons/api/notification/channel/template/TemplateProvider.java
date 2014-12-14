@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.annotation.TemplateConfig;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfigs;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
@@ -39,11 +41,11 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
   /** */
   private final static String CHANNEL_ID_KEY = "channel-id";
   /** */
-  protected final  Map<String, String> templateFilePaths = new HashMap<String, String>();
+  protected final  Map<PluginKey, String> templateFilePaths = new HashMap<PluginKey, String>();
   /** */
-  protected final Map<String, AbstractTemplateBuilder> templateBuilders = new HashMap<String, AbstractTemplateBuilder>();
+  protected final Map<PluginKey, AbstractTemplateBuilder> templateBuilders = new HashMap<PluginKey, AbstractTemplateBuilder>();
   /** */
-  private String channelId = "";
+  private ChannelKey key = null;
   
   public TemplateProvider(InitParams initParams) {
     //parser the annotation and build the template map
@@ -51,7 +53,7 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
     if (templates != null) {
       for (TemplateConfig config : templates.templates()) {
         if (config != null && config.pluginId() != "") {
-          templateFilePaths.put(config.pluginId(), config.template());
+          templateFilePaths.put(PluginKey.key(config.pluginId()), config.template());
         }
       }
     }
@@ -59,7 +61,7 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
     ValueParam channelIdParam = initParams.getValueParam(CHANNEL_ID_KEY);
     //
     try {
-      this.channelId = channelIdParam.getValue();
+      this.key = ChannelKey.key(channelIdParam.getValue());
     } catch (Exception e) {
       LOG.error("Register the template provider must allow the channelId.", e);
     }
@@ -72,7 +74,7 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
    * Gets all of the template files
    * @return
    */
-  public Map<String, String> getTemplateFilePathConfigs() {
+  public Map<PluginKey, String> getTemplateFilePathConfigs() {
     return templateFilePaths;
   }
   /**
@@ -80,7 +82,7 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
    * 
    * @return
    */
-  public Map<String, AbstractTemplateBuilder> getTemplateBuilder() {
+  public Map<PluginKey, AbstractTemplateBuilder> getTemplateBuilder() {
     return this.templateBuilders;
   }
   
@@ -88,8 +90,8 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
    * Gets channelId
    * @return
    */
-  public String getChannelId() {
-    return channelId;
+  public ChannelKey getChannelKey() {
+    return key;
   }
   
 

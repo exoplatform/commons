@@ -22,7 +22,7 @@ import java.util.List;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
@@ -76,8 +76,8 @@ public class PluginTest extends AbstractNotificationPlugin {
     StringBuilder childContent = new StringBuilder();
     
     PluginContainer pluginContainer = CommonsUtils.getService(PluginContainer.class);
-    List<NotificationKey> childKeys = pluginContainer.getChildPluginKeys(getKey());
-    for (NotificationKey notificationKey : childKeys) {
+    List<PluginKey> childKeys = pluginContainer.getChildPluginKeys(getKey());
+    for (PluginKey notificationKey : childKeys) {
       AbstractNotificationPlugin child = pluginContainer.getPlugin(notificationKey);
       childContent.append("<br>").append(((AbstractNotificationChildPlugin) child).makeContent(ctx));
     }

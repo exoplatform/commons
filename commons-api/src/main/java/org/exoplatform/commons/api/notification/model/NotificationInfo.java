@@ -34,7 +34,7 @@ public class NotificationInfo {
 
   private String              id;
 
-  private NotificationKey     key;                                  //
+  private PluginKey     key;                                  //
 
   private String              from           = "";
 
@@ -87,17 +87,17 @@ public class NotificationInfo {
   }
 
 
-  public NotificationKey getKey() {
+  public PluginKey getKey() {
     return this.key;
   }
 
-  public NotificationInfo key(NotificationKey key) {
+  public NotificationInfo key(PluginKey key) {
     this.key = key;
     return this;
   }
   
   public NotificationInfo key(String id) {
-    this.key = NotificationKey.key(id);
+    this.key = PluginKey.key(id);
     return this;
   }
 

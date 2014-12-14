@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
@@ -42,19 +42,19 @@ import org.picocontainer.Startable;
 public class NotificationPluginContainer implements PluginContainer, Startable {
   private static final Log LOG = ExoLogger.getLogger(NotificationPluginContainer.class);
 
-  private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
+  private final Map<PluginKey, AbstractNotificationPlugin> pluginMap;
 
   private GStringTemplateEngine gTemplateEngine;
   
   //parent key and list child key
-  private final Map<NotificationKey, List<NotificationKey>>      parentChildrenKeysMap;
+  private final Map<PluginKey, List<PluginKey>>      parentChildrenKeysMap;
 
   private PluginSettingService                                   pSettingService;
   private ResourceBundleConfigDeployer                           deployer;
 
   public NotificationPluginContainer() {
-    pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
-    parentChildrenKeysMap = new HashMap<NotificationKey, List<NotificationKey>>();
+    pluginMap = new HashMap<PluginKey, AbstractNotificationPlugin>();
+    parentChildrenKeysMap = new HashMap<PluginKey, List<PluginKey>>();
     pSettingService = CommonsUtils.getService(PluginSettingService.class);
     deployer = new ResourceBundleConfigDeployer();
     gTemplateEngine = new GStringTemplateEngine();
@@ -84,17 +84,17 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   }
 
   @Override
-  public AbstractNotificationPlugin getPlugin(NotificationKey key) {
+  public AbstractNotificationPlugin getPlugin(PluginKey key) {
     return pluginMap.get(key);
   }
 
   @Override
-  public List<NotificationKey> getChildPluginKeys(NotificationKey parentKey) {
-    List<NotificationKey> keys = parentChildrenKeysMap.get(parentKey);
+  public List<PluginKey> getChildPluginKeys(PluginKey parentKey) {
+    List<PluginKey> keys = parentChildrenKeysMap.get(parentKey);
     if (keys != null) {
       return keys;
     }
-    return new ArrayList<NotificationKey>();
+    return new ArrayList<PluginKey>();
   }
 
   @Override
@@ -103,14 +103,14 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
     
     //
     List<String> parentIds = plugin.getParentPluginIds();
-    NotificationKey parentKey;
-    List<NotificationKey> childrenKeys;
+    PluginKey parentKey;
+    List<PluginKey> childrenKeys;
     for (String parentId : parentIds) {
-      parentKey = new NotificationKey(parentId);
+      parentKey = new PluginKey(parentId);
       if (parentChildrenKeysMap.containsKey(parentKey)) {
         childrenKeys = parentChildrenKeysMap.get(parentKey);
       } else {
-        childrenKeys = new ArrayList<NotificationKey>();
+        childrenKeys = new ArrayList<PluginKey>();
       }
       //
       childrenKeys.add(plugin.getKey());
@@ -136,7 +136,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   }
 
   @Override
-  public boolean remove(NotificationKey key) {
+  public boolean remove(PluginKey key) {
     pluginMap.remove(key);
     return true;
   }

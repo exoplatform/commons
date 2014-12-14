@@ -12,7 +12,7 @@ import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
@@ -84,9 +84,9 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     context.append(NotificationJob.DAY_OF_JOB, dayName);
     //
     context.append(NotificationJob.JOB_WEEKLY, false);
-    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
+    Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
     
-    List<NotificationInfo> list = map.get(new NotificationKey(PluginTest.ID));
+    List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
     
     assertTrue(list.get(0).equals(notification));
@@ -102,7 +102,7 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     
     userSetting.setUserId("demo").addProvider(PluginTest.ID, FREQUENCY.WEEKLY);
     map = notificationDataStorage.getByUser(context, userSetting);
-    list = map.get(new NotificationKey(PluginTest.ID));
+    list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
     
     
@@ -130,9 +130,9 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     //
     context.append(NotificationJob.JOB_WEEKLY, false);
     
-    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
+    Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
     
-    List<NotificationInfo> list = map.get(new NotificationKey(PluginTest.ID));
+    List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
     
     assertTrue(list.get(0).equals(notification));
@@ -154,7 +154,7 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     context.append(NotificationJob.JOB_WEEKLY, true);
     userSetting.setUserId("demo").addProvider(PluginTest.ID, FREQUENCY.WEEKLY);
     map = notificationDataStorage.getByUser(context, userSetting);
-    list = map.get(new NotificationKey(PluginTest.ID));
+    list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
     
     notificationDataStorage.removeMessageAfterSent();
@@ -178,8 +178,8 @@ public class NotificationServiceTest extends BaseCommonsTestCase {
     userSetting.setUserId(userNameSpecial).addProvider(PluginTest.ID, FREQUENCY.DAILY);
     userSetting.setActive(true);
     //
-    Map<NotificationKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
-    List<NotificationInfo> list = map.get(new NotificationKey(PluginTest.ID));
+    Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
+    List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
     //
     assertEquals(1, list.size());
     assertTrue(list.get(0).equals(notification));

@@ -20,7 +20,7 @@ import java.io.Writer;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 
@@ -36,7 +36,7 @@ public interface NotificationCommand {
    * Gets a notification key associated with the notification command.
    * @return The notification key.
    */
-  NotificationKey getNotificationKey();
+  PluginKey getNotificationKey();
   
   /**
    * Builds information of a message from the notification context.

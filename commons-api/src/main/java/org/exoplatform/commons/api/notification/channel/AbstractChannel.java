@@ -17,9 +17,11 @@
 package org.exoplatform.commons.api.notification.channel;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.jboss.util.Strings;
 
@@ -80,10 +82,26 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
   
   /**
    * Gets the template by the specified pluginId
-   * @param pluginId
+   * @param key the plugin key
    */
-  public String getTemplateFilePath(String pluginId) {
+  public String getTemplateFilePath(PluginKey key) {
     return Strings.EMPTY;
+  }
+  
+  /**
+   * Has the template builder of the plugin and the channel
+   * @param key the plugin key
+   */
+  public boolean hasTemplateBuilder(PluginKey key) {
+    return false;
+  }
+  
+  /**
+   * Gets the template builder by the specified PluginKey
+   * @param key the PluginKey
+   */
+  public AbstractTemplateBuilder getTemplateBuilder(PluginKey key) {
+    return null;
   }
   
 }

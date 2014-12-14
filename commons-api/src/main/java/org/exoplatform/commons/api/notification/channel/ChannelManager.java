@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 
 public interface ChannelManager {
 
@@ -29,21 +30,24 @@ public interface ChannelManager {
   void registerTemplateProvider(TemplateProvider provider);
 
   /**
-   * @param channelId
+   * Gets the channel by the specified key
+   * @param key the channel key
    * @return
    */
-  AbstractChannel getChannel(String channelId);
+  AbstractChannel getChannel(ChannelKey key);
 
   /**
+   * Gets list of the channels
    * @return
    */
   List<AbstractChannel> getChannels();
 
   /**
-   * @param channelId
+   * Gets the lifecycle by the ChannelKey
+   * @param key
    * @return
    */
-  AbstractNotificationLifecycle getLifecycle(String channelId);
+  AbstractNotificationLifecycle getLifecycle(ChannelKey key);
 
   /**
    * Gets size of channels has been registered

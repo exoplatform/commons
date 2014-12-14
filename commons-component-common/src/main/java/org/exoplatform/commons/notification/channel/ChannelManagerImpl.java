@@ -25,6 +25,7 @@ import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -38,10 +39,10 @@ public class ChannelManagerImpl implements ChannelManager {
   /** logger */
   private static final Log LOG = ExoLogger.getLogger(ChannelManagerImpl.class);
   /** Defines the channels: key = channelId and Channel*/
-  private final Map<String, AbstractChannel> channels;
+  private final Map<ChannelKey, AbstractChannel> channels;
   
   public ChannelManagerImpl() {
-    channels = new HashMap<String, AbstractChannel>();
+    channels = new HashMap<ChannelKey, AbstractChannel>();
   }
   
   /**
@@ -50,7 +51,7 @@ public class ChannelManagerImpl implements ChannelManager {
    */
   @Override
   public void register(AbstractChannel channel) {
-    channels.put(channel.getId(), channel);
+    channels.put(ChannelKey.key(channel.getId()), channel);
   }
 
   /**
@@ -70,7 +71,7 @@ public class ChannelManagerImpl implements ChannelManager {
    */
   @Override
   public void registerTemplateProvider(TemplateProvider provider) {
-    AbstractChannel channel = channels.get(provider.getChannelId());
+    AbstractChannel channel = channels.get(provider.getChannelKey());
     if (channel != null) {
       channel.registerTemplateProvider(provider);
     } else {
@@ -79,13 +80,13 @@ public class ChannelManagerImpl implements ChannelManager {
   }
 
   @Override
-  public AbstractChannel getChannel(String channelId) {
-    return channels.get(channelId);
+  public AbstractChannel getChannel(ChannelKey key) {
+    return channels.get(key);
   }
-
+  
   @Override
-  public AbstractNotificationLifecycle getLifecycle(String channelId) {
-    return getChannel(channelId).getLifecycle();
+  public AbstractNotificationLifecycle getLifecycle(ChannelKey key) {
+    return getChannel(key).getLifecycle();
   }
 
   /**
@@ -101,7 +102,7 @@ public class ChannelManagerImpl implements ChannelManager {
   @Override
   public List<AbstractChannel> getChannels() {
     List<AbstractChannel> channels = new ArrayList<AbstractChannel>();
-    AbstractChannel emailChannel = this.getChannel("email");
+    AbstractChannel emailChannel = this.getChannel(ChannelKey.key(MailChannel.ID));
     if (emailChannel != null) {
       channels.add(emailChannel);
     }

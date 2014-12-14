@@ -20,25 +20,25 @@ import java.io.Serializable;
 
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 
-public final class NotificationKey implements Serializable {
+public final class PluginKey implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final String id;
   
-  public NotificationKey(AbstractNotificationPlugin plugin) {
+  public PluginKey(AbstractNotificationPlugin plugin) {
     this(plugin.getId());
   }
   
-  public NotificationKey(String id) {
+  public PluginKey(String id) {
     this.id = id;
   }
 
-  public static NotificationKey key(AbstractNotificationPlugin plugin) {
-    return new NotificationKey(plugin);
+  public static PluginKey key(AbstractNotificationPlugin plugin) {
+    return new PluginKey(plugin);
   }
   
-  public static NotificationKey key(String id) {
-    return new NotificationKey(id);
+  public static PluginKey key(String id) {
+    return new PluginKey(id);
   }
   
   public String getId() {
@@ -50,11 +50,11 @@ public final class NotificationKey implements Serializable {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof NotificationKey)) {
+    if (!(o instanceof PluginKey)) {
       return false;
     }
 
-    NotificationKey that = (NotificationKey) o;
+    PluginKey that = (PluginKey) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) {
       return false;
@@ -69,7 +69,7 @@ public final class NotificationKey implements Serializable {
   
   @Override
   public String toString() {
-      return "NotificationKey[id=" + id + "]";
+      return "NotificationPluginKey[id=" + id + "]";
   }
 
 }

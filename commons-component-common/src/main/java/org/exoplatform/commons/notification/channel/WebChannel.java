@@ -24,6 +24,7 @@ import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.lifecycle.WebLifecycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -40,11 +41,11 @@ public class WebChannel extends AbstractChannel {
   /** */
   private static final Log LOG = ExoLogger.getLogger(WebChannel.class);
   /** */
-  private final Map<String, AbstractTemplateBuilder> templateBuilders;
+  private final Map<PluginKey, AbstractTemplateBuilder> templateBuilders;
 
   public WebChannel() {
     super(new WebLifecycle());
-    templateBuilders = new HashMap<String, AbstractTemplateBuilder>();
+    templateBuilders = new HashMap<PluginKey, AbstractTemplateBuilder>();
   }
   
   @Override

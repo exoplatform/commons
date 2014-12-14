@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
@@ -57,7 +57,7 @@ public class DigestorServiceImpl implements DigestorService {
   public DigestorServiceImpl() {}
   
   
-  public MessageInfo buildMessage(NotificationContext jobContext, Map<NotificationKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
+  public MessageInfo buildMessage(NotificationContext jobContext, Map<PluginKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
     MessageInfo messageInfo = null;
 
     if (notificationData == null || notificationData.size() == 0) {
@@ -75,12 +75,12 @@ public class DigestorServiceImpl implements DigestorService {
       Writer writer = new StringWriter();
 
       for (String providerId : activeProviders) {
-        List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
+        List<NotificationInfo> messages = notificationData.get(PluginKey.key(providerId));
         if (messages == null || messages.size() == 0){
           continue;
         }
         
-        AbstractNotificationPlugin plugin = containerService.getPlugin(NotificationKey.key(providerId));
+        AbstractNotificationPlugin plugin = containerService.getPlugin(PluginKey.key(providerId));
         nCtx.setNotificationInfos(messages);
         plugin.buildDigest(nCtx, writer);
       }

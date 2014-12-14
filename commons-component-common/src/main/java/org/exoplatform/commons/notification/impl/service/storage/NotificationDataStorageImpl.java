@@ -34,7 +34,7 @@ import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
@@ -93,21 +93,21 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   }
   
   @Override
-  public Map<NotificationKey, List<NotificationInfo>> getByUser(NotificationContext context, UserSetting setting) {
+  public Map<PluginKey, List<NotificationInfo>> getByUser(NotificationContext context, UserSetting setting) {
     SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
-    Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
+    Map<PluginKey, List<NotificationInfo>> notificationData = new LinkedHashMap<PluginKey, List<NotificationInfo>>();
     try {
       boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
       if (isWeekly) {
         for (String pluginId : setting.getWeeklyProviders()) {
-          putMap(notificationData, NotificationKey.key(pluginId), getWeeklyNotifs(sProvider, pluginId, setting.getUserId()));
+          putMap(notificationData, PluginKey.key(pluginId), getWeeklyNotifs(sProvider, pluginId, setting.getUserId()));
         }
       }
       //
       boolean isDaily = context.value(NotificationJob.JOB_DAILY);
       if (isDaily) {
         for (String pluginId : setting.getDailyProviders()) {
-          putMap(notificationData, NotificationKey.key(pluginId), getDailyNotifs(sProvider, context, pluginId, setting.getUserId()));
+          putMap(notificationData, PluginKey.key(pluginId), getDailyNotifs(sProvider, context, pluginId, setting.getUserId()));
         }
       }
     } catch (Exception e) {
@@ -117,7 +117,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     return notificationData;
   }
 
-  private static void putMap(Map<NotificationKey, List<NotificationInfo>> notificationData, NotificationKey key, List<NotificationInfo> values) {
+  private static void putMap(Map<PluginKey, List<NotificationInfo>> notificationData, PluginKey key, List<NotificationInfo> values) {
     if (notificationData.containsKey(key)) {
       List<NotificationInfo> messages = notificationData.get(key);
       for (NotificationInfo notificationMessage : values) {

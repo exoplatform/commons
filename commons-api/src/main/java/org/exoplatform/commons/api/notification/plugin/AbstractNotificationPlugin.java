@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -131,8 +131,8 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
    * Creates the key for NotificationPlugin
    * @return
    */
-  public NotificationKey getKey() {
-    return NotificationKey.key(this);
+  public PluginKey getKey() {
+    return PluginKey.key(this);
   }
   
   /**

@@ -22,7 +22,7 @@ import groovy.text.Template;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.api.notification.template.Element;
@@ -51,7 +51,7 @@ public class GroovyElementVisitor implements ElementVisitor {
     this.ctx.put("_ctx", element);
     //
     try {
-      NotificationKey key = new NotificationKey(ctx.getPluginId());
+      PluginKey key = new PluginKey(ctx.getPluginId());
       Template engine = CommonsUtils.getService(PluginContainer.class).getPlugin(key).getTemplateEngine();
       Writable writable = engine.make(getTemplateContext());
       writable.writeTo(writer);

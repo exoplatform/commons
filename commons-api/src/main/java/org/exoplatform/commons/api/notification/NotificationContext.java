@@ -22,7 +22,7 @@ import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 
@@ -114,7 +114,7 @@ public interface NotificationContext extends Cloneable {
    * @param key
    * @return
    */
-  NotificationCommand makeCommand(NotificationKey key);
+  NotificationCommand makeCommand(PluginKey key);
 
   /**
    * Creates and returns a copy of this object

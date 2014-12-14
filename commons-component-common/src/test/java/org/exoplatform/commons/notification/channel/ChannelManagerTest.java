@@ -18,6 +18,8 @@ package org.exoplatform.commons.notification.channel;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
@@ -47,14 +49,14 @@ public class ChannelManagerTest extends BaseCommonsTestCase {
   }
   
   public void testGetChannel() throws Exception {
-    AbstractChannel channel = manager.getChannel(MailChannel.ID);
+    AbstractChannel channel = manager.getChannel(ChannelKey.key(MailChannel.ID));
     assertTrue(channel != null);
     //check the daily
-    String actual = channel.getTemplateFilePath(DigestDailyPlugin.ID);
+    String actual = channel.getTemplateFilePath(PluginKey.key(DigestDailyPlugin.ID));
     String expected = "war:/notification/templates/DigestDailyPlugin.gtmpl";
     assertEquals(expected, actual);
     //check the weekly
-    actual = channel.getTemplateFilePath(DigestWeeklyPlugin.ID);
+    actual = channel.getTemplateFilePath(PluginKey.key(DigestWeeklyPlugin.ID));
     expected = "war:/notification/templates/DigestWeeklyPlugin.gtmpl";
     assertEquals(expected, actual);
   }

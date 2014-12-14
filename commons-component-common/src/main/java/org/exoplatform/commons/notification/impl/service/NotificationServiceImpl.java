@@ -25,7 +25,7 @@ import java.util.Map;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
@@ -278,7 +278,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         continue;
       }
       
-      Map<NotificationKey, List<NotificationInfo>> notificationMessageMap = storage.getByUser(context, userSetting);
+      Map<PluginKey, List<NotificationInfo>> notificationMessageMap = storage.getByUser(context, userSetting);
 
       if (notificationMessageMap.size() > 0) {
         MessageInfo messageInfo = this.digestorService.buildMessage(context, notificationMessageMap, userSetting);
@@ -304,7 +304,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       }
 
       userSetting = defaultConfigPlugins.clone().setUserId(userSetting.getUserId()).setLastUpdateTime(userSetting.getLastUpdateTime());
-      Map<NotificationKey, List<NotificationInfo>> notificationMessageMap = storage.getByUser(context, userSetting);
+      Map<PluginKey, List<NotificationInfo>> notificationMessageMap = storage.getByUser(context, userSetting);
 
       if (notificationMessageMap.size() > 0) {
         MessageInfo messageInfo = this.digestorService.buildMessage(context, notificationMessageMap, userSetting);
