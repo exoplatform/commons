@@ -40,7 +40,7 @@ import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.services.compress.CompressData;
 
 /**
@@ -49,7 +49,7 @@ import org.exoplatform.services.compress.CompressData;
  *          exo@exoplatform.com
  * May 18, 2012  
  */
-public class UtilsTest extends BaseCommonsTestCase {
+public class UtilsTest extends BaseNotificationTestCase {
     
   private static final String    ROOT_SQL_QUERY      = "select * from mix:versionable order by exo:dateCreated DESC";
 
