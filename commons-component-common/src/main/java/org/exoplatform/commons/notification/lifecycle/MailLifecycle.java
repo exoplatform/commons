@@ -53,9 +53,14 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
     List<String> userIdPendings = new ArrayList<String>();
     for (String userId : userIds) {
       UserSetting userSetting = userService.get(userId);
-      // send instantly mail
+      //check channel active for user
+      if (!userSetting.isChannelActive(MailChannel.ID)) {
+        continue;
+      }
+      
+      // check plugin active for user
       if (userSetting.isActive(MailChannel.ID, pluginId)) {
-        send(ctx, notification.clone().setTo(userId));
+        send(ctx, notification.clone().setTo(userId), userId);
       }
       //handles the daily or weekly
       if (userSetting.isInDaily(pluginId) || userSetting.isInWeekly(pluginId)) {
@@ -108,7 +113,7 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
   }
   
   @Override
-  public void send(NotificationContext ctx, NotificationInfo notification) {
+  public void send(NotificationContext ctx, NotificationInfo notification, String userId) {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(notification.getKey());
     if (builder != null) {

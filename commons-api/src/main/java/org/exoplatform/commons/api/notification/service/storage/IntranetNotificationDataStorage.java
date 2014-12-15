@@ -22,7 +22,7 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 
 
 public interface IntranetNotificationDataStorage {
-
+  
   /**
    * Saves information of a notification.
    * 
@@ -32,19 +32,12 @@ public interface IntranetNotificationDataStorage {
   void save(NotificationInfo notification) throws Exception;
 
   /**
-   * @param notificationInfo
-   * @return
-   * @throws Exception
-   */
-  String buildUIMessage(NotificationInfo notificationInfo) throws Exception;
-
-  /**
    * 
    * @param userId
-   * @param id the NotificationInfo's id
+   * @param notificationId the NotificationInfo's id
    * @throws Exception
    */
-  void saveRead(String userId, String id) throws Exception;
+  void saveRead(String userId, String notificationId) throws Exception;
 
   /**
    * @param userId
@@ -54,34 +47,25 @@ public interface IntranetNotificationDataStorage {
 
   /**
    * @param userId the user's id of owner NotificationInfo
-   * @param limit The limit to get NotificationInfo
+   * @param offset The offset
+   * @param limit The limit
    * @throws Exception
    */
-  List<NotificationInfo> get(String userId, int limit) throws Exception;
-
-  /**
-   * @param userId the user's id
-   * @param isOnMenu The status to check display on menu or not.
-   * @throws Exception
-   */
-  List<String> getNotificationContent(String userId, boolean isOnMenu) throws Exception;
+  List<NotificationInfo> get(String userId, int offset, int limit) throws Exception;
 
   /**
    * @param userId
-   * @param id the NotificationInfo's id
+   * @param notificationId the NotificationInfo's id
    * @return the status removed or not
    * @throws Exception
    */
-  boolean remove(String userId, String id) throws Exception;
+  boolean remove(String userId, String notificationId) throws Exception;
 
   /**
    * Remove the NotificationInfo live after X days
-   * @param userId
    * @param days 
    * @return the status removed or not
    * @throws Exception
    */
   boolean remove(int days) throws Exception;
-  
-  public String getChannelId();
 }

@@ -113,7 +113,7 @@ public class IntranetNotificationDataStorageImpl extends AbstractService impleme
   }
 
   @Override
-  public List<NotificationInfo> get(String userId, int limit) throws Exception {
+  public List<NotificationInfo> get(String userId, int offset, int limit) throws Exception {
     List<NotificationInfo> notificationInfos = new ArrayList<NotificationInfo>();
     List<NotificationInfo> current = tempStorage.get(userId);
     if(current != null) {
@@ -124,31 +124,6 @@ public class IntranetNotificationDataStorageImpl extends AbstractService impleme
       }
     }
     return notificationInfos;
-  }
-  
-  @Override
-  public List<String> getNotificationContent(String userId, boolean isOnMenu) throws Exception {
-    List<String> notifications = new ArrayList<String>();
-    List<NotificationInfo> notificationInfos = get(userId, MENU_LIMIT);
-    for (NotificationInfo notificationInfo : notificationInfos) {
-      notifications.add(buildUIMessage(notificationInfo));
-    }
-    return notifications;
-  }
-
-  @Override
-  public String buildUIMessage(NotificationInfo notificationInfo) throws Exception {
-    NotificationContext nCtx = NotificationContextImpl.cloneInstance();
-    AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notificationInfo.getKey());
-    if (plugin == null) {
-      return "";
-    }
-    try {
-      return plugin.buildUIMessage(nCtx.setNotificationInfo(notificationInfo));
-    } catch (Exception e) {
-      LOG.error("Failed to build UIMessage", e);
-    }
-    return "";
   }
 
   @Override
@@ -181,9 +156,5 @@ public class IntranetNotificationDataStorageImpl extends AbstractService impleme
       }
     }
     return false;
-  }
-
-  public String getChannelId() {
-    return WebChannel.ID;
   }
 }

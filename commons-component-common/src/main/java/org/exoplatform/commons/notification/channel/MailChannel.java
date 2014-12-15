@@ -24,6 +24,7 @@ import org.exoplatform.commons.api.notification.annotation.ChannelConfig;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.lifecycle.MailLifecycle;
 import org.exoplatform.services.log.ExoLogger;
@@ -39,9 +40,15 @@ import org.exoplatform.services.log.Log;
   lifecycle = MailLifecycle.class
 )
 public final class MailChannel extends AbstractChannel {
-  public final static String ID = "MAIL_CHANNEL";
+  /** logger */
   private static final Log LOG = ExoLogger.getLogger(MailChannel.class);
+  /** */
+  public final static String ID = "MAIL_CHANNEL";
+  /** */
+  private final ChannelKey key = ChannelKey.key(ID);
+  /** */
   private final Map<PluginKey, String> templateFilePaths = new HashMap<PluginKey, String>();
+  /** */
   private final Map<PluginKey, AbstractTemplateBuilder> templateBuilders = new HashMap<PluginKey, AbstractTemplateBuilder>();
 
   public MailChannel() {
@@ -51,6 +58,11 @@ public final class MailChannel extends AbstractChannel {
   @Override
   public String getId() {
     return ID;
+  }
+  
+  @Override
+  public ChannelKey getKey() {
+    return key;
   }
   
   @Override

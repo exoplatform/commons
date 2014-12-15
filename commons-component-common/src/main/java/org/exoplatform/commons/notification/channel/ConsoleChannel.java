@@ -19,6 +19,7 @@ package org.exoplatform.commons.notification.channel;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
 
 /**
@@ -28,8 +29,11 @@ import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
  * Dec 12, 2014  
  */
 public class ConsoleChannel extends AbstractChannel {
+  /** */
   private final static String ID = "CONSOLE_CHANNEL";
-
+  /** */
+  private final ChannelKey key = ChannelKey.key(ID);
+  
   public ConsoleChannel() {
     super(new SimpleLifecycle());
   }
@@ -37,6 +41,11 @@ public class ConsoleChannel extends AbstractChannel {
   @Override
   public String getId() {
     return ID;
+  }
+  
+  @Override
+  public ChannelKey getKey() {
+    return key;
   }
   
   @Override

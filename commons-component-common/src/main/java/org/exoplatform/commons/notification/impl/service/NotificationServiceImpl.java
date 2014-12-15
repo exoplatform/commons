@@ -97,7 +97,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
     List<AbstractChannel> channels = channelManager.getChannels();
     for(AbstractChannel channel : channels) {
-      if (CommonsUtils.getService(PluginSettingService.class).isActive(channel.getId(), pluginId) == false) {
+      if (!CommonsUtils.getService(PluginSettingService.class).isActive(channel.getId(), pluginId)) {
         continue;
       }
       
@@ -109,6 +109,10 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       } else {
         //
         for (String userId : userIds) {
+          UserSetting userSetting = userService.get(userId);
+          if (!userSetting.isChannelActive(MailChannel.ID)) {
+            continue;
+          }
           lifecycle.process(ctx, userId);
         }
       }

@@ -16,11 +16,18 @@
  */
 package org.exoplatform.commons.notification.lifecycle;
 
+import java.util.Calendar;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.notification.net.WebSocketBootstrap;
+import org.exoplatform.commons.notification.net.WebSocketServer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.vertx.java.core.json.JsonObject;
 
 /**
  * Created by The eXo Platform SAS
@@ -39,35 +46,35 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   @Override
   public void process(NotificationContext ctx, String userId) {
     LOG.info("Web Notification process user: " + userId);
-    send(ctx, ctx.getNotificationInfo());
+    NotificationInfo notif = ctx.getNotificationInfo();
+    notif.setTo(userId);
+    send(ctx, ctx.getNotificationInfo(), userId);
   }
   
   @Override
   public void store(NotificationInfo notifInfo) {
     LOG.info("store the notification to db for Web channel.");
+    notifInfo.setChannelKey(getChannel().getKey());
+  //notification.set
+    // dataStorage.save(notification);
   }
   
   @Override
-  public void send(NotificationContext ctx, NotificationInfo notification) {
+  public void send(NotificationContext ctx, NotificationInfo notification, String userId) {
     LOG.info("send the message by Web channel.");
+    
+    getChannel().dispatch(notification);
+    try {
+      AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(notification.getKey());
+      notification.setLastModifiedDate(Calendar.getInstance());
+      MessageInfo msg = builder.buildMessage(ctx);
+      // String message = dataStorage.buildUIMessage(notification);
+      WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER,
+                                     notification.getTo(),
+                                     new JsonObject().putString("message", msg.getBody()).encode());
+      
+    } catch (Exception e) {
+      LOG.error("Failed to connect with server : " + e, e.getMessage());
+    }
   }
-  
-//private void sendIntranetNotification(NotificationInfo notification) {
-//NotificationContext nCtx = NotificationContextImpl.cloneInstance();
-//AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notification.getKey());
-//if (plugin == null) {
-//  return;
-//}
-//try {
-//  notification.setLastModifiedDate(Calendar.getInstance());
-//  notification.setId(new NotificationInfo().getId());
-//  String message = dataStorage.buildUIMessage(notification);
-//  WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER, notification.getTo(),
-//                                 new JsonObject().putString("message", message).encode());
-//  //
-//  dataStorage.save(notification);
-//} catch (Exception e) {
-//  LOG.error("Failed to connect with server : " + e, e.getMessage());
-//}
-//}
 }

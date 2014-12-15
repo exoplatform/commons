@@ -35,7 +35,7 @@ public class NotificationInfo {
 
   private String              id;
 
-  private PluginKey     key;                                  //
+  private PluginKey           key;                                           //
 
   private String              from           = "";
 
@@ -55,6 +55,10 @@ public class NotificationInfo {
   private boolean             hasRead        = false;
 
   private Calendar            lastModifiedDate;
+  
+  private String              title = "";
+  
+  private ChannelKey          channelKey;
 
   public NotificationInfo() {
     this.id = PREFIX_ID + IdGenerator.generate();
@@ -114,7 +118,39 @@ public class NotificationInfo {
     this.from = from;
     return this;
   }
-  
+
+  /**
+   * Gets the title of the notification
+   * @return
+   */
+  public String getTitle() {
+    return title;
+  }
+
+  /**
+   * Sets the title of the notification
+   * @param title
+   */
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  /**
+   * Gets the channel key of the notification
+   * @return
+   */
+  public ChannelKey getChannelKey() {
+    return channelKey;
+  }
+
+  /**
+   * Sets the channel of the notification
+   * @param channelKey
+   */
+  public void setChannelKey(ChannelKey channelKey) {
+    this.channelKey = channelKey;
+  }
+
   /**
    * @return the to
    */

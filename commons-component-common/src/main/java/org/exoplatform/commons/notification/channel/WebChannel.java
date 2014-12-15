@@ -23,6 +23,7 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.lifecycle.WebLifecycle;
@@ -39,6 +40,8 @@ public class WebChannel extends AbstractChannel {
   /** */
   public final static String ID = "WEB_CHANNEL";
   /** */
+  private final ChannelKey key = ChannelKey.key(ID);
+  /** logger */
   private static final Log LOG = ExoLogger.getLogger(WebChannel.class);
   /** */
   private final Map<PluginKey, AbstractTemplateBuilder> templateBuilders;
@@ -51,6 +54,11 @@ public class WebChannel extends AbstractChannel {
   @Override
   public String getId() {
     return ID;
+  }
+  
+  @Override
+  public ChannelKey getKey() {
+    return key;
   }
   
   @Override
