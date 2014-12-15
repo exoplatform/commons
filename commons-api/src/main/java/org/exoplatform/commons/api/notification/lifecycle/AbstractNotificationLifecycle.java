@@ -67,7 +67,7 @@ public abstract class AbstractNotificationLifecycle {
   
   /**
    * Sends the message by Mail, UI or any the configured channel
-   * @param msg
+   * @param ctx
    */
-  public void send(NotificationContext ctx, NotificationInfo notification, String userId) {}
+  public void send(NotificationContext ctx) {}
 }

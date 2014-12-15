@@ -103,19 +103,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       
       userIds = notification.isSendAll() ? userService.getUserHasSettingPlugin(channel.getId(), pluginId) : notification.getSendToUserIds();
       AbstractNotificationLifecycle lifecycle = channelManager.getLifecycle(ChannelKey.key(channel.getId()));
-      //Mail is special case, must provide the multi-users to process in lifecycle
-      if (MailChannel.ID.equals(channel.getId())) {
-        lifecycle.process(ctx, userIds.toArray(new String[userIds.size()]));
-      } else {
-        //
-        for (String userId : userIds) {
-          UserSetting userSetting = userService.get(userId);
-          if (!userSetting.isChannelActive(MailChannel.ID)) {
-            continue;
-          }
-          lifecycle.process(ctx, userId);
-        }
-      }
+      lifecycle.process(ctx, userIds.toArray(new String[userIds.size()]));
     }
     
   }

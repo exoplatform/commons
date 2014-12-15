@@ -60,7 +60,7 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
       
       // check plugin active for user
       if (userSetting.isActive(MailChannel.ID, pluginId)) {
-        send(ctx, notification.clone().setTo(userId), userId);
+        send(ctx.setNotificationInfo(notification.clone().setTo(userId)));
       }
       //handles the daily or weekly
       if (userSetting.isInDaily(pluginId) || userSetting.isInWeekly(pluginId)) {
@@ -113,8 +113,10 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
   }
   
   @Override
-  public void send(NotificationContext ctx, NotificationInfo notification, String userId) {
+  public void send(NotificationContext ctx) {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    NotificationInfo notification = ctx.getNotificationInfo();
+    
     AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(notification.getKey());
     if (builder != null) {
       MessageInfo msg = builder.buildMessage(ctx);

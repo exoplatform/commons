@@ -38,6 +38,7 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
   
   public AbstractChannel(AbstractNotificationLifecycle lifecycle) {
     this.lifecycle = lifecycle;
+    this.lifecycle.setChannel(this);
   }
   /**
    * Initialize something when starts to work the channel

@@ -23,8 +23,12 @@ import org.exoplatform.commons.api.notification.channel.template.AbstractTemplat
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
+import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.notification.net.WebSocketBootstrap;
 import org.exoplatform.commons.notification.net.WebSocketServer;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.vertx.java.core.json.JsonObject;
@@ -40,15 +44,29 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
 
   @Override
   public void process(NotificationContext ctx, String... userIds) {
+    NotificationInfo notification = ctx.getNotificationInfo();
+    String pluginId = notification.getKey().getId();
+    UserSettingService userService = CommonsUtils.getService(UserSettingService.class);
     
+    for (String userId : userIds) {
+      UserSetting userSetting = userService.get(userId);
+      //check channel active for user
+      if (!userSetting.isChannelActive(WebChannel.ID)) {
+        continue;
+      }
+      
+      if (userSetting.isActive(WebChannel.ID, pluginId)) {
+        send(ctx.setNotificationInfo(notification.clone().setTo(userId)));
+      }
+      
+    }
+
   }
 
   @Override
   public void process(NotificationContext ctx, String userId) {
     LOG.info("Web Notification process user: " + userId);
-    NotificationInfo notif = ctx.getNotificationInfo();
-    notif.setTo(userId);
-    send(ctx, ctx.getNotificationInfo(), userId);
+    
   }
   
   @Override
@@ -60,9 +78,9 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   }
   
   @Override
-  public void send(NotificationContext ctx, NotificationInfo notification, String userId) {
+  public void send(NotificationContext ctx) {
     LOG.info("send the message by Web channel.");
-    
+    NotificationInfo notification = ctx.getNotificationInfo(); 
     getChannel().dispatch(notification);
     try {
       AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(notification.getKey());
