@@ -18,7 +18,6 @@ package org.exoplatform.commons.notification.lifecycle;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
-import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -34,14 +33,13 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
 
   @Override
   public void process(NotificationContext ctx, String... userIds) {
-    for(String userId : userIds) {
-      process(ctx, userId);
-    }
+    
   }
 
   @Override
   public void process(NotificationContext ctx, String userId) {
     LOG.info("Web Notification process user: " + userId);
+    send(ctx, ctx.getNotificationInfo());
   }
   
   @Override
@@ -50,7 +48,26 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   }
   
   @Override
-  public void send(MessageInfo msg) {
+  public void send(NotificationContext ctx, NotificationInfo notification) {
     LOG.info("send the message by Web channel.");
   }
+  
+//private void sendIntranetNotification(NotificationInfo notification) {
+//NotificationContext nCtx = NotificationContextImpl.cloneInstance();
+//AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notification.getKey());
+//if (plugin == null) {
+//  return;
+//}
+//try {
+//  notification.setLastModifiedDate(Calendar.getInstance());
+//  notification.setId(new NotificationInfo().getId());
+//  String message = dataStorage.buildUIMessage(notification);
+//  WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER, notification.getTo(),
+//                                 new JsonObject().putString("message", message).encode());
+//  //
+//  dataStorage.save(notification);
+//} catch (Exception e) {
+//  LOG.error("Failed to connect with server : " + e, e.getMessage());
+//}
+//}
 }

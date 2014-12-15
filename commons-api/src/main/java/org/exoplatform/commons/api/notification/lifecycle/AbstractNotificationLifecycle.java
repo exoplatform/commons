@@ -18,7 +18,6 @@ package org.exoplatform.commons.api.notification.lifecycle;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
-import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 
 /**
@@ -70,5 +69,5 @@ public abstract class AbstractNotificationLifecycle {
    * Sends the message by Mail, UI or any the configured channel
    * @param msg
    */
-  public void send(MessageInfo msg) {}
+  public void send(NotificationContext ctx, NotificationInfo notification) {}
 }

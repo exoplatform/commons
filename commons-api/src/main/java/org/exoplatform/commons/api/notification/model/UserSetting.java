@@ -28,11 +28,6 @@ import org.exoplatform.container.PortalContainer;
 /**
  * User setting notification
  */
-
-/**
- * @author hanhvq
- *
- */
 public class UserSetting {
   private static UserSetting defaultSetting = null;
 
@@ -258,10 +253,13 @@ public class UserSetting {
   }
 
   /**
+   * Checks the user's setting for the channel and the plugin
+   * if it's active, it's instantly including the email channel.
+   * 
    * @param pluginId
    * @return
    */
-  public boolean isEnabled(String channelId, String pluginId) {
+  public boolean isActive(String channelId, String pluginId) {
     return (getPlugins(channelId).contains(pluginId));
   }
   
@@ -279,11 +277,6 @@ public class UserSetting {
    */
   public boolean isInWeekly(String pluginId) {
     return (weeklyPlugins.contains(pluginId)) ? true : false;
-  }
-
-
-  public boolean isActiveWithoutInstantly(String pluginId) {
-    return isInDaily(pluginId) || isInWeekly(pluginId);
   }
 
   private void addProperty(List<String> providers, String pluginId) {

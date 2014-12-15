@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
+import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
@@ -38,21 +41,18 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
-import org.exoplatform.commons.notification.channel.WebChannel;
+import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.notification.net.WebSocketBootstrap;
-import org.exoplatform.commons.notification.net.WebSocketServer;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
-import org.vertx.java.core.json.JsonObject;
 
 public class NotificationServiceImpl extends AbstractService implements NotificationService {
-  private static final Log         LOG              = ExoLogger.getLogger(NotificationServiceImpl.class);
+  private static final Log LOG = ExoLogger.getLogger(NotificationServiceImpl.class);
   /** */
   private final NotificationDataStorage storage;
   /** */
@@ -61,157 +61,65 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private final DigestorService digestorService;
   /** */
   private final UserSettingService userService;
+  /** */
+  private final NotificationContextFactory notificationContextFactory;
+  /** */
+  private final ChannelManager channelManager;
 
-  public NotificationServiceImpl(UserSettingService userService, DigestorService digestorService,
-                                 NotificationDataStorage storage, IntranetNotificationDataStorage dataStorage) {
+
+  public NotificationServiceImpl(ChannelManager channelManager,
+                                 UserSettingService userService,
+                                 DigestorService digestorService,
+                                 NotificationDataStorage storage,
+                                 IntranetNotificationDataStorage dataStorage,
+                                 NotificationContextFactory notificationContextFactory) {
     this.userService = userService;
     this.digestorService = digestorService;
     this.storage = storage;
+    this.notificationContextFactory = notificationContextFactory;
+    this.channelManager = channelManager;
     this.dataStorage = dataStorage;
   }
   
   @Override
   public void process(NotificationInfo notification) throws Exception {
-
     String pluginId = notification.getKey().getId();
     
-    //create notification here
-    if (NotificationContextFactory.getInstance().getStatisticsService().isStatisticsEnabled()) {
-      NotificationContextFactory.getInstance().getStatisticsCollector().createNotificationInfoCount(pluginId);
+    //statistic metrics
+    if (this.notificationContextFactory.getStatisticsService().isStatisticsEnabled()) {
+     this.notificationContextFactory.getStatisticsCollector().createNotificationInfoCount(pluginId);
     }
     //
-    processEmailNotification(notification);
+    NotificationContext ctx = NotificationContextImpl.cloneInstance();
+    ctx.setNotificationInfo(notification);
     //
-    processChannelNotification(notification);
-  }
-  
-  private void processEmailNotification(NotificationInfo notification) throws Exception {
-    String pluginId = notification.getKey().getId();
-    // if the plugin is not active, do nothing
-    if (CommonsUtils.getService(PluginSettingService.class).isActive(UserSetting.EMAIL_CHANNEL, pluginId) == false) {
-      return;
-    }
-    //
-    UserSettingService notificationService = CommonsUtils.getService(UserSettingService.class);
-    List<String> userIds = notification.getSendToUserIds();
-    //
-    if (notification.isSendAll()) {
-      userIds = notificationService.getUserHasSettingPlugin(UserSetting.EMAIL_CHANNEL, pluginId);
-    }
+    List<String> userIds = null;
 
-    List<String> userIdPendings = new ArrayList<String>();
-    for (String userId : userIds) {
-      UserSetting userSetting = notificationService.get(userId);
-      //
-      if (userSetting.isChannelActive(UserSetting.EMAIL_CHANNEL) == false) {
+    List<AbstractChannel> channels = channelManager.getChannels();
+    for(AbstractChannel channel : channels) {
+      if (CommonsUtils.getService(PluginSettingService.class).isActive(channel.getId(), pluginId) == false) {
         continue;
       }
-      // send instantly mail
-      if (userSetting.isEnabled(UserSetting.EMAIL_CHANNEL, pluginId)) {
-        sendInstantly(notification.clone().setTo(userId));
-      }
-      //
-      if (userSetting.isActiveWithoutInstantly(pluginId)) {
-        userIdPendings.add(userId);
-        setValueSendbyFrequency(notification, userSetting, userId);
-      }
-    }
-
-    if (userIdPendings.size() > 0 || notification.isSendAll()) {
-      notification.to(userIdPendings);
-      storage.save(notification);
-    }
-  }
-  
-  private void processChannelNotification(NotificationInfo notification) {
-    // for all channel
-    
-    String pluginId = notification.getKey().getId();
-    // if the plugin is not active, do nothing
-    if (CommonsUtils.getService(PluginSettingService.class).isActive(WebChannel.ID, pluginId) == false) {
-      return;
-    }
-    //
-    UserSettingService notificationService = CommonsUtils.getService(UserSettingService.class);
-    List<String> userIds = notification.getSendToUserIds();
-    //
-    if (notification.isSendAll()) {
-      userIds = notificationService.getUserHasSettingPlugin(WebChannel.ID, pluginId);
-    }
-    for (String userId : userIds) {
-      UserSetting userSetting = notificationService.get(userId);
-      //
-      if (userSetting.isChannelActive(WebChannel.ID) && userSetting.isEnabled(WebChannel.ID, pluginId)) {
-        sendIntranetNotification(notification.clone().setTo(userId));
-      }
-    }
-  }
-  
-  
-  /**
-   * Process to send instantly mail
-   * 
-   * @param notification
-   */
-  private void sendInstantly(NotificationInfo notification) {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
-    NotificationContext nCtx = NotificationContextImpl.cloneInstance();
-    AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notification.getKey());
-    if (plugin != null) {
-      nCtx.setNotificationInfo(notification);
-      MessageInfo info = plugin.buildMessage(nCtx);
       
-      if (info != null) {
-        if (NotificationUtils.isValidEmailAddresses(info.getTo()) == true) {
-          CommonsUtils.getService(QueueMessageImpl.class).sendMessage(info.makeEmailNotification());
-        } else {
-          LOG.warn(String.format("The email %s is not valid for sending notification", info.getTo()));
-        }
-        if (stats) {
-          NotificationContextFactory.getInstance().getStatisticsCollector().createMessageInfoCount(info.getPluginId());
+      userIds = notification.isSendAll() ? userService.getUserHasSettingPlugin(channel.getId(), pluginId) : notification.getSendToUserIds();
+      AbstractNotificationLifecycle lifecycle = channelManager.getLifecycle(ChannelKey.key(channel.getId()));
+      //Mail is special case, must provide the multi-users to process in lifecycle
+      if (MailChannel.ID.equals(channel.getId())) {
+        lifecycle.process(ctx, userIds.toArray(new String[userIds.size()]));
+      } else {
+        //
+        for (String userId : userIds) {
+          lifecycle.process(ctx, userId);
         }
       }
     }
-  }
-
-  private void sendIntranetNotification(NotificationInfo notification) {
-    NotificationContext nCtx = NotificationContextImpl.cloneInstance();
-    AbstractNotificationPlugin plugin = nCtx.getPluginContainer().getPlugin(notification.getKey());
-    if (plugin == null) {
-      return;
-    }
-    try {
-      notification.setLastModifiedDate(Calendar.getInstance());
-      notification.setId(new NotificationInfo().getId());
-      String message = dataStorage.buildUIMessage(notification);
-      WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER, notification.getTo(),
-                                     new JsonObject().putString("message", message).encode());
-      //
-      dataStorage.save(notification);
-    } catch (Exception e) {
-      LOG.error("Failed to connect with server : " + e, e.getMessage());
-    }
+    
   }
   
   @Override
   public void process(Collection<NotificationInfo> messages) throws Exception {
     for (NotificationInfo message : messages) {
       process(message);
-    }
-  }
-  
-  private void setValueSendbyFrequency(NotificationInfo message, UserSetting userNotificationSetting, String userId) {
-    if (message.isSendAll()) {
-      return;
-    }
-    //
-    String pluginId = message.getKey().getId();
-    if (userNotificationSetting.isInDaily(pluginId)) {
-      message.setSendToDaily(userId);
-    }
-    //
-    if (userNotificationSetting.isInWeekly(pluginId)) {
-      message.setSendToWeekly(userId);
     }
   }
 
