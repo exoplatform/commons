@@ -32,10 +32,10 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
+import org.exoplatform.commons.api.notification.service.WebNotificationService;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
-import org.exoplatform.commons.api.notification.service.storage.IntranetNotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
@@ -56,7 +56,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   /** */
   private final NotificationDataStorage storage;
   /** */
-  private final IntranetNotificationDataStorage dataStorage;
+  private final WebNotificationService dataStorage;
   /** */
   private final DigestorService digestorService;
   /** */
@@ -71,7 +71,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
                                  UserSettingService userService,
                                  DigestorService digestorService,
                                  NotificationDataStorage storage,
-                                 IntranetNotificationDataStorage dataStorage,
+                                 WebNotificationService dataStorage,
                                  NotificationContextFactory notificationContextFactory) {
     this.userService = userService;
     this.digestorService = digestorService;

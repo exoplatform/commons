@@ -57,7 +57,6 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
       if (!userSetting.isChannelActive(MailChannel.ID)) {
         continue;
       }
-      
       // check plugin active for user
       if (userSetting.isActive(MailChannel.ID, pluginId)) {
         send(ctx.setNotificationInfo(notification.clone().setTo(userId)));

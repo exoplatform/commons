@@ -16,8 +16,13 @@
   </component>
 
   <component>
-		<key>org.exoplatform.commons.api.notification.service.storage.IntranetNotificationDataStorage</key>
-		<type>org.exoplatform.commons.notification.impl.service.storage.IntranetNotificationDataStorageImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl</type>
+  </component>
+
+  <component>
+		<key>org.exoplatform.commons.api.notification.service.WebNotificationService</key>
+		<type>org.exoplatform.commons.notification.impl.service.WebNotificationServiceImpl</type>
 	</component>
 
   <component>
@@ -275,7 +280,7 @@
                 </value>
                 <value>               
                   <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>ntfMessageHome</string></field>
+                    <field  name="alias"><string>messageHome</string></field>
                     <field  name="path"><string>/eXoNotification/messageHome</string></field>
                     <field name="nodeType"><string>ntf:messageHome</string></field>
                     <field name="mixinTypes">
@@ -296,6 +301,47 @@
                         </value>                        
                       </collection>
                     </field>                       
+                  </object>
+                </value>
+
+								<value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>messageInfoHome</string></field>
+                    <field  name="path"><string>/eXoNotification/messageInfoHome</string></field>
+                    <field name="nodeType"><string>ntf:messageInfoHome</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">               
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>
+                            <field name="addNode"><string>true</string></field>
+                            <field name="setProperty"><string>true</string></field>
+                            <field name="remove"><string>true</string></field>
+                          </object>  
+                        </value>                        
+                      </collection>
+                    </field>
+                  </object>
+                </value>
+                <value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>emailChannel</string></field>
+                    <field  name="path"><string>/eXoNotification/emailChannel</string></field>
+                    <field name="nodeType"><string>ntf:channel</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>
+                            <field name="addNode"><string>true</string></field>
+                            <field name="setProperty"><string>true</string></field>
+                            <field name="remove"><string>true</string></field>
+                          </object>
+                        </value>                        
+                      </collection>
+                    </field>
                   </object>
                 </value>
 

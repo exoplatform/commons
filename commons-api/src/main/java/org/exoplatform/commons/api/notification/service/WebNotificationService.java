@@ -14,58 +14,42 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.api.notification.service.storage;
+package org.exoplatform.commons.api.notification.service;
 
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.WebFilter;
 
 
-public interface IntranetNotificationDataStorage {
-  
+public interface WebNotificationService {
+
   /**
    * Saves information of a notification.
    * 
    * @param notification The notification to be saved.
    * @throws Exception
    */
-  void save(NotificationInfo notification) throws Exception;
-
-  /**
-   * 
-   * @param userId
-   * @param notificationId the NotificationInfo's id
-   * @throws Exception
-   */
-  void saveRead(String userId, String notificationId) throws Exception;
-
-  /**
-   * @param userId
-   * @throws Exception
-   */
-  void saveReadAll(String userId) throws Exception;
-
-  /**
-   * @param userId the user's id of owner NotificationInfo
-   * @param offset The offset
-   * @param limit The limit
-   * @throws Exception
-   */
-  List<NotificationInfo> get(String userId, int offset, int limit) throws Exception;
+  void save(NotificationInfo notification);
 
   /**
    * @param userId
    * @param notificationId the NotificationInfo's id
-   * @return the status removed or not
    * @throws Exception
    */
-  boolean remove(String userId, String notificationId) throws Exception;
+  void markRead(String notificationId);
 
   /**
-   * Remove the NotificationInfo live after X days
-   * @param days 
-   * @return the status removed or not
+   * @param userId
    * @throws Exception
    */
-  boolean remove(int days) throws Exception;
+  void markReadAll(String userId);
+
+  /**
+   * @param filter the filter to set web notifications
+   * @throws Exception
+   */
+  List<String> getNotificationContents(WebFilter filter);
+
+  void remove(String userId, String notificationId);
 }

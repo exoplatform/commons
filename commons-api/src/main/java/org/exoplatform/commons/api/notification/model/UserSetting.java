@@ -17,11 +17,14 @@
 package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.container.PortalContainer;
 
@@ -329,10 +332,19 @@ public class UserSetting {
     if (defaultSetting == null) {
       PluginSettingService settingService = (PluginSettingService) PortalContainer.getInstance().
                                               getComponentInstanceOfType(PluginSettingService.class);
-      List<PluginInfo> plugins = settingService.getAllPlugins();
-
+      ChannelManager channelManager = (ChannelManager) PortalContainer.getInstance().
+                                              getComponentInstanceOfType(ChannelManager.class);
       defaultSetting = getInstance();
+      List<String> activeChannels = getDefaultSettingActiveChannels();
+      if (activeChannels.size() > 0) {
+        defaultSetting.channelActives.addAll(activeChannels);
+      } else {
+        for (AbstractChannel channel : channelManager.getChannels()) {
+          defaultSetting.setChannelActive(channel.getId());
+        }
+      }
       //
+      List<PluginInfo> plugins = settingService.getAllPlugins();
       for (PluginInfo pluginInfo : plugins) {
         for (String defaultConf : pluginInfo.getDefaultConfig()) {
           for (String channelId : pluginInfo.getAllChannelActive()) {
@@ -345,8 +357,11 @@ public class UserSetting {
         }
       }
     }
-
     return defaultSetting.clone();
   }
 
+  private static List<String> getDefaultSettingActiveChannels() {
+    String activeChannels = System.getProperty("exo.notification.channels", "");
+    return Arrays.asList(activeChannels.split(","));
+  }
 }

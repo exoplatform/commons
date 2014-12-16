@@ -14,6 +14,12 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
     //
     addNodeEventListener();
   }
+  
+  @Override
+  protected void tearDown() throws Exception {
+    session.logout();
+  }
+
   protected void addNodeEventListener() throws Exception {
     try {
       ObservationManager observation = session.getWorkspace().getObservationManager();

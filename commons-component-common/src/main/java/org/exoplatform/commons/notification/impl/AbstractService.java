@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.notification.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import javax.jcr.Node;
@@ -24,7 +25,6 @@ import javax.jcr.Session;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
-
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -52,31 +52,55 @@ public abstract class AbstractService {
 
   public static final String NTF_FROM                 = "ntf:from";
 
+  public static final String NTF_TEXT                 = "ntf:text";
+
+  public static final String NTF_READ                 = "ntf:read";
+
   public static final String NTF_ORDER                = "ntf:order";
 
+  public static final String NTF_SENDER               = "ntf:sender";
+
+  public static final String NTF_OWNER                = "ntf:owner";
+
+  public static final String NTF_CHANNEL              = "ntf:channel";
+
   public static final String NTF_MESSAGE              = "ntf:message";
+
+  public static final String NTF_PARENT_ID            = "ntf:parentId";
+
+  public static final String NTF_PLUGIN_ID            = "ntf:pluginId";
+
+  public static final String NTF_NOTIF_USER           = "ntf:notifUser";
+
+  public static final String NTF_NOTIF_DATE           = "ntf:notifDate";
+
+  public static final String NTF_NOTIF_INFO           = "ntf:notifInfo";
+
+  public static final String NTF_SHOW_POPOVER         = "ntf:showPopover";
 
   public static final String NTF_MESSAGE_INFO         = "ntf:messageInfo";
 
   public static final String NTF_SEND_TO_DAILY        = "ntf:sendToDaily";
 
-  public static final String NTF_SEND_TO_WEEKLY       = "ntf:sendToWeekly";
-
   public static final String NTF_MESSAGE_HOME         = "ntf:messageHome";
 
-  public static final String NTF_MESSAGE_INFO_HOME    = "ntf:messageInfoHome";
+  public static final String NTF_SEND_TO_WEEKLY       = "ntf:sendToWeekly";
 
   public static final String NTF_NOTIFICATION         = "ntf:notification";
 
   public static final String NTF_PROVIDER_TYPE        = "ntf:providerType";
 
-  public static final String MIX_SUB_MESSAGE_HOME     = "mix:subMessageHome";
+  public static final String NTF_SEND_TO_MONTHLY      = "ntf:sendToMonthly";
+
+  public static final String NTF_LAST_MODIFIED_DATE   = "ntf:lastModifiedDate";
 
   public static final String MIX_DEFAULT_SETTING      = "mix:defaultSetting";
 
+  public static final String MIX_SUB_MESSAGE_HOME     = "mix:subMessageHome";
+
   public static final String NTF_OWNER_PARAMETER      = "ntf:ownerParameter";
 
-  public static final String NTF_HAS_READ             = "ntf:hasRead";
+  public static final String NTF_MESSAGE_INFO_HOME    = "ntf:messageInfoHome";
 
   public static final String EXO_LAST_MODIFIED_DATE   = "exo:lastModifiedDate";
 
@@ -96,6 +120,8 @@ public abstract class AbstractService {
   
   public static final String MESSAGE_INFO_HOME_NODE   = "messageInfoHome";
 
+  public static final String EMAIL_CHANNEL            = "emailChannel";
+
   public static final String SETTING_NODE             = "settings";
 
   public static final String SETTING_USER_NODE        = "user";
@@ -105,6 +131,10 @@ public abstract class AbstractService {
   public static final String NOTIFICATION_PARENT_PATH = "/";
 
   public static final String VALUE_PATTERN            = "{VALUE}";
+
+  public static final String DATE_NODE_PATTERN        = "yyyymmdd";
+
+  public static final String NTF_NAME_SPACE           = "ntf:";
 
   /** Defines the prefix of the parent message node such as d20 */
   public static final String DAY                      = "d";
@@ -207,6 +237,42 @@ public abstract class AbstractService {
     }
   }
 
+  protected Node getOrCreateWebDateNode(SessionProvider sProvider, String workspace, String dateNodeName) throws Exception {
+    Node root = getNotificationHomeNode(sProvider, workspace);
+    Node webNode = root.getNode(EMAIL_CHANNEL);
+    if (webNode.hasNode(dateNodeName)) {
+      return webNode.getNode(dateNodeName);
+    }
+    Node dateNode = webNode.addNode(dateNodeName, NTF_NOTIF_DATE);
+    webNode.getSession().save();
+    //
+    return dateNode;
+  }
+
+  protected Node getOrCreateWebCurrentDateNode(SessionProvider sProvider, String workspace) throws Exception {
+    return getOrCreateWebDateNode(sProvider, workspace, getDateName(Calendar.getInstance()));
+  }
+
+  protected Node getOrCreateWebUserNode(SessionProvider sProvider, String workspace, String dateNodeName, String userId) throws Exception {
+    Node dateNode = getOrCreateWebDateNode(sProvider, workspace, dateNodeName);
+    Node userNode = null;
+    if (dateNode.hasNode(userId)) {
+      userNode = dateNode.getNode(userId);
+    } else {
+      userNode = dateNode.addNode(userId, NTF_NOTIF_USER);
+    }
+    return userNode;
+  }
+
+  protected Node getOrCreateWebCurrentUserNode(SessionProvider sProvider, String workspace, String userId) throws Exception {
+    return getOrCreateWebUserNode(sProvider, workspace, getDateName(Calendar.getInstance()), userId);
+  }
+
+  protected String getDateName(Calendar cal) {
+    return new SimpleDateFormat(DATE_NODE_PATTERN).format(cal.getTime());
+  }
+  
+
   public static String getCurrentTenantName() {
     try {
       return CommonsUtils.getRepository().getConfiguration().getName();
@@ -232,5 +298,5 @@ public abstract class AbstractService {
     }
     return values.replace("{", "").replace("}", "");
   }
-
+  
 }

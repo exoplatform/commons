@@ -25,7 +25,9 @@ import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
+import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.channel.WebChannel;
+import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.net.WebSocketBootstrap;
 import org.exoplatform.commons.notification.net.WebSocketServer;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -56,7 +58,7 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       }
       
       if (userSetting.isActive(WebChannel.ID, pluginId)) {
-        send(ctx.setNotificationInfo(notification.clone().setTo(userId)));
+        send(ctx.setNotificationInfo(notification.clone(true).setTo(userId)));
       }
       
     }
@@ -72,27 +74,34 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   @Override
   public void store(NotificationInfo notifInfo) {
     LOG.info("store the notification to db for Web channel.");
-    notifInfo.setChannelKey(getChannel().getKey());
-  //notification.set
-    // dataStorage.save(notification);
+    notifInfo.with(AbstractService.NTF_SHOW_POPOVER, "true")
+             .with(AbstractService.NTF_READ, "false");
+    CommonsUtils.getService(WebNotificationStorage.class).save(notifInfo);
   }
   
   @Override
   public void send(NotificationContext ctx) {
     LOG.info("send the message by Web channel.");
     NotificationInfo notification = ctx.getNotificationInfo(); 
-    getChannel().dispatch(notification);
+    getChannel().dispatch(notification.setLastModifiedDate(Calendar.getInstance()));
     try {
-      AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(notification.getKey());
-      notification.setLastModifiedDate(Calendar.getInstance());
-      MessageInfo msg = builder.buildMessage(ctx);
-      // String message = dataStorage.buildUIMessage(notification);
-      WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER,
-                                     notification.getTo(),
-                                     new JsonObject().putString("message", msg.getBody()).encode());
-      
+      MessageInfo msg = buildMessageInfo(ctx);
+      if(msg != null) {
+        WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER,
+                                       notification.getTo(),
+                                       new JsonObject().putString("message", msg.getBody()).encode());
+      }
     } catch (Exception e) {
       LOG.error("Failed to connect with server : " + e, e.getMessage());
+    } finally {
+      //
+      store(notification);
     }
   }
+
+  public MessageInfo buildMessageInfo(NotificationContext ctx) {
+    AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(ctx.getNotificationInfo().getKey());
+    return builder.buildMessage(ctx);
+  }
+
 }

@@ -52,9 +52,7 @@ public class NotificationInfo {
 
   private String[]            sendToWeekly;
 
-  private boolean             hasRead        = false;
-
-  private Calendar            lastModifiedDate;
+  private long                lastModifiedDate;
   
   private String              title = "";
   
@@ -64,6 +62,7 @@ public class NotificationInfo {
     this.id = PREFIX_ID + IdGenerator.generate();
     this.sendToDaily = new String[] { "" };
     this.sendToWeekly = new String[] { "" };
+    this.lastModifiedDate = System.currentTimeMillis();
   }
   
   public static NotificationInfo instance() {
@@ -131,8 +130,9 @@ public class NotificationInfo {
    * Sets the title of the notification
    * @param title
    */
-  public void setTitle(String title) {
+  public NotificationInfo setTitle(String title) {
     this.title = title;
+    return this;
   }
 
   /**
@@ -264,26 +264,10 @@ public class NotificationInfo {
   }
 
   /**
-   * Get the status of notification has read or not.
-   * @return
-   */
-  public boolean isHasRead() {
-    return hasRead;
-  }
-
-  /**
-   * @param hasRead
-   */
-  public NotificationInfo setHasRead(boolean hasRead) {
-    this.hasRead = hasRead;
-    return this;
-  }
-
-  /**
    * Get the last modified date
    * @return
    */
-  public Calendar getLastModifiedDate() {
+  public long getLastModifiedDate() {
     return lastModifiedDate;
   }
 
@@ -291,6 +275,14 @@ public class NotificationInfo {
    * @param lastModifiedDate
    */
   public NotificationInfo setLastModifiedDate(Calendar lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate.getTimeInMillis();
+    return this;
+  }
+
+  /**
+   * @param lastModifiedDate
+   */
+  public NotificationInfo setLastModifiedDate(long lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -416,15 +408,21 @@ public class NotificationInfo {
 
   @Override
   public NotificationInfo clone() {
+    return clone(false);
+  }
+
+  public NotificationInfo clone(boolean isNew) {
     NotificationInfo message = instance();
     message.setFrom(from)
            .key(key)
-           .setId(id)
            .setOrder(order)
            .setOwnerParameter(ownerParameter)
            .setSendToDaily(sendToDaily)
            .setSendToWeekly(sendToWeekly)
            .setTo(to);
+    if(!isNew) {
+      message.setId(id);
+    }
     return message;
   }
 }
