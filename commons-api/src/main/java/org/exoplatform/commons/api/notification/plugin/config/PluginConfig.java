@@ -53,8 +53,6 @@ public class PluginConfig {
   private String       bundlePath;
   
   private Map<String, String> keyMapping = new HashMap<String, String>();
-  //will remove after done channel
-  private TemplateConfig templateConfig;
 
   public PluginConfig() {
   }
@@ -200,19 +198,5 @@ public class PluginConfig {
       return keyMapping.get(key);
     }
     return defaultValue;
-  }
-  
-  /**
-   * @return the templateConfig
-   */
-  public TemplateConfig getTemplateConfig() {
-    return templateConfig.setProviderId(pluginId);
-  }
-
-  /**
-   * @param templateConfig the templateConfig to set
-   */
-  public void setTemplateConfig(TemplateConfig templateConfig) {
-    this.templateConfig = templateConfig;
   }
 }

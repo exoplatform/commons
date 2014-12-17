@@ -479,8 +479,8 @@
                 </value>
                 <value>               
                   <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>emailChannel</string></field>
-                    <field  name="path"><string>/eXoNotification/emailChannel</string></field>
+                    <field  name="alias"><string>webChannel</string></field>
+                    <field  name="path"><string>/eXoNotification/web</string></field>
                     <field name="nodeType"><string>ntf:channel</string></field>
                     <field name="permissions">
                       <collection type="java.util.ArrayList">
@@ -524,16 +524,6 @@
             <field name="groupId">
               <string></string>
             </field>
-            <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-                <field name="bundlePath">
-                  <string>locale.notification.template.CommonsNotification</string>
-                </field>
-                <field name="templatePath">
-                  <string>war:/notification/templates/DigestDailyPlugin.gtmpl</string>
-                </field>
-              </object>
-            </field>
           </object>
         </object-param>
       </init-params>
@@ -557,16 +547,6 @@
             </field>
             <field name="groupId">
               <string></string>
-            </field>
-            <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-                <field name="bundlePath">
-                  <string>locale.notification.template.CommonsNotification</string>
-                </field>
-                <field name="templatePath">
-                  <string>war:/notification/templates/DigestWeeklyPlugin.gtmpl</string>
-                </field>
-              </object>
             </field>
           </object>
         </object-param>

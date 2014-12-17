@@ -30,17 +30,17 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     Node nftNode = null;
     if(!session.getRootNode().hasNode("eXoNotification")) {
       nftNode = session.getRootNode().addNode(AbstractService.NOTIFICATION_HOME_NODE, AbstractService.NTF_NOTIFICATION);
-      nftNode.addNode(AbstractService.EMAIL_CHANNEL, AbstractService.NTF_CHANNEL);
-    } else if(!session.getRootNode().hasNode("eXoNotification/emailChannel")) {
+      nftNode.addNode(AbstractService.WEB_CHANNEL, AbstractService.NTF_CHANNEL);
+    } else if(!session.getRootNode().hasNode("eXoNotification/web")) {
       session.getRootNode().getNode(AbstractService.NOTIFICATION_HOME_NODE)
-             .addNode(AbstractService.EMAIL_CHANNEL, AbstractService.NTF_CHANNEL);
+             .addNode(AbstractService.WEB_CHANNEL, AbstractService.NTF_CHANNEL);
     }
     session.save();
   }
   
   @Override
   public void tearDown() throws Exception {
-    Node homeNode = (Node) session.getItem("/eXoNotification/emailChannel");
+    Node homeNode = (Node) session.getItem("/eXoNotification/web");
     NodeIterator iterator = homeNode.getNodes();
     while (iterator.hasNext()) {
       Node node = (iterator.nextNode());
@@ -65,7 +65,7 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
   
   private Node getUserNode(String userId) throws Exception {
     String dateName = new SimpleDateFormat(AbstractService.DATE_NODE_PATTERN).format(Calendar.getInstance().getTime());
-    Node homeNode = (Node) session.getItem("/eXoNotification/emailChannel");
+    Node homeNode = (Node) session.getItem("/eXoNotification/web");
     assertTrue(homeNode.hasNode(dateName));
     assertTrue(homeNode.getNode(dateName).hasNode(userId));
     return homeNode.getNode(dateName + "/" + userId);

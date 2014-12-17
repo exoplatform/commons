@@ -20,9 +20,9 @@ import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
-import org.exoplatform.commons.testing.BaseCommonsTestCase;
 
 /**
  * Created by The eXo Platform SAS
@@ -30,7 +30,7 @@ import org.exoplatform.commons.testing.BaseCommonsTestCase;
  *          thanhvc@exoplatform.com
  * Dec 13, 2014  
  */
-public class ChannelManagerTest extends BaseCommonsTestCase {
+public class ChannelManagerTest extends BaseNotificationTestCase {
   private ChannelManager manager;
   
   @Override
@@ -53,11 +53,11 @@ public class ChannelManagerTest extends BaseCommonsTestCase {
     assertTrue(channel != null);
     //check the daily
     String actual = channel.getTemplateFilePath(PluginKey.key(DigestDailyPlugin.ID));
-    String expected = "war:/notification/templates/DigestDailyPlugin.gtmpl";
+    String expected = "classpath:/groovy/notification/template/provider1.gtmpl";
     assertEquals(expected, actual);
     //check the weekly
     actual = channel.getTemplateFilePath(PluginKey.key(DigestWeeklyPlugin.ID));
-    expected = "war:/notification/templates/DigestWeeklyPlugin.gtmpl";
+    expected = "classpath:/groovy/notification/template/provider1.gtmpl";
     assertEquals(expected, actual);
   }
 }

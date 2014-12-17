@@ -18,12 +18,10 @@ package org.exoplatform.commons.api.notification.plugin;
 
 import groovy.text.Template;
 
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
@@ -59,29 +57,18 @@ public abstract class AbstractNotificationChildPlugin extends AbstractNotificati
     return parentPluginIds;
   }
 
-  @Override
-  protected MessageInfo makeMessage(NotificationContext ctx) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeMessage.");
+  /**
+   * 
+   * @param message
+   * @return
+   */
+  protected String getLanguage(NotificationInfo message) {
+    return NotificationPluginUtils.getLanguage(message.getTo());
   }
-
+  
   @Override
   protected NotificationInfo makeNotification(NotificationContext ctx) {
     throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeNotification.");
-  }
-
-  @Override
-  protected boolean makeDigest(NotificationContext ctx, Writer writer) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeDigest.");
-  }
-
-  @Override
-  public String buildUIMessage(NotificationContext ctx) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method buildUIMessage.");
-  }
-
-  @Override
-  protected String makeUIMessage(NotificationContext ctx) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeUIMessage.");
   }
 
   public abstract String makeContent(NotificationContext ctx);

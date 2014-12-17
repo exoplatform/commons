@@ -16,12 +16,9 @@
  */
 package org.exoplatform.commons.api.notification.command;
 
-import java.io.Writer;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 
 public interface NotificationCommand {
@@ -39,25 +36,10 @@ public interface NotificationCommand {
   PluginKey getNotificationKey();
   
   /**
-   * Builds information of a message from the notification context.
-   * @param ctx The notification context.
-   * @return The message information.
-   */
-  MessageInfo processMessage(NotificationContext ctx);
-  
-  /**
    * Builds information of a notification from the notification context.
    * @param ctx The notification context.
    * @return The notification information.
    */
   NotificationInfo processNotification(NotificationContext ctx);
-  
-  /**
-   * Builds a digest message which is sent daily or weekly.
-   * @param ctx The notification context.
-   * @param writer Stores the digest message.
-   */
-  void processDigest(NotificationContext ctx, Writer writer);
-  
   
 }

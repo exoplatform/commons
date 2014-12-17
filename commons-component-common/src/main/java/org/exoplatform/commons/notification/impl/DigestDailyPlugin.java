@@ -16,10 +16,7 @@
  */
 package org.exoplatform.commons.notification.impl;
 
-import java.io.Writer;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.container.xml.InitParams;
@@ -37,28 +34,13 @@ public class DigestDailyPlugin extends AbstractNotificationPlugin {
   }
 
   @Override
-  protected boolean makeDigest(NotificationContext ctx, Writer writer) {
-    return false;
+  public boolean isValid(NotificationContext ctx) {
+    return true;
   }
 
   @Override
   protected NotificationInfo makeNotification(NotificationContext ctx) {
     return null;
   }
-
-  @Override
-  protected MessageInfo makeMessage(NotificationContext ctx) {
-    return null;
-  }
-
-  @Override
-  public boolean isValid(NotificationContext ctx) {
-    return true;
-  }
   
-  @Override
-  protected String makeUIMessage(NotificationContext ctx) {
-    return null;
-  }
-
 }

@@ -120,7 +120,7 @@ public abstract class AbstractService {
   
   public static final String MESSAGE_INFO_HOME_NODE   = "messageInfoHome";
 
-  public static final String EMAIL_CHANNEL            = "emailChannel";
+  public static final String WEB_CHANNEL              = "web";
 
   public static final String SETTING_NODE             = "settings";
 
@@ -239,7 +239,12 @@ public abstract class AbstractService {
 
   protected Node getOrCreateWebDateNode(SessionProvider sProvider, String workspace, String dateNodeName) throws Exception {
     Node root = getNotificationHomeNode(sProvider, workspace);
-    Node webNode = root.getNode(EMAIL_CHANNEL);
+    //
+    return getOrCreateWebDateNode(root, dateNodeName);
+  }
+
+  protected Node getOrCreateWebDateNode(Node root, String dateNodeName) throws Exception {
+    Node webNode = root.getNode(WEB_CHANNEL);
     if (webNode.hasNode(dateNodeName)) {
       return webNode.getNode(dateNodeName);
     }

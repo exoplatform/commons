@@ -29,7 +29,6 @@ import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
-import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.notification.template.ResourceBundleConfigDeployer;
@@ -61,7 +60,6 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   @Override
   public void start() {
     Set<String> datas = new HashSet<String>();
-    // register plugin
     
     for (AbstractNotificationPlugin plugin : pluginMap.values()) {
       boolean isChild = (plugin instanceof AbstractNotificationChildPlugin);
@@ -129,29 +127,6 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   @Override
   public void addPlugin(AbstractNotificationPlugin plugin) {
     pluginMap.put(plugin.getKey(), plugin);
-    //TODO: need remove after done channel.
-    PluginConfig cf = plugin.getPluginConfigs().get(0);
-    TemplateConfig tf = cf.getTemplateConfig();
-    String templatePath = tf.getTemplatePath();
-    if (templatePath != null && templatePath.length() > 0) {
-      try {
-        String template = TemplateUtils.loadGroovyTemplate(templatePath);
-        plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
-      } catch (Exception e) {
-        ExoLogger.getExoLogger(getClass()).warn("Failed to build groovy template engine for: " + plugin.getId(), e);
-      }
-    }
-    String intranetTemplatePath = tf.getIntranetTemplatePath();
-    if (intranetTemplatePath != null && intranetTemplatePath.length() > 0) {
-      try {
-        String template = TemplateUtils.loadGroovyTemplate(intranetTemplatePath);
-        plugin.setIntranetNotificationEngine(gTemplateEngine.createTemplate(template));
-      } catch (Exception e) {
-        ExoLogger.getExoLogger(getClass()).warn("Failed to build groovy template engine for: " + plugin.getId(), e);
-      }
-    }
-    //
-    cf.setBundlePath(tf.getBundlePath());
   }
 
   @Override

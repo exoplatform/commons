@@ -19,6 +19,7 @@ package org.exoplatform.commons.api.notification.service.template;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 
 public class TemplateContext extends HashMap<String, Object> {
@@ -27,7 +28,7 @@ public class TemplateContext extends HashMap<String, Object> {
 
   private String            pluginId;
 
-  private String            channelId        = UserSetting.EMAIL_CHANNEL;
+  private ChannelKey        channelKey;
 
   private String            language;
 
@@ -40,14 +41,14 @@ public class TemplateContext extends HashMap<String, Object> {
   }
 
   public TemplateContext(String pluginId, String language) {
-    this.channelId = UserSetting.EMAIL_CHANNEL;
+    this.channelKey = ChannelKey.key(UserSetting.EMAIL_CHANNEL);
     this.pluginId = pluginId;
     this.language = language;
   }
 
-  public static TemplateContext newChannelInstance(String channelId, String pluginId, String language) {
+  public static TemplateContext newChannelInstance(ChannelKey channelKey, String pluginId, String language) {
     TemplateContext context = new TemplateContext(pluginId, language);
-    context.channelId = channelId;
+    context.channelKey = channelKey;
     return context;
   }
   
@@ -68,8 +69,8 @@ public class TemplateContext extends HashMap<String, Object> {
     return this;
   }
 
-  public TemplateContext channelId(String channelId) {
-    this.channelId = channelId;
+  public TemplateContext channelKey(ChannelKey channelKey) {
+    this.channelKey = channelKey;
     return this;
   }
 
@@ -100,8 +101,8 @@ public class TemplateContext extends HashMap<String, Object> {
   /**
    * @return the channelId
    */
-  public String getChannelId() {
-    return channelId;
+  public ChannelKey getChannelKey() {
+    return channelKey;
   }
 
   /**

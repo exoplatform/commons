@@ -94,7 +94,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
     strQuery.append(NTF_NOTIF_INFO).append(" WHERE ");
     if (filter.getJcrPath() == null || filter.getJcrPath().isEmpty()) {
-      filter.setJcrPath(session.getItem("/" + NOTIFICATION_HOME_NODE + "/" + EMAIL_CHANNEL).getPath());
+      filter.setJcrPath(session.getItem("/" + NOTIFICATION_HOME_NODE + "/" + WEB_CHANNEL).getPath());
     }
     strQuery.append("jcr:path LIKE '").append(filter.getJcrPath()).append("/%' ");
     if (filter.getUserId() != null && !filter.getUserId().isEmpty()) {

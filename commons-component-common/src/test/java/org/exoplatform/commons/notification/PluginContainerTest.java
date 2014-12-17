@@ -19,12 +19,16 @@ package org.exoplatform.commons.notification;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
+import org.exoplatform.commons.notification.channel.MailChannel;
+import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.plugin.PluginTest;
 import org.exoplatform.commons.notification.template.TemplateUtils;
@@ -39,8 +43,7 @@ public class PluginContainerTest extends BaseNotificationTestCase {
   public void setUp() throws Exception {
     super.setUp();
     container = getService(PluginContainer.class);
-    assertNotNull(container);
-    
+    assertNotNull(container);    
   }
   
   @Override
@@ -66,8 +69,11 @@ public class PluginContainerTest extends BaseNotificationTestCase {
     assertEquals(PluginTest.ID, notificationInfo.getKey().getId());
     //
     ctx.setNotificationInfo(notificationInfo);
-    MessageInfo messageInfo = plugin.buildMessage(ctx);
-
+    //
+    AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(MailChannel.ID));
+    assertNotNull(channel);
+    MessageInfo messageInfo = channel.getTemplateBuilder(pluginKey).buildMessage(ctx);
+    
     // check subject
     assertEquals("The subject Test plugin notification", messageInfo.getSubject());
     // check content
@@ -83,7 +89,7 @@ public class PluginContainerTest extends BaseNotificationTestCase {
   }
 
   public void testRenderPlugin() throws Exception {
-    TemplateContext ctx = new TemplateContext("DigestDailyPlugin", null);
+    TemplateContext ctx = TemplateContext.newChannelInstance(ChannelKey.key(MailChannel.ID), DigestDailyPlugin.ID, null);
     ctx.put("FIRSTNAME", "User ROOT");
     ctx.put("USER", "root");
     ctx.put("ACTIVITY", "Content of Activity");

@@ -167,7 +167,7 @@
     <component-plugin>
       <name>mail.channel.template</name>
       <set-method>registerTemplateProvider</set-method>
-      <type>org.exoplatform.commons.notification.channel.template.DigestMailTemplateProvider</type>
+      <type>org.exoplatform.commons.notification.mock.MockDigestMailTemplateProvider</type>
       <init-params>
         <value-param>
           <name>channel-id</name>
@@ -326,8 +326,8 @@
                 </value>
                 <value>               
                   <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>emailChannel</string></field>
-                    <field  name="path"><string>/eXoNotification/emailChannel</string></field>
+                    <field  name="alias"><string>webChannel</string></field>
+                    <field  name="path"><string>/eXoNotification/web</string></field>
                     <field name="nodeType"><string>ntf:channel</string></field>
                     <field name="permissions">
                       <collection type="java.util.ArrayList">
@@ -368,18 +368,8 @@
             <field name="pluginId">
               <string>DigestDailyPlugin</string>
             </field>
-            <field name="groupId">
-              <string></string>
-            </field>
-            <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-                <field name="bundlePath">
-                  <string>locale.notification.template.Notification</string>
-                </field>
-                <field name="templatePath">
-                  <string>classpath:/groovy/notification/template/provider1.gtmpl</string>
-                </field>
-              </object>
+            <field name="bundlePath">
+              <string>locale.notification.template.Notification</string>
             </field>
           </object>
         </object-param>
@@ -402,18 +392,8 @@
             <field name="pluginId">
               <string>DigestWeeklyPlugin</string>
             </field>
-            <field name="groupId">
-              <string></string>
-            </field>
-            <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-                <field name="bundlePath">
-                  <string>locale.notification.template.Notification</string>
-                </field>
-                <field name="templatePath">
-                  <string>classpath:/groovy/notification/template/provider1.gtmpl</string>
-                </field>
-              </object>
+            <field name="bundlePath">
+              <string>locale.notification.template.Notification</string>
             </field>
           </object>
         </object-param>
@@ -451,16 +431,9 @@
 	          <field name="groupId">
 	            <string>other</string>
 	          </field>
-	          <field name="templateConfig">
-	            <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-	              <field name="bundlePath">
-	                <string>locale.notification.template.Notification</string>
-	              </field>
-	              <field name="templatePath">
-	                <string>classpath:/groovy/notification/template/TestPlugin.gtmpl</string>
-	              </field>
-	            </object>
-	          </field>
+            <field name="bundlePath">
+              <string>locale.notification.template.Notification</string>
+            </field>
 	        </object>
 	      </object-param>
 	    </init-params>
@@ -475,6 +448,10 @@
 	    <type>org.exoplatform.commons.notification.plugin.ChildPluginTest</type>
 	    <description>Initial information for default child plugin.</description>
 	    <init-params>
+ 	      <value-param>
+	        <name>templatePath</name>
+	        <value><![CDATA[classpath:/groovy/notification/template/TestChildPlugin.gtmpl]]></value>
+	      </value-param>
 	      <values-param>
 	        <name>parentIds</name>
 	        <description>Add parent of plugin</description>
@@ -487,16 +464,9 @@
 	          <field name="pluginId">
 	            <string>Child_Plugin</string>
 	          </field>
-	          <field name="templateConfig">
-	            <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-	              <field name="bundlePath">
-	                <string>locale.notification.template.Notification</string>
-	              </field>
-	              <field name="templatePath">
-	                <string>classpath:/groovy/notification/template/TestChildPlugin.gtmpl</string>
-	              </field>
-	            </object>
-	          </field>
+            <field name="bundlePath">
+             <string>locale.notification.template.Notification</string>
+            </field>
 	        </object>
 	      </object-param>
 	    </init-params>

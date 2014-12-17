@@ -22,13 +22,17 @@ import groovy.text.Template;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
+import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.api.notification.template.ElementVisitor;
 import org.exoplatform.commons.utils.CommonsUtils;
-
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -51,15 +55,22 @@ public class GroovyElementVisitor implements ElementVisitor {
     this.ctx.put("_ctx", element);
     //
     try {
-      PluginKey key = new PluginKey(ctx.getPluginId());
       Template engine = null;
-      if (Boolean.parseBoolean(String.valueOf(ctx.get("isIntranet")))) {
-        engine = CommonsUtils.getService(PluginContainer.class).getPlugin(key).getIntranetNotificationEngine();
+      PluginKey pluginKey = new PluginKey(ctx.getPluginId());
+      AbstractNotificationPlugin plugin = CommonsUtils.getService(PluginContainer.class).getPlugin(pluginKey);
+      if (plugin instanceof AbstractNotificationChildPlugin) {
+        engine = ((AbstractNotificationChildPlugin) plugin).getTemplateEngine();
       } else {
-        engine = CommonsUtils.getService(PluginContainer.class).getPlugin(key).getTemplateEngine();
+        AbstractChannel channel = CommonsUtils.getService(ChannelManager.class).getChannel(ctx.getChannelKey());
+        AbstractTemplateBuilder builder = channel.getTemplateBuilder(pluginKey);
+        if (builder != null) {
+          engine = builder.getTemplateEngine();
+        }
       }
-      Writable writable = engine.make(getTemplateContext());
-      writable.writeTo(writer);
+      if (engine != null) {
+        Writable writable = engine.make(getTemplateContext());
+        writable.writeTo(writer);
+      }
     } catch (Exception e) {
       LOG.error("Failed at visit().", e);
     }

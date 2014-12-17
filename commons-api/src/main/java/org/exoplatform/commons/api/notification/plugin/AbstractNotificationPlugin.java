@@ -16,16 +16,12 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
-import groovy.text.Template;
-
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
@@ -33,10 +29,6 @@ import org.exoplatform.services.organization.OrganizationService;
 
 public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
   List<PluginConfig> pluginConfig = new ArrayList<PluginConfig>();
-  // TODO: need remove after done channel.
-  private Template   engine;
-  // TODO: need remove after done channel.
-  private Template   intranetNotificationEngine;
   
   public AbstractNotificationPlugin(InitParams initParams) {
     pluginConfig = initParams.getObjectParamValues(PluginConfig.class);
@@ -84,66 +76,12 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
   protected abstract NotificationInfo makeNotification(NotificationContext ctx);
   
   /**
-   * Makes the MessageInfor from given NotificationMessage what keep inside NotificationContext
-   * @param context
-   * @return
-   */
-  protected abstract MessageInfo makeMessage(NotificationContext ctx);
-  
-  /**
-  * Makes the MessageInfor from given NotificationMessage what keep inside NotificationContext
-  * it's using to display on the popover
-  * @param context
-  * @return
-  */
- protected abstract String makeUIMessage(NotificationContext ctx);
-  
-  /**
-   * Makes the Digest message from given NotificationMessage what keep inside NotificationContext
-   * @param ctx
-   * @param wtiter
-   * @return
-   */
-  protected abstract boolean makeDigest(NotificationContext ctx, Writer writer);
-  
-  /**
    * Makes notification
    * @param ctx
    * @return
    */
   public NotificationInfo buildNotification(NotificationContext ctx) {
     return makeNotification(ctx);
-  }
-  
-  /**
-   * Makes massage
-   * @param ctx
-   * @return
-   */
-  public MessageInfo buildMessage(NotificationContext ctx) {
-    NotificationInfo message = ctx.getNotificationInfo();
-    MessageInfo messageInfo = makeMessage(ctx);
-    return messageInfo.pluginId(getId()).from(NotificationPluginUtils.getFrom(message.getFrom()))
-               .to(NotificationPluginUtils.getTo(message.getTo())).end();
-  }
-  
-  /**
-   * Makes ui massage
-   * @param ctx
-   * @return
-   */
-  public String buildUIMessage(NotificationContext ctx) {
-    return makeUIMessage(ctx);
-  }
-
-  /**
-   * Makes digest message
-   * @param ctx
-   * @param writer
-   * @return
-   */
-  public boolean buildDigest(NotificationContext ctx, Writer writer) {
-    return makeDigest(ctx, writer);
   }
   
   /**
@@ -154,41 +92,7 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
     return PluginKey.key(this);
   }
   
-  /**
-   * 
-   * @param message
-   * @return
-   */
-  protected String getLanguage(NotificationInfo message) {
-    return NotificationPluginUtils.getLanguage(message.getTo());
-  }
-  
   protected OrganizationService getOrganizationService() {
     return NotificationPluginUtils.getOrganizationService();
   }
-
-  /**
-   * Get TemplateEngine of plugin
-   * @return the TemplateEngine
-   */
-  public Template getTemplateEngine() {
-    return engine;
-  }
-
-  /**
-   * Set TemplateEngine for plugin
-   * @param engine the TemplateEngine to set
-   */
-  public void setTemplateEngine(Template engine) {
-    this.engine = engine;
-  }
-
-  public Template getIntranetNotificationEngine() {
-    return intranetNotificationEngine;
-  }
-
-  public void setIntranetNotificationEngine(Template intranetNotificationEngine) {
-    this.intranetNotificationEngine = intranetNotificationEngine;
-  }
-
 }

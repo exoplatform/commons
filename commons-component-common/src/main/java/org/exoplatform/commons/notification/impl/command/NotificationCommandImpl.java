@@ -44,21 +44,10 @@ public class NotificationCommandImpl implements NotificationCommand {
   }
 
   @Override
-  public MessageInfo processMessage(NotificationContext ctx) {
-    return plugin.buildMessage(ctx);
-  }
-
-  @Override
   public NotificationInfo processNotification(NotificationContext ctx) {
     return plugin.buildNotification(ctx);
   }
 
-  @Override
-  public void processDigest(NotificationContext ctx, Writer writer) {
-    plugin.buildDigest(ctx, writer);
-    
-  }
-  
   @Override
   public String toString() {
     return "NotificationCommand[" + plugin.getKey().getId() + "]";

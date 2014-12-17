@@ -16,9 +16,15 @@
  */
 package org.exoplatform.commons.notification.channel.template;
 
+import java.io.Writer;
+
+import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfig;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfigs;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.container.xml.InitParams;
@@ -39,5 +45,28 @@ public class DigestMailTemplateProvider extends TemplateProvider {
 
   public DigestMailTemplateProvider(InitParams initParams) {
     super(initParams);
+    templateBuilders.put(new PluginKey(DigestDailyPlugin.ID), dailyBuilder);
+    templateBuilders.put(new PluginKey(DigestWeeklyPlugin.ID), weeklyBuilder);
   }
+  
+  AbstractTemplateBuilder dailyBuilder = new AbstractTemplateBuilder() {
+    @Override
+    protected MessageInfo makeMessage(NotificationContext ctx) {
+      return null;
+    }
+    @Override
+    protected boolean makeDigest(NotificationContext ctx, Writer writer) {
+      return false;
+    }
+  }; 
+  AbstractTemplateBuilder weeklyBuilder = new AbstractTemplateBuilder() {
+    @Override
+    protected MessageInfo makeMessage(NotificationContext ctx) {
+      return null;
+    }
+    @Override
+    protected boolean makeDigest(NotificationContext ctx, Writer writer) {
+      return false;
+    }
+  }; 
 }

@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.notification.channel;
 
+import groovy.text.GStringTemplateEngine;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,11 +26,15 @@ import java.util.Map;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.picocontainer.Startable;
 
 /**
  * Created by The eXo Platform SAS
@@ -36,14 +42,17 @@ import org.exoplatform.services.log.Log;
  *          thanhvc@exoplatform.com
  * Dec 12, 2014  
  */
-public class ChannelManagerImpl implements ChannelManager {
+public class ChannelManagerImpl implements ChannelManager, Startable {
   /** logger */
   private static final Log LOG = ExoLogger.getLogger(ChannelManagerImpl.class);
   /** Defines the channels: key = channelId and Channel*/
   private final Map<ChannelKey, AbstractChannel> channels;
-  
+  private final List<TemplateProvider> providers;
+  private final GStringTemplateEngine gTemplateEngine;
   public ChannelManagerImpl() {
     channels = new HashMap<ChannelKey, AbstractChannel>();
+    providers = new LinkedList<TemplateProvider>();
+    gTemplateEngine = new GStringTemplateEngine();
   }
   
   /**
@@ -72,12 +81,7 @@ public class ChannelManagerImpl implements ChannelManager {
    */
   @Override
   public void registerTemplateProvider(TemplateProvider provider) {
-    AbstractChannel channel = channels.get(provider.getChannelKey());
-    if (channel != null) {
-      channel.registerTemplateProvider(provider);
-    } else {
-      LOG.warn("Register the new TemplateProvider is unsucessful");
-    }
+    providers.add(provider);
   }
 
   @Override
@@ -116,4 +120,39 @@ public class ChannelManagerImpl implements ChannelManager {
     return Collections.unmodifiableList(channels);
   }
 
+  @Override
+  public void start() {
+    for (TemplateProvider provider : providers) {
+      AbstractChannel channel = channels.get(provider.getChannelKey());
+      if (channel != null) {
+        channel.registerTemplateProvider(addTemplateEngine(provider));
+      } else {
+        LOG.warn("Register the new TemplateProvider is unsucessful");
+      }
+    }
+  }
+
+  @Override
+  public void stop() {
+  }
+
+  public TemplateProvider addTemplateEngine(TemplateProvider provider) {
+    Map<PluginKey, AbstractTemplateBuilder> builders = provider.getTemplateBuilder();
+    Map<PluginKey, String> configs = provider.getTemplateFilePathConfigs();
+    for (PluginKey plugin : configs.keySet()) {
+      String templatePath = configs.get(plugin);
+      if (templatePath != null && templatePath.length() > 0) {
+        try {
+          AbstractTemplateBuilder builder = builders.get(plugin);
+          if (builder != null) {
+            String template = TemplateUtils.loadGroovyTemplate(templatePath);
+            builder.setTemplateEngine(gTemplateEngine.createTemplate(template));
+          }
+        } catch (Exception e) {
+          LOG.warn("Failed to build groovy template engine for: " + plugin.getId() + " templatePath: " + templatePath, e);
+        }
+      }
+    }
+    return provider;
+  }
 }
