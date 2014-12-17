@@ -17,12 +17,22 @@
 package org.exoplatform.commons.notification.impl.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.WebFilter;
 import org.exoplatform.commons.api.notification.service.WebNotificationService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
+import org.exoplatform.commons.notification.channel.WebChannel;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.notification.net.WebNotificationSender;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -52,8 +62,27 @@ public class WebNotificationServiceImpl implements WebNotificationService {
   public List<String> getNotificationContents(WebFilter filter) {
     List<String> messages = new ArrayList<String>();
     List<NotificationInfo> notificationInfos = webStorage.get(filter);
+    NotificationContext ctx = NotificationContextImpl.cloneInstance();
+    AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(WebChannel.ID));
     //
-    
+    for (NotificationInfo notification : notificationInfos) {
+      boolean isText = true;
+      try {
+        AbstractTemplateBuilder builder = channel.getTemplateBuilder(notification.getKey());
+        if(builder != null) {
+          MessageInfo msg = builder.buildMessage(ctx.setNotificationInfo(notification));
+          if(msg != null) {
+            messages.add(msg.getBody());
+            isText = false;
+          }
+        }
+      } catch (Exception e) {
+        LOG.error("Failed to build web notification: " + notification.getId(), e);
+      }
+      if (isText) {
+        messages.add(notification.getTitle());
+      }
+    }
     return messages;
   }
 

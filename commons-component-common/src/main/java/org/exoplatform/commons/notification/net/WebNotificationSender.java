@@ -45,7 +45,7 @@ public class WebNotificationSender {
           continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json, String.valueOf(message.hashCode()));
         } else {
           JsonValue json = new JsonGeneratorImpl().createJsonObject(message);
-          continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json, message.toString());
+          continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json, String.valueOf(message.hashCode()));
         }
       }
     } catch (Exception e) {

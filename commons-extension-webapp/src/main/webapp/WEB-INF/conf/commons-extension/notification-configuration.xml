@@ -6,11 +6,6 @@
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   
    <component>
-     <key>org.exoplatform.commons.notification.net.WebSocketBootstrap</key>
-     <type>org.exoplatform.commons.notification.net.WebSocketBootstrap</type>
-   </component>
-   
-   <component>
     <key>org.exoplatform.commons.notification.net.router.ExoRouter</key>
     <type>org.exoplatform.commons.notification.net.router.ExoRouter</type>
     <component-plugins>
@@ -524,6 +519,9 @@
             <field name="groupId">
               <string></string>
             </field>
+            <field name="bundlePath">
+              <string>locale.notification.template.CommonsNotification</string>
+            </field>
           </object>
         </object-param>
       </init-params>
@@ -547,6 +545,9 @@
             </field>
             <field name="groupId">
               <string></string>
+            </field>
+            <field name="bundlePath">
+              <string>locale.notification.template.CommonsNotification</string>
             </field>
           </object>
         </object-param>

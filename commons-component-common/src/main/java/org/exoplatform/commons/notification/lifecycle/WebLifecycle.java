@@ -66,7 +66,6 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   @Override
   public void process(NotificationContext ctx, String userId) {
     LOG.info("Web Notification process user: " + userId);
-    
   }
   
   @Override
@@ -86,6 +85,7 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       MessageInfo msg = buildMessageInfo(ctx);
       if(msg != null) {
         WebNotificationSender.sendJsonMessage(notification.getTo(), msg);
+        notification.setTitle(msg.getBody());
       }
     } catch (Exception e) {
       LOG.error("Failed to connect with server : " + e, e.getMessage());
