@@ -28,12 +28,10 @@ import org.exoplatform.commons.api.notification.service.setting.UserSettingServi
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
-import org.exoplatform.commons.notification.net.WebSocketBootstrap;
-import org.exoplatform.commons.notification.net.WebSocketServer;
+import org.exoplatform.commons.notification.net.WebNotificationSender;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.vertx.java.core.json.JsonObject;
 
 /**
  * Created by The eXo Platform SAS
@@ -87,9 +85,7 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
     try {
       MessageInfo msg = buildMessageInfo(ctx);
       if(msg != null) {
-        WebSocketBootstrap.sendMessage(WebSocketServer.NOTIFICATION_WEB_IDENTIFIER,
-                                       notification.getTo(),
-                                       new JsonObject().putString("message", msg.getBody()).encode());
+        WebNotificationSender.sendJsonMessage(notification.getTo(), msg);
       }
     } catch (Exception e) {
       LOG.error("Failed to connect with server : " + e, e.getMessage());

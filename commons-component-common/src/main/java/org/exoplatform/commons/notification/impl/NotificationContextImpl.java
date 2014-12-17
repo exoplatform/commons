@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
@@ -52,12 +53,15 @@ public final class NotificationContextImpl implements NotificationContext {
   
   private final PluginSettingService settingService;
 
+  private final ChannelManager channelManager;
+
   private NotificationContextImpl() {
     //TODO apply static method for Notification
     //Create the pluginConttext for operation-per-session such as transaction 
     executor = new NotificationExecutorImpl();
     pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
     settingService = CommonsUtils.getService(PluginSettingService.class);
+    channelManager = CommonsUtils.getService(ChannelManager.class);
   }
 
   public static NotificationContext cloneInstance() {
@@ -72,6 +76,11 @@ public final class NotificationContextImpl implements NotificationContext {
   @Override
   public PluginContainer getPluginContainer() {
     return this.pluginService;
+  }
+
+  @Override
+  public ChannelManager getChannelManager() {
+    return this.channelManager;
   }
   
   public PluginSettingService getPluginSettingService() {

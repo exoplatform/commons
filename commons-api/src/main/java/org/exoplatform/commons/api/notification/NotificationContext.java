@@ -18,13 +18,14 @@ package org.exoplatform.commons.api.notification;
 
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 
 public interface NotificationContext extends Cloneable {
 
@@ -137,4 +138,9 @@ public interface NotificationContext extends Cloneable {
    */
   PluginContainer getPluginContainer();
   
+  /**
+   * Gets the channel manager what contains all channel on Notification
+   * @return
+   */
+  ChannelManager getChannelManager();
 }
