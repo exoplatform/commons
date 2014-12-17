@@ -74,4 +74,9 @@ public class WebChannel extends AbstractChannel {
     MessageInfo msg = builder.buildMessage(ctx);
     LOG.info("Web::{ userId:" + userId + ", pluginId: " + pluginId + ", message: "+ msg.getBody() + "}");
   }
+  
+  @Override
+  public AbstractTemplateBuilder getTemplateBuilder(PluginKey key) {
+    return this.templateBuilders.get(key);
+  }
 }
