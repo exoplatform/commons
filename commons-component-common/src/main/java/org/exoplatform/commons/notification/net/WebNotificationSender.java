@@ -42,10 +42,10 @@ public class WebNotificationSender {
         ContinuationService continuation = CommonsUtils.getService(ContinuationService.class);
         if (message instanceof String) {
           JsonValue json = new StringValue("{ \"body\" : " + message.toString() + "}");
-          continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json, String.valueOf(message.hashCode()));
+          continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json);
         } else {
           JsonValue json = new JsonGeneratorImpl().createJsonObject(message);
-          continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json, String.valueOf(message.hashCode()));
+          continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json, message.toString());
         }
       }
     } catch (Exception e) {
