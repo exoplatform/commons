@@ -208,7 +208,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       .with("UUID", node.getUUID())
       .setId(node.getName())
       .end();
-    List<String> ignoreProperties = Arrays.asList(NTF_SENDER, NTF_PLUGIN_ID, NTF_TEXT, NTF_OWNER, NTF_LAST_MODIFIED_DATE);
+    List<String> ignoreProperties = Arrays.asList(NTF_PLUGIN_ID, NTF_TEXT, NTF_OWNER, NTF_LAST_MODIFIED_DATE);
     PropertyIterator iterator = node.getProperties();
     while (iterator.hasNext()) {
       Property p = iterator.nextProperty();

@@ -46,10 +46,16 @@ public interface WebNotificationService {
   void markReadAll(String userId);
 
   /**
+   * Remove the notification on top menu popup.
+   * @param notificationId
+   */
+  void hidePopover(String notificationId);
+
+  /**
    * @param filter the filter to set web notifications
    * @throws Exception
    */
   List<String> getNotificationContents(WebFilter filter);
 
-  void remove(String userId, String notificationId);
+  void remove(String notificationId);
 }

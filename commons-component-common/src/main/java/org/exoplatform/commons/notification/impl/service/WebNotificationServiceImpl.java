@@ -17,7 +17,6 @@
 package org.exoplatform.commons.notification.impl.service;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
@@ -26,13 +25,11 @@ import org.exoplatform.commons.api.notification.channel.template.AbstractTemplat
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.WebFilter;
 import org.exoplatform.commons.api.notification.service.WebNotificationService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.notification.net.WebNotificationSender;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -87,7 +84,12 @@ public class WebNotificationServiceImpl implements WebNotificationService {
   }
 
   @Override
-  public void remove(String userId, String notificationId) {
+  public void remove(String notificationId) {
     webStorage.remove(notificationId);
+  }
+
+  @Override
+  public void hidePopover(String notificationId) {
+    webStorage.hidePopover(notificationId);
   }
 }
