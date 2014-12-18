@@ -362,6 +362,6 @@ public class UserSetting {
 
   private static List<String> getDefaultSettingActiveChannels() {
     String activeChannels = System.getProperty("exo.notification.channels", "");
-    return Arrays.asList(activeChannels.split(","));
+    return activeChannels.isEmpty() ? new ArrayList<String>() : Arrays.asList(activeChannels.split(","));
   }
 }
