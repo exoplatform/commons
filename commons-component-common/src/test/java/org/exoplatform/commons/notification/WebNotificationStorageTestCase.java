@@ -18,7 +18,6 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
 
   public WebNotificationStorageTestCase() {
   }
-  
   private WebNotificationStorage   webStorage;
   
   @Override

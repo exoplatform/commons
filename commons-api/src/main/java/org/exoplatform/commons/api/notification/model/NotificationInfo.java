@@ -192,6 +192,9 @@ public class NotificationInfo {
 
   public NotificationInfo to(String sendToUserId) {
     this.sendToUserIds.add(sendToUserId);
+    if (to == null) {
+      to = sendToUserId;
+    }
     return this;
   }
 

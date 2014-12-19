@@ -102,10 +102,8 @@ public class DigestorServiceImpl implements DigestorService {
       }
 
       DigestInfo digestInfo = new DigestInfo(jobContext, userSetting);
-      
-      ChannelKey channelKey = ChannelKey.key(MailChannel.ID);
-      TemplateContext ctx = TemplateContext.newChannelInstance(channelKey, digestInfo.getPluginId(), digestInfo.getLocale().getLanguage());
 
+      TemplateContext ctx = TemplateContext.newChannelInstance(channel.getKey(), digestInfo.getPluginId(), digestInfo.getLocale().getLanguage());
       ctx.put("FIRSTNAME", digestInfo.getFirstName());
       ctx.put("PORTAL_NAME", digestInfo.getPortalName());
       ctx.put("PORTAL_HOME", digestInfo.getPortalHome());

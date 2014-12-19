@@ -132,7 +132,7 @@ public abstract class AbstractService {
 
   public static final String VALUE_PATTERN            = "{VALUE}";
 
-  public static final String DATE_NODE_PATTERN        = "yyyymmdd";
+  public static final String DATE_NODE_PATTERN        = "yyyyMMdd";
 
   public static final String NTF_NAME_SPACE           = "ntf:";
 

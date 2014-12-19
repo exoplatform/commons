@@ -117,7 +117,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       strQuery.append("ORDER BY ").append(NTF_LAST_MODIFIED_DATE).append(" DESC");
     }
     //
-    LOG.info(" The query get web notification:\n" + strQuery);
+    LOG.debug(" The query get web notification:\n" + strQuery);
     QueryManager qm = session.getWorkspace().getQueryManager();
     QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
     if (filter.getLimit() > 0) {
