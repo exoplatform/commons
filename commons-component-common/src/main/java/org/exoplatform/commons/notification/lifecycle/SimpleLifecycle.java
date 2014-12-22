@@ -27,10 +27,10 @@ import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLi
  */
 public final class SimpleLifecycle extends AbstractNotificationLifecycle {
   @Override
-  public void process(NotificationContext ctx, String userId) {}
+  public void process(NotificationContext ctx, String userId) {
+    getChannel().dispatch(ctx, userId);
+  }
   
   @Override
-  public void process(NotificationContext ctx, String... userIds) {
-    
-  }
+  public void process(NotificationContext ctx, String... userIds) {}
 }

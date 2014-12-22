@@ -21,6 +21,8 @@ import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Created by The eXo Platform SAS
@@ -29,6 +31,8 @@ import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
  * Dec 12, 2014  
  */
 public class ConsoleChannel extends AbstractChannel {
+  /** logger */
+  private static final Log LOG = ExoLogger.getLogger(ConsoleChannel.class);
   /** */
   private final static String ID = "CONSOLE_CHANNEL";
   /** */
@@ -50,7 +54,7 @@ public class ConsoleChannel extends AbstractChannel {
   
   @Override
   public void dispatch(NotificationContext ctx, String userId) {
-
+    LOG.info("userId will be received the message.");
   }
   
   @Override
