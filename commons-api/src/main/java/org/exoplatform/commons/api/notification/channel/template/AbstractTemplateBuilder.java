@@ -33,8 +33,8 @@ import org.exoplatform.services.organization.OrganizationService;
  * Dec 13, 2014  
  */
 public abstract class AbstractTemplateBuilder {
+  /** Holding the template to generate message.*/
   private Template engine;
-  
   /**
    * Makes the MessageInfor from given NotificationMessage what keep inside NotificationContext
    * @param context

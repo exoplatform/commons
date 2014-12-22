@@ -47,8 +47,8 @@ public class ChannelManagerImpl implements ChannelManager, Startable {
   private static final Log LOG = ExoLogger.getLogger(ChannelManagerImpl.class);
   /** Defines the channels: key = channelId and Channel*/
   private final Map<ChannelKey, AbstractChannel> channels;
-  private final List<TemplateProvider> providers;
-  private final GStringTemplateEngine gTemplateEngine;
+  private List<TemplateProvider> providers;
+  private GStringTemplateEngine gTemplateEngine;
   public ChannelManagerImpl() {
     channels = new HashMap<ChannelKey, AbstractChannel>();
     providers = new LinkedList<TemplateProvider>();
@@ -122,21 +122,38 @@ public class ChannelManagerImpl implements ChannelManager, Startable {
 
   @Override
   public void start() {
-    for (TemplateProvider provider : providers) {
-      AbstractChannel channel = channels.get(provider.getChannelKey());
-      if (channel != null) {
-        channel.registerTemplateProvider(addTemplateEngine(provider));
-      } else {
-        LOG.warn("Register the new TemplateProvider is unsucessful");
+    try {
+      for (TemplateProvider provider : providers) {
+        AbstractChannel channel = channels.get(provider.getChannelKey());
+        if (channel != null) {
+          channel.registerTemplateProvider(addTemplateEngine(provider));
+        } else {
+          LOG.warn("Register the new TemplateProvider is unsucessful");
+        }
       }
+    } finally {
+      providers = null;
+      gTemplateEngine = null;
     }
+    
   }
 
   @Override
   public void stop() {
   }
 
-  public TemplateProvider addTemplateEngine(TemplateProvider provider) {
+  /**
+   * Makes the template file to Groovy template.
+   * It's ready to generate the message.
+   * 
+   * Why needs to do this way?
+   * - TemplateBuilder and TemplateProvider can be extensible or override. So only final list to make the template.
+   * - Don't waste time to build the template for useless template. 
+   
+   * @param provider
+   * @return
+   */
+  private TemplateProvider addTemplateEngine(TemplateProvider provider) {
     Map<PluginKey, AbstractTemplateBuilder> builders = provider.getTemplateBuilder();
     Map<PluginKey, String> configs = provider.getTemplateFilePathConfigs();
     for (PluginKey plugin : configs.keySet()) {
