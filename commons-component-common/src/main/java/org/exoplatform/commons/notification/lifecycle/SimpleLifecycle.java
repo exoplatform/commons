@@ -18,6 +18,10 @@ package org.exoplatform.commons.notification.lifecycle;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
+import org.exoplatform.commons.utils.CommonsUtils;
 
 /**
  * Created by The eXo Platform SAS
@@ -32,5 +36,25 @@ public final class SimpleLifecycle extends AbstractNotificationLifecycle {
   }
   
   @Override
-  public void process(NotificationContext ctx, String... userIds) {}
+  public void process(NotificationContext ctx, String... userIds) {
+    NotificationInfo notification = ctx.getNotificationInfo();
+    String pluginId = notification.getKey().getId();
+    UserSettingService userService = CommonsUtils.getService(UserSettingService.class);
+    
+    for (String userId : userIds) {
+      UserSetting userSetting = userService.get(userId);
+      //check channel active for user
+      if (!userSetting.isChannelActive(getChannel().getId())) {
+        continue;
+      }
+      
+      if (userSetting.isActive(getChannel().getId(), pluginId)) {
+        process(ctx.setNotificationInfo(notification.clone(true).setTo(userId)), userId);
+      }
+    }
+  }
+  
+  @Override
+  public void send(NotificationContext ctx) {
+  }
 }

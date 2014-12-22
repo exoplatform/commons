@@ -57,8 +57,8 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       
       if (userSetting.isActive(WebChannel.ID, pluginId)) {
         send(ctx.setNotificationInfo(notification.clone(true).setTo(userId)));
+        store(ctx.getNotificationInfo());
       }
-      
     }
 
   }
@@ -70,7 +70,7 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   
   @Override
   public void store(NotificationInfo notifInfo) {
-    LOG.info("store the notification to db for Web channel.");
+    LOG.info("WEB:: Store the notification to db by Web channel.");
     notifInfo.with(AbstractService.NTF_SHOW_POPOVER, "true")
              .with(AbstractService.NTF_READ, "false");
     CommonsUtils.getService(WebNotificationStorage.class).save(notifInfo);
@@ -78,7 +78,7 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   
   @Override
   public void send(NotificationContext ctx) {
-    LOG.info("send the message by Web channel.");
+    LOG.info("WEB:: Send the message by Web channel.");
     NotificationInfo notification = ctx.getNotificationInfo(); 
     getChannel().dispatch(notification.setLastModifiedDate(Calendar.getInstance()));
     try {
@@ -89,13 +89,16 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       }
     } catch (Exception e) {
       LOG.error("Failed to connect with server : " + e, e.getMessage());
-    } finally {
-      //
-      store(notification);
     }
   }
 
-  public MessageInfo buildMessageInfo(NotificationContext ctx) {
+  /**
+   * Builds the message inform from the notification context.
+   * 
+   * @param ctx
+   * @return
+   */
+  private MessageInfo buildMessageInfo(NotificationContext ctx) {
     AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(ctx.getNotificationInfo().getKey());
     return builder.buildMessage(ctx);
   }

@@ -73,10 +73,9 @@ public final class MailChannel extends AbstractChannel {
   
   @Override
   public void dispatch(NotificationContext ctx, String userId) {
-    // TODO call MailSendService to send mail to receipts
     String pluginId = ctx.getNotificationInfo().getKey().getId();
     String templateFilePath = this.templateFilePaths.get(pluginId);
-    LOG.info("Mail::{ userId:" + userId + ", pluginId: " + pluginId + ", templateFilePath: "+ templateFilePath + "}");
+    LOG.debug("Mail::{ userId:" + userId + ", pluginId: " + pluginId + ", templateFilePath: "+ templateFilePath + "}");
   }
   
   @Override
