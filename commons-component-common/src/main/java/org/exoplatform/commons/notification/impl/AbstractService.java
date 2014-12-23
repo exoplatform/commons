@@ -16,7 +16,6 @@
  */
 package org.exoplatform.commons.notification.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import javax.jcr.Node;
@@ -236,47 +235,6 @@ public abstract class AbstractService {
       }
     }
   }
-
-  protected Node getOrCreateWebDateNode(SessionProvider sProvider, String workspace, String dateNodeName) throws Exception {
-    Node root = getNotificationHomeNode(sProvider, workspace);
-    //
-    return getOrCreateWebDateNode(root, dateNodeName);
-  }
-
-  protected Node getOrCreateWebDateNode(Node root, String dateNodeName) throws Exception {
-    Node webNode = root.getNode(WEB_CHANNEL);
-    if (webNode.hasNode(dateNodeName)) {
-      return webNode.getNode(dateNodeName);
-    }
-    Node dateNode = webNode.addNode(dateNodeName, NTF_NOTIF_DATE);
-    webNode.getSession().save();
-    //
-    return dateNode;
-  }
-
-  protected Node getOrCreateWebCurrentDateNode(SessionProvider sProvider, String workspace) throws Exception {
-    return getOrCreateWebDateNode(sProvider, workspace, getDateName(Calendar.getInstance()));
-  }
-
-  protected Node getOrCreateWebUserNode(SessionProvider sProvider, String workspace, String dateNodeName, String userId) throws Exception {
-    Node dateNode = getOrCreateWebDateNode(sProvider, workspace, dateNodeName);
-    Node userNode = null;
-    if (dateNode.hasNode(userId)) {
-      userNode = dateNode.getNode(userId);
-    } else {
-      userNode = dateNode.addNode(userId, NTF_NOTIF_USER);
-    }
-    return userNode;
-  }
-
-  protected Node getOrCreateWebCurrentUserNode(SessionProvider sProvider, String workspace, String userId) throws Exception {
-    return getOrCreateWebUserNode(sProvider, workspace, getDateName(Calendar.getInstance()), userId);
-  }
-
-  protected String getDateName(Calendar cal) {
-    return new SimpleDateFormat(DATE_NODE_PATTERN).format(cal.getTime());
-  }
-  
 
   public static String getCurrentTenantName() {
     try {

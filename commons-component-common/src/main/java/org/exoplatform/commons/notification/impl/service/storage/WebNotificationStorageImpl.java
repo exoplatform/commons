@@ -1,7 +1,9 @@
 package org.exoplatform.commons.notification.impl.service.storage;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,22 +20,64 @@ import javax.jcr.query.QueryManager;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
-import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public class WebNotificationStorageImpl extends AbstractService implements WebNotificationStorage {
   private static final Log LOG = ExoLogger.getLogger(WebNotificationStorageImpl.class);
+  private static final String NOTIFICATION = "notification";
+  private static final String NT_UNSTRUCTURED = "nt:unstructured";
 
   private final ReentrantLock lock = new ReentrantLock();
+  private final NodeHierarchyCreator nodeHierarchyCreator;
+  public WebNotificationStorageImpl(NodeHierarchyCreator nodeHierarchyCreator) {
+    this.nodeHierarchyCreator = nodeHierarchyCreator;
+  }
 
-  private final String workspace;
-  public WebNotificationStorageImpl(NotificationConfiguration configuration) {
-    this.workspace = configuration.getWorkspace();
+  private Session getSession(SessionProvider sProvider) throws Exception {
+    ManageableRepository repository = CommonsUtils.getRepository();
+    return sProvider.getSession(repository.getConfiguration().getDefaultWorkspaceName(), repository);
+  }
+  
+  private String getDateName(Calendar cal) {
+    return new SimpleDateFormat(DATE_NODE_PATTERN).format(cal.getTime());
+  }
+  
+
+  protected Node getOrCreateWebUserNode(SessionProvider sProvider, String dateNodeName, String userId) throws Exception {
+    Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId);
+    try {
+      Node parentNode = null;
+      if (userNodeApp.hasNode(NOTIFICATION)) {
+        parentNode = userNodeApp.getNode(NOTIFICATION);
+      } else {
+        parentNode = userNodeApp.addNode(NOTIFICATION, NT_UNSTRUCTURED);
+      }
+      if (parentNode.hasNode(WEB_CHANNEL)) {
+        parentNode = parentNode.getNode(WEB_CHANNEL);
+      } else {
+        parentNode = parentNode.addNode(WEB_CHANNEL, NTF_CHANNEL);
+      }
+      if (parentNode.hasNode(dateNodeName)) {
+        return parentNode.getNode(dateNodeName);
+      }
+      //
+      Node dateNode = parentNode.addNode(dateNodeName, AbstractService.NTF_NOTIF_DATE);
+      userNodeApp.getSession().save();
+      return dateNode;
+    } finally {
+    }
+  }
+
+  protected Node getOrCreateWebCurrentUserNode(SessionProvider sProvider, String userId) throws Exception {
+    return getOrCreateWebUserNode(sProvider, getDateName(Calendar.getInstance()), userId);
   }
 
   @Override
@@ -43,7 +87,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     try {
       localLock.lock();
       String owner = notification.getTo();
-      Node userNode = getOrCreateWebCurrentUserNode(sProvider, workspace, owner);
+      Node userNode = getOrCreateWebCurrentUserNode(sProvider, owner);
       Node notifyNode = null;
       if(userNode.hasNode(notification.getId())) {
         notifyNode = userNode.getNode(notification.getId());
@@ -90,14 +134,18 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   }
   
   private NodeIterator get(SessionProvider sProvider, WebFilter filter) throws Exception {
-    Session session = getSession(sProvider, workspace);
+    Session session = getSession(sProvider);
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
     strQuery.append(NTF_NOTIF_INFO).append(" WHERE ");
-    if (filter.getJcrPath() == null || filter.getJcrPath().isEmpty()) {
-      filter.setJcrPath(session.getItem("/" + NOTIFICATION_HOME_NODE + "/" + WEB_CHANNEL).getPath());
+    if (isEmpty(filter.getJcrPath())) {
+      if(!isEmpty(filter.getUserId())) {
+        filter.setJcrPath(nodeHierarchyCreator.getUserApplicationNode(sProvider, filter.getUserId()).getPath());
+      } else {
+        filter.setJcrPath("/Users");
+      }
     }
     strQuery.append("jcr:path LIKE '").append(filter.getJcrPath()).append("/%' ");
-    if (filter.getUserId() != null && !filter.getUserId().isEmpty()) {
+    if (!isEmpty(filter.getUserId())) {
       strQuery.append("AND ").append(NTF_OWNER).append("='").append(filter.getUserId()).append("' ");
     }
     if (filter.isOnPopover()) {
@@ -125,6 +173,10 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       query.setOffset(filter.getOffset());
     }
     return query.execute().getNodes();
+  }
+
+  private boolean isEmpty(String str) {
+    return str == null || str.trim().isEmpty();
   }
 
   @Override
@@ -190,7 +242,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
         Node node = it.nextNode();
         node.setProperty(NTF_READ, "true");
       }
-      getSession(sProvider, workspace).save();
+      getSession(sProvider).save();
     } catch (Exception e) {
       LOG.warn("Can not get web notifications by filter: " + filter.toString(), e);
     }
@@ -229,7 +281,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   
   private Node getNodeNotification(SessionProvider sProvider, String notificationId) {
     try {
-      Session session = getSession(sProvider, workspace);
+      Session session = getSession(sProvider);
       try {
         return session.getNodeByUUID(notificationId);
       } catch (ItemNotFoundException e) {

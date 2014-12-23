@@ -1,7 +1,9 @@
 package org.exoplatform.commons.notification;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -13,42 +15,47 @@ import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.plugin.PluginTest;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 
 public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
 
   public WebNotificationStorageTestCase() {
   }
+  private static final String NOTIFICATION = "notification";
+  private static final String NT_UNSTRUCTURED = "nt:unstructured";
   private WebNotificationStorage   webStorage;
-  
+  private final String WORKSPACE_COLLABORATION = "collaboration";
+  private NodeHierarchyCreator nodeHierarchyCreator;
+  private List<String> userIds;
+
   @Override
   public void setUp() throws Exception {
     super.setUp();
+    nodeHierarchyCreator = getService(NodeHierarchyCreator.class);
     webStorage = getService(WebNotificationStorage.class);
     assertNotNull(webStorage);
     //
-    Node nftNode = null;
-    if(!session.getRootNode().hasNode("eXoNotification")) {
-      nftNode = session.getRootNode().addNode(AbstractService.NOTIFICATION_HOME_NODE, AbstractService.NTF_NOTIFICATION);
-      nftNode.addNode(AbstractService.WEB_CHANNEL, AbstractService.NTF_CHANNEL);
-    } else if(!session.getRootNode().hasNode("eXoNotification/web")) {
-      session.getRootNode().getNode(AbstractService.NOTIFICATION_HOME_NODE)
-             .addNode(AbstractService.WEB_CHANNEL, AbstractService.NTF_CHANNEL);
-    }
-    session.save();
+    ManageableRepository repo = repositoryService.getRepository(REPO_NAME);
+    repo.getConfiguration().setDefaultWorkspaceName(WORKSPACE_COLLABORATION);
+    session = repo.getSystemSession(WORKSPACE_COLLABORATION);
+    root = session.getRootNode();
+    //
+    userIds = new ArrayList<String>();
   }
-  
+
   @Override
   public void tearDown() throws Exception {
-    Node homeNode = (Node) session.getItem("/eXoNotification/web");
-    NodeIterator iterator = homeNode.getNodes();
-    while (iterator.hasNext()) {
-      Node node = (iterator.nextNode());
-      node.remove();
+    for (String userId : userIds) {
+      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(SessionProvider.createSystemProvider(), userId);
+      userNodeApp.getNode(NOTIFICATION).remove();
     }
     session.save();
+    //
     super.tearDown();
   }
-  
+
   private NotificationInfo makeWebNotificationInfo(String userId) {
     NotificationInfo info = NotificationInfo.instance();
     info.key(new PluginKey(PluginTest.ID));
@@ -62,40 +69,67 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     return info;
   }
   
-  private Node getUserNode(String userId) throws Exception {
-    String dateName = new SimpleDateFormat(AbstractService.DATE_NODE_PATTERN).format(Calendar.getInstance().getTime());
-    Node homeNode = (Node) session.getItem("/eXoNotification/web");
-    assertTrue(homeNode.hasNode(dateName));
-    assertTrue(homeNode.getNode(dateName).hasNode(userId));
-    return homeNode.getNode(dateName + "/" + userId);
+  private String getDateName() {
+    return new SimpleDateFormat(AbstractService.DATE_NODE_PATTERN).format(Calendar.getInstance().getTime());
+  }
+
+  private Node getUserNotificationNode(String userId) throws Exception {
+    Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(SessionProvider.createSystemProvider(), userId);
+    Node parentNode;
+    if (userNodeApp.hasNode(NOTIFICATION)) {
+      parentNode = userNodeApp.getNode(NOTIFICATION);
+    } else {
+      parentNode = userNodeApp.addNode(NOTIFICATION, NT_UNSTRUCTURED);
+    }
+    if (parentNode.hasNode(AbstractService.WEB_CHANNEL)) {
+      parentNode = parentNode.getNode(AbstractService.WEB_CHANNEL);
+    } else {
+      parentNode = parentNode.addNode(AbstractService.WEB_CHANNEL, AbstractService.NTF_CHANNEL);
+    }
+    String dateNodeName = getDateName();
+    if (parentNode.hasNode(dateNodeName)) {
+      return parentNode.getNode(dateNodeName);
+    }
+    //
+    Node dateNode = parentNode.addNode(dateNodeName, AbstractService.NTF_NOTIF_DATE);
+    userNodeApp.getSession().save();
+
+    return dateNode;
   }
 
   public void testSaveWebNotification() throws Exception {
-    NotificationInfo info = makeWebNotificationInfo("root");
+    String userId = "root";
+    userIds.add(userId);
+    NotificationInfo info = makeWebNotificationInfo(userId);
     webStorage.save(info);
     //
-    assertTrue(getUserNode("root").getNodes().getSize() == 1);
+    assertTrue(getUserNotificationNode(userId).getNodes().getSize() == 1);
   }
-  
+
   public void testMarkRead() throws Exception {
-    NotificationInfo info = makeWebNotificationInfo("root");
+    String userId = "root";
+    userIds.add(userId);
+    NotificationInfo info = makeWebNotificationInfo(userId);
     webStorage.save(info);
-    Node notifiNode = getUserNode("root").getNodes().nextNode();
+    Node notifiNode = getUserNotificationNode(userId).getNodes().nextNode();
     assertTrue(notifiNode.hasProperty(AbstractService.NTF_READ));
     assertFalse(notifiNode.getProperty(AbstractService.NTF_READ).getBoolean());
     //
+    System.out.println(info.getValueOwnerParameter("UUID"));
     webStorage.markRead(info.getValueOwnerParameter("UUID"));
     //
+    notifiNode = session.getNodeByUUID(info.getValueOwnerParameter("UUID"));
     assertTrue(notifiNode.getProperty(AbstractService.NTF_READ).getBoolean());
   }
-  
+
   public void testMarkReadAll() throws Exception {
     String userId = "demo";
+    userIds.add(userId);
     for (int i = 0; i < 10; i++) {
       NotificationInfo info = makeWebNotificationInfo(userId);
       webStorage.save(info);
     }
-    NodeIterator iter = getUserNode(userId).getNodes();
+    NodeIterator iter = getUserNotificationNode(userId).getNodes();
     assertEquals(10, iter.getSize());
     while (iter.hasNext()) {
       Node node = iter.nextNode();
@@ -104,7 +138,7 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     //
     webStorage.markReadAll(userId);
     //
-    iter = getUserNode(userId).getNodes();
+    iter = getUserNotificationNode(userId).getNodes();
     while (iter.hasNext()) {
       Node node = iter.nextNode();
       
@@ -125,7 +159,6 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
       assertTrue(node.getProperty(AbstractService.NTF_READ).getBoolean());
     }
   }
-
 }
 
 
