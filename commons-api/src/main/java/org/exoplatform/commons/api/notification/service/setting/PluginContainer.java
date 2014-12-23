@@ -63,4 +63,9 @@ public interface PluginContainer {
    * @return
    */
   boolean remove(PluginKey key);
+  
+  /**
+   * @return
+   */
+  List<String> getDefaultActivePlugins();
 }

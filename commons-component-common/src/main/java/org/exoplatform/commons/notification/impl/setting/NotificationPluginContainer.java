@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
@@ -154,4 +155,17 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
     return true;
   }
 
+  public List<String> getDefaultActivePlugins() {
+    List<String> list = new ArrayList<String>();
+    for (AbstractNotificationPlugin plugin : pluginMap.values()) {
+      if (!(plugin instanceof AbstractNotificationChildPlugin)) {
+        for (String defaultConf : plugin.getPluginConfigs().get(0).getDefaultConfig()) {
+          if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY) {
+            list.add(plugin.getId());
+          }
+        }
+      }
+    }
+    return list;
+  }
 }
