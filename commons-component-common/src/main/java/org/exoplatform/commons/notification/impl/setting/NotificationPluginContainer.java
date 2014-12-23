@@ -157,7 +157,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   public List<String> getDefaultActivePlugins() {
     List<String> list = new ArrayList<String>();
-    for (AbstractNotificationPlugin plugin : pluginMap.values()) {
+    for (BaseNotificationPlugin plugin : pluginMap.values()) {
       if (!(plugin instanceof AbstractNotificationChildPlugin)) {
         for (String defaultConf : plugin.getPluginConfigs().get(0).getDefaultConfig()) {
           if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY) {
