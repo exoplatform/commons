@@ -23,18 +23,18 @@ import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 
 public class NotificationCommandImpl implements NotificationCommand {
 
-  private final AbstractNotificationPlugin plugin;
+  private final BaseNotificationPlugin plugin;
   
-  public NotificationCommandImpl(AbstractNotificationPlugin plugin) {
+  public NotificationCommandImpl(BaseNotificationPlugin plugin) {
     this.plugin = plugin;
   }
   
   @Override
-  public AbstractNotificationPlugin getPlugin() {
+  public BaseNotificationPlugin getPlugin() {
     return this.plugin;
   }
 

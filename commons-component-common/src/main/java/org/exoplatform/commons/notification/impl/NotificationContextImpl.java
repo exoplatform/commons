@@ -27,7 +27,7 @@ import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.notification.impl.command.NotificationCommandImpl;
@@ -174,7 +174,7 @@ public final class NotificationContextImpl implements NotificationContext {
   
   @Override
   public NotificationCommand makeCommand(PluginKey key) {
-    AbstractNotificationPlugin plugin = this.pluginService.getPlugin(key);
+    BaseNotificationPlugin plugin = this.pluginService.getPlugin(key);
     return (plugin != null) ? new NotificationCommandImpl(plugin) : null;
   }
 

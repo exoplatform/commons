@@ -28,6 +28,7 @@ import org.exoplatform.commons.api.notification.channel.template.AbstractTemplat
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.api.notification.template.Element;
@@ -57,9 +58,11 @@ public class GroovyElementVisitor implements ElementVisitor {
     try {
       Template engine = null;
       PluginKey pluginKey = new PluginKey(ctx.getPluginId());
-      AbstractNotificationPlugin plugin = CommonsUtils.getService(PluginContainer.class).getPlugin(pluginKey);
+      BaseNotificationPlugin plugin = CommonsUtils.getService(PluginContainer.class).getPlugin(pluginKey);
       if (plugin instanceof AbstractNotificationChildPlugin) {
         engine = ((AbstractNotificationChildPlugin) plugin).getTemplateEngine();
+      } else if (plugin.isOldPlugin()) {
+        engine = ((AbstractNotificationPlugin) plugin).getTemplateEngine();
       } else {
         AbstractChannel channel = CommonsUtils.getService(ChannelManager.class).getChannel(ctx.getChannelKey());
         AbstractTemplateBuilder builder = channel.getTemplateBuilder(pluginKey);

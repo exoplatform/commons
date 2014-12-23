@@ -18,14 +18,14 @@ package org.exoplatform.commons.api.notification.model;
 
 import java.io.Serializable;
 
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 
 public final class PluginKey implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final String id;
   
-  public PluginKey(AbstractNotificationPlugin plugin) {
+  public PluginKey(BaseNotificationPlugin plugin) {
     this(plugin.getId());
   }
   
@@ -33,7 +33,7 @@ public final class PluginKey implements Serializable {
     this.id = id;
   }
 
-  public static PluginKey key(AbstractNotificationPlugin plugin) {
+  public static PluginKey key(BaseNotificationPlugin plugin) {
     return new PluginKey(plugin);
   }
   

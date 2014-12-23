@@ -27,7 +27,7 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.container.xml.ValuesParam;
 
-public abstract class AbstractNotificationChildPlugin extends AbstractNotificationPlugin {
+public abstract class AbstractNotificationChildPlugin extends BaseNotificationPlugin {
   private static final String PARENT_ID_KEY = "parentIds";
   private static final String TEMPLATE_PATH_KEY = "templatePath";
   private List<String> parentPluginIds = new ArrayList<String>();

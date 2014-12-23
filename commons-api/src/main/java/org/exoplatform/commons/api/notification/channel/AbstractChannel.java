@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.channel;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
+import org.exoplatform.commons.api.notification.channel.template.PluginTemplateBuilderAdapter;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
@@ -109,7 +110,11 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
    * @param key the PluginKey
    */
   public AbstractTemplateBuilder getTemplateBuilder(PluginKey key) {
-    return null;
+    if (!hasTemplateBuilder(key)) {
+      return new PluginTemplateBuilderAdapter();
+    }
+    return getTemplateBuilderInChannel(key);
   }
   
+  protected abstract AbstractTemplateBuilder getTemplateBuilderInChannel(PluginKey key);
 }

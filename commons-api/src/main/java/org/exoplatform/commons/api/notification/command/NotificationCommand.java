@@ -19,7 +19,7 @@ package org.exoplatform.commons.api.notification.command;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 
 public interface NotificationCommand {
 
@@ -27,7 +27,7 @@ public interface NotificationCommand {
    * Gets a plugin associated with the notification command.
    * @return The notification plugin.
    */
-  AbstractNotificationPlugin getPlugin();
+  BaseNotificationPlugin getPlugin();
   
   /**
    * Gets a notification key associated with the notification command.

@@ -68,7 +68,6 @@ public class WebChannel extends AbstractChannel {
   
   @Override
   public void dispatch(NotificationContext ctx, String userId) {
-    // TODO call WebSendService to send mail to receipts
     String pluginId = ctx.getNotificationInfo().getKey().getId();
     AbstractTemplateBuilder builder = templateBuilders.get(pluginId);
     MessageInfo msg = builder.buildMessage(ctx);
@@ -76,7 +75,13 @@ public class WebChannel extends AbstractChannel {
   }
   
   @Override
-  public AbstractTemplateBuilder getTemplateBuilder(PluginKey key) {
+  public boolean hasTemplateBuilder(PluginKey key) {
+    AbstractTemplateBuilder builder = this.templateBuilders.get(key);
+    return builder != null;
+  }
+  
+  @Override
+  protected AbstractTemplateBuilder getTemplateBuilderInChannel(PluginKey key) {
     return this.templateBuilders.get(key);
   }
 }

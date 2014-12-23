@@ -20,16 +20,19 @@ import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
+import org.exoplatform.commons.api.notification.channel.template.PluginTemplateBuilderAdapter;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.notification.plugin.PluginPLF41Test;
 import org.exoplatform.commons.notification.plugin.PluginTest;
 import org.exoplatform.commons.notification.template.TemplateUtils;
 
@@ -54,7 +57,7 @@ public class PluginContainerTest extends BaseNotificationTestCase {
   public void testPlugin() {
     // check existing plugin
     PluginKey pluginKey = new PluginKey(PluginTest.ID);
-    AbstractNotificationPlugin plugin = container.getPlugin(pluginKey);
+    BaseNotificationPlugin plugin = container.getPlugin(pluginKey);
     assertNotNull(plugin);
     // get child
     List<PluginKey> chikdKeys = container.getChildPluginKeys(pluginKey);
@@ -72,7 +75,9 @@ public class PluginContainerTest extends BaseNotificationTestCase {
     //
     AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(MailChannel.ID));
     assertNotNull(channel);
-    MessageInfo messageInfo = channel.getTemplateBuilder(pluginKey).buildMessage(ctx);
+    
+    AbstractTemplateBuilder builder = channel.getTemplateBuilder(pluginKey);
+    MessageInfo messageInfo = builder.buildMessage(ctx);
     
     // check subject
     assertEquals("The subject Test plugin notification", messageInfo.getSubject());
@@ -86,6 +91,34 @@ public class PluginContainerTest extends BaseNotificationTestCase {
     assertTrue(messageInfo.getBody().indexOf("The content of child plugin") > 0);
     // check process resource-bundle on plugin
     assertTrue(messageInfo.getBody().indexOf("The test child plugin") > 0);
+  }
+  
+  public void testPLF41Plugin() {
+    // check existing plugin
+    PluginKey pluginKey = new PluginKey(PluginPLF41Test.ID);
+    BaseNotificationPlugin plugin = container.getPlugin(pluginKey);
+    assertNotNull(plugin);
+    
+    //
+    NotificationContext ctx = NotificationContextImpl.cloneInstance();
+    NotificationInfo notificationInfo = plugin.buildNotification(ctx);
+    assertNotNull(notificationInfo);
+    assertEquals("demo", notificationInfo.getTo());
+    assertEquals(PluginPLF41Test.ID, notificationInfo.getKey().getId());
+    //
+    ctx.setNotificationInfo(notificationInfo);
+    //
+    AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(MailChannel.ID));
+    assertNotNull(channel);
+    AbstractTemplateBuilder templateBuilder = channel.getTemplateBuilder(pluginKey);
+    
+    assertTrue((templateBuilder instanceof PluginTemplateBuilderAdapter));
+    
+    MessageInfo messageInfo = templateBuilder.buildMessage(ctx);
+    // check subject
+    assertEquals(PluginPLF41Test.SUBJECT, messageInfo.getSubject());
+    // check process resource-bundle on plugin
+    assertTrue(messageInfo.getBody().indexOf("The test plugin") > 0);
   }
 
   public void testRenderPlugin() throws Exception {

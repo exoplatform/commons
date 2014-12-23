@@ -75,7 +75,7 @@ public final class MailChannel extends AbstractChannel {
   public void dispatch(NotificationContext ctx, String userId) {
     String pluginId = ctx.getNotificationInfo().getKey().getId();
     String templateFilePath = this.templateFilePaths.get(pluginId);
-    LOG.debug("Mail::{ userId:" + userId + ", pluginId: " + pluginId + ", templateFilePath: "+ templateFilePath + "}");
+    LOG.debug("Mail::{ userId:" + userId + ", pluginId: " + pluginId + ", templateFilePath: " + templateFilePath + "}");
   }
   
   @Override
@@ -90,7 +90,7 @@ public final class MailChannel extends AbstractChannel {
   }
   
   @Override
-  public AbstractTemplateBuilder getTemplateBuilder(PluginKey key) {
+  protected AbstractTemplateBuilder getTemplateBuilderInChannel(PluginKey key) {
     return this.templateBuilders.get(key);
   }
   

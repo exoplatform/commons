@@ -11,7 +11,7 @@ import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.channel.template.DigestMailTemplateProvider;
@@ -54,7 +54,7 @@ public class MockDigestMailTemplateProvider extends DigestMailTemplateProvider {
       PluginContainer pluginContainer = CommonsUtils.getService(PluginContainer.class);
       List<PluginKey> childKeys = pluginContainer.getChildPluginKeys(new PluginKey(PluginTest.ID));
       for (PluginKey notificationKey : childKeys) {
-        AbstractNotificationPlugin child = pluginContainer.getPlugin(notificationKey);
+        BaseNotificationPlugin child = pluginContainer.getPlugin(notificationKey);
         childContent.append("<br>").append(((AbstractNotificationChildPlugin) child).makeContent(ctx));
       }
       templateContext.put("CHILD_CONTENT", childContent.toString());

@@ -49,6 +49,8 @@ public class PluginConfig {
   private List<String> defaultConfig = new ArrayList<String>();
 
   private GroupConfig  groupConfig;
+  
+  private TemplateConfig templateConfig;
 
   private String       bundlePath;
   
@@ -199,4 +201,19 @@ public class PluginConfig {
     }
     return defaultValue;
   }
+  
+  /**
+   * @return the templateConfig
+   */
+  public TemplateConfig getTemplateConfig() {
+    return templateConfig.setProviderId(pluginId);
+  }
+
+  /**
+   * @param templateConfig the templateConfig to set
+   */
+  public void setTemplateConfig(TemplateConfig templateConfig) {
+    this.templateConfig = templateConfig;
+  }
+
 }

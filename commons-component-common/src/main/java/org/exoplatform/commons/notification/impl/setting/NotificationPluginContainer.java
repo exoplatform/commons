@@ -28,6 +28,7 @@ import java.util.Set;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
@@ -35,12 +36,15 @@ import org.exoplatform.commons.notification.template.ResourceBundleConfigDeploye
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
 
 public class NotificationPluginContainer implements PluginContainer, Startable {
+  /** logger */
+  private static final Log LOG = ExoLogger.getLogger(NotificationPluginContainer.class);
 
-  private final Map<PluginKey, AbstractNotificationPlugin> pluginMap;
+  private final Map<PluginKey, BaseNotificationPlugin> pluginMap;
   
   //parent key and list child key
   private final Map<PluginKey, List<PluginKey>>      parentChildrenKeysMap;
@@ -50,7 +54,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   private GStringTemplateEngine gTemplateEngine;
   
   public NotificationPluginContainer() {
-    pluginMap = new HashMap<PluginKey, AbstractNotificationPlugin>();
+    pluginMap = new HashMap<PluginKey, BaseNotificationPlugin>();
     parentChildrenKeysMap = new HashMap<PluginKey, List<PluginKey>>();
     pSettingService = CommonsUtils.getService(PluginSettingService.class);
     deployer = new ResourceBundleConfigDeployer();
@@ -61,7 +65,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   public void start() {
     Set<String> datas = new HashSet<String>();
     
-    for (AbstractNotificationPlugin plugin : pluginMap.values()) {
+    for (BaseNotificationPlugin plugin : pluginMap.values()) {
       boolean isChild = (plugin instanceof AbstractNotificationChildPlugin);
       for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
         pSettingService.registerPluginConfig(pluginConfig.isChildPlugin(isChild));
@@ -80,7 +84,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   }
 
   @Override
-  public AbstractNotificationPlugin getPlugin(PluginKey key) {
+  public BaseNotificationPlugin getPlugin(PluginKey key) {
     return pluginMap.get(key);
   }
 
@@ -118,14 +122,29 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
         String template = TemplateUtils.loadGroovyTemplate(templatePath);
         plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
       } catch (Exception e) {
-        ExoLogger.getExoLogger(getClass()).warn("Failed to build groovy template engine for: " + plugin.getId(), e);
+        LOG.warn("Failed to build groovy template engine for: " + plugin.getId(), e);
       }
     }
     
   }
 
   @Override
-  public void addPlugin(AbstractNotificationPlugin plugin) {
+  public void addPlugin(BaseNotificationPlugin plugin) {
+    if (plugin.isOldPlugin()) {
+      registerPlugin((AbstractNotificationPlugin) plugin);
+    }
+    pluginMap.put(plugin.getKey(), plugin);
+  }
+  
+  private void registerPlugin(AbstractNotificationPlugin plugin) {
+    try {
+      String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
+      //String templatePath = "";
+      String template = TemplateUtils.loadGroovyTemplate(templatePath);
+      plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
+    } catch (Exception e) {
+      LOG.debug("Failed to register notification plugin " + plugin.getId());
+    }
     pluginMap.put(plugin.getKey(), plugin);
   }
 

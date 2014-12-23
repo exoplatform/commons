@@ -18,8 +18,10 @@ package org.exoplatform.commons.notification.channel;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -61,4 +63,9 @@ public class ConsoleChannel extends AbstractChannel {
   
   @Override
   public void registerTemplateProvider(TemplateProvider provider) {}
+  
+  @Override
+  protected AbstractTemplateBuilder getTemplateBuilderInChannel(PluginKey key) {
+    return null;
+  }
 }

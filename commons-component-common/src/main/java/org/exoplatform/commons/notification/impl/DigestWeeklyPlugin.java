@@ -18,10 +18,10 @@ package org.exoplatform.commons.notification.impl;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.container.xml.InitParams;
 
-public class DigestWeeklyPlugin extends AbstractNotificationPlugin {
+public class DigestWeeklyPlugin extends BaseNotificationPlugin {
   public static final String ID = "DigestWeeklyPlugin";
 
   public DigestWeeklyPlugin(InitParams initParams) {
