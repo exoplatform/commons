@@ -48,9 +48,9 @@ public interface WebNotificationStorage {
 
   /**
    * Remove the NotificationInfo live after X days
-   * @param days 
+   * @param seconds 
    * @return the status removed or not
    * @throws Exception
    */
-  boolean remove(String userId, int days);
+  boolean remove(String userId, long seconds);
 }

@@ -7,8 +7,6 @@ import java.util.List;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
-import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
 
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
@@ -69,13 +67,28 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     return info;
   }
   
-  private String getDateName() {
-    return new SimpleDateFormat(AbstractService.DATE_NODE_PATTERN).format(Calendar.getInstance().getTime());
+  private String getDateName(Calendar cal) {
+    return new SimpleDateFormat(AbstractService.DATE_NODE_PATTERN).format(cal.getTime());
+  }
+  
+  private Node getWebUserCurrentDateNode(String userId) throws Exception {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    Calendar cal = Calendar.getInstance();
+    return getWebUserDateNode(sProvider, cal, userId);
   }
 
-  private Node getUserNotificationNode(String userId) throws Exception {
-    Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(SessionProvider.createSystemProvider(), userId);
-    Node parentNode;
+  private Node getWebUserDateNode(SessionProvider sProvider, Calendar cal, String userId) throws Exception {
+    String dateNodeName = getDateName(cal);
+    Node userNode = getOrCreateWebUserNode(sProvider, userId);
+    if (userNode.hasNode(dateNodeName)) {
+      return userNode.getNode(dateNodeName);
+    }
+    return null;
+  }
+
+  private Node getOrCreateWebUserNode(SessionProvider sProvider, String userId) throws Exception {
+    Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId);
+    Node parentNode = null;
     if (userNodeApp.hasNode(NOTIFICATION)) {
       parentNode = userNodeApp.getNode(NOTIFICATION);
     } else {
@@ -86,15 +99,7 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     } else {
       parentNode = parentNode.addNode(AbstractService.WEB_CHANNEL, AbstractService.NTF_CHANNEL);
     }
-    String dateNodeName = getDateName();
-    if (parentNode.hasNode(dateNodeName)) {
-      return parentNode.getNode(dateNodeName);
-    }
-    //
-    Node dateNode = parentNode.addNode(dateNodeName, AbstractService.NTF_NOTIF_DATE);
-    userNodeApp.getSession().save();
-
-    return dateNode;
+    return parentNode;
   }
 
   public void testSaveWebNotification() throws Exception {
@@ -103,7 +108,7 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     NotificationInfo info = makeWebNotificationInfo(userId);
     webStorage.save(info);
     //
-    assertTrue(getUserNotificationNode(userId).getNodes().getSize() == 1);
+    assertTrue(getWebUserCurrentDateNode(userId).getNodes().getSize() == 1);
   }
 
   public void testMarkRead() throws Exception {
@@ -111,7 +116,7 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     userIds.add(userId);
     NotificationInfo info = makeWebNotificationInfo(userId);
     webStorage.save(info);
-    Node notifiNode = getUserNotificationNode(userId).getNodes().nextNode();
+    Node notifiNode = getWebUserCurrentDateNode(userId).getNodes().nextNode();
     assertTrue(notifiNode.hasProperty(AbstractService.NTF_READ));
     assertFalse(notifiNode.getProperty(AbstractService.NTF_READ).getBoolean());
     //
@@ -129,7 +134,7 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
       NotificationInfo info = makeWebNotificationInfo(userId);
       webStorage.save(info);
     }
-    NodeIterator iter = getUserNotificationNode(userId).getNodes();
+    NodeIterator iter = getWebUserCurrentDateNode(userId).getNodes();
     assertEquals(10, iter.getSize());
     while (iter.hasNext()) {
       Node node = iter.nextNode();
@@ -138,41 +143,65 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     //
     webStorage.markReadAll(userId);
     //
-    iter = getUserNotificationNode(userId).getNodes();
+    iter = getWebUserCurrentDateNode(userId).getNodes();
     while (iter.hasNext()) {
       Node node = iter.nextNode();
-      
-      PropertyIterator iterator = node.getProperties();
-      System.out.println("node: " + node.getName()  + " {");
-      while (iterator.hasNext()) {
-        Property p = iterator.nextProperty();
-        if (p.getName().indexOf("jcr:") == 0) {
-          continue;
-        }
-        try {
-          System.out.println(" +" + p.getName() + " : " + p.getString());
-        } catch (Exception e) {
-          System.out.println(" +" +p.getName() + " : " + p.getValue().toString());
-        }
-      }
-      System.out.println("}");
       assertTrue(node.getProperty(AbstractService.NTF_READ).getBoolean());
     }
   }
+  
+  public void testRemoveByJob() throws Exception {
+    // Create data for old notifications 
+    /* Example:
+     *  PastTime is 1/12/2014
+     *  Today is 15/12/2014
+     *  Create notification for:
+     *   + 04/12/2014
+     *   + 06/12/2014
+     *   + 08/12/2014
+     *   + 10/12/2014
+     *   + 12/12/2014
+     *  Case 1: Delay time 9 days, remove all web notification on days:
+     *   + 04/12/2014
+     *   + 06/12/2014
+     *  Expected: remaining is 30 notifications / 3 days
+     *  Case 2: Delay time 3 days, remove all web notification on days:
+     *   + 08/12/2014
+     *   + 10/12/2014
+     *   + 12/12/2014
+     *  Expected: remaining is 0 notification
+    */
+    String userId = "demo";
+    Calendar cal = Calendar.getInstance();
+    long t = 86400000l;
+    long current = cal.getTimeInMillis();
+    for (int i = 12; i > 3; i = i - 2) {
+      cal.setTimeInMillis(current - i * t);
+      for (int j = 0; j < 10; j++) {
+        NotificationInfo info = makeWebNotificationInfo(userId).setDateCreated(cal);
+        //
+        webStorage.save(info);
+      }
+    }
+    // check data
+    //getWebUserDateNode
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    Node parentNode = getOrCreateWebUserNode(sProvider, userId);
+    assertEquals(5, parentNode.getNodes().getSize());
+    //
+    NodeIterator iter = null;
+    for (int i = 4; i < 13; i = i + 2) {
+      cal.setTimeInMillis(current - i * t);
+      Node node = getWebUserDateNode(sProvider, cal, userId);
+      iter = node.getNodes();
+      assertEquals(10, iter.getSize());
+    }
+    //
+    webStorage.remove(userId, 9*86400);
+    //
+    assertEquals(3, parentNode.getNodes().getSize());
+    //
+    webStorage.remove(userId, 3*86400);
+    assertEquals(0, parentNode.getNodes().getSize());
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

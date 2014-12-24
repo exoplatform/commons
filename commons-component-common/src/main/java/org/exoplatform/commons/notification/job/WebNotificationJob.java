@@ -19,7 +19,7 @@ public class WebNotificationJob extends NotificationJob {
     OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
     //
     JobDataMap jdatamap = context.getJobDetail().getJobDataMap();
-    int liveDays = Integer.valueOf(jdatamap.getString(WebCronJob.LIVE_DAYS_KEY));
+    long liveDays = Long.valueOf(jdatamap.getString(WebCronJob.LIVE_DAYS_KEY));
     //
     CommonsUtils.startRequest(organizationService);
     ListAccess<User> allUsers = null;

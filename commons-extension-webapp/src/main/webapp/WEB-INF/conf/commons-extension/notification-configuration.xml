@@ -253,12 +253,12 @@
 					<property name="jobName" value="WebNotificationJob" />
 					<property name="groupName" value="Notification" />
 					<property name="job" value="org.exoplatform.commons.notification.job.WebNotificationJob" />
-					<property name="expression" value="${cronJob.notification.WebNotificationJob.expression:0 0 23 ? * SUN}" /><!-- Run at 11:00pm every day -->
+					<property name="expression" value="${cronJob.notification.WebNotificationJob.expression:0 0 23 ? * *}" /><!-- Run at 11:00pm every day -->
 				</properties-param>
 				<properties-param>
 					<name>web.info</name>
 					<description></description>
-					<property name="liveDays" value="${cronJob.notification.WebNotificationJob.liveDays:30}" />
+					<property name="liveDays" value="${exo.notifications.viewall:2600000}" />
 				</properties-param>
 			</init-params>
 		</component-plugin>

@@ -46,38 +46,37 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     return sProvider.getSession(repository.getConfiguration().getDefaultWorkspaceName(), repository);
   }
   
-  private String getDateName(Calendar cal) {
+  private String converDateToNodeName(Calendar cal) {
     return new SimpleDateFormat(DATE_NODE_PATTERN).format(cal.getTime());
   }
-  
 
-  protected Node getOrCreateWebUserNode(SessionProvider sProvider, String dateNodeName, String userId) throws Exception {
-    Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId);
-    try {
-      Node parentNode = null;
-      if (userNodeApp.hasNode(NOTIFICATION)) {
-        parentNode = userNodeApp.getNode(NOTIFICATION);
-      } else {
-        parentNode = userNodeApp.addNode(NOTIFICATION, NT_UNSTRUCTURED);
-      }
-      if (parentNode.hasNode(WEB_CHANNEL)) {
-        parentNode = parentNode.getNode(WEB_CHANNEL);
-      } else {
-        parentNode = parentNode.addNode(WEB_CHANNEL, NTF_CHANNEL);
-      }
-      if (parentNode.hasNode(dateNodeName)) {
-        return parentNode.getNode(dateNodeName);
-      }
-      //
-      Node dateNode = parentNode.addNode(dateNodeName, AbstractService.NTF_NOTIF_DATE);
-      userNodeApp.getSession().save();
+  private Node getWebUserDateNode(SessionProvider sProvider, NotificationInfo notification) throws Exception {
+    String dateNodeName = converDateToNodeName(notification.getDateCreated());
+    Node userNode = getOrCreateWebUserNode(sProvider, notification.getTo());
+    if (userNode.hasNode(dateNodeName)) {
+      return userNode.getNode(dateNodeName);
+    } else {
+      Node dateNode = userNode.addNode(dateNodeName, NTF_NOTIF_DATE);
+      dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
+      userNode.getSession().save();
       return dateNode;
-    } finally {
     }
   }
 
-  protected Node getOrCreateWebCurrentUserNode(SessionProvider sProvider, String userId) throws Exception {
-    return getOrCreateWebUserNode(sProvider, getDateName(Calendar.getInstance()), userId);
+  private Node getOrCreateWebUserNode(SessionProvider sProvider, String userId) throws Exception {
+    Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId);
+    Node parentNode = null;
+    if (userNodeApp.hasNode(NOTIFICATION)) {
+      parentNode = userNodeApp.getNode(NOTIFICATION);
+    } else {
+      parentNode = userNodeApp.addNode(NOTIFICATION, NT_UNSTRUCTURED);
+    }
+    if (parentNode.hasNode(WEB_CHANNEL)) {
+      parentNode = parentNode.getNode(WEB_CHANNEL);
+    } else {
+      parentNode = parentNode.addNode(WEB_CHANNEL, NTF_CHANNEL);
+    }
+    return parentNode;
   }
 
   @Override
@@ -86,8 +85,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     final ReentrantLock localLock = lock;
     try {
       localLock.lock();
-      String owner = notification.getTo();
-      Node userNode = getOrCreateWebCurrentUserNode(sProvider, owner);
+      Node userNode = getWebUserDateNode(sProvider, notification);
       Node notifyNode = null;
       if(userNode.hasNode(notification.getId())) {
         notifyNode = userNode.getNode(notification.getId());
@@ -97,7 +95,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       notifyNode.setProperty(NTF_PLUGIN_ID, notification.getKey().getId());
       notifyNode.setProperty(NTF_TEXT, notification.getTitle());
       notifyNode.setProperty(NTF_SENDER, notification.getFrom());
-      notifyNode.setProperty(NTF_OWNER, owner);
+      notifyNode.setProperty(NTF_OWNER, notification.getTo());
       notifyNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getLastModifiedDate());
       //NTF_NAME_SPACE
       Map<String, String> ownerParameter = notification.getOwnerParameter();
@@ -197,8 +195,29 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   }
 
   @Override
-  public boolean remove(String userId, int days) {
-    
+  public boolean remove(String userId, long seconds) {
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    try {
+      Node userNode = getOrCreateWebUserNode(sProvider, userId);
+      Session session = userNode.getSession();
+      long delayTime = System.currentTimeMillis() - (seconds * 1000);
+      StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
+      strQuery.append(NTF_NOTIF_DATE).append(" WHERE (").append("jcr:path LIKE '").append(userNode.getPath())
+              .append("/%' AND NOT jcr:path LIKE '").append(userNode.getPath()).append("/%/%'").append(") AND (")
+              .append(NTF_LAST_MODIFIED_DATE).append(" < ").append(delayTime).append(")");
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      Query query = qm.createQuery(strQuery.toString(), Query.SQL);
+      NodeIterator it = query.execute().getNodes();
+      while (it.hasNext()) {
+        Node node = it.nextNode();
+        node.remove();
+        //
+        session.save();
+      }
+    } catch (Exception e) {
+      LOG.warn("Failed to remove old web notifications.", e);
+      return false;
+    }
     return false;
   }
 
@@ -258,6 +277,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       .setTitle(node.getProperty(NTF_TEXT).getString())
       //
       .setLastModifiedDate(node.getProperty(NTF_LAST_MODIFIED_DATE).getLong())
+      .setDateCreated(node.getProperty(EXO_DATE_CREATED).getDate())
       .with("UUID", node.getUUID())
       .setId(node.getName())
       .end();

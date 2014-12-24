@@ -2,6 +2,22 @@
 
   <nodeType name="mix:defaultSetting" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
   </nodeType>
+  
+  <nodeType name="ntf:notifInfoRef" isMixin="false" hasOrderableChildNodes="true">
+    <supertypes>
+      <supertype>nt:base</supertype>
+      <supertype>mix:referenceable</supertype>
+    </supertypes>
+    <propertyDefinitions>
+      <propertyDefinition name="ntf:lastUpdated" requiredType="Long" autoCreated="true" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+      <propertyDefinition name="ntf:target" requiredType="Reference" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+    </propertyDefinitions>
+    <childNodeDefinitions/>
+  </nodeType>
 
 <!-- Begin Channel storage  -->  
   <nodeType name="ntf:notifInfo" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
@@ -70,6 +86,11 @@
       <supertype>nt:base</supertype>
       <supertype>mix:referenceable</supertype>
     </supertypes>
+    <propertyDefinitions>
+      <propertyDefinition name="ntf:lastModifiedDate" requiredType="Long" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+    </propertyDefinitions>
     <childNodeDefinitions>
       <childNodeDefinition name="*" defaultPrimaryType="ntf:notifUser" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" sameNameSiblings="false">
         <requiredPrimaryTypes>
