@@ -52,5 +52,5 @@ public interface WebNotificationStorage {
    * @return the status removed or not
    * @throws Exception
    */
-  boolean remove(int days);
+  boolean remove(String userId, int days);
 }

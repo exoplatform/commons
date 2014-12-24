@@ -145,7 +145,8 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   }
 
   @Override
-  public boolean remove(int days) {
+  public boolean remove(String userId, int days) {
+    
     return false;
   }
 

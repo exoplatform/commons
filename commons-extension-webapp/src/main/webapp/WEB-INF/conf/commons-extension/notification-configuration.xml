@@ -240,6 +240,31 @@
   </external-component-plugins>
 
   <external-component-plugins>
+		<target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
+		<component-plugin>
+			<name>AddCronJob</name>
+			<set-method>addCronJob</set-method>
+			<type>org.exoplatform.commons.notification.job.WebCronJob</type>
+			<description>Add clean old web notifications job to the JobSchedulerService</description>
+			<init-params>
+				<properties-param>
+					<name>cronjob.info</name>
+					<description>Configuration for cleaning old web notifications</description>
+					<property name="jobName" value="WebNotificationJob" />
+					<property name="groupName" value="Notification" />
+					<property name="job" value="org.exoplatform.commons.notification.job.WebNotificationJob" />
+					<property name="expression" value="${cronJob.notification.WebNotificationJob.expression:0 0 23 ? * SUN}" /><!-- Run at 11:00pm every day -->
+				</properties-param>
+				<properties-param>
+					<name>web.info</name>
+					<description></description>
+					<property name="liveDays" value="${cronJob.notification.WebNotificationJob.liveDays:30}" />
+				</properties-param>
+			</init-params>
+		</component-plugin>
+	</external-component-plugins>
+  
+  <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</target-component>
     <component-plugin>
       <name>notification.groups</name>
