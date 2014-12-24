@@ -101,6 +101,8 @@ public abstract class AbstractService {
 
   public static final String NTF_MESSAGE_INFO_HOME    = "ntf:messageInfoHome";
 
+  public static final String EXO_DATE_CREATED         = "exo:dateCreated";
+
   public static final String EXO_LAST_MODIFIED_DATE   = "exo:lastModifiedDate";
 
   public static final String JCR_ROOT                 = "/jcr:root";

@@ -57,12 +57,15 @@ public class NotificationInfo {
   private String              title = "";
   
   private ChannelKey          channelKey;
+  
+  private Calendar            dateCreated;
 
   public NotificationInfo() {
     this.id = PREFIX_ID + IdGenerator.generate();
     this.sendToDaily = new String[] { "" };
     this.sendToWeekly = new String[] { "" };
     this.lastModifiedDate = System.currentTimeMillis();
+    this.setDateCreated(Calendar.getInstance());
   }
   
   public static NotificationInfo instance() {
@@ -287,6 +290,15 @@ public class NotificationInfo {
    */
   public NotificationInfo setLastModifiedDate(long lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
+    return this;
+  }
+
+  public Calendar getDateCreated() {
+    return dateCreated;
+  }
+
+  public NotificationInfo setDateCreated(Calendar dateCreated) {
+    this.dateCreated = dateCreated;
     return this;
   }
 
