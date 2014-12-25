@@ -59,6 +59,8 @@ public class WebStorageMultiThreadTestCase extends BaseNotificationTestCase {
     session = repo.getSystemSession(WORKSPACE_COLLABORATION);
     root = session.getRootNode();
     //
+    addNodeEventListener();
+    //
     userIds = new ArrayList<String>();
     //
     craeteUsers(NUMBER_USER, false);

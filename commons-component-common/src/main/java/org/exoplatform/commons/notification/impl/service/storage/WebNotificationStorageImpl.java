@@ -271,7 +271,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   private NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
     NotificationInfo notifiInfo = NotificationInfo.instance()
-      .setTo(node.getParent().getName()) // owner of notification NTF_OWNER
+      .setTo(node.getProperty(NTF_OWNER).getString()) // owner of notification NTF_OWNER
       .setFrom(node.getProperty(NTF_SENDER).getString()) // user make event of notification
       .key(node.getProperty(NTF_PLUGIN_ID).getString())//pluginId
       .setTitle(node.getProperty(NTF_TEXT).getString())
@@ -290,7 +290,6 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
           continue;
         }
         try {
-          notifiInfo.with(p.getName(), p.getString());
           notifiInfo.with(p.getName().replace(NTF_NAME_SPACE, ""), p.getString());
         } catch (Exception e) {}
       }

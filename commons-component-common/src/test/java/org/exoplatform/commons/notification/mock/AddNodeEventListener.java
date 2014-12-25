@@ -40,6 +40,7 @@ public class AddNodeEventListener implements EventListener {
           if(node.canAddMixin("exo:datetime")) {
             node.addMixin("exo:datetime");
             node.setProperty("exo:lastModifiedDate", Calendar.getInstance());
+            node.setProperty("exo:dateCreated", Calendar.getInstance());
             node.getSession().save();
           }
           break;

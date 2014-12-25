@@ -40,6 +40,8 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     session = repo.getSystemSession(WORKSPACE_COLLABORATION);
     root = session.getRootNode();
     //
+    addNodeEventListener();
+    //
     userIds = new ArrayList<String>();
   }
 
@@ -120,7 +122,6 @@ public class WebNotificationStorageTestCase extends BaseNotificationTestCase {
     assertTrue(notifiNode.hasProperty(AbstractService.NTF_READ));
     assertFalse(notifiNode.getProperty(AbstractService.NTF_READ).getBoolean());
     //
-    System.out.println(info.getValueOwnerParameter("UUID"));
     webStorage.markRead(info.getValueOwnerParameter("UUID"));
     //
     notifiNode = session.getNodeByUUID(info.getValueOwnerParameter("UUID"));
