@@ -50,20 +50,42 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     return new SimpleDateFormat(DATE_NODE_PATTERN).format(cal.getTime());
   }
 
-  private Node getWebUserDateNode(SessionProvider sProvider, NotificationInfo notification) throws Exception {
+  /**
+   * Gets or create the Web Date Node on Collaboration workspace.
+   * 
+   * For example: The web date node has the path as bellow:
+   * User1: /U/Us__/Use__/User1/notification/web/20141224/
+   * 
+   * @param sProvider
+   * @param notification
+   * @return
+   * @throws Exception
+   */
+  private Node getOrCreateWebDateNode(SessionProvider sProvider, NotificationInfo notification) throws Exception {
     String dateNodeName = converDateToNodeName(notification.getDateCreated());
-    Node userNode = getOrCreateWebUserNode(sProvider, notification.getTo());
-    if (userNode.hasNode(dateNodeName)) {
-      return userNode.getNode(dateNodeName);
+    Node channelNode = getOrCreateChannelNode(sProvider, notification.getTo());
+    if (channelNode.hasNode(dateNodeName)) {
+      return channelNode.getNode(dateNodeName);
     } else {
-      Node dateNode = userNode.addNode(dateNodeName, NTF_NOTIF_DATE);
+      Node dateNode = channelNode.addNode(dateNodeName, NTF_NOTIF_DATE);
       dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
-      userNode.getSession().save();
+      channelNode.getSession().save();
       return dateNode;
     }
   }
 
-  private Node getOrCreateWebUserNode(SessionProvider sProvider, String userId) throws Exception {
+  /**
+   * Gets or create the Channel Node by NodeHierarchyCreator on Collaboration workspace.
+   * 
+   * For example: The channel node has the path as bellow:
+   * User1: /U/Us__/Use__/User1/notification/web
+   * 
+   * @param sProvider
+   * @param userId the remoteId
+   * @return the channel node
+   * @throws Exception
+   */
+  private Node getOrCreateChannelNode(SessionProvider sProvider, String userId) throws Exception {
     Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId);
     Node parentNode = null;
     if (userNodeApp.hasNode(NOTIFICATION)) {
@@ -71,12 +93,13 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     } else {
       parentNode = userNodeApp.addNode(NOTIFICATION, NT_UNSTRUCTURED);
     }
+    Node channelNode = null;
     if (parentNode.hasNode(WEB_CHANNEL)) {
-      parentNode = parentNode.getNode(WEB_CHANNEL);
+      channelNode = parentNode.getNode(WEB_CHANNEL);
     } else {
-      parentNode = parentNode.addNode(WEB_CHANNEL, NTF_CHANNEL);
+      channelNode = parentNode.addNode(WEB_CHANNEL, NTF_CHANNEL);
     }
-    return parentNode;
+    return channelNode;
   }
 
   @Override
@@ -85,7 +108,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     final ReentrantLock localLock = lock;
     try {
       localLock.lock();
-      Node userNode = getWebUserDateNode(sProvider, notification);
+      Node userNode = getOrCreateWebDateNode(sProvider, notification);
       Node notifyNode = null;
       if(userNode.hasNode(notification.getId())) {
         notifyNode = userNode.getNode(notification.getId());
@@ -147,7 +170,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       strQuery.append("AND ").append(NTF_OWNER).append("='").append(filter.getUserId()).append("' ");
     }
     if (filter.isOnPopover()) {
-      strQuery.append("AND ").append(NTF_SHOW_POPOVER).append("='true' ");
+      strQuery.append("AND ").append(NTF_SHOW_POPOVER).append("= 'true' ");
     }
     if (filter.getPluginKey() != null) {
       strQuery.append("AND ").append(NTF_PLUGIN_ID).append("='").append(filter.getPluginKey().getId()).append("' ");
@@ -198,7 +221,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   public boolean remove(String userId, long seconds) {
     SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     try {
-      Node userNode = getOrCreateWebUserNode(sProvider, userId);
+      Node userNode = getOrCreateChannelNode(sProvider, userId);
       Session session = userNode.getSession();
       long delayTime = System.currentTimeMillis() - (seconds * 1000);
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
