@@ -106,7 +106,9 @@ public class OembedEmbedder extends AbstractEmbedder {
 
     try {
       mediaObject.setTitle(jsonObject.getString(EMBED_TITLE));
-      mediaObject.setHtml(jsonObject.getString(EMBED_HTML));
+      mediaObject.setHtml(jsonObject.getString(EMBED_HTML)
+              .replaceFirst("width=\\\"[0-9]*\\\"","width=\"330\"")
+              .replaceFirst("height=\\\"[0-9]*\\\"","height=\"200\""));
       mediaObject.setType(jsonObject.getString(EMBED_TYPE));
       mediaObject.setProvider(jsonObject.getString(EMBED_PROVIDER));
       mediaObject.setDescription(jsonObject.has(EMBED_DESC) ? jsonObject.getString(EMBED_DESC) : "");

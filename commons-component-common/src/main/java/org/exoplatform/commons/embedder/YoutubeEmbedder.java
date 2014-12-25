@@ -148,7 +148,7 @@ public class YoutubeEmbedder extends AbstractEmbedder {
     String videoPlayerType = contentObject.getString("type");
     StringBuilder contentURL = new StringBuilder();
     
-    contentURL.append("<embed width=\"420\" height=\"345\"")
+    contentURL.append("<embed width=\"330\" height=\"200\"")
               .append(" src=\"").append(contentSrc).append("\"")
               .append(" type=\"").append(videoPlayerType).append("\">")
               .append("</embed>");
