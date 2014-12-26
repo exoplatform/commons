@@ -10,7 +10,6 @@ import javax.jcr.Node;
 
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
-import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.util.IdGenerator;
 import org.exoplatform.services.log.ExoLogger;
@@ -19,13 +18,14 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.idm.UserImpl;
 
+
 public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
   private static final Log LOG = ExoLogger.getLogger(WebStorageMultiThreadTest.class);
   private OrganizationService organizationService;
   private ExecutorService executor;
   
-  private int NUMBER_THREAD = 10;
-  private int NUMBER_USER = 20;
+  private int NUMBER_THREAD = 5;
+  private int NUMBER_USER = 10;
   
   private int HCR_save = 0;
   private int HCT_get_time = 0;
@@ -48,12 +48,12 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
         return new Thread(arg0, "User thread");
       }
     };
-    int threads = (NUMBER_THREAD > NUMBER_USER) ? NUMBER_THREAD : NUMBER_USER ;
+    int threads = (NUMBER_THREAD > NUMBER_USER * 2) ? NUMBER_THREAD : NUMBER_USER * 2;
     executor = Executors.newFixedThreadPool(threads+5, threadFactory);
     //
     HCR_save = 0;
   }
-  
+
   @Override
   protected void tearDown() throws Exception {
     SessionProvider sessionProvider = SessionProvider.createSystemProvider();
@@ -64,10 +64,12 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
         userNodeApp.save();
       }
     }
-    
     for (String string : userIds) {
       organizationService.getUserHandler().removeUser(string, false);
     }
+    //
+    executor.shutdownNow();
+    //
     super.tearDown();
   }
 
@@ -88,7 +90,7 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
     LOG.info("\nThread: " + NUMBER_THREAD + 
              "\nUsers: " + userIds.size());
     //
-    CountDownLatch latch = new CountDownLatch(NUMBER_THREAD * NUMBER_USER);
+    CountDownLatch latch = new CountDownLatch(NUMBER_THREAD * NUMBER_USER * 2);
     //
     for (final String userId : userIds) {
       for (int i = 0; i < NUMBER_THREAD; i++) {
@@ -96,7 +98,6 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
           @Override
           public void process() {
             long t = System.currentTimeMillis();
-            RequestLifeCycle.begin(container);
             try {
               storage.save(makeWebNotificationInfo(userId));
               ++HCR_save;
@@ -104,8 +105,6 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
               assertFalse(true);
               LOG.error(e);
             } finally {
-              RequestLifeCycle.end();
-              latch.countDown();
               HCT_time += (System.currentTimeMillis() - t);
             }
           }
@@ -116,7 +115,7 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
     //
     LOG.info("\nTotal number of notifications saved: " + HCR_save + " total time: " + HCT_time + " ms");
     //
-    latch = new CountDownLatch(NUMBER_USER);
+    latch = new CountDownLatch(NUMBER_USER * 2);
     for (final String userId : userIds) {
       executor.execute(new Processor(latch) {
         @Override
@@ -143,8 +142,10 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
   
   public void waitCompletionFinished(CountDownLatch latch) throws InterruptedException {
     try {
-      latch.await(); // wait untill latch counted down to 0
-    } catch (InterruptedException e) {
+      while (latch.getCount() > 0) {
+        Thread.sleep(1000);
+      }; // wait untill latch counted down to 0
+    } catch (Exception e) {
       LOG.warn(e);
     }
   }

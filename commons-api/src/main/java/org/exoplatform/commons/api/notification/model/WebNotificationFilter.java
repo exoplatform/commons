@@ -6,8 +6,7 @@ import org.json.JSONObject;
 public class WebNotificationFilter {
   
   private PluginKey pluginKey;
-  private final String    userId;
-  private String    jcrPath;
+  private final String userId;
   private int limitDay = 0;
   private boolean onPopover = false;
   private Boolean isRead = null;
@@ -70,14 +69,6 @@ public class WebNotificationFilter {
     return this;
   }
   
-  public String getJcrPath() {
-    return jcrPath;
-  }
-
-  public void setJcrPath(String jcrPath) {
-    this.jcrPath = jcrPath;
-  }
-
   @Override
   public String toString() {
     try {

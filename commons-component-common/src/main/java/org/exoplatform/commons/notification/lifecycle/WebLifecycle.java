@@ -88,7 +88,7 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
         notification.setTitle(msg.getBody());
       }
     } catch (Exception e) {
-      LOG.error("Failed to connect with server : " + e, e.getMessage());
+      LOG.error("Failed to connect with server :", e);
     }
   }
 

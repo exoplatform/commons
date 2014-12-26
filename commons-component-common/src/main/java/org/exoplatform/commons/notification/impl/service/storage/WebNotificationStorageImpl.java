@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
@@ -54,7 +53,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * Gets or create the Web Date Node on Collaboration workspace.
    * 
    * For example: The web date node has the path as bellow:
-   * User1: /Users/U___/Us___/Use___/User1/notification/web/20141224/
+   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notification/web/20141224/
    * 
    * @param sProvider
    * @param notification
@@ -62,15 +61,21 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * @throws Exception
    */
   private Node getOrCreateWebDateNode(SessionProvider sProvider, NotificationInfo notification) throws Exception {
-    String dateNodeName = converDateToNodeName(notification.getDateCreated());
-    Node channelNode = getOrCreateChannelNode(sProvider, notification.getTo());
-    if (channelNode.hasNode(dateNodeName)) {
-      return channelNode.getNode(dateNodeName);
-    } else {
-      Node dateNode = channelNode.addNode(dateNodeName, NTF_NOTIF_DATE);
-      dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
-      channelNode.getSession().save();
-      return dateNode;
+    final ReentrantLock localLock = lock;
+    try {
+      localLock.lock();
+      String dateNodeName = converDateToNodeName(notification.getDateCreated());
+      Node channelNode = getOrCreateChannelNode(sProvider, notification.getTo());
+      if (channelNode.hasNode(dateNodeName)) {
+        return channelNode.getNode(dateNodeName);
+      } else {
+        Node dateNode = channelNode.addNode(dateNodeName, NTF_NOTIF_DATE);
+        dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
+        channelNode.getSession().save();
+        return dateNode;
+      }
+    } finally {
+      localLock.unlock();
     }
   }
 
@@ -78,7 +83,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * Gets or create the Channel Node by NodeHierarchyCreator on Collaboration workspace.
    * 
    * For example: The channel node has the path as bellow:
-   * User1: /Users/U___/Us___/Use___/User1/notification/web
+   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notification/web
    * 
    * @param sProvider
    * @param userId the remoteId
@@ -105,9 +110,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   @Override
   public void save(NotificationInfo notification) {
     SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
-    final ReentrantLock localLock = lock;
     try {
-      localLock.lock();
       Node userNode = getOrCreateWebDateNode(sProvider, notification);
       Node notifyNode = null;
       if(userNode.hasNode(notification.getId())) {
@@ -128,14 +131,10 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
           notifyNode.setProperty(propertyName, ownerParameter.get(key));
         }
       }
-      notification.with("UUID", notifyNode.getUUID());
       getSession(sProvider).save();
     } catch (Exception e) {
       LOG.error("Failed to save the notificaton.", e);
-    } finally {
-      localLock.unlock();
     }
-    
   }
   
   @Override
@@ -163,22 +162,13 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       return null;
     }
   }
-  
+
   private NodeIterator get(SessionProvider sProvider, WebNotificationFilter filter, int offset, int limit) throws Exception {
     Session session = getSession(sProvider);
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
     strQuery.append(NTF_NOTIF_INFO).append(" WHERE ");
-    if (isEmpty(filter.getJcrPath())) {
-      if(!isEmpty(filter.getUserId())) {
-        filter.setJcrPath(nodeHierarchyCreator.getUserApplicationNode(sProvider, filter.getUserId()).getPath());
-      } else {
-        filter.setJcrPath("/Users");
-      }
-    }
-    strQuery.append("jcr:path LIKE '").append(filter.getJcrPath()).append("/%' ");
-    if (!isEmpty(filter.getUserId())) {
-      strQuery.append("AND ").append(NTF_OWNER).append("='").append(filter.getUserId()).append("' ");
-    }
+    String path = getOrCreateChannelNode(sProvider, filter.getUserId()).getPath();
+    strQuery.append("jcr:path LIKE '").append(path).append("/%' ");
     if (filter.isOnPopover()) {
       strQuery.append("AND ").append(NTF_SHOW_POPOVER).append("= 'true' ");
     }
@@ -204,10 +194,6 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       query.setOffset(offset);
     }
     return query.execute().getNodes();
-  }
-
-  private boolean isEmpty(String str) {
-    return str == null || str.trim().isEmpty();
   }
 
   @Override
@@ -310,10 +296,11 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       .setTitle(node.getProperty(NTF_TEXT).getString())
       //
       .setLastModifiedDate(node.getProperty(NTF_LAST_MODIFIED_DATE).getLong())
-      .setDateCreated(node.getProperty(EXO_DATE_CREATED).getDate())
-      .with("UUID", node.getUUID())
       .setId(node.getName())
       .end();
+    if (node.hasProperty(EXO_DATE_CREATED)) {
+      notifiInfo.setDateCreated(node.getProperty(EXO_DATE_CREATED).getDate());
+    }
     List<String> ignoreProperties = Arrays.asList(NTF_PLUGIN_ID, NTF_TEXT, NTF_OWNER, NTF_LAST_MODIFIED_DATE);
     PropertyIterator iterator = node.getProperties();
     while (iterator.hasNext()) {
@@ -336,17 +323,13 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   private Node getNodeNotification(SessionProvider sProvider, String notificationId) {
     try {
       Session session = getSession(sProvider);
-      try {
-        return session.getNodeByUUID(notificationId);
-      } catch (ItemNotFoundException e) {
-        StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
-        strQuery.append(NTF_NOTIF_INFO).append(" WHERE fn:name() = '").append(notificationId).append("'");
-        QueryManager qm = session.getWorkspace().getQueryManager();
-        Query query = qm.createQuery(strQuery.toString(), Query.SQL);
-        NodeIterator it = query.execute().getNodes();
-        if (it.getSize() > 0) {
-          return it.nextNode();
-        }
+      StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
+      strQuery.append(NTF_NOTIF_INFO).append(" WHERE fn:name() = '").append(notificationId).append("'");
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      Query query = qm.createQuery(strQuery.toString(), Query.SQL);
+      NodeIterator it = query.execute().getNodes();
+      if (it.getSize() > 0) {
+        return it.nextNode();
       }
     } catch (Exception e) {
       LOG.error("Failed to get web notification node: " + notificationId, e);

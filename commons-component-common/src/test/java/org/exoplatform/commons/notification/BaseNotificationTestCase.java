@@ -80,7 +80,7 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
    * Gets or create the Web Date Node on Collaboration workspace.
    * 
    * For example: The web date node has the path as bellow:
-   * User1: /U/Us__/Use__/User1/notification/web/20141224/
+   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notification/web/20141224/
    * 
    * @param sProvider
    * @param notification
@@ -104,7 +104,7 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
    * Gets or create the Channel Node by NodeHierarchyCreator on Collaboration workspace.
    * 
    * For example: The channel node has the path as bellow:
-   * User1: /U/Us__/Use__/User1/notification/web
+   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notification/web/20141224/
    * 
    * @param sProvider
    * @param userId the remoteId
