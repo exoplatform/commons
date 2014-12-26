@@ -44,6 +44,8 @@ public class WebChannel extends AbstractChannel {
   /** logger */
   private static final Log LOG = ExoLogger.getLogger(WebChannel.class);
   /** */
+  private final Map<PluginKey, String> templateFilePaths = new HashMap<PluginKey, String>();
+  /** */
   private final Map<PluginKey, AbstractTemplateBuilder> templateBuilders;
 
   public WebChannel() {
@@ -63,6 +65,7 @@ public class WebChannel extends AbstractChannel {
   
   @Override
   public void registerTemplateProvider(TemplateProvider provider) {
+    this.templateFilePaths.putAll(provider.getTemplateFilePathConfigs());
     this.templateBuilders.putAll(provider.getTemplateBuilder());
   }
   
@@ -72,6 +75,11 @@ public class WebChannel extends AbstractChannel {
     AbstractTemplateBuilder builder = templateBuilders.get(pluginId);
     MessageInfo msg = builder.buildMessage(ctx);
     LOG.info("Web::{ userId:" + userId + ", pluginId: " + pluginId + ", message: "+ msg.getBody() + "}");
+  }
+  
+  @Override
+  public String getTemplateFilePath(PluginKey key) {
+    return this.templateFilePaths.get(key);
   }
   
   @Override

@@ -75,13 +75,29 @@ public class ChannelManagerImpl implements ChannelManager, Startable {
   }
 
   /**
-   * Register the new channel
+   * Register the template provider
    * 
    * @param provider
    */
   @Override
   public void registerTemplateProvider(TemplateProvider provider) {
     providers.add(provider);
+  }
+  
+  /**
+   * Register and override the template provider
+   * 
+   * @param provider
+   */
+  @Override
+  public void registerOverrideTemplateProvider(TemplateProvider provider) {
+    providers.add(provider);
+    AbstractChannel channel = channels.get(provider.getChannelKey());
+    if (channel != null) {
+      channel.registerTemplateProvider(addTemplateEngine(provider));
+    } else {
+      LOG.warn("Register the new TemplateProvider is unsucessful");
+    }
   }
 
   @Override
@@ -122,20 +138,14 @@ public class ChannelManagerImpl implements ChannelManager, Startable {
 
   @Override
   public void start() {
-    try {
-      for (TemplateProvider provider : providers) {
-        AbstractChannel channel = channels.get(provider.getChannelKey());
-        if (channel != null) {
-          channel.registerTemplateProvider(addTemplateEngine(provider));
-        } else {
-          LOG.warn("Register the new TemplateProvider is unsucessful");
-        }
+    for (TemplateProvider provider : providers) {
+      AbstractChannel channel = channels.get(provider.getChannelKey());
+      if (channel != null) {
+        channel.registerTemplateProvider(addTemplateEngine(provider));
+      } else {
+        LOG.warn("Register the new TemplateProvider is unsucessful");
       }
-    } finally {
-      providers = null;
-      gTemplateEngine = null;
     }
-    
   }
 
   @Override

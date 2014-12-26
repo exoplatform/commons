@@ -39,7 +39,7 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
   /** logger */
   private static final Log LOG = ExoLogger.getLogger(TemplateProvider.class);
   /** */
-  private final static String CHANNEL_ID_KEY = "channel-id";
+  public final static String CHANNEL_ID_KEY = "channel-id";
   /** */
   protected final  Map<PluginKey, String> templateFilePaths = new HashMap<PluginKey, String>();
   /** */

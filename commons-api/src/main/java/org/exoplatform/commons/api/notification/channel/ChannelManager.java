@@ -23,11 +23,18 @@ public interface ChannelManager {
   void unregister(AbstractChannel channel);
 
   /**
-   * Register the new channel
+   * Register the Template provider
    * 
    * @param provider
    */
   void registerTemplateProvider(TemplateProvider provider);
+  
+  /**
+   * Register and override the Template provider
+   * 
+   * @param provider
+   */
+  void registerOverrideTemplateProvider(TemplateProvider provider);
 
   /**
    * Gets the channel by the specified key
