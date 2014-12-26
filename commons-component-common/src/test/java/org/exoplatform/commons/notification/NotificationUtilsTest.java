@@ -21,9 +21,9 @@ import java.util.Locale;
 
 import junit.framework.TestCase;
 
-public class TestNotificationUtils extends TestCase {
+public class NotificationUtilsTest extends TestCase {
 
-  public TestNotificationUtils() {
+  public NotificationUtilsTest() {
   }
   
   public void testGetLocale() {

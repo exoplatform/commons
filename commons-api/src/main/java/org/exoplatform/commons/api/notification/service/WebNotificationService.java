@@ -19,43 +19,71 @@ package org.exoplatform.commons.api.notification.service;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.WebFilter;
-
+import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 
 public interface WebNotificationService {
-
   /**
-   * Saves information of a notification.
+   * Creates the new notification message to the specified user.
+   * The userId gets from the notification#getTo().
    * 
-   * @param notification The notification to be saved.
-   * @throws Exception
+   * @param notification the notification
+   * @LevelAPI Platform
+   * @since PLF 4.2
    */
   void save(NotificationInfo notification);
 
   /**
-   * @param userId
-   * @param notificationId the NotificationInfo's id
-   * @throws Exception
+   * Marks the notification to be read by the userId
+   * @param notificationId the Notification Id
+   * @LevelAPI Platform
+   * @since PLF 4.2
    */
   void markRead(String notificationId);
 
   /**
-   * @param userId
-   * @throws Exception
+   * Marks all notifications what belong to the user to be read.
+   * 
+   * 
+   * @param userId the userId
+   * @LevelAPI Platform
+   * @since PLF 4.2
    */
-  void markReadAll(String userId);
+  void markAllRead(String userId);
 
   /**
-   * Remove the notification on top menu popup.
-   * @param notificationId
+   * Updates the notification's popover list status to be FALSE value
+   * However it's still showing on View All page.
+   * 
+   * @param notificationId the Notification Id
+   * @LevelAPI Platform
+   * @since PLF 4.2
    */
   void hidePopover(String notificationId);
 
   /**
-   * @param filter the filter to set web notifications
-   * @throws Exception
+   * Gets the notification list by the given filter.
+   * 
+   * The filter consist of these criteria:
+   * + UserId
+   * + isPopover TRUE/FALSE
+   * + Read TRUE/FALSE
+   * 
+   * @param filter the filter condition
+   * @param offset
+   * @param limit
+   * @return The notification list matched the given filter
+   * @LevelAPI Platform
+   * @since PLF 4.2
    */
-  List<String> getNotificationContents(WebFilter filter);
+  List<String> get(WebNotificationFilter filter, int offset, int limit);
 
-  void remove(String notificationId);
+  /**
+   * Removes the notification by the notificationId
+   * 
+   * @param notificationId
+   * @return Returns TRUE if removing successfully Otherwise FALSE
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  boolean remove(String notificationId);
 }

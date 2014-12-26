@@ -25,7 +25,7 @@ import org.exoplatform.commons.api.notification.channel.template.AbstractTemplat
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.WebFilter;
+import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.WebNotificationService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.channel.WebChannel;
@@ -34,62 +34,62 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public class WebNotificationServiceImpl implements WebNotificationService {
+  /** logger */
   private static final Log LOG = ExoLogger.getLogger(WebNotificationServiceImpl.class);
-  private final WebNotificationStorage webStorage;
+  /** storage */
+  private final WebNotificationStorage storage;
+  
   public WebNotificationServiceImpl(WebNotificationStorage webStorage) {
-    this.webStorage = webStorage;
+    this.storage = webStorage;
   }
 
   @Override
   public void save(NotificationInfo notification) {
-    webStorage.save(notification);
+    storage.save(notification);
   }
 
   @Override
   public void markRead(String notificationId) {
-    webStorage.markRead(notificationId);
+    storage.markRead(notificationId);
   }
 
   @Override
-  public void markReadAll(String userId) {
-    webStorage.markReadAll(userId);
+  public void markAllRead(String userId) {
+    storage.markAllRead(userId);
   }
 
   @Override
-  public List<String> getNotificationContents(WebFilter filter) {
-    List<String> messages = new ArrayList<String>();
-    List<NotificationInfo> notificationInfos = webStorage.get(filter);
+  public List<String> get(WebNotificationFilter filter, int offset, int limit) {
+    List<String> result = new ArrayList<String>();
+    List<NotificationInfo> gotList = storage.get(filter, offset, limit);
     NotificationContext ctx = NotificationContextImpl.cloneInstance();
     AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(WebChannel.ID));
     //
-    for (NotificationInfo notification : notificationInfos) {
-      boolean isText = true;
-      try {
-        AbstractTemplateBuilder builder = channel.getTemplateBuilder(notification.getKey());
-        if(builder != null) {
-          MessageInfo msg = builder.buildMessage(ctx.setNotificationInfo(notification));
-          if(msg != null) {
-            messages.add(msg.getBody());
-            isText = false;
-          }
+    for (NotificationInfo notification : gotList) {
+      AbstractTemplateBuilder builder = channel.getTemplateBuilder(notification.getKey());
+      if (builder != null) {
+        MessageInfo msg = builder.buildMessage(ctx.setNotificationInfo(notification));
+        result.add(msg.getBody());
+        //if have any exception when template transformation
+        // gets the default title
+        if (ctx.isFailed()) {
+          LOG.debug(ctx.getException().getMessage(), ctx.getException());
+          result.add(notification.getTitle());
         }
-      } catch (Exception e) {
-        LOG.error("Failed to build web notification: " + notification.getId(), e);
-      }
-      if (isText) {
-        messages.add(notification.getTitle());
+      } else {
+        result.add(notification.getTitle());
       }
     }
-    return messages;
+    return result;
   }
 
   @Override
-  public void remove(String notificationId) {
-    webStorage.remove(notificationId);
+  public boolean remove(String notificationId) {
+    return storage.remove(notificationId);
   }
 
   @Override
   public void hidePopover(String notificationId) {
-    webStorage.hidePopover(notificationId);
+    storage.hidePopover(notificationId);
   }
 }

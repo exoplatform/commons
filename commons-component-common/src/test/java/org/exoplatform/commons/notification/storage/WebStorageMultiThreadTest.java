@@ -1,7 +1,5 @@
-package org.exoplatform.commons.notification;
+package org.exoplatform.commons.notification.storage;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -10,16 +8,10 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.jcr.Node;
 
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.model.WebFilter;
-import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
-import org.exoplatform.commons.notification.impl.AbstractService;
-import org.exoplatform.commons.notification.plugin.PluginTest;
+import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
+import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.util.IdGenerator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -27,11 +19,9 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.idm.UserImpl;
 
-public class WebStorageMultiThreadTestCase extends BaseNotificationTestCase {
-  private static final Log LOG = ExoLogger.getLogger(WebStorageMultiThreadTestCase.class);
-  private NodeHierarchyCreator nodeHierarchyCreator;
+public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
+  private static final Log LOG = ExoLogger.getLogger(WebStorageMultiThreadTest.class);
   private OrganizationService organizationService;
-  private WebNotificationStorage   webStorage;
   private ExecutorService executor;
   
   private int NUMBER_THREAD = 10;
@@ -42,30 +32,15 @@ public class WebStorageMultiThreadTestCase extends BaseNotificationTestCase {
 
   private long HCT_time = 0l;
   
-  private final String WORKSPACE_COLLABORATION = "collaboration";
-  private List<String> userIds;
-  public WebStorageMultiThreadTestCase() {
-  }
   @Override
   public void setUp() throws Exception {
+    initCollaborationWorkspace();
     super.setUp();
     //
     organizationService = getService(OrganizationService.class);
-    nodeHierarchyCreator = getService(NodeHierarchyCreator.class);
-    webStorage = getService(WebNotificationStorage.class);
+    create(NUMBER_USER, false);
     //
-    ManageableRepository repo = repositoryService.getRepository(REPO_NAME);
-    repo.getConfiguration().setDefaultWorkspaceName(WORKSPACE_COLLABORATION);
-    session = repo.getSystemSession(WORKSPACE_COLLABORATION);
-    root = session.getRootNode();
-    //
-    addNodeEventListener();
-    //
-    userIds = new ArrayList<String>();
-    //
-    craeteUsers(NUMBER_USER, false);
-    //
-    craeteUsers(NUMBER_USER, true);
+    create(NUMBER_USER, true);
     
     //
     ThreadFactory threadFactory = new ThreadFactory() {
@@ -81,20 +56,22 @@ public class WebStorageMultiThreadTestCase extends BaseNotificationTestCase {
   
   @Override
   protected void tearDown() throws Exception {
+    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
     for (String userId : userIds) {
-      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(SessionProvider.createSystemProvider(), userId);
-      if(userNodeApp.hasNode("notification")) {
-        userNodeApp.getNode("notification").remove();
+      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
+      if (userNodeApp.hasNode(NOTIFICATION)) {
+        userNodeApp.getNode(NOTIFICATION).remove();
+        userNodeApp.save();
       }
     }
-    session.save();
+    
     for (String string : userIds) {
       organizationService.getUserHandler().removeUser(string, false);
     }
     super.tearDown();
   }
 
-  private void craeteUsers(int number, boolean isSameFirst) throws Exception {
+  private void create(int number, boolean isSameFirst) throws Exception {
     for (int i = 0; i < number; i++) {
       String first = (isSameFirst) ? "" : String.valueOf(new Random().nextInt(1000));
       String userId = first + "user" + i + "_"+ String.valueOf(IdGenerator.generate()).hashCode();
@@ -103,21 +80,7 @@ public class WebStorageMultiThreadTestCase extends BaseNotificationTestCase {
       //
       userIds.add(userId);
     }
-    LOG.info("Done to cureate " + number + " users");
-  }
-
-  private NotificationInfo makeWebNotificationInfo(String userId) {
-    NotificationInfo info = NotificationInfo.instance();
-    info.key(new PluginKey(PluginTest.ID));
-    info.setTitle("The title of test notification");
-    info.setFrom("abc_user");
-    info.setTo(userId);
-    info.with(AbstractService.NTF_SHOW_POPOVER, "true")
-        .with(AbstractService.NTF_READ, "false")
-        .with("sender", "abc_user")
-        .with("activityId", "TheActivityId")
-        .with("accessLink", "http://fsdfsdf.com/fsdfsf");
-    return info;
+    LOG.info("Done to create " + number + " users");
   }
   
   public void testWebDatastorage() throws Exception {
@@ -135,7 +98,7 @@ public class WebStorageMultiThreadTestCase extends BaseNotificationTestCase {
             long t = System.currentTimeMillis();
             RequestLifeCycle.begin(container);
             try {
-              webStorage.save(makeWebNotificationInfo(userId));
+              storage.save(makeWebNotificationInfo(userId));
               ++HCR_save;
             } catch (Exception e) {
               assertFalse(true);
@@ -160,9 +123,9 @@ public class WebStorageMultiThreadTestCase extends BaseNotificationTestCase {
         public void process() {
           long t = System.currentTimeMillis();
           try {
-            WebFilter filter = new WebFilter(userId, 0, 20);
+            WebNotificationFilter filter = new WebNotificationFilter(userId);
             //
-            webStorage.get(filter);
+            storage.get(filter, 0, 20);
           } catch (Exception e) {
             assertFalse(true);
             LOG.error(e);

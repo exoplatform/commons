@@ -75,6 +75,7 @@ public class GroovyElementVisitor implements ElementVisitor {
         writable.writeTo(writer);
       }
     } catch (Exception e) {
+      ctx.setException(e);
       LOG.error("Failed at visit().", e);
     }
     return this;

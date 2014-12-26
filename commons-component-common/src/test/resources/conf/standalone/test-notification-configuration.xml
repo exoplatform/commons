@@ -16,8 +16,12 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
     <type>org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage</type>
   </component>
 
   <component>

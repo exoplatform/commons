@@ -18,7 +18,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.WebFilter;
+import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
@@ -54,7 +54,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * Gets or create the Web Date Node on Collaboration workspace.
    * 
    * For example: The web date node has the path as bellow:
-   * User1: /U/Us__/Use__/User1/notification/web/20141224/
+   * User1: /Users/U___/Us___/Use___/User1/notification/web/20141224/
    * 
    * @param sProvider
    * @param notification
@@ -78,7 +78,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * Gets or create the Channel Node by NodeHierarchyCreator on Collaboration workspace.
    * 
    * For example: The channel node has the path as bellow:
-   * User1: /U/Us__/Use__/User1/notification/web
+   * User1: /Users/U___/Us___/Use___/User1/notification/web
    * 
    * @param sProvider
    * @param userId the remoteId
@@ -128,33 +128,43 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
           notifyNode.setProperty(propertyName, ownerParameter.get(key));
         }
       }
-      notifyNode.getSession().save();
-      //
       notification.with("UUID", notifyNode.getUUID());
+      getSession(sProvider).save();
     } catch (Exception e) {
-      LOG.error("Failed to save the NotificationMessage", e);
+      LOG.error("Failed to save the notificaton.", e);
     } finally {
       localLock.unlock();
     }
+    
+  }
+  
+  @Override
+  public List<NotificationInfo> get(WebNotificationFilter filter, int offset, int limit) {
+    List<NotificationInfo> result = new ArrayList<NotificationInfo>();
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    try {
+      NodeIterator it = get(sProvider, filter, offset, limit);
+      while (it.hasNext()) {
+        Node node = it.nextNode();
+        result.add(fillModel(node));
+      }
+    } catch (Exception e) {
+      LOG.error("Notifications not found by filter: " + filter.toString(), e);
+    }
+    return result;
   }
 
   @Override
-  public List<NotificationInfo> get(WebFilter filter) {
-    List<NotificationInfo> notificationInfos = new ArrayList<NotificationInfo>();
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+  public NotificationInfo get(String id) {
     try {
-      NodeIterator it = get(sProvider, filter);
-      while (it.hasNext()) {
-        Node node = it.nextNode();
-        notificationInfos.add(fillModel(node));
-      }
+      return fillModel(getNodeNotification(NotificationSessionManager.getOrCreateSessionProvider(), id));
     } catch (Exception e) {
-      LOG.warn("Can not get web notifications by filter: " + filter.toString(), e);
+      LOG.error("Notification not found by id: " + id, e);
+      return null;
     }
-    return notificationInfos;
   }
   
-  private NodeIterator get(SessionProvider sProvider, WebFilter filter) throws Exception {
+  private NodeIterator get(SessionProvider sProvider, WebNotificationFilter filter, int offset, int limit) throws Exception {
     Session session = getSession(sProvider);
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
     strQuery.append(NTF_NOTIF_INFO).append(" WHERE ");
@@ -189,9 +199,9 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     LOG.debug(" The query get web notification:\n" + strQuery);
     QueryManager qm = session.getWorkspace().getQueryManager();
     QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
-    if (filter.getLimit() > 0) {
-      query.setLimit(filter.getLimit());
-      query.setOffset(filter.getOffset());
+    if (limit > 0) {
+      query.setLimit(limit);
+      query.setOffset(offset);
     }
     return query.execute().getNodes();
   }
@@ -211,7 +221,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
         session.save();
         return true;
       } catch (Exception e) {
-        LOG.warn("Can not remove web notification node: " + notificationId, e);
+        LOG.error("Failed to remove the notification id: " + notificationId, e);
       }
     }
     return false;
@@ -238,7 +248,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
         session.save();
       }
     } catch (Exception e) {
-      LOG.warn("Failed to remove old web notifications.", e);
+      LOG.error("Failed to remove all notifications for the user id: " + userId, e);
       return false;
     }
     return false;
@@ -254,7 +264,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
         node.setProperty(NTF_READ, "true");
         session.save();
       } catch (Exception e) {
-        LOG.warn("Can not save read on popover for web notification node: " + notificationId, e);
+        LOG.error("Failed to update the read notification Id: " + notificationId, e);
       }
     }
   }
@@ -269,24 +279,24 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
         node.setProperty(NTF_SHOW_POPOVER, "false");
         session.save();
       } catch (Exception e) {
-        LOG.warn("Can not save hidden on popover for web notification node: " + notificationId, e);
+        LOG.error("Failed to hide the notification Id: " + notificationId + " on the popover list.", e);
       }
     }
   }
 
   @Override
-  public void markReadAll(String userId) {
+  public void markAllRead(String userId) {
     SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
-    WebFilter filter = new WebFilter(userId, 0, 0).setRead(false).setOrder(false);
+    WebNotificationFilter filter = new WebNotificationFilter(userId).setRead(false).setOrder(false);
     try {
-      NodeIterator it = get(sProvider, filter);
+      NodeIterator it = get(sProvider, filter, 0, 0);
       while (it.hasNext()) {
         Node node = it.nextNode();
         node.setProperty(NTF_READ, "true");
       }
       getSession(sProvider).save();
     } catch (Exception e) {
-      LOG.warn("Can not get web notifications by filter: " + filter.toString(), e);
+      LOG.error("Failed to update the all read for userId:" + userId, e);
     }
   }
 
@@ -313,8 +323,10 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
           continue;
         }
         try {
-          notifiInfo.with(p.getName().replace(NTF_NAME_SPACE, ""), p.getString());
-        } catch (Exception e) {}
+          notifiInfo.with(p.getName(), p.getString());
+        } catch (Exception e) {
+          LOG.error("Failed to get the property value.", e);
+        }
       }
     }
     //
@@ -337,7 +349,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
         }
       }
     } catch (Exception e) {
-      LOG.warn("Failed to get web notification node: " + notificationId, e);
+      LOG.error("Failed to get web notification node: " + notificationId, e);
     }
     return null;
   }
