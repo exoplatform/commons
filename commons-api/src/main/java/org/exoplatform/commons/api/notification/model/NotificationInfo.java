@@ -59,6 +59,8 @@ public class NotificationInfo {
   private ChannelKey          channelKey;
   
   private Calendar            dateCreated;
+  
+  private boolean             isOnPopOver;
 
   public NotificationInfo() {
     this.id = PREFIX_ID + IdGenerator.generate();
@@ -299,6 +301,15 @@ public class NotificationInfo {
 
   public NotificationInfo setDateCreated(Calendar dateCreated) {
     this.dateCreated = dateCreated;
+    return this;
+  }
+  
+  public boolean isOnPopOver() {
+    return isOnPopOver;
+  }
+
+  public NotificationInfo setOnPopOver(boolean isOnPopOver) {
+    this.isOnPopOver = isOnPopOver;
     return this;
   }
 

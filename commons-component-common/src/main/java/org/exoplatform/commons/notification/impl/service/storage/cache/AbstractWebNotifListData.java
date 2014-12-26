@@ -171,11 +171,11 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
   }
   
   /**
-   * Removes the hidden activity out this stream
+   * Removes the item by its value
    * @param value the id
    * @return
    */
-  public boolean removeHidden(V value) {
+  public boolean removeByValue(V value) {
     return this.list.remove(value);
   }
 }

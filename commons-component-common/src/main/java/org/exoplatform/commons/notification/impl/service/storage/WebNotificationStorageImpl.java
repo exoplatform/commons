@@ -22,6 +22,7 @@ import org.exoplatform.commons.api.notification.service.storage.WebNotificationS
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
@@ -33,9 +34,12 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   private static final Log LOG = ExoLogger.getLogger(WebNotificationStorageImpl.class);
   private static final String NOTIFICATION = "notification";
   private static final String NT_UNSTRUCTURED = "nt:unstructured";
-
+  
   private final ReentrantLock lock = new ReentrantLock();
   private final NodeHierarchyCreator nodeHierarchyCreator;
+  
+  private WebNotificationStorage webNotificationStorage;
+  
   public WebNotificationStorageImpl(NodeHierarchyCreator nodeHierarchyCreator) {
     this.nodeHierarchyCreator = nodeHierarchyCreator;
   }
@@ -144,8 +148,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     try {
       NodeIterator it = get(sProvider, filter, offset, limit);
       while (it.hasNext()) {
-        Node node = it.nextNode();
-        result.add(fillModel(node));
+        result.add(getWebNotificationStorage().get(it.nextNode().getName()));
       }
     } catch (Exception e) {
       LOG.error("Notifications not found by filter: " + filter.toString(), e);
@@ -294,6 +297,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       .setFrom(node.getProperty(NTF_SENDER).getString()) // user make event of notification
       .key(node.getProperty(NTF_PLUGIN_ID).getString())//pluginId
       .setTitle(node.getProperty(NTF_TEXT).getString())
+      .setOnPopOver(node.getProperty(NTF_SHOW_POPOVER).getBoolean())
       //
       .setLastModifiedDate(node.getProperty(NTF_LAST_MODIFIED_DATE).getLong())
       .setId(node.getName())
@@ -335,5 +339,13 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       LOG.error("Failed to get web notification node: " + notificationId, e);
     }
     return null;
+  }
+  
+  private WebNotificationStorage getWebNotificationStorage() {
+    if (webNotificationStorage == null) {
+      webNotificationStorage = CommonsUtils.getService(WebNotificationStorage.class);
+    }
+    
+    return webNotificationStorage;
   }
 }

@@ -17,21 +17,22 @@
 
 package org.exoplatform.commons.notification.impl.service.storage.cache;
 
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.services.cache.CachedObjectSelector;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.ObjectCacheInfo;
 
 public class WebNotificationInfosSelector implements CachedObjectSelector<ListWebNotificationsKey, Object> {
-  private final String userId;
+  private final NotificationInfo notificationInfo;
   
-  public WebNotificationInfosSelector(String userId) {
-    this.userId = userId;
+  public WebNotificationInfosSelector(NotificationInfo notificationInfo) {
+    this.notificationInfo = notificationInfo;
   }
   
   @Override
   public boolean select(ListWebNotificationsKey key, ObjectCacheInfo<? extends Object> ocinfo) {
     if (key != null && key.getUserId() != null) {
-      return key.getUserId().equals(userId);
+      return key.getUserId().equals(notificationInfo.getTo());
     }
     return false;
   }
@@ -39,7 +40,15 @@ public class WebNotificationInfosSelector implements CachedObjectSelector<ListWe
   @Override
   public void onSelect(ExoCache<? extends ListWebNotificationsKey, ? extends Object> cache,
       ListWebNotificationsKey key, ObjectCacheInfo<? extends Object> ocinfo) throws Exception {
-    cache.remove(key);
+    Object data = ocinfo.get();
+    if (data instanceof ListWebNotificationsData) {
+      ListWebNotificationsData listData = (ListWebNotificationsData) data;
+      if (key.isOnPopover()) {
+        listData.removeByValue(notificationInfo.getId());
+      } else {
+        listData.clear();          
+      }  
+    }
   }
 
 }

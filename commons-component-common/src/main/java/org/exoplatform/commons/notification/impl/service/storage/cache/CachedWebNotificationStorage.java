@@ -70,7 +70,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     //
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
     exoWebNotificationCache.remove(key);
-    clearCachingList(notification.getTo());
+    clearCachingList(notification);
   }
 
   @Override
@@ -110,7 +110,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     //
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
     exoWebNotificationCache.remove(key);
-    clearCachingList(notification.getTo());
+    clearCachingList(notification);
     return true;
   }
 
@@ -182,11 +182,10 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
    * Clear the list caching
    * @param userId
    */
-  private void clearCachingList(String userId) {
+  private void clearCachingList(NotificationInfo notificationInfo) {
+    
     try {
-      if (userId != null) {
-        exoWebNotificationsCache.select(new WebNotificationInfosSelector(userId));
-      }
+      exoWebNotificationsCache.select(new WebNotificationInfosSelector(notificationInfo));
     } catch (Exception e) {
       LOG.error("Failed when clear the caching list", e);
     }
