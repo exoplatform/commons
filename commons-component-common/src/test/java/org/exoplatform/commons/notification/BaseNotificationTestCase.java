@@ -23,7 +23,7 @@ import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 
 public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
 
-  protected static final String NOTIFICATION = "notification";
+  protected static final String NOTIFICATIONS = "notifications";
   protected static final String NT_UNSTRUCTURED = "nt:unstructured";
   protected final String WORKSPACE_COLLABORATION = "collaboration";
   protected List<String> userIds;
@@ -62,8 +62,8 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
       SessionProvider sessionProvider = SessionProvider.createSystemProvider();
       for (String userId : userIds) {
         Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
-        if (userNodeApp.hasNode(NOTIFICATION)) {
-          userNodeApp.getNode(NOTIFICATION).remove();
+        if (userNodeApp.hasNode(NOTIFICATIONS)) {
+          userNodeApp.getNode(NOTIFICATIONS).remove();
           userNodeApp.save();
         }
       }
@@ -80,7 +80,7 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
    * Gets or create the Web Date Node on Collaboration workspace.
    * 
    * For example: The web date node has the path as bellow:
-   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notification/web/20141224/
+   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notifications/web/20141224/
    * 
    * @param sProvider
    * @param notification
@@ -104,7 +104,7 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
    * Gets or create the Channel Node by NodeHierarchyCreator on Collaboration workspace.
    * 
    * For example: The channel node has the path as bellow:
-   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notification/web/20141224/
+   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notifications/web/20141224/
    * 
    * @param sProvider
    * @param userId the remoteId
@@ -114,10 +114,10 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
   protected Node getOrCreateChannelNode(SessionProvider sProvider, String userId) throws Exception {
     Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId);
     Node parentNode = null;
-    if (userNodeApp.hasNode(NOTIFICATION)) {
-      parentNode = userNodeApp.getNode(NOTIFICATION);
+    if (userNodeApp.hasNode(NOTIFICATIONS)) {
+      parentNode = userNodeApp.getNode(NOTIFICATIONS);
     } else {
-      parentNode = userNodeApp.addNode(NOTIFICATION, NT_UNSTRUCTURED);
+      parentNode = userNodeApp.addNode(NOTIFICATIONS, NT_UNSTRUCTURED);
     }
     Node channelNode = null;
     if (parentNode.hasNode(AbstractService.WEB_CHANNEL)) {

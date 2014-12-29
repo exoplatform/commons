@@ -59,8 +59,8 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
     SessionProvider sessionProvider = SessionProvider.createSystemProvider();
     for (String userId : userIds) {
       Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
-      if (userNodeApp.hasNode(NOTIFICATION)) {
-        userNodeApp.getNode(NOTIFICATION).remove();
+      if (userNodeApp.hasNode(NOTIFICATIONS)) {
+        userNodeApp.getNode(NOTIFICATIONS).remove();
         userNodeApp.save();
       }
     }

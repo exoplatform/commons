@@ -31,7 +31,7 @@ import org.exoplatform.services.log.Log;
 
 public class WebNotificationStorageImpl extends AbstractService implements WebNotificationStorage {
   private static final Log LOG = ExoLogger.getLogger(WebNotificationStorageImpl.class);
-  private static final String NOTIFICATION = "notification";
+  private static final String NOTIFICATIONS = "notifications";
   private static final String NT_UNSTRUCTURED = "nt:unstructured";
   
   private final ReentrantLock lock = new ReentrantLock();
@@ -56,7 +56,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * Gets or create the Web Date Node on Collaboration workspace.
    * 
    * For example: The web date node has the path as bellow:
-   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notification/web/20141224/
+   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notifications/web/20141224/
    * 
    * @param sProvider
    * @param notification
@@ -86,7 +86,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * Gets or create the Channel Node by NodeHierarchyCreator on Collaboration workspace.
    * 
    * For example: The channel node has the path as bellow:
-   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notification/web
+   * User1: /Users/U___/Us___/Use___/User1/ApplicationData/notifications/web
    * 
    * @param sProvider
    * @param userId the remoteId
@@ -96,10 +96,10 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   private Node getOrCreateChannelNode(SessionProvider sProvider, String userId) throws Exception {
     Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId);
     Node parentNode = null;
-    if (userNodeApp.hasNode(NOTIFICATION)) {
-      parentNode = userNodeApp.getNode(NOTIFICATION);
+    if (userNodeApp.hasNode(NOTIFICATIONS)) {
+      parentNode = userNodeApp.getNode(NOTIFICATIONS);
     } else {
-      parentNode = userNodeApp.addNode(NOTIFICATION, NT_UNSTRUCTURED);
+      parentNode = userNodeApp.addNode(NOTIFICATIONS, NT_UNSTRUCTURED);
     }
     Node channelNode = null;
     if (parentNode.hasNode(WEB_CHANNEL)) {
