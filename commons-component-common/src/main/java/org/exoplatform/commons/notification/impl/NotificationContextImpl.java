@@ -54,9 +54,10 @@ public final class NotificationContextImpl implements NotificationContext {
   private final PluginSettingService settingService;
 
   private final ChannelManager channelManager;
+  
+  private boolean writingStatus = false;
 
   private NotificationContextImpl() {
-    //TODO apply static method for Notification
     //Create the pluginConttext for operation-per-session such as transaction 
     executor = new NotificationExecutorImpl();
     pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
@@ -181,6 +182,16 @@ public final class NotificationContextImpl implements NotificationContext {
   @Override
   public NotificationContext clone() {
     return new NotificationContextImpl();
+  }
+  
+  @Override
+  public boolean isWritingProcess() {
+    return this.writingStatus;
+  }
+  
+  @Override
+  public void setWritingProcess(boolean writingStatus) {
+    this.writingStatus = writingStatus;
   }
 
 }

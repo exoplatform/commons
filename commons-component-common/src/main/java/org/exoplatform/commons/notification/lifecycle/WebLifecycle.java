@@ -56,8 +56,13 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       }
       
       if (userSetting.isActive(WebChannel.ID, pluginId)) {
+        ctx.setWritingProcess(true);
         send(ctx.setNotificationInfo(notification.clone(true).setTo(userId)));
-        store(ctx.getNotificationInfo());
+        if (notification.getId().equals(ctx.getNotificationInfo().getId())) {
+          store(ctx.getNotificationInfo());
+        } else {
+          update(ctx.getNotificationInfo());
+        }
       }
     }
 
@@ -77,13 +82,21 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   }
   
   @Override
+  public void update(NotificationInfo notifInfo) {
+    LOG.info("WEB:: Update an existing notification to db by Web channel.");
+    notifInfo.with(AbstractService.NTF_SHOW_POPOVER, "true")
+             .with(AbstractService.NTF_READ, "false");
+    CommonsUtils.getService(WebNotificationStorage.class).update(notifInfo);
+  }
+  
+  @Override
   public void send(NotificationContext ctx) {
     LOG.info("WEB:: Send the message by Web channel.");
-    NotificationInfo notification = ctx.getNotificationInfo(); 
-    getChannel().dispatch(notification.setLastModifiedDate(Calendar.getInstance()));
+    getChannel().dispatch(ctx.getNotificationInfo().setLastModifiedDate(Calendar.getInstance()));
     try {
       MessageInfo msg = buildMessageInfo(ctx);
       if(msg != null) {
+        NotificationInfo notification = ctx.getNotificationInfo();
         WebNotificationSender.sendJsonMessage(notification.getTo(), msg);
         notification.setTitle(msg.getBody());
       }

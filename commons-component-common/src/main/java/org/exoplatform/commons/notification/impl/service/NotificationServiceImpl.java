@@ -32,7 +32,6 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
-import org.exoplatform.commons.api.notification.service.WebNotificationService;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
@@ -41,7 +40,6 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
-import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -56,8 +54,6 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   /** */
   private final NotificationDataStorage storage;
   /** */
-  private final WebNotificationService dataStorage;
-  /** */
   private final DigestorService digestorService;
   /** */
   private final UserSettingService userService;
@@ -71,14 +67,12 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
                                  UserSettingService userService,
                                  DigestorService digestorService,
                                  NotificationDataStorage storage,
-                                 WebNotificationService dataStorage,
                                  NotificationContextFactory notificationContextFactory) {
     this.userService = userService;
     this.digestorService = digestorService;
     this.storage = storage;
     this.notificationContextFactory = notificationContextFactory;
     this.channelManager = channelManager;
-    this.dataStorage = dataStorage;
   }
   
   @Override

@@ -16,6 +16,15 @@ public interface WebNotificationStorage {
    * @since PLF 4.2
    */
   void save(NotificationInfo notification);
+  
+  /**
+   * Update an existing notification message.
+   * 
+   * @param notification the notification
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  void update(NotificationInfo notification);
 
   /**
    * Marks the notification to be read by the userId
@@ -91,4 +100,12 @@ public interface WebNotificationStorage {
    * @since PLF 4.2
    */
   boolean remove(String userId, long seconds);
+  
+  /**
+   * @param pluginId
+   * @param activityId
+   * @param owner
+   * @return
+   */
+  NotificationInfo getUnreadNotification(String pluginId, String activityId, String owner);
 }

@@ -22,7 +22,6 @@ import org.exoplatform.commons.api.notification.service.storage.WebNotificationS
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
@@ -340,12 +339,41 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     }
     return null;
   }
-  
+
   private WebNotificationStorage getWebNotificationStorage() {
     if (webNotificationStorage == null) {
       webNotificationStorage = CommonsUtils.getService(WebNotificationStorage.class);
     }
-    
     return webNotificationStorage;
+  }
+
+  @Override
+  public NotificationInfo getUnreadNotification(String pluginId, String activityId, String owner) {
+    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    try {
+      String userNodePath = getOrCreateChannelNode(sProvider, owner).getPath();
+      StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(NTF_NOTIF_INFO);
+      strQuery.append(" WHERE jcr:path LIKE '").append(userNodePath).append("/%'")
+              .append(" AND ntf:pluginId = '").append(pluginId).append("'")
+              .append(" AND ntf:activityId = '").append(activityId).append("'")
+              .append(" AND ntf:read = 'false'");
+      Session session = getSession(sProvider);
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
+      query.setOffset(0);
+      query.setLimit(1);
+      NodeIterator iter = query.execute().getNodes();
+      if (iter.hasNext()) {
+        return getWebNotificationStorage().get(iter.nextNode().getName());
+      }
+    } catch (Exception e) {
+      LOG.debug("Failed to getUnreadNotification ", e);
+    }
+    return null;
+  }
+
+  @Override
+  public void update(NotificationInfo notification) {
+    save(notification);
   }
 }

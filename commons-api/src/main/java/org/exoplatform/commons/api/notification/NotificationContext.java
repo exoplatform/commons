@@ -28,7 +28,20 @@ import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 
 public interface NotificationContext extends Cloneable {
-
+  
+  /**
+   * Determines the writing processing or NOT
+   * @return
+   */
+  boolean isWritingProcess();
+  
+  /**
+   * Sets the writing status to the context
+   * 
+   * @param writingStatus
+   */
+  void setWritingProcess(boolean writingStatus);
+  
   /**
    * Append the argument literal.
    * @param param

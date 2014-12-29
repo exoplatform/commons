@@ -135,7 +135,11 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     //
     return notificationInfo.build();
   }
-  
+
+  public NotificationInfo getUnreadNotification(String pluginId, String activityId, String owner) {
+    return storage.getUnreadNotification(pluginId, activityId, owner);
+  }
+
   @Override
   public boolean remove(String userId, long seconds) {
     return storage.remove(userId, seconds);
@@ -197,5 +201,11 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   
   public <K extends CacheKey, V extends Serializable> FutureExoCache<K, V, ServiceContext<V>> createFutureCache(ExoCache<K, V> cache) {
     return new FutureExoCache<K, V, ServiceContext<V>>(new CacheLoader<K, V>(), cache);
+  }
+
+  @Override
+  public void update(NotificationInfo notification) {
+    storage.update(notification);
+    clearCachingList(notification);
   }
 }

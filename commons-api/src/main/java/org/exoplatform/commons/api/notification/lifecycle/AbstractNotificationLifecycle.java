@@ -66,6 +66,12 @@ public abstract class AbstractNotificationLifecycle {
   public void store(NotificationInfo notifInfo) {}
   
   /**
+   * Update an existing notification
+   * @param notifInfo
+   */
+  public void update(NotificationInfo notifInfo) {}
+  
+  /**
    * Sends the message by Mail, UI or any the configured channel
    * @param ctx
    */
