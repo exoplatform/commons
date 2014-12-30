@@ -19,6 +19,7 @@ package org.exoplatform.commons.notification.lifecycle;
 import java.util.Calendar;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
@@ -27,7 +28,6 @@ import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.channel.WebChannel;
-import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.net.WebNotificationSender;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
@@ -76,16 +76,16 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   @Override
   public void store(NotificationInfo notifInfo) {
     LOG.info("WEB:: Store the notification to db by Web channel.");
-    notifInfo.with(AbstractService.NTF_SHOW_POPOVER, "true")
-             .with(AbstractService.NTF_READ, "false");
+    notifInfo.with(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), "true")
+             .with(NotificationMessageUtils.READ_PORPERTY.getKey(), "false");
     CommonsUtils.getService(WebNotificationStorage.class).save(notifInfo);
   }
   
   @Override
   public void update(NotificationInfo notifInfo) {
     LOG.info("WEB:: Update an existing notification to db by Web channel.");
-    notifInfo.with(AbstractService.NTF_SHOW_POPOVER, "true")
-             .with(AbstractService.NTF_READ, "false");
+    notifInfo.with(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), "true")
+             .with(NotificationMessageUtils.READ_PORPERTY.getKey(), "false");
     CommonsUtils.getService(WebNotificationStorage.class).update(notifInfo);
   }
   

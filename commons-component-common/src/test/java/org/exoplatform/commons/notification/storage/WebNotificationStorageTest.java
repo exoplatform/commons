@@ -6,10 +6,10 @@ import java.util.List;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 
+import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
-import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.mortbay.log.Log;
 
@@ -43,12 +43,12 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     List<NotificationInfo> list = storage.get(new WebNotificationFilter(userId), 0, 10);
     assertEquals(1, list.size());
     NotificationInfo notif = list.get(0);
-    assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(AbstractService.NTF_READ)));
+    assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY)));
     //
     storage.markRead(notif.getId());
     //
     notif = storage.get(notif.getId());
-    assertTrue(Boolean.valueOf(notif.getOwnerParameter().get(AbstractService.NTF_READ)));
+    assertTrue(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY)));
   }
 
   public void testMarkReadAll() throws Exception {
@@ -61,7 +61,7 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     List<NotificationInfo> list = storage.get(new WebNotificationFilter(userId), 0, 10);
     assertEquals(10, list.size());
     for(NotificationInfo notif : list) {
-      assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(AbstractService.NTF_READ)));
+      assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY)));
     }
     //
     storage.markAllRead(userId);
@@ -70,7 +70,7 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     assertEquals(10, list.size());
     //
     for(NotificationInfo notif : list) {
-      assertTrue(Boolean.valueOf(notif.getValueOwnerParameter(AbstractService.NTF_READ)));
+      assertTrue(Boolean.valueOf(notif.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY)));
     }
   }
   

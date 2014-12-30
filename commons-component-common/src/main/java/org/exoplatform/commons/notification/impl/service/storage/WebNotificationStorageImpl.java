@@ -313,7 +313,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
           continue;
         }
         try {
-          notifiInfo.with(p.getName(), p.getString());
+          notifiInfo.with(p.getName().replace(NTF_NAME_SPACE, ""), p.getString());
         } catch (Exception e) {
           LOG.error("Failed to get the property value.", e);
         }

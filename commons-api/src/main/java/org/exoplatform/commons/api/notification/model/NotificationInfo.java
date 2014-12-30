@@ -43,7 +43,7 @@ public class NotificationInfo {
 
   private int                 order;
 
-  private Map<String, String> ownerParameter = new LikeHashMap<String, String>();
+  private Map<String, String> ownerParameter = new HashMap<String, String>();
 
   private List<String>        sendToUserIds  = new ArrayList<String>();
 
@@ -450,17 +450,5 @@ public class NotificationInfo {
       message.setId(id);
     }
     return message;
-  }
-
-  public class LikeHashMap<K, V> extends HashMap<K, V> {
-    private static final long serialVersionUID = 1L;
-    @Override
-    public V get(Object key) {
-      V value = super.get(key);
-      if (value == null && key instanceof String) {
-        value = super.get("ntf:" + key.toString());
-      }
-      return value;
-    }
   }
 }
