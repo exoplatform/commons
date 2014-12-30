@@ -21,6 +21,7 @@ import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
+import org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
@@ -277,10 +278,18 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
     WebNotificationFilter filter = new WebNotificationFilter(userId).setRead(false).setOrder(false);
     try {
+      CachedWebNotificationStorage cacheStorage = null;
+      if (getWebNotificationStorage() instanceof CachedWebNotificationStorage) {
+        cacheStorage = (CachedWebNotificationStorage) getWebNotificationStorage();
+      }
       NodeIterator it = get(sProvider, filter, 0, 0);
       while (it.hasNext()) {
         Node node = it.nextNode();
         node.setProperty(NTF_READ, "true");
+        //
+        if (cacheStorage != null) {
+          cacheStorage.updateRead(node.getName(), true);
+        }
       }
       getSession(sProvider).save();
     } catch (Exception e) {

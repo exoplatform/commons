@@ -107,7 +107,9 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
   
   public void afterPutRef() {}
   
-  public void beforeMove() {}
+  public void beforeMove(V value) {
+    this.list.remove(value);
+  }
   
   public void afterMove() {}
   
@@ -121,7 +123,7 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
    * @param position
    */
   public void move(int index, V value, String ownerId) {
-    beforeMove();
+    beforeMove(value);
     this.list.add(index, value);
     afterMove();
   }
@@ -131,7 +133,9 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
    * @param value the given value
    */
   public void moveTop(V value, String ownerId) {
-    move(0, value, ownerId);
+    beforeMove(value);
+    this.list.addFirst(value);
+    afterMove();
   }
   
   /**
@@ -141,6 +145,7 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
    */
   public void remove(V value, String ownerId) {
     beforeRemove();
+    this.list.remove(value);
     afterRemove();
   }
   

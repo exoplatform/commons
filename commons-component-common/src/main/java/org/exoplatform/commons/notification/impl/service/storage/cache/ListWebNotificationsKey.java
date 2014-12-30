@@ -49,10 +49,7 @@ public class ListWebNotificationsKey implements CacheKey, Serializable {
     if (!(o instanceof ListWebNotificationsKey)) {
       return false;
     }
-    if (!super.equals(o)) {
-      return false;
-    }
-
+    
     ListWebNotificationsKey that = (ListWebNotificationsKey) o;
 
     if (userId != that.userId) {
@@ -68,9 +65,8 @@ public class ListWebNotificationsKey implements CacheKey, Serializable {
 
   @Override
   public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (userId != null ? userId.hashCode() : 0);
-    result = 31 * result + (isOnPopover ? 1231 : 1237);
+    int result = 31 * (userId != null ? userId.hashCode() : 0);
+    result = 31 * result + (isOnPopover ? 1 : 0);
     return result;
   }
 

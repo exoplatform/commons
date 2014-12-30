@@ -25,7 +25,6 @@ import java.util.List;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
-
 import org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
@@ -63,27 +62,37 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
 
   @Override
   public void markRead(String notificationId) {
-    NotificationInfo notification = storage.get(notificationId);
-    
     storage.markRead(notificationId);
-    
     //
+    updateRead(notificationId, true);
+  }
+  
+  public void updateRead(String notificationId, boolean isRead) {
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
-    exoWebNotificationCache.remove(key);
-    clearCachingList(notification);
+    WebNotifInfoData infoData = exoWebNotificationCache.get(key);
+    if (infoData != null) {
+      infoData.updateRead(isRead);
+    }
   }
 
   @Override
   public void markAllRead(String userId) {
     storage.markAllRead(userId);
-    exoWebNotificationsCache.clearCache();
   }
 
   @Override
   public void hidePopover(String notificationId) {
     storage.hidePopover(notificationId);
+    // update data showPopover
+    WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
+    WebNotifInfoData infoData = exoWebNotificationCache.get(key);
+    if (infoData != null) {
+      infoData.updateShowPopover(false);
+    }
+    // update list
+    removePopover(get(notificationId));
   }
-
+  
   @Override
   public List<NotificationInfo> get(final WebNotificationFilter filter, final int offset, final int limit) {
     final ListWebNotificationsKey key = ListWebNotificationsKey.key(filter.getUserId(), filter.isOnPopover());
@@ -101,16 +110,20 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
 
   @Override
   public boolean remove(String notificationId) {
-    NotificationInfo notification = storage.get(notificationId);
+    NotificationInfo notification = get(notificationId);
     if (notification == null) {
       return false;
     }
     //
     storage.remove(notificationId);
     //
+    removePopover(notification);
+    //
+    removeViewAll(notification);
+    //
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
     exoWebNotificationCache.remove(key);
-    clearCachingList(notification);
+    //
     return true;
   }
 
@@ -131,8 +144,10 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
             }
           }
         }, key);
-
     //
+    if(notificationInfo == null) {
+      return null;
+    }
     return notificationInfo.build();
   }
 
@@ -147,13 +162,11 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   
   private ListWebNotificationsData buildWebNotifDataIds(ListWebNotificationsKey key,
                                                         List<NotificationInfo> notifications) {
-
     ListWebNotificationsData data = this.exoWebNotificationsCache.get(key);
     if (data == null) {
       data = new ListWebNotificationsData(key);
       this.exoWebNotificationsCache.put(key, data);
     }
-
     //
     for (int i = 0, len = notifications.size(); i < len; i++) {
       NotificationInfo notif = notifications.get(i);
@@ -176,10 +189,54 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     for (String id : ids) {
       NotificationInfo a = get(id);
       if (a != null) {
-          notifications.add(a);
+        notifications.add(a);
       }
     }
     return notifications;
+  }
+
+  @Override
+  public void update(NotificationInfo notification) {
+    storage.update(notification);
+    //
+    WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notification.getId());
+    exoWebNotificationCache.put(key, new WebNotifInfoData(notification));
+    //
+    moveTopPopover(notification);
+    //
+    moveTopViewAll(notification);
+  }
+  
+  private void moveTopPopover(NotificationInfo notification) {
+    ListWebNotificationsKey userPopoverKey = ListWebNotificationsKey.key(notification.getTo(), true);
+    ListWebNotificationsData listData = exoWebNotificationsCache.get(userPopoverKey);
+    if (listData != null) {
+      listData.moveTop(notification.getId(), notification.getTo());
+    }
+  }
+
+  private void moveTopViewAll(NotificationInfo notification) {
+    ListWebNotificationsKey userViewAllKey = ListWebNotificationsKey.key(notification.getTo(), false);
+    ListWebNotificationsData listData = exoWebNotificationsCache.get(userViewAllKey);
+    if (listData != null) {
+      listData.moveTop(notification.getId(), notification.getTo());
+    }
+  }
+
+  private void removePopover(NotificationInfo notification) {
+    ListWebNotificationsKey userPopoverKey = ListWebNotificationsKey.key(notification.getTo(), true);
+    ListWebNotificationsData listData = exoWebNotificationsCache.get(userPopoverKey);
+    if (listData != null) {
+      listData.removeByValue(notification.getId());
+    }
+  }
+  
+  private void removeViewAll(NotificationInfo notification) {
+    ListWebNotificationsKey userViewAllKey = ListWebNotificationsKey.key(notification.getTo(), false);
+    ListWebNotificationsData listData = exoWebNotificationsCache.get(userViewAllKey);
+    if (listData != null) {
+      listData.removeByValue(notification.getId());
+    }
   }
   
   /**
@@ -199,13 +256,8 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     return new FutureWebNotifExoCache<T, K, V, ServiceContext<V>>(new CacheLoader<K, V>(), cache);
   }
   
-  public <K extends CacheKey, V extends Serializable> FutureExoCache<K, V, ServiceContext<V>> createFutureCache(ExoCache<K, V> cache) {
+  private <K extends CacheKey, V extends Serializable> FutureExoCache<K, V, ServiceContext<V>> createFutureCache(ExoCache<K, V> cache) {
     return new FutureExoCache<K, V, ServiceContext<V>>(new CacheLoader<K, V>(), cache);
   }
 
-  @Override
-  public void update(NotificationInfo notification) {
-    storage.update(notification);
-    clearCachingList(notification);
-  }
 }

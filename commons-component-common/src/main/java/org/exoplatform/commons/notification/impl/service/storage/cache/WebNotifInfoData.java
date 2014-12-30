@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
@@ -74,6 +75,22 @@ public class WebNotifInfoData implements Serializable {
     notificationInfo.setChannelKey(this.channelKey);
     
     return notificationInfo;
+  }
+
+  public WebNotifInfoData updateRead(boolean isRead) {
+    if (ownerParameter == null) {
+      ownerParameter = new HashMap<String, String>();
+    }
+    ownerParameter.put(NotificationMessageUtils.READ_PORPERTY.getKey(), String.valueOf(isRead));
+    return this;
+  }
+
+  public WebNotifInfoData updateShowPopover(boolean isShow) {
+    if (ownerParameter == null) {
+      ownerParameter = new HashMap<String, String>();
+    }
+    ownerParameter.put(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), String.valueOf(isShow));
+    return this;
   }
 
 }
