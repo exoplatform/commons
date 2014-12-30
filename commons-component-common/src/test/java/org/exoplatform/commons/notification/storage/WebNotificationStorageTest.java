@@ -11,7 +11,6 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.mortbay.log.Log;
 
 public class WebNotificationStorageTest extends BaseNotificationTestCase {
 
@@ -43,12 +42,12 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     List<NotificationInfo> list = storage.get(new WebNotificationFilter(userId), 0, 10);
     assertEquals(1, list.size());
     NotificationInfo notif = list.get(0);
-    assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY)));
+    assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY.getKey())));
     //
     storage.markRead(notif.getId());
     //
     notif = storage.get(notif.getId());
-    assertTrue(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY)));
+    assertTrue(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY.getKey())));
   }
 
   public void testMarkReadAll() throws Exception {
@@ -61,7 +60,7 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     List<NotificationInfo> list = storage.get(new WebNotificationFilter(userId), 0, 10);
     assertEquals(10, list.size());
     for(NotificationInfo notif : list) {
-      assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY)));
+      assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY.getKey())));
     }
     //
     storage.markAllRead(userId);
@@ -70,7 +69,7 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     assertEquals(10, list.size());
     //
     for(NotificationInfo notif : list) {
-      assertTrue(Boolean.valueOf(notif.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY)));
+      assertTrue(Boolean.valueOf(notif.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
     }
   }
   
@@ -113,9 +112,6 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     Node parentNode = getOrCreateChannelNode(sProvider, userId);
     NodeIterator it = parentNode.getNodes();
-    while(it.hasNext()) {
-      Log.info("Node path = " + it.nextNode().getPath());
-    }
     assertEquals(5, parentNode.getNodes().getSize());
     //
     NodeIterator iter = null;
