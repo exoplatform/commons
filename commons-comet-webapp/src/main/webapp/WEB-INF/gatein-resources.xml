@@ -10,10 +10,35 @@
 		<script>
 			<path>/javascript/eXo/commons/commons-Cometd.js</path>
 		</script>
-		<!-- need Browser.js -->
 		<depends>
 			<module>base</module>
 			<as>gtnbase</as>
+		</depends>
+	</module>
+
+	<module>
+		<name>cometd</name>
+		<script>
+			<adapter>
+				(function() {
+				<include>/org/cometd.js</include>
+				return org.cometd;
+				})();
+			</adapter>
+		</script>
+	</module>
+
+	<module>
+		<name>jquery_cometd</name>
+		<script>
+			<path>/jquery/jquery.cometd.js</path>
+		</script>
+		<depends>
+			<module>jquery</module>
+			<as>jQuery</as>
+		</depends>
+		<depends>
+			<module>cometd</module>
 		</depends>
 	</module>
 

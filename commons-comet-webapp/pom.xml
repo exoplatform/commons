@@ -9,4 +9,29 @@
   <artifactId>commons-comet-webapp</artifactId>
   <packaging>war</packaging>
   <name>eXo Commons - Comet WebApp</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <overlays>
+            <overlay />
+            <overlay>
+              <groupId>org.cometd.javascript</groupId>
+              <artifactId>cometd-javascript-jquery</artifactId>
+            </overlay>
+          </overlays>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.cometd.javascript</groupId>
+      <artifactId>cometd-javascript-jquery</artifactId>
+      <type>war</type>
+    </dependency>
+  </dependencies>
 </project>
