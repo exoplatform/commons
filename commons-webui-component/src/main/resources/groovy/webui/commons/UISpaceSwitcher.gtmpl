@@ -44,7 +44,7 @@
       <i class="uiIconClose pull-right" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></i>
       <%= _ctx.appRes("UISpaceSwitcher.title.select-location"); %>
     </li>
-    <li style="display:block" class="spaceSearch"><input type="text" class="spaceSearchText lostFocus"></input></li>
+    <li style="display:block" class="spaceSearch"><input type="text" placeholder="<%=defaultValueForTextSearch %>" class="spaceSearchText " /></li>
     <li style="display:block" class="portalSpace"></li>
     <li style="display:block" class="userSpace"></li>
     <li style="display:block" class="spaceOption"><div class='spaceOption spaceTitle' id='UISpaceSwitcher_spaceTitle'><%=spaceLabel%></div></li>
