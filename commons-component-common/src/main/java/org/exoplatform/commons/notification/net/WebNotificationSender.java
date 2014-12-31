@@ -16,13 +16,13 @@
  */
 package org.exoplatform.commons.notification.net;
 
+import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.ws.frameworks.cometd.ContinuationService;
 import org.exoplatform.ws.frameworks.json.impl.JsonGeneratorImpl;
 import org.exoplatform.ws.frameworks.json.value.JsonValue;
-import org.exoplatform.ws.frameworks.json.value.impl.StringValue;
 
 /**
  * Created by The eXo Platform SAS
@@ -31,25 +31,23 @@ import org.exoplatform.ws.frameworks.json.value.impl.StringValue;
  * Nov 23, 2014  
  */
 public class WebNotificationSender {
-  private static final Log LOG = ExoLogger.getLogger(WebNotificationSender.class);
+  private final static Log LOG = ExoLogger.getLogger(WebNotificationSender.class);
+  private final static String COMETD_CHANNEL = "/eXo/Application/web/NotificationMessage";
   /**
    * @param identifierId
    * @param message
    */
-  public static void sendJsonMessage(String remoteId, Object message) {
+  public static void sendJsonMessage(String remoteId, MessageInfo message) {
     try {
       if (message != null) {
         ContinuationService continuation = CommonsUtils.getService(ContinuationService.class);
-        if (message instanceof String) {
-          JsonValue json = new StringValue("{ \"body\" : " + message.toString() + "}");
-          continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json);
-        } else {
+        if (continuation.isSubscribe(remoteId, COMETD_CHANNEL)) {
           JsonValue json = new JsonGeneratorImpl().createJsonObject(message);
-          continuation.sendMessage(remoteId, "/eXo/Application/web/NotificationMessage", json, message.toString());
+          continuation.sendMessage(remoteId, COMETD_CHANNEL, json);
         }
       }
     } catch (Exception e) {
-      LOG.error("Failed to send notification message:" +  e.getMessage());
+      LOG.error("Failed to send notification message:" + e.getMessage());
     }
   }
 

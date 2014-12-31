@@ -29,5 +29,13 @@ public class NotificationMessageUtils {
   public final static ArgumentLiteral<String> READ_PORPERTY = new ArgumentLiteral<String>(String.class, "read");
   
   public final static ArgumentLiteral<String> SHOW_POPOVER_PROPERTY = new ArgumentLiteral<String>(String.class, "showPopover");
+  
+  /**
+   * Gets the max items what configured in the properties file.
+   * @return
+   */
+  public static int getMaxItemsInPopover() {
+    return Integer.valueOf(System.getProperty("exo.notifications.maxitems", "8"));
+  }
 
 }
