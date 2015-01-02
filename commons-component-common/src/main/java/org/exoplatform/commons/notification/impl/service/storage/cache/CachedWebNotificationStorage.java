@@ -35,8 +35,8 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   /** Logger */
   private static final Log LOG = ExoLogger.getLogger(CachedWebNotificationStorage.class);
   //
-  private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCaching";
-  private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationsCaching";
+  private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCache";
+  private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationListCache";
   //
   private final ExoCache<WebNotifInfoCacheKey, WebNotifInfoData> exoWebNotificationCache;
   private final ExoCache<ListWebNotificationsKey, ListWebNotificationsData> exoWebNotificationsCache;

@@ -143,21 +143,23 @@
           </object>
         </object-param>
         <object-param>
-          <name>cache.config.WebNotificationStorage</name>
-          <description>The JBoss Cache configuration for the Notification web storage</description>
+          <name>WebNotificationCache</name>
+          <description>The JBoss Cache configuration for the Web Notification Cache</description>
           <object type="org.exoplatform.services.cache.ExoCacheConfig">
-            <field name="name">
-              <string>WebNotificationStorage</string>
-            </field>
-            <field name="maxSize">
-              <int>${cache.exo.commons.WebNotificationStorage.Capacity:2000}</int>
-            </field>
-            <field name="liveTime">
-              <long>${cache.exo.commons.WebNotificationStorage.TimeToLive:600000}</long>
-            </field>
-            <field name="implementation">
-              <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
-            </field>
+            <field name="name"><string>WebNotificationCache</string></field>
+            <field name="maxSize"><int>${cache.exo.commons.WebNotificationCache.Capacity:5000}</int></field>
+            <field name="liveTime"><long>${cache.exo.commons.WebNotificationCache.TimeToLive:-1}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
+        <object-param>
+          <name>WebNotificationListCache</name>
+          <description>The JBoss Cache configuration for the Web Notification List Cache</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>WebNotificationListCache</string></field>
+            <field name="maxSize"><int>${cache.exo.commons.WebNotificationListCache.Capacity:500}</int></field>
+            <field name="liveTime"><long>${cache.exo.commons.WebNotificationListCache.TimeToLive:-1}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
           </object>
         </object-param>
       </init-params>
@@ -187,17 +189,35 @@
           </object>
         </object-param>
         <object-param>
-          <name>cache.config.WebNotificationStorage</name>
-          <description>The JBoss Cache configuration for the Web Notification Storage</description>
+          <name>WebNotificationCache</name>
+          <description>The JBoss Cache configuration for the Web Notification Cache</description>
           <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
             <field name="name">
-              <string>WebNotificationStorage</string>
+              <string>WebNotificationCache</string>
             </field>
             <field name="expirationTimeout">
-              <long>${cache.exo.commons.WebNotificationStorage.ExpirationTimeout:600000}</long>
+              <long>${cache.exo.commons.WebNotificationCache.ExpirationTimeout:-1}</long>
             </field>
             <field name="maxNodes">
-              <int>${cache.exo.commons.WebNotificationStorage.MaxNodes:5000}</int>
+              <int>${cache.exo.commons.WebNotificationCache.MaxNodes:5000}</int>
+            </field>
+            <field name="distributed">
+              <boolean>true</boolean>
+            </field>
+          </object>
+        </object-param>
+        <object-param>
+          <name>WebNotificationListCache</name>
+          <description>The JBoss Cache configuration for the Web Notification List Cache</description>
+          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
+            <field name="name">
+              <string>WebNotificationListCache</string>
+            </field>
+            <field name="expirationTimeout">
+              <long>${cache.exo.commons.WebNotificationListCache.ExpirationTimeout:-1}</long>
+            </field>
+            <field name="maxNodes">
+              <int>${cache.exo.commons.WebNotificationListCache.MaxNodes:500}</int>
             </field>
             <field name="distributed">
               <boolean>true</boolean>
