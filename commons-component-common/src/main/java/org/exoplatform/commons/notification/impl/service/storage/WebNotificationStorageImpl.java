@@ -65,21 +65,15 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * @throws Exception
    */
   private Node getOrCreateWebDateNode(SessionProvider sProvider, NotificationInfo notification) throws Exception {
-    final ReentrantLock localLock = lock;
-    try {
-      localLock.lock();
-      String dateNodeName = converDateToNodeName(notification.getDateCreated());
-      Node channelNode = getOrCreateChannelNode(sProvider, notification.getTo());
-      if (channelNode.hasNode(dateNodeName)) {
-        return channelNode.getNode(dateNodeName);
-      } else {
-        Node dateNode = channelNode.addNode(dateNodeName, NTF_NOTIF_DATE);
-        dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
-        channelNode.getSession().save();
-        return dateNode;
-      }
-    } finally {
-      localLock.unlock();
+    String dateNodeName = converDateToNodeName(notification.getDateCreated());
+    Node channelNode = getOrCreateChannelNode(sProvider, notification.getTo());
+    if (channelNode.hasNode(dateNodeName)) {
+      return channelNode.getNode(dateNodeName);
+    } else {
+      Node dateNode = channelNode.addNode(dateNodeName, NTF_NOTIF_DATE);
+      dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
+      channelNode.getSession().save();
+      return dateNode;
     }
   }
 
@@ -113,8 +107,11 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public void save(NotificationInfo notification) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
+    final ReentrantLock localLock = lock;
     try {
+      localLock.lock();
       Node userNode = getOrCreateWebDateNode(sProvider, notification);
       Node notifyNode = null;
       if(userNode.hasNode(notification.getId())) {
@@ -138,13 +135,16 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       getSession(sProvider).save();
     } catch (Exception e) {
       LOG.error("Failed to save the notificaton.", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
+      localLock.unlock();
     }
   }
   
   @Override
   public List<NotificationInfo> get(WebNotificationFilter filter, int offset, int limit) {
     List<NotificationInfo> result = new ArrayList<NotificationInfo>();
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       NodeIterator it = get(sProvider, filter, offset, limit);
       while (it.hasNext()) {
@@ -159,13 +159,23 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   @Override
   public NotificationInfo get(String id) {
     try {
-      return fillModel(getNodeNotification(NotificationSessionManager.getOrCreateSessionProvider(), id));
+      return fillModel(getNodeNotification(CommonsUtils.getSystemSessionProvider(), id));
     } catch (Exception e) {
       LOG.error("Notification not found by id: " + id, e);
       return null;
     }
   }
 
+  /**
+   * Gets notifications node by filter and offset, limit 
+   * 
+   * @param sProvider The SessionProvider
+   * @param filter The WebNotificationFilter
+   * @param offset The offset
+   * @param limit  The limit, if limit <= 0, do not apply offset, limit
+   * @return
+   * @throws Exception
+   */
   private NodeIterator get(SessionProvider sProvider, WebNotificationFilter filter, int offset, int limit) throws Exception {
     Session session = getSession(sProvider);
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
@@ -201,24 +211,28 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public boolean remove(String notificationId) {
-    Node node = getNodeNotification(NotificationSessionManager.getOrCreateSessionProvider(), notificationId);
-    if (node != null) {
-      Session session;
-      try {
-        session = node.getSession();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
+    try {
+      Node node = getNodeNotification(sProvider, notificationId);
+      if (node != null) {
+        Session session = node.getSession();
         node.remove();
         session.save();
         return true;
-      } catch (Exception e) {
-        LOG.error("Failed to remove the notification id: " + notificationId, e);
       }
+    } catch (Exception e) {
+      LOG.error("Failed to remove the notification id: " + notificationId, e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
     return false;
   }
 
   @Override
   public boolean remove(String userId, long seconds) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
       Node userNode = getOrCreateChannelNode(sProvider, userId);
       Session session = userNode.getSession();
@@ -239,13 +253,15 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     } catch (Exception e) {
       LOG.error("Failed to remove all notifications for the user id: " + userId, e);
       return false;
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
     return false;
   }
 
   @Override
   public void markRead(String notificationId) {
-    Node node = getNodeNotification(NotificationSessionManager.getOrCreateSessionProvider(), notificationId);
+    Node node = getNodeNotification(CommonsUtils.getSystemSessionProvider(), notificationId);
     if (node != null) {
       Session session;
       try {
@@ -260,7 +276,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public void hidePopover(String notificationId) {
-    Node node = getNodeNotification(NotificationSessionManager.getOrCreateSessionProvider(), notificationId);
+    Node node = getNodeNotification(CommonsUtils.getSystemSessionProvider(), notificationId);
     if (node != null) {
       Session session;
       try {
@@ -275,7 +291,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public void markAllRead(String userId) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     WebNotificationFilter filter = new WebNotificationFilter(userId).setRead(false).setOrder(false);
     try {
       CachedWebNotificationStorage cacheStorage = null;
@@ -349,6 +365,10 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     return null;
   }
 
+  /**
+   * Gets {@link WebNotificationStorage}
+   * @return
+   */
   private WebNotificationStorage getWebNotificationStorage() {
     if (webNotificationStorage == null) {
       webNotificationStorage = CommonsUtils.getService(WebNotificationStorage.class);
@@ -358,7 +378,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public NotificationInfo getUnreadNotification(String pluginId, String activityId, String owner) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       String userNodePath = getOrCreateChannelNode(sProvider, owner).getPath();
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(NTF_NOTIF_INFO);

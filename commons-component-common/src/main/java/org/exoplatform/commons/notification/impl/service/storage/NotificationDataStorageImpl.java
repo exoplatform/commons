@@ -66,7 +66,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public void save(NotificationInfo message) throws Exception {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     final ReentrantLock localLock = lock;
     try {
       localLock.lock();
@@ -88,13 +89,16 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     } catch (Exception e) {
       LOG.error("Failed to save the NotificationMessage", e);
     } finally {
+      NotificationSessionManager.closeSessionProvider(created);
       localLock.unlock();
     }
   }
   
   @Override
   public Map<PluginKey, List<NotificationInfo>> getByUser(NotificationContext context, UserSetting setting) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created =  NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();
+    
     Map<PluginKey, List<NotificationInfo>> notificationData = new LinkedHashMap<PluginKey, List<NotificationInfo>>();
     try {
       boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
@@ -112,6 +116,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       }
     } catch (Exception e) {
       LOG.error("Failed to get the NotificationMessage by user: " + setting.getUserId(), e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
 
     return notificationData;
@@ -311,7 +317,9 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   @Override
   public void removeMessageAfterSent() throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
-    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+    boolean created =  NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();
+    
     try {
       Node notificationHome = getNotificationHomeNode(sProvider, workspace);
       Session session = notificationHome.getSession();
@@ -355,6 +363,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       }
     } catch (Exception e) {
       LOG.warn("Failed to remove message after sent email notification", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
   }
 

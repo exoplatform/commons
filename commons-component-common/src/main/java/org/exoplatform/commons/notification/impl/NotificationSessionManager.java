@@ -19,28 +19,41 @@ package org.exoplatform.commons.notification.impl;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class NotificationSessionManager {
-
+  /** */
   private static ThreadLocal<SessionProvider> session_ = new ThreadLocal<SessionProvider>();
 
-  public static SessionProvider getOrCreateSessionProvider() {
-    SessionProvider sProvider = session_.get();
-    if (sProvider == null) {
-      return createSystemProvider();
-    }
-    return sProvider;
-  }
-
-  public static void closeSessionProvider() {
+  public static SessionProvider getSessionProvider() {
     SessionProvider sProvider = session_.get();
     if (sProvider != null) {
+      return sProvider;
+    } else {
+      return null;
+    }
+  }
+  
+  /**
+   * Checks the session provided is existing or not.
+   * @return
+   */
+  public static boolean isExistingSessionProvider() {
+    return session_.get() != null;
+  }
+
+  public static void closeSessionProvider(boolean requestClose) {
+    SessionProvider sProvider = session_.get();
+    if (sProvider != null && requestClose) {
       sProvider.close();
       session_.set(null);
     }
   }
 
-  public static SessionProvider createSystemProvider() {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
-    session_.set(sProvider);
-    return sProvider;
+  public static boolean createSystemProvider() {
+    if (session_.get() == null) {
+      SessionProvider sProvider = SessionProvider.createSystemProvider();
+      session_.set(sProvider);
+      return true;
+    } else {
+      return false;
+    }
   }
 }

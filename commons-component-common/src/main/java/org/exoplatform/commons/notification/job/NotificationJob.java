@@ -52,14 +52,14 @@ public abstract class NotificationJob implements Job {
     Callable<Boolean> task = new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
+        boolean created = NotificationSessionManager.createSystemProvider();
         try {
-          NotificationSessionManager.createSystemProvider();
           processSendNotification(context);
         } catch (Exception e) {
           LOG.error("Failed to running NotificationJob", e);
           return false;
         } finally {
-          NotificationSessionManager.closeSessionProvider();
+          NotificationSessionManager.closeSessionProvider(created);
         }
         return true;
       }

@@ -58,7 +58,7 @@ public abstract class AbstractTemplateBuilder {
   public MessageInfo buildMessage(NotificationContext ctx) {
     NotificationInfo notif = ctx.getNotificationInfo();
     MessageInfo messageInfo = makeMessage(ctx);
-    return messageInfo.pluginId(notif.getId()).from(NotificationPluginUtils.getFrom(notif.getFrom()))
+    return messageInfo.setId(notif.getId()).pluginId(notif.getKey().getId()).from(NotificationPluginUtils.getFrom(notif.getFrom()))
                .to(NotificationPluginUtils.getTo(notif.getTo())).end();
   }
 

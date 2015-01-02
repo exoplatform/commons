@@ -229,12 +229,8 @@ public abstract class AbstractService {
     try {
       return sProvider.getSession(workspace, CommonsUtils.getRepository());
     } catch (RepositoryException e) {
-      LOG.error("Failed to get session." + e);
-      try {
-        return NotificationSessionManager.createSystemProvider().getSession(workspace, CommonsUtils.getRepository());
-      } catch (Exception e2) {
-        return null;
-      }
+      LOG.error("Failed to get session for workspace " + workspace, e);
+      return null;
     }
   }
 

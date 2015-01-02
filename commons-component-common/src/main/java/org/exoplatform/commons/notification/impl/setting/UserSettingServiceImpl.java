@@ -171,11 +171,14 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public void addMixin(User[] users) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
       addMixin(sProvider, users);
     } catch (Exception e) {
       LOG.error("Failed to add mixin for default setting of users", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
   }
 
@@ -251,7 +254,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<UserSetting> getUserSettingWithDeactivate() {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();;
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();;
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
@@ -273,6 +277,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       
     } catch (Exception e) {
       LOG.warn("Can not get the user setting with deactivated");
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
 
     return models;
@@ -285,7 +291,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<String> getUserHasSettingPlugin(String channelId, String pluginId) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();;
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();;
     List<String> userIds = new ArrayList<String>();
     try {
       NodeIterator iter = getUserHasSettingPlugin(sProvider, channelId, pluginId);
@@ -295,6 +302,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get all users have the " + pluginId + " in settings", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
 
     return userIds;
@@ -355,7 +364,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<UserSetting> getDigestSettingForAllUser(NotificationContext context, int offset, int limit) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
       NodeIterator iter = getDigestIterator(context, sProvider, offset, limit);
@@ -365,6 +375,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get all daily users have notification messages", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
 
     return models;
@@ -428,7 +440,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public List<UserSetting> getDigestDefaultSettingForAllUser(int offset, int limit) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
@@ -447,7 +460,9 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get default daily users have notification messages", e);
-    } 
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
+    }
 
     return users;
   }
