@@ -54,18 +54,17 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       if (!userSetting.isChannelActive(WebChannel.ID)) {
         continue;
       }
-      
       if (userSetting.isActive(WebChannel.ID, pluginId)) {
         ctx.setWritingProcess(true);
-        send(ctx.setNotificationInfo(notification.clone(true).setTo(userId)));
-        if (notification.getId().equals(ctx.getNotificationInfo().getId())) {
+        NotificationInfo notif = notification.clone(true).setTo(userId);
+        send(ctx.setNotificationInfo(notif));
+        if (notif.getId().equals(ctx.getNotificationInfo().getId())) {
           store(ctx.getNotificationInfo());
         } else {
           update(ctx.getNotificationInfo());
         }
       }
     }
-
   }
 
   @Override
@@ -92,11 +91,17 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   @Override
   public void send(NotificationContext ctx) {
     LOG.info("WEB:: Send the message by Web channel.");
+    String notifId = ctx.getNotificationInfo().getId();
     getChannel().dispatch(ctx.getNotificationInfo().setLastModifiedDate(Calendar.getInstance()));
     try {
       MessageInfo msg = buildMessageInfo(ctx);
       if(msg != null) {
         NotificationInfo notification = ctx.getNotificationInfo();
+        if (!notification.getId().equals(notifId)) {
+          // Update badge number
+          int badgeNumber = CommonsUtils.getService(WebNotificationStorage.class).getNumberOnBadge(notification.getTo());
+          msg.setNumberOnBadge(badgeNumber);
+        }
         WebNotificationSender.sendJsonMessage(notification.getTo(), msg);
         notification.setTitle(msg.getBody());
       }

@@ -16,6 +16,7 @@ import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
+import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
@@ -105,6 +106,15 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     return channelNode;
   }
 
+  private void addMixinCountItemOnPopover(Node notifyNode, String userId) throws Exception {
+    if (!notifyNode.isNodeType(MIX_NEW_NODE)) {
+      int currentNewMessage = getWebNotificationStorage().getNumberOnBadge(userId);
+      if (currentNewMessage < NotificationMessageUtils.getMaxItemsInPopover() + 1 && notifyNode.canAddMixin(MIX_NEW_NODE)) {
+        notifyNode.addMixin(MIX_NEW_NODE);
+      }
+    }
+  }
+
   @Override
   public void save(NotificationInfo notification) {
     boolean created = NotificationSessionManager.createSystemProvider();
@@ -114,7 +124,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       localLock.lock();
       Node userNode = getOrCreateWebDateNode(sProvider, notification);
       Node notifyNode = null;
-      if(userNode.hasNode(notification.getId())) {
+      if (userNode.hasNode(notification.getId())) {
         notifyNode = userNode.getNode(notification.getId());
       } else {
         notifyNode = userNode.addNode(notification.getId(), NTF_NOTIF_INFO);
@@ -132,6 +142,9 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
           notifyNode.setProperty(propertyName, ownerParameter.get(key));
         }
       }
+      //
+      addMixinCountItemOnPopover(notifyNode, notification.getTo());
+      //
       getSession(sProvider).save();
     } catch (Exception e) {
       LOG.error("Failed to save the notificaton.", e);
@@ -404,5 +417,48 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   @Override
   public void update(NotificationInfo notification) {
     save(notification);
+  }
+
+  @Override
+  public int getNumberOnBadge(String userId) {
+    try {
+      SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+      int limit = NotificationMessageUtils.getMaxItemsInPopover() + 1;
+      NodeIterator iter = getNewMessage(sProvider, userId, limit);
+      return (int) iter.getSize();
+    } catch (Exception e) {
+      LOG.debug("Failed to clearNewMessageNumber ", e);
+    }
+    return 0;
+  }
+
+  @Override
+  public void resetNumberOnBadge(String userId) {
+    try {
+      SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+      NodeIterator iter = getNewMessage(sProvider, userId, 0);
+      while (iter.hasNext()) {
+        Node node = iter.nextNode();
+        node.removeMixin(MIX_NEW_NODE);
+      }
+      getSession(sProvider).save();
+    } catch (Exception e) {
+      LOG.debug("Failed to clearNewMessageNumber ", e);
+    }
+  }
+  
+  private NodeIterator getNewMessage(SessionProvider sProvider, String userId, int limit) throws Exception {
+    Session session = getSession(sProvider);
+    String path = getOrCreateChannelNode(sProvider, userId).getPath();
+    StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(MIX_NEW_NODE)
+        .append(" WHERE jcr:path LIKE '").append(path).append("/%' ");
+    QueryManager qm = session.getWorkspace().getQueryManager();
+    QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
+    if (limit > 0) {
+      query.setOffset(0);
+      query.setLimit(limit);
+    }
+    //
+    return query.execute().getNodes();
   }
 }

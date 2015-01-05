@@ -111,7 +111,6 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     //getWebUserDateNode
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     Node parentNode = getOrCreateChannelNode(sProvider, userId);
-    NodeIterator it = parentNode.getNodes();
     assertEquals(5, parentNode.getNodes().getSize());
     //
     NodeIterator iter = null;
@@ -129,4 +128,29 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     storage.remove(userId, 3 * daySeconds);
     assertEquals(0, parentNode.getNodes().getSize());
   }
+  
+  public void testGetNewMessage() throws Exception  {
+    assertEquals(8, NotificationMessageUtils.getMaxItemsInPopover());
+    //
+    String userId = "root";
+    userIds.add(userId);
+    storage.save(makeWebNotificationInfo(userId));
+    //
+    assertEquals(1, storage.getNumberOnBadge(userId));
+    storage.save(makeWebNotificationInfo(userId));
+    assertEquals(2, storage.getNumberOnBadge(userId));
+    for (int i = 0; i < 10; ++i) {
+      storage.save(makeWebNotificationInfo(userId));
+    }
+    //
+    List<NotificationInfo> list = storage.get(new WebNotificationFilter(userId), 0, 15);
+    assertEquals(12, list.size());
+    //
+    assertEquals(9, storage.getNumberOnBadge(userId));
+    //
+    storage.resetNumberOnBadge(userId);
+    //
+    assertEquals(0, storage.getNumberOnBadge(userId));
+  }
+  
 }

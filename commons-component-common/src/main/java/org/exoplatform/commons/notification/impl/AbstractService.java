@@ -97,6 +97,8 @@ public abstract class AbstractService {
 
   public static final String MIX_SUB_MESSAGE_HOME     = "mix:subMessageHome";
 
+  public static final String MIX_NEW_NODE             = "mix:newNode";
+
   public static final String NTF_OWNER_PARAMETER      = "ntf:ownerParameter";
 
   public static final String NTF_MESSAGE_INFO_HOME    = "ntf:messageInfoHome";

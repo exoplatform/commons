@@ -185,4 +185,28 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     NotificationInfo firstViewAllInfos = viewAllInfos.get(0);
     assertEquals(newTitle, firstViewAllInfos.getTitle());
   }
+  
+  public void testGetNewMessage() throws Exception  {
+    assertEquals(8, NotificationMessageUtils.getMaxItemsInPopover());
+    //
+    String userId = "root";
+    userIds.add(userId);
+    cachedStorage.save(makeWebNotificationInfo(userId));
+    //
+    assertEquals(1, cachedStorage.getNumberOnBadge(userId));
+    cachedStorage.save(makeWebNotificationInfo(userId));
+    assertEquals(2, cachedStorage.getNumberOnBadge(userId));
+    for (int i = 0; i < 10; ++i) {
+      cachedStorage.save(makeWebNotificationInfo(userId));
+    }
+    //
+    List<NotificationInfo> list = cachedStorage.get(new WebNotificationFilter(userId), 0, 15);
+    assertEquals(12, list.size());
+    //
+    assertEquals(9, cachedStorage.getNumberOnBadge(userId));
+    //
+    cachedStorage.resetNumberOnBadge(userId);
+    //
+    assertEquals(0, cachedStorage.getNumberOnBadge(userId));
+  }
 }

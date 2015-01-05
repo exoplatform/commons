@@ -2,6 +2,14 @@
 
   <nodeType name="mix:defaultSetting" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
   </nodeType>
+
+  <nodeType name="mix:newNode" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+    <propertyDefinitions>
+      <propertyDefinition name="*" requiredType="undefined" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+    </propertyDefinitions>
+  </nodeType>
   
   <nodeType name="ntf:notifInfoRef" isMixin="false" hasOrderableChildNodes="true">
     <supertypes>

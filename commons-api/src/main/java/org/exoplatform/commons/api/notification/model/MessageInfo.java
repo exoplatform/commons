@@ -35,6 +35,8 @@ public class MessageInfo {
   private String pluginId = "digest";
   
   private long createdTime;
+  
+  private int numberOnBadge = 0;
 
   public MessageInfo() {
   }
@@ -186,11 +188,28 @@ public class MessageInfo {
     this.createdTime = createdTime;
   }
 
+  /**
+   * Gets the badge number of the user
+   * @return
+   */
+  public int getNumberOnBadge() {
+    return numberOnBadge;
+  }
+  
+  /**
+   * Sets the badge number of the user
+   * @param numberOnBadge
+   */
+  public void setNumberOnBadge(int numberOnBadge) {
+    this.numberOnBadge = numberOnBadge;
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
     String body = this.body + ((footer != null && footer.length() > 0) ? footer : ""); 
     builder.append("{ ")
+           .append("numberOnBadge: '").append(numberOnBadge).append("', ")
            .append("subject: '").append(subject.replaceAll("'", "&#39;")).append("', ")
            .append("from: '").append(from).append("', ")
            .append("to: '").append(to).append("', ")

@@ -86,4 +86,19 @@ public interface WebNotificationService {
    * @since PLF 4.2
    */
   boolean remove(String notificationId);
+  /**
+   * @param userId
+   * @return
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  int getNumberOfMessage(String userId);
+  
+  
+  /**
+   * @param userId
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  void clearNumberOfMessage(String userId);
 }

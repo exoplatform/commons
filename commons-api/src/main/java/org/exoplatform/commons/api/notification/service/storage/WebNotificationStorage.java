@@ -102,10 +102,33 @@ public interface WebNotificationStorage {
   boolean remove(String userId, long seconds);
   
   /**
+   * Gets the notification by the given conditions
    * @param pluginId
    * @param activityId
    * @param owner
    * @return
+   * @LevelAPI Platform
+   * @since PLF 4.2
    */
   NotificationInfo getUnreadNotification(String pluginId, String activityId, String owner);
+
+  /**
+   * Gets the number on the badge by the specified user 
+   * 
+   * @param userId the userId
+   * @return
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  int getNumberOnBadge(String userId);
+  
+  
+  /**
+   * Reset the number on badge of the specified user
+   *  
+   * @param userId the userId
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  void resetNumberOnBadge(String userId);
 }

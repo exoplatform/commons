@@ -25,6 +25,7 @@ import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
  * Dec 30, 2014  
  */
 public class NotificationMessageUtils {
+  private static int maxItemsInPopover = 0;
   
   public final static ArgumentLiteral<String> READ_PORPERTY = new ArgumentLiteral<String>(String.class, "read");
   
@@ -35,7 +36,10 @@ public class NotificationMessageUtils {
    * @return
    */
   public static int getMaxItemsInPopover() {
-    return Integer.valueOf(System.getProperty("exo.notifications.maxitems", "8"));
+    if (maxItemsInPopover == 0) {
+      maxItemsInPopover = Integer.valueOf(System.getProperty("exo.notifications.maxitems", "8"));
+    }
+    return maxItemsInPopover;
   }
 
 }

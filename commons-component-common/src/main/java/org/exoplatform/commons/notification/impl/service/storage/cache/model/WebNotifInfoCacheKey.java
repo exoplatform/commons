@@ -15,9 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.commons.notification.impl.service.storage.cache;
+package org.exoplatform.commons.notification.impl.service.storage.cache.model;
 
 import java.io.Serializable;
+
+import org.exoplatform.commons.notification.impl.service.storage.cache.CacheKey;
 
 public class WebNotifInfoCacheKey implements CacheKey, Serializable {
   private static final long serialVersionUID = 1L;
