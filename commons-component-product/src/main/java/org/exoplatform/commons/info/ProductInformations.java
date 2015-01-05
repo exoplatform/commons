@@ -38,6 +38,8 @@ import javax.jcr.*;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -545,10 +547,9 @@ public class ProductInformations implements Startable {
     }
   }
 
-  private static int currentFlag () {
-
-      return Calendar.getInstance(TimeZone.getDefault()).get(Calendar.YEAR);
-
+  private static String currentFlag () {
+    DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    return dateFormat.format(Calendar.getInstance(TimeZone.getDefault()).getTime());
   }
 
 }
