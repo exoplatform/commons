@@ -32,6 +32,7 @@
       <groupId>org.cometd.javascript</groupId>
       <artifactId>cometd-javascript-jquery</artifactId>
       <type>war</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
