@@ -19,8 +19,6 @@ package org.exoplatform.webui.utils;
 import java.util.Calendar;
 import java.util.Locale;
 
-import org.exoplatform.webui.utils.TimeConvertUtils;
-
 import junit.framework.TestCase;
 
 /**
@@ -32,6 +30,32 @@ import junit.framework.TestCase;
 public class TestTimeConvertUtils extends TestCase {
   public TestTimeConvertUtils() throws Exception {
     super();
+  }
+  
+  public void testConvertDateTimeByCurrentDate() throws Exception {
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 3);
+    assertEquals("3 months", TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(), "EE, dd yyyy", Locale.ENGLISH, TimeConvertUtils.YEAR));
+    
+    cal = Calendar.getInstance();
+    cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 9);
+    assertEquals("1 week", TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(), "EE, dd yyyy", Locale.ENGLISH, TimeConvertUtils.YEAR));
+    
+    cal = Calendar.getInstance();
+    cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 5);
+    assertEquals("5 days", TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(), "EE, dd yyyy", Locale.ENGLISH, TimeConvertUtils.YEAR));
+    
+    cal = Calendar.getInstance();
+    cal.set(Calendar.HOUR, cal.get(Calendar.HOUR) - 1);
+    assertEquals("1 hour", TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(), "EE, dd yyyy", Locale.ENGLISH, TimeConvertUtils.YEAR));
+    
+    cal = Calendar.getInstance();
+    cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - 25);
+    assertEquals("25 minutes", TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(), "EE, dd yyyy", Locale.ENGLISH, TimeConvertUtils.YEAR));
+    
+    cal = Calendar.getInstance();
+    cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - 10);
+    assertEquals("justnow", TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(), "EE, dd yyyy", Locale.ENGLISH, TimeConvertUtils.YEAR));
   }
 
   public void testConvertDateTime() throws Exception {
