@@ -18,6 +18,8 @@
 package org.exoplatform.commons.notification.impl.service.storage.cache;
 
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsData;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsKey;
 import org.exoplatform.services.cache.CachedObjectSelector;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.ObjectCacheInfo;

@@ -15,10 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.commons.notification.impl.service.storage.cache;
+package org.exoplatform.commons.notification.impl.service.storage.cache.model;
 
 import java.io.Serializable;
 import java.util.List;
+
+import org.exoplatform.commons.notification.impl.service.storage.cache.AbstractWebNotifListData;
 
 /**
  * Cached data list.

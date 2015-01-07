@@ -92,5 +92,22 @@ public class WebNotifInfoData implements Serializable {
     ownerParameter.put(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), String.valueOf(isShow));
     return this;
   }
+  
+  @Override
+  public String toString() {
+    StringBuffer sb = new StringBuffer();
+    sb.append("WebNotif{")
+      .append("title: ")
+      .append(title)
+      .append("from: ")
+      .append(from)
+      .append("to: ")
+      .append(to)
+      .append("channelKey: ")
+      .append(channelKey)
+      .append(", showPopover: ")
+      .append(ownerParameter.get(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey()));
+    return sb.toString();
+  }
 
 }

@@ -15,9 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.exoplatform.commons.notification.impl.service.storage.cache;
+package org.exoplatform.commons.notification.impl.service.storage.cache.model;
 
 import java.io.Serializable;
+
+import org.exoplatform.commons.notification.impl.service.storage.cache.CacheKey;
 
 public class ListWebNotificationsKey implements CacheKey, Serializable {
   private static final long serialVersionUID = 1L;
@@ -52,9 +54,8 @@ public class ListWebNotificationsKey implements CacheKey, Serializable {
     
     ListWebNotificationsKey that = (ListWebNotificationsKey) o;
 
-    if (userId != that.userId) {
+    if (userId != null ? !userId.equals(that.userId) : that.userId != null)
       return false;
-    }
     
     if (isOnPopover != that.isOnPopover) {
       return false;

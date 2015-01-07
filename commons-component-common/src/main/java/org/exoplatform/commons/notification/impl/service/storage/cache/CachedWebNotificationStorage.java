@@ -28,6 +28,8 @@ import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.IntegerData;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsData;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsKey;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoCacheKey;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoData;
 import org.exoplatform.services.cache.CacheService;

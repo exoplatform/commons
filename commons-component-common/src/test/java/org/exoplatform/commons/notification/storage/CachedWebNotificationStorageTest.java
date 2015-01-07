@@ -9,19 +9,32 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsData;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsKey;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoCacheKey;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoData;
 import org.exoplatform.services.cache.CacheService;
+import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
   private WebNotificationStorage cachedStorage;
   private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCaching";
   private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationsCaching";
+  private  CacheService cacheService;
+  private ExoCache<ListWebNotificationsKey, ListWebNotificationsData> exoWebNotificationsCache;
+  private ExoCache<WebNotifInfoCacheKey, WebNotifInfoData> exoWebNotificationCache;
+
   //
   @Override
   public void setUp() throws Exception {
     initCollaborationWorkspace();
     super.setUp();
     cachedStorage = getService(WebNotificationStorage.class);
+    cacheService = getService(CacheService.class);
+    cacheService.getCacheInstance(WEB_NOTIFICATION_CACHING_NAME);
+    exoWebNotificationCache = cacheService.getCacheInstance(WEB_NOTIFICATION_CACHING_NAME);
+    exoWebNotificationsCache = cacheService.getCacheInstance(LIST_WEB_NOTIFICATION_CACHING_NAME);
   }
   
   @Override
@@ -34,7 +47,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
         userNodeApp.save();
       }
     }
-    CacheService cacheService = getService(CacheService.class);
+    
     cacheService.getCacheInstance(WEB_NOTIFICATION_CACHING_NAME).clearCache();
     cacheService.getCacheInstance(LIST_WEB_NOTIFICATION_CACHING_NAME).clearCache();
     
@@ -133,19 +146,28 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     NotificationInfo notifInfo = cachedStorage.get(info.getId());
     assertTrue(Boolean.valueOf(notifInfo.getValueOwnerParameter(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey())));
     //
+    ListWebNotificationsKey key = ListWebNotificationsKey.key(userId, true);
+    //checks caching
     List<NotificationInfo> infos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
+    ListWebNotificationsData listData = exoWebNotificationsCache.get(key);
+    assertNotNull(listData);
+    assertEquals(1,listData.size());
+    //
+    infos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
     assertEquals(infos.get(0), notifInfo);
     assertTrue(Boolean.valueOf(infos.get(0).getValueOwnerParameter(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey())));
     //
     cachedStorage.hidePopover(notifInfo.getId());
+    //checks caching
+    listData = exoWebNotificationsCache.get(key);
+    assertNotNull(listData);
+    assertEquals(0,listData.size());
     //
-    notifInfo = cachedStorage.get(info.getId());
+    WebNotifInfoCacheKey notifKey = WebNotifInfoCacheKey.key(info.getId());
+    WebNotifInfoData notifData = exoWebNotificationCache.get(notifKey);
+    notifInfo = notifData.build();
     assertFalse(Boolean.valueOf(notifInfo.getValueOwnerParameter(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey())));
-    //
-    infos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
-    assertEquals(0, infos.size());
   }
-  
   
   public void testUpdate() throws Exception {
     String userId = "mary";
