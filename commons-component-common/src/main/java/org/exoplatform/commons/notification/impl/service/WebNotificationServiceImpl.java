@@ -95,12 +95,12 @@ public class WebNotificationServiceImpl implements WebNotificationService {
   }
 
   @Override
-  public void clearNumberOfMessage(String userId) {
+  public void resetNumberOnBadge(String userId) {
     storage.resetNumberOnBadge(userId);
   }
 
   @Override
-  public int getNumberOfMessage(String userId) {
+  public int getNumberOnBadge(String userId) {
     return storage.getNumberOnBadge(userId);
   }
 }

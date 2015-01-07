@@ -391,7 +391,8 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public NotificationInfo getUnreadNotification(String pluginId, String activityId, String owner) {
-    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
       String userNodePath = getOrCreateChannelNode(sProvider, owner).getPath();
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(NTF_NOTIF_INFO);
@@ -410,6 +411,8 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       }
     } catch (Exception e) {
       LOG.debug("Failed to getUnreadNotification ", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
     return null;
   }

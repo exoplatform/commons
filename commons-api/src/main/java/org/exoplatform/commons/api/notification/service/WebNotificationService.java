@@ -86,13 +86,15 @@ public interface WebNotificationService {
    * @since PLF 4.2
    */
   boolean remove(String notificationId);
+  
   /**
+   * Gets the number on the badge by the specified user
    * @param userId
    * @return
    * @LevelAPI Platform
    * @since PLF 4.2
    */
-  int getNumberOfMessage(String userId);
+  int getNumberOnBadge(String userId);
   
   
   /**
@@ -100,5 +102,5 @@ public interface WebNotificationService {
    * @LevelAPI Platform
    * @since PLF 4.2
    */
-  void clearNumberOfMessage(String userId);
+  void resetNumberOnBadge(String userId);
 }
