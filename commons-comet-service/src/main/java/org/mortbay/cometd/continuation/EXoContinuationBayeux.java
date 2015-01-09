@@ -191,6 +191,11 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
     return (clientIDs.get(eXoID) != null && clientIDs.get(eXoID).contains(clientID));
   }
 
+  public boolean isPresent(String eXoID) {
+    eXoID = toCloudId(eXoID);
+    return seti.isPresent(eXoID);
+  }
+
   /**
    * @param channel the id of channel.
    * @param data the message

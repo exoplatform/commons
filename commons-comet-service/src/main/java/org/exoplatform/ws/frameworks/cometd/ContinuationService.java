@@ -105,10 +105,15 @@ public class ContinuationService {
   }
 
   /**
+   * Use {@link #isPresent(String)} instead.
+   * One user can have multiple session, it doesn't make sense to check if he has subscribed for one channel.
+   * This method can only check for channel subscribing status in non-clustering environment.
+   * 
    * @param eXoId the client id (as eXoId).
    * @param channel the id of channel.
    * @return true if client subscribe to channel else false.
    */
+  @Deprecated 
   public boolean isSubscribe(String eXoId, String channel) {
     ServerChannelImpl channelImpl = (ServerChannelImpl) bayeux.getChannel(channel);
     Collection<ServerSession> collection = channelImpl.getSubscribers();
@@ -118,6 +123,10 @@ public class ContinuationService {
         return true;
     }
     return false;
+  }
+  
+  public boolean isPresent(String eXoID) {
+    return bayeux.isPresent(eXoID);
   }
 
   /**

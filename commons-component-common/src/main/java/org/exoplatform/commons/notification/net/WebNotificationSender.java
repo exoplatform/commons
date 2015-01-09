@@ -41,7 +41,7 @@ public class WebNotificationSender {
     try {
       if (message != null) {
         ContinuationService continuation = CommonsUtils.getService(ContinuationService.class);
-        if (continuation.isSubscribe(remoteId, COMETD_CHANNEL)) {
+        if (continuation.isPresent(remoteId)) {
           JsonValue json = new JsonGeneratorImpl().createJsonObject(message);
           continuation.sendMessage(remoteId, COMETD_CHANNEL, json);
         }
