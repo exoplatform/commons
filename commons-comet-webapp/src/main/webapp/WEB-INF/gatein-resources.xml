@@ -15,6 +15,20 @@
 			<as>gtnbase</as>
 		</depends>
 	</module>
+	
+	<module>
+		<name>commons-cometd3</name>		
+		<as>cCometD</as>
+		<script>
+			<path>/javascript/eXo/commons/commons-cometd3.js</path>
+		</script>
+		<depends>
+			<module>jquery</module>
+		</depends>
+		<depends>
+			<module>jquery_cometd</module>
+		</depends>
+	</module>
 
 	<module>
 		<name>cometd</name>
