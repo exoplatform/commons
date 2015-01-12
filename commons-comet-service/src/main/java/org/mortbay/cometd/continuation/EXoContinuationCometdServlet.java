@@ -31,7 +31,7 @@ import org.cometd.bayeux.server.BayeuxServer;
 import org.cometd.client.transport.LongPollingTransport;
 import org.cometd.oort.Oort;
 import org.cometd.oort.OortConfigServlet;
-import org.cometd.oort.OortMulticastConfigServlet;
+import org.cometd.oort.OortStaticConfigServlet;
 import org.cometd.oort.Seti;
 import org.cometd.oort.SetiServlet;
 import org.cometd.server.CometDServlet;
@@ -184,7 +184,7 @@ public class EXoContinuationCometdServlet extends CometDServlet {
    * This class help to workaround issue with eap 6.2 that has not support
    * Websocket transport yet
    */
-  public static class OortConfig extends OortMulticastConfigServlet {
+  public static class OortConfig extends OortStaticConfigServlet {
     private static final long serialVersionUID = 1054209695244836363L;
 
     @Override
@@ -192,7 +192,7 @@ public class EXoContinuationCometdServlet extends CometDServlet {
       Oort oort = super.newOort(bayeux, url);
       ServletConfig config = getServletConfig();
       String transport = config.getInitParameter("transports");
-      if (transport == null || !transport.contains(WebSocketTransport.class.getName())) {        
+      if (transport == null || !transport.contains(WebSocketTransport.class.getName())) {
         oort.getClientTransportFactories().add(new LongPollingTransport.Factory(new HttpClient()));
       }
       return oort;

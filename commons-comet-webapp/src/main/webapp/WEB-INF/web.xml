@@ -66,6 +66,10 @@
       <param-value>exo</param-value>
     </init-param>
     <init-param>
+      <param-name>oort.cloud</param-name>
+      <param-value></param-value>
+    </init-param>
+    <init-param>
       <param-name>oort.channels</param-name>
       <param-value>/*</param-value>
     </init-param>
