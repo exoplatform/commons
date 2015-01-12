@@ -418,7 +418,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   }
 
   @Override
-  public void update(NotificationInfo notification) {
+  public void update(NotificationInfo notification, boolean moveTop) {
     save(notification);
   }
 

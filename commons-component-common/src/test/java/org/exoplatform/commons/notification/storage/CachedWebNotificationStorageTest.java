@@ -193,7 +193,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     String newTitle = "The new title";
     createdFirstInfo.setTitle(newTitle);
     //
-    cachedStorage.update(createdFirstInfo);
+    cachedStorage.update(createdFirstInfo, true);
     //
     createdFirstInfo = cachedStorage.get(info.getId());
     //

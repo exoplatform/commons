@@ -21,10 +21,11 @@ public interface WebNotificationStorage {
    * Update an existing notification message.
    * 
    * @param notification the notification
+   * @param moveTop After updating, MUST move the notification to top of list
    * @LevelAPI Platform
    * @since PLF 4.2
    */
-  void update(NotificationInfo notification);
+  void update(NotificationInfo notification, boolean moveTop);
 
   /**
    * Marks the notification to be read by the userId

@@ -85,7 +85,7 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
     LOG.info("WEB:: Update an existing notification to db by Web channel.");
     notifInfo.with(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), "true")
              .with(NotificationMessageUtils.READ_PORPERTY.getKey(), "false");
-    CommonsUtils.getService(WebNotificationStorage.class).update(notifInfo);
+    CommonsUtils.getService(WebNotificationStorage.class).update(notifInfo, true);
   }
   
   @Override
