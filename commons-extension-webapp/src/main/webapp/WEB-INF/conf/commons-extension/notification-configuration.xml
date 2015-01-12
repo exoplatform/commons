@@ -180,12 +180,14 @@
       <type>org.exoplatform.commons.notification.channel.WebChannel</type>
       <description>Register the web channel to manager.</description>
     </component-plugin>
+    <!--  
     <component-plugin profiles="all">
       <name>console.channel</name>
       <set-method>register</set-method>
       <type>org.exoplatform.commons.notification.channel.ConsoleChannel</type>
       <description>Register the console channel to manager.</description>
     </component-plugin>
+    -->
   </external-component-plugins>
 
   <!-- template channel register -->

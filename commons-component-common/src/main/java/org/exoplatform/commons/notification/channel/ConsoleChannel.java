@@ -16,11 +16,15 @@
  */
 package org.exoplatform.commons.notification.channel;
 
+import java.io.Writer;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.lifecycle.SimpleLifecycle;
 import org.exoplatform.services.log.ExoLogger;
@@ -66,6 +70,22 @@ public class ConsoleChannel extends AbstractChannel {
   
   @Override
   protected AbstractTemplateBuilder getTemplateBuilderInChannel(PluginKey key) {
-    return null;
+    return new AbstractTemplateBuilder() {
+      @Override
+      protected MessageInfo makeMessage(NotificationContext ctx) {
+        NotificationInfo notification = ctx.getNotificationInfo();
+        MessageInfo messageInfo = new MessageInfo();
+        return messageInfo.from(notification.getFrom())
+                          .to(notification.getTo())
+                          .body(notification.getKey().getId() + " raised notification: "
+                              + notification.getTitle())
+                          .end();
+      }
+
+      @Override
+      protected boolean makeDigest(NotificationContext ctx, Writer writer) {
+        return false;
+      }
+    };
   }
 }
