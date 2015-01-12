@@ -70,7 +70,7 @@ public class EXoContinuationCometdServlet extends CometDServlet {
 
   private SetiServlet           setiServlet;
 
-  public static final String    PREFIX             = "eXo.cometd.";
+  public static final String    PREFIX             = "exo.cometd.";
 
   protected static final String CLOUD_ID_SEPARATOR = "cloudIDSeparator";
 
