@@ -18,8 +18,6 @@ package org.mortbay.cometd.continuation;
  */
 
 import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -37,6 +35,7 @@ import org.cometd.bayeux.server.BayeuxServer;
 import org.cometd.client.transport.LongPollingTransport;
 import org.cometd.oort.Oort;
 import org.cometd.oort.OortConfigServlet;
+import org.cometd.oort.OortMulticastConfigServlet;
 import org.cometd.oort.OortStaticConfigServlet;
 import org.cometd.oort.Seti;
 import org.cometd.oort.SetiServlet;
@@ -76,9 +75,15 @@ public class EXoContinuationCometdServlet extends CometDServlet {
 
   private SetiServlet           setiServlet;
 
+  private boolean clusterEnabled = false;
+  
   public static final String    PREFIX             = "exo.cometd.";
 
   protected static final String CLOUD_ID_SEPARATOR = "cloudIDSeparator";
+  
+  public static String OORT_CONFIG_TYPE = PREFIX + "oort.configType";
+  public static String OORT_MULTICAST = "multicast";
+  public static String OORT_STATIC = "static";
 
   public static String[]        configs            = { "transports", "allowedTransports", "jsonContext", "validateMessageFields", "broadcastToPublisher", "timeout", "interval",
       "maxInterval", "maxLazyTimeout", "metaConnectDeliverOnly", "maxQueue", "maxSessionsPerBrowser", "allowMultiSessionsNoBrowser", "multiSessionInterval", "browserCookieName",
@@ -95,7 +100,17 @@ public class EXoContinuationCometdServlet extends CometDServlet {
         try {
           EXoContinuationCometdServlet.super.init(config);
 
-          oConfig = new OortConfig();
+          String profiles = PropertyManager.getProperty("exo.profiles");
+          if (profiles != null) {
+            clusterEnabled = profiles.contains("cluster");
+          }
+          
+          String configType = getInitParameter(OORT_CONFIG_TYPE);
+          if (OORT_STATIC.equals(configType)) {
+            oConfig = new OortStaticConfig();
+          } else {
+            oConfig = new OortMulticastConfig();
+          }
           oConfig.init(new ServletConfig() {
 
             @Override
@@ -214,23 +229,51 @@ public class EXoContinuationCometdServlet extends CometDServlet {
     oConfig.destroy();
     super.destroy();
   }
+  
+  private Oort configTransports(Oort oort) {
+    ServletConfig config = getServletConfig();
+    String transport = config.getInitParameter("transports");
+    if (transport == null || !transport.contains(WebSocketTransport.class.getName())) {
+      oort.getClientTransportFactories().add(new LongPollingTransport.Factory(new HttpClient()));
+    }
+    return oort;
+  }
 
   /**
    * This class help to workaround issue with eap 6.2 that has not support
    * Websocket transport yet
    */
-  public static class OortConfig extends OortStaticConfigServlet {
+  public class OortStaticConfig extends OortStaticConfigServlet {
     private static final long serialVersionUID = 1054209695244836363L;
+
+    @Override
+    protected void configureCloud(ServletConfig config, Oort oort) throws Exception {
+      if (clusterEnabled) {
+        super.configureCloud(config, oort);        
+      }
+    }
 
     @Override
     protected Oort newOort(BayeuxServer bayeux, String url) {
       Oort oort = super.newOort(bayeux, url);
-      ServletConfig config = getServletConfig();
-      String transport = config.getInitParameter("transports");
-      if (transport == null || !transport.contains(WebSocketTransport.class.getName())) {
-        oort.getClientTransportFactories().add(new LongPollingTransport.Factory(new HttpClient()));
+      return configTransports(oort);
+    }
+  }
+  
+  public class OortMulticastConfig extends OortMulticastConfigServlet {
+    private static final long serialVersionUID = 6836833932474627776L;
+
+    @Override
+    protected void configureCloud(ServletConfig config, Oort oort) throws Exception {
+      if (clusterEnabled) {
+        super.configureCloud(config, oort);        
       }
-      return oort;
+    }
+    
+    @Override
+    protected Oort newOort(BayeuxServer bayeux, String url) {
+      Oort oort = super.newOort(bayeux, url);
+      return configTransports(oort);
     }
   }
 }
