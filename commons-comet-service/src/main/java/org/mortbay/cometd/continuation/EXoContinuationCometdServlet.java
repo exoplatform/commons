@@ -17,10 +17,16 @@ package org.mortbay.cometd.continuation;
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -134,6 +140,35 @@ public class EXoContinuationCometdServlet extends CometDServlet {
       }
     };
     PortalContainer.addInitTask(config.getServletContext(), task);
+  }
+
+  @Override
+  protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+                                                                                  IOException {
+    if (container == null || container.getComponentInstanceOfType(BayeuxServer.class) == null) {
+      final AsyncContext ac = request.startAsync(request, response);      
+      ac.start(new Runnable() {
+        
+        @Override
+        public void run() {
+          while (container == null || container.getComponentInstanceOfType(BayeuxServer.class) == null) {
+            try {
+              Thread.sleep(5000);
+            } catch (InterruptedException e) {
+              LOG.error(e);
+            }
+          }
+          
+          try {
+            EXoContinuationCometdServlet.this.service(ac.getRequest(), ac.getResponse());
+          } catch (Exception e) {
+            LOG.error(e);
+          }
+        }
+      });
+    } else {
+      super.service(request, response);      
+    }
   }
 
   /**

@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.cometd.bayeux.Channel;
+import org.cometd.bayeux.ChannelId;
 import org.cometd.bayeux.MarkedReference;
 import org.cometd.bayeux.server.BayeuxServer;
 import org.cometd.bayeux.server.ConfigurableServerChannel;
@@ -298,8 +299,8 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
      */
     @Override
     public boolean canCreate(BayeuxServer server, ServerSession client, String channelId, ServerMessage message) {
-      //
-      Boolean b = client != null && !channelId.startsWith("/meta/");
+      //      
+      Boolean b = client != null && !ChannelId.isMeta(channelId);
       return b;
     }
 
