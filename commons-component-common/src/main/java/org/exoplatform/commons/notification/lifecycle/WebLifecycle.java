@@ -57,12 +57,9 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       if (userSetting.isActive(WebChannel.ID, pluginId)) {
         ctx.setWritingProcess(true);
         NotificationInfo notif = notification.clone(true).setTo(userId);
+        //TODO Removes the update here and confirm with SOC team
+        store(notif);
         send(ctx.setNotificationInfo(notif));
-        if (notif.getId().equals(ctx.getNotificationInfo().getId())) {
-          store(ctx.getNotificationInfo());
-        } else {
-          update(ctx.getNotificationInfo());
-        }
       }
     }
   }
