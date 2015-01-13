@@ -37,6 +37,11 @@ public class MessageInfo {
   private long createdTime;
   
   private int numberOnBadge = 0;
+  
+  /** MUST move the message to the top of list or NOT 
+   * and wrapper by JSON and transfer to UI
+   * */
+  private boolean moveTop = true;
 
   public MessageInfo() {
   }
@@ -195,7 +200,22 @@ public class MessageInfo {
   public int getNumberOnBadge() {
     return numberOnBadge;
   }
-  
+  /**
+   * Gets the the move top value
+   * @return TRUE/FALSE
+   */
+  public boolean isMoveTop() {
+    return moveTop;
+  }
+
+  /**
+   * Sets the the move top value
+   * @param moveTop TRUE/FALSE
+   */
+  public void setMoveTop(boolean moveTop) {
+    this.moveTop = moveTop;
+  }
+
   /**
    * Sets the badge number of the user
    * @param numberOnBadge
