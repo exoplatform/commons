@@ -56,7 +56,7 @@
       <org.exoplatform.ws.version>2.3.x-SNAPSHOT</org.exoplatform.ws.version>
       <org.exoplatform.jcr.version>1.15.x-SNAPSHOT</org.exoplatform.jcr.version>
     <!-- GateIn Project Dependencies -->
-    <org.gatein.portal.version>3.5.x-PLF-SNAPSHOT</org.gatein.portal.version>
+    <org.gatein.portal.version>4.2.x-PLF-SNAPSHOT</org.gatein.portal.version>
     <!-- Platform Project Dependencies -->
     <org.exoplatform.platform-ui.version>4.2.x-SNAPSHOT</org.exoplatform.platform-ui.version>
   </properties>
