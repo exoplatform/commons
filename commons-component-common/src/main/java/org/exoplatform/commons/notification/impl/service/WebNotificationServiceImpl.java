@@ -68,17 +68,14 @@ public class WebNotificationServiceImpl implements WebNotificationService {
     //
     for (NotificationInfo notification : gotList) {
       AbstractTemplateBuilder builder = channel.getTemplateBuilder(notification.getKey());
-      if (builder != null) {
-        MessageInfo msg = builder.buildMessage(ctx.setNotificationInfo(notification));
+      MessageInfo msg = builder.buildMessage(ctx.setNotificationInfo(notification));
+      if (msg != null && msg.getBody() != null && !msg.getBody().isEmpty()) {
         result.add(msg.getBody());
-        //if have any exception when template transformation
-        // gets the default title
-        if (ctx.isFailed()) {
-          LOG.debug(ctx.getException().getMessage(), ctx.getException());
-          result.add(notification.getTitle());
-        }
-      } else {
-        result.add(notification.getTitle());
+      }
+      // if have any exception when template transformation
+      // ignore to display the notification
+      if (ctx.isFailed()) {
+        LOG.debug(ctx.getException().getMessage(), ctx.getException());
       }
     }
     return result;
