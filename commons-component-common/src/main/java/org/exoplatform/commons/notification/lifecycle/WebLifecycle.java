@@ -58,8 +58,9 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
         ctx.setWritingProcess(true);
         NotificationInfo notif = notification.clone(true).setTo(userId);
         //TODO Removes the update here and confirm with SOC team
-        store(notif);
         send(ctx.setNotificationInfo(notif));
+        //store must after the send due to build the notification's title
+        store(ctx.getNotificationInfo());
       }
     }
   }
@@ -75,14 +76,6 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
     notifInfo.with(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), "true")
              .with(NotificationMessageUtils.READ_PORPERTY.getKey(), "false");
     CommonsUtils.getService(WebNotificationStorage.class).save(notifInfo);
-  }
-  
-  @Override
-  public void update(NotificationInfo notifInfo) {
-    LOG.info("WEB:: Update an existing notification to db by Web channel.");
-    notifInfo.with(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), "true")
-             .with(NotificationMessageUtils.READ_PORPERTY.getKey(), "false");
-    CommonsUtils.getService(WebNotificationStorage.class).update(notifInfo, true);
   }
   
   @Override

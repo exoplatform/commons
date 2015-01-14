@@ -69,16 +69,22 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   
   @Override
   public void save(NotificationInfo notification) {
-    storage.save(notification);
-    //
-    Integer current = getNumberOnBadge(notification.getTo());
-    if (current <= NotificationMessageUtils.getMaxItemsInPopover()) {
-      current += 1;
-      exoWebNotificationCountCache.put(WebNotifInfoCacheKey.key(notification.getTo()), new IntegerData(current));
+    //check the notification is existing or not
+    //calling update or create new. 
+    boolean isExisting = get(notification.getId()) != null;
+    if (isExisting) {
+      update(notification, true);
+    } else {
+      storage.save(notification);
+      //
+      Integer current = getNumberOnBadge(notification.getTo());
+      if (current <= NotificationMessageUtils.getMaxItemsInPopover()) {
+        current += 1;
+        exoWebNotificationCountCache.put(WebNotifInfoCacheKey.key(notification.getTo()), new IntegerData(current));
+      }
+      moveTopPopover(notification);
+      moveTopViewAll(notification);
     }
-    
-    moveTopPopover(notification);
-    moveTopViewAll(notification);
   }
 
   @Override
