@@ -711,9 +711,9 @@ function UIDSUpload() {
 	  styleText += ".FileHidden { opacity: 0; overflow: hidden; position: absolute; height: 26px; bottom: 0px; right: 0px; -moz-opacity:0 ; filter:alpha(opacity: 0); cursor: pointer;} ";  
 	  styleText += ".BrowseLink { font-family: Arial, Helvetica, sans-serif; text-decoration: none; border: 1px solid transparent; width: 24px; height: 24px; display: block;";
 	  styleText += "     text-decoration: none;";
-	  styleText += "    background: url('/eXoSkin/skin/images/commons/skin/DocumentSelector/fileShareUpload.png') no-repeat 3px center;}";
+	  styleText += "    background: url('/eXoSkin/skin/images/Default/commons/skin/DocumentSelector/fileshareUploadDefault.png') no-repeat 3px center;}";
 	  styleText += ".BrowseLink:hover { background-color: #F9F9F9; border: 1px solid #CFCFCF; text-decoration: none; border-radius: 3px; box-shadow: 0 1px 2px 0 #FFFFFF; cursor: pointer;";
-	  styleText += "    background: url('/eXoSkin/skin/images/commons/skin/DocumentSelector/fileShareUploadBlue.png') no-repeat 3px center;}";
+	  styleText += "    background: url('/eXoSkin/skin/images/Default/commons/skin/DocumentSelector/fileshareUploadPrimary.png') no-repeat 3px center;}";
 	  return styleText;
 	}
 
