@@ -220,7 +220,7 @@
           <property name="jobName" value="NotificationDailyJob"/>
           <property name="groupName" value="Notification"/>
           <property name="job" value="org.exoplatform.commons.notification.job.NotificationDailyJob"/>
-          <property name="expression" value="${cronJob.notification.NotificationDailyJob.expression:0 0 23 ? * *}"/><!-- Run at 11:00pm every day -->
+          <property name="expression" value="${exo.notification.NotificationDailyJob.expression:0 0 23 ? * *}"/><!-- Run at 11:00pm every day -->
         </properties-param>
       </init-params>
     </component-plugin>
@@ -240,7 +240,7 @@
           <property name="jobName" value="NotificationWeeklyJob"/>
           <property name="groupName" value="Notification"/>
           <property name="job" value="org.exoplatform.commons.notification.job.NotificationWeeklyJob"/>
-          <property name="expression" value="${cronJob.notification.NotificationWeeklyJob.expression:0 0 11 ? * SUN}"/><!-- Run at 11:00am every Sunday in every month -->
+          <property name="expression" value="${exo.notification.NotificationWeeklyJob.expression:0 0 11 ? * SUN}"/><!-- Run at 11:00am every Sunday in every month -->
         </properties-param>
       </init-params>
     </component-plugin>
@@ -260,12 +260,12 @@
 					<property name="jobName" value="WebNotificationJob" />
 					<property name="groupName" value="Notification" />
 					<property name="job" value="org.exoplatform.commons.notification.job.WebNotificationJob" />
-					<property name="expression" value="${cronJob.notification.WebNotificationJob.expression:0 0 23 ? * *}" /><!-- Run at 11:00pm every day -->
+					<property name="expression" value="${exo.notification.WebNotificationCleanJob.expression:0 0 23 ? * *}" /><!-- Run at 11:00pm every day -->
 				</properties-param>
 				<properties-param>
 					<name>web.info</name>
 					<description></description>
-					<property name="liveDays" value="${exo.notifications.viewall:2600000}" />
+					<property name="liveDays" value="${exo.notification.viewall:30}" /><!-- 30 days -->
 				</properties-param>
 			</init-params>
 		</component-plugin>

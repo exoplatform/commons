@@ -9,6 +9,7 @@ import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
+import java.lang.NumberFormatException;
 
 public class WebNotificationJob extends NotificationJob {
 
@@ -19,7 +20,19 @@ public class WebNotificationJob extends NotificationJob {
     OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
     //
     JobDataMap jdatamap = context.getJobDetail().getJobDataMap();
-    long liveDays = Long.valueOf(jdatamap.getString(WebCronJob.LIVE_DAYS_KEY));
+    // Number of days during which notifications are stored, converted in seconds
+    long liveDays = 30;
+    try {
+      liveDays = Long.valueOf(jdatamap.getString(WebCronJob.LIVE_DAYS_KEY));
+      if (liveDays <= 0) {
+        LOG.warn("The value of the propety exo.notification.viewall cannot be 0 or negative. Using the default instead: 30.");
+        liveDays = 30;
+      }
+    } catch (NumberFormatException e) {
+      LOG.warn(String.format("The value of the propety exo.notification.viewall is incorrect:%s. Using the default instead: 30.", jdatamap.getString(WebCronJob.LIVE_DAYS_KEY)));
+      liveDays = 30;
+    }
+    liveDays *= (24 * 60 * 60); // convert days to seconds
     //
     CommonsUtils.startRequest(organizationService);
     ListAccess<User> allUsers = null;
