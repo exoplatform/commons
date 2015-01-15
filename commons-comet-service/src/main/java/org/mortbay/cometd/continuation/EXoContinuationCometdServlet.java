@@ -25,11 +25,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.cometd.bayeux.server.BayeuxServer;
 import org.cometd.client.transport.LongPollingTransport;
@@ -89,6 +91,19 @@ public class EXoContinuationCometdServlet extends CometDServlet {
       "maxInterval", "maxLazyTimeout", "metaConnectDeliverOnly", "maxQueue", "maxSessionsPerBrowser", "allowMultiSessionsNoBrowser", "multiSessionInterval", "browserCookieName",
       "browserCookieDomain", "browserCookiePath", "ws.cometdURLMapping", "ws.messagesPerFrame", "ws.bufferSize", "ws.maxMessageSize", "ws.idleTimeout" };
 
+  public static final Pattern URL_REGEX;
+  static {
+    String ip_regex = "(((((25[0-5])|(2[0-4][0-9])|([01]?[0-9]?[0-9]))\\.){3}((25[0-4])|(2[0-4][0-9])|((1?[1-9]?[1-9])|([1-9]0))))|(0\\.){3}0)";
+    URL_REGEX = Pattern.compile("^((ht|f)tp(s?)://)" // protocol
+                                + "(\\w+(:\\w+)?@)?" // username:password@
+                                + "(" + ip_regex // ip
+                                + "|([0-9a-z_!~*'()-]+\\.)*([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\.[a-z]{2,6}" // domain like www.exoplatform.org
+                                + "|([a-zA-Z][-a-zA-Z0-9]+))" // domain like localhost
+                                + "(:[0-9]{1,5})?" // port number :8080
+                                + "((/?)|(/[0-9a-zA-Z_!~*'().;?:@&=+$,%#-]+)+/?)$"); // uri
+    
+  }
+  
   /**
    * {@inheritDoc}
    */
@@ -103,6 +118,9 @@ public class EXoContinuationCometdServlet extends CometDServlet {
           String profiles = PropertyManager.getProperty("exo.profiles");
           if (profiles != null) {
             clusterEnabled = profiles.contains("cluster");
+            if (clusterEnabled) {
+              warnInvalidUrl(getInitParameter(OortConfigServlet.OORT_URL_PARAM));
+            }
           }
           
           String configType = getInitParameter(OORT_CONFIG_TYPE);
@@ -149,7 +167,7 @@ public class EXoContinuationCometdServlet extends CometDServlet {
           if (separator != null) {
             bayeux.setCloudIDSeparator(separator);
           }
-        } catch (ServletException e) {
+        } catch (Exception e) {
           LOG.error("Cannot initialize Bayeux", e);
         }
       }
@@ -238,6 +256,14 @@ public class EXoContinuationCometdServlet extends CometDServlet {
     }
     return oort;
   }
+  
+  private void warnInvalidUrl(String url) {
+    if (url == null || url.isEmpty()) {
+      LOG.warn("You didn’t set exo.cometd.oort.url, cometd cannot work in cluster mode without this property, please set it.");
+    } else if (URL_REGEX.matcher(url).matches()) {
+      LOG.warn("exo.cometd.oort.url is invalid {}, cometd cannot work in cluster mode without this property, please set it.", url);
+    }
+  }
 
   /**
    * This class help to workaround issue with eap 6.2 that has not support
@@ -249,7 +275,7 @@ public class EXoContinuationCometdServlet extends CometDServlet {
     @Override
     protected void configureCloud(ServletConfig config, Oort oort) throws Exception {
       if (clusterEnabled) {
-        super.configureCloud(config, oort);        
+        super.configureCloud(config, oort);
       }
     }
 
@@ -262,7 +288,7 @@ public class EXoContinuationCometdServlet extends CometDServlet {
   
   public class OortMulticastConfig extends OortMulticastConfigServlet {
     private static final long serialVersionUID = 6836833932474627776L;
-
+    
     @Override
     protected void configureCloud(ServletConfig config, Oort oort) throws Exception {
       if (clusterEnabled) {
