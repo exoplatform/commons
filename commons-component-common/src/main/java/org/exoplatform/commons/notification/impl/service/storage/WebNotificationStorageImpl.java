@@ -430,7 +430,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       NodeIterator iter = getNewMessage(sProvider, userId, limit);
       return (int) iter.getSize();
     } catch (Exception e) {
-      LOG.debug("Failed to clearNewMessageNumber ", e);
+      LOG.error("Failed to getNumberOnBadge() ", e);
     }
     return 0;
   }
@@ -446,7 +446,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       }
       getSession(sProvider).save();
     } catch (Exception e) {
-      LOG.debug("Failed to clearNewMessageNumber ", e);
+      LOG.error("Failed to resetNumberOnBadge() ", e);
     }
   }
   
