@@ -21,6 +21,7 @@ import javax.jcr.query.QueryManager;
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
+import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
@@ -43,12 +44,15 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   private final ReentrantLock lock = new ReentrantLock();
   private final NodeHierarchyCreator nodeHierarchyCreator;
   
+  private final UserSettingService userSettingService;
+  private final DataDistributionManager distributionManager;
   private WebNotificationStorage webNotificationStorage;
-  private DataDistributionManager distributionManager;
   
-  public WebNotificationStorageImpl(NodeHierarchyCreator nodeHierarchyCreator, DataDistributionManager distributionManager) {
+  public WebNotificationStorageImpl(NodeHierarchyCreator nodeHierarchyCreator, DataDistributionManager distributionManager,
+                                    UserSettingService userSettingService) {
     this.nodeHierarchyCreator = nodeHierarchyCreator;
     this.distributionManager = distributionManager;
+    this.userSettingService = userSettingService;
   }
 
   private Session getSession(SessionProvider sProvider) throws Exception {
@@ -311,29 +315,25 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public void markAllRead(String userId) {
-    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
-    WebNotificationFilter filter = new WebNotificationFilter(userId).setRead(false).setOrder(false);
     try {
-      CachedWebNotificationStorage cacheStorage = null;
+      //
+      userSettingService.saveLastReadDate(userId, System.currentTimeMillis());
+      //
       if (getWebNotificationStorage() instanceof CachedWebNotificationStorage) {
-        cacheStorage = (CachedWebNotificationStorage) getWebNotificationStorage();
+        CachedWebNotificationStorage cacheStorage = (CachedWebNotificationStorage) getWebNotificationStorage();
+        cacheStorage.updateAllRead(userId);
       }
-      NodeIterator it = get(sProvider, filter, 0, 0);
-      while (it.hasNext()) {
-        Node node = it.nextNode();
-        node.setProperty(NTF_READ, "true");
-        //
-        if (cacheStorage != null) {
-          cacheStorage.updateRead(node.getName(), true);
-        }
-      }
-      getSession(sProvider).save();
     } catch (Exception e) {
       LOG.error("Failed to update the all read for userId:" + userId, e);
     }
   }
 
-  
+  /**
+   * Fill data from JCR node to model object
+   * @param node
+   * @return
+   * @throws Exception
+   */
   private NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
     NotificationInfo notifiInfo = NotificationInfo.instance()
@@ -363,6 +363,15 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
           LOG.error("Failed to get the property value.", e);
         }
       }
+    }
+    /**
+     * Comparison the read time point to decide the read status of message.
+     * + If less than the read time point, Read = TRUE
+     * + Else depends on the the status of the message
+     */
+    long lastReadDate = getLastReadDateOfUser(notifiInfo.getTo());
+    if (notifiInfo.getLastModifiedDate() <= lastReadDate) {
+      notifiInfo.with(NotificationMessageUtils.READ_PORPERTY.getKey(), "true");
     }
     //
     return notifiInfo;
@@ -470,5 +479,13 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     }
     //
     return query.execute().getNodes();
+  }
+
+  /**
+   * @param userId
+   * @return
+   */
+  private long getLastReadDateOfUser(String userId) {
+    return userSettingService.get(userId).getLastReadDate();
   }
 }

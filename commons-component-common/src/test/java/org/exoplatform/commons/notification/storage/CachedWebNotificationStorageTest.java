@@ -48,8 +48,8 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
       }
     }
     
-    cacheService.getCacheInstance(WEB_NOTIFICATION_CACHING_NAME).clearCache();
-    cacheService.getCacheInstance(LIST_WEB_NOTIFICATION_CACHING_NAME).clearCache();
+    exoWebNotificationCache.clearCache();
+    exoWebNotificationsCache.clearCache();
     
     super.tearDown();
   }
@@ -121,7 +121,6 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     for (NotificationInfo notifInfo : viewAllInfos) {
       assertFalse(Boolean.valueOf(notifInfo.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
     }
-    
     //
     cachedStorage.markAllRead(userId);
     //
@@ -133,6 +132,13 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     viewAllInfos = cachedStorage.get(new WebNotificationFilter(userId, false), 0 , 10);
     assertEquals(10, viewAllInfos.size());
     for (NotificationInfo notifInfo : viewAllInfos) {
+      assertTrue(Boolean.valueOf(notifInfo.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
+    }
+    //
+    for (NotificationInfo info : viewAllInfos) {
+      WebNotifInfoCacheKey notifKey = WebNotifInfoCacheKey.key(info.getId());
+      WebNotifInfoData notifData = exoWebNotificationCache.get(notifKey);
+      NotificationInfo notifInfo = notifData.build();
       assertTrue(Boolean.valueOf(notifInfo.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
     }
   }

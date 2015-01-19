@@ -61,6 +61,8 @@ public class UserSetting {
 
   private List<String> weeklyPlugins;
 
+  private long lastReadDate = 0;
+
   public UserSetting() {
     this.channelActives = new ArrayList<String>();
     this.channelPlugins = new HashMap<String, List<String>>();
@@ -72,6 +74,22 @@ public class UserSetting {
   
   public static UserSetting getInstance() {
     return new UserSetting();
+  }
+
+  /**
+   * Get the last read date
+   * @return
+   */
+  public long getLastReadDate() {
+    return lastReadDate;
+  }
+
+  /**
+   * Set last read date
+   * @param lastReadDate
+   */
+  public void setLastReadDate(long lastReadDate) {
+    this.lastReadDate = lastReadDate;
   }
 
   /**

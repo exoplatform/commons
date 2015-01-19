@@ -95,4 +95,16 @@ public interface UserSettingService {
    * @param users The list of users.
    */
   void addMixin(User[] users);
+
+  /**
+   * Stores the read time point when user clicks mark all read his/her messages.
+   * This value will be using to decide the read status of message.
+   *  + If less than the read time point, Read = TRUE
+   *  + Else depends on the the status of the message
+   * @param userId The user's id
+   * @param time The time milliseconds 
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  void saveLastReadDate(String userId, Long time);
 }

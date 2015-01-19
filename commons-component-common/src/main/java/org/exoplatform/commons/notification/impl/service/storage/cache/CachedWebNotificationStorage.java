@@ -102,6 +102,18 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     }
   }
 
+  public void updateAllRead(String userId) throws Exception {
+    List<?> infoDatas = exoWebNotificationCache.getCachedObjects();
+    if (infoDatas != null) {
+      for (Object webNotifInfoData : infoDatas) {
+        WebNotifInfoData webData = (WebNotifInfoData) webNotifInfoData;
+        if (userId.equals(webData.build().getTo())) {
+          webData.updateRead(true);
+        }
+      }
+    }
+  }
+
   @Override
   public void markAllRead(String userId) {
     storage.markAllRead(userId);

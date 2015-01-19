@@ -45,6 +45,8 @@ public abstract class AbstractService {
   
   public static final String EXO_DAILY                = "exo:daily";
 
+  public static final String EXO_LAST_READ_DATE       = "exo:lastReadDate";
+
   public static final String EXO_WEEKLY               = "exo:weekly";
 
   public static final String NTF_TO                   = "ntf:to";
