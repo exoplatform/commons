@@ -10,8 +10,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.jcr.PathNotFoundException;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
@@ -26,6 +28,8 @@ import org.exoplatform.commons.notification.impl.service.storage.cache.CachedWeb
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
+import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
@@ -35,14 +39,16 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   private static final Log LOG = ExoLogger.getLogger(WebNotificationStorageImpl.class);
   private static final String NOTIFICATIONS = "notifications";
   private static final String NT_UNSTRUCTURED = "nt:unstructured";
-  
+
   private final ReentrantLock lock = new ReentrantLock();
   private final NodeHierarchyCreator nodeHierarchyCreator;
   
   private WebNotificationStorage webNotificationStorage;
+  private DataDistributionManager distributionManager;
   
-  public WebNotificationStorageImpl(NodeHierarchyCreator nodeHierarchyCreator) {
+  public WebNotificationStorageImpl(NodeHierarchyCreator nodeHierarchyCreator, DataDistributionManager distributionManager) {
     this.nodeHierarchyCreator = nodeHierarchyCreator;
+    this.distributionManager = distributionManager;
   }
 
   private Session getSession(SessionProvider sProvider) throws Exception {
@@ -52,6 +58,14 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   
   private String converDateToNodeName(Calendar cal) {
     return new SimpleDateFormat(DATE_NODE_PATTERN).format(cal.getTime());
+  }
+
+  /**
+   * Gets or create the Web Date Node on Collaboration workspace.
+   */
+  private Node getOrCreateDataNode(Node rootNode, String nodeName, String nodeType) throws RepositoryException {
+    return distributionManager.getDataDistributionType(DataDistributionMode.NONE)
+        .getOrCreateDataNode(rootNode, nodeName, nodeType);
   }
 
   /**
@@ -68,13 +82,18 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   private Node getOrCreateWebDateNode(SessionProvider sProvider, NotificationInfo notification) throws Exception {
     String dateNodeName = converDateToNodeName(notification.getDateCreated());
     Node channelNode = getOrCreateChannelNode(sProvider, notification.getTo());
-    if (channelNode.hasNode(dateNodeName)) {
+    try {
       return channelNode.getNode(dateNodeName);
-    } else {
-      Node dateNode = channelNode.addNode(dateNodeName, NTF_NOTIF_DATE);
-      dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
-      channelNode.getSession().save();
-      return dateNode;
+    } catch (PathNotFoundException e) {
+      try {
+        lock.lock();
+        Node dateNode = getOrCreateDataNode(channelNode, dateNodeName, NTF_NOTIF_DATE);
+        dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
+        channelNode.save();
+        return dateNode;
+      } finally {
+        lock.unlock();
+      }
     }
   }
 
@@ -91,18 +110,8 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    */
   private Node getOrCreateChannelNode(SessionProvider sProvider, String userId) throws Exception {
     Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId);
-    Node parentNode = null;
-    if (userNodeApp.hasNode(NOTIFICATIONS)) {
-      parentNode = userNodeApp.getNode(NOTIFICATIONS);
-    } else {
-      parentNode = userNodeApp.addNode(NOTIFICATIONS, NT_UNSTRUCTURED);
-    }
-    Node channelNode = null;
-    if (parentNode.hasNode(WEB_CHANNEL)) {
-      channelNode = parentNode.getNode(WEB_CHANNEL);
-    } else {
-      channelNode = parentNode.addNode(WEB_CHANNEL, NTF_CHANNEL);
-    }
+    Node parentNode = getOrCreateDataNode(userNodeApp, NOTIFICATIONS, NT_UNSTRUCTURED);
+    Node channelNode = getOrCreateDataNode(parentNode, WEB_CHANNEL, NTF_CHANNEL);
     return channelNode;
   }
 
@@ -119,9 +128,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   public void save(NotificationInfo notification) {
     boolean created = NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
-    final ReentrantLock localLock = lock;
     try {
-      localLock.lock();
       Node userNode = getOrCreateWebDateNode(sProvider, notification);
       Node notifyNode = null;
       if (userNode.hasNode(notification.getId())) {
@@ -136,6 +143,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       notifyNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getLastModifiedDate());
       //NTF_NAME_SPACE
       Map<String, String> ownerParameter = notification.getOwnerParameter();
+      
       if(ownerParameter != null && !ownerParameter.isEmpty()) {
         for (String key : ownerParameter.keySet()) {
           String propertyName = (key.indexOf(NTF_NAME_SPACE) != 0) ? NTF_NAME_SPACE + key : key;
@@ -150,7 +158,6 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       LOG.error("Failed to save the notificaton.", e);
     } finally {
       NotificationSessionManager.closeSessionProvider(created);
-      localLock.unlock();
     }
   }
   
