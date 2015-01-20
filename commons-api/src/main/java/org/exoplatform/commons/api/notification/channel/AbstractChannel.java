@@ -21,6 +21,7 @@ import org.exoplatform.commons.api.notification.channel.template.AbstractTemplat
 import org.exoplatform.commons.api.notification.channel.template.PluginTemplateBuilderAdapter;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
+import org.exoplatform.commons.api.notification.lifecycle.DefaultLifecycle;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
@@ -38,7 +39,18 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
   private final AbstractNotificationLifecycle lifecycle;
   
   public AbstractChannel(AbstractNotificationLifecycle lifecycle) {
-    this.lifecycle = lifecycle;
+    if (lifecycle != null) {
+      this.lifecycle = lifecycle;
+    } else {
+      this.lifecycle = new DefaultLifecycle();
+    }
+    this.lifecycle.setChannel(this);
+  }
+  /**
+   * Using the default life-cycle
+   */
+  public AbstractChannel() {
+    this.lifecycle = new DefaultLifecycle();
     this.lifecycle.setChannel(this);
   }
   /**
