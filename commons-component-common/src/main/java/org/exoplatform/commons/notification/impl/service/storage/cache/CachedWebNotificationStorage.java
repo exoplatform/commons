@@ -129,7 +129,10 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
       infoData.updateShowPopover(false);
     }
     // update list
-    removePopover(get(notificationId));
+    NotificationInfo notification = get(notificationId);
+    if (notification != null) {
+      removePopover(notification);
+    }
   }
   
   @Override
