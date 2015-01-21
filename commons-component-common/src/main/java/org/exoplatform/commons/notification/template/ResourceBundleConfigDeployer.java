@@ -107,26 +107,37 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
           filePaths.addAll(buildFilePath(path, baseName, config.getLocale()));
         }
       }
-      
+      Map<ResourceBundleFile, StringBuilder> resourceMap = new HashMap<ResourceBundleFile, StringBuilder>();
       //step 2: Loading resource bundle file from webapps
       for (WebApp app : contexts.values()) {
         for(ResourceBundleFile bundleFile : filePaths) {
           String content = this.getResourceBundleContent(bundleFile.filePath, app.getServletContext());
           if (content != null) {
-            // save the content
-            ResourceBundleData data = new ResourceBundleData(content);
-            data.setName(bundleFile.resourceName);
-            data.setLanguage(bundleFile.locale.getLanguage());
-            data.setCountry(bundleFile.locale.getCountry());
-            data.setVariant(bundleFile.locale.getVariant());
-            this.bundleService.saveResourceBundle(data);
-            includedWebApp.add(bundleFile.resourceName);
-            LOG.debug("Loading file path = " + bundleFile.filePath + " ResourceBundleData's ID = " + data.getId());
+            StringBuilder sb = resourceMap.get(bundleFile);
+            if (sb == null) {
+              sb = new StringBuilder();
+              resourceMap.put(bundleFile, sb);
+            }
+            sb.append(content);
+            LOG.debug("Loading file path = " + bundleFile.filePath);
           }
         }
       }
       
-      //step 3 Loading the resource bundle from jar file what keep in integration notification. 
+      //step 3 push the map to the resource bundle service
+      for (Map.Entry<ResourceBundleFile, StringBuilder> entry : resourceMap.entrySet()) {
+        ResourceBundleFile key = entry.getKey();
+        // save the content
+        ResourceBundleData data = new ResourceBundleData(entry.getValue().toString());
+        data.setName(key.resourceName);
+        data.setLanguage(key.locale.getLanguage());
+        data.setCountry(key.locale.getCountry());
+        data.setVariant(key.locale.getVariant());
+        this.bundleService.saveResourceBundle(data);
+        includedWebApp.add(key.resourceName);
+        LOG.debug("Loading file path = " + key.filePath + " ResourceBundleData's ID = " + data.getId());
+      }
+      //step 4 Loading the resource bundle from jar file what keep in integration notification. 
       for (String path : list) {
         if (!includedWebApp.contains(path)) {
         //add the bundle from jar file
