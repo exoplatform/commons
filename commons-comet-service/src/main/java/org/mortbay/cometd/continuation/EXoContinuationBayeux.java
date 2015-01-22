@@ -17,7 +17,7 @@ package org.mortbay.cometd.continuation;
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 import javax.jcr.RepositoryException;
-import javax.servlet.ServletContext;
+import javax.servlet.ServletConfig;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,23 +27,23 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.cometd.bayeux.Channel;
 import org.cometd.bayeux.ChannelId;
-import org.cometd.bayeux.MarkedReference;
 import org.cometd.bayeux.server.BayeuxServer;
-import org.cometd.bayeux.server.ConfigurableServerChannel;
 import org.cometd.bayeux.server.SecurityPolicy;
 import org.cometd.bayeux.server.ServerChannel;
 import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
 import org.cometd.oort.Oort;
 import org.cometd.oort.Seti;
+import org.cometd.server.AbstractServerTransport;
 import org.cometd.server.BayeuxServerImpl;
 import org.cometd.server.ServerSessionImpl;
 import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.picocontainer.Disposable;
 
 /**
  * Created by The eXo Platform SAS.
@@ -51,7 +51,7 @@ import org.exoplatform.services.log.Log;
  * @author <a href="mailto:vitaly.parfonov@gmail.com">Vitaly Parfonov</a>
  * @version $Id: $
  */
-public class EXoContinuationBayeux extends BayeuxServerImpl {
+public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposable {
 
   /**
    * Map for userToken.
@@ -62,11 +62,6 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
    * Stores the eXoID <=> clientID association
    */
   private static Map<String, Set<String>> clientIDs         = new ConcurrentHashMap<String, Set<String>>();
-
-  /**
-   * Timeout.
-   */
-  private long                            timeout;
 
   /**
    * Cometd webapp context name
@@ -87,6 +82,8 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
 
   private RepositoryService               repoService;
 
+  private ServletConfig servletConfig;
+
   /**
    * Logger.
    */
@@ -99,6 +96,12 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
     super();
     this.setSecurityPolicy(new EXoSecurityPolicy(this));
     this.repoService = repoService;
+    //
+    EXoContinuationCometdServlet servlet = EXoContinuationCometdServlet.getInstance();
+    if (servlet != null) {
+      servlet.setContainer(ExoContainerContext.getCurrentContainer());
+      servlet.reInit();
+    }
   }
 
   /**
@@ -109,19 +112,14 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
     return client;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Deprecated
   public void setTimeout(long timeout) {
-    this.timeout = timeout;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public long getTimeout() {
-    return timeout;
+      return getOption(AbstractServerTransport.TIMEOUT_OPTION, 30000);
   }
+  
 
   /**
    * @return context name of cometd webapp
@@ -153,21 +151,6 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
     String token = Long.toString(this.getRandom(System.identityHashCode(this) ^ System.currentTimeMillis()), 36);
     userToken.put(eXoId, token);
     return token;
-  }
-
-  /* ------------------------------------------------------------ */
-  public void initialize(ServletContext context) {
-    // http://docs.cometd.org/3/apidocs/org/cometd/server/BayeuxServerImpl.html#createChannelIfAbsent-java.lang.String-org.cometd.bayeux.server.ConfigurableServerChannel.Initializer...-
-    // It seems to be the new way to initialize a channel
-
-    MarkedReference<ServerChannel> ref = createChannelIfAbsent(Channel.SERVICE, new ServerChannel.Initializer() {
-      public void configureChannel(ConfigurableServerChannel channel) {
-        channel.setPersistent(true);
-      }
-    });
-    // if (ref.isMarked())
-    // return; // avoid initializing twice
-    setCometdContextName(context.getServletContextName());
   }
 
   /**
@@ -275,6 +258,29 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
 
     return eXoID;
   }
+  
+  public ServletConfig getServletConfig() {
+    return servletConfig;
+  }
+
+  public void setServletConfig(ServletConfig config) {
+    this.servletConfig = config;
+  }
+
+  @Override
+  public void dispose() {
+    for (ServerSession session : getSessions()) {
+      ((ServerSessionImpl)session).cancelSchedule();
+    }
+
+    try {
+      seti.stop();
+      oort.stop();
+      super.stop();
+    } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
+    }
+  }
 
   public static class EXoSecurityPolicy implements SecurityPolicy, ServerSession.RemoveListener {
 
@@ -360,4 +366,6 @@ public class EXoContinuationBayeux extends BayeuxServerImpl {
       }
     }
   }
+
+
 }

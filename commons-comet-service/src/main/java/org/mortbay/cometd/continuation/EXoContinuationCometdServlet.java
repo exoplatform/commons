@@ -25,11 +25,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -44,12 +46,14 @@ import org.cometd.oort.SetiServlet;
 import org.cometd.server.CometDServlet;
 import org.cometd.websocket.client.WebSocketTransport;
 import org.eclipse.jetty.client.HttpClient;
+import org.exoplatform.commons.utils.PrivilegedSystemHelper;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer.PortalContainerPostInitTask;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.ws.frameworks.cometd.ServletContextWrapper;
 
 /**
  * Created by The eXo Platform SAS.
@@ -59,37 +63,32 @@ import org.exoplatform.services.log.Log;
  */
 
 public class EXoContinuationCometdServlet extends CometDServlet {
-  /**
-    * 
-    */
-  private static final long     serialVersionUID   = 9204910608302112814L;
-  /**
-   * Logger.
-   */
-  private static final Log      LOG                = ExoLogger.getLogger(CometDServlet.class);
 
-  /**
-   * The portal container
-   */
-  private ExoContainer          container;
+  private static final long     serialVersionUID   = 9204910608302112814L;
+  
+  private static final Log      LOG                = ExoLogger.getLogger(CometDServlet.class);
 
   private OortConfigServlet     oConfig;
 
-  private SetiServlet           setiServlet;
-
-  private boolean clusterEnabled = false;
+  private SetiServlet           setiConfig;
   
+  private ExoContainer container;
+  
+  private boolean initialized;
+
+  private boolean clusterEnabled = false;  
+  
+  private static EXoContinuationCometdServlet instance;
+  
+  private ServletConfig originConfig;
+
   public static final String    PREFIX             = "exo.cometd.";
 
-  protected static final String CLOUD_ID_SEPARATOR = "cloudIDSeparator";
+  protected static final String CLOUD_ID_SEPARATOR = PREFIX + "cloudIDSeparator";
   
   public static String OORT_CONFIG_TYPE = PREFIX + "oort.configType";
   public static String OORT_MULTICAST = "multicast";
   public static String OORT_STATIC = "static";
-
-  public static String[]        configs            = { "transports", "allowedTransports", "jsonContext", "validateMessageFields", "broadcastToPublisher", "timeout", "interval",
-      "maxInterval", "maxLazyTimeout", "metaConnectDeliverOnly", "maxQueue", "maxSessionsPerBrowser", "allowMultiSessionsNoBrowser", "multiSessionInterval", "browserCookieName",
-      "browserCookieDomain", "browserCookiePath", "ws.cometdURLMapping", "ws.messagesPerFrame", "ws.bufferSize", "ws.maxMessageSize", "ws.idleTimeout" };
 
   public static final Pattern URL_REGEX;
   static {
@@ -100,91 +99,81 @@ public class EXoContinuationCometdServlet extends CometDServlet {
                                 + "|([0-9a-z_!~*'()-]+\\.)*([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\.[a-z]{2,6}" // domain like www.exoplatform.org
                                 + "|([a-zA-Z][-a-zA-Z0-9]+))" // domain like localhost
                                 + "(:[0-9]{1,5})?" // port number :8080
-                                + "((/?)|(/[0-9a-zA-Z_!~*'().;?:@&=+$,%#-]+)+/?)$"); // uri
-    
+                                + "((/?)|(/[0-9a-zA-Z_!~*'().;?:@&=+$,%#-]+)+/?)$"); // uri    
   }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public void init(final ServletConfig config) throws ServletException {
-    final PortalContainerPostInitTask task = new PortalContainerPostInitTask() {
 
+  public void init(ServletConfig config) throws ServletException {
+    originConfig = config;
+
+    PortalContainerPostInitTask task = new PortalContainerPostInitTask() {
       public void execute(ServletContext context, PortalContainer portalContainer) {
-        EXoContinuationCometdServlet.this.container = portalContainer;
-        try {
-          EXoContinuationCometdServlet.super.init(config);
-
-          String profiles = PropertyManager.getProperty("exo.profiles");
-          if (profiles != null) {
-            clusterEnabled = profiles.contains("cluster");
-            if (clusterEnabled) {
-              warnInvalidUrl(getInitParameter(OortConfigServlet.OORT_URL_PARAM));
-            }
-          }
-          
-          String configType = getInitParameter(OORT_CONFIG_TYPE);
-          if (OORT_STATIC.equals(configType)) {
-            oConfig = new OortStaticConfig();
-          } else {
-            oConfig = new OortMulticastConfig();
-          }
-          oConfig.init(new ServletConfig() {
-
-            @Override
-            public String getServletName() {
-              return config.getServletName();
-            }
-
-            @Override
-            public ServletContext getServletContext() {
-              return config.getServletContext();
-            }
-
-            @Override
-            public Enumeration getInitParameterNames() {
-              return config.getInitParameterNames();
-            }
-
-            @Override
-            public String getInitParameter(String name) {
-              return EXoContinuationCometdServlet.this.getInitParameter(name);
-            }
-          });
-
-          setiServlet = new SetiServlet();
-          setiServlet.init(config);
-
-          ServletContext cometdContext = config.getServletContext();
-          Seti seti = (Seti) cometdContext.getAttribute(Seti.SETI_ATTRIBUTE);
-          Oort oort = (Oort) cometdContext.getAttribute(Oort.OORT_ATTRIBUTE);
-
-          EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
-          bayeux.setSeti(seti);
-          bayeux.setOort(oort);
-
-          String separator = getInitParameter(CLOUD_ID_SEPARATOR);
-          if (separator != null) {
-            bayeux.setCloudIDSeparator(separator);
-          }
-        } catch (Exception e) {
-          LOG.error("Cannot initialize Bayeux", e);
-        }
+          setContainer(portalContainer);
+          init();
+          initialized = true;
       }
     };
     PortalContainer.addInitTask(config.getServletContext(), task);
+    instance = this;
+  }
+  
+  public void reInit() {
+    if (initialized) {
+      init();
+    }
+  }
+
+  public void init() {
+    ServletConfig servletConfig = getServletConfig();
+
+    try {
+      super.init();
+
+      String profiles = PropertyManager.getProperty("exo.profiles");
+      if (profiles != null) {
+        clusterEnabled = profiles.contains("cluster");
+        if (clusterEnabled) {
+          warnInvalidUrl(getInitParameter(OortConfigServlet.OORT_URL_PARAM));
+        }
+      }
+
+      String configType = getInitParameter(OORT_CONFIG_TYPE);
+      if (OORT_STATIC.equals(configType)) {
+        oConfig = new OortStaticConfig();
+      } else {
+        oConfig = new OortMulticastConfig();
+      }
+      oConfig.init(servletConfig);
+
+      setiConfig = new SetiServlet();
+      setiConfig.init(servletConfig);
+
+      ServletContext cometdContext = servletConfig.getServletContext();
+      Seti seti = (Seti) cometdContext.getAttribute(Seti.SETI_ATTRIBUTE);
+      Oort oort = (Oort) cometdContext.getAttribute(Oort.OORT_ATTRIBUTE);
+
+      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getBayeux();
+      bayeux.setSeti(seti);
+      bayeux.setOort(oort);
+
+      String separator = getInitParameter(CLOUD_ID_SEPARATOR);
+      if (separator != null) {
+        bayeux.setCloudIDSeparator(separator);
+      }
+    } catch (Exception e) {
+      LOG.error("Cannot initialize Bayeux", e);
+    }
   }
 
   @Override
   protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
                                                                                   IOException {
-    if (container == null || container.getComponentInstanceOfType(BayeuxServer.class) == null) {
-      final AsyncContext ac = request.startAsync(request, response);      
+    if (getContainer() == null || getBayeux() == null) {
+      final AsyncContext ac = request.startAsync(request, response);
       ac.start(new Runnable() {
         
         @Override
         public void run() {
-          while (container == null || container.getComponentInstanceOfType(BayeuxServer.class) == null) {
+          while (getContainer() == null || getBayeux() == null) {
             try {
               Thread.sleep(5000);
             } catch (InterruptedException e) {
@@ -204,48 +193,53 @@ public class EXoContinuationCometdServlet extends CometDServlet {
     }
   }
 
+  @Override
+  public ServletConfig getServletConfig() {
+    EXoContinuationBayeux bayeux = getBayeux();
+    ServletConfig config = bayeux.getServletConfig();
+    if (config == null) {
+      config = new ServletConfigWrapper(originConfig);
+      bayeux.setServletConfig(config);
+    }
+    return config;
+  }
+
+  public void setContainer(ExoContainer container) {
+    this.container = container;
+  }
+
+  private ExoContainer getContainer() {
+    return container;
+  }
+  
   /**
    * {@inheritDoc}
    */
   protected EXoContinuationBayeux newBayeuxServer() {
+    return getBayeux();
+  }
+
+  public EXoContinuationBayeux getBayeux() {
     try {
       if (LOG.isDebugEnabled())
-        LOG.debug("EXoContinuationCometdServlet - Current Container-ExoContainer: " + container);
-      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) container.getComponentInstanceOfType(BayeuxServer.class);
-      bayeux.setTimeout(Long.parseLong(getInitParameter("timeout")));
+        LOG.debug("EXoContinuationCometdServlet - Current Container-ExoContainer: " + getContainer());
+      EXoContinuationBayeux bayeux = (EXoContinuationBayeux) getContainer().getComponentInstanceOfType(BayeuxServer.class);
       if (LOG.isDebugEnabled())
         LOG.debug("EXoContinuationCometdServlet - -->AbstractBayeux=" + bayeux);
       return bayeux;
-    } catch (NumberFormatException e) {
+    } catch (Exception e) {
       LOG.error("Error new Bayeux creation ", e);
       return null;
     }
   }
-
-  @Override
-  public String getInitParameter(String name) {
-    String value = PropertyManager.getProperty(PREFIX + name);
-    if (value == null) {
-      value = super.getInitParameter(name);
-    }
-    return value;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Enumeration getInitParameterNames() {
-    Set<String> names = new HashSet<String>();
-    names.addAll(Collections.list(super.getInitParameterNames()));
-    names.addAll(Arrays.asList(configs));
-
-    return Collections.enumeration(names);
+  
+  public static EXoContinuationCometdServlet getInstance() {
+    return instance;
   }
 
   @Override
   public void destroy() {
-    setiServlet.destroy();
-    oConfig.destroy();
-    super.destroy();
+    //destroy procedure should be done in BayeuxServer eXo kernel disposable lifecycle method
   }
   
   private Oort configTransports(Oort oort) {
@@ -260,7 +254,7 @@ public class EXoContinuationCometdServlet extends CometDServlet {
   private void warnInvalidUrl(String url) {
     if (url == null || url.isEmpty()) {
       LOG.warn("You didn’t set exo.cometd.oort.url, cometd cannot work in cluster mode without this property, please set it.");
-    } else if (URL_REGEX.matcher(url).matches()) {
+    } else if (!URL_REGEX.matcher(url).matches()) {
       LOG.warn("exo.cometd.oort.url is invalid {}, cometd cannot work in cluster mode without this property, please set it.", url);
     }
   }
@@ -302,4 +296,57 @@ public class EXoContinuationCometdServlet extends CometDServlet {
       return configTransports(oort);
     }
   }
+  
+  private class ServletConfigWrapper implements ServletConfig {
+    private ServletConfig delegate;
+    private ServletContext contextWrapper;
+    private String[] configs;
+
+    public ServletConfigWrapper(ServletConfig config) {
+      this.delegate = config;
+      contextWrapper = new ServletContextWrapper(delegate.getServletContext());
+    }
+
+    @Override
+    public String getInitParameter(String name) {
+      String value = PropertyManager.getProperty(PREFIX + name);
+      if (value == null) {
+        value = delegate.getInitParameter(name);
+      }
+      return value;
+    }
+
+    @Override
+    public Enumeration<String> getInitParameterNames() {
+      if (configs == null) {
+        List<String> keys = new LinkedList<String>();
+        Properties props = PrivilegedSystemHelper.getProperties();
+        int len = PREFIX.length();
+
+        for (Object key : props.keySet()) {
+          String k = key.toString().trim();
+          if (k.startsWith(PREFIX) && k.length() > len) {
+            keys.add(k.substring(len));
+          }
+        }
+
+        configs = keys.toArray(new String[keys.size()]);
+      }
+      Set<String> names = new HashSet<String>();
+      names.addAll(Collections.list(delegate.getInitParameterNames()));
+      names.addAll(Arrays.asList(configs));
+
+      return Collections.enumeration(names);
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+      return contextWrapper;
+    }
+
+    @Override
+    public String getServletName() {
+      return delegate.getServletName();
+    }    
+  } 
 }
