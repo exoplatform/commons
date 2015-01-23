@@ -65,6 +65,57 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     assertEquals(1, cachedStorage.get(new WebNotificationFilter(userId, false), 0, 10).size());
   }
   
+  private ListWebNotificationsData getWebNotificationsData(ListWebNotificationsKey key) {
+    ListWebNotificationsData data = exoWebNotificationsCache.get(key);
+    if (data == null) {
+      data = new ListWebNotificationsData(key);
+      exoWebNotificationsCache.put(key, data);
+    }
+    return data;
+  }
+
+  public void testGetNotifications() {
+    String userId = "demo";
+    userIds.add(userId);
+    //
+    ListWebNotificationsKey key = ListWebNotificationsKey.key(userId, true);
+    List<NotificationInfo> onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
+    assertEquals(0, onPopoverInfos.size());
+    for (int i = 0; i < 2; i++) {
+      cachedStorage.save(makeWebNotificationInfo(userId));
+    }
+    ListWebNotificationsData data = getWebNotificationsData(key);
+    assertFalse(data.isMax());
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
+    assertTrue(data.isMax());
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
+    //
+    assertEquals(2, onPopoverInfos.size());
+    for (int i = 0; i < 20; i++) {
+      cachedStorage.save(makeWebNotificationInfo(userId));
+    }
+    assertFalse(data.isMax());
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 10);
+    assertFalse(data.isMax());
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 10);
+    //
+    assertEquals(10, onPopoverInfos.size());
+    assertFalse(data.isMax());
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 15);
+    assertFalse(data.isMax());
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 15);
+    //
+    assertEquals(15, onPopoverInfos.size());
+    //
+    assertFalse(data.isMax());
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 30);
+    assertTrue(data.isMax());
+    onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 30);
+    assertEquals(22, onPopoverInfos.size());
+    assertTrue(data.isMax());
+  }
+  
   public void testRemove() throws Exception {
     String userId = "demo";
     userIds.add(userId);

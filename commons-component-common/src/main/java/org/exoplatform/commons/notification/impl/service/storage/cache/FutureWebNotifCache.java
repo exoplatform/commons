@@ -116,7 +116,6 @@ public abstract class FutureWebNotifCache<K, V, C>
         public V call() throws Exception {
           // Retrieve the value from the loader
           V value = loader.retrieve(context, key);
-
           //
           if (value != null) {
             // Cache it, it is made available to other threads (unless someone

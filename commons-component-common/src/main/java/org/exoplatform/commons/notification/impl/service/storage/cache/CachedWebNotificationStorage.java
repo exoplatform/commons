@@ -84,6 +84,8 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
       }
       moveTopPopover(notification);
       moveTopViewAll(notification);
+      //
+      clearIsMaxOnWebNotificationsData(notification.getTo(), false);
     }
   }
 
@@ -143,7 +145,8 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
         new ServiceContext<ListWebNotificationsData>() {
           public ListWebNotificationsData execute() {
             List<NotificationInfo> got = storage.get(filter, offset, limit);
-            return buildWebNotifDataIds(key, got);
+            boolean isMax = (got.size() < limit);
+            return buildWebNotifDataIds(key, got, isMax);
           }
         }, key, offset, limit);
       //
@@ -204,14 +207,29 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     clearWebNotificationCountCache(userId);
     return storage.remove(userId, seconds);
   }
-  
-  private ListWebNotificationsData buildWebNotifDataIds(ListWebNotificationsKey key,
-                                                        List<NotificationInfo> notifications) {
+
+  private void clearIsMaxOnWebNotificationsData(String userId, boolean onlyPopopver) {
+    ListWebNotificationsKey key = ListWebNotificationsKey.key(userId, true);
+    getWebNotificationsData(key).setMax(false);
+    if (!onlyPopopver) {
+      key = ListWebNotificationsKey.key(userId, false);
+      getWebNotificationsData(key).setMax(false);
+    }
+  }
+
+  private ListWebNotificationsData getWebNotificationsData(ListWebNotificationsKey key) {
     ListWebNotificationsData data = this.exoWebNotificationsCache.get(key);
     if (data == null) {
       data = new ListWebNotificationsData(key);
       this.exoWebNotificationsCache.put(key, data);
     }
+    return data;
+  }
+
+  private ListWebNotificationsData buildWebNotifDataIds(ListWebNotificationsKey key,
+                                                        List<NotificationInfo> notifications, boolean isMax) {
+    ListWebNotificationsData data = getWebNotificationsData(key);
+    data.setMax(isMax);
     //
     for (int i = 0, len = notifications.size(); i < len; i++) {
       NotificationInfo notif = notifications.get(i);
@@ -294,7 +312,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   
   private void moveTopPopover(NotificationInfo notification) {
     ListWebNotificationsKey userPopoverKey = ListWebNotificationsKey.key(notification.getTo(), true);
-    ListWebNotificationsData listData = exoWebNotificationsCache.get(userPopoverKey);
+    ListWebNotificationsData listData = getWebNotificationsData(userPopoverKey);
     if (listData != null) {
       listData.moveTop(notification.getId(), notification.getTo());
     }
@@ -302,7 +320,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
 
   private void moveTopViewAll(NotificationInfo notification) {
     ListWebNotificationsKey userViewAllKey = ListWebNotificationsKey.key(notification.getTo(), false);
-    ListWebNotificationsData listData = exoWebNotificationsCache.get(userViewAllKey);
+    ListWebNotificationsData listData = getWebNotificationsData(userViewAllKey);
     if (listData != null) {
       listData.moveTop(notification.getId(), notification.getTo());
     }
@@ -310,7 +328,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
 
   private void removePopover(NotificationInfo notification) {
     ListWebNotificationsKey userPopoverKey = ListWebNotificationsKey.key(notification.getTo(), true);
-    ListWebNotificationsData listData = exoWebNotificationsCache.get(userPopoverKey);
+    ListWebNotificationsData listData = getWebNotificationsData(userPopoverKey);
     if (listData != null) {
       listData.removeByValue(notification.getId());
     }
@@ -318,7 +336,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   
   private void removeViewAll(NotificationInfo notification) {
     ListWebNotificationsKey userViewAllKey = ListWebNotificationsKey.key(notification.getTo(), false);
-    ListWebNotificationsData listData = exoWebNotificationsCache.get(userViewAllKey);
+    ListWebNotificationsData listData = getWebNotificationsData(userViewAllKey);
     if (listData != null) {
       listData.removeByValue(notification.getId());
     }

@@ -36,6 +36,10 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
+    if (!root.hasNode("settings")) {
+      root.addNode("settings", "stg:settings");
+      session.save();
+    }
     if (this.mustInitCollaborationWorkspace) {
       nodeHierarchyCreator = getService(NodeHierarchyCreator.class);
       storage = getService(WebNotificationStorageImpl.class);

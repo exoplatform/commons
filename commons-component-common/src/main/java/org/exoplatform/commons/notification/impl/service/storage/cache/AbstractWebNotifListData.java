@@ -31,6 +31,8 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
   /** defines the list keeps the data **/
   private final LinkedList<V> list = new LinkedList<V>();
   /** */
+  private boolean isMax = false;
+  /** */
   protected final K key;
   
   /**
@@ -54,7 +56,15 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
   public List<V> getList() {
     return this.list;
   }
-  
+
+  public boolean isMax() {
+    return isMax;
+  }
+
+  public void setMax(boolean isMax) {
+    this.isMax = isMax;
+  }
+
   /**
    * Gets the size of elements
    * @return

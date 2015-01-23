@@ -54,11 +54,12 @@ public class FutureWebNotifExoCache<T, K extends Serializable, V extends Abstrac
     //find better way to handle
     int size = (int)(offset + limit);
     //if the sublist's size < limit, return NULL for continue Loader
-    return v.size() >= size ? v : null;
+    return (v.isMax() || v.size() >= size) ? v : null;
   }
 
   @Override
   protected void put(K key, V entry) {
     cache.put(key, entry);
+    
   }
 }
