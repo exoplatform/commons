@@ -334,8 +334,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         mailService.sendMessage(message);
         return true;
       } catch (Exception e) {
-        LOG.warn("Failed at sendMessage().");
-        LOG.debug(e.getMessage(), e);
+        LOG.error("Error while sending a message - Cause : " + e.getMessage(), e);
         return false;
       }
     } else {
