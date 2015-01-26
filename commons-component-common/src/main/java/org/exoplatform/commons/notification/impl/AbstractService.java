@@ -16,14 +16,29 @@
  */
 package org.exoplatform.commons.notification.impl;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RangeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.jcr.access.PermissionType;
+import org.exoplatform.services.jcr.datamodel.ItemData;
+import org.exoplatform.services.jcr.datamodel.NodeData;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.core.ItemImpl;
+import org.exoplatform.services.jcr.impl.core.NodeImpl;
+import org.exoplatform.services.jcr.impl.core.SessionDataManager;
+import org.exoplatform.services.jcr.impl.core.SessionImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -262,6 +277,203 @@ public abstract class AbstractService {
       return "";
     }
     return values.replace("{", "").replace("}", "");
+  }
+  
+  /**
+   * Gets the NodeIterator with list of nodes order by DESC lastUpdated value
+   * 
+   * @param parentNode
+   * @return
+   */
+  public static NodeIterator getNodeIteratorOrderDESC(Node parentNode) throws RepositoryException {
+    SessionImpl session = (SessionImpl) parentNode.getSession();
+    NodeData data = (NodeData) ((NodeImpl) parentNode).getData();
+    SessionDataManager dataManager = ((SessionImpl) session).getTransientNodesManager();
+    List<NodeData> storedNodes = new ArrayList<NodeData>(dataManager.getChildNodesData(data));
+    Collections.sort(storedNodes, new NodeDataComparatorDESC());
+    return new LazyNodeIterator(session, data, storedNodes);
+  }
+  
+  /**
+   * Defines the comparator with order by DESC of NodeData
+   * @author thanhvc
+   *
+   */
+  private static class NodeDataComparatorDESC implements Comparator<NodeData> {
+    public int compare(NodeData n1, NodeData n2) {
+      return n2.getOrderNumber() - n1.getOrderNumber();
+    }
+  }
+  
+  /**
+   * Defines the LazyNodeIterator
+   * @author thanhvc
+   *
+   */
+  private static class LazyNodeIterator extends LazyItemsIterator implements NodeIterator {
+    
+    LazyNodeIterator(SessionImpl session, NodeData parentData, List<NodeData> nodes) throws RepositoryException {
+      super(session, parentData, nodes);
+    }
+    /**
+     * {@inheritDoc}
+     */
+    public Node nextNode() {
+      return (Node) nextItem();
+    }
+  }
+  
+  private static abstract class LazyItemsIterator implements RangeIterator {
+
+    protected Iterator<NodeData>           iter;
+
+    protected int                          size = -1;
+
+    protected NodeImpl                     next;
+
+    protected int                          pos  = 0;
+    
+    private final SessionImpl session;
+    private final NodeData parentData;
+
+    LazyItemsIterator(SessionImpl session, NodeData parentData, List<NodeData> items) throws RepositoryException {
+      this.iter = items.iterator();
+      this.session = session;
+      this.parentData = parentData;
+      fetchNext();
+    }
+
+    protected void fetchNext() throws RepositoryException {
+      // We use a while loop instead of re-calling fetchNext if canRead(item)
+      // returns false to avoid affecting the call stack because if we have
+      // a lot of items and we have canRead(item) that returns false too
+      // many consecutive times, we will get a StackOverflowError like in
+      // JCR-2283
+      while (iter.hasNext()) {
+        NodeData item = iter.next();
+
+        // check read conditions
+        if (canRead(item)) {
+          next = new NodeImpl(item, this.parentData, session);
+          return;
+        }
+      }
+      next = null;
+    }
+
+    protected boolean canRead(ItemData item) {
+      return session.getAccessManager().hasPermission(item.isNode() ? ((NodeData) item).getACL() : this.parentData.getACL(),
+                                                      new String[] { PermissionType.READ },
+                                                      session.getUserState().getIdentity());
+    }
+
+    public ItemImpl nextItem() {
+      if (next != null) {
+        try {
+          ItemImpl i = next;
+          fetchNext();
+          pos++;
+          // fire action post-READ
+          session.getActionHandler().postRead(i);
+          return i;
+        } catch (RepositoryException e) {
+          LOG.error("An exception occured: " + e.getMessage());
+          throw new NoSuchElementException(e.toString());
+        }
+      }
+
+      throw new NoSuchElementException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasNext() {
+      return next != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object next() {
+      return nextItem();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void skip(long skipNum) {
+      trySkip(skipNum, true);
+    }
+
+    /**
+     * Tries to skip some elements.
+     * 
+     * @param throwException indicates to throw an NoSuchElementException if
+     *          can't skip defined count of elements
+     * @return how many elememnts remained to skip
+     */
+    protected long trySkip(long skipNum, boolean throwException) {
+      pos += skipNum;
+      while (skipNum-- > 1) {
+        try {
+          iter.next();
+        } catch (NoSuchElementException e) {
+          if (throwException) {
+            throw e;
+          }
+          return skipNum;
+        }
+      }
+
+      try {
+        fetchNext();
+      } catch (RepositoryException e) {
+        LOG.error("An exception occured: " + e.getMessage());
+        throw new NoSuchElementException(e.toString());
+      }
+
+      return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getSize() {
+      if (size == -1) {
+        // calc size
+        int sz = pos + (next != null ? 1 : 0);
+        if (iter.hasNext()) {
+          List<NodeData> itemsLeft = new ArrayList<NodeData>();
+          do {
+            NodeData item = iter.next();
+            if (canRead(item)) {
+              itemsLeft.add(item);
+              sz++;
+            }
+          } while (iter.hasNext());
+
+          iter = itemsLeft.iterator();
+        }
+        size = sz;
+      }
+
+      return size;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getPosition() {
+      return pos;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void remove() {
+      LOG.warn("Remove not supported");
+    }
   }
   
 }

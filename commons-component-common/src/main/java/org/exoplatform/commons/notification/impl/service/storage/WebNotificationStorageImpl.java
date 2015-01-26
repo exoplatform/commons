@@ -170,16 +170,19 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     List<NotificationInfo> result = new ArrayList<NotificationInfo>();
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
-      NodeIterator it = get(sProvider, filter, offset, limit);
-      while (it.hasNext()) {
-        result.add(getWebNotificationStorage().get(it.nextNode().getName()));
+      Node userWebNotificationNode = getOrCreateChannelNode(sProvider, filter.getUserId());
+      NotificationIterator notificationIterator = new NotificationIterator(userWebNotificationNode, offset, limit);
+      //nodes order by lastUpdated DESC
+      List<Node> nodes = notificationIterator.nodes();
+      //
+      for(Node node : nodes) {
+        result.add(getWebNotificationStorage().get(node.getName()));
       }
     } catch (Exception e) {
       LOG.error("Notifications not found by filter: " + filter.toString(), e);
     }
     return result;
   }
-
   @Override
   public NotificationInfo get(String id) {
     try {
@@ -190,48 +193,6 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     }
   }
 
-  /**
-   * Gets notifications node by filter and offset, limit 
-   * 
-   * @param sProvider The SessionProvider
-   * @param filter The WebNotificationFilter
-   * @param offset The offset
-   * @param limit  The limit, if limit <= 0, do not apply offset, limit
-   * @return
-   * @throws Exception
-   */
-  private NodeIterator get(SessionProvider sProvider, WebNotificationFilter filter, int offset, int limit) throws Exception {
-    Session session = getSession(sProvider);
-    StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
-    strQuery.append(NTF_NOTIF_INFO).append(" WHERE ");
-    String path = getOrCreateChannelNode(sProvider, filter.getUserId()).getPath();
-    strQuery.append("jcr:path LIKE '").append(path).append("/%' ");
-    if (filter.isOnPopover()) {
-      strQuery.append("AND ").append(NTF_SHOW_POPOVER).append("= 'true' ");
-    }
-    if (filter.getPluginKey() != null) {
-      strQuery.append("AND ").append(NTF_PLUGIN_ID).append("='").append(filter.getPluginKey().getId()).append("' ");
-    }
-    if (filter.isRead() != null) {
-      strQuery.append("AND ").append(NTF_READ).append("='").append(filter.isRead()).append("' ");
-    }
-    if (filter.getLimitDay() > 0) {
-      long time = System.currentTimeMillis() - filter.getLimitDay() * 86400000;
-      strQuery.append("AND ").append(NTF_LAST_MODIFIED_DATE).append(">='").append(time).append("' ");
-    }
-    if (filter.isOrder()) {
-      strQuery.append("ORDER BY ").append(NTF_LAST_MODIFIED_DATE).append(" DESC");
-    }
-    //
-    LOG.debug(" The query get web notification:\n" + strQuery + " offset: " + offset + " limit: " + limit);
-    QueryManager qm = session.getWorkspace().getQueryManager();
-    QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
-    if (limit > 0) {
-      query.setLimit(limit);
-      query.setOffset(offset);
-    }
-    return query.execute().getNodes();
-  }
 
   @Override
   public boolean remove(String notificationId) {
@@ -383,9 +344,11 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
       strQuery.append(NTF_NOTIF_INFO).append(" WHERE fn:name() = '").append(notificationId).append("'");
       QueryManager qm = session.getWorkspace().getQueryManager();
-      Query query = qm.createQuery(strQuery.toString(), Query.SQL);
+      QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
+      query.setOffset(0);
+      query.setLimit(1);
       NodeIterator it = query.execute().getNodes();
-      if (it.getSize() > 0) {
+      if (it.hasNext()) {
         return it.nextNode();
       }
     } catch (Exception e) {
