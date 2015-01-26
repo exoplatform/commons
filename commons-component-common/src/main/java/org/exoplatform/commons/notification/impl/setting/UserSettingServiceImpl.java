@@ -137,15 +137,15 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       model.setDailyPlugins(getArrayListValue(userId, EXO_DAILY, new ArrayList<String>()));
       model.setWeeklyPlugins(getArrayListValue(userId, EXO_WEEKLY, new ArrayList<String>()));
       //
-      SettingValue<?> value = settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_LAST_READ_DATE);
-      if (value != null) {
-        model.setLastReadDate((Long) value.getValue());
-      } else {
-        saveLastReadDate(userId, 0l);
-      }
     } else {
       model = UserSetting.getDefaultInstance().setUserId(userId);
       addMixin(userId);
+    }
+    SettingValue<?> value = settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_LAST_READ_DATE);
+    if (value != null) {
+      model.setLastReadDate((Long) value.getValue());
+    } else {
+      saveLastReadDate(userId, 0l);
     }
     return model;
   }

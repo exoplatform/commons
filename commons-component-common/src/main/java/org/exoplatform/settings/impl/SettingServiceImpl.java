@@ -58,7 +58,7 @@ public class SettingServiceImpl implements SettingService {
           scopeEntity = createScope(context, scope);
         }
         scopeEntity.setValue(key, value.getValue());
-        ctx.getSession().save();
+//        ctx.getSession().save();
         return null;
       }
     }.executeWith(chromatticLifeCycle);
