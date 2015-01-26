@@ -146,7 +146,7 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     List<NotificationInfo> list = storage.get(new WebNotificationFilter(userId), 0, 15);
     assertEquals(12, list.size());
     //
-    assertEquals(9, storage.getNumberOnBadge(userId));
+    assertEquals(12, storage.getNumberOnBadge(userId));
     //
     storage.resetNumberOnBadge(userId);
     //

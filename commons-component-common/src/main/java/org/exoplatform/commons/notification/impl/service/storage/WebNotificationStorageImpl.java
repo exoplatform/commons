@@ -121,10 +121,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   private void addMixinCountItemOnPopover(Node notifyNode, String userId) throws Exception {
     if (!notifyNode.isNodeType(MIX_NEW_NODE)) {
-      int currentNewMessage = getWebNotificationStorage().getNumberOnBadge(userId);
-      if (currentNewMessage < NotificationMessageUtils.getMaxItemsInPopover() + 1 && notifyNode.canAddMixin(MIX_NEW_NODE)) {
-        notifyNode.addMixin(MIX_NEW_NODE);
-      }
+      notifyNode.addMixin(MIX_NEW_NODE);
     }
   }
 
@@ -405,8 +402,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   public int getNumberOnBadge(String userId) {
     try {
       SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
-      int limit = NotificationMessageUtils.getMaxItemsInPopover() + 1;
-      NodeIterator iter = getNewMessage(sProvider, userId, limit);
+      NodeIterator iter = getNewMessage(sProvider, userId, 0);
       return (int) iter.getSize();
     } catch (Exception e) {
       LOG.error("Failed to getNumberOnBadge() ", e);

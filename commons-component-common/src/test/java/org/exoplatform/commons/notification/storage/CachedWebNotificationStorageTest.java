@@ -9,6 +9,7 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.IntegerData;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsData;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsKey;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoCacheKey;
@@ -21,9 +22,11 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
   private WebNotificationStorage cachedStorage;
   private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCaching";
   private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationsCaching";
+  private final static String WEB_NOTIFICATION_COUNT_CACHING_NAME = "WebNotificationsCaching";
   private  CacheService cacheService;
   private ExoCache<ListWebNotificationsKey, ListWebNotificationsData> exoWebNotificationsCache;
   private ExoCache<WebNotifInfoCacheKey, WebNotifInfoData> exoWebNotificationCache;
+  private ExoCache<WebNotifInfoCacheKey, IntegerData> exoWebNotificationCountCache;
 
   //
   @Override
@@ -35,6 +38,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     cacheService.getCacheInstance(WEB_NOTIFICATION_CACHING_NAME);
     exoWebNotificationCache = cacheService.getCacheInstance(WEB_NOTIFICATION_CACHING_NAME);
     exoWebNotificationsCache = cacheService.getCacheInstance(LIST_WEB_NOTIFICATION_CACHING_NAME);
+    exoWebNotificationCountCache = cacheService.getCacheInstance(WEB_NOTIFICATION_COUNT_CACHING_NAME);
   }
   
   @Override
@@ -50,6 +54,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     
     exoWebNotificationCache.clearCache();
     exoWebNotificationsCache.clearCache();
+    exoWebNotificationCountCache.clearCache();
     
     super.tearDown();
   }
@@ -267,9 +272,10 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
   
   public void testGetNewMessage() throws Exception  {
     assertEquals(8, NotificationMessageUtils.getMaxItemsInPopover());
-    //
     String userId = "root";
     userIds.add(userId);
+    assertEquals(0, cachedStorage.getNumberOnBadge(userId));
+    //
     cachedStorage.save(makeWebNotificationInfo(userId));
     //
     assertEquals(1, cachedStorage.getNumberOnBadge(userId));
@@ -282,7 +288,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     List<NotificationInfo> list = cachedStorage.get(new WebNotificationFilter(userId), 0, 15);
     assertEquals(12, list.size());
     //
-    assertEquals(9, cachedStorage.getNumberOnBadge(userId));
+    assertEquals(12, cachedStorage.getNumberOnBadge(userId));
     //
     cachedStorage.resetNumberOnBadge(userId);
     //

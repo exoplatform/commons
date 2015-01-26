@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
@@ -78,10 +77,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
       storage.save(notification);
       //
       Integer current = getNumberOnBadge(notification.getTo());
-      if (current <= NotificationMessageUtils.getMaxItemsInPopover()) {
-        current += 1;
-        exoWebNotificationCountCache.put(WebNotifInfoCacheKey.key(notification.getTo()), new IntegerData(current));
-      }
+      exoWebNotificationCountCache.put(WebNotifInfoCacheKey.key(notification.getTo()), new IntegerData(current + 1));
       moveTopPopover(notification);
       moveTopViewAll(notification);
       //
