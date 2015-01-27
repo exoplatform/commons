@@ -35,7 +35,7 @@
 	<div data-toggle="dropdown" class="btn dropdown-toggle">
 		<span>$currentSpaceName</span>
 		<span class="spiter"></span> 
-		<span class="caret"></span>
+		<i class="uiIconMiniArrowDown uiIconLightGray"></i>
 	</div>
   </div>
   
@@ -44,7 +44,7 @@
       <i class="uiIconClose pull-right" title="<%= _ctx.appRes("UISpaceSwitcher.title.close"); %>" onclick="eXo.commons.UISpaceSwitcher.closePopup(this);"></i>
       <%= _ctx.appRes("UISpaceSwitcher.title.select-location"); %>
     </li>
-    <li style="display:block" class="spaceSearch"><input type="text" class="spaceSearchText lostFocus"></input></li>
+    <li style="display:block" class="spaceSearch"><input type="text" placeholder="<%=defaultValueForTextSearch %>" class="spaceSearchText " /></li>
     <li style="display:block" class="portalSpace"></li>
     <li style="display:block" class="userSpace"></li>
     <li style="display:block" class="spaceOption"><div class='spaceOption spaceTitle' id='UISpaceSwitcher_spaceTitle'><%=spaceLabel%></div></li>

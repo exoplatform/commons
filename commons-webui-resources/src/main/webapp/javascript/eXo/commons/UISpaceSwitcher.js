@@ -68,25 +68,12 @@ UISpaceSwitcher.prototype.initAfterLoaded = function(uicomponentId, baseRestUrl,
     me.onTextSearchChange(uicomponentId);
   };
 
-  textField.onfocus = function() {
-    if (textField.value == storage.defaultValueForTextSearch) {
-      textField.value = "";
-    }
-    textField.className = "spaceSearchText focus"
-  };
 
   textField.onclick = function() {
     var event = event || window.event;
     event.cancelBubble = true;
   };
 
-  // When textField lost focus
-  textField.onblur = function() {
-    if (textField.value == "") {
-      textField.value = storage.defaultValueForTextSearch;
-      textField.className = "spaceSearchText lostFocus";
-    }
-  };
 
   // hide the popup when clicking outside
   jQuery(document).mouseup(function (e) {
@@ -181,7 +168,7 @@ UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
 
   // Reset search textbox to default value
   var textField = jQuery(wikiSpaceSwitcher).find("input.spaceSearchText")[0];
-  textField.value = storage.defaultValueForTextSearch;
+  textField.value = "";
 
   // Init data
   me.getRecentlyVisitedSpace(uicomponentId);

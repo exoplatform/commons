@@ -624,9 +624,7 @@ function UIDSUpload() {
 	  uploadHTML += "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>";
 	  uploadHTML += "<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='" +eXo.core.I18n.lang+ "' dir='" +eXo.core.I18n.dir+ "'>";
 	  uploadHTML += "<head>";
-	  uploadHTML += "<style type='text/css'>";
-	  uploadHTML += this.getStyleSheetContent();
-	  uploadHTML += "</style>";
+	  uploadHTML += "<link  rel='stylesheet' type='text/css' href='/eXoSkin/skin/css/commons/skin/commons.css' />";
 	  uploadHTML += "<script type='text/javascript'>var eXo = parent.eXo</script>";
 	  uploadHTML += "</head>";
 	  uploadHTML += "<body style='margin: 0px; border: 0px;'>";
@@ -669,11 +667,10 @@ function UIDSUpload() {
 	  idoc.head = idoc.head || idoc.getElementsByTagName('head')[0];
 	  idoc.head.appendChild(script);
 
-	  var style = document.createElement('style');
-	  style.type = "text/css"; 
-	  var styleText = this.getStyleSheetContent();
-	  var cssText = document.createTextNode(styleText);
-	  style.appendChild(cssText);
+	  var style = document.createElement('link');
+	  style.type = "text/css";
+      style.rel='stylesheet';
+	  style.setAttribute('href', '/eXoSkin/skin/css/commons/skin/commons.css');
 	  idoc.head.appendChild(style);
 	  
 	  idoc.body.innerHTML= this.getUploadContent(uploadId, uploadAction, isAutoUpload);
@@ -689,14 +686,14 @@ function UIDSUpload() {
     uploadHTML += "  <form id='"+uploadId+"' class='UIDSUploadForm' style='margin: 0px; padding: 0px' action='"+uploadAction+"' enctype='multipart/form-data' method='post'>";
     uploadHTML += "    <div class='BrowseDiv'>";
     if(gtnbase.Browser.isIE()) {
-          uploadHTML += "      <a class='BrowseLink' href='javascript:void(0);'>";
+          uploadHTML += "      <a class='BrowseLink' href='javascript:void(0);'> <i class='uiIconUpload uiIconLightGray'></i>";
           uploadHTML += "        <label for='" + idFile + "' style='width: 26px; height: 26px; display:block'>";
           uploadHTML += "          <input style=\"position:absolute; left:-5000px;\" type='file' name='" + idFile + "' size='1' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
           uploadHTML += "        </label>";
           uploadHTML += "      </a>";
         } else {
-          uploadHTML += "      <a class=\"BrowseLink\" onclick=\"(function(elm) { document.getElementById('" + idFile + "').click();})(this)\">";
-          uploadHTML += "        <input type='file' name='file' size='1' style='display:none' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
+          uploadHTML += "      <a class=\"BrowseLink actionIcon\" onclick=\"(function(elm) { document.getElementById('" + idFile + "').click();})(this)\">";
+          uploadHTML += "        <i class='uiIconUpload uiIconLightGray'></i><input type='file' name='file' size='1' style='display:none' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
           uploadHTML += "      </a>";
         }
     uploadHTML += "    </div>";
@@ -705,16 +702,7 @@ function UIDSUpload() {
 	}
 
 	UIDSUpload.prototype.getStyleSheetContent = function(){
-	  var styleText = "";
-	  styleText += "body { margin:0; padding:0}";
-	  styleText += ".BrowseDiv {position: relative; }";
-	  styleText += ".FileHidden { opacity: 0; overflow: hidden; position: absolute; height: 26px; bottom: 0px; right: 0px; -moz-opacity:0 ; filter:alpha(opacity: 0); cursor: pointer;} ";  
-	  styleText += ".BrowseLink { font-family: Arial, Helvetica, sans-serif; text-decoration: none; border: 1px solid transparent; width: 24px; height: 24px; display: block;";
-	  styleText += "     text-decoration: none;";
-	  styleText += "    background: url('/CommonsResources/skin/less/DocumentSelector/images/fileShareUpload.png') no-repeat 3px center;}";
-	  styleText += ".BrowseLink:hover { background-color: #F9F9F9; border: 1px solid #CFCFCF; text-decoration: none; border-radius: 3px; box-shadow: 0 1px 2px 0 #FFFFFF; cursor: pointer;";
-	  styleText += "    background: url('/CommonsResources/skin/less/DocumentSelector/images/fileShareUploadBlue.png') no-repeat 3px center;}";
-	  return styleText;
+	  return '';
 	}
 
 	/**
