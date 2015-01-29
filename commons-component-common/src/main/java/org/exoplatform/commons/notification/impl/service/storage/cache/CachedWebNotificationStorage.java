@@ -301,12 +301,12 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
    * Clear the notification badge number of the specified user.
    * @param userId
    */
-  private void clearWebNotificationCountCache(String userId) {
+  public void clearWebNotificationCountCache(String userId) {
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(userId);
     exoWebNotificationCountCache.remove(key);
   }
   
-  private void moveTopPopover(NotificationInfo notification) {
+  public void moveTopPopover(NotificationInfo notification) {
     ListWebNotificationsKey userPopoverKey = ListWebNotificationsKey.key(notification.getTo(), true);
     ListWebNotificationsData listData = getWebNotificationsData(userPopoverKey);
     if (listData != null) {
@@ -314,7 +314,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     }
   }
 
-  private void moveTopViewAll(NotificationInfo notification) {
+  public void moveTopViewAll(NotificationInfo notification) {
     ListWebNotificationsKey userViewAllKey = ListWebNotificationsKey.key(notification.getTo(), false);
     ListWebNotificationsData listData = getWebNotificationsData(userViewAllKey);
     if (listData != null) {

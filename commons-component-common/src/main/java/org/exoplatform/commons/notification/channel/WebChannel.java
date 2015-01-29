@@ -23,10 +23,15 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
+import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.lifecycle.WebLifecycle;
+import org.exoplatform.commons.notification.net.WebNotificationSender;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -47,6 +52,8 @@ public class WebChannel extends AbstractChannel {
   private final Map<PluginKey, String> templateFilePaths = new HashMap<PluginKey, String>();
   /** */
   private final Map<PluginKey, AbstractTemplateBuilder> templateBuilders;
+  
+  public final static ArgumentLiteral<MessageInfo> MESSAGE_INFO = new ArgumentLiteral<MessageInfo>(MessageInfo.class, "messageInfo");
 
   public WebChannel() {
     super(new WebLifecycle());
@@ -71,10 +78,20 @@ public class WebChannel extends AbstractChannel {
   
   @Override
   public void dispatch(NotificationContext ctx, String userId) {
-    String pluginId = ctx.getNotificationInfo().getKey().getId();
-    AbstractTemplateBuilder builder = templateBuilders.get(pluginId);
-    MessageInfo msg = builder.buildMessage(ctx);
-    LOG.info("Web::{ userId:" + userId + ", pluginId: " + pluginId + ", message: "+ msg.getBody() + "}");
+    try {
+      MessageInfo msg = ctx.value(MESSAGE_INFO);
+      if(msg != null) {
+        NotificationInfo notification = ctx.getNotificationInfo();
+        // Update badge number
+        int badgeNumber = CommonsUtils.getService(WebNotificationStorage.class).getNumberOnBadge(notification.getTo());
+        msg.setNumberOnBadge(badgeNumber);
+        //
+        WebNotificationSender.sendJsonMessage(notification.getTo(), msg);
+        notification.setTitle(msg.getBody());
+      }
+    } catch (Exception e) {
+      LOG.error("Failed to connect with server :", e);
+    }
   }
   
   @Override

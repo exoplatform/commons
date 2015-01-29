@@ -28,7 +28,6 @@ import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.channel.WebChannel;
-import org.exoplatform.commons.notification.net.WebNotificationSender;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -56,15 +55,18 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       }
       if (userSetting.isActive(WebChannel.ID, pluginId)) {
         ctx.setWritingProcess(true);
-        NotificationInfo notif = notification.clone(true).setTo(userId);
-        //TODO Removes the update here and confirm with SOC team
-        send(ctx.setNotificationInfo(notif));
-        //store must after the send due to build the notification's title
+        NotificationInfo notif = notification.clone(true).setTo(userId).setLastModifiedDate(Calendar.getInstance());
+        //build message
+        MessageInfo msg = buildMessageInfo(ctx.setNotificationInfo(notif));
+        ctx.append(WebChannel.MESSAGE_INFO, msg);
+        //store
         store(ctx.getNotificationInfo());
+        //send
+        getChannel().dispatch(ctx, userId);
       }
     }
   }
-
+  
   @Override
   public void process(NotificationContext ctx, String userId) {
     LOG.info("Web Notification process user: " + userId);
@@ -81,23 +83,6 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
   @Override
   public void send(NotificationContext ctx) {
     LOG.info("WEB:: Send the message by Web channel.");
-    String notifId = ctx.getNotificationInfo().getId();
-    getChannel().dispatch(ctx.getNotificationInfo().setLastModifiedDate(Calendar.getInstance()));
-    try {
-      MessageInfo msg = buildMessageInfo(ctx);
-      if(msg != null) {
-        NotificationInfo notification = ctx.getNotificationInfo();
-        if (!notification.getId().equals(notifId)) {
-          // Update badge number
-          int badgeNumber = CommonsUtils.getService(WebNotificationStorage.class).getNumberOnBadge(notification.getTo());
-          msg.setNumberOnBadge(badgeNumber);
-        }
-        WebNotificationSender.sendJsonMessage(notification.getTo(), msg);
-        notification.setTitle(msg.getBody());
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to connect with server :", e);
-    }
   }
 
   /**
