@@ -33,12 +33,8 @@ import org.exoplatform.commons.notification.impl.service.storage.cache.model.Web
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoData;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 
 public class CachedWebNotificationStorage implements WebNotificationStorage {
-  /** Logger */
-  private static final Log LOG = ExoLogger.getLogger(CachedWebNotificationStorage.class);
   //
   private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCaching";
   private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationsCaching";
@@ -70,8 +66,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   public void save(NotificationInfo notification) {
     //check the notification is existing or not
     //calling update or create new. 
-    boolean isExisting = get(notification.getId()) != null;
-    if (isExisting) {
+    if (notification.isUpdate()) {
       update(notification, true);
     } else {
       storage.save(notification);
@@ -256,7 +251,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
 
   @Override
   public void update(NotificationInfo notification, boolean moveTop) {
-    storage.update(notification, moveTop);
+    storage.update(notification, true);
     //
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notification.getId());
     exoWebNotificationCache.put(key, new WebNotifInfoData(notification));

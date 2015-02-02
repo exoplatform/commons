@@ -62,6 +62,8 @@ public class NotificationInfo {
   
   private boolean             isOnPopOver;
 
+  private boolean             isUpdate = false;
+
   public NotificationInfo() {
     this.id = PREFIX_ID + IdGenerator.generate();
     this.sendToDaily = new String[] { "" };
@@ -99,6 +101,14 @@ public class NotificationInfo {
       ArrayUtils.contains(sendToWeekly, FOR_ALL_USER);
   }
 
+  public boolean isUpdate() {
+    return isUpdate;
+  }
+
+  public NotificationInfo setUpdate(boolean isUpdate) {
+    this.isUpdate = isUpdate;
+    return this;
+  }
 
   public PluginKey getKey() {
     return this.key;

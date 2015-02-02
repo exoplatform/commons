@@ -70,7 +70,7 @@ public class NotificationExecutorImpl implements NotificationExecutor {
           try {
             notificationService.process(create(ctx, command));
           } catch (Exception e) {
-            LOG.warn("Process NotificationInfo is failed: " + e.getMessage());
+            LOG.warn("Process NotificationInfo is failed: " + e.getMessage(), e);
             LOG.debug(e.getMessage(), e);
             return false;
           } finally {

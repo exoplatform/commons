@@ -89,15 +89,10 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     try {
       return channelNode.getNode(dateNodeName);
     } catch (PathNotFoundException e) {
-      try {
-        lock.lock();
-        Node dateNode = getOrCreateDataNode(channelNode, dateNodeName, NTF_NOTIF_DATE);
-        dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
-        channelNode.save();
-        return dateNode;
-      } finally {
-        lock.unlock();
-      }
+      Node dateNode = getOrCreateDataNode(channelNode, dateNodeName, NTF_NOTIF_DATE);
+      dateNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getDateCreated().getTimeInMillis());
+      channelNode.save();
+      return dateNode;
     }
   }
 
@@ -130,13 +125,11 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     boolean created = NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
+      lock.lock();
+      //
       Node userNode = getOrCreateWebDateNode(sProvider, notification);
-      Node notifyNode = null;
-      if (userNode.hasNode(notification.getId())) {
-        notifyNode = userNode.getNode(notification.getId());
-      } else {
-        notifyNode = userNode.addNode(notification.getId(), NTF_NOTIF_INFO);
-      }
+      Node notifyNode = getOrCreateDataNode(userNode, notification.getId(), NTF_NOTIF_INFO);
+      //
       notifyNode.setProperty(NTF_PLUGIN_ID, notification.getKey().getId());
       notifyNode.setProperty(NTF_TEXT, notification.getTitle());
       notifyNode.setProperty(NTF_SENDER, notification.getFrom());
@@ -144,7 +137,6 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       notifyNode.setProperty(NTF_LAST_MODIFIED_DATE, notification.getLastModifiedDate());
       //NTF_NAME_SPACE
       Map<String, String> ownerParameter = notification.getOwnerParameter();
-      
       if(ownerParameter != null && !ownerParameter.isEmpty()) {
         for (String key : ownerParameter.keySet()) {
           String propertyName = (key.indexOf(NTF_NAME_SPACE) != 0) ? NTF_NAME_SPACE + key : key;
@@ -154,11 +146,12 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       //
       addMixinCountItemOnPopover(notifyNode, notification.getTo());
       //
-      getSession(sProvider).save();
+      userNode.getSession().save();
     } catch (Exception e) {
       LOG.error("Failed to save the notificaton.", e);
     } finally {
       NotificationSessionManager.closeSessionProvider(created);
+      lock.unlock();
     }
   }
   
@@ -198,9 +191,8 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     try {
       Node node = getNodeNotification(sProvider, notificationId);
       if (node != null) {
-        Session session = node.getSession();
-        node.remove();
-        session.save();
+        distributionManager.getDataDistributionType(DataDistributionMode.NONE)
+                           .removeDataNode(node.getParent(), notificationId);
         return true;
       }
     } catch (Exception e) {
@@ -395,7 +387,14 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public void update(NotificationInfo notification, boolean moveTop) {
-    save(notification);
+    try {
+      lock.lock();
+      //
+      remove(notification.getId());
+      save(notification);
+    } finally {
+      lock.unlock();
+    }
   }
 
   @Override
