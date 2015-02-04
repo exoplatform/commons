@@ -1,5 +1,6 @@
 package org.exoplatform.commons.notification.storage;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.jcr.Node;
@@ -268,6 +269,54 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     assertEquals(newTitle, firstOnPopoverInfo.getTitle());
     NotificationInfo firstViewAllInfos = viewAllInfos.get(0);
     assertEquals(newTitle, firstViewAllInfos.getTitle());
+  }
+
+  public void testRemoveByJob() throws Exception {
+    // Create data for old notifications 
+    /* Example:
+     *  PastTime is 1/12/2014
+     *  Today is 15/12/2014
+     *  Create 50 notifications for:
+     *   + 04/12/2014
+     *   + 06/12/2014
+     *   + 08/12/2014
+     *   + 10/12/2014
+     *   + 12/12/2014
+     *  Case 1: Delay time 9 days, remove all web notification on days:
+     *   + 04/12/2014
+     *   + 06/12/2014
+     *  Expected: remaining is 30 notifications on 3 days
+     *  Case 2: Delay time 3 days, remove all web notification on days:
+     *   + 08/12/2014
+     *   + 10/12/2014
+     *   + 12/12/2014
+     *  Expected: remaining is 0 notification
+    */
+    long daySeconds = 86400;
+    String userId = "demo";
+    Calendar cal = Calendar.getInstance();
+    long t = 86400000l;
+    long current = cal.getTimeInMillis();
+    for (int i = 12; i > 3; i = i - 2) {
+      cal.setTimeInMillis(current - i * t);
+      for (int j = 0; j < 10; j++) {
+        NotificationInfo info = makeWebNotificationInfo(userId).setDateCreated(cal);
+        //
+        cachedStorage.save(info);
+      }
+    }
+    // check data on cache
+    List<NotificationInfo>  info = cachedStorage.get(new WebNotificationFilter(userId, false), 0, 60);
+    assertEquals(50, info.size());
+    //
+    cachedStorage.remove(userId, 9 * daySeconds);
+    //
+    info = cachedStorage.get(new WebNotificationFilter(userId, false), 0, 60);
+    assertEquals(30, info.size());
+    //
+    cachedStorage.remove(userId, 3 * daySeconds);
+    info = cachedStorage.get(new WebNotificationFilter(userId, false), 0, 60);
+    assertEquals(0, info.size());
   }
   
   public void testGetNewMessage() throws Exception  {
