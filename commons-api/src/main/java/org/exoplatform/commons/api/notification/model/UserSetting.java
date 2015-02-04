@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
@@ -309,11 +310,13 @@ public class UserSetting {
   @Override
   public UserSetting clone() {
     UserSetting setting = getInstance();
-    setting.setChannelActives(channelActives);
-    setting.setDailyPlugins(dailyPlugins);
-    setting.setWeeklyPlugins(weeklyPlugins);
+    setting.setChannelActives(new ArrayList<String>(channelActives));
+    setting.setDailyPlugins(new ArrayList<String>(dailyPlugins));
+    setting.setWeeklyPlugins(new ArrayList<String>(weeklyPlugins));
     //
-    setting.setAllChannelPlugins(channelPlugins);
+    for (Entry<String, List<String>> entry : channelPlugins.entrySet()) {
+      setting.getPlugins(entry.getKey()).addAll(entry.getValue());
+    }
     setting.setUserId(userId);
     return setting;
   }

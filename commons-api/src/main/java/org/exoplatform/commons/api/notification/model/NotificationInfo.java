@@ -452,13 +452,24 @@ public class NotificationInfo {
     message.setFrom(from)
            .key(key)
            .setOrder(order)
-           .setOwnerParameter(ownerParameter)
-           .setSendToDaily(sendToDaily)
-           .setSendToWeekly(sendToWeekly)
+           .setOwnerParameter(new HashMap<String, String>(ownerParameter))
+           .setSendToDaily(arrayCopy(sendToDaily))
+           .setSendToWeekly(arrayCopy(sendToWeekly))
            .setTo(to);
     if(!isNew) {
       message.setId(id);
     }
     return message;
+  }
+
+  /**
+   * Copy the array string, 
+   *  if source is empty or null, return array has one empty item. 
+   * @param source
+   * @return
+   */
+  private String[] arrayCopy(String[] source) {
+    return (source != null && source.length > 0) ? 
+              Arrays.asList(source).toArray(new String[source.length]) : new String[] { "" };
   }
 }

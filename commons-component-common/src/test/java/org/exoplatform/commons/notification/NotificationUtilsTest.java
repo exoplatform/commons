@@ -17,9 +17,19 @@
 package org.exoplatform.commons.notification;
 
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import junit.framework.TestCase;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.services.idgenerator.impl.IDGeneratorServiceImpl;
+import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationUtilsTest extends TestCase {
 
@@ -87,4 +97,70 @@ public class NotificationUtilsTest extends TestCase {
     assertEquals("<a href=\"www.yahoo.com\" style=\"color: #2f5e92; text-decoration: none;\">Yahoo Site</a> is better than <a href=\"www.hotmail.com\" style=\"color: #2f5e92; text-decoration: none;\">Hotmail Site</a>", title);
   }
   
+  public void testCloneUserSettting() {
+    UserSetting setting = UserSetting.getInstance();
+    setting.setUserId("test");
+    setting.setChannelActive("channel_test");
+    //
+    List<String> pluginIds = Arrays.asList("ActivityMentionPlugin,PostActivityPlugin,ActivityCommentPlugin,SpaceInvitationPlugin,RequestJoinSpacePlugin".split(","));
+    for (String pluginId : pluginIds) {
+      setting.addChannelPlugin("channel_test", pluginId);
+    }
+    UserSetting clone = setting.clone();
+    //
+    assertEquals(setting.getUserId(), clone.getUserId());
+    //
+    clone.setUserId("test1");
+    clone.setChannelActive("channel_test1");
+    clone.addChannelPlugin("channel_test", "NewUserPlugin");
+    clone.addChannelPlugin("channel_test1", "NewUserPlugin");
+    //
+    assertFalse(setting.getUserId().equals(clone.getUserId()));
+    //
+    assertFalse(setting.getPlugins("channel_test").contains("NewUserPlugin"));
+    assertTrue(clone.getPlugins("channel_test").contains("NewUserPlugin"));
+    //
+    assertTrue(setting.getPlugins("channel_test1").isEmpty());
+    assertTrue(clone.getPlugins("channel_test1").contains("NewUserPlugin"));
+    //
+    assertTrue(setting.getChannelActives().contains("channel_test"));
+    assertFalse(setting.getChannelActives().contains("channel_test1"));
+    assertTrue(clone.getChannelActives().contains("channel_test"));
+    assertTrue(clone.getChannelActives().contains("channel_test1"));
+  }
+
+  public void testNotificationInfoClone() {
+    //
+    new IdGenerator(new IDGeneratorServiceImpl());
+    Map<String, String> ownerParameter = new HashMap<String, String>();
+    ownerParameter.put("test", "value test");
+    NotificationInfo info = NotificationInfo.instance();
+    info.setFrom("demo").key("notifiId").setOrder(1)
+        .setOwnerParameter(ownerParameter)
+        .setSendToDaily(new String[]{"plugin1", "plugin2"})
+        .setSendToWeekly(new String[]{"plugin2", "plugin3"})
+        .setTo("root");
+    NotificationInfo clone = info.clone();
+    assertEquals(info.getId(), clone.getId());
+    assertEquals(info.getId(), clone.getId());
+    assertEquals(info.getFrom(), clone.getFrom());
+    assertEquals(info.getTo(), clone.getTo());
+    //
+    assertTrue(Arrays.equals(info.getSendToDaily(), clone.getSendToDaily()));
+    assertTrue(Arrays.equals(info.getSendToWeekly(), clone.getSendToWeekly()));
+    assertTrue(CollectionUtils.isEqualCollection(info.getOwnerParameter().keySet(), clone.getOwnerParameter().keySet()));
+    assertTrue(CollectionUtils.isEqualCollection(info.getOwnerParameter().values(), clone.getOwnerParameter().values()));
+    assertEquals(info.getValueOwnerParameter("test"), clone.getValueOwnerParameter("test"));
+    //
+    clone.getSendToDaily()[0] = "plugin4";
+    clone.getOwnerParameter().put("test", "value clone");
+    //
+    assertFalse(Arrays.equals(info.getSendToDaily(), clone.getSendToDaily()));
+    assertFalse(CollectionUtils.isEqualCollection(info.getOwnerParameter().values(), clone.getOwnerParameter().values()));
+    //
+    assertFalse(info.getValueOwnerParameter("test").equals(clone.getValueOwnerParameter("test")));
+    //
+    clone = info.clone(true);
+    assertFalse(info.getId().equals(clone.getId()));
+  }
 }
