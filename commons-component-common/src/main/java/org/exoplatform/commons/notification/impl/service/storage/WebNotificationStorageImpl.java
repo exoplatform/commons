@@ -122,6 +122,16 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public void save(NotificationInfo notification) {
+    save(notification, true);
+  }
+
+  /**
+   * Creates the notification message to the specified user.
+   * 
+   * @param notification The notification to save
+   * @param isCountOnPopover The status to update count on Popover or not
+   */
+  private void save(NotificationInfo notification, boolean isCountOnPopover) {
     boolean created = NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
@@ -144,7 +154,9 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
         }
       }
       //
-      addMixinCountItemOnPopover(notifyNode, notification.getTo());
+      if (isCountOnPopover) {
+        addMixinCountItemOnPopover(notifyNode, notification.getTo());
+      }
       //
       userNode.getSession().save();
     } catch (Exception e) {
@@ -391,7 +403,9 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       lock.lock();
       //
       remove(notification.getId());
-      save(notification);
+      // if moveTop == true, the number on badge will increase
+      // else the number on badge will not increase
+      save(notification, moveTop);
     } finally {
       lock.unlock();
     }

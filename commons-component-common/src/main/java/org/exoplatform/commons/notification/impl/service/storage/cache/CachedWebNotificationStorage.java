@@ -71,8 +71,12 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     } else {
       storage.save(notification);
       //
-      Integer current = getNumberOnBadge(notification.getTo());
-      exoWebNotificationCountCache.put(WebNotifInfoCacheKey.key(notification.getTo()), new IntegerData(current + 1));
+      WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notification.getTo());
+      IntegerData data = exoWebNotificationCountCache.get(key);
+      if (data != null) {
+        Integer current = data.build();
+        exoWebNotificationCountCache.put(key, new IntegerData(current + 1));
+      }
       moveTopPopover(notification);
       moveTopViewAll(notification);
       //
@@ -251,7 +255,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
 
   @Override
   public void update(NotificationInfo notification, boolean moveTop) {
-    storage.update(notification, true);
+    storage.update(notification, moveTop);
     //
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notification.getId());
     exoWebNotificationCache.put(key, new WebNotifInfoData(notification));
@@ -260,9 +264,9 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
       moveTopPopover(notification);
       //
       moveTopViewAll(notification);
-      //
-      clearWebNotificationCountCache(notification.getTo());
     }
+    //
+    clearWebNotificationCountCache(notification.getTo());
   }
 
   @Override
