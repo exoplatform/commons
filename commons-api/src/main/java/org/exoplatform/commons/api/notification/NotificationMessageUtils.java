@@ -36,6 +36,8 @@ public class NotificationMessageUtils {
   
   public final static ArgumentLiteral<String> SHOW_POPOVER_PROPERTY = new ArgumentLiteral<String>(String.class, "showPopover");
   
+  public final static ArgumentLiteral<String> NOT_HIGHLIGHT_COMMENT_PORPERTY = new ArgumentLiteral<String>(String.class, "notHighlightComment");
+  
   /**
    * Gets the number of notifications that are displayed in the popover list.<br/>
    * The first time this method is called, it will retrieve it from the configuration, via the property exo.notification.maxitems,
