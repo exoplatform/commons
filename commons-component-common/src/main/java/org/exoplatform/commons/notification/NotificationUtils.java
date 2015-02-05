@@ -277,7 +277,7 @@ public class NotificationUtils {
       }
       //
       String url = matcher.group(2);
-      title = title.replace(url, "javascript:void(0)");
+      title = title.replace("href=\"" + url + "\"", "href=\"" + "javascript:void(0)" + "\"");
     }
     return title;
   }
