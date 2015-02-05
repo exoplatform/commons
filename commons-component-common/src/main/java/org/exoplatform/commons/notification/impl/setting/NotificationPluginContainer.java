@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
@@ -70,6 +71,12 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
       boolean isChild = (plugin instanceof AbstractNotificationChildPlugin);
       for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
         pSettingService.registerPluginConfig(pluginConfig.isChildPlugin(isChild));
+        // Adapt bundle path configuration from old version 4.1.x to 4.2.x
+        if(StringUtils.isEmpty(pluginConfig.getBundlePath()) &&
+            !StringUtils.isEmpty(pluginConfig.getTemplateConfig().getBundlePath())) {
+          pluginConfig.setBundlePath(pluginConfig.getTemplateConfig().getBundlePath());
+        }
+        //
         datas.add(pluginConfig.getBundlePath());
       }
     }
@@ -144,7 +151,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
       String template = TemplateUtils.loadGroovyTemplate(templatePath);
       plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
     } catch (Exception e) {
-      LOG.debug("Failed to register notification plugin " + plugin.getId());
+      LOG.debug("Failed to register notification plugin " + plugin.getId(), e);
     }
     pluginMap.put(plugin.getKey(), plugin);
   }

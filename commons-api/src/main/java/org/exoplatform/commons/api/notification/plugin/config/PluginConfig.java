@@ -57,6 +57,7 @@ public class PluginConfig {
   private Map<String, String> keyMapping = new HashMap<String, String>();
 
   public PluginConfig() {
+    templateConfig = new TemplateConfig();
   }
 
   /**
