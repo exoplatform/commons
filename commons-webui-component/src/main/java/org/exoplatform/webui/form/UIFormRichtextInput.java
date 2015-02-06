@@ -172,7 +172,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     builder.append("<div class=\"clearfix\">");
     builder.append("  <span style=\"float:left; width:").append(width).append(";\">");
     //
-    builder.append("  <textarea id=\"").append(name).append("\" name=\"").append(name).append("\">")
+    builder.append("  <textarea style=\"width:1px;height:1px;\" id=\"").append(name).append("\" name=\"").append(name).append("\">")
           .append(value_).append("</textarea>\n");
 
     builder.append("<script type=\"text/javascript\">\n");
@@ -202,19 +202,22 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
            //workaround, fix IE case: can not focus to editor
            .append("  //]]>\n")
            .append("});")
-           .append("if(eXo.core.Browser.ie==9 || eXo.core.Browser.ie==10){")
+//           .append("if(eXo.core.Browser.ie==9 || eXo.core.Browser.ie==10){")
            .append(" var textare = document.getElementById('").append(name).append("'); ")
            .append(" var form = textare;")
            .append(" while (form && (form.nodeName.toLowerCase() != 'form')) { form = form.parentNode;}")
-           .append(" form.onmouseover=function(){")
-           .append("  this.onmouseover='';")
-           .append("  var textare = document.getElementById('").append(name).append("'); ")
-           .append("  textare.style.display='block';")
-           .append("  textare.style.visibility='visible';")
-           .append("  textare.focus();")           
-           .append("  textare.style.display='none';")
+           .append(" if (form){")
+           .append("  form.textareaName = '").append(name).append("';")
+           .append("  form.onmouseover=function() {")
+           .append("   this.onmouseover='';")
+           .append("   var textare = document.getElementById('").append(name).append("'); ")
+           .append("   textare.style.display='block';")
+           .append("   textare.style.visibility='visible';")
+           .append("   textare.focus();")           
+           .append("   textare.style.display='none';")
+           .append("  }")
            .append(" }")
-           .append("}")           
+//           .append("}")           
 
            .append("</script>\n");
 
