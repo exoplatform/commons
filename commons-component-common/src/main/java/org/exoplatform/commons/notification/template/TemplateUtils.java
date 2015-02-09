@@ -254,7 +254,7 @@ public class TemplateUtils {
    * @return
    */
   public static String getResourceBundle(String key, Locale locale, String resourcePath) {
-    if (key == null || key.trim().length() == 0) {
+    if (key == null || key.trim().length() == 0 || resourcePath == null || resourcePath.isEmpty()) {
       return "";
     }
     if (locale == null || locale.getLanguage().isEmpty()) {

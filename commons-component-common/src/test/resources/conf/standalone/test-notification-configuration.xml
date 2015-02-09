@@ -474,9 +474,6 @@
 	          <field name="groupId">
 	            <string>other</string>
 	          </field>
-            <field name="bundlePath">
-              <string>locale.notification.template.Notification</string>
-            </field>
             <field name="templateConfig">
               <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
                 <field name="bundlePath">
