@@ -173,7 +173,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
     try {
       Node userWebNotificationNode = getOrCreateChannelNode(sProvider, filter.getUserId());
-      NotificationIterator notificationIterator = new NotificationIterator(userWebNotificationNode, offset, limit);
+      NotificationIterator notificationIterator = new NotificationIterator(filter, userWebNotificationNode, offset, limit);
       //nodes order by lastUpdated DESC
       List<Node> nodes = notificationIterator.nodes();
       //

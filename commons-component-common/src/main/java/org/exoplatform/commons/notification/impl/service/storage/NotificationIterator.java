@@ -25,7 +25,10 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 
+import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.notification.impl.AbstractService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Defines the NotificationInterator for Notification message nodes
@@ -37,6 +40,8 @@ import org.exoplatform.commons.notification.impl.AbstractService;
  */
 public class NotificationIterator implements Iterator<Node> {
 
+  private static final Log LOG = ExoLogger.getLogger(NotificationIterator.class);
+
   private int offset;
   
   private int limit;
@@ -44,10 +49,13 @@ public class NotificationIterator implements Iterator<Node> {
   private NodeIterator parentNotifIter;
   
   private NodeIterator notifIter;
+  
+  private WebNotificationFilter filter;
 
-  public NotificationIterator(Node parentNode, int offset, int limit) {
+  public NotificationIterator(WebNotificationFilter filter, Node parentNode, int offset, int limit) {
     this.offset = offset;
     this.limit = limit;
+    this.filter = filter;
     try {
       this.parentNotifIter = AbstractService.getNodeIteratorOrderDESC(parentNode);
       if (this.parentNotifIter.hasNext()) {
@@ -67,9 +75,6 @@ public class NotificationIterator implements Iterator<Node> {
 
   @Override
   public boolean hasNext() {
-    if (this.limit == 0) {
-      return false;
-    }
     try {
       return getCurrentDateIterator().hasNext();
     } catch (Exception e) {
@@ -93,14 +98,21 @@ public class NotificationIterator implements Iterator<Node> {
     
     List<Node> nodes = new LinkedList<Node>();
     //
-    while (hasNext()) {
+    while (hasNext() && this.limit > 0) {
       Node node = next();
-      if (offset > 0) {
-        offset--;
+      try {
+        if (this.filter.isOnPopover() && !node.getProperty(AbstractService.NTF_SHOW_POPOVER).getBoolean()) {
+          continue;
+        }
+      } catch (Exception e) {
+        LOG.debug("Failed to get value of property ntf:showPopover ", e);
+      }
+      if (this.offset > 0) {
+        this.offset--;
         continue;
       }
       nodes.add(node);
-      limit--;
+      this.limit--;
     }
     return nodes;
   }
