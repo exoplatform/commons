@@ -401,8 +401,11 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   public void update(NotificationInfo notification, boolean moveTop) {
     try {
       lock.lock();
-      //
-      remove(notification.getId());
+      //only remove the old notification and create a new one in case of update and move top
+      //else just update it
+      if (moveTop) {
+        remove(notification.getId());
+      }
       // if moveTop == true, the number on badge will increase
       // else the number on badge will not increase
       save(notification, moveTop);

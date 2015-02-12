@@ -73,6 +73,33 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     }
   }
   
+  public void testUpdateNotification() throws Exception {
+    String userId = "john";
+    NotificationInfo info = makeWebNotificationInfo(userId);
+    String notifId = info.getId();
+    storage.save(info);
+    NotificationInfo got = storage.get(notifId);
+    assertEquals("The title", got.getTitle());
+    long lastUpdatedTime = got.getLastModifiedDate();
+    
+    //update and move top, the lastUpdatedTime will be modified
+    got = makeWebNotificationInfo(userId);
+    got.setId(notifId);
+    got.setTitle("new title");
+    storage.update(got, true);
+    got = storage.get(notifId);
+    assertEquals("new title", got.getTitle());
+    assertFalse(lastUpdatedTime == got.getLastModifiedDate());
+    
+    //update but don't move top, the lastUpdatedTime will not be modified
+    lastUpdatedTime = got.getLastModifiedDate();
+    got.setTitle("new new title");
+    storage.update(got, false);
+    got = storage.get(notifId);
+    assertEquals("new new title", got.getTitle());
+    assertTrue(lastUpdatedTime == got.getLastModifiedDate());
+  }
+  
   public void testRemoveByJob() throws Exception {
     // Create data for old notifications 
     /* Example:
