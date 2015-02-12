@@ -375,10 +375,12 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
       String userNodePath = getOrCreateChannelNode(sProvider, owner).getPath();
+      long lastReadDate = getLastReadDateOfUser(owner);
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(NTF_NOTIF_INFO);
       strQuery.append(" WHERE jcr:path LIKE '").append(userNodePath).append("/%'")
               .append(" AND ntf:pluginId = '").append(pluginId).append("'")
               .append(" AND ntf:activityId = '").append(activityId).append("'")
+              .append(" AND ntf:lastModifiedDate > ").append(lastReadDate)
               .append(" AND ntf:read = 'false'");
       Session session = getSession(sProvider);
       QueryManager qm = session.getWorkspace().getQueryManager();
