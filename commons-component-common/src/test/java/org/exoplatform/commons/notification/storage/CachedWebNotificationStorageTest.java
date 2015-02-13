@@ -21,9 +21,9 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
   private WebNotificationStorage cachedStorage;
-  private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCaching";
-  private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationsCaching";
-  private final static String WEB_NOTIFICATION_COUNT_CACHING_NAME = "WebNotificationsCaching";
+  private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCache";
+  private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationsCache";
+  private final static String WEB_NOTIFICATION_COUNT_CACHING_NAME = "WebNotificationsCache";
   private  CacheService cacheService;
   private ExoCache<ListWebNotificationsKey, ListWebNotificationsData> exoWebNotificationsCache;
   private ExoCache<WebNotifInfoCacheKey, WebNotifInfoData> exoWebNotificationCache;
