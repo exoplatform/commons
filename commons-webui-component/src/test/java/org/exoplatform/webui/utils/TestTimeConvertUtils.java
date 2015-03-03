@@ -35,6 +35,7 @@ public class TestTimeConvertUtils extends TestCase {
   public void testConvertDateTimeByCurrentDate() throws Exception {
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 3);
+    cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 2);
     assertEquals("3 months", TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(), "EE, dd yyyy", Locale.ENGLISH, TimeConvertUtils.YEAR));
     
     cal = Calendar.getInstance();
