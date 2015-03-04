@@ -26,6 +26,10 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   public static final String ENTER_BR = "2";
   public static final String ENTER_DIV = "3";
 
+  private static final String CKEDITOR_ENTER_P = "CKEDITOR.ENTER_P";
+  private static final String CKEDITOR_ENTER_BR = "CKEDITOR.ENTER_BR";
+  private static final String CKEDITOR_ENTER_DIV = "CKEDITOR.ENTER_DIV";
+  
   private String width;
 
   private String height;
@@ -34,6 +38,10 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   
   private String enterMode;
   
+  private String shiftEnterMode;
+
+  private boolean forceEnterMode = false;
+
   private String css;
   
   private boolean isPasteAsPlainText = false;
@@ -90,12 +98,20 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     return enterMode;
   }
 
+  public String getShiftEnterMode() {
+    return shiftEnterMode;
+  }
+
   public void setToolbar(String toolbar) {
     this.toolbar = toolbar;
   }
 
   public void setEnterMode(String enterMode) {
     this.enterMode = enterMode;
+  }
+
+  public void setShiftEnterMode(String shiftEnterMode) {
+    this.shiftEnterMode = shiftEnterMode;
   }
 
   public UIFormRichtextInput setIsPasteAsPlainText(boolean isPasteAsPlainText) {
@@ -143,7 +159,12 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     if (toolbar == null) toolbar = BASIC_TOOLBAR;
     if (width == null) width = "98%";
     if (height == null) height = "'200px'";
-    if (enterMode == null) enterMode = "1";
+    if (enterMode == null) enterMode = CKEDITOR_ENTER_P;
+    if (shiftEnterMode == null) shiftEnterMode = CKEDITOR_ENTER_BR;
+    if (CKEDITOR_ENTER_P.equals(enterMode) && CKEDITOR_ENTER_DIV.equals(shiftEnterMode)
+       || CKEDITOR_ENTER_DIV.equals(enterMode) && CKEDITOR_ENTER_P.equals(shiftEnterMode)) {
+      forceEnterMode = true;
+    }
     if (css == null) css = "\"/CommonsResources/ckeditor/contents.css\"";
     if (value_ == null) value_ = "";
 
@@ -172,7 +193,9 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     
     builder.append("    CKEDITOR.replace('").append(name).append("', {toolbar:'").append(toolbar).append("', height:")
            .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
-           .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "").append("});\n");
+           .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
+           .append(", forceEnterMode:").append(forceEnterMode)
+           .append(", shiftEnterMode:").append(shiftEnterMode).append("});\n");
 
     builder.append("    instance = CKEDITOR.instances['" + name + "'];")
            .append("    instance.on( 'change', function(e) { document.getElementById('").append(name).append("').value = instance.getData(); });\n")
