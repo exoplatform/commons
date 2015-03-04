@@ -28,6 +28,7 @@ import javax.jcr.Value;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.template.Element;
@@ -62,6 +63,9 @@ public class NotificationUtils {
   private static final String styleCSS = " style=\"color: #2f5e92; text-decoration: none;\"";
   
   private static final String userClass = "class=\"user-name text-bold\"";
+  
+  /** This value must be the same with CalendarSpaceActivityPublisher.CALENDAR_APP_ID */
+  public static final String CALENDAR_ACTIVITY = "cs-calendar:spaces";
   
   public static String getDefaultKey(String key, String providerId) {
     return MessageFormat.format(key, providerId);
@@ -258,6 +262,24 @@ public class NotificationUtils {
       title = title.replace(result, result + styleCSS);
     }
     return title;
+  }
+  
+  /**
+   * 
+   * @param title
+   * @param activityType
+   * @return
+   */
+  public static String getNotificationActivityTitle(String title, String activityType) {
+    String displayTitle = removeLinkTitle(title);
+    
+    //Work-around for SOC-4730 : for calendar activity only, the title is not stored by raw data but 
+    //it's escaped before store to jcr. We need to unescape the title when build the notification
+    if (CALENDAR_ACTIVITY.equals(activityType)) {
+      displayTitle = StringEscapeUtils.unescapeHtml(displayTitle);
+    }
+    //
+    return displayTitle;
   }
   
   /**

@@ -31,5 +31,11 @@ public class NotificationUtilsTest extends BaseCommonsTestCase {
     String title = "<a href=\"http://exoplatform.github.io/\" target=\"_blank\">http://exoplatform.github.io/</a>";
     String newTitle = "<a class=\"user-name text-bold\" href=\"javascript:void(0)\" target=\"_blank\">http://exoplatform.github.io/</a>";
     assertEquals(newTitle, NotificationUtils.removeLinkTitle(title));
+    
+    title = "MHM&amp;#39s B-day Party";
+    assertEquals("MHM&#39s B-day Party", NotificationUtils.getNotificationActivityTitle(title, NotificationUtils.CALENDAR_ACTIVITY));
+    
+    title = "MHM&amp;#39s B-day Party";
+    assertEquals("MHM&amp;#39s B-day Party", NotificationUtils.getNotificationActivityTitle(title, ""));
   }
 }
