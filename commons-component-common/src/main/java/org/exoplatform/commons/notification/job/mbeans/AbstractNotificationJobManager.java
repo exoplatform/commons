@@ -112,7 +112,7 @@ public abstract class AbstractNotificationJobManager implements ManagementAware 
       }
     } catch (SchedulerException e) {
       LOG.warn(e);
-    } catch (ClassCastException e) {}
+    }
     return 0;
   }
   
@@ -126,7 +126,7 @@ public abstract class AbstractNotificationJobManager implements ManagementAware 
       }
     } catch (SchedulerException e) {
       LOG.warn(e);
-    } catch (Exception e) {}
+    }
     return 0;
   }
   

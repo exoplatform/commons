@@ -163,7 +163,7 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
           try {
             is.close();
           } catch (IOException e) {
-            // Do nothing
+            LOG.error("Failed close InputStream");
           }
         }
       }

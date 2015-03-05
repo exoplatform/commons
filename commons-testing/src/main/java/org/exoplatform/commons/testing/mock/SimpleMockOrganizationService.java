@@ -17,6 +17,8 @@ import org.exoplatform.commons.utils.ListAccessImpl;
 import org.exoplatform.commons.utils.ObjectPageList;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.GroupEventListener;
 import org.exoplatform.services.organization.GroupHandler;
@@ -44,7 +46,7 @@ import org.exoplatform.services.organization.idm.UserImpl;
  */
 @SuppressWarnings("deprecation")
 public class SimpleMockOrganizationService implements OrganizationService {
-
+  private static final Log LOG = ExoLogger.getLogger(SimpleMockOrganizationService.class);
   private Set<SimpleMembership> storage = new HashSet<SimpleMembership>();
 
   /**
@@ -106,6 +108,7 @@ public class SimpleMockOrganizationService implements OrganizationService {
       usr = new UserImpl("demo");
       getUserHandler().createUser(usr, false);
     } catch (Exception e) {
+      LOG.error("Failed to create default users", e);
     }
   }
   

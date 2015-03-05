@@ -435,15 +435,16 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   
   private int removeNodes(Session session, NodeIterator it) throws Exception {
     int i = 0, size = Integer.valueOf(System.getProperty("sizePersiter", "200"));
+    LOG.trace("Starting to remove nodes...");
     while (it.hasNext()) {
       it.nextNode().remove();
       ++i;
       if (i % size == 0) {
         session.save();
       }
-      System.out.print(".");
     }
     session.save();
+    LOG.trace(String.format("Done to removed %s nodes", i));
     return i;
   }
   

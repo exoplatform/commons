@@ -23,7 +23,6 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.groovyscript.GroovyTemplate;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.quartz.Job;
@@ -38,9 +37,6 @@ public class NotificationDigestJob implements Job {
   private final Log LOG = ExoLogger.getLogger(NotificationDigestJob.class);
   
   public NotificationDigestJob() {
-    try {
-      new GroovyTemplate("");
-    } catch (Exception e) {}
   }
 
   @Override
