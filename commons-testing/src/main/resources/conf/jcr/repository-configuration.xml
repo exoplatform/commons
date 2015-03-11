@@ -114,11 +114,12 @@
               <property name="index-dir" value="target/temp/jcrlucenedb/collaboration"/>
             </properties>
           </query-handler>
-          <lock-manager class="org.exoplatform.services.jcr.impl.core.lock.jbosscache.CacheableLockManagerImpl">
+          <lock-manager class="org.exoplatform.services.jcr.impl.core.lock.infinispan.ISPNCacheableLockManagerImpl">
               <properties>
               <property name="time-out" value="15m" /><!-- 15min -->
                 <property name="path" value="target/temp/lock/collaboration"/>
-                <property name="jbosscache-configuration" value="conf/jcr/jcr-jbosscache-lock-config.xml" />
+                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcexo" />
+                <property name="infinispan-configuration" value="conf/jcr/jcr-infinispan-lock-config.xml" />
               </properties>
           </lock-manager>
           

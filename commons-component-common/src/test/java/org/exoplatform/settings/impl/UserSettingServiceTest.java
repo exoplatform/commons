@@ -95,8 +95,10 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", true, true);
     userSetting = userSettingService.get("binh");
     assertTrue(userSetting.isActive());
-    
-    CommonsUtils.getService(OrganizationService.class).getUserHandler().removeUser("binh", true);
+
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().removeUser("binh", false);
+    assertNull(CommonsUtils.getService(OrganizationService.class).getUserHandler().findUserByName("binh"));
+
   }
 
   public void test_2_GetUsersSetting() throws Exception {

@@ -119,7 +119,7 @@
 			</init-params>
 		</component-plugin>
 	</external-component-plugins>
-	
+
 	<external-component-plugins>
     <target-component>org.exoplatform.services.cache.CacheService</target-component>
     <!-- SettingService configuration -->
@@ -229,7 +229,7 @@
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>SettingService</string></field>
             <field name="strategy"><string>LIRS</string></field>
-            <fieldname="maxEntries"><int>${cache.exo.commons.SettingService.MaxNodes:5000}</int></field>
+            <field name="maxEntries"><int>${cache.exo.commons.SettingService.MaxNodes:5000}</int></field>
             <field name="lifespan"><long>-1</long></field>
             <field name="replicated"><boolean>true</boolean></field>
           </object>

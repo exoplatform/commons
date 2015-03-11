@@ -494,7 +494,8 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return new SimpleUser(id);
     }
     
-    public User setEnabled(String userName, boolean enabled, boolean broadcast) throws Exception, UnsupportedOperationException {
+    public User setEnabled(String userName, boolean enabled, boolean broadcast) throws Exception,
+            UnsupportedOperationException {
         return null;
     }
 
