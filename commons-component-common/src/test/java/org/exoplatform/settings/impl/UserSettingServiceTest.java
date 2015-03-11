@@ -138,7 +138,7 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
     }
   }
   
-  /*public void testAddMixingMultiThreads() throws Exception {
+  public void testAddMixingMultiThreads() throws Exception {
     for (int i = 0; i < 500; i++) {
       executor.execute(new Runnable() {
         @Override
@@ -159,5 +159,5 @@ public class UserSettingServiceTest extends BaseCommonsTestCase {
     }
     //
     Thread.sleep(1000);
-  }*/
+  }
 }
