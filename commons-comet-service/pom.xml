@@ -16,6 +16,10 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
     </dependency>
@@ -136,6 +140,12 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+     <groupId>javax.websocket</groupId>
+     <artifactId>javax.websocket-api</artifactId>
+     <version>1.0</version>
+     <scope>provided</scope>
     </dependency>
     <!-- New Cometd -->
     <dependency>
