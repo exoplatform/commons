@@ -1,5 +1,9 @@
 package org.exoplatform.settings.listeners.impl;
 
+import java.util.List;
+
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -22,8 +26,13 @@ public class CommonsUserSettingEventListenerImpl extends UserEventListener {
     UserSettingService userSettingService = CommonsUtils.getService(UserSettingService.class);
     try {
       UserSetting userSetting = userSettingService.get(user.getUserName());
-      userSetting.setActive(user.isEnabled());
-      userSettingService.save(userSetting);
+      if (!user.isEnabled()) {
+        List<AbstractChannel> chanels = CommonsUtils.getService(ChannelManager.class).getChannels();
+        for (AbstractChannel channel : chanels) {
+          userSetting.removeChannelActive(channel.getId());
+        }
+        userSettingService.save(userSetting);
+      }
     } catch (Exception e) {
       LOG.warn("Failed to update user's setting : ", e);
     }

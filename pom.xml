@@ -336,14 +336,14 @@
       <!-- We enforce it to have the good version in our packaging -->
       <!-- remove it after migration to jcr 1.16.x-->
       <dependency>
-          <groupId>org.exoplatform.kernel</groupId>
-          <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v5</artifactId>
-          <version>${org.exoplatform.kernel.version}</version>
+        <groupId>org.exoplatform.kernel</groupId>
+        <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v5</artifactId>
+        <version>${org.exoplatform.kernel.version}</version>
       </dependency>
       <dependency>
-          <groupId>org.exoplatform.jcr</groupId>
-          <artifactId>exo.jcr.component.core.impl.infinispan.v5</artifactId>
-          <version>${org.exoplatform.jcr.version}</version>
+        <groupId>org.exoplatform.jcr</groupId>
+        <artifactId>exo.jcr.component.core.impl.infinispan.v5</artifactId>
+        <version>${org.exoplatform.jcr.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
