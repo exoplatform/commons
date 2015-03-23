@@ -69,7 +69,6 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
     }
 
     if (userIdPendings.size() > 0 || notification.isSendAll()) {
-      notification.to(userIdPendings);
       store(notification);
     }
   }
