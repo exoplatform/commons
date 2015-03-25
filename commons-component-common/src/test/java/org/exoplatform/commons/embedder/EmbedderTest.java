@@ -19,6 +19,10 @@ package org.exoplatform.commons.embedder;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.webui.util.Util;
+import org.exoplatform.webui.application.WebuiRequestContext;
+import org.mockito.Mockito;
 
 public class EmbedderTest extends BaseCommonsTestCase {
 
@@ -32,6 +36,10 @@ public class EmbedderTest extends BaseCommonsTestCase {
   @Override
   public void setUp() throws Exception {
     super.setUp();
+    WebuiRequestContext context = Mockito.mock(WebuiRequestContext.class);
+    WebuiRequestContext.setCurrentInstance(context);
+    PortalRequestContext ctx = Mockito.mock(PortalRequestContext.class);
+    Mockito.when(Util.getPortalRequestContext()).thenReturn(ctx);
   }
   
   @Override
@@ -64,7 +72,7 @@ public class EmbedderTest extends BaseCommonsTestCase {
   } 
   
   /**
-   * test slideshare link
+   * Test if slideShare link can be shared as video in AS
    */
   public void testSlideShare() {
     String slideShareURL = "http://www.slideshare.net/sh1mmer/using-nodejs-to-make-html5-work-for-everyone";
@@ -72,10 +80,44 @@ public class EmbedderTest extends BaseCommonsTestCase {
     embedder = EmbedderFactory.getInstance(slideShareURL);
     ExoMedia slideObj = embedder.getExoMedia();
     if(slideObj == null) {
-      LOG.warn("Can't connect to slideshare");
+      LOG.warn("Can't connect to slideshare"); 
     } else {
       assertEquals("SlideShare", slideObj.getProvider());
     }
+    assertRetrurnedData("http://www.slideshare.net/thanhc0110m/social-media-trends-exo-platform-company");
+    assertRetrurnedData("https://www.slideshare.net/thanhc0110m/social-media-trends-exo-platform-company");
+    assertRetrurnedData("http://www.slideshare.net/slideshow/embed_code/43654545");
+    assertRetrurnedData("https://www.slideshare.net/slideshow/embed_code/43654545");
+  }
+
+  public void testDailyMotionShare() {
+    String dailyMotion = "http://www.dailymotion.com/video/x2g4jx_exo-platform-theserverside-video-te_news";
+    // Dailymotion oembed response
+    embedder = EmbedderFactory.getInstance(dailyMotion);
+    ExoMedia dailyObj = embedder.getExoMedia();
+    if(dailyObj == null) {
+      LOG.warn("Can't connect to dailymotion"); 
+    }
+    assertRetrurnedData("http://www.dailymotion.com/video/x2g4jx_exo-platform-theserverside-video-te_news");
+    assertRetrurnedData("https://www.dailymotion.com/video/x2g4jx_exo-platform-theserverside-video-te_news");
+    assertRetrurnedData("http://dai.ly/x2g4jx");
+    assertRetrurnedData("https://dai.ly/x2g4jx");
+    assertRetrurnedData("http://www.dailymotion.com/embed/video/x2g4jx");
+    assertRetrurnedData("https://www.dailymotion.com/embed/video/x2g4jx");
+  }
+
+  public void testVimeoShare() {
+    String dailyMotion = "http://vimeo.com/72407771";
+    // Vimeo oembed response
+    embedder = EmbedderFactory.getInstance(dailyMotion);
+    ExoMedia vimeoObj = embedder.getExoMedia();
+    if(vimeoObj == null) {
+      LOG.warn("Can't connect to vimeo"); 
+    }
+    assertRetrurnedData("http://vimeo.com/72407771");
+    assertRetrurnedData("https://vimeo.com/72407771");
+    assertRetrurnedData("http://player.vimeo.com/video/72407771");
+    assertRetrurnedData("https://player.vimeo.com/video/72407771");
   }
 
   /**
@@ -115,4 +157,6 @@ public class EmbedderTest extends BaseCommonsTestCase {
     assertNotNull(videoObj.getHtml());
     assertNotNull(videoObj.getDescription());
   }
+
+
 }
