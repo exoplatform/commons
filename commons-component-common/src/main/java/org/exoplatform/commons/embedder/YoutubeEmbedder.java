@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.json.JSONArray;
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.webui.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,7 +39,7 @@ public class YoutubeEmbedder extends AbstractEmbedder {
   
   private static final Pattern YOUTUBE_ID_PATTERN = Pattern
       .compile("(youtu\\.be\\/|youtube\\.com\\/(watch\\?(.*&)?v=|(embed|v)\\/))([^\\?&\"'>]+)");
-  private static final String YOUTUBE_SRC = "http://www.youtube.com/embed/%s?enablejsapi=1";
+  private static final String YOUTUBE_SRC = "//www.youtube.com/embed/%s?enablejsapi=1";
   private static final String YOUTUBE_V3_API_KEY_PROPERTY = "youtube.v3.api.key";
   
   /**
@@ -60,10 +61,17 @@ public class YoutubeEmbedder extends AbstractEmbedder {
    */
   public ExoMedia getExoMedia() {
     String feedsURL = null;
+    String scheme = "http";
     for(Pattern pattern : schemeEndpointMap.keySet()) {
       Matcher matcher = pattern.matcher(url);
       if(matcher.find()) {
         feedsURL = schemeEndpointMap.get(pattern);
+        try {
+          PortalRequestContext portalRequestContext = Util.getPortalRequestContext();
+          scheme = portalRequestContext.getRequest().getScheme();
+        } catch (Exception e) {
+          LOG.info("Cannot get scheme from Portal Request Context");
+        }
       } else {
         return null;
       }
@@ -79,9 +87,8 @@ public class YoutubeEmbedder extends AbstractEmbedder {
       while (matcher.find()) {
         youtubeId = matcher.group(5);
       }
-       
-      //
-      String html = buildIFramePlayer(youtubeId);
+
+      String html = buildIFramePlayer(youtubeId,scheme);
       
       if (html == null) {
         return null;
@@ -97,7 +104,7 @@ public class YoutubeEmbedder extends AbstractEmbedder {
       }
       
       String youTubeFeedURL = String.format(feedsURL, youtubeV3APIKey, youtubeId);
-      URL reqURL = new URL(youTubeFeedURL);
+      URL reqURL = new URL(correctURIString(youTubeFeedURL, scheme, false));
       JSONObject jsonObject = getJSONObject(reqURL);
       JSONObject snippetObject = jsonObject.getJSONArray("items").getJSONObject(0).getJSONObject("snippet");
       
@@ -136,7 +143,8 @@ public class YoutubeEmbedder extends AbstractEmbedder {
     }
   }
   
-  private String buildIFramePlayer(String youtubeId) throws JSONException {
+  private String buildIFramePlayer(String youtubeId, String scheme) throws JSONException {
+    
     if (youtubeId == null) {
       LOG.info("Returned content url not match the pattern to get content source.");
       return null;
@@ -144,7 +152,7 @@ public class YoutubeEmbedder extends AbstractEmbedder {
     String youTubeSRC = String.format(YOUTUBE_SRC, youtubeId);
     StringBuilder contentURL = new StringBuilder();
     contentURL.append("<iframe id=\"player\" type=\"text/html\" width=\"330\" height=\"200\" frameborder=\"0\" allowfullscreen=\"true\"")
-              .append(" src=\"").append(youTubeSRC).append("\">").append("&nbsp;</iframe>");
+              .append(" src=\"").append(correctURIString(youTubeSRC,scheme,false)).append("\">").append("&nbsp;</iframe>");
     return contentURL.toString();
   }
 

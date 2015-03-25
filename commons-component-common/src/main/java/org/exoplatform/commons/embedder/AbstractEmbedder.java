@@ -18,12 +18,14 @@ package org.exoplatform.commons.embedder;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.core.UriBuilder;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.Log;
@@ -60,6 +62,22 @@ public abstract class AbstractEmbedder implements Embedder {
     this.url = url;
   }
   
+  /** Correct URI String
+   *
+   * @param URI URI string to correct
+   * @param scheme scheme to set
+   * @param force if force is false, only set again scheme when scheme is missing. Otherwise, always set it
+   * @return
+   */
+
+  public String correctURIString(String uriString, String scheme, boolean force) {
+    URI uri = UriBuilder.fromUri(uriString).build();
+    if (uri.getScheme() == null || force) {
+      uri = UriBuilder.fromUri(uri.toString()).scheme(scheme).build();
+    }
+    return uri.toString();
+  }
+
   protected JSONObject getJSONObject(URL url) {
 
     BufferedReader bufferedReader;
