@@ -57,6 +57,7 @@ import org.exoplatform.services.log.Log;
  * hoa.pham@exoplatform.com
  * Sep 6, 2008
  */
+@Deprecated
 public class XMLDeploymentPlugin extends DeploymentPlugin {
 
     /** The configuration manager. */
@@ -75,7 +76,9 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
      * @param configurationManager the configuration manager
      * @param repositoryService the repository service
      * @param publicationService the publication service
+     * @deprecated use {@link WCMDeploymentPublicationPlugin} instead.
      */
+    @Deprecated
     public XMLDeploymentPlugin(InitParams initParams,
                                ConfigurationManager configurationManager,
                                RepositoryService repositoryService) {
@@ -92,6 +95,9 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
   */
     @SuppressWarnings("unchecked")
     public void deploy(SessionProvider sessionProvider) throws Exception {
+      if (LOG.isWarnEnabled()) {
+        LOG.warn(this.getClass() + " is now deprecated, please use WCMDeploymentPublicationPlugin instead!");
+      }
         ManageableRepository repository = repositoryService.getCurrentRepository();
         Iterator iterator = initParams.getObjectParamIterator();
         DeploymentDescriptor deploymentDescriptor = null;
