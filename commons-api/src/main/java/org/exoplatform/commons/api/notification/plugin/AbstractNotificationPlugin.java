@@ -24,62 +24,22 @@ import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
-import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.OrganizationService;
 
-public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
+public abstract class AbstractNotificationPlugin extends BaseNotificationPlugin {
   List<PluginConfig> pluginConfig = new ArrayList<PluginConfig>();
   
   private Template engine;
   
   public AbstractNotificationPlugin(InitParams initParams) {
-    pluginConfig = initParams.getObjectParamValues(PluginConfig.class);
+    super(initParams);
+    //sets the TRUE value for these plug in extends this
+    setOldPlugin(true);
   }
-  
-  public List<PluginConfig> getPluginConfigs() {
-    return pluginConfig;
-  }
-  
-  /**
-   * Start the plug in
-   * @param context
-   * @return
-   */
-  public void start(NotificationContext ctx) {
-    
-  }
-  
-  /**
-   * End the plug in
-   * @param context
-   * @return
-   */
-  public void end(NotificationContext ctx) {
-    
-  }
-  
-  /**
-   * Gets Notification Plug in key
-   * @return
-   */
-  public abstract String getId();
-  
-  /**
-   * Check, for each plugin, if we will send notification
-   * @return
-   */
-  public abstract boolean isValid(NotificationContext ctx);
-  
-  /**
-   * Makes MessageInfo from given information what keep inside NotificationContext
-   * @param context
-   * @return
-   */
-  protected abstract NotificationInfo makeNotification(NotificationContext ctx);
   
   /**
    * Makes the MessageInfor from given NotificationMessage what keep inside NotificationContext
@@ -95,15 +55,6 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
    * @return
    */
   protected abstract boolean makeDigest(NotificationContext ctx, Writer writer);
-  
-  /**
-   * Makes notification
-   * @param ctx
-   * @return
-   */
-  public NotificationInfo buildNotification(NotificationContext ctx) {
-    return makeNotification(ctx);
-  }
   
   /**
    * Makes massage
@@ -131,8 +82,8 @@ public abstract class AbstractNotificationPlugin extends BaseComponentPlugin {
    * Creates the key for NotificationPlugin
    * @return
    */
-  public NotificationKey getKey() {
-    return NotificationKey.key(this);
+  public PluginKey getKey() {
+    return PluginKey.key(this);
   }
   
   /**

@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,8 +28,9 @@ import javax.jcr.Value;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
+import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.notification.template.DigestTemplate;
 import org.exoplatform.commons.notification.template.SimpleElement;
@@ -53,10 +55,13 @@ public class NotificationUtils {
   public static final String FEATURE_NAME              = "notification";
   
   private static final Pattern LINK_PATTERN = Pattern.compile("<a ([^>]+)>([^<]+)</a>");
-
+  
   private static final Pattern EMAIL_PATTERN = Pattern.compile("^[_a-z0-9-+]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,5})$");
   
   private static final String styleCSS = " style=\"color: #2f5e92; text-decoration: none;\"";
+  
+  /** This value must be the same with CalendarSpaceActivityPublisher.CALENDAR_APP_ID */
+  public static final String CALENDAR_ACTIVITY = "cs-calendar:spaces";
   
   public static String getDefaultKey(String key, String providerId) {
     return MessageFormat.format(key, providerId);
@@ -87,11 +92,11 @@ public class NotificationUtils {
    * @param language
    * @return
    */
-  public static DigestTemplate getDigest(TemplateConfig templateConfig, String pluginId, String language) {
+  public static DigestTemplate getDigest(PluginConfig templateConfig, String pluginId, String language) {
     String srcResource = templateConfig.getBundlePath();
-    String digestOneKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, pluginId));
-    String digestThreeKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, pluginId));
-    String digestMoreKey = templateConfig.getKeyValue(TemplateConfig.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, pluginId));
+    String digestOneKey = templateConfig.getKeyValue(PluginConfig.DIGEST_ONE_KEY, getDefaultKey(DEFAULT_DIGEST_ONE_KEY, pluginId));
+    String digestThreeKey = templateConfig.getKeyValue(PluginConfig.DIGEST_THREE_KEY, getDefaultKey(DEFAULT_DIGEST_THREE_KEY, pluginId));
+    String digestMoreKey = templateConfig.getKeyValue(PluginConfig.DIGEST_MORE_KEY, getDefaultKey(DEFAULT_DIGEST_MORE_KEY, pluginId));
     
     Locale locale = getLocale(language);
     
@@ -110,9 +115,9 @@ public class NotificationUtils {
    * @param language
    * @return
    */
-  public static Element getSubject(TemplateConfig templateConfig, String pluginId, String language) {
+  public static Element getSubject(PluginConfig templateConfig, String pluginId, String language) {
     String bundlePath = templateConfig.getBundlePath();
-    String subjectKey = templateConfig.getKeyValue(TemplateConfig.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, pluginId));
+    String subjectKey = templateConfig.getKeyValue(PluginConfig.SUBJECT_KEY, getDefaultKey(DEFAULT_SUBJECT_KEY, pluginId));
     
     Locale locale = getLocale(language);
     
@@ -132,6 +137,32 @@ public class NotificationUtils {
       values.append(str);
     }
     return values.toString();
+  }
+
+  public static String listToString(List<String> list, String pattern) {
+    if (list == null || list.size() == 0) {
+      return "";
+    }
+    StringBuffer values = new StringBuffer();
+    for (String str : list) {
+      if (values.length() > 0) {
+        values.append(",");
+      }
+      values.append(pattern.replace("VALUE", str));
+    }
+    return values.toString();
+  }
+  
+  public static List<String> stringToList(String value) {
+    List<String> result = new ArrayList<String>();
+    if (value == null || value.isEmpty()) {
+      return result;
+    }
+    StringTokenizer tokenizer = new StringTokenizer(value, ",");
+    while (tokenizer.hasMoreTokens()) {
+      result.add(tokenizer.nextToken());
+    }
+    return result;
   }
 
   public static String[] valuesToArray(Value[] values) throws Exception {
@@ -227,6 +258,35 @@ public class NotificationUtils {
       title = title.replace(result, result + styleCSS);
     }
     return title;
+  }
+  
+  /**
+   * 
+   * @param title
+   * @param activityType
+   * @return
+   */
+  public static String getNotificationActivityTitle(String title, String activityType) {
+    String displayTitle = removeLinkTitle(title);
+    
+    //Work-around for SOC-4730 : for calendar activity only, the title is not stored by raw data but 
+    //it's escaped before store to jcr. We need to unescape the title when build the notification
+    if (CALENDAR_ACTIVITY.equals(activityType)) {
+      displayTitle = StringEscapeUtils.unescapeHtml(displayTitle);
+    }
+    //
+    return displayTitle;
+  }
+  
+  /**
+   * Remove all link in activity title and add user-name class
+   *  
+   * @param title
+   * @return
+   */
+  public static String removeLinkTitle(String title) {
+    Matcher mat = LINK_PATTERN.matcher(title);
+    return mat.replaceAll("<span class=\"text-bold\">$2</span>");
   }
   
   public static String getProfileUrl(String userId) {

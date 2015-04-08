@@ -19,11 +19,16 @@ package org.exoplatform.commons.api.notification.service.template;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.exoplatform.commons.api.notification.model.ChannelKey;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+
 public class TemplateContext extends HashMap<String, Object> {
   
   private static final long serialVersionUID = 1L;
 
   private String            pluginId;
+
+  private ChannelKey        channelKey;
 
   private String            language;
 
@@ -36,8 +41,15 @@ public class TemplateContext extends HashMap<String, Object> {
   }
 
   public TemplateContext(String pluginId, String language) {
+    this.channelKey = ChannelKey.key(UserSetting.EMAIL_CHANNEL);
     this.pluginId = pluginId;
     this.language = language;
+  }
+
+  public static TemplateContext newChannelInstance(ChannelKey channelKey, String pluginId, String language) {
+    TemplateContext context = new TemplateContext(pluginId, language);
+    context.channelKey = channelKey;
+    return context;
   }
   
   /**
@@ -57,8 +69,13 @@ public class TemplateContext extends HashMap<String, Object> {
     return this;
   }
 
-  public TemplateContext provider(String providerId) {
-    this.pluginId = providerId;
+  public TemplateContext channelKey(ChannelKey channelKey) {
+    this.channelKey = channelKey;
+    return this;
+  }
+
+  public TemplateContext pluginId(String pluginId) {
+    this.pluginId = pluginId;
     return this;
   }
 
@@ -79,6 +96,13 @@ public class TemplateContext extends HashMap<String, Object> {
    */
   public String getPluginId() {
     return pluginId;
+  }
+
+  /**
+   * @return the channelId
+   */
+  public ChannelKey getChannelKey() {
+    return channelKey;
   }
 
   /**

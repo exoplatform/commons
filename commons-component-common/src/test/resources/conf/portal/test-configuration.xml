@@ -88,6 +88,7 @@
 					<name>autoCreatedInNewRepository</name>
 					<description>Node types configuration file</description>
 					<value>classpath:/conf/jcr/test-nodetypes-config.xml</value>
+					<value>jar:/conf/notification-nodetypes.xml</value>
 					<value>jar:/conf/portal/activity-extension-nodetypes.xml</value>
 				</values-param>
 			</init-params>
@@ -100,6 +101,7 @@
 				<properties-param>
 					<name>namespaces</name>
 					<property name="stg" value="http://www.gatein.org/jcr/token/1.0/" />
+					<property name="ntf" value="http://www.gatein.org/jcr/ntf/1.0/" />
 				</properties-param>
 			</init-params>
 		</component-plugin>

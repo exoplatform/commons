@@ -17,8 +17,6 @@
 package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -29,6 +27,8 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.settings.SettingService;
@@ -52,19 +52,23 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   private static final Log LOG = ExoLogger.getLogger(UserSettingServiceImpl.class);
 
   /** Setting Scope on Common Setting **/
-  private static final Scope      NOTIFICATION_SCOPE = Scope.GLOBAL;
-  
-  private SettingService            settingService;
+  private static final Scope    NOTIFICATION_SCOPE = Scope.GLOBAL;
+  private SettingService        settingService;
+  private ChannelManager        channelManager;
 
-  private final String                    workspace;
+  private final String          workspace;
 
   protected static final int MAX_LIMIT = 30;
+
+  public static final String NAME_PATTERN = "exo:{CHANNELID}Channel";
   
   transient final ReentrantLock lock = new ReentrantLock();
   
-  public UserSettingServiceImpl(SettingService settingService, NotificationConfiguration configuration) {
+  public UserSettingServiceImpl(SettingService settingService, NotificationConfiguration configuration,
+                                ChannelManager channelManager) {
     this.settingService = settingService;
     this.workspace = configuration.getWorkspace();
+    this.channelManager = channelManager;
   }
 
   private Node getUserSettingHome(Session session) throws Exception {
@@ -83,16 +87,26 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   public void save(UserSetting model) {
 
     String userId = model.getUserId();
-    String instantlys = NotificationUtils.listToString(model.getInstantlyProviders());
-    String dailys = NotificationUtils.listToString(model.getDailyProviders());
-    String weeklys = NotificationUtils.listToString(model.getWeeklyProviders());
+    String dailys = NotificationUtils.listToString(model.getDailyPlugins(), VALUE_PATTERN);
+    String weeklys = NotificationUtils.listToString(model.getWeeklyPlugins(), VALUE_PATTERN);
+    String channelActives = NotificationUtils.listToString(model.getChannelActives(), VALUE_PATTERN);
 
-    saveUserSetting(userId, EXO_IS_ACTIVE, String.valueOf(model.isActive()));
-    saveUserSetting(userId, EXO_INSTANTLY, instantlys);
+    // Save plugins active
+    List<String> channels = new ArrayList<String>(model.getAllChannelPlugins().keySet());
+    for (String channelId : channels) {
+      saveUserSetting(userId, getChannelProperty(channelId), NotificationUtils.listToString(model.getPlugins(channelId), VALUE_PATTERN));
+    }
+    //
     saveUserSetting(userId, EXO_DAILY, dailys);
     saveUserSetting(userId, EXO_WEEKLY, weeklys);
+    //
+    saveUserSetting(userId, EXO_IS_ACTIVE, channelActives);
 
     removeMixin(userId);
+  }
+
+  private String getChannelProperty(String channelId) {
+    return NAME_PATTERN.replace("{CHANNELID}", channelId);
   }
 
   /**
@@ -110,16 +124,28 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   public UserSetting get(String userId) {
     UserSetting model = UserSetting.getInstance();
 
-    List<String> instantlys = getArrayListValue(userId, EXO_INSTANTLY, null);
-    if (instantlys != null) {
+    List<String> actives = getArrayListValue(userId, EXO_IS_ACTIVE, null);
+    if (actives != null) {
       model.setUserId(userId);
-      model.setActive(isActive(userId));
-      model.setInstantlyProviders(instantlys);
-      model.setDailyProviders(getArrayListValue(userId, EXO_DAILY, Collections.<String> emptyList()));
-      model.setWeeklyProviders(getArrayListValue(userId, EXO_WEEKLY, Collections.<String> emptyList()));
+      model.setChannelActives(actives);
+      // for all channel to set plugin
+      List<AbstractChannel> channels = channelManager.getChannels();
+      for (AbstractChannel channel : channels) {
+        model.setChannelPlugins(channel.getId(), getArrayListValue(userId, getChannelProperty(channel.getId()), new ArrayList<String>()));
+      }
+      //
+      model.setDailyPlugins(getArrayListValue(userId, EXO_DAILY, new ArrayList<String>()));
+      model.setWeeklyPlugins(getArrayListValue(userId, EXO_WEEKLY, new ArrayList<String>()));
+      //
     } else {
       model = UserSetting.getDefaultInstance().setUserId(userId);
       addMixin(userId);
+    }
+    SettingValue<?> value = settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_LAST_READ_DATE);
+    if (value != null) {
+      model.setLastReadDate((Long) value.getValue());
+    } else {
+      saveLastReadDate(userId, 0l);
     }
     return model;
   }
@@ -133,19 +159,17 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     SettingValue<String> values = getSettingValue(userId, propertyName);
     if (values != null) {
       String strs = values.getValue();
-      return Arrays.asList(strs.split(","));
+      if ("true".equals(strs)) {
+        strs = UserSetting.EMAIL_CHANNEL;
+      }
+      if ("false".equals(strs)) {
+        return defaultValue;
+      }
+      return NotificationUtils.stringToList(getValues(strs));
     }
     return defaultValue;
   }
 
-  private boolean isActive(String userId) {
-    SettingValue<String> values = getSettingValue(userId, EXO_IS_ACTIVE);
-    if (values != null) {
-      return Boolean.valueOf(values.getValue());
-    }
-    return false;
-  }
-  
   @Override
   public void addMixin(String userId) {
     addMixin(new User[] { new UserImpl(userId) });
@@ -153,11 +177,14 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public void addMixin(User[] users) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
       addMixin(sProvider, users);
     } catch (Exception e) {
       LOG.error("Failed to add mixin for default setting of users", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
   }
 
@@ -219,7 +246,9 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   private StringBuilder buildQuery(NotificationContext context) {
     StringBuilder queryBuffer = new StringBuilder();
-    queryBuffer.append(EXO_IS_ACTIVE).append("='true'");
+    
+    queryBuffer.append(buildSQLLikeProperty(EXO_IS_ACTIVE, UserSetting.EMAIL_CHANNEL));
+    
     Boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
     if (isWeekly) {
       queryBuffer.append(" AND ").append(EXO_WEEKLY).append("<>''");
@@ -231,7 +260,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<UserSetting> getUserSettingWithDeactivate() {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();;
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();;
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
@@ -240,7 +270,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
       
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
-      strQuery.append(" WHERE ").append(EXO_IS_ACTIVE).append("='false'");
+      strQuery.append(" WHERE (").append(EXO_IS_ACTIVE).append("='')");
       
       QueryManager qm = session.getWorkspace().getQueryManager();
       QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
@@ -253,56 +283,64 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       
     } catch (Exception e) {
       LOG.warn("Can not get the user setting with deactivated");
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
 
     return models;
   }
   
   @Override
-  public List<String> getUserSettingByPlugin(String pluginId) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();;
+  public List<String> getUserSettingByPlugin(String pluginId) {// only use for email channel
+    return getUserHasSettingPlugin(UserSetting.EMAIL_CHANNEL, pluginId);
+  }
+  
+  @Override
+  public List<String> getUserHasSettingPlugin(String channelId, String pluginId) {
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();;
     List<String> userIds = new ArrayList<String>();
     try {
-      NodeIterator iter = getUserSettingByPluginIterator(sProvider, pluginId);
+      NodeIterator iter = getUserHasSettingPlugin(sProvider, channelId, pluginId);
       while (iter != null && iter.hasNext()) {
         Node node = iter.nextNode();
         userIds.add(node.getParent().getName());
       }
     } catch (Exception e) {
       LOG.error("Failed to get all users have the " + pluginId + " in settings", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
 
     return userIds;
   }
-  
-  /**
-   * Gets the all of the userId who has already plugin setting.
-   * 
-   * @param sProvider
-   * @param pluginId
-   * @return
-   * @throws Exception
-   */
-  private NodeIterator getUserSettingByPluginIterator(SessionProvider sProvider, String pluginId) throws Exception {
+
+  private NodeIterator getUserHasSettingPlugin(SessionProvider sProvider, String channelId, String pluginId) throws Exception {
     Session session = getSession(sProvider, workspace);
     if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
       return null;
     }
-    
+    String property = getChannelProperty(channelId);
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
-    strQuery.append(" WHERE ").append(EXO_IS_ACTIVE).append("='true' AND (")
-    //if user wants to receive this kind of notification instantly
-            .append(EXO_INSTANTLY).append("='").append(pluginId).append("'")
-            .append(" OR ").append(EXO_INSTANTLY).append(" LIKE '%,").append(pluginId).append(",%'")
-            .append(" OR ").append(EXO_INSTANTLY).append(" LIKE '%,").append(pluginId).append("'")
-            .append(" OR ").append(EXO_INSTANTLY).append(" LIKE '").append(pluginId).append(",%'")
-            .append(")");
-    
+    String plugin = getValue(pluginId);
+    strQuery.append(" WHERE")
+            .append(buildSQLLikeProperty(EXO_IS_ACTIVE, channelId))
+            .append(" AND (");
+    //
+    if(UserSetting.EMAIL_CHANNEL.equals(channelId)) {
+      strQuery.append(buildSQLLikeProperty(property, plugin)).append(" OR")
+              .append(buildSQLLikeProperty(EXO_DAILY, plugin)).append(" OR")
+              .append(buildSQLLikeProperty(EXO_WEEKLY, plugin));
+    } else {
+      strQuery.append(buildSQLLikeProperty(property, plugin));
+    }
+    //
+    strQuery.append(" )");
     QueryManager qm = session.getWorkspace().getQueryManager();
     QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
     return query.execute().getNodes();
   }
-
+  
   /**
    * Gets these plugins what configured the daily
    * 
@@ -332,7 +370,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   
   @Override
   public List<UserSetting> getDigestSettingForAllUser(NotificationContext context, int offset, int limit) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
       NodeIterator iter = getDigestIterator(context, sProvider, offset, limit);
@@ -342,6 +381,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get all daily users have notification messages", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
 
     return models;
@@ -356,11 +397,12 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * @throws Exception
    */
   private List<String> getValues(Node node, String propertyName) throws Exception {
-    String values = node.getProperty(propertyName).getString();
-    if (values.trim().length() == 0) {
+    try {
+      String values = node.getProperty(propertyName).getString();
+      return NotificationUtils.stringToList(getValues(values));
+    } catch (Exception e) {
       return new ArrayList<String>();
     }
-    return Arrays.asList(values.split(","));
   }
 
   /**
@@ -373,10 +415,16 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   private UserSetting fillModel(Node node) throws Exception {
     UserSetting model = UserSetting.getInstance();
     model.setUserId(node.getParent().getName());
-    model.setDailyProviders(getValues(node, EXO_DAILY));
-    model.setWeeklyProviders(getValues(node, EXO_WEEKLY));
-    model.setInstantlyProviders(getValues(node, EXO_INSTANTLY));
-    model.setActive(node.getProperty(EXO_IS_ACTIVE).getBoolean());
+    model.setDailyPlugins(getValues(node, EXO_DAILY));
+    model.setWeeklyPlugins(getValues(node, EXO_WEEKLY));
+    //
+    model.setChannelActives(getValues(node, EXO_IS_ACTIVE));
+    //
+    List<AbstractChannel> channels = channelManager.getChannels();
+    for (AbstractChannel channel : channels) {
+      model.setChannelPlugins(channel.getId(), getValues(node, getChannelProperty(channel.getId())));
+    }
+    //
     model.setLastUpdateTime(node.getParent().getProperty(EXO_LAST_MODIFIED_DATE).getDate());
     return model;
   }
@@ -398,7 +446,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
 
   @Override
   public List<UserSetting> getDigestDefaultSettingForAllUser(int offset, int limit) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
       Session session = getSession(sProvider, workspace);
@@ -417,9 +466,22 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
     } catch (Exception e) {
       LOG.error("Failed to get default daily users have notification messages", e);
-    } 
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
+    }
 
     return users;
   }
+  
+  private String buildSQLLikeProperty(String property, String value) {
+    StringBuilder strQuery = new StringBuilder(" (")
+            .append(property).append(" LIKE '%").append(value).append("%'")
+            .append(")");
+    return strQuery.toString();
+  }
  
+  @Override
+  public void saveLastReadDate(String userId, Long time) {
+    settingService.set(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_LAST_READ_DATE, SettingValue.create(time));
+  }
 }

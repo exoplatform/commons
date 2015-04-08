@@ -25,9 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
@@ -40,21 +43,21 @@ import org.gatein.wci.ServletContainerFactory;
 import org.picocontainer.Startable;
 
 public class NotificationPluginContainer implements PluginContainer, Startable {
+  /** logger */
   private static final Log LOG = ExoLogger.getLogger(NotificationPluginContainer.class);
 
-  private final Map<NotificationKey, AbstractNotificationPlugin> pluginMap;
-
-  private GStringTemplateEngine gTemplateEngine;
+  private final Map<PluginKey, BaseNotificationPlugin> pluginMap;
   
   //parent key and list child key
-  private final Map<NotificationKey, List<NotificationKey>>      parentChildrenKeysMap;
+  private final Map<PluginKey, List<PluginKey>>      parentChildrenKeysMap;
 
   private PluginSettingService                                   pSettingService;
   private ResourceBundleConfigDeployer                           deployer;
-
+  private GStringTemplateEngine gTemplateEngine;
+  
   public NotificationPluginContainer() {
-    pluginMap = new HashMap<NotificationKey, AbstractNotificationPlugin>();
-    parentChildrenKeysMap = new HashMap<NotificationKey, List<NotificationKey>>();
+    pluginMap = new HashMap<PluginKey, BaseNotificationPlugin>();
+    parentChildrenKeysMap = new HashMap<PluginKey, List<PluginKey>>();
     pSettingService = CommonsUtils.getService(PluginSettingService.class);
     deployer = new ResourceBundleConfigDeployer();
     gTemplateEngine = new GStringTemplateEngine();
@@ -63,13 +66,18 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   @Override
   public void start() {
     Set<String> datas = new HashSet<String>();
-    // register plugin
     
-    for (AbstractNotificationPlugin plugin : pluginMap.values()) {
+    for (BaseNotificationPlugin plugin : pluginMap.values()) {
       boolean isChild = (plugin instanceof AbstractNotificationChildPlugin);
       for (PluginConfig pluginConfig : plugin.getPluginConfigs()) {
         pSettingService.registerPluginConfig(pluginConfig.isChildPlugin(isChild));
-        datas.add(pluginConfig.getTemplateConfig().getBundlePath());
+        // Adapt bundle path configuration from old version 4.1.x to 4.2.x
+        if(StringUtils.isEmpty(pluginConfig.getBundlePath()) &&
+            !StringUtils.isEmpty(pluginConfig.getTemplateConfig().getBundlePath())) {
+          pluginConfig.setBundlePath(pluginConfig.getTemplateConfig().getBundlePath());
+        }
+        //
+        datas.add(pluginConfig.getBundlePath());
       }
     }
     //
@@ -84,62 +92,87 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   }
 
   @Override
-  public AbstractNotificationPlugin getPlugin(NotificationKey key) {
+  public BaseNotificationPlugin getPlugin(PluginKey key) {
     return pluginMap.get(key);
   }
 
   @Override
-  public List<NotificationKey> getChildPluginKeys(NotificationKey parentKey) {
-    List<NotificationKey> keys = parentChildrenKeysMap.get(parentKey);
+  public List<PluginKey> getChildPluginKeys(PluginKey parentKey) {
+    List<PluginKey> keys = parentChildrenKeysMap.get(parentKey);
     if (keys != null) {
       return keys;
     }
-    return new ArrayList<NotificationKey>();
+    return new ArrayList<PluginKey>();
   }
 
   @Override
   public void addChildPlugin(AbstractNotificationChildPlugin plugin) {
-    registerPlugin(plugin);
-    
+    addPlugin(plugin);
     //
     List<String> parentIds = plugin.getParentPluginIds();
-    NotificationKey parentKey;
-    List<NotificationKey> childrenKeys;
+    PluginKey parentKey;
+    List<PluginKey> childrenKeys;
     for (String parentId : parentIds) {
-      parentKey = new NotificationKey(parentId);
+      parentKey = new PluginKey(parentId);
       if (parentChildrenKeysMap.containsKey(parentKey)) {
         childrenKeys = parentChildrenKeysMap.get(parentKey);
       } else {
-        childrenKeys = new ArrayList<NotificationKey>();
+        childrenKeys = new ArrayList<PluginKey>();
       }
       //
       childrenKeys.add(plugin.getKey());
       parentChildrenKeysMap.put(parentKey, childrenKeys);
     }
-
+    //
+    String templatePath = plugin.getTemplatePath();
+    if (templatePath != null && templatePath.length() > 0) {
+      try {
+        String template = TemplateUtils.loadGroovyTemplate(templatePath);
+        plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
+      } catch (Exception e) {
+        LOG.warn("Failed to build groovy template engine for: " + plugin.getId(), e);
+      }
+    }
+    
   }
 
   @Override
-  public void addPlugin(AbstractNotificationPlugin plugin) {
-    registerPlugin(plugin);
+  public void addPlugin(BaseNotificationPlugin plugin) {
+    if (plugin.isOldPlugin()) {
+      registerPlugin((AbstractNotificationPlugin) plugin);
+    }
+    pluginMap.put(plugin.getKey(), plugin);
   }
-
+  
   private void registerPlugin(AbstractNotificationPlugin plugin) {
     try {
       String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
+      //String templatePath = "";
       String template = TemplateUtils.loadGroovyTemplate(templatePath);
       plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
     } catch (Exception e) {
-      LOG.debug("Failed to register notification plugin " + plugin.getId());
+      LOG.debug("Failed to register notification plugin " + plugin.getId(), e);
     }
     pluginMap.put(plugin.getKey(), plugin);
   }
 
   @Override
-  public boolean remove(NotificationKey key) {
+  public boolean remove(PluginKey key) {
     pluginMap.remove(key);
     return true;
   }
 
-
+  public List<String> getDefaultActivePlugins() {
+    List<String> list = new ArrayList<String>();
+    for (BaseNotificationPlugin plugin : pluginMap.values()) {
+      if (!(plugin instanceof AbstractNotificationChildPlugin)) {
+        for (String defaultConf : plugin.getPluginConfigs().get(0).getDefaultConfig()) {
+          if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY) {
+            list.add(plugin.getId());
+          }
+        }
+      }
+    }
+    return list;
+  }
 }

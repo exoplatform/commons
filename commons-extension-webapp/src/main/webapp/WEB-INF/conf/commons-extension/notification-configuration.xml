@@ -5,66 +5,114 @@
   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   
-  <component>
+   <component>
+    <key>org.exoplatform.commons.notification.net.router.ExoRouter</key>
+    <type>org.exoplatform.commons.notification.net.router.ExoRouter</type>
+    <component-plugins>
+      <component-plugin>
+        <name>addRoutes</name>
+        <set-method>addRoutes</set-method>
+        <type>org.exoplatform.commons.notification.net.router.ExoRouterConfig</type>
+        <init-params>
+          <object-param>
+            <name>uri.configuration</name>
+            <description>defines action name which associate with uri pattern.</description>
+            <object type="org.exoplatform.commons.notification.net.router.ExoRouterConfig">
+              <field name="routeMapping">
+                <map type="java.util.HashMap">
+                  <entry>
+                    <key><string>websocket.notification.web.path</string></key>
+                    <value><string>/channels/{identifierId}/{remoteId}</string></value>
+                  </entry>
+                </map>
+              </field>
+            </object>
+          </object-param>
+        </init-params>
+      </component-plugin>    
+    </component-plugins>   
+  </component>
+   
+  <component profiles="all">
+    <key>org.exoplatform.commons.api.notification.channel.ChannelManager</key>
+    <type>org.exoplatform.commons.notification.channel.ChannelManagerImpl</type>
+  </component>
+  
+  <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
     <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
   </component>
+
+  <component profiles="all">
+    <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorageImpl</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl</type>
+  </component>
+
+  <component profiles="all">
+    <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage</type>
+  </component>
   
-  <component>
+  <component profiles="all">
+		<key>org.exoplatform.commons.api.notification.service.WebNotificationService</key>
+		<type>org.exoplatform.commons.notification.impl.service.WebNotificationServiceImpl</type>
+	</component>
+  
+  <component profiles="all">
     <key>org.exoplatform.commons.api.settings.ExoFeatureService</key>
     <type>org.exoplatform.settings.impl.ExoFeatureServiceImpl</type>
   </component>
 
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.storage.NotificationService</key>
     <type>org.exoplatform.commons.notification.impl.service.NotificationServiceImpl</type>
   </component>
 
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
     <type>org.exoplatform.commons.notification.impl.setting.UserSettingServiceImpl</type>
   </component>
 
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</key>
     <type>org.exoplatform.commons.notification.impl.setting.PluginSettingServiceImpl</type>
   </component>
 
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.api.notification.command.NotificationCommand</key>
     <type>org.exoplatform.commons.notification.impl.command.NotificationCommandImpl</type>
   </component>
   
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.notification.impl.PluginStatisticService</key>
     <type>org.exoplatform.commons.notification.impl.PluginStatisticService</type>
   </component>
   
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.notification.impl.StatisticsService</key>
     <type>org.exoplatform.commons.notification.impl.StatisticsService</type>
   </component>
   
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.notification.job.mbeans.DailyService</key>
     <type>org.exoplatform.commons.notification.job.mbeans.DailyService</type>
   </component>
   
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.notification.job.mbeans.WeeklyService</key>
     <type>org.exoplatform.commons.notification.job.mbeans.WeeklyService</type>
   </component>
   
-  <component>
+  <component profiles="all">
     <type>org.exoplatform.commons.notification.NotificationContextFactory</type>
   </component>
 
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.template.DigestorService</key>
     <type>org.exoplatform.commons.notification.impl.service.template.DigestorServiceImpl</type>
   </component>
 
-	<component>
+	<component profiles="all">
 		<key>org.exoplatform.commons.api.notification.service.QueueMessage</key>
 		<type>org.exoplatform.commons.notification.impl.service.QueueMessageImpl</type>
 		<init-params>
@@ -79,7 +127,7 @@
 		</init-params>
 	</component>
 
-  <component>
+  <component profiles="all">
     <type>org.exoplatform.commons.notification.NotificationConfiguration</type>
     <init-params>
       <value-param>
@@ -89,7 +137,7 @@
     </init-params>
   </component>
   
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.NotificationCompletionService</key>
     <type>org.exoplatform.commons.api.notification.service.NotificationCompletionService</type>
     <init-params>
@@ -108,18 +156,59 @@
     </init-params>
   </component>
   
-  <component>
+  <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.setting.PluginContainer</key>
     <type>org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer</type>
   </component>
 
-  <component>
+  <component profiles="all">
     <type>org.exoplatform.commons.notification.cache.TemplateCaching</type>
   </component>
   
+  <!-- channel register -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
+    <component-plugin profiles="all">
+      <name>mail.channel</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.commons.notification.channel.MailChannel</type>
+      <description>Register the email channel to manager.</description>
+    </component-plugin>
+    <component-plugin profiles="all">
+      <name>web.channel</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.commons.notification.channel.WebChannel</type>
+      <description>Register the web channel to manager.</description>
+    </component-plugin>
+    <!--  
+    <component-plugin profiles="all">
+      <name>console.channel</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.commons.notification.channel.ConsoleChannel</type>
+      <description>Register the console channel to manager.</description>
+    </component-plugin>
+    -->
+  </external-component-plugins>
+
+  <!-- template channel register -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
+    <component-plugin profiles="all">
+      <name>mail.channel.template</name>
+      <set-method>registerTemplateProvider</set-method>
+      <type>org.exoplatform.commons.notification.channel.template.DigestMailTemplateProvider</type>
+      <init-params>
+        <value-param>
+          <name>channel-id</name>
+          <value>MAIL_CHANNEL</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  
   <external-component-plugins>
      <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>    
-     <component-plugin>
+     <component-plugin profiles="all">
      <name>AddCronJob</name>
      <set-method>addCronJob</set-method>
      <type>org.exoplatform.services.scheduler.CronJob</type>
@@ -131,7 +220,7 @@
           <property name="jobName" value="NotificationDailyJob"/>
           <property name="groupName" value="Notification"/>
           <property name="job" value="org.exoplatform.commons.notification.job.NotificationDailyJob"/>
-          <property name="expression" value="${cronJob.notification.NotificationDailyJob.expression:0 0 23 ? * *}"/><!-- Run at 11:00pm every day -->
+          <property name="expression" value="${exo.notification.NotificationDailyJob.expression:0 0 23 ? * *}"/><!-- Run at 11:00pm every day -->
         </properties-param>
       </init-params>
     </component-plugin>
@@ -139,7 +228,7 @@
 
   <external-component-plugins>
      <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>    
-     <component-plugin>
+     <component-plugin profiles="all">
      <name>AddCronJob</name>
      <set-method>addCronJob</set-method>
      <type>org.exoplatform.services.scheduler.CronJob</type>
@@ -151,15 +240,40 @@
           <property name="jobName" value="NotificationWeeklyJob"/>
           <property name="groupName" value="Notification"/>
           <property name="job" value="org.exoplatform.commons.notification.job.NotificationWeeklyJob"/>
-          <property name="expression" value="${cronJob.notification.NotificationWeeklyJob.expression:0 0 11 ? * SUN}"/><!-- Run at 11:00am every Sunday in every month -->
+          <property name="expression" value="${exo.notification.NotificationWeeklyJob.expression:0 0 11 ? * SUN}"/><!-- Run at 11:00am every Sunday in every month -->
         </properties-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>
 
   <external-component-plugins>
+		<target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
+		<component-plugin profiles="all">
+			<name>AddCronJob</name>
+			<set-method>addCronJob</set-method>
+			<type>org.exoplatform.commons.notification.job.WebCronJob</type>
+			<description>Add clean old web notifications job to the JobSchedulerService</description>
+			<init-params>
+				<properties-param>
+					<name>cronjob.info</name>
+					<description>Configuration for cleaning old web notifications</description>
+					<property name="jobName" value="WebNotificationJob" />
+					<property name="groupName" value="Notification" />
+					<property name="job" value="org.exoplatform.commons.notification.job.WebNotificationJob" />
+					<property name="expression" value="${exo.notification.WebNotificationCleanJob.expression:0 0 23 ? * *}" /><!-- Run at 11:00pm every day -->
+				</properties-param>
+				<properties-param>
+					<name>web.info</name>
+					<description></description>
+					<property name="liveDays" value="${exo.notification.viewall:30}" /><!-- 30 days -->
+				</properties-param>
+			</init-params>
+		</component-plugin>
+	</external-component-plugins>
+  
+  <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</target-component>
-    <component-plugin>
+    <component-plugin profiles="all">
       <name>notification.groups</name>
       <set-method>registerGroupConfig</set-method>
       <type>org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin</type>
@@ -251,7 +365,7 @@
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator</target-component>
-    <component-plugin>
+    <component-plugin profiles="all">
       <name>addPaths</name>
       <set-method>addPlugin</set-method>
       <type>org.exoplatform.services.jcr.ext.hierarchy.impl.AddPathPlugin</type>
@@ -352,7 +466,7 @@
                 </value>
                 <value>               
                   <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>ntfMessageHome</string></field>
+                    <field  name="alias"><string>messageHome</string></field>
                     <field  name="path"><string>/eXoNotification/messageHome</string></field>
                     <field name="nodeType"><string>ntf:messageHome</string></field>
                     <field name="mixinTypes">
@@ -376,6 +490,47 @@
                   </object>
                 </value>
 
+								<value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>messageInfoHome</string></field>
+                    <field  name="path"><string>/eXoNotification/messageInfoHome</string></field>
+                    <field name="nodeType"><string>ntf:messageInfoHome</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">               
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>
+                            <field name="addNode"><string>true</string></field>
+                            <field name="setProperty"><string>true</string></field>
+                            <field name="remove"><string>true</string></field>
+                          </object>  
+                        </value>                        
+                      </collection>
+                    </field>
+                  </object>
+                </value>
+                <value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>webChannel</string></field>
+                    <field  name="path"><string>/eXoNotification/web</string></field>
+                    <field name="nodeType"><string>ntf:channel</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>
+                            <field name="addNode"><string>true</string></field>
+                            <field name="setProperty"><string>true</string></field>
+                            <field name="remove"><string>true</string></field>
+                          </object>
+                        </value>                        
+                      </collection>
+                    </field>
+                  </object>
+                </value>
+
               </collection>
             </field>
           </object>
@@ -386,7 +541,7 @@
 
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
-    <component-plugin>
+    <component-plugin profiles="all">
       <name>notification.plugins</name>
       <set-method>addPlugin</set-method>
       <type>org.exoplatform.commons.notification.impl.DigestDailyPlugin</type>
@@ -402,15 +557,8 @@
             <field name="groupId">
               <string></string>
             </field>
-            <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-                <field name="bundlePath">
-                  <string>locale.notification.template.CommonsNotification</string>
-                </field>
-                <field name="templatePath">
-                  <string>war:/notification/templates/DigestDailyPlugin.gtmpl</string>
-                </field>
-              </object>
+            <field name="bundlePath">
+              <string>locale.notification.template.CommonsNotification</string>
             </field>
           </object>
         </object-param>
@@ -420,7 +568,7 @@
 
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
-    <component-plugin>
+    <component-plugin profiles="all">
       <name>notification.plugins</name>
       <set-method>addPlugin</set-method>
       <type>org.exoplatform.commons.notification.impl.DigestWeeklyPlugin</type>
@@ -436,15 +584,8 @@
             <field name="groupId">
               <string></string>
             </field>
-            <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-                <field name="bundlePath">
-                  <string>locale.notification.template.CommonsNotification</string>
-                </field>
-                <field name="templatePath">
-                  <string>war:/notification/templates/DigestWeeklyPlugin.gtmpl</string>
-                </field>
-              </object>
+            <field name="bundlePath">
+              <string>locale.notification.template.CommonsNotification</string>
             </field>
           </object>
         </object-param>

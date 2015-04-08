@@ -4,12 +4,18 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>4.2.x-SNAPSHOT</version>
+    <version>4.2.x-commons-user-profile-redesign-SNAPSHOT</version>
   </parent>
   <artifactId>commons-api</artifactId>
   <packaging>jar</packaging>
   <name>eXo Commons - API</name>
   <dependencies>
+    <dependency>
+     <groupId>javax.websocket</groupId>
+     <artifactId>javax.websocket-api</artifactId>
+     <version>1.0</version>
+     <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-webui-component</artifactId>

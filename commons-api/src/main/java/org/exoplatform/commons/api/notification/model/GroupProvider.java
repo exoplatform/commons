@@ -30,7 +30,7 @@ public class GroupProvider {
 
   private int                order         = 0;
 
-  private List<PluginInfo> providerDatas = new ArrayList<PluginInfo>();
+  private List<PluginInfo> pluginInfos = new ArrayList<PluginInfo>();
 
   public GroupProvider(String groupId) {
     this.groupId = groupId;
@@ -79,24 +79,24 @@ public class GroupProvider {
   }
 
   /**
-   * @return the providerDatas
+   * @return the pluginInfos
    */
-  public List<PluginInfo> getProviderDatas() {
-    return providerDatas;
+  public List<PluginInfo> getPluginInfos() {
+    return pluginInfos;
   }
 
   /**
-   * @param providerDatas the providerDatas to set
+   * @param pluginInfos the pluginInfos to set
    */
-  public void setProviderDatas(List<PluginInfo> providerDatas) {
-    this.providerDatas = providerDatas;
+  public void setPluginInfos(List<PluginInfo> pluginInfos) {
+    this.pluginInfos = pluginInfos;
   }
 
   /**
-   * @param providerDatas the providerDatas to set
+   * @param pluginInfo the pluginInfo to add
    */
-  public void addProviderData(PluginInfo providerData) {
-    this.providerDatas.add(providerData);
+  public void addPluginInfo(PluginInfo pluginInfo) {
+    this.pluginInfos.add(pluginInfo);
   }
 
 }

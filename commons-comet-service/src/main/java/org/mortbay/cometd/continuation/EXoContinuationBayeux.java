@@ -1,7 +1,7 @@
 package org.mortbay.cometd.continuation;
 
 /*
- * Copyright (C) 2003-2008 eXo Platform SAS.
+ * Copyright (C) 2003-2014 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -10,29 +10,40 @@ package org.mortbay.cometd.continuation;
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import javax.jcr.RepositoryException;
+import javax.servlet.ServletConfig;
+
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.ServletContext;
-
+import org.cometd.bayeux.ChannelId;
+import org.cometd.bayeux.server.BayeuxServer;
+import org.cometd.bayeux.server.SecurityPolicy;
+import org.cometd.bayeux.server.ServerChannel;
+import org.cometd.bayeux.server.ServerMessage;
+import org.cometd.bayeux.server.ServerSession;
+import org.cometd.oort.Oort;
+import org.cometd.oort.Seti;
+import org.cometd.server.AbstractServerTransport;
+import org.cometd.server.BayeuxServerImpl;
+import org.cometd.server.ServerSessionImpl;
+import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.mortbay.cometd.ClientImpl;
-
-import dojox.cometd.Channel;
-import dojox.cometd.Client;
-import dojox.cometd.Message;
-import dojox.cometd.SecurityPolicy;
+import org.picocontainer.Disposable;
 
 /**
  * Created by The eXo Platform SAS.
@@ -40,287 +51,321 @@ import dojox.cometd.SecurityPolicy;
  * @author <a href="mailto:vitaly.parfonov@gmail.com">Vitaly Parfonov</a>
  * @version $Id: $
  */
+public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposable {
 
-public class EXoContinuationBayeux
-   extends ContinuationBayeux
-{
+  /**
+   * Map for userToken.
+   */
+  private static Map<String, String>      userToken         = new HashMap<String, String>();
 
-   /**
-    * Map for userToken.
-    */
-   private static Map<String, String> userToken = new HashMap<String, String>();
+  /**
+   * Stores the eXoID <=> clientID association
+   */
+  private static Map<String, Set<String>> clientIDs         = new ConcurrentHashMap<String, Set<String>>();
 
-   /**
-    * Generate userToken.
-    */
-   transient Random random;
+  /**
+   * Cometd webapp context name
+   */
+  private String                          cometdContextName = "cometd";
 
-   /**
-    * Timeout.
-    */
-   private long timeout;
+  private String                          cloudIDSeparator  = "/";
 
-   /**
-    * Cometd webapp context name
-    */
-   private String cometdContextName = "cometd";
-   
-   /**
-    * Used to send message to all client or a specific client that listen a specific channel
-    */
-   private ClientImpl systemClient;
-   
-   /**
-    * Logger.
-    */
-   private static final Log LOG = ExoLogger.getLogger(EXoContinuationBayeux.class);
+  /**
+   * Used to send message to all client or a specific client that listen a
+   * specific channel
+   */
+  private ServerSessionImpl               systemClient;
 
-   /**
-    * Default constructor.
-    */
-   public EXoContinuationBayeux()
-   {
-      super();
-      this.setSecurityPolicy(new EXoSecurityPolicy());
-   }
+  private Seti                            seti;
 
-   /**
-    * {@inheritDoc}
-    */
-   public ClientImpl newRemoteClient()
-   {
-      EXoContinuationClient client = new EXoContinuationClient(this);
-      return client;
-   }
+  private Oort                            oort;
 
-   /**
-    * {@inheritDoc}
-    */
-   public void setTimeout(long timeout)
-   {
-      this.timeout = timeout;
-   }
+  private RepositoryService               repoService;
 
-   /**
-    * {@inheritDoc}
-    */
-   public long getTimeout()
-   {
-      return timeout;
-   }
+  private ServletConfig servletConfig;
 
-   /**
-    * 
-    * @return context name of cometd webapp
-    */
-   public String getCometdContextName() {
-     return cometdContextName;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   long getRandom(long variation)
-   {
-      long l = random.nextLong() ^ variation;
-      return l < 0 ? -l : l;
-   }
+  /**
+   * Logger.
+   */
+  private static final Log                LOG               = ExoLogger.getLogger(EXoContinuationBayeux.class);
 
-   /**
-    * @param eXoId the client id.
-    * @return token for client
-    */
-   public String getUserToken(String eXoId)
-   {
-      if (userToken.containsKey(eXoId))
-      {
-         return (String) userToken.get(eXoId);
+  /**
+   * Default constructor.
+   */
+  public EXoContinuationBayeux(RepositoryService repoService) {
+    super();
+    this.setSecurityPolicy(new EXoSecurityPolicy(this));
+    this.repoService = repoService;
+    //
+    EXoContinuationCometdServlet servlet = EXoContinuationCometdServlet.getInstance();
+    if (servlet != null) {
+      servlet.setContainer(ExoContainerContext.getCurrentContainer());
+      servlet.reInit();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public ServerSession newRemoteClient() {
+    ServerSessionImpl client = newServerSession();
+    return client;
+  }
+
+  @Deprecated
+  public void setTimeout(long timeout) {
+  }
+
+  public long getTimeout() {
+      return getOption(AbstractServerTransport.TIMEOUT_OPTION, 30000);
+  }
+  
+
+  /**
+   * @return context name of cometd webapp
+   */
+  public String getCometdContextName() {
+    return cometdContextName;
+  }
+
+  public void setCometdContextName(String context) {
+    this.cometdContextName = context;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  long getRandom(long variation) {
+    long l = randomLong() ^ variation;
+    return l < 0 ? -l : l;
+  }
+
+  /**
+   * @param eXoId the client id.
+   * @return token for client
+   */
+  public String getUserToken(String eXoId) {
+    if (userToken.containsKey(eXoId)) {
+      return (String) userToken.get(eXoId);
+    }
+    String token = Long.toString(this.getRandom(System.identityHashCode(this) ^ System.currentTimeMillis()), 36);
+    userToken.put(eXoId, token);
+    return token;
+  }
+
+  /**
+   * @param eXoID the id of client.
+   * @return client with eXoID
+   */
+  @Deprecated
+  public EXoContinuationClient getClientByEXoId(String eXoID) {
+    List<ServerSession> ids = getSessions();
+    for (ServerSession client : ids) {
+      if (client instanceof EXoContinuationClient) {
+        EXoContinuationClient exoClient = (EXoContinuationClient) client;
+        if (exoClient.getEXoId() != null && exoClient.getEXoId().equals(eXoID))
+          return exoClient;
       }
-      String token = Long.toString(this.getRandom(System.identityHashCode(this) ^ System.currentTimeMillis()), 36);
-      userToken.put(eXoId, token);
-      return token;
-   }
+    }
+    return null;
+  }
 
-   /* ------------------------------------------------------------ */
-   /**
-    * {@inheritDoc}
-    */
-   protected void initialize(ServletContext context)
-   {
-      if (super._initialized) return; // avoid initializing twice
-      super.initialize(context);
-      cometdContextName = context.getServletContextName();
-      try
-      {
-         random = SecureRandom.getInstance("SHA1PRNG");
-      }
-      catch (NoSuchAlgorithmException e)
-      {
-         context.log("Could not get secure random for ID generation", e);
-         random = new Random();
-      }
-      random.setSeed(random.nextLong() ^ hashCode() ^ (context.hashCode() << 32) ^ Runtime.getRuntime().freeMemory());
+  public boolean isSubscribed(String eXoID, String clientID) {
+    eXoID = toCloudId(eXoID);
+    return (clientIDs.get(eXoID) != null && clientIDs.get(eXoID).contains(clientID));
+  }
+
+  public boolean isPresent(String eXoID) {
+    eXoID = toCloudId(eXoID);
+    return seti.isPresent(eXoID);
+  }
+
+  /**
+   * @param channel the id of channel.
+   * @param data the message
+   * @param msgId the message id
+   */
+  public void sendBroadcastMessage(String channel, Object data, String msgId) {
+    ServerSessionImpl fromClient = getSystemClient();
+    ServerChannel ch = getChannel(channel);
+    if (ch != null) {
+      ch.publish(fromClient, data);
       if (LOG.isDebugEnabled())
-         LOG.debug("Initialized");
-   }
+        LOG.debug("Send broadcast message " + data.toString() + " on channel " + channel);
+    } else {
+      if (LOG.isDebugEnabled())
+        LOG.debug("Message " + data.toString() + " not send. Channel " + channel + " not exist!");
+    }
+  }
 
-   /**
-    * @param eXoID the id of client.
-    * @return client with eXoID
-    */
-   public EXoContinuationClient getClientByEXoId(String eXoID)
-   {
-      Set<String> ids = getClientIDs();
-      for (String id : ids)
-      {
-         Client client = getClient(id);
-         if (client instanceof EXoContinuationClient)
-         {
-            EXoContinuationClient exoClient = (EXoContinuationClient) client;
-            if (exoClient.getEXoId() != null && exoClient.getEXoId().equals(eXoID))
-               return exoClient;
-         }
-      }
-      return null;
-   }
+  /**
+   * Send data to a individual client. The data passed is sent to the client as
+   * the "data" member of a message with the given channel and id. The message
+   * is not published on the channel and is thus not broadcast to all channel
+   * subscribers. However to the target client, the message appears as if it was
+   * broadcast.
+   * <p>
+   * Typcially this method is only required if a service method sends
+   * response(s) to channels other than the subscribed channel. If the response
+   * is to be sent to the subscribed channel, then the data can simply be
+   * returned from the subscription method.
+   * 
+   * @param eXoID the id of target client
+   * @param channel The id of channel the message is for
+   * @param data The data of the message
+   * @param id The id of the message (or null for a random id).
+   */
+  public void sendMessage(String eXoID, String channel, Object data, String id) {
+    eXoID = toCloudId(eXoID);
+    seti.sendMessage(eXoID, channel, data);
+  }
 
-   /**
-    * @param channel the id of channel.
-    * @param data the message
-    * @param msgId the message id
-    */
-   public void sendBroadcastMessage(String channel, Object data, String msgId)
-   {
-      ClientImpl fromClient = getSystemClient();
-      Channel ch = getChannel(channel);
-      if (ch != null)
-      {
-         ch.publish(fromClient, data, msgId);
-         if (LOG.isDebugEnabled())
-            LOG.debug("Send broadcast message " + data.toString() + " on channel " + channel);
-      }
-      else
-      {
-         if (LOG.isDebugEnabled())
-            LOG.debug("Message " + data.toString() + " not send. Channel " + channel + " not exist!");
-      }
-   }
+  public void setSeti(Seti seti) {
+    this.seti = seti;
+  }
 
-   /**
-    * Send data to a individual client. The data passed is sent to the client as
-    * the "data" member of a message with the given channel and id. The message
-    * is not published on the channel and is thus not broadcast to all channel
-    * subscribers. However to the target client, the message appears as if it was
-    * broadcast.
-    * <p>
-    * Typcially this method is only required if a service method sends
-    * response(s) to channels other than the subscribed channel. If the response
-    * is to be sent to the subscribed channel, then the data can simply be
-    * returned from the subscription method.
-    * 
-    * @param eXoId the id of target client
-    * @param channel The id of channel the message is for
-    * @param data The data of the message
-    * @param id The id of the message (or null for a random id).
-    */
-   public void sendMessage(String eXoId, String channel, Object data, String id)
-   {
-      EXoContinuationClient toClient = getClientByEXoId(eXoId);
-      ClientImpl fromClient = getSystemClient();
-      if (toClient != null)
-      {
-         toClient.deliver(fromClient, channel, data, id);
-         if (LOG.isDebugEnabled())
-            LOG.debug("Send message " + data.toString() + " on channel " + channel + " to client " + eXoId);
-      }
-      else
-      {
-         if (LOG.isDebugEnabled())
-            LOG.debug("Message " + data.toString() + " not send on channel " + channel + " client " + eXoId
-                     + " not exist!");
-      }
-   }
+  public void setOort(Oort oort) {
+    this.oort = oort;
+  }
 
-  private ClientImpl getSystemClient() {
+  public void setCloudIDSeparator(String cloudIDSeparator) {
+    if (cloudIDSeparator != null) {
+      this.cloudIDSeparator = cloudIDSeparator;
+    } else {
+      LOG.warn("Can't set null for cloudIDSeparator");
+    }
+  }
+
+  private ServerSessionImpl getSystemClient() {
     if (systemClient == null) {
-      systemClient = (ClientImpl) newClient("EXoContinuationBayeux");
+      systemClient = newServerSession();
     }
     return systemClient;
   }
-   
-   /* ------------------------------------------------------------ */
-   /**
-    * @author vetal
-    *
-    */
-   public static class EXoSecurityPolicy
-      implements SecurityPolicy
-   {
 
-      /**
-       * 
-       */
-      public EXoSecurityPolicy()
-      {
-         super();
+  private String toCloudId(String eXoID) {
+    if (repoService != null) {
+      try {
+        String currRepo = repoService.getCurrentRepository().getConfiguration().getName();
+        StringBuilder builder = new StringBuilder(currRepo);
+        builder.append(cloudIDSeparator);
+        builder.append(eXoID);
+        return builder.toString();
+      } catch (RepositoryException e) {
+        LOG.error(e.getMessage(), e);
       }
+    }
 
-      /**
-       * {@inheritDoc}
-       */
-      public boolean canHandshake(Message message)
-      {
-         return checkUser(message);
+    return eXoID;
+  }
+  
+  public ServletConfig getServletConfig() {
+    return servletConfig;
+  }
+
+  public void setServletConfig(ServletConfig config) {
+    this.servletConfig = config;
+  }
+
+  @Override
+  public void dispose() {
+    for (ServerSession session : getSessions()) {
+      ((ServerSessionImpl)session).cancelSchedule();
+    }
+
+    try {
+      seti.stop();
+      oort.stop();
+      super.stop();
+    } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
+    }
+  }
+
+  public static class EXoSecurityPolicy implements SecurityPolicy, ServerSession.RemoveListener {
+
+    private EXoContinuationBayeux bayeux;
+
+    public EXoSecurityPolicy(EXoContinuationBayeux bayeux) {
+      this.bayeux = bayeux;
+    }
+
+    /**
+     * @param message the cometd message.
+     * @return true if user valid else false.
+     */
+    private boolean checkUser(ServerMessage message) {
+      String userId = (String) message.get("exoId");
+      String eXoToken = (String) message.get("exoToken");
+      return (userId != null && userToken.containsKey(userId) && userToken.get(userId).equals(eXoToken));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canCreate(BayeuxServer server, ServerSession client, String channelId, ServerMessage message) {
+      //      
+      Boolean b = client != null && !ChannelId.isMeta(channelId);
+      return b;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canHandshake(BayeuxServer server, ServerSession client, ServerMessage message) {
+      if (client.isLocalSession() || bayeux.oort.isOortHandshake(message)) {
+        return true;
+      } else if (checkUser(message)) {
+        client.addListener(this);
+
+        String eXoID = (String) message.get("exoId");
+        eXoID = bayeux.toCloudId(eXoID);
+        Set<String> cIds = clientIDs.get(eXoID);
+        if (cIds == null) {
+          cIds = new ConcurrentHashSet<String>();
+          clientIDs.put(eXoID, cIds);
+        }
+        bayeux.seti.associate(eXoID, client);
+
+        cIds.add(client.getId());
+        return true;
+      } else {
+        return false;
       }
+    }
 
-      /**
-       * {@inheritDoc}
-       */
-      public boolean canCreate(Client client, String channel, Message message)
-      {
-         Boolean b = client != null && !channel.startsWith("/meta/");
-         return b;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canPublish(BayeuxServer server, ServerSession client, ServerChannel channel, ServerMessage message) {
+      return client != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canSubscribe(BayeuxServer server, ServerSession client, ServerChannel channel, ServerMessage message) {
+      return client != null && (checkUser(message) || client.isLocalSession() || bayeux.oort.isOort(client));
+    }
+
+    @Override
+    public void removed(ServerSession session, boolean timeout) {
+      Iterator<Entry<String, Set<String>>> iter = clientIDs.entrySet().iterator();
+
+      while (iter.hasNext()) {
+        Entry<String, Set<String>> client = iter.next();
+        Set<String> ids = client.getValue();
+        ids.remove(session.getId());
+        if (ids.isEmpty()) {
+          iter.remove();
+        }
       }
+    }
+  }
 
-      /**
-       * {@inheritDoc}
-       */
-      public boolean canSubscribe(Client client, String channel, Message message)
-      {
-         Boolean b = client != null && !channel.startsWith("/meta/");
-         if (!checkUser(message))
-         {
-            return false;
-         }
-         // We set the eXoID
-         if (((EXoContinuationClient) client).getEXoId() == null)
-         {
-            ((EXoContinuationClient) client).setEXoId((String) message.get("exoId"));
-         }
-
-         return client != null && !channel.startsWith("/meta/");
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      public boolean canPublish(Client client, String channel, Message message)
-      {
-         Boolean b = client != null && !channel.startsWith("/meta/");
-         return b;
-      }
-
-      /**
-       * @param message the cometd message.
-       * @return true if user valid else false.
-       */
-      private boolean checkUser(Message message)
-      {
-         String userId = (String) message.get("exoId");
-         String eXoToken = (String) message.get("exoToken");
-         return (userId != null && userToken.containsKey(userId) && userToken.get(userId).equals(eXoToken));
-      }
-
-   }
 
 }

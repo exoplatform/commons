@@ -18,16 +18,30 @@ package org.exoplatform.commons.api.notification;
 
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 
 public interface NotificationContext extends Cloneable {
-
+  
+  /**
+   * Determines the writing processing or NOT
+   * @return
+   */
+  boolean isWritingProcess();
+  
+  /**
+   * Sets the writing status to the context
+   * 
+   * @param writingStatus
+   */
+  void setWritingProcess(boolean writingStatus);
+  
   /**
    * Append the argument literal.
    * @param param
@@ -114,7 +128,7 @@ public interface NotificationContext extends Cloneable {
    * @param key
    * @return
    */
-  NotificationCommand makeCommand(NotificationKey key);
+  NotificationCommand makeCommand(PluginKey key);
 
   /**
    * Creates and returns a copy of this object
@@ -137,4 +151,9 @@ public interface NotificationContext extends Cloneable {
    */
   PluginContainer getPluginContainer();
   
+  /**
+   * Gets the channel manager what contains all channel on Notification
+   * @return
+   */
+  ChannelManager getChannelManager();
 }

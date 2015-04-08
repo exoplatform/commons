@@ -45,21 +45,21 @@ public abstract class NotificationJob implements Job {
   public NotificationJob() {}
 
   @Override
-  public void execute(JobExecutionContext context) throws JobExecutionException {
+  public void execute(final JobExecutionContext context) throws JobExecutionException {
     if (isValid() == false) {
       return;
     }
     Callable<Boolean> task = new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
+        boolean created = NotificationSessionManager.createSystemProvider();
         try {
-          NotificationSessionManager.createSystemProvider();
-          processSendNotification();
+          processSendNotification(context);
         } catch (Exception e) {
           LOG.error("Failed to running NotificationJob", e);
           return false;
         } finally {
-          NotificationSessionManager.closeSessionProvider();
+          NotificationSessionManager.closeSessionProvider(created);
         }
         return true;
       }
@@ -81,5 +81,8 @@ public abstract class NotificationJob implements Job {
    * 
    * @throws Exception
    */
-  protected abstract void processSendNotification() throws Exception;
+  protected void processSendNotification() throws Exception {}
+  protected void processSendNotification(JobExecutionContext context) throws Exception {
+    processSendNotification();
+  }
 }

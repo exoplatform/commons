@@ -52,5 +52,4 @@ public class ChildPluginTest extends AbstractNotificationChildPlugin {
   public boolean isValid(NotificationContext ctx) {
     return false;
   }
-
 }

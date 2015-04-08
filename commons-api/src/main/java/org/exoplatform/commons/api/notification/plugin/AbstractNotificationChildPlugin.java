@@ -16,19 +16,24 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
-import java.io.Writer;
+import groovy.text.Template;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.container.xml.ValuesParam;
 
-public abstract class AbstractNotificationChildPlugin extends AbstractNotificationPlugin {
+public abstract class AbstractNotificationChildPlugin extends BaseNotificationPlugin {
   private static final String PARENT_ID_KEY = "parentIds";
+  private static final String TEMPLATE_PATH_KEY = "templatePath";
   private List<String> parentPluginIds = new ArrayList<String>();
+
+  private Template engine;
+  private String templatePath;
 
   public AbstractNotificationChildPlugin(InitParams initParams) {
     super(initParams);
@@ -36,6 +41,10 @@ public abstract class AbstractNotificationChildPlugin extends AbstractNotificati
     ValuesParam params = initParams.getValuesParam(PARENT_ID_KEY);
     if(params != null) {
       parentPluginIds.addAll(params.getValues());
+    }
+    ValueParam paramTemplatePath = initParams.getValueParam(TEMPLATE_PATH_KEY);
+    if(paramTemplatePath != null) {
+      templatePath = paramTemplatePath.getValue();
     }
   }
   
@@ -48,20 +57,43 @@ public abstract class AbstractNotificationChildPlugin extends AbstractNotificati
     return parentPluginIds;
   }
 
+  /**
+   * 
+   * @param message
+   * @return
+   */
+  protected String getLanguage(NotificationInfo message) {
+    return NotificationPluginUtils.getLanguage(message.getTo());
+  }
+  
   @Override
   protected NotificationInfo makeNotification(NotificationContext ctx) {
     throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeNotification.");
   }
 
-  @Override
-  protected MessageInfo makeMessage(NotificationContext ctx) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeMessage.");
+  public abstract String makeContent(NotificationContext ctx);
+
+  /**
+   * Get TemplateEngine of plugin
+   * @return the TemplateEngine
+   */
+  public Template getTemplateEngine() {
+    return engine;
   }
 
-  @Override
-  protected boolean makeDigest(NotificationContext ctx, Writer writer) {
-    throw new UnsupportedOperationException("The children plugin " + getId() + " unsupported method makeDigest.");
+  /**
+   * Set TemplateEngine for plugin
+   * @param engine the TemplateEngine to set
+   */
+  public void setTemplateEngine(Template engine) {
+    this.engine = engine;
   }
-  
-  public abstract String makeContent(NotificationContext ctx);
+
+  public String getTemplatePath() {
+    return templatePath;
+  }
+
+  public void setTemplatePath(String templatePath) {
+    this.templatePath = templatePath;
+  }
 }

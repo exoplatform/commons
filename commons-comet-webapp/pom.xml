@@ -4,9 +4,35 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>4.2.x-SNAPSHOT</version>
+    <version>4.2.x-commons-user-profile-redesign-SNAPSHOT</version>
   </parent>
   <artifactId>commons-comet-webapp</artifactId>
   <packaging>war</packaging>
   <name>eXo Commons - Comet WebApp</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <overlays>
+            <overlay />
+            <overlay>
+              <groupId>org.cometd.javascript</groupId>
+              <artifactId>cometd-javascript-jquery</artifactId>
+            </overlay>
+          </overlays>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.cometd.javascript</groupId>
+      <artifactId>cometd-javascript-jquery</artifactId>
+      <type>war</type>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 </project>

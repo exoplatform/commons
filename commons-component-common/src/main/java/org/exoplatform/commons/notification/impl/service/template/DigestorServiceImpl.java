@@ -26,26 +26,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
 import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
-import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
-import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.DigestDailyPlugin;
 import org.exoplatform.commons.notification.impl.DigestWeeklyPlugin;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.notification.impl.setting.NotificationPluginContainer;
 import org.exoplatform.commons.notification.job.NotificationJob;
-import org.exoplatform.commons.notification.job.mbeans.AbstractNotificationJobManager;
 import org.exoplatform.commons.notification.template.TemplateUtils;
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.utils.TimeConvertUtils;
@@ -57,7 +54,7 @@ public class DigestorServiceImpl implements DigestorService {
   public DigestorServiceImpl() {}
   
   
-  public MessageInfo buildMessage(NotificationContext jobContext, Map<NotificationKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
+  public MessageInfo buildMessage(NotificationContext jobContext, Map<PluginKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
     MessageInfo messageInfo = null;
 
     if (notificationData == null || notificationData.size() == 0) {
@@ -67,22 +64,19 @@ public class DigestorServiceImpl implements DigestorService {
     long startTime = System.currentTimeMillis();
     try {
       messageInfo = new MessageInfo();
-      NotificationPluginContainer containerService = CommonsUtils.getService(NotificationPluginContainer.class);
-      
-      List<String> activeProviders = jobContext.getPluginSettingService().getActivePluginIds();
+      List<String> activePlugins = jobContext.getPluginSettingService().getActivePluginIds(MailChannel.ID);
       NotificationContext nCtx = NotificationContextImpl.cloneInstance();
-      
-      Writer writer = new StringWriter();
 
-      for (String providerId : activeProviders) {
-        List<NotificationInfo> messages = notificationData.get(NotificationKey.key(providerId));
+      Writer writer = new StringWriter();
+      AbstractChannel channel = nCtx.getChannelManager().getChannel(ChannelKey.key(MailChannel.ID));
+      
+      for (String pluginId : activePlugins) {
+        List<NotificationInfo> messages = notificationData.get(PluginKey.key(pluginId));
         if (messages == null || messages.size() == 0){
           continue;
         }
-        
-        AbstractNotificationPlugin plugin = containerService.getPlugin(NotificationKey.key(providerId));
         nCtx.setNotificationInfos(messages);
-        plugin.buildDigest(nCtx, writer);
+        channel.getTemplateBuilder(PluginKey.key(pluginId)).buildDigest(nCtx, writer);
       }
 
       StringBuffer sb = ((StringWriter) writer).getBuffer();
@@ -109,8 +103,7 @@ public class DigestorServiceImpl implements DigestorService {
 
       DigestInfo digestInfo = new DigestInfo(jobContext, userSetting);
 
-      TemplateContext ctx = new TemplateContext(digestInfo.getPluginId(), digestInfo.getLocale().getLanguage());
-
+      TemplateContext ctx = TemplateContext.newChannelInstance(channel.getKey(), digestInfo.getPluginId(), digestInfo.getLocale().getLanguage());
       ctx.put("FIRSTNAME", digestInfo.getFirstName());
       ctx.put("PORTAL_NAME", digestInfo.getPortalName());
       ctx.put("PORTAL_HOME", digestInfo.getPortalHome());
@@ -173,7 +166,7 @@ public class DigestorServiceImpl implements DigestorService {
       
       this.isWeekly = context.value(NotificationJob.JOB_WEEKLY);
       //
-      if(isWeekly && userSetting.getWeeklyProviders().size() > 0) {
+      if(isWeekly && userSetting.getWeeklyPlugins().size() > 0) {
         pluginId = DigestWeeklyPlugin.ID;
         periodType = "Weekly";
         //
@@ -225,7 +218,10 @@ public class DigestorServiceImpl implements DigestorService {
     public String getFooterLink() {
       return footerLink;
     }
-
+    
+    public Boolean isWeekly() {
+      return this.isWeekly;
+    }
   }
   
 }

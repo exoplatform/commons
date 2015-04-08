@@ -69,6 +69,7 @@
     <url-pattern>/cometd/*</url-pattern>
   </servlet-mapping>
   
+  <absolute-ordering/>
 </web-app>
 
 
