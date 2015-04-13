@@ -201,9 +201,13 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         Calendar cal = Calendar.getInstance();
         for (int i = 0; i < users.length; i++) {
           userSetting = UserSetting.getInstance().setUserId(users[i].getUserName());
-          if (!sentUsers.contains(userSetting) && users[i].getCreatedDate()!=null) {
+          if (!sentUsers.contains(userSetting)) {
             //
-            cal.setTime(users[i].getCreatedDate());
+            if (users[i].getCreatedDate() != null) {
+              cal.setTime(users[i].getCreatedDate());
+            } else {
+              cal.setTime(Calendar.getInstance().getTime());
+            }
             usersDefaultSettings.add(userSetting.setLastUpdateTime(cal));
             //
             addMixinUsers.add(users[i]);
