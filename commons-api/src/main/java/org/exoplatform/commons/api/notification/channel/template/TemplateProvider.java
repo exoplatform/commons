@@ -52,7 +52,7 @@ public abstract class TemplateProvider extends BaseComponentPlugin {
     TemplateConfigs templates = this.getClass().getAnnotation(TemplateConfigs.class);
     if (templates != null) {
       for (TemplateConfig config : templates.templates()) {
-        if (config != null && config.pluginId() != "") {
+        if (config != null && !config.pluginId().isEmpty()) {
           templateFilePaths.put(PluginKey.key(config.pluginId()), config.template());
         }
       }
