@@ -72,7 +72,7 @@ public class TestNotificationUtils extends TestCase {
     emails = "test.ABC@demo.COM";
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
     
-    // email contains printed characters, domain part has 2 dots
+    // email contains printed characters, local part has 2 dots
     emails = "test.ABC.def@demo2test.vn";
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
 
