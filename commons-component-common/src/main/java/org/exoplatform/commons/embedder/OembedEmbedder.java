@@ -16,16 +16,16 @@
  */
 package org.exoplatform.commons.embedder;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -125,6 +125,9 @@ public class OembedEmbedder extends AbstractEmbedder {
         mediaObject.setThumbnailWidth(jsonObject.getString(EMBED_THUMBNAIL_WIDTH));
       }
 
+      if ("Flickr".equals(mediaObject.getProvider())) {
+        mediaObject.setHtml(mediaObject.getHtml().replaceAll("<script.+</script>", ""));
+      }
       return mediaObject;
     } catch (JSONException e) {
       LOG.warn("Can't convert JSONObject to ExoMedia object", e);
