@@ -66,12 +66,21 @@ public interface UserSettingService {
   List<UserSetting> getUserSettingWithDeactivate();
   
   /**
+   * Gets all Ids of users registering for email notifications by a given plugin.
+   * 
+   * @param pluginId Id of the plugin.
+   * @return The remote Ids of users.
+   * @deprecated - Replace by {@link #getUserHasSettingPlugin(String, String)}
+   */
+  List<String> getUserSettingByPlugin(String pluginId);
+  
+  /**
    * Gets all Ids of users registering for notifications by a given plugin.
    * 
    * @param pluginId Id of the plugin.
    * @return The remote Ids of users.
    */
-  List<String> getUserSettingByPlugin(String pluginId);
+  List<String> getUserHasSettingPlugin(String channelId, String pluginId);
   
   /**
    * Adds the default settings to a user's node.
@@ -86,4 +95,16 @@ public interface UserSettingService {
    * @param users The list of users.
    */
   void addMixin(User[] users);
+
+  /**
+   * Stores the read time point when user clicks mark all read his/her messages.
+   * This value will be using to decide the read status of message.
+   *  + If less than the read time point, Read = TRUE
+   *  + Else depends on the the status of the message
+   * @param userId The user's id
+   * @param time The time milliseconds 
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  void saveLastReadDate(String userId, Long time);
 }

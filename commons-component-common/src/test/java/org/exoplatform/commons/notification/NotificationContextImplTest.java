@@ -19,7 +19,6 @@ package org.exoplatform.commons.notification;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.job.NotificationJob;
-import org.exoplatform.commons.testing.BaseCommonsTestCase;
 
 /**
  * Created by The eXo Platform SAS
@@ -27,7 +26,7 @@ import org.exoplatform.commons.testing.BaseCommonsTestCase;
  *          exo@exoplatform.com
  * Aug 21, 2014  
  */
-public class NotificationContextImplTest extends BaseCommonsTestCase {
+public class NotificationContextImplTest extends BaseNotificationTestCase {
   
   @Override
   public void setUp() throws Exception {

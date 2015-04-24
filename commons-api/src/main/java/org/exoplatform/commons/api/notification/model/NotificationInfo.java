@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class NotificationInfo {
 
   private String              id;
 
-  private NotificationKey     key;                                  //
+  private PluginKey           key;                                           //
 
   private String              from           = "";
 
@@ -51,10 +52,24 @@ public class NotificationInfo {
 
   private String[]            sendToWeekly;
 
+  private long                lastModifiedDate;
+  
+  private String              title = "";
+  
+  private ChannelKey          channelKey;
+  
+  private Calendar            dateCreated;
+  
+  private boolean             isOnPopOver;
+
+  private boolean             isUpdate = false;
+
   public NotificationInfo() {
     this.id = PREFIX_ID + IdGenerator.generate();
     this.sendToDaily = new String[] { "" };
     this.sendToWeekly = new String[] { "" };
+    this.lastModifiedDate = System.currentTimeMillis();
+    this.setDateCreated(Calendar.getInstance());
   }
   
   public static NotificationInfo instance() {
@@ -86,18 +101,26 @@ public class NotificationInfo {
       ArrayUtils.contains(sendToWeekly, FOR_ALL_USER);
   }
 
+  public boolean isUpdate() {
+    return isUpdate;
+  }
 
-  public NotificationKey getKey() {
+  public NotificationInfo setUpdate(boolean isUpdate) {
+    this.isUpdate = isUpdate;
+    return this;
+  }
+
+  public PluginKey getKey() {
     return this.key;
   }
 
-  public NotificationInfo key(NotificationKey key) {
+  public NotificationInfo key(PluginKey key) {
     this.key = key;
     return this;
   }
   
   public NotificationInfo key(String id) {
-    this.key = NotificationKey.key(id);
+    this.key = PluginKey.key(id);
     return this;
   }
 
@@ -109,7 +132,40 @@ public class NotificationInfo {
     this.from = from;
     return this;
   }
-  
+
+  /**
+   * Gets the title of the notification
+   * @return
+   */
+  public String getTitle() {
+    return title;
+  }
+
+  /**
+   * Sets the title of the notification
+   * @param title
+   */
+  public NotificationInfo setTitle(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * Gets the channel key of the notification
+   * @return
+   */
+  public ChannelKey getChannelKey() {
+    return channelKey;
+  }
+
+  /**
+   * Sets the channel of the notification
+   * @param channelKey
+   */
+  public void setChannelKey(ChannelKey channelKey) {
+    this.channelKey = channelKey;
+  }
+
   /**
    * @return the to
    */
@@ -151,6 +207,9 @@ public class NotificationInfo {
 
   public NotificationInfo to(String sendToUserId) {
     this.sendToUserIds.add(sendToUserId);
+    if (to == null) {
+      to = sendToUserId;
+    }
     return this;
   }
 
@@ -219,6 +278,48 @@ public class NotificationInfo {
       }
 
     }
+    return this;
+  }
+
+  /**
+   * Get the last modified date
+   * @return
+   */
+  public long getLastModifiedDate() {
+    return lastModifiedDate;
+  }
+
+  /**
+   * @param lastModifiedDate
+   */
+  public NotificationInfo setLastModifiedDate(Calendar lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate.getTimeInMillis();
+    return this;
+  }
+
+  /**
+   * @param lastModifiedDate
+   */
+  public NotificationInfo setLastModifiedDate(long lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
+    return this;
+  }
+
+  public Calendar getDateCreated() {
+    return dateCreated;
+  }
+
+  public NotificationInfo setDateCreated(Calendar dateCreated) {
+    this.dateCreated = dateCreated;
+    return this;
+  }
+  
+  public boolean isOnPopOver() {
+    return isOnPopOver;
+  }
+
+  public NotificationInfo setOnPopOver(boolean isOnPopOver) {
+    this.isOnPopOver = isOnPopOver;
     return this;
   }
 
@@ -296,11 +397,6 @@ public class NotificationInfo {
       if (m.getId().equals(this.id)) {
         return true;
       }
-
-      if (m.getTo() != null && m.getTo().length() > 0 && m.getTo().equals(to) 
-            && m.getKey() != null && m.getKey().equals(key)) {
-        return true;
-      }
     }
     return false;
   }
@@ -348,15 +444,32 @@ public class NotificationInfo {
 
   @Override
   public NotificationInfo clone() {
+    return clone(false);
+  }
+
+  public NotificationInfo clone(boolean isNew) {
     NotificationInfo message = instance();
     message.setFrom(from)
            .key(key)
-           .setId(id)
            .setOrder(order)
-           .setOwnerParameter(ownerParameter)
-           .setSendToDaily(sendToDaily)
-           .setSendToWeekly(sendToWeekly)
+           .setOwnerParameter(new HashMap<String, String>(ownerParameter))
+           .setSendToDaily(arrayCopy(sendToDaily))
+           .setSendToWeekly(arrayCopy(sendToWeekly))
            .setTo(to);
+    if(!isNew) {
+      message.setId(id);
+    }
     return message;
+  }
+
+  /**
+   * Copy the array string, 
+   *  if source is empty or null, return array has one empty item. 
+   * @param source
+   * @return
+   */
+  private String[] arrayCopy(String[] source) {
+    return (source != null && source.length > 0) ? 
+              Arrays.asList(source).toArray(new String[source.length]) : new String[] { "" };
   }
 }

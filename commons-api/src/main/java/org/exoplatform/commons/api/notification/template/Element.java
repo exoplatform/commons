@@ -1,6 +1,6 @@
 package org.exoplatform.commons.api.notification.template;
 
-import org.exoplatform.commons.api.notification.plugin.config.TemplateConfig;
+import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 
 public interface Element {
   /**
@@ -41,14 +41,14 @@ public interface Element {
    * uses it in the case when we need to get the groovy template.
    * @return
    */
-  TemplateConfig getTemplateConfig();
+  PluginConfig getPluginConfig();
   
   /**
    * Sets the template configure for the element 
    * @param templateConfig
    * @return
    */
-  Element config(TemplateConfig templateConfig);
+  Element config(PluginConfig templateConfig);
 
   /**
    * Set the value isNewLine for the case digest

@@ -6,9 +6,28 @@
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   
   <component>
+    <key>org.exoplatform.commons.api.notification.channel.ChannelManager</key>
+    <type>org.exoplatform.commons.notification.channel.ChannelManagerImpl</type>
+  </component>
+  
+  <component>
     <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
     <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
   </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage</type>
+  </component>
+
+  <component>
+		<key>org.exoplatform.commons.api.notification.service.WebNotificationService</key>
+		<type>org.exoplatform.commons.notification.impl.service.WebNotificationServiceImpl</type>
+	</component>
 
   <component>
     <key>org.exoplatform.services.mail.MailService</key>
@@ -128,7 +147,40 @@
   <component>
     <type>org.exoplatform.commons.notification.cache.TemplateCaching</type>
   </component>
+  
+  <!-- channel register -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
+    <component-plugin>
+      <name>mail.channel</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.commons.notification.channel.MailChannel</type>
+      <description>Register the email channel to manager.</description>
+    </component-plugin>
+    <component-plugin>
+      <name>web.channel</name>
+      <set-method>register</set-method>
+      <type>org.exoplatform.commons.notification.channel.WebChannel</type>
+      <description>Register the email channel to manager.</description>
+    </component-plugin>
+  </external-component-plugins>
 
+  <!-- template channel register -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
+    <component-plugin>
+      <name>mail.channel.template</name>
+      <set-method>registerTemplateProvider</set-method>
+      <type>org.exoplatform.commons.notification.mock.MockDigestMailTemplateProvider</type>
+      <init-params>
+        <value-param>
+          <name>channel-id</name>
+          <value>MAIL_CHANNEL</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator</target-component>
     <component-plugin>
@@ -232,7 +284,7 @@
                 </value>
                 <value>               
                   <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>ntfMessageHome</string></field>
+                    <field  name="alias"><string>messageHome</string></field>
                     <field  name="path"><string>/eXoNotification/messageHome</string></field>
                     <field name="nodeType"><string>ntf:messageHome</string></field>
                     <field name="mixinTypes">
@@ -253,6 +305,47 @@
                         </value>                        
                       </collection>
                     </field>                       
+                  </object>
+                </value>
+
+								<value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>messageInfoHome</string></field>
+                    <field  name="path"><string>/eXoNotification/messageInfoHome</string></field>
+                    <field name="nodeType"><string>ntf:messageInfoHome</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">               
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>
+                            <field name="addNode"><string>true</string></field>
+                            <field name="setProperty"><string>true</string></field>
+                            <field name="remove"><string>true</string></field>
+                          </object>  
+                        </value>                        
+                      </collection>
+                    </field>
+                  </object>
+                </value>
+                <value>               
+                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
+                    <field  name="alias"><string>webChannel</string></field>
+                    <field  name="path"><string>/eXoNotification/web</string></field>
+                    <field name="nodeType"><string>ntf:channel</string></field>
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">
+                        <value>                            
+                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
+                            <field name="identity"><string>*:/platform/administrators</string></field>
+                            <field name="read"><string>true</string></field>
+                            <field name="addNode"><string>true</string></field>
+                            <field name="setProperty"><string>true</string></field>
+                            <field name="remove"><string>true</string></field>
+                          </object>
+                        </value>                        
+                      </collection>
+                    </field>
                   </object>
                 </value>
 
@@ -279,18 +372,8 @@
             <field name="pluginId">
               <string>DigestDailyPlugin</string>
             </field>
-            <field name="groupId">
-              <string></string>
-            </field>
-            <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-                <field name="bundlePath">
-                  <string>locale.notification.template.Notification</string>
-                </field>
-                <field name="templatePath">
-                  <string>classpath:/groovy/notification/template/provider1.gtmpl</string>
-                </field>
-              </object>
+            <field name="bundlePath">
+              <string>locale.notification.template.Notification</string>
             </field>
           </object>
         </object-param>
@@ -313,18 +396,8 @@
             <field name="pluginId">
               <string>DigestWeeklyPlugin</string>
             </field>
-            <field name="groupId">
-              <string></string>
-            </field>
-            <field name="templateConfig">
-              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-                <field name="bundlePath">
-                  <string>locale.notification.template.Notification</string>
-                </field>
-                <field name="templatePath">
-                  <string>classpath:/groovy/notification/template/provider1.gtmpl</string>
-                </field>
-              </object>
+            <field name="bundlePath">
+              <string>locale.notification.template.Notification</string>
             </field>
           </object>
         </object-param>
@@ -362,16 +435,55 @@
 	          <field name="groupId">
 	            <string>other</string>
 	          </field>
-	          <field name="templateConfig">
-	            <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-	              <field name="bundlePath">
-	                <string>locale.notification.template.Notification</string>
-	              </field>
-	              <field name="templatePath">
-	                <string>classpath:/groovy/notification/template/TestPlugin.gtmpl</string>
-	              </field>
-	            </object>
+            <field name="bundlePath">
+              <string>locale.notification.template.Notification</string>
+            </field>
+	        </object>
+	      </object-param>
+	    </init-params>
+	  </component-plugin>
+	</external-component-plugins>
+	
+	<external-component-plugins>
+	  <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
+	  <component-plugin>
+	    <name>notification.plugins</name>
+	    <set-method>addPlugin</set-method>
+	    <type>org.exoplatform.commons.notification.plugin.PluginPLF41Test</type>
+	    <description>Initial information for plugin for PLF 4.1.</description>
+	    <init-params>
+	      <object-param>
+	        <name>template.PluginTest</name>
+	        <description>The template of PluginTest</description>
+	        <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
+	          <field name="pluginId">
+	            <string>PluginPLF41Test</string>
 	          </field>
+	          <field name="resourceBundleKey">
+	            <string>UINotification.label.PluginPLF41Test</string>
+	          </field>
+	          <field name="order">
+	            <string>2</string>
+	          </field>
+	          <field name="defaultConfig">
+	            <collection type="java.util.ArrayList">
+	              <value><string>Instantly</string></value>
+	              <value><string>weekly</string></value>
+	            </collection>
+	          </field>
+	          <field name="groupId">
+	            <string>other</string>
+	          </field>
+            <field name="templateConfig">
+              <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
+                <field name="bundlePath">
+                  <string>locale.notification.template.Notification</string>
+                </field>
+                <field name="templatePath">
+                  <string>classpath:/groovy/notification/template/TestPLF41Plugin.gtmpl</string>
+                </field>
+              </object>
+            </field>
 	        </object>
 	      </object-param>
 	    </init-params>
@@ -386,6 +498,10 @@
 	    <type>org.exoplatform.commons.notification.plugin.ChildPluginTest</type>
 	    <description>Initial information for default child plugin.</description>
 	    <init-params>
+ 	      <value-param>
+	        <name>templatePath</name>
+	        <value><![CDATA[classpath:/groovy/notification/template/TestChildPlugin.gtmpl]]></value>
+	      </value-param>
 	      <values-param>
 	        <name>parentIds</name>
 	        <description>Add parent of plugin</description>
@@ -398,16 +514,9 @@
 	          <field name="pluginId">
 	            <string>Child_Plugin</string>
 	          </field>
-	          <field name="templateConfig">
-	            <object type="org.exoplatform.commons.api.notification.plugin.config.TemplateConfig">
-	              <field name="bundlePath">
-	                <string>locale.notification.template.Notification</string>
-	              </field>
-	              <field name="templatePath">
-	                <string>classpath:/groovy/notification/template/TestChildPlugin.gtmpl</string>
-	              </field>
-	            </object>
-	          </field>
+            <field name="bundlePath">
+             <string>locale.notification.template.Notification</string>
+            </field>
 	        </object>
 	      </object-param>
 	    </init-params>

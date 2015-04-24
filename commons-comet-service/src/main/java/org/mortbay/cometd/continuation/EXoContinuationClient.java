@@ -1,5 +1,7 @@
 package org.mortbay.cometd.continuation;
 
+import org.cometd.server.ServerSessionImpl;
+
 /*
  * Copyright (C) 2003-2008 eXo Platform SAS.
  *
@@ -10,7 +12,7 @@ package org.mortbay.cometd.continuation;
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
@@ -24,36 +26,32 @@ package org.mortbay.cometd.continuation;
  * @version $Id: $
  */
 
-public class EXoContinuationClient
-   extends ContinuationClient
-{
+@Deprecated
+public class EXoContinuationClient extends ServerSessionImpl {
 
-   /**
+  /**
     * 
     */
-   protected String eXoId;
+  protected String eXoId;
 
-   /**
-    * @param bayeux the bayeux.
-    */
-   protected EXoContinuationClient(EXoContinuationBayeux bayeux)
-   {
-      super(bayeux);
-   }
+  /**
+   * @param bayeux the bayeux.
+   */
+  protected EXoContinuationClient(EXoContinuationBayeux bayeux) {
+    super(bayeux);
+  }
 
-   /**
-    * @return exoId of client.
-    */
-   public String getEXoId()
-   {
-      return eXoId;
-   }
+  /**
+   * @return exoId of client.
+   */
+  public String getEXoId() {
+    return eXoId;
+  }
 
-   /**
-    * @param eXoId the client id.
-    */
-   public void setEXoId(String eXoId)
-   {
-      this.eXoId = eXoId;
-   }
+  /**
+   * @param eXoId the client id.
+   */
+  public void setEXoId(String eXoId) {
+    this.eXoId = eXoId;
+  }
 }

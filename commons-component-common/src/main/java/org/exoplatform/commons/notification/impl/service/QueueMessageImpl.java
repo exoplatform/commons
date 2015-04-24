@@ -235,9 +235,11 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
   private void saveMessageInfo(MessageInfo message) {
     final ReentrantLock lock = this.lock;
-    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+    lock.lock();
+    
+    boolean created =  NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();
     try {
-      lock.lock();
       message.setCreatedTime(System.currentTimeMillis());
       Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
       Node messageInfoNode = messageInfoHome.addNode(String.valueOf(message.getCreatedTime()), NTF_MESSAGE_INFO);
@@ -253,6 +255,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       LOG.warn("Failed to save message.");
       LOG.debug(e.getMessage() + message.toJSON(), e);
     } finally {
+      NotificationSessionManager.closeSessionProvider(created);
       lock.unlock();
     }
   }
@@ -334,8 +337,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
         mailService.sendMessage(message);
         return true;
       } catch (Exception e) {
-        LOG.warn("Failed at sendMessage().");
-        LOG.debug(e.getMessage(), e);
+        LOG.error("Error while sending a message - Cause : " + e.getMessage(), e);
         return false;
       }
     } else {

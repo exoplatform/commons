@@ -34,7 +34,7 @@ import javax.jcr.query.QueryManager;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
@@ -66,7 +66,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   @Override
   public void save(NotificationInfo message) throws Exception {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     final ReentrantLock localLock = lock;
     try {
       localLock.lock();
@@ -88,36 +89,41 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     } catch (Exception e) {
       LOG.error("Failed to save the NotificationMessage", e);
     } finally {
+      NotificationSessionManager.closeSessionProvider(created);
       localLock.unlock();
     }
   }
   
   @Override
-  public Map<NotificationKey, List<NotificationInfo>> getByUser(NotificationContext context, UserSetting setting) {
-    SessionProvider sProvider = NotificationSessionManager.getOrCreateSessionProvider();
-    Map<NotificationKey, List<NotificationInfo>> notificationData = new LinkedHashMap<NotificationKey, List<NotificationInfo>>();
+  public Map<PluginKey, List<NotificationInfo>> getByUser(NotificationContext context, UserSetting setting) {
+    boolean created =  NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();
+    
+    Map<PluginKey, List<NotificationInfo>> notificationData = new LinkedHashMap<PluginKey, List<NotificationInfo>>();
     try {
       boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
       if (isWeekly) {
-        for (String pluginId : setting.getWeeklyProviders()) {
-          putMap(notificationData, NotificationKey.key(pluginId), getWeeklyNotifs(sProvider, pluginId, setting.getUserId()));
+        for (String pluginId : setting.getWeeklyPlugins()) {
+          putMap(notificationData, PluginKey.key(pluginId), getWeeklyNotifs(sProvider, pluginId, setting.getUserId()));
         }
       }
       //
       boolean isDaily = context.value(NotificationJob.JOB_DAILY);
       if (isDaily) {
-        for (String pluginId : setting.getDailyProviders()) {
-          putMap(notificationData, NotificationKey.key(pluginId), getDailyNotifs(sProvider, context, pluginId, setting.getUserId()));
+        for (String pluginId : setting.getDailyPlugins()) {
+          putMap(notificationData, PluginKey.key(pluginId), getDailyNotifs(sProvider, context, pluginId, setting.getUserId()));
         }
       }
     } catch (Exception e) {
       LOG.error("Failed to get the NotificationMessage by user: " + setting.getUserId(), e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
 
     return notificationData;
   }
 
-  private static void putMap(Map<NotificationKey, List<NotificationInfo>> notificationData, NotificationKey key, List<NotificationInfo> values) {
+  private static void putMap(Map<PluginKey, List<NotificationInfo>> notificationData, PluginKey key, List<NotificationInfo> values) {
     if (notificationData.containsKey(key)) {
       List<NotificationInfo> messages = notificationData.get(key);
       for (NotificationInfo notificationMessage : values) {
@@ -245,6 +251,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       .setOwnerParameter(node.getProperty(NTF_OWNER_PARAMETER).getValues())
       .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_DAILY).getValues()))
       .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
+      .setLastModifiedDate(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate())
       .setId(node.getName());
 
     return message;
@@ -310,7 +317,9 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   @Override
   public void removeMessageAfterSent() throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
-    SessionProvider sProvider = NotificationSessionManager.createSystemProvider();
+    boolean created =  NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();
+    
     try {
       Node notificationHome = getNotificationHomeNode(sProvider, workspace);
       Session session = notificationHome.getSession();
@@ -354,6 +363,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       }
     } catch (Exception e) {
       LOG.warn("Failed to remove message after sent email notification", e);
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
     }
   }
 

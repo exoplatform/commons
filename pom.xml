@@ -290,8 +290,62 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- New cometd -->
+      <dependency>
+        <groupId>org.cometd.java</groupId>
+        <artifactId>bayeux-api</artifactId>
+        <version>3.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.cometd.java</groupId>
+        <artifactId>cometd-java-common</artifactId>
+        <version>3.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.cometd.java</groupId>
+        <artifactId>cometd-java-websocket-javax-server</artifactId>
+        <version>3.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.cometd.java</groupId>
+        <artifactId>cometd-java-websocket-common-server</artifactId>
+        <version>3.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.cometd.java</groupId>
+        <artifactId>cometd-java-annotations</artifactId>
+        <version>3.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.cometd.java</groupId>
+        <artifactId>cometd-java-oort</artifactId>
+        <version>3.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.cometd.java</groupId>
+        <artifactId>cometd-java-server</artifactId>
+        <version>3.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.cometd.javascript</groupId>
+        <artifactId>cometd-javascript-jquery</artifactId>
+        <version>3.0.3</version>
+        <type>war</type>
+      </dependency>
     </dependencies>
   </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <pluginManagement>
       <plugins>

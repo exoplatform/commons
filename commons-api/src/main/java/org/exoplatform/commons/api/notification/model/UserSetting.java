@@ -17,19 +17,26 @@
 package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.exoplatform.commons.api.notification.channel.AbstractChannel;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.container.PortalContainer;
 
 /**
  * User setting notification
  */
-
 public class UserSetting {
   private static UserSetting defaultSetting = null;
-  
+
+  public static String EMAIL_CHANNEL = "MAIL_CHANNEL";
+
   public enum FREQUENCY {
     INSTANTLY, DAILY, WEEKLY;
 
@@ -43,22 +50,26 @@ public class UserSetting {
     }
   }
 
-  private boolean     isActive = true;
+  private List<String> channelActives;
 
   private Calendar     lastUpdateTime;
 
   private String       userId;
 
-  private List<String> instantlyProviders;
+  private Map<String, List<String>> channelPlugins;
 
-  private List<String> dailyProviders;
+  private List<String> dailyPlugins;
 
-  private List<String> weeklyProviders;
+  private List<String> weeklyPlugins;
+
+  private long lastReadDate = 0;
 
   public UserSetting() {
-    this.instantlyProviders = new ArrayList<String>();
-    this.dailyProviders = new ArrayList<String>();
-    this.weeklyProviders = new ArrayList<String>();
+    this.channelActives = new ArrayList<String>();
+    this.channelPlugins = new HashMap<String, List<String>>();
+    //
+    this.dailyPlugins = new ArrayList<String>();
+    this.weeklyPlugins = new ArrayList<String>();
     this.lastUpdateTime = Calendar.getInstance();
   }
   
@@ -67,17 +78,58 @@ public class UserSetting {
   }
 
   /**
-   * @return the isActive
+   * Get the last read date
+   * @return
    */
-  public boolean isActive() {
-    return isActive;
+  public long getLastReadDate() {
+    return lastReadDate;
   }
 
   /**
-   * @param isActive the isActive to set
+   * Set last read date
+   * @param lastReadDate
    */
-  public void setActive(boolean isActive) {
-    this.isActive = isActive;
+  public void setLastReadDate(long lastReadDate) {
+    this.lastReadDate = lastReadDate;
+  }
+
+  /**
+   * @return
+   */
+  public List<String> getChannelActives() {
+    return channelActives;
+  }
+  
+  /**
+   * @return
+   */
+  public boolean isChannelActive(String channelId) {
+    return channelActives.contains(channelId);
+  }
+
+  /**
+   * @param channelId
+   */
+  public void setChannelActive(String channelId) {
+    if(!isChannelActive(channelId)) {
+      channelActives.add(channelId);
+    }
+  }
+
+  /**
+   * @param channelId
+   */
+  public void removeChannelActive(String channelId) {
+    if(isChannelActive(channelId)) {
+      channelActives.remove(channelId);
+    }
+  }
+  
+  /**
+   * @param channelActives
+   */
+  public void setChannelActives(List<String> channelActives) {
+    this.channelActives = channelActives;
   }
 
   /**
@@ -111,103 +163,160 @@ public class UserSetting {
   }
 
   /**
-   * @return the instantlyProviders
+   * @return the all channelPlugins
    */
-  public List<String> getInstantlyProviders() {
-    return instantlyProviders;
+  public void setAllChannelPlugins(Map<String, List<String>> channelPlugins) {
+    this.channelPlugins = channelPlugins;
+  }
+  
+  /**
+   * @return the all channelPlugins
+   */
+  public Map<String, List<String>> getAllChannelPlugins() {
+    return channelPlugins;
   }
 
   /**
-   * @param instantlyProviders the instantlyProviders to set
+   * @return the channelPlugins
    */
-  public void setInstantlyProviders(List<String> instantlyProviders) {
-    this.instantlyProviders = instantlyProviders;
+  public List<String> getPlugins(String channelId) {
+    List<String> channelPlugins = this.channelPlugins.get(channelId);
+    if (channelPlugins == null) {
+      channelPlugins = new ArrayList<String>();
+      this.channelPlugins.put(channelId, channelPlugins);
+    }
+    return channelPlugins;
   }
 
   /**
-   * @return the dailyProviders
+   * @param channelId
+   * @param pluginIds
    */
-  public List<String> getDailyProviders() {
-    return dailyProviders;
+  public void setChannelPlugins(String channelId, List<String> pluginIds) {
+    this.channelPlugins.put(channelId, pluginIds);
   }
 
   /**
-   * @param dailyProviders the dailyProviders to set
+   * Add the pluginId by channel
+   * @param channelId
+   * @param pluginId
    */
-  public void setDailyProviders(List<String> dailyProviders) {
-    this.dailyProviders = dailyProviders;
+  public void addChannelPlugin(String channelId, String pluginId) {
+    List<String> plugins = getPlugins(channelId);
+    if (!plugins.contains(pluginId)) {
+      plugins.add(pluginId);
+    }
   }
-
+  
   /**
-   * @return the weeklyProviders
+   * remove the pluginId on channel
+   * @param channelId
+   * @param pluginId
    */
-  public List<String> getWeeklyProviders() {
-    return weeklyProviders;
-  }
-
-  /**
-   * @param weeklyProviders the weeklyProviders to set
-   */
-  public void setWeeklyProviders(List<String> weeklyProviders) {
-    this.weeklyProviders = weeklyProviders;
-  }
-
-
-  /**
-   * @param providerId the provider's id to add
-   */
-  public void addProvider(String providerId, FREQUENCY frequencyType) {
-    if (frequencyType.equals(FREQUENCY.DAILY)) {
-      addProperty(dailyProviders, providerId);
-    } else if (frequencyType.equals(FREQUENCY.WEEKLY)) {
-      addProperty(weeklyProviders, providerId);
-    } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
-      addProperty(instantlyProviders, providerId);
+  public void removeChannelPlugin(String channelId, String pluginId) {
+    List<String> plugins = getPlugins(channelId);
+    if (plugins.contains(pluginId)) {
+      plugins.remove(pluginId);
     }
   }
 
   /**
-   * @param providerId
-   * @return
+   * @return the dailyPlugins
    */
-  public boolean isInInstantly(String providerId) {
-    return (instantlyProviders.contains(providerId)) ? true : false;
+  public List<String> getDailyPlugins() {
+    return dailyPlugins;
   }
 
   /**
-   * @param providerId
-   * @return
+   * @param dailyPlugins the dailyPlugins to set
    */
-  public boolean isInDaily(String providerId) {
-    return (dailyProviders.contains(providerId)) ? true : false;
+  public void setDailyPlugins(List<String> dailyPlugins) {
+    this.dailyPlugins = dailyPlugins;
   }
 
   /**
-   * @param providerId
+   * @return the weeklyPlugins
+   */
+  public List<String> getWeeklyPlugins() {
+    return weeklyPlugins;
+  }
+
+  /**
+   * @param weeklyPlugins the weeklyPlugins to set
+   */
+  public void setWeeklyPlugins(List<String> weeklyPlugins) {
+    this.weeklyPlugins = weeklyPlugins;
+  }
+
+
+  /**
+   * @param pluginId the provider's id to add
+   */
+  public void addPlugin(String pluginId, FREQUENCY frequencyType) {
+    if (frequencyType.equals(FREQUENCY.DAILY)) {
+      addProperty(dailyPlugins, pluginId);
+      weeklyPlugins.remove(pluginId);
+    } else if (frequencyType.equals(FREQUENCY.WEEKLY)) {
+      addProperty(weeklyPlugins, pluginId);
+      dailyPlugins.remove(pluginId);
+    } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
+      addChannelPlugin(EMAIL_CHANNEL, pluginId);
+    }
+  }
+
+  public void removePlugin(String pluginId, FREQUENCY frequencyType) {
+    if (frequencyType.equals(FREQUENCY.DAILY)) {
+      weeklyPlugins.remove(pluginId);
+    } else if (frequencyType.equals(FREQUENCY.WEEKLY)) {
+      dailyPlugins.remove(pluginId);
+    } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
+      removeChannelPlugin(EMAIL_CHANNEL, pluginId);
+    }
+  }
+
+  /**
+   * Checks the user's setting for the channel and the plugin
+   * if it's active, it's instantly including the email channel.
+   * 
+   * @param pluginId
    * @return
    */
-  public boolean isInWeekly(String providerId) {
-    return (weeklyProviders.contains(providerId)) ? true : false;
+  public boolean isActive(String channelId, String pluginId) {
+    return (getPlugins(channelId).contains(pluginId));
+  }
+  
+  /**
+   * @param pluginId
+   * @return
+   */
+  public boolean isInDaily(String pluginId) {
+    return (dailyPlugins.contains(pluginId)) ? true : false;
   }
 
-
-  public boolean isActiveWithoutInstantly(String pluginId) {
-    return isInDaily(pluginId) || isInWeekly(pluginId);
+  /**
+   * @param pluginId
+   * @return
+   */
+  public boolean isInWeekly(String pluginId) {
+    return (weeklyPlugins.contains(pluginId)) ? true : false;
   }
 
-  private void addProperty(List<String> providers, String providerId) {
-    if (providers.contains(providerId) == false) {
-      providers.add(providerId);
+  private void addProperty(List<String> providers, String pluginId) {
+    if (providers.contains(pluginId) == false) {
+      providers.add(pluginId);
     }
   }
   
   @Override
   public UserSetting clone() {
     UserSetting setting = getInstance();
-    setting.setActive(isActive);
-    setting.setDailyProviders(dailyProviders);
-    setting.setWeeklyProviders(weeklyProviders);
-    setting.setInstantlyProviders(instantlyProviders);
+    setting.setChannelActives(new ArrayList<String>(channelActives));
+    setting.setDailyPlugins(new ArrayList<String>(dailyPlugins));
+    setting.setWeeklyPlugins(new ArrayList<String>(weeklyPlugins));
+    //
+    for (Entry<String, List<String>> entry : channelPlugins.entrySet()) {
+      setting.getPlugins(entry.getKey()).addAll(entry.getValue());
+    }
     setting.setUserId(userId);
     return setting;
   }
@@ -242,24 +351,38 @@ public class UserSetting {
   
   public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
-      PluginSettingService settingService = (PluginSettingService) PortalContainer.getInstance()
-                                              .getComponentInstanceOfType(PluginSettingService.class);
-      List<PluginInfo> providerDatas = settingService.getActivePlugins();
-      
-      if (providerDatas == null || providerDatas.size()==0) {
-        return new UserSetting();
-      }
-      
+      PluginSettingService settingService = (PluginSettingService) PortalContainer.getInstance().
+                                              getComponentInstanceOfType(PluginSettingService.class);
+      ChannelManager channelManager = (ChannelManager) PortalContainer.getInstance().
+                                              getComponentInstanceOfType(ChannelManager.class);
       defaultSetting = getInstance();
-      defaultSetting.setActive(true);
-      for (PluginInfo providerData : providerDatas) {
-        for (String defaultConf : providerData.getDefaultConfig()) {
-          defaultSetting.addProvider(providerData.getType(), FREQUENCY.getFrequecy(defaultConf));
+      List<String> activeChannels = getDefaultSettingActiveChannels();
+      if (activeChannels.size() > 0) {
+        defaultSetting.channelActives.addAll(activeChannels);
+      } else {
+        for (AbstractChannel channel : channelManager.getChannels()) {
+          defaultSetting.setChannelActive(channel.getId());
+        }
+      }
+      //
+      List<PluginInfo> plugins = settingService.getAllPlugins();
+      for (PluginInfo pluginInfo : plugins) {
+        for (String defaultConf : pluginInfo.getDefaultConfig()) {
+          for (String channelId : pluginInfo.getAllChannelActive()) {
+            if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY) {
+              defaultSetting.addChannelPlugin(channelId, pluginInfo.getType());
+            } else {
+              defaultSetting.addPlugin(pluginInfo.getType(), FREQUENCY.getFrequecy(defaultConf));
+            }
+          }
         }
       }
     }
-
     return defaultSetting.clone();
   }
 
+  private static List<String> getDefaultSettingActiveChannels() {
+    String activeChannels = System.getProperty("exo.notification.channels", "");
+    return activeChannels.isEmpty() ? new ArrayList<String>() : Arrays.asList(activeChannels.split(","));
+  }
 }

@@ -66,14 +66,15 @@ public class NotificationExecutorImpl implements NotificationExecutor {
       Callable<Boolean> task = new Callable<Boolean>() {
         @Override
         public Boolean call() throws Exception {
+          boolean created = NotificationSessionManager.createSystemProvider();
           try {
             notificationService.process(create(ctx, command));
           } catch (Exception e) {
-            LOG.warn("Process NotificationInfo is failed: " + e.getMessage());
+            LOG.warn("Process NotificationInfo is failed: " + e.getMessage(), e);
             LOG.debug(e.getMessage(), e);
             return false;
           } finally {
-            NotificationSessionManager.closeSessionProvider();
+            NotificationSessionManager.closeSessionProvider(created);
           }
           //
           return true;
@@ -101,13 +102,16 @@ public class NotificationExecutorImpl implements NotificationExecutor {
       commands.clear();
       return result;
     }
-
-    //
-    for(NotificationCommand command : commands) {
-      result &= process(ctx, command);
-      printLog(ctx);
-    }
     
+    boolean created = NotificationSessionManager.createSystemProvider();
+    try {
+      for(NotificationCommand command : commands) {
+        result &= process(ctx, command);
+        printLog(ctx);
+      }
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
+    }
     commands.clear();
 
     return result;

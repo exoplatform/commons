@@ -16,15 +16,7 @@
  */
 package org.exoplatform.services.user;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Session;
-
+import org.apache.commons.lang.math.NumberUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
@@ -36,6 +28,13 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityConstants;
 
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Session;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class UserStateService {
   private static final Log LOG = ExoLogger.getLogger(UserStateService.class.getName());
@@ -45,6 +44,8 @@ public class UserStateService {
   public static String LAST_ACTIVITY_PROP = "exo:lastActivity";
   public static String STATUS_PROP = "exo:status";
   public static String DEFAULT_STATUS = "available";
+  public static final int DEFAULT_OFFLINE_DELAY = 60000;
+  public static final int DEFAULT_PING_FREQUENCY = 15000;
   public int delay = 60*1000;
   public static final int _delay_update_DB = 3*60*1000; //3 mins
   public static int pingCounter = 0;
@@ -53,9 +54,9 @@ public class UserStateService {
    
   public UserStateService(CacheService cacheService) {
     this.cacheService = cacheService;
-    if (System.getProperty("user.status.offline.delay") != null) {
-      delay = Integer.parseInt(System.getProperty("user.status.offline.delay", "1000"));
-    }
+    String strDelay = System.getProperty("user.status.offline.delay");
+    delay = NumberUtils.toInt(strDelay, DEFAULT_OFFLINE_DELAY);
+    delay = (delay > 0) ? delay : DEFAULT_OFFLINE_DELAY;
   }
 
   // Add or update a userState

@@ -22,30 +22,25 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 
 public class NotificationCommandImpl implements NotificationCommand {
 
-  private final AbstractNotificationPlugin plugin;
+  private final BaseNotificationPlugin plugin;
   
-  public NotificationCommandImpl(AbstractNotificationPlugin plugin) {
+  public NotificationCommandImpl(BaseNotificationPlugin plugin) {
     this.plugin = plugin;
   }
   
   @Override
-  public AbstractNotificationPlugin getPlugin() {
+  public BaseNotificationPlugin getPlugin() {
     return this.plugin;
   }
 
   @Override
-  public NotificationKey getNotificationKey() {
+  public PluginKey getNotificationKey() {
     return this.plugin.getKey();
-  }
-
-  @Override
-  public MessageInfo processMessage(NotificationContext ctx) {
-    return plugin.buildMessage(ctx);
   }
 
   @Override
@@ -53,12 +48,6 @@ public class NotificationCommandImpl implements NotificationCommand {
     return plugin.buildNotification(ctx);
   }
 
-  @Override
-  public void processDigest(NotificationContext ctx, Writer writer) {
-    plugin.buildDigest(ctx, writer);
-    
-  }
-  
   @Override
   public String toString() {
     return "NotificationCommand[" + plugin.getKey().getId() + "]";

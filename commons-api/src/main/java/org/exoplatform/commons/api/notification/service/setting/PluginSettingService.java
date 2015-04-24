@@ -58,7 +58,15 @@ public interface PluginSettingService {
    * @param pluginId Id of the saved plugin.
    * @param isActive If "true", the plugin is active. If "false", the plugin is inactive.
    */
-  void savePlugin(String pluginId, boolean isActive);
+  void saveActivePlugin(String channelId, String pluginId, boolean isActive);
+
+  /**
+   * the channelId is email channel.
+   * @param pluginId
+   * @param isActive
+   * @deprecated user isActive(String channelId, String pluginId);
+   */
+  void saveActive(String pluginId, boolean isActive);
 
   /**
    * Checks if a plugin is active or inactive.
@@ -66,20 +74,34 @@ public interface PluginSettingService {
    * @param pluginId Id of the plugin.
    * @return The returned value is "true" if the plugin is active or "false" if the plugin is inactive.
    */
-  boolean isActive(String pluginId);
-  
+  boolean isActive(String channelId, String pluginId);
+
   /**
-   * Gets all Ids of active plugins.
+   * the channelId is email channel.
+   * @param pluginId
+   * @return
+   * @deprecated user isActive(String channelId, String pluginId);
+   */
+  boolean isActive(String pluginId);
+
+  /**
+   * Gets all Ids of active plugins by channel.
    * 
    * @return Ids of the active plugins.
    */
-  List<String> getActivePluginIds();
+  List<String> getActivePluginIds(String channelId);
 
   /**
-   * Gets information of all active plugins.
+   * Gets information of all active plugins by channel.
    * 
    * @return Information of the active plugins.
    */
-  List<PluginInfo> getActivePlugins();
+  List<PluginInfo> getActivePlugins(String channelId);
+  /**
+   * Gets information of all plugins.
+   * 
+   * @return Information of the plugins.
+   */
+  List<PluginInfo> getAllPlugins();
 
 }

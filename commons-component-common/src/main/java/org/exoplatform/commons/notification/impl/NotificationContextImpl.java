@@ -21,12 +21,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.NotificationKey;
-import org.exoplatform.commons.api.notification.plugin.AbstractNotificationPlugin;
+import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.api.notification.service.setting.PluginContainer;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.notification.impl.command.NotificationCommandImpl;
@@ -52,12 +53,16 @@ public final class NotificationContextImpl implements NotificationContext {
   
   private final PluginSettingService settingService;
 
+  private final ChannelManager channelManager;
+  
+  private boolean writingStatus = false;
+
   private NotificationContextImpl() {
-    //TODO apply static method for Notification
     //Create the pluginConttext for operation-per-session such as transaction 
     executor = new NotificationExecutorImpl();
     pluginService = CommonsUtils.getService(NotificationPluginContainer.class);
     settingService = CommonsUtils.getService(PluginSettingService.class);
+    channelManager = CommonsUtils.getService(ChannelManager.class);
   }
 
   public static NotificationContext cloneInstance() {
@@ -72,6 +77,11 @@ public final class NotificationContextImpl implements NotificationContext {
   @Override
   public PluginContainer getPluginContainer() {
     return this.pluginService;
+  }
+
+  @Override
+  public ChannelManager getChannelManager() {
+    return this.channelManager;
   }
   
   public PluginSettingService getPluginSettingService() {
@@ -164,14 +174,24 @@ public final class NotificationContextImpl implements NotificationContext {
   }
   
   @Override
-  public NotificationCommand makeCommand(NotificationKey key) {
-    AbstractNotificationPlugin plugin = this.pluginService.getPlugin(key);
+  public NotificationCommand makeCommand(PluginKey key) {
+    BaseNotificationPlugin plugin = this.pluginService.getPlugin(key);
     return (plugin != null) ? new NotificationCommandImpl(plugin) : null;
   }
 
   @Override
   public NotificationContext clone() {
     return new NotificationContextImpl();
+  }
+  
+  @Override
+  public boolean isWritingProcess() {
+    return this.writingStatus;
+  }
+  
+  @Override
+  public void setWritingProcess(boolean writingStatus) {
+    this.writingStatus = writingStatus;
   }
 
 }

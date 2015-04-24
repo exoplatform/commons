@@ -103,6 +103,9 @@ public class CommonsUtils {
 
     public static boolean isFeatureActive(String featureName) {
       ExoFeatureService featureService = getService(ExoFeatureService.class);
+      if (featureService == null) {
+        return false;
+      }
       return featureService.isActiveFeature(featureName);
     }
 

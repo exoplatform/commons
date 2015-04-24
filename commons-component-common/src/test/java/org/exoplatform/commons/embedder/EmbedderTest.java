@@ -77,6 +77,21 @@ public class EmbedderTest extends BaseCommonsTestCase {
       assertEquals("SlideShare", slideObj.getProvider());
     }
   }
+
+  /**
+   * test flick link
+   */
+  public void testFlickr() {
+    String flickrURL = "https://www.flickr.com/photos/saarblitz/15515790937";
+    // slideshare oembed response
+    embedder = EmbedderFactory.getInstance(flickrURL);
+    ExoMedia slideObj = embedder.getExoMedia();
+    if(slideObj == null) {
+      LOG.warn("Can't connect to flickr");
+    } else {
+      assertEquals("Flickr", slideObj.getProvider());
+    }
+  }
   
   /**
    * test links that dont match any url schemes

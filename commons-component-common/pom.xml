@@ -39,6 +39,10 @@
       <artifactId>commons-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-comet-service</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.organization.api</artifactId>
     </dependency>

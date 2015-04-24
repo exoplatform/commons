@@ -102,6 +102,9 @@ public class ResourceBundleConfigDeployer implements WebAppListener {
       
       Set<ResourceBundleFile> filePaths = new HashSet<ResourceBundleFile>();
       for (String path : list) {
+        if(path == null || path.isEmpty()) {
+          continue;
+        }
         String baseName = getRealPathFile(path);
         for (LocaleConfig config : locales) {
           filePaths.addAll(buildFilePath(path, baseName, config.getLocale()));

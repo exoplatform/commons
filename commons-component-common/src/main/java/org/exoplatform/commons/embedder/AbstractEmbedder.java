@@ -74,7 +74,7 @@ public abstract class AbstractEmbedder implements Embedder {
       bufferedReader.close();
       return new JSONObject(stringBuffer.toString());
     } catch (Exception e) {
-      getExoLogger().warn("Can't get json from url: " + url.getPath(), e);
+      getExoLogger().warn("Can't get json from url: " + url.toString());
       return null;
     }
   }

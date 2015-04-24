@@ -80,8 +80,8 @@ public class TimeConvertUtils {
 
   private static String  RESOURCE_KEY         = "TimeConvert.type.";
 
-  private static String convertXTimeAgo(Date myDate){
-    float delta = (getGreenwichMeanTime().getTimeInMillis() - myDate.getTime());
+  private static String convertXTimeAgo(Date myDate, Date baseDate){
+    float delta = (baseDate.getTime() - myDate.getTime());
     int i = 0;
     for (i = 0; (delta >= timeLength[i]) && i < timeLength.length - 1; i++) {
       delta = delta / timeLength[i];
@@ -109,6 +109,20 @@ public class TimeConvertUtils {
   /**
    * Convert date to display string with format X time ago
    * 
+   * @param myDate The object date input for convert, it must has ZoneTime is server ZoneTime
+   * @param format The date/time format
+   * @param locale The Local of current location(language/country).
+   * @param limit The value set for limit convert x time ago. It must is: TimeConvertUtils.YEAR, MONTH, WEEK, DAY.
+   * @return String
+   */
+  public static String convertXTimeAgoByTimeServer(Date myDate, String format, Locale locale, int limit) {
+    Date baseDate = Calendar.getInstance().getTime();
+    return convertXTimeAgo(myDate, baseDate, format, locale, limit);
+  }
+
+  /**
+   * Convert date to display string with format X time ago
+   * 
    * @param myDate The object date input for convert, it must has ZoneTime is GMT+0
    * @param format The date/time format
    * @param locale The Local of current location(language/country).
@@ -116,7 +130,12 @@ public class TimeConvertUtils {
    * @return String 
    */
   public static String convertXTimeAgo(Date myDate, String format, Locale locale, int limit) {
-    String[] values = convertXTimeAgo(myDate).split(SPACE);
+    Date baseDate = getGreenwichMeanTime().getTime();
+    return convertXTimeAgo(myDate, baseDate, format, locale, limit);
+  }
+  
+  private static String convertXTimeAgo(Date myDate, Date baseDate, String format, Locale locale, int limit) {
+    String[] values = convertXTimeAgo(myDate, baseDate).split(SPACE);
     if (values[0].equals(JUSTNOW))
       return getResourceBundle(RESOURCE_KEY + JUSTNOW, locale);
     int i = ArrayUtils.indexOf(strs, values[1].replace(STR_S, STR_EMPTY));
