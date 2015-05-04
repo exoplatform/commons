@@ -59,7 +59,7 @@ public class TimeConvertUtils {
 
   private static float   DAY_OF_WEEK          = 7.0f;
 
-  private static float   WEEK_OF_MONTH        = 4.35f;
+  private static float   WEEK_OF_MONTH        = 4.33f;
 
   private static float   MONTH_OF_YEAR        = 12;
 
