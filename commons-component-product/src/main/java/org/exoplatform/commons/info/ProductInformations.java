@@ -407,7 +407,7 @@ public class ProductInformations implements Startable {
       Node productVersionDeclarationNodeContent = productVersionDeclarationNode.getNode("jcr:content");
       productVersionDeclarationNodeContent.setProperty("jcr:data", getPreviousProductInformationsAsString() );
       productVersionDeclarationNodeContent.setProperty("jcr:lastModified", new Date().getTime());
-      productVersionDeclarationNode.getSession().save();
+      productVersionDeclarationNode.save();
     } catch (LoginException exception) {
       LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
     } catch (NoSuchWorkspaceException exception) {
