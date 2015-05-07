@@ -4,7 +4,6 @@ package org.exoplatform.webui.form;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.webui.application.WebuiRequestContext;
 
@@ -174,7 +173,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     builder.append("  <span style=\"float:left; width:").append(width).append(";\">");
     //
     builder.append("  <textarea id=\"").append(name).append("\" name=\"").append(name).append("\">")
-          .append(StringEscapeUtils.escapeHtml(value_)).append("</textarea>\n");
+          .append(value_).append("</textarea>\n");
 
     builder.append("<script type=\"text/javascript\">\n");
     //fix issue INTEG-320
