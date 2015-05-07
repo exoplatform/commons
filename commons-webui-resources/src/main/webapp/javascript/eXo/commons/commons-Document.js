@@ -559,6 +559,7 @@ function BreadCrumbs() {
 
 DocumentSelector.prototype.request = function(url){
   var res;
+  url = encodeURI(url);
   jQuery.ajax({
     url: url,
     type: "GET",
@@ -803,7 +804,8 @@ function UIDSUpload() {
 	  url += "action=save" + "&workspaceName=" + selectedItem.workspaceName
 	  + "&driveName=" + selectedItem.driveName + "&currentFolder="
 	  + selectedItem.currentFolder + "&currentPortal=" + eXo.env.portal.portalName + "&language="
-	  + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" + encodeURIComponent(fileName);
+	  + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" + fileName;
+          url = encodeURI(url);
 	  var responseText = ajaxAsyncGetRequest(url, false);
 	};
 
