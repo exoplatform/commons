@@ -687,8 +687,9 @@ function UIDSUpload() {
     uploadHTML += "  <form id='"+uploadId+"' class='UIDSUploadForm' style='margin: 0px; padding: 0px' action='"+uploadAction+"' enctype='multipart/form-data' method='post'>";
     uploadHTML += "    <div class='BrowseDiv'>";
     if(gtnbase.Browser.isIE()) {
-          uploadHTML += "      <a class='BrowseLink' href='javascript:void(0);'> <i class='uiIconUpload uiIconLightGray'></i>";
+          uploadHTML += "      <a class='BrowseLink' href='javascript:void(0);'>";
           uploadHTML += "        <label for='" + idFile + "' style='width: 26px; height: 26px; display:block'>";
+          uploadHTML += "          <i class='uiIconUpload uiIconLightGray'></i>";
           uploadHTML += "          <input style=\"position:absolute; left:-5000px;\" type='file' name='" + idFile + "' size='1' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
           uploadHTML += "        </label>";
           uploadHTML += "      </a>";
