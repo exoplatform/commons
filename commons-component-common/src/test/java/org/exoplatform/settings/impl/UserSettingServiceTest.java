@@ -87,16 +87,19 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     userSettingService.save(createUserSetting("binh", null, null, null));
     UserSetting userSetting = userSettingService.get("binh");
     assertTrue(userSetting.isChannelActive(MailChannel.ID));
+    assertTrue(userSetting.isEnabled());
     
     //disable user "root"
     CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", false, true);
     userSetting = userSettingService.get("binh");
-    assertFalse(userSetting.isChannelActive(MailChannel.ID));
+    assertTrue(userSetting.isChannelActive(MailChannel.ID));
+    assertFalse(userSetting.isEnabled());
     
     //enable user "root" but not change the active channel status
     CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", true, true);
     userSetting = userSettingService.get("binh");
-    assertFalse(userSetting.isChannelActive(MailChannel.ID));
+    assertTrue(userSetting.isChannelActive(MailChannel.ID));
+    assertTrue(userSetting.isEnabled());
 
     CommonsUtils.getService(OrganizationService.class).getUserHandler().removeUser("binh", false);
     assertNull(CommonsUtils.getService(OrganizationService.class).getUserHandler().findUserByName("binh"));
@@ -113,6 +116,11 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     //
     List<String> list = userSettingService.getUserSettingByPlugin("2");
     assertEquals(3, list.size());// root, john, demo
+    
+    //disable user "root"
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("root", false, true);
+    list = userSettingService.getUserSettingByPlugin("2");
+    assertEquals(2, list.size());//john, demo
   }
 
   private void runUpgrade() throws Exception {

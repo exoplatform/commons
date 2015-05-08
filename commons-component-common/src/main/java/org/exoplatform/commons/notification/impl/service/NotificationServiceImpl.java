@@ -96,11 +96,28 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         continue;
       }
       
-      userIds = notification.isSendAll() ? userService.getUserHasSettingPlugin(channel.getId(), pluginId) : notification.getSendToUserIds();
+      userIds = notification.isSendAll() ? userService.getUserHasSettingPlugin(channel.getId(), pluginId) : removeDisabledUsers(notification.getSendToUserIds());
       AbstractNotificationLifecycle lifecycle = channelManager.getLifecycle(ChannelKey.key(channel.getId()));
       lifecycle.process(ctx, userIds.toArray(new String[userIds.size()]));
     }
     
+  }
+  
+  /**
+   * Remove all disabled users from the list to send notification
+   * 
+   * @param users
+   * @return
+   */
+  private List<String> removeDisabledUsers(List<String> users) {
+    List<String> result = new ArrayList<String>();
+    for (String user : users) {
+      UserSetting userSetting = userService.get(user);
+      if (userSetting.isEnabled()) {
+        result.add(user);
+      }
+    }
+    return result;
   }
   
   @Override

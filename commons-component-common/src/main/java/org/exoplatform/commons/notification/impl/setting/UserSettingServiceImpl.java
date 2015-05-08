@@ -101,6 +101,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     saveUserSetting(userId, EXO_WEEKLY, weeklys);
     //
     saveUserSetting(userId, EXO_IS_ACTIVE, channelActives);
+    saveUserSetting(userId, EXO_IS_ENABLED, "" + model.isEnabled());
     //
     if (model.getLastReadDate() > 0) {
       saveLastReadDate(userId, model.getLastReadDate());
@@ -144,11 +145,16 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       model = UserSetting.getDefaultInstance().setUserId(userId);
       addMixin(userId);
     }
-    SettingValue<?> value = settingService.get(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_LAST_READ_DATE);
+    SettingValue<?> value = getSettingValue(userId, EXO_LAST_READ_DATE);
     if (value != null) {
       model.setLastReadDate((Long) value.getValue());
     } else {
       saveLastReadDate(userId, 0l);
+    }
+    //
+    SettingValue<String> isEnabled = getSettingValue(userId, EXO_IS_ENABLED);
+    if (isEnabled != null) {
+      model.setEnabled(Boolean.valueOf(isEnabled.getValue()));
     }
     return model;
   }
@@ -258,6 +264,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     } else {
       queryBuffer.append(" AND ").append(EXO_DAILY).append("<>''");
     }
+    queryBuffer.append(" AND (").append(EXO_IS_ENABLED).append(" IS NULL OR ").append(EXO_IS_ENABLED).append(" = 'true')");
     return queryBuffer;
   }
   
@@ -273,7 +280,9 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       }
       
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
-      strQuery.append(" WHERE (").append(EXO_IS_ACTIVE).append("='')");
+      strQuery.append(" WHERE (").append(EXO_IS_ACTIVE).append("='')")
+              .append(" OR (")
+              .append(EXO_IS_ENABLED).append(" IS NOT NULL AND ").append(EXO_IS_ENABLED).append(" = 'false')");;
       
       QueryManager qm = session.getWorkspace().getQueryManager();
       QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
@@ -338,6 +347,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       strQuery.append(buildSQLLikeProperty(property, plugin));
     }
     //
+    strQuery.append(" ) AND (")
+            .append(EXO_IS_ENABLED).append(" IS NULL OR ").append(EXO_IS_ENABLED).append(" = 'true'");
     strQuery.append(" )");
     QueryManager qm = session.getWorkspace().getQueryManager();
     QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
@@ -429,6 +440,10 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     }
     //
     model.setLastUpdateTime(node.getParent().getProperty(EXO_LAST_MODIFIED_DATE).getDate());
+    //
+    if (node.hasProperty(EXO_IS_ENABLED)) {
+      model.setEnabled(Boolean.valueOf(node.getProperty(EXO_IS_ENABLED).getString()));
+    }
     return model;
   }
   

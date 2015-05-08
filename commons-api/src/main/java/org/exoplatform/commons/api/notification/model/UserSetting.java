@@ -63,6 +63,8 @@ public class UserSetting {
   private List<String> weeklyPlugins;
 
   private long lastReadDate = 0;
+  
+  private boolean isEnabled = true;
 
   public UserSetting() {
     this.channelActives = new ArrayList<String>();
@@ -71,6 +73,7 @@ public class UserSetting {
     this.dailyPlugins = new ArrayList<String>();
     this.weeklyPlugins = new ArrayList<String>();
     this.lastUpdateTime = Calendar.getInstance();
+    this.isEnabled = true;
   }
   
   public static UserSetting getInstance() {
@@ -384,5 +387,13 @@ public class UserSetting {
   private static List<String> getDefaultSettingActiveChannels() {
     String activeChannels = System.getProperty("exo.notification.channels", "");
     return activeChannels.isEmpty() ? new ArrayList<String>() : Arrays.asList(activeChannels.split(","));
+  }
+
+  public boolean isEnabled() {
+    return isEnabled;
+  }
+
+  public void setEnabled(boolean isEnabled) {
+    this.isEnabled = isEnabled;
   }
 }
