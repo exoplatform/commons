@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,9 +38,9 @@ public class YoutubeEmbedder extends AbstractEmbedder {
   
   private static final Pattern YOUTUBE_ID_PATTERN = Pattern
       .compile("(youtu\\.be\\/|youtube\\.com\\/(watch\\?(.*&)?v=|(embed|v)\\/))([^\\?&\"'>]+)");
-  private static final Pattern CONTENT_URL_PATTERN = Pattern
-      .compile(".*youtube\\.com\\/v\\/([^\\&\\?\\/]+)");
-
+  private static final String YOUTUBE_SRC = "http://www.youtube.com/embed/%s?enablejsapi=1";
+  private static final String YOUTUBE_V3_API_KEY_PROPERTY = "youtube.v3.api.key";
+  
   /**
    * constructor
    * @param initParams
@@ -68,6 +69,8 @@ public class YoutubeEmbedder extends AbstractEmbedder {
       }
     }
     
+    String youtubeV3APIKey = System.getProperty(YOUTUBE_V3_API_KEY_PROPERTY);
+    
     //
     try {
       Matcher matcher = YOUTUBE_ID_PATTERN.matcher(url);
@@ -77,40 +80,44 @@ public class YoutubeEmbedder extends AbstractEmbedder {
         youtubeId = matcher.group(5);
       }
        
-      String youTubeFeedURL = String.format(feedsURL, youtubeId);
-      URL reqURL = new URL(youTubeFeedURL);
-      
-      JSONObject jsonObject = getJSONObject(reqURL);
-      
-      JSONObject entryObject = jsonObject.getJSONObject("entry");
-      
       //
-      String html = buildHtmlInfo(entryObject.getJSONObject("content"));
+      String html = buildIFramePlayer(youtubeId);
       
       if (html == null) {
         return null;
       }
       
-      JSONObject mediaGroupObject = entryObject.getJSONObject("media$group");
-      String title = entryObject.getJSONObject("title").getString("$t");
+      ExoMedia mediaObject = new ExoMedia();
+      mediaObject.setHtml(html);
+      
+      if (youtubeV3APIKey == null || youtubeV3APIKey.length() == 0) {
+        mediaObject.setTitle(url);
+        mediaObject.setDescription(url);
+        return mediaObject;
+      }
+      
+      String youTubeFeedURL = String.format(feedsURL, youtubeV3APIKey, youtubeId);
+      URL reqURL = new URL(youTubeFeedURL);
+      JSONObject jsonObject = getJSONObject(reqURL);
+      JSONObject snippetObject = jsonObject.getJSONArray("items").getJSONObject(0).getJSONObject("snippet");
+      
+      String title = snippetObject.getString("title");
       String description = "";
-      if (mediaGroupObject.has("media$description") == true) {
-        description = mediaGroupObject.getJSONObject("media$description").getString("$t");
+      if (snippetObject.has("description") == true) {
+        description = snippetObject.getString("description");
       }
       String thumbnailURL = "";
       String thumbnailWidth = "";
       String thumbnailHeight = "";
-      if (mediaGroupObject.has("media$thumbnail") == true) {
-        JSONObject thumbnail = mediaGroupObject.getJSONArray("media$thumbnail").getJSONObject(0);
-        thumbnailURL = thumbnail.getString("url");
-        thumbnailWidth = thumbnail.getString("width");
-        thumbnailHeight = thumbnail.getString("height");
+      if (snippetObject.has("thumbnails") == true) {
+        JSONObject thumbnails = snippetObject.getJSONObject("thumbnails").getJSONObject("medium");
+        thumbnailURL = thumbnails.getString("url");
+        thumbnailWidth = thumbnails.getString("width");
+        thumbnailHeight = thumbnails.getString("height");
       }
 
       //
-      ExoMedia mediaObject = new ExoMedia();
       mediaObject.setTitle(title);
-      mediaObject.setHtml(html);
       mediaObject.setDescription(description);
       mediaObject.setThumbnailUrl(thumbnailURL);
       mediaObject.setThumbnailHeight(thumbnailHeight);
@@ -129,30 +136,15 @@ public class YoutubeEmbedder extends AbstractEmbedder {
     }
   }
   
-  private String buildHtmlInfo(JSONObject contentObject) throws JSONException {
-    String videoContentURL = contentObject.getString("src");
-
-    //
-    Matcher matcher = CONTENT_URL_PATTERN.matcher(videoContentURL);
-
-    String contentSrc = null;
-    while (matcher.find()) {
-      contentSrc = matcher.group(0);
-    }
-
-    if (contentSrc == null) {
+  private String buildIFramePlayer(String youtubeId) throws JSONException {
+    if (youtubeId == null) {
       LOG.info("Returned content url not match the pattern to get content source.");
       return null;
     }
-
-    String videoPlayerType = contentObject.getString("type");
+    String youTubeSRC = String.format(YOUTUBE_SRC, youtubeId);
     StringBuilder contentURL = new StringBuilder();
-    
-    contentURL.append("<embed width=\"330\" height=\"200\"")
-              .append(" src=\"").append(contentSrc).append("\"")
-              .append(" type=\"").append(videoPlayerType).append("\">")
-              .append("</embed>");
-    
+    contentURL.append("<iframe id=\"player\" type=\"text/html\" width=\"330\" height=\"200\" frameborder=\"0\" allowfullscreen=\"true\"")
+              .append(" src=\"").append(youTubeSRC).append("\">").append("&nbsp;</iframe>");
     return contentURL.toString();
   }
 
