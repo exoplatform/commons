@@ -37,8 +37,7 @@ public class YoutubeEmbedder extends AbstractEmbedder {
   
   private static final Pattern YOUTUBE_ID_PATTERN = Pattern
       .compile("(youtu\\.be\\/|youtube\\.com\\/(watch\\?(.*&)?v=|(embed|v)\\/))([^\\?&\"'>]+)");
-  private static final Pattern CONTENT_URL_PATTERN = Pattern
-      .compile(".*youtube\\.com\\/v\\/([^\\&\\?\\/]+)");
+  private static final String YOUTUBE_SRC = "http://www.youtube.com/embed/%s?enablejsapi=1";
 
   /**
    * constructor
@@ -79,13 +78,10 @@ public class YoutubeEmbedder extends AbstractEmbedder {
        
       String youTubeFeedURL = String.format(feedsURL, youtubeId);
       URL reqURL = new URL(youTubeFeedURL);
-      
       JSONObject jsonObject = getJSONObject(reqURL);
-      
       JSONObject entryObject = jsonObject.getJSONObject("entry");
-      
       //
-      String html = buildHtmlInfo(entryObject.getJSONObject("content"));
+      String html = buildIFramePlayer(youtubeId);
       
       if (html == null) {
         return null;
@@ -129,30 +125,15 @@ public class YoutubeEmbedder extends AbstractEmbedder {
     }
   }
   
-  private String buildHtmlInfo(JSONObject contentObject) throws JSONException {
-    String videoContentURL = contentObject.getString("src");
-
-    //
-    Matcher matcher = CONTENT_URL_PATTERN.matcher(videoContentURL);
-
-    String contentSrc = null;
-    while (matcher.find()) {
-      contentSrc = matcher.group(0);
-    }
-
-    if (contentSrc == null) {
+  private String buildIFramePlayer(String youtubeId) throws JSONException {
+    if (youtubeId == null) {
       LOG.info("Returned content url not match the pattern to get content source.");
       return null;
     }
-
-    String videoPlayerType = contentObject.getString("type");
+    String youTubeSRC = String.format(YOUTUBE_SRC, youtubeId);
     StringBuilder contentURL = new StringBuilder();
-    
-    contentURL.append("<embed width=\"330\" height=\"200\"")
-              .append(" src=\"").append(contentSrc).append("\"")
-              .append(" type=\"").append(videoPlayerType).append("\">")
-              .append("</embed>");
-    
+    contentURL.append("<iframe id='player' type='text/html' width='330' height='200' frameborder='0'")
+              .append(" src=\'").append(youTubeSRC).append("'/>");
     return contentURL.toString();
   }
 
