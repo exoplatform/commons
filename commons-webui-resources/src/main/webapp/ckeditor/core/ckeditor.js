@@ -142,6 +142,14 @@ CKEDITOR.on( 'instanceDestroyed', function() {
 		CKEDITOR.fire( 'reset' );
 });
 
+// Workaround from https://dev.ckeditor.com/ticket/9958
+CKEDITOR.on('instanceReady', function(event) {
+  event.editor.on('dialogShow', function(dialogShowEvent) {
+    if(CKEDITOR.env.ie) {
+      $(dialogShowEvent.data._.element.$).find('a[href*="void(0)"]').removeAttr('href');
+    }
+  });
+});
 // Load the bootstrap script.
 CKEDITOR.loader.load( '_bootstrap' ); // %REMOVE_LINE%
 
