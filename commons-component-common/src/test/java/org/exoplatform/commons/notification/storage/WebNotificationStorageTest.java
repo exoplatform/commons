@@ -10,6 +10,7 @@ import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
+import org.exoplatform.commons.notification.plugin.PluginTest;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class WebNotificationStorageTest extends BaseNotificationTestCase {
@@ -176,6 +177,21 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     assertEquals(12, storage.getNumberOnBadge(userId));
     //
     storage.resetNumberOnBadge(userId);
+    //
+    assertEquals(0, storage.getNumberOnBadge(userId));
+  }
+  
+  public void testSpecialUserNameToGetMessage() throws Exception {
+    //Test with methods: getUnreadNotification, getNewMessage and remove
+    String userId = "don't_blink_polarity";
+    userIds.add(userId);
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeInMillis(cal.getTimeInMillis() - 3 * 86400000l);
+    //
+    storage.save(makeWebNotificationInfo(userId).setDateCreated(cal));
+    assertEquals(PluginTest.ID, storage.getUnreadNotification(PluginTest.ID, "TheActivityId", userId).getKey().getId());
+    assertEquals(1, storage.getNumberOnBadge(userId));
+    assertTrue(storage.remove(userId, 2 * 86400));
     //
     assertEquals(0, storage.getNumberOnBadge(userId));
   }

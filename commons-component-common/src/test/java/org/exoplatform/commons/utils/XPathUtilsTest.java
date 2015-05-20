@@ -18,10 +18,9 @@
 
 package org.exoplatform.commons.utils;
 
-import org.exoplatform.commons.testing.BaseCommonsTestCase;
-import org.exoplatform.commons.utils.XPathUtils;
+import junit.framework.TestCase;
 
-public class XPathUtilsTest extends BaseCommonsTestCase {
+public class XPathUtilsTest extends TestCase {
 
   public void testNull () {
     assertNull(XPathUtils.escapeIllegalXPathName(null));
@@ -45,5 +44,14 @@ public class XPathUtilsTest extends BaseCommonsTestCase {
     assertEquals("Cannot convert path starting with numberic",hexString ,"/_x0031_23456789");
     hexString = XPathUtils.escapeIllegalXPathName("/12345/6789");
     assertEquals("Cannot convert path starting with numberic",hexString ,"/_x0031_2345/_x0036_789");
+  }
+  
+  public void testEscapeIllegalSQLName() {
+    assertNull(XPathUtils.escapeIllegalSQLName(null));
+    assertEquals("", XPathUtils.escapeIllegalSQLName(""));
+    //
+    assertEquals("''", XPathUtils.escapeIllegalSQLName("'"));
+    assertEquals("It''s a foo", XPathUtils.escapeIllegalSQLName("It's a foo"));
+    assertEquals("/a/b''/c", XPathUtils.escapeIllegalSQLName("/a/b'/c"));
   }
 }
