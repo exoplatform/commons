@@ -27,6 +27,7 @@ import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.XPathUtils;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
@@ -221,11 +222,12 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
       Node userNode = getOrCreateChannelNode(sProvider, userId);
+      String userPath = XPathUtils.escapeIllegalSQLName(userNode.getPath());
       Session session = userNode.getSession();
       long delayTime = System.currentTimeMillis() - (seconds * 1000);
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ");
-      strQuery.append(NTF_NOTIF_DATE).append(" WHERE (").append("jcr:path LIKE '").append(userNode.getPath())
-              .append("/%' AND NOT jcr:path LIKE '").append(userNode.getPath()).append("/%/%'").append(") AND (")
+      strQuery.append(NTF_NOTIF_DATE).append(" WHERE (").append("jcr:path LIKE '").append(userPath)
+              .append("/%' AND NOT jcr:path LIKE '").append(userPath).append("/%/%'").append(") AND (")
               .append(NTF_LAST_MODIFIED_DATE).append(" < ").append(delayTime).append(")");
       QueryManager qm = session.getWorkspace().getQueryManager();
       Query query = qm.createQuery(strQuery.toString(), Query.SQL);
@@ -242,7 +244,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     } finally {
       NotificationSessionManager.closeSessionProvider(created);
     }
-    return false;
+    return true;
   }
 
   @Override
@@ -374,10 +376,10 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     boolean created = NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
-      String userNodePath = getOrCreateChannelNode(sProvider, owner).getPath();
+      String userPath = getOrCreateChannelNode(sProvider, owner).getPath();
       long lastReadDate = getLastReadDateOfUser(owner);
       StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(NTF_NOTIF_INFO);
-      strQuery.append(" WHERE jcr:path LIKE '").append(userNodePath).append("/%'")
+      strQuery.append(" WHERE jcr:path LIKE '").append(XPathUtils.escapeIllegalSQLName(userPath)).append("/%'")
               .append(" AND ntf:pluginId = '").append(pluginId).append("'")
               .append(" AND ntf:activityId = '").append(activityId).append("'")
               .append(" AND ntf:lastModifiedDate > ").append(lastReadDate)
@@ -445,9 +447,9 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   
   private NodeIterator getNewMessage(SessionProvider sProvider, String userId, int limit) throws Exception {
     Session session = getSession(sProvider);
-    String path = getOrCreateChannelNode(sProvider, userId).getPath();
+    String userPath = getOrCreateChannelNode(sProvider, userId).getPath();
     StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(MIX_NEW_NODE)
-        .append(" WHERE jcr:path LIKE '").append(path).append("/%' ");
+        .append(" WHERE jcr:path LIKE '").append(XPathUtils.escapeIllegalSQLName(userPath)).append("/%' ");
     QueryManager qm = session.getWorkspace().getQueryManager();
     QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
     if (limit > 0) {
