@@ -29,7 +29,7 @@ public class NotificationUtilsTest extends BaseCommonsTestCase {
 
   public void testRemoveLinkTitle() {
     String title = "<a href=\"http://exoplatform.github.io/\" target=\"_blank\">http://exoplatform.github.io/</a>";
-    String newTitle = "<span class=\"text-bold\">http://exoplatform.github.io/</span>";
+    String newTitle = "<span class=\"user-name text-bold\">http://exoplatform.github.io/</span>";
     assertEquals(newTitle, NotificationUtils.removeLinkTitle(title));
     
     title = "MHM&amp;#39s B-day Party";
