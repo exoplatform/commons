@@ -13,9 +13,11 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
+import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.impl.setting.UserSettingServiceImpl;
 import org.exoplatform.commons.notification.job.NotificationJob;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
@@ -72,6 +74,33 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     // after upgrade
     list = userSettingService.getDigestDefaultSettingForAllUser(0, 0);
     assertTrue(list.size() > size);
+  }
+  
+  public void testDisabledUser() throws Exception {
+    User u = CommonsUtils.getService(OrganizationService.class).getUserHandler().createUserInstance("binh");
+    u.setEmail("email@test");
+    u.setFirstName("first");
+    u.setLastName("last");
+    u.setPassword("pwdADDSomeSaltToBeCompliantWithSomeIS00");
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().createUser(u, true);
+    
+    userSettingService.save(createUserSetting("binh", null, null, null));
+    UserSetting userSetting = userSettingService.get("binh");
+    assertTrue(userSetting.isChannelActive(MailChannel.ID));
+    
+    //disable user "root"
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", false, true);
+    userSetting = userSettingService.get("binh");
+    assertFalse(userSetting.isChannelActive(MailChannel.ID));
+    
+    //enable user "root" but not change the active channel status
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", true, true);
+    userSetting = userSettingService.get("binh");
+    assertFalse(userSetting.isChannelActive(MailChannel.ID));
+
+    CommonsUtils.getService(OrganizationService.class).getUserHandler().removeUser("binh", false);
+    assertNull(CommonsUtils.getService(OrganizationService.class).getUserHandler().findUserByName("binh"));
+
   }
 
   public void test_2_GetUsersSetting() throws Exception {

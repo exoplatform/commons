@@ -25,6 +25,7 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
@@ -169,18 +170,16 @@ public class NotificationPluginUtils {
     }
     return settingService;
   }
-  
-  private static void startRequest(Object service)
-  {
-    if(service instanceof ComponentRequestLifecycle) {
-      ((ComponentRequestLifecycle) service).startRequest(ExoContainerContext.getCurrentContainer());
+
+  private static void startRequest(Object service) {
+    if (service instanceof ComponentRequestLifecycle) {
+      RequestLifeCycle.begin((ComponentRequestLifecycle) service);
     }
   }
 
-  private static void endRequest(Object service) 
-  {
-    if(service instanceof ComponentRequestLifecycle) {
-      ((ComponentRequestLifecycle) service).endRequest(ExoContainerContext.getCurrentContainer());
+  private static void endRequest(Object service) {
+    if (service instanceof ComponentRequestLifecycle) {
+      RequestLifeCycle.end();
     }
   }
   

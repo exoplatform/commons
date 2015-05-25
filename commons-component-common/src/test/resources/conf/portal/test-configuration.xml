@@ -18,6 +18,7 @@
 	</component>
 
     <!-- configuration unused : please check why it's declared here (incorrect behavior) -->
+<!--
 	<component>
 		<key>org.exoplatform.services.cache.CacheService</key>
 		<jmx-name>cache:type=CacheService</jmx-name>
@@ -45,7 +46,7 @@
 			</object-param>
 		</init-params>
 	</component>
-
+-->
 	<component>
 		<key>org.exoplatform.commons.api.settings.SettingService</key>
 		<type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>

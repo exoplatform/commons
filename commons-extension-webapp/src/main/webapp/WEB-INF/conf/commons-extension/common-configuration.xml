@@ -13,4 +13,12 @@
 	<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
   </component>
 
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
+    <component-plugin>
+      <name>commons.user.setting.event.listener</name>
+      <set-method>addListenerPlugin</set-method>
+      <type>org.exoplatform.settings.listeners.impl.CommonsUserSettingEventListenerImpl</type>
+    </component-plugin>
+  </external-component-plugins>
 </configuration>

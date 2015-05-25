@@ -101,7 +101,10 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     saveUserSetting(userId, EXO_WEEKLY, weeklys);
     //
     saveUserSetting(userId, EXO_IS_ACTIVE, channelActives);
-
+    //
+    if (model.getLastReadDate() > 0) {
+      saveLastReadDate(userId, model.getLastReadDate());
+    }
     removeMixin(userId);
   }
 
