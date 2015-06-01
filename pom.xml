@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.exoplatform.commons</groupId>
   <artifactId>commons</artifactId>
-  <version>4.3.x-SNAPSHOT</version>
+  <version>4.3.x-commons-task-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <modules>
@@ -58,7 +58,7 @@
     <!-- GateIn Project Dependencies -->
     <org.gatein.portal.version>4.3.x-PLF-SNAPSHOT</org.gatein.portal.version>
     <!-- Platform Project Dependencies -->
-    <org.exoplatform.platform-ui.version>4.3.x-SNAPSHOT</org.exoplatform.platform-ui.version>
+    <org.exoplatform.platform-ui.version>4.3.x-plfui-task-SNAPSHOT</org.exoplatform.platform-ui.version>
   </properties>
   <dependencyManagement>
     <!-- ### NEVER CHANGE THIS ORDER OF DEPMGT ### -->
