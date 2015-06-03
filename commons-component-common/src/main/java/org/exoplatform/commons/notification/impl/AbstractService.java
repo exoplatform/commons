@@ -59,6 +59,8 @@ public abstract class AbstractService {
   public static final String EXO_INSTANTLY            = "exo:instantly";
   
   public static final String EXO_DAILY                = "exo:daily";
+  
+  public static final String EXO_IS_ENABLED           = "exo:isEnabled";
 
   public static final String EXO_LAST_READ_DATE       = "exo:lastReadDate";
 

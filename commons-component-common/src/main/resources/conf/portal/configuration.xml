@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
-	xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+  xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+  xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
+  <component>
+    <key>org.exoplatform.commons.api.event.EventManager</key>
+    <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
+  </component>
 
-	<component>
-		<key>org.exoplatform.commons.api.event.EventManager</key>
-		<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
-	</component>
+  <component>
+    <key>org.exoplatform.settings.impl.SettingServiceImpl</key>
+    <type>org.exoplatform.settings.impl.SettingServiceImpl</type>
+  </component>
 
-	<component>
-		<key>org.exoplatform.settings.impl.SettingServiceImpl</key>
-		<type>org.exoplatform.settings.impl.SettingServiceImpl</type>
-	</component>
+  <component>
+    <key>org.exoplatform.commons.api.settings.SettingService</key>
+    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
+  </component>
 
-	<component>
-		<key>org.exoplatform.commons.api.settings.SettingService</key>
-		<type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
-	</component>
-	
-	
-    <component>
-	    <key>org.exoplatform.services.user.UserStateService</key>
-     	<type>org.exoplatform.services.user.UserStateService</type>
-    </component>
-    <component>
-    	<key>org.exoplatform.services.user.RESTUserService</key>
-     	<type>org.exoplatform.services.user.RESTUserService</type>
-    </component>
+  <component>
+    <key>org.exoplatform.services.user.UserStateService</key>
+     <type>org.exoplatform.services.user.UserStateService</type>
+  </component>
+  <component>
+    <key>org.exoplatform.services.user.RESTUserService</key>
+     <type>org.exoplatform.services.user.RESTUserService</type>
+  </component>
 
   <component>
     <key>org.exoplatform.commons.embedder.OembedEmbedder</key>
@@ -63,93 +61,86 @@
     </init-params>
   </component>
 
-	<external-component-plugins>
-		<target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
-		<component-plugin>
-			<name>chromattic</name>
-			<set-method>addLifeCycle</set-method>
-			<type>org.exoplatform.commons.chromattic.ChromatticLifeCycle</type>
-			<init-params>
-				<value-param>
-					<name>domain-name</name>
-					<value>setting</value>
-				</value-param>
-				<value-param>
-					<name>workspace-name</name>
-					<value>portal-system</value>
-				</value-param>
-				<values-param>
-					<name>entities</name>
-					<value>org.exoplatform.settings.chromattic.SettingsRoot</value>
-					<value>org.exoplatform.settings.chromattic.ContextEntity</value>
-					<value>org.exoplatform.settings.chromattic.SimpleContextEntity
-					</value>
-					<value>org.exoplatform.settings.chromattic.SubContextEntity</value>
-					<value>org.exoplatform.settings.chromattic.ScopeEntity</value>
-				</values-param>
-			</init-params>
-		</component-plugin>
-	</external-component-plugins>
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
+    <component-plugin>
+      <name>chromattic</name>
+      <set-method>addLifeCycle</set-method>
+      <type>org.exoplatform.commons.chromattic.ChromatticLifeCycle</type>
+      <init-params>
+        <value-param>
+          <name>domain-name</name>
+          <value>setting</value>
+        </value-param>
+        <value-param>
+          <name>workspace-name</name>
+          <value>portal-system</value>
+        </value-param>
+        <values-param>
+          <name>entities</name>
+          <value>org.exoplatform.settings.chromattic.SettingsRoot</value>
+          <value>org.exoplatform.settings.chromattic.ContextEntity</value>
+          <value>org.exoplatform.settings.chromattic.SimpleContextEntity
+          </value>
+          <value>org.exoplatform.settings.chromattic.SubContextEntity</value>
+          <value>org.exoplatform.settings.chromattic.ScopeEntity</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
 
-	<external-component-plugins>
-		<target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
-		<component-plugin>
-			<name>add.nodeType</name>
-			<set-method>addPlugin</set-method>
-			<type>org.exoplatform.services.jcr.impl.AddNodeTypePlugin</type>
-			<init-params>
-				<values-param>
-					<name>autoCreatedInNewRepository</name>
-					<description>Node types configuration file</description>
-					<value>jar:/conf/settings-nodetypes.xml</value>
-					<value>jar:/conf/notification-nodetypes.xml</value>
-				</values-param>
-			</init-params>
-		</component-plugin>
-		<component-plugin>
-			<name>add.namespaces</name>
-			<set-method>addPlugin</set-method>
-			<type>org.exoplatform.services.jcr.impl.AddNamespacesPlugin</type>
-			<init-params>
-				<properties-param>
-					<name>namespaces</name>
-					<property name="stg" value="http://www.gatein.org/jcr/stg/1.0/" />
-					<property name="ntf" value="http://www.gatein.org/jcr/ntf/1.0/" />
-				</properties-param>
-			</init-params>
-		</component-plugin>
-	</external-component-plugins>
-	
-	<external-component-plugins>
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
+    <component-plugin>
+      <name>add.nodeType</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.jcr.impl.AddNodeTypePlugin</type>
+      <init-params>
+        <values-param>
+          <name>autoCreatedInNewRepository</name>
+          <description>Node types configuration file</description>
+          <value>jar:/conf/settings-nodetypes.xml</value>
+          <value>jar:/conf/notification-nodetypes.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>add.namespaces</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.jcr.impl.AddNamespacesPlugin</type>
+      <init-params>
+        <properties-param>
+          <name>namespaces</name>
+          <property name="stg" value="http://www.gatein.org/jcr/stg/1.0/" />
+          <property name="ntf" value="http://www.gatein.org/jcr/ntf/1.0/" />
+        </properties-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
     <target-component>org.exoplatform.services.cache.CacheService</target-component>
-    <!-- SettingService configuration -->
     <component-plugin>
       <name>addExoCacheConfig</name>
       <set-method>addExoCacheConfig</set-method>
       <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
-      <description>add Exo Cache Config</description>
+      <description>The Exo Cache configuration for the setting service</description>
       <init-params>
+        <!-- SettingService -->
         <object-param>
           <name>cache.config.SettingService</name>
-          <description>The JBoss Cache configuration for the setting service</description>
+          <description>The Exo Cache configuration for the setting service</description>
           <object type="org.exoplatform.services.cache.ExoCacheConfig">
-            <field name="name">
-              <string>SettingService</string>
-            </field>
-            <field name="maxSize">
-              <int>${cache.exo.commons.SettingService.Capacity:2000}</int>
-            </field>
-            <field name="liveTime">
-              <long>${cache.exo.commons.SettingService.TimeToLive:30000}</long>
-            </field>
-            <field name="implementation">
-              <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
-            </field>
+            <field name="name"><string>SettingService</string></field>
+            <field name="maxSize"><int>${cache.exo.commons.SettingService.Capacity:2000}</int></field>
+            <field name="liveTime"><long>${cache.exo.commons.SettingService.TimeToLive:30000}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
           </object>
         </object-param>
+        <!-- WebNotificationCache -->
         <object-param>
           <name>WebNotificationCache</name>
-          <description>The JBoss Cache configuration for the Web Notification Cache</description>
+          <description>The Exo Cache configuration for the Web Notification Cache</description>
           <object type="org.exoplatform.services.cache.ExoCacheConfig">
             <field name="name"><string>WebNotificationCache</string></field>
             <field name="maxSize"><int>${cache.exo.commons.WebNotificationCache.Capacity:5000}</int></field>
@@ -157,56 +148,10 @@
             <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
           </object>
         </object-param>
-      </init-params>
-    </component-plugin>
-    
-    <component-plugin>
-      <name>addExoCacheConfig</name>
-      <set-method>addExoCacheConfig</set-method>
-      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
-      <description>add Exo Cache Config</description>
-      <init-params>
-        <object-param>
-          <name>WebNotificationCache</name>
-          <description>The JBoss Cache configuration for the Web Notification Cache</description>
-          <object type="org.exoplatform.services.cache.ExoCacheConfig">
-            <field name="name"><string>WebNotificationCache</string></field>
-            <field name="maxSize"><int>${cache.exo.commons.WebNotificationCache.Capacity:5000}</int></field>
-            <field name="liveTime"><long>${cache.exo.commons.WebNotificationCache.TimeToLive:-1}</long></field>
-            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-
-    <component-plugin>
-      <name>addExoCacheConfig</name>
-      <set-method>addExoCacheConfig</set-method>
-      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
-      <description>add Exo Cache Config</description>
-      <init-params>
-        <object-param>
-          <name>WebNotificationsCache</name>
-          <description>The JBoss Cache configuration for the Web Notification List Cache</description>
-          <object type="org.exoplatform.services.cache.ExoCacheConfig">
-            <field name="name"><string>WebNotificationsCache</string></field>
-            <field name="maxSize"><int>${cache.exo.commons.WebNotificationsCache.Capacity:500}</int></field>
-            <field name="liveTime"><long>${cache.exo.commons.WebNotificationsCache.TimeToLive:-1}</long></field>
-            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-    
-     <component-plugin>
-      <name>addExoCacheConfig</name>
-      <set-method>addExoCacheConfig</set-method>
-      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
-      <description>add Exo Cache Config</description>
-      <init-params>
+        <!-- WebNotificationCountCache -->
         <object-param>
           <name>WebNotificationCountCache</name>
-          <description>The JBoss Cache configuration for the Web Notification Count Cache</description>
+          <description>The Exo Cache configuration for the Web Notification Count Cache</description>
           <object type="org.exoplatform.services.cache.ExoCacheConfig">
             <field name="name"><string>WebNotificationCountCache</string></field>
             <field name="maxSize"><int>${cache.exo.commons.WebNotificationCountCache.Capacity:500}</int></field>
@@ -214,144 +159,98 @@
             <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
           </object>
         </object-param>
+        <!-- UserStateService -->
+        <object-param>
+          <name>org.exoplatform.services.user.UserStateService</name>
+          <description>The Exo Cache configuration for the User State Service Cache</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>UserStateService</string></field>
+            <field name="maxSize"><int>${cache.exo.commons.UserStateService.MaxNodes:5000}</int></field>
+            <field name="liveTime"><long>${cache.exo.commons.UserStateService.ExpirationTimeout:600000}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
+        <!-- SettingService -->
+        <object-param>
+          <name>org.exoplatform.services.user.UserService</name>
+          <description>The Exo Cache configuration for the navigation service</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>UserService</string></field>
+            <field name="maxSize"><int>${cache.exo.commons.UserService.MaxNodes:5000}</int></field>
+            <field name="liveTime"><long>${cache.exo.commons.UserService.ExpirationTimeout:600000}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
       </init-params>
     </component-plugin>
-    
+
     <component-plugin profiles="cluster">
       <name>addExoCacheConfig</name>
       <set-method>addExoCacheConfig</set-method>
       <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
       <description>The JBoss Cache configuration for the setting service</description>
       <init-params>
+        <!-- SettingService -->
         <object-param>
           <name>cache.config.SettingService</name>
           <description>The JBoss Cache configuration for the navigation service</description>
-          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
-            <field name="name">
-              <string>SettingService</string>
-            </field>
-            <field name="expirationTimeout">
-              <long>${cache.exo.commons.SettingService.ExpirationTimeout:600000}</long>
-            </field>
-            <field name="maxNodes">
-              <int>${cache.exo.commons.SettingService.MaxNodes:5000}</int>
-            </field>
-            <field name="distributed">
-              <boolean>true</boolean>
-            </field>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>SettingService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${cache.exo.commons.SettingService.MaxNodes:5000}</int></field>
+            <field name="lifespan"><long>-1</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
           </object>
         </object-param>
+        <!-- WebNotificationCache -->
         <object-param>
-          <name>WebNotificationCache</name>
+          <name>cache.config.WebNotificationCache</name>
           <description>The JBoss Cache configuration for the Web Notification Cache</description>
-          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
-            <field name="name">
-              <string>WebNotificationCache</string>
-            </field>
-            <field name="expirationTimeout">
-              <long>${cache.exo.commons.WebNotificationCache.ExpirationTimeout:-1}</long>
-            </field>
-            <field name="maxNodes">
-              <int>${cache.exo.commons.WebNotificationCache.MaxNodes:5000}</int>
-            </field>
-            <field name="distributed">
-              <boolean>true</boolean>
-            </field>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>WebNotificationCache</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="lifespan"><long>${cache.exo.commons.WebNotificationCache.ExpirationTimeout:-1}</long></field>
+            <field name="maxEntries"><int>${cache.exo.commons.WebNotificationCache.MaxNodes:5000}</int></field>
+            <field name="replicated"><boolean>true</boolean></field>
           </object>
         </object-param>
+        <!-- WebNotificationCountCache -->
         <object-param>
-          <name>WebNotificationsCache</name>
+          <name>cache.config.WebNotificationCountCache</name>
           <description>The JBoss Cache configuration for the Web Notification List Cache</description>
-          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
-            <field name="name">
-              <string>WebNotificationsCache</string>
-            </field>
-            <field name="expirationTimeout">
-              <long>${cache.exo.commons.WebNotificationsCache.ExpirationTimeout:-1}</long>
-            </field>
-            <field name="maxNodes">
-              <int>${cache.exo.commons.WebNotificationsCache.MaxNodes:500}</int>
-            </field>
-            <field name="distributed">
-              <boolean>true</boolean>
-            </field>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>WebNotificationListCache</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="lifespan"><long>${cache.exo.commons.WebNotificationCountCache.ExpirationTimeout:-1}</long></field>
+            <field name="maxEntries"><int>${cache.exo.commons.WebNotificationCountCache.MaxNodes:500}</int></field>
+            <field name="replicated"><boolean>true</boolean></field>
           </object>
         </object-param>
-        <object-param>
-          <name>WebNotificationCountCache</name>
-          <description>The JBoss Cache configuration for the Web Notification List Cache</description>
-          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
-            <field name="name">
-              <string>WebNotificationListCache</string>
-            </field>
-            <field name="expirationTimeout">
-              <long>${cache.exo.commons.WebNotificationCountCache.ExpirationTimeout:-1}</long>
-            </field>
-            <field name="maxNodes">
-              <int>${cache.exo.commons.WebNotificationCountCache.MaxNodes:500}</int>
-            </field>
-            <field name="distributed">
-              <boolean>true</boolean>
-            </field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-    
-    
-    <component-plugin profiles="cluster">
-      <name>addExoCacheConfig</name>
-      <set-method>addExoCacheConfig</set-method>
-      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
-      <description>The JBoss Cache configuration for the setting service</description>
-      <init-params>
+        <!-- UserService -->
         <object-param>
           <name>org.exoplatform.services.user.UserService</name>
           <description>The JBoss Cache configuration for the navigation service</description>
-          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
-            <field name="name">
-              <string>UserService</string>
-            </field>
-            <field name="expirationTimeout">
-              <long>${cache.exo.commons.UserService.ExpirationTimeout:600000}</long>
-            </field>
-            <field name="maxNodes">
-              <int>${cache.exo.commons.UserService.MaxNodes:5000}</int>
-            </field>
-            <field name="distributed">
-              <boolean>true</boolean>
-            </field>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>UserService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${cache.exo.commons.UserService.MaxNodes:5000}</int></field>
+            <field name="lifespan"><long>${cache.exo.commons.UserService.ExpirationTimeout:600000}</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
           </object>
         </object-param>
-      </init-params>
-    </component-plugin>
-    
-    <component-plugin profiles="cluster">
-      <name>addExoCacheConfig</name>
-      <set-method>addExoCacheConfig</set-method>
-      <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
-      <description>The JBoss Cache configuration for the setting service</description>
-      <init-params>
+        <!-- UserStateService -->
         <object-param>
           <name>org.exoplatform.services.user.UserStateService</name>
           <description>The JBoss Cache configuration for the navigation service</description>
-          <object type="org.exoplatform.services.cache.impl.jboss.ea.EAExoCacheConfig">
-            <field name="name">
-              <string>UserStateService</string>
-            </field>
-            <field name="expirationTimeout">
-              <long>${cache.exo.commons.UserStateService.ExpirationTimeout:600000}</long>
-            </field>
-            <field name="maxNodes">
-              <int>${cache.exo.commons.UserStateService.MaxNodes:5000}</int>
-            </field>
-            <field name="distributed">
-              <boolean>true</boolean>
-            </field>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>UserStateService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${cache.exo.commons.UserStateService.MaxNodes:5000}</int></field>
+            <field name="lifespan"><long>${cache.exo.commons.UserStateService.ExpirationTimeout:600000}</long></field>
+            <field name="replicated"><boolean>true</boolean></field>
           </object>
         </object-param>
       </init-params>
     </component-plugin>
-    
   </external-component-plugins>
 </configuration>

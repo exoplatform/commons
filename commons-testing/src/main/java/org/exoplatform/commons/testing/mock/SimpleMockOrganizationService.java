@@ -34,6 +34,7 @@ import org.exoplatform.services.organization.UserEventListener;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.organization.UserProfileHandler;
 import org.exoplatform.services.organization.idm.UserImpl;
+import org.exoplatform.services.organization.*;
 
 /**
  * A partial implementation of OrganizationService for use in tests of classes
@@ -229,6 +230,12 @@ public class SimpleMockOrganizationService implements OrganizationService {
     public void removeGroupEventListener(GroupEventListener listener) {
       
     }
+    @Override
+    public Collection<Group> resolveGroupByMembership(String userName, String membershipType) throws Exception {
+        return null;
+    }
+
+
   }
 
   class MockMembershipHandler implements MembershipHandler {
@@ -381,6 +388,11 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return new ObjectPageList(Arrays.asList(userSet.toArray()), 10);
     }
     @SuppressWarnings("unchecked")
+    public ListAccess<User> findUsersByGroupId(String groupId, UserStatus status) throws Exception {
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
     public PageList<User> findUsers(Query query) throws Exception {
       Iterator<SimpleMembership> mbIt = storage.iterator();
       HashSet<User> userSet = new HashSet<User>();
@@ -404,7 +416,9 @@ public class SimpleMockOrganizationService implements OrganizationService {
       }
       return null;
     }
-
+    public User findUserByName(String userName, UserStatus status) throws Exception {
+        return null;
+    }
     public User createUserInstance(String username) {
       return new SimpleUser(username);
     }
@@ -436,6 +450,9 @@ public class SimpleMockOrganizationService implements OrganizationService {
       //
       return new ListAccessImpl<User>(User.class, new ArrayList<User>(users));
     }
+    public ListAccess<User> findAllUsers(UserStatus status) throws Exception {
+        return null;
+    }
 
     public ListAccess<User> findUsersByGroupId(String groupId) throws Exception {
       Iterator<SimpleMembership> mbIt = storage.iterator();
@@ -464,7 +481,10 @@ public class SimpleMockOrganizationService implements OrganizationService {
       //
       return new ListAccessImpl<User>(User.class, new ArrayList<User>(users));
     }
-
+    @Override
+    public ListAccess<User> findUsersByQuery(Query query, UserStatus status) throws Exception {
+        return null;
+    }
     @Override
     public void removeUserEventListener(UserEventListener listener) {
       
@@ -472,6 +492,11 @@ public class SimpleMockOrganizationService implements OrganizationService {
     
     private User user(String id) {
       return new SimpleUser(id);
+    }
+    
+    public User setEnabled(String userName, boolean enabled, boolean broadcast) throws Exception,
+            UnsupportedOperationException {
+        return null;
     }
 
   }
@@ -563,6 +588,10 @@ public class SimpleMockOrganizationService implements OrganizationService {
         return super.getDisplayName();
       }
       return name;
+    }
+    public boolean isEnabled() {
+
+        return true;
     }
   }
 

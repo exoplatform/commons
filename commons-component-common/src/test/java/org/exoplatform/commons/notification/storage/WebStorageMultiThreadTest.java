@@ -8,7 +8,9 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.jcr.Node;
 
+import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
+import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.util.IdGenerator;
@@ -74,15 +76,21 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
   }
 
   private void create(int number, boolean isSameFirst) throws Exception {
+    UserSettingService userSettingService = getService(UserSettingService.class);
+    UserSetting userSetting;
     for (int i = 0; i < number; i++) {
       String first = (isSameFirst) ? "" : String.valueOf(new Random().nextInt(1000));
-      String userId = first + "user" + i + "_"+ String.valueOf(IdGenerator.generate()).hashCode();
+      String userId = first + "user" + i + String.valueOf(IdGenerator.generate()).hashCode();
       User user = new UserImpl(userId);
       organizationService.getUserHandler().createUser(user, true);
       //
+      userSetting = UserSetting.getDefaultInstance().setUserId(userId);
+      userSetting.setLastReadDate(System.currentTimeMillis());
+      userSettingService.save(userSetting);
+      //
       userIds.add(userId);
     }
-    LOG.info("Done to create " + number + " users");
+    LOG.info("\nDone to create " + number + " users");
   }
   
   public void testWebDatastorage() throws Exception {

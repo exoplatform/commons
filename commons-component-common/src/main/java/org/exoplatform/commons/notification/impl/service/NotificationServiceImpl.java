@@ -40,6 +40,7 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
+import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -95,11 +96,28 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         continue;
       }
       
-      userIds = notification.isSendAll() ? userService.getUserHasSettingPlugin(channel.getId(), pluginId) : notification.getSendToUserIds();
+      userIds = notification.isSendAll() ? userService.getUserHasSettingPlugin(channel.getId(), pluginId) : removeDisabledUsers(notification.getSendToUserIds());
       AbstractNotificationLifecycle lifecycle = channelManager.getLifecycle(ChannelKey.key(channel.getId()));
       lifecycle.process(ctx, userIds.toArray(new String[userIds.size()]));
     }
     
+  }
+  
+  /**
+   * Remove all disabled users from the list to send notification
+   * 
+   * @param users
+   * @return
+   */
+  private List<String> removeDisabledUsers(List<String> users) {
+    List<String> result = new ArrayList<String>();
+    for (String user : users) {
+      UserSetting userSetting = userService.get(user);
+      if (userSetting.isEnabled()) {
+        result.add(user);
+      }
+    }
+    return result;
   }
   
   @Override
@@ -232,7 +250,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
-      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+      if (!userSetting.isChannelActive(MailChannel.ID) || NotificationUtils.isDeletedMember(userSetting.getUserId())) {
         continue;
       }
       
