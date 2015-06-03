@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadFactory;
 import javax.jcr.Node;
 
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
+import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.util.IdGenerator;
@@ -16,8 +17,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.idm.UserImpl;
-
+import org.exoplatform.services.organization.impl.UserImpl;
 
 public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
   private static final Log LOG = ExoLogger.getLogger(WebStorageMultiThreadTest.class);
@@ -81,6 +81,7 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
       organizationService.getUserHandler().createUser(user, true);
       //
       userIds.add(userId);
+      getService(UserSettingService.class).get(userId);
     }
     LOG.info("Done to create " + number + " users");
   }
