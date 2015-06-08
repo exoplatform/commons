@@ -16,6 +16,12 @@
  */
 package org.exoplatform.commons.embedder;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Properties;
+
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -50,76 +56,124 @@ public class EmbedderTest extends BaseCommonsTestCase {
    * Test youtube link
    */
   public void testYoutube() {
-    String youTubeURL = "http://www.youtube.com/watch?v=CZUXUjhXzDo";
-    // youtube video link, exist media object
-    embedder = EmbedderFactory.getInstance(youTubeURL);
-    ExoMedia videoObj = embedder.getExoMedia();
-    if(videoObj == null) {
+    URL url;
+    try {
+      url = new URL("http://www.youtube.com");
+      URLConnection conn = url.openConnection();
+      conn.connect();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
       LOG.warn("Can't connect to youtube");
       return;
-    } 
-    
-    assertRetrurnedData("http://www.youtube.com/watch?v=CZUXUjhXzDo");
-    assertRetrurnedData("http://www.youtube.com/watch?feature=player_embedded&v=mhu0cNjWE8I");
-    assertRetrurnedData("http://youtu.be/mhu0cNjWE8I");
-    assertRetrurnedData("http://www.youtube.com/embed/mhu0cNjWE8I");
-    assertRetrurnedData("http://m.youtube.com/watch?v=mhu0cNjWE8I");
-    assertRetrurnedData("https://www.youtube.com/watch?v=CZUXUjhXzDo");
-    assertRetrurnedData("https://www.youtube.com/watch?feature=player_embedded&v=mhu0cNjWE8I");
-    assertRetrurnedData("https://youtu.be/mhu0cNjWE8I");
-    assertRetrurnedData("https://www.youtube.com/embed/mhu0cNjWE8I");
-    assertRetrurnedData("https://m.youtube.com/watch?v=mhu0cNjWE8I");
+    }
+
+    ExoMedia videoObj;
+    Properties props = System.getProperties();
+    props.setProperty("youtube.v3.api.key", "AIzaSyCqzJhxwjrS4poTGmw83PmboW7RMqhbuG8");
+    videoObj = getExoMedia("http://www.youtube.com/watch?v=mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
+    videoObj = getExoMedia("http://www.youtube.com/watch?feature=player_embedded&v=mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
+    videoObj = getExoMedia("http://youtu.be/mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
+    videoObj = getExoMedia("http://www.youtube.com/embed/mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
+    videoObj = getExoMedia("http://m.youtube.com/watch?v=mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
+    videoObj = getExoMedia("https://www.youtube.com/watch?v=mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
+    videoObj = getExoMedia("https://www.youtube.com/watch?feature=player_embedded&v=mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
+    videoObj = getExoMedia("https://www.youtube.com/embed/mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
+    videoObj = getExoMedia("https://m.youtube.com/watch?v=mhu0cNjWE8I");
+    assertMedia (videoObj, "eXo Platform 4", "mhu0cNjWE8I", "");
   } 
   
   /**
    * Test if slideShare link can be shared as video in AS
    */
   public void testSlideShare() {
-    String slideShareURL = "http://www.slideshare.net/sh1mmer/using-nodejs-to-make-html5-work-for-everyone";
-    // slideshare oembed response
-    embedder = EmbedderFactory.getInstance(slideShareURL);
-    ExoMedia slideObj = embedder.getExoMedia();
-    if(slideObj == null) {
-      LOG.warn("Can't connect to slideshare"); 
-    } else {
-      assertEquals("SlideShare", slideObj.getProvider());
+    URL url;
+    try {
+      url = new URL("http://www.slideshare.net");
+      URLConnection conn = url.openConnection();
+      conn.connect();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      LOG.warn("Can't connect to slideshare");
+      return;
     }
-    assertRetrurnedData("http://www.slideshare.net/thanhc0110m/social-media-trends-exo-platform-company");
-    assertRetrurnedData("https://www.slideshare.net/thanhc0110m/social-media-trends-exo-platform-company");
-    assertRetrurnedData("http://www.slideshare.net/slideshow/embed_code/43654545");
-    assertRetrurnedData("https://www.slideshare.net/slideshow/embed_code/43654545");
+    
+    ExoMedia slideObj;
+    slideObj = getExoMedia("http://www.slideshare.net/thanhc0110m/social-media-trends-exo-platform-company");
+    assertMedia (slideObj, "Exo Platform Company", "7xQ5VD8wA6W7sz", "");
+    slideObj = getExoMedia("https://www.slideshare.net/thanhc0110m/social-media-trends-exo-platform-company");
+    assertMedia (slideObj, "Exo Platform Company", "7xQ5VD8wA6W7sz", "");
+    slideObj = getExoMedia("http://www.slideshare.net/slideshow/embed_code/43654545");
+    assertMedia (slideObj, "Exo Platform Company", "7xQ5VD8wA6W7sz", "");
+    slideObj = getExoMedia("https://www.slideshare.net/slideshow/embed_code/43654545");
+    assertMedia (slideObj, "Exo Platform Company", "7xQ5VD8wA6W7sz", "");
+  }
+  /**
+   * Test if daily motion link can be shared as video in AS
+   */
+  public void testDailyMotionShare() {
+    URL url;
+    try {
+      url = new URL("http://www.dailymotion.com");
+      URLConnection conn = url.openConnection();
+      conn.connect();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      LOG.warn("Can't connect to dailymotion");
+      return;
+    }
+
+    ExoMedia dailymotionMedia;
+    dailymotionMedia = getExoMedia("http://www.dailymotion.com/video/x2g4jx_exo-platform-theserverside-video-te_news");
+    assertMedia(dailymotionMedia,"eXo Platform", "x2g4jx", "");
+    dailymotionMedia = getExoMedia("https://www.dailymotion.com/video/x2g4jx_exo-platform-theserverside-video-te_news");
+    assertMedia(dailymotionMedia,"eXo Platform", "x2g4jx", "");
+    dailymotionMedia = getExoMedia("http://dai.ly/x2g4jx");
+    assertMedia(dailymotionMedia,"eXo Platform", "x2g4jx", "");
+    dailymotionMedia = getExoMedia("https://dai.ly/x2g4jx");
+    assertMedia(dailymotionMedia,"eXo Platform", "x2g4jx", "");
+    dailymotionMedia = getExoMedia("http://www.dailymotion.com/embed/video/x2g4jx");
+    assertMedia(dailymotionMedia,"eXo Platform", "x2g4jx", "");
+    dailymotionMedia = getExoMedia("https://www.dailymotion.com/embed/video/x2g4jx");
+    assertMedia(dailymotionMedia,"eXo Platform", "x2g4jx", "");
   }
 
-  public void testDailyMotionShare() {
-    String dailyMotion = "http://www.dailymotion.com/video/x2g4jx_exo-platform-theserverside-video-te_news";
-    // Dailymotion oembed response
-    embedder = EmbedderFactory.getInstance(dailyMotion);
-    ExoMedia dailyObj = embedder.getExoMedia();
-    if(dailyObj == null) {
-      LOG.warn("Can't connect to dailymotion"); 
-    }
-    assertRetrurnedData("http://www.dailymotion.com/video/x2g4jx_exo-platform-theserverside-video-te_news");
-    assertRetrurnedData("https://www.dailymotion.com/video/x2g4jx_exo-platform-theserverside-video-te_news");
-    assertRetrurnedData("http://dai.ly/x2g4jx");
-    assertRetrurnedData("https://dai.ly/x2g4jx");
-    assertRetrurnedData("http://www.dailymotion.com/embed/video/x2g4jx");
-    assertRetrurnedData("https://www.dailymotion.com/embed/video/x2g4jx");
-  }
+  /**
+   *  Test if vimeo link can be shared as video in AS
+   */
 
   public void testVimeoShare() {
-    String dailyMotion = "http://vimeo.com/72407771";
-    // Vimeo oembed response
-    embedder = EmbedderFactory.getInstance(dailyMotion);
-    ExoMedia vimeoObj = embedder.getExoMedia();
-    if(vimeoObj == null) {
-      LOG.warn("Can't connect to vimeo"); 
+    URL url;
+    try {
+      url = new URL("http://vimeo.com");
+      URLConnection conn = url.openConnection();
+      conn.connect();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      LOG.warn("Can't connect to vimeo");
+      return;
     }
-    assertRetrurnedData("http://vimeo.com/72407771");
-    assertRetrurnedData("https://vimeo.com/72407771");
-    assertRetrurnedData("http://player.vimeo.com/video/72407771");
-    assertRetrurnedData("https://player.vimeo.com/video/72407771");
+    ExoMedia vimeoObj;
+    vimeoObj = getExoMedia("http://vimeo.com/72407771");
+    assertMedia(vimeoObj, "eXo Platform", "72407771", "eXo Plataform");
+    vimeoObj = getExoMedia("https://vimeo.com/72407771");
+    assertMedia(vimeoObj, "eXo Platform", "72407771", "eXo Plataform");
+    vimeoObj = getExoMedia("http://player.vimeo.com/video/72407771");
+    assertMedia(vimeoObj, "eXo Platform", "72407771", "eXo Plataform");
+    vimeoObj = getExoMedia("https://player.vimeo.com/video/72407771");
+    assertMedia(vimeoObj, "eXo Platform", "72407771", "eXo Plataform");
   }
-
   /**
    * test flick link
    */
@@ -150,12 +204,25 @@ public class EmbedderTest extends BaseCommonsTestCase {
     assertNull(embedder.getExoMedia());
   }
   
-  private void assertRetrurnedData(String youTubeURL) {
-    embedder = EmbedderFactory.getInstance(youTubeURL);
-    ExoMedia videoObj = embedder.getExoMedia();
+  private ExoMedia getExoMedia(String videoURL) {
+    embedder = EmbedderFactory.getInstance(videoURL);
+    return embedder.getExoMedia();
+  }
+  
+  private void assertMedia(ExoMedia videoObj, String expectedTitle, String expectedHTML, String expectedDescription) {
+    assertNotNull(videoObj);
+
+    // Assert title
     assertNotNull(videoObj.getTitle());
+    assertTrue(videoObj.getTitle().contains(expectedTitle));
+
+    // Assert html
     assertNotNull(videoObj.getHtml());
+    assertTrue(videoObj.getHtml().contains(expectedHTML));
+
+    // Assert description
     assertNotNull(videoObj.getDescription());
+    assertTrue(videoObj.getDescription().contains(expectedDescription));
   }
 
 
