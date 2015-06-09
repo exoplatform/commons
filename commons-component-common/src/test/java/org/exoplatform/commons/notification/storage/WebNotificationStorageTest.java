@@ -195,5 +195,51 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     //
     assertEquals(0, storage.getNumberOnBadge(userId));
   }
-  
+
+  public void testRemoveByLiveTime() throws Exception {
+    // Create data for old notifications 
+    /* Example:
+     *  PastTime is 1/12/2014
+     *  Today is 15/12/2014
+     *  Create notification for:
+     *   + 04/12/2014
+     *   + 06/12/2014
+     *   + 08/12/2014
+     *   + 10/12/2014
+     *   + 12/12/2014
+     *  Case 1: Delay time 9 days, remove all web notification on days:
+     *   + 04/12/2014
+     *   + 06/12/2014
+     *  Expected: remaining is 30 notifications / 3 days
+     *  Case 2: Delay time 3 days, remove all web notification on days:
+     *   + 08/12/2014
+     *   + 10/12/2014
+     *   + 12/12/2014
+     *  Expected: remaining is 0 notification
+    */
+    long daySeconds = 86400;
+    String userId = "demo";
+    Calendar cal = Calendar.getInstance();
+    long t = 86400000l;
+    long current = cal.getTimeInMillis();
+    for (int i = 12; i > 3; i = i - 2) {
+      cal.setTimeInMillis(current - i * t);
+      for (int j = 0; j < 10; j++) {
+        NotificationInfo info = makeWebNotificationInfo(userId).setDateCreated(cal);
+        //
+        storage.save(info);
+      }
+    }
+    // check data
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    Node parentNode = getOrCreateChannelNode(sProvider, userId);
+    assertEquals(5, parentNode.getNodes().getSize());
+    //
+    storage.remove(userId, 9 * daySeconds);
+    //
+    assertEquals(3, parentNode.getNodes().getSize());
+    //
+    storage.remove(userId, 3 * daySeconds);
+    assertEquals(0, parentNode.getNodes().getSize());
+  }
 }

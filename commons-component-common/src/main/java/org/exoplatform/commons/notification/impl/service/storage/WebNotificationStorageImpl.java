@@ -34,6 +34,7 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
+import org.exoplatform.services.jcr.impl.util.ISO9075;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -217,10 +218,40 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   }
 
   @Override
+  public boolean remove(long seconds) {
+    boolean created = NotificationSessionManager.createSystemProvider();
+    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
+    Calendar cal = Calendar.getInstance();
+    long delayTime = System.currentTimeMillis() - (seconds * 1000);
+    cal.setTimeInMillis(delayTime);
+    try {
+      Session session = getSession(sProvider);
+      StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(NTF_NOTIF_DATE).append(" WHERE ");
+      strQuery.append(NTF_LAST_MODIFIED_DATE).append(" < ").append(delayTime);
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      Query query = qm.createQuery(strQuery.toString(), Query.SQL);
+      NodeIterator it = query.execute().getNodes();
+      while (it.hasNext()) {
+        Node node = it.nextNode();
+        node.remove();
+        //
+        session.save();
+      }
+    } catch (Exception e) {
+      LOG.error("Failed to remove all notifications and delay date: " + converDateToNodeName(cal), e);
+      return false;
+    } finally {
+      NotificationSessionManager.closeSessionProvider(created);
+    }
+    return true;
+  }
+  
+  @Override
   public boolean remove(String userId, long seconds) {
     boolean created = NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {
+      //
       Node userNode = getOrCreateChannelNode(sProvider, userId);
       String userPath = XPathUtils.escapeIllegalSQLName(userNode.getPath());
       Session session = userNode.getSession();

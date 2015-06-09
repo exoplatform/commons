@@ -225,6 +225,16 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     return storage.remove(userId, seconds);
   }
 
+  @Override
+  public boolean remove(long seconds) {
+    try {
+      return storage.remove(seconds);
+    } finally {
+      exoWebNotificationCache.clearCache();
+      exoWebNotificationCountCache.clearCache();
+    }
+  }
+
   private void clearIsMaxOnWebNotificationsData(String userId, boolean onlyPopopver) {
     ListWebNotificationsKey key = ListWebNotificationsKey.key(userId, true);
     getWebNotificationsData(key).setMax(false);
@@ -366,5 +376,4 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   private <K extends CacheKey, V extends Serializable> FutureExoCache<K, V, ServiceContext<V>> createFutureCache(ExoCache<K, V> cache) {
     return new FutureExoCache<K, V, ServiceContext<V>>(new CacheLoader<K, V>(), cache);
   }
-
 }
