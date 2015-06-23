@@ -16,7 +16,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.exoplatform.commons.api.jpa;
+package org.exoplatform.commons.persistence.impl;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -45,20 +45,21 @@ import org.exoplatform.services.log.Log;
  */
 public class EntityManagerService implements ComponentRequestLifecycle {
 
-  protected static Log log = ExoLogger.getLogger(EntityManagerService.class);
+  protected static Log                log      = ExoLogger.getLogger(EntityManagerService.class);
 
   private static EntityManagerFactory entityManagerFactory;
 
-  private ThreadLocal<EntityManager> instance = new ThreadLocal<EntityManager>();
+  private ThreadLocal<EntityManager>  instance = new ThreadLocal<EntityManager>();
 
-  private String persistenceName;
+  private String                      persistenceName;
 
   public EntityManagerService(InitParams params) {
     ValueParam value = params.getValueParam("persistence.unit.name");
     persistenceName = value.getValue();
     entityManagerFactory = Persistence.createEntityManagerFactory(persistenceName);
     if (log.isInfoEnabled()) {
-      log.info("Created EntityManagerFactory instance: {}", persistenceName);;
+      log.info("Created EntityManagerFactory instance: {}", persistenceName);
+      ;
     }
   }
 
@@ -68,9 +69,6 @@ public class EntityManagerService implements ComponentRequestLifecycle {
    */
   public EntityManager getEntityManager() {
     if (instance.get() == null) {
-      if (log.isErrorEnabled()) {
-        log.error("No EntityManager is available!!! It must be in a request lifecycle.");
-      }
       return null;
     } else {
       return instance.get();
@@ -79,23 +77,27 @@ public class EntityManagerService implements ComponentRequestLifecycle {
 
   /**
    * Return a completely new instance of EntityManager. The EntityManager
-   * instance will not be managed by the service, so the caller needs to manage
-   * it himself.
+   * instance is put in the threadLocal for further use.
    * 
    * @return return a completely new instance of EntityManager.
    */
-  public EntityManager createEntityManager() {
-    return entityManagerFactory.createEntityManager();
+  EntityManager createEntityManager() {
+    EntityManager em = entityManagerFactory.createEntityManager();
+    instance.set(em);
+    return em;
   }
 
   @Override
   public void startRequest(ExoContainer container) {
-    EntityManager em = entityManagerFactory.createEntityManager();
-    instance.set(em);
+    createEntityManager();
   }
 
   @Override
   public void endRequest(ExoContainer container) {
+    closeEntityManager();
+  }
+
+  void closeEntityManager() {
     EntityManager em = getEntityManager();
     EntityTransaction tx = null;
     try {
@@ -104,7 +106,7 @@ public class EntityManagerService implements ComponentRequestLifecycle {
         tx.commit();
       }
     } catch (RuntimeException e) {
-      if ( tx != null && tx.isActive() ) {
+      if (tx != null && tx.isActive()) {
         if (log.isErrorEnabled()) {
           log.error("Failed to commit transaction.", e);
         }

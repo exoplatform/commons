@@ -50,14 +50,14 @@
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.core</artifactId>
       <exclusions>
-        <exclusion>          
+        <exclusion>
           <groupId>xml-apis</groupId>
           <artifactId>xml-apis</artifactId>
         </exclusion>
         <exclusion>
 		  <groupId>xml-apis</groupId>
-          <artifactId>xml-apis-ext</artifactId>          
-        </exclusion>        
+          <artifactId>xml-apis-ext</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -88,15 +88,19 @@
       <groupId>org.owasp.antisamy</groupId>
       <artifactId>antisamy</artifactId>
       <exclusions>
-        <exclusion>          
+        <exclusion>
           <groupId>xml-apis</groupId>
           <artifactId>xml-apis</artifactId>
         </exclusion>
         <exclusion>
 		  <groupId>xml-apis</groupId>
-          <artifactId>xml-apis-ext</artifactId>          
-        </exclusion>        
+          <artifactId>xml-apis-ext</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
@@ -167,6 +171,12 @@
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <version>4.1.12.Final</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -185,5 +195,28 @@
         </includes>
       </resource>
     </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>test-compile</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+          <complianceLevel>${maven.compiler.target}</complianceLevel>
+          <showWeaveInfo>false</showWeaveInfo>
+          <includes>
+            <include>**/persistence/**/*.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>

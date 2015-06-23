@@ -6,16 +6,15 @@
   <persistence-unit name="org.exoplatform.persistence" transaction-type="RESOURCE_LOCAL">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
+    <class>org.exoplatform.commons.persistence.impl.Task</class>
+
     <properties>
       <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
       <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:file:target/hsql-db;" />
       <property name="javax.persistence.jdbc.user" value="sa" />
       <property name="javax.persistence.jdbc.password" value="" />
 
-      <!--
-      <property name="hibernate.hbm2ddl.auto" value="create" />
-      -->
-
+      <property name="hibernate.hbm2ddl.auto" value="create-drop" />
       <property name="hibernate.show_sql" value="true" />
 
     </properties>

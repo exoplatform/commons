@@ -1,4 +1,4 @@
-package org.exoplatform.commons.api.jpa;
+package org.exoplatform.commons.persistence.impl;
 
 import javax.persistence.EntityManager;
 
@@ -13,8 +13,7 @@ public class TestEntityManagerService extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
-    service = PortalContainer.getInstance()
-        .getComponentInstanceOfType(EntityManagerService.class);
+    service = PortalContainer.getInstance().getComponentInstanceOfType(EntityManagerService.class);
     RequestLifeCycle.begin(service);
   }
 
@@ -71,8 +70,10 @@ public class TestEntityManagerService extends TestCase {
   class A implements Runnable {
 
     private EntityManager em1;
-    private boolean succeed;
-    private boolean sameEntity;
+
+    private boolean       succeed;
+
+    private boolean       sameEntity;
 
     public A(EntityManager em) {
       this.em1 = em;

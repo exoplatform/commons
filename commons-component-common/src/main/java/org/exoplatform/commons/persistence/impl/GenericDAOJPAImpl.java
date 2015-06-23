@@ -14,17 +14,19 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with this program. If not, see http://www.gnu.org/licenses/ .
 */
-package org.exoplatform.commons.api.jpa.dao;
+package org.exoplatform.commons.persistence.impl;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+
+import org.exoplatform.commons.api.persistence.GenericDAO;
+import org.exoplatform.commons.api.persistence.Transactional;
 
 /**
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
@@ -32,20 +34,14 @@ import javax.persistence.criteria.Root;
  * @param <E> Entity type
  * @param <ID> Identity of the entity
  */
-abstract public class AbstractGenericDAO<E, ID extends Serializable> implements GenericDAO<E, ID> {
+public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO<E, ID> {
 
   protected Class<E> modelClass;
 
-  public AbstractGenericDAO() {
+  public GenericDAOJPAImpl() {
     ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
     this.modelClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
   }
-
-  /**
-   * Return an EntityManager instance.
-   * @return An EntityManger instance.
-   */
-  public abstract EntityManager getEntityManager();
 
   @Override
   public Long count() {
@@ -66,6 +62,7 @@ abstract public class AbstractGenericDAO<E, ID extends Serializable> implements 
   }
 
   @Override
+  @Transactional
   public List<E> findAll() {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<E> query = cb.createQuery(modelClass);
@@ -79,6 +76,7 @@ abstract public class AbstractGenericDAO<E, ID extends Serializable> implements 
   }
 
   @Override
+  @Transactional
   public E create(E entity) {
     EntityManager em = getEntityManager();
     em.persist(entity);
@@ -86,6 +84,7 @@ abstract public class AbstractGenericDAO<E, ID extends Serializable> implements 
   }
 
   @Override
+  @Transactional
   public void createAll(List<E> entities) {
     EntityManager em = getEntityManager();
     for (E entity : entities) {
@@ -94,12 +93,14 @@ abstract public class AbstractGenericDAO<E, ID extends Serializable> implements 
   }
 
   @Override
+  @Transactional
   public E update(E entity) {
     getEntityManager().merge(entity);
     return entity;
   }
 
   @Override
+  @Transactional
   public void updateAll(List<E> entities) {
     for (E entity : entities) {
       getEntityManager().merge(entity);
@@ -107,12 +108,14 @@ abstract public class AbstractGenericDAO<E, ID extends Serializable> implements 
   }
 
   @Override
+  @Transactional
   public void delete(E entity) {
     EntityManager em = getEntityManager();
-    em.remove(entity);
+    em.remove(em.merge(entity));
   }
 
   @Override
+  @Transactional
   public void deleteAll(List<E> entities) {
     EntityManager em = getEntityManager();
     for (E entity : entities) {
@@ -121,6 +124,7 @@ abstract public class AbstractGenericDAO<E, ID extends Serializable> implements 
   }
 
   @Override
+  @Transactional
   public void deleteAll() {
     List<E> entities = findAll();
 
@@ -128,6 +132,14 @@ abstract public class AbstractGenericDAO<E, ID extends Serializable> implements 
     for (E entity : entities) {
       em.remove(entity);
     }
+  }
+
+  /**
+   * Return an EntityManager instance.
+   * @return An EntityManger instance.
+   */
+  protected EntityManager getEntityManager() {
+    return EntityManagerHolder.get();
   }
 }
 
