@@ -95,6 +95,7 @@ public interface WebNotificationStorage {
   /**
    * Remove the NotificationInfo live after X days
    * 
+   * @param userId 
    * @param seconds 
    * @return Returns TRUE if removing successfully Otherwise FALSE
    * @LevelAPI Platform
@@ -132,4 +133,14 @@ public interface WebNotificationStorage {
    * @since PLF 4.2
    */
   void resetNumberOnBadge(String userId);
+
+  /**
+   * Remove the NotificationInfo live after X days
+   * 
+   * @param seconds
+   * @return Returns TRUE if removing successfully Otherwise FALSE
+   * @LevelAPI Platform
+   * @since PLF 4.2
+   */
+  boolean remove(long seconds);
 }

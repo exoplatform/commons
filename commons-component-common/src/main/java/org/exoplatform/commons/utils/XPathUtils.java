@@ -46,4 +46,8 @@ public class XPathUtils {
     if (currentItem != null && currentItem.length() > 0) encoded.append(ISO9075.encode(currentItem.toString()));
     return encoded.toString();
   }
+  
+  public static String escapeIllegalSQLName(String path) {
+    return (path == null || path.trim().length() == 0) ? path : path.replace("'", "''");
+  }
 }

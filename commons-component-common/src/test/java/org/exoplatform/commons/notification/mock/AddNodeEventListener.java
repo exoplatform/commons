@@ -43,6 +43,11 @@ public class AddNodeEventListener implements EventListener {
             node.setProperty("exo:dateCreated", Calendar.getInstance());
             node.save();
           }
+          if(node.canAddMixin("exo:sortable")) {
+            node.addMixin("exo:sortable");
+            node.setProperty("exo:name", node.getName());
+            node.save();
+          }
           break;
         }
       }

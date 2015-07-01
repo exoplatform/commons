@@ -32,7 +32,7 @@
      def reqJS = rcontext.getJavascriptManager().require("SHARED/portal", "portal");
      reqJS.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
 %>  
-<div class="UIContainer UIColumnContainer EdittingContainer ProtectedContainer%>" 
+<div class="UIContainer UIColumnContainer EdittingContainer ProtectedContainer"
         id="${uicomponent.id}" ${cssStyle}>
 <%
   }

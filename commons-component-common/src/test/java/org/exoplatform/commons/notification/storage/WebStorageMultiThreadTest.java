@@ -18,8 +18,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.idm.UserImpl;
-
+import org.exoplatform.services.organization.impl.UserImpl;
 
 public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
   private static final Log LOG = ExoLogger.getLogger(WebStorageMultiThreadTest.class);
@@ -89,6 +88,7 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
       userSettingService.save(userSetting);
       //
       userIds.add(userId);
+      getService(UserSettingService.class).get(userId);
     }
     LOG.info("\nDone to create " + number + " users");
   }

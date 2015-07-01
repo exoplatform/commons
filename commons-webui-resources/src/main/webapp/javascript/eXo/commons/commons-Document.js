@@ -559,6 +559,7 @@ function BreadCrumbs() {
 
 DocumentSelector.prototype.request = function(url){
   var res;
+  url = encodeURI(url);
   jQuery.ajax({
     url: url,
     type: "GET",
@@ -686,8 +687,9 @@ function UIDSUpload() {
     uploadHTML += "  <form id='"+uploadId+"' class='UIDSUploadForm' style='margin: 0px; padding: 0px' action='"+uploadAction+"' enctype='multipart/form-data' method='post'>";
     uploadHTML += "    <div class='BrowseDiv'>";
     if(gtnbase.Browser.isIE()) {
-          uploadHTML += "      <a class='BrowseLink' href='javascript:void(0);'> <i class='uiIconUpload uiIconLightGray'></i>";
+          uploadHTML += "      <a class='BrowseLink' href='javascript:void(0);'>";
           uploadHTML += "        <label for='" + idFile + "' style='width: 26px; height: 26px; display:block'>";
+          uploadHTML += "          <i class='uiIconUpload uiIconLightGray'></i>";
           uploadHTML += "          <input style=\"position:absolute; left:-5000px;\" type='file' name='" + idFile + "' size='1' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
           uploadHTML += "        </label>";
           uploadHTML += "      </a>";
@@ -803,7 +805,8 @@ function UIDSUpload() {
 	  url += "action=save" + "&workspaceName=" + selectedItem.workspaceName
 	  + "&driveName=" + selectedItem.driveName + "&currentFolder="
 	  + selectedItem.currentFolder + "&currentPortal=" + eXo.env.portal.portalName + "&language="
-	  + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" + encodeURIComponent(fileName);
+	  + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" + fileName;
+          url = encodeURI(url);
 	  var responseText = ajaxAsyncGetRequest(url, false);
 	};
 
