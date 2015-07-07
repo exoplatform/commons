@@ -72,8 +72,9 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
    * @param limit The limitation number of search results.
    * @param sort The sorting criteria (title, relevancy and date).
    * @param order The sorting order (ascending and descending).
+   * @param language The current language of the portal.
    * @return The collection of search results.
    * @LevelAPI Experimental 
    */
-  public abstract Collection<SearchResult> search(SearchContext context, String query, Collection<String> sites, int offset, int limit, String sort, String order);
+  public abstract Collection<SearchResult> search(SearchContext context, String query, Collection<String> sites, int offset, int limit, String sort, String order, String language);
 }
