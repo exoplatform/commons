@@ -68,6 +68,7 @@
             <%} else out.print("<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>");%>
         </div>
         
+        
       <%if(portalMode != UIPortalApplication.NORMAL_MODE){%>
         <div class="EDITION-BLOCK EDITION-CONTAINER" style="position: relative; display: none;">
 
@@ -112,10 +113,8 @@
                 <%/*End InfoBar*/ %>
               </div>
               
-            </div>
-
-        </div>  
+            </div> 
       <%} %>
-
+      
   </div> 
 </div>

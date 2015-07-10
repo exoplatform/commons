@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.exoplatform.portal.webui.container.UIContainerForm;
 import org.exoplatform.portal.webui.workspace.UIMaskWorkspace;
+import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.ComponentConfigs;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -36,12 +37,15 @@ import org.exoplatform.webui.form.UIFormStringInput;
 import org.exoplatform.webui.form.validator.MandatoryValidator;
 import org.exoplatform.webui.form.validator.NameValidator;
 import org.exoplatform.webui.form.validator.StringLengthValidator;
+import org.exoplatform.webui.organization.UIListPermissionSelector;
+import org.exoplatform.webui.organization.UIListPermissionSelector.EmptyIteratorValidator;
 
 @ComponentConfigs({
     @ComponentConfig(id = "UIContainerForm", lifecycle = UIFormLifecycle.class, template = "system:/groovy/webui/form/UIFormTabPane.gtmpl", events = {
             @EventConfig(listeners = UIContainerForm.SaveActionListener.class),
             @EventConfig(listeners = UIMaskWorkspace.CloseActionListener.class, phase = Phase.DECODE) }),
-    @ComponentConfig(id = "UIContainerPermission", type = UIFormInputSet.class, lifecycle = UIContainerLifecycle.class) })
+    @ComponentConfig(id = "UIContainerPermission", type = UIFormInputSet.class, template = "system:/groovy/webui/core/UITabSelector.gtmpl", events = { @EventConfig(listeners = UIFormInputSet.SelectComponentActionListener.class) }),
+    @ComponentConfig(id = "UIAddonContainerPermission", type = UIFormInputSet.class, lifecycle = UIContainerLifecycle.class) })
 public class UIAddOnContainerForm extends UIContainerForm {
 
     public UIAddOnContainerForm() throws Exception {
@@ -56,6 +60,14 @@ public class UIAddOnContainerForm extends UIContainerForm {
         List<UIComponent> children = infoInputSet.getChildren();
         children.add(1, input);
         infoInputSet.setChildren(children);
+        this.removeChildById("UIContainerPermission");
+
+        UIFormInputSet uiPermissionSetting = createUIComponent(UIFormInputSet.class, "UIAddonContainerPermission", null);
+        UIListPermissionSelector uiAccessPermissionSelector = createUIComponent(UIListPermissionSelector.class, null, null);
+        uiAccessPermissionSelector.configure(WebuiRequestContext.generateUUID("UIListPermissionSelector"), "accessPermissions");
+        uiAccessPermissionSelector.addValidator(EmptyIteratorValidator.class);
+        uiPermissionSetting.addChild(uiAccessPermissionSelector);
+        addUIFormInput(uiPermissionSetting);
     }
 
 }
