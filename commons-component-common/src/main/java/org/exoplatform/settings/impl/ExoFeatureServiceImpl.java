@@ -34,13 +34,13 @@ public class ExoFeatureServiceImpl implements ExoFeatureService {
 
   @Override
   public boolean isActiveFeature(String featureName) {
-    SettingValue<?> sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + featureName));
+    SettingValue<?> sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), (NAME_SPACES + featureName));
     return (sValue != null) ? (Boolean) sValue.getValue() : true;
   }
 
   @Override
   public void saveActiveFeature(String featureName, boolean isActive) {
-    settingService.set(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + featureName), SettingValue.create(isActive));
+    settingService.set(Context.GLOBAL, Scope.GLOBAL.id(null), (NAME_SPACES + featureName), SettingValue.create(isActive));
   }
 
 
