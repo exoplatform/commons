@@ -41,7 +41,7 @@ public class PluginTemplateBuilderAdapter extends AbstractTemplateBuilder {
       AbstractNotificationPlugin abstractPlugin = (AbstractNotificationPlugin) basePlugin;
       return abstractPlugin.buildMessage(ctx);
     }
-    return null;
+    return new MessageInfo().body(ctx.getNotificationInfo().getTitle());
   }
 
   @Override
