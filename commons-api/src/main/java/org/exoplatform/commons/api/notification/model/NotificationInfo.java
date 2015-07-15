@@ -451,6 +451,7 @@ public class NotificationInfo {
     NotificationInfo message = instance();
     message.setFrom(from)
            .key(key)
+           .setTitle(title)
            .setOrder(order)
            .setOwnerParameter(new HashMap<String, String>(ownerParameter))
            .setSendToDaily(arrayCopy(sendToDaily))
