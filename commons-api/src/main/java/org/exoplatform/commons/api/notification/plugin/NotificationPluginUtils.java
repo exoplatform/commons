@@ -26,6 +26,9 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.pom.config.POMSessionManager;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
@@ -33,7 +36,7 @@ import org.exoplatform.services.organization.UserProfile;
 
 public class NotificationPluginUtils {
 
-  public static final String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
+  public static final String DEFAULT_LANGUAGE = Locale.getDefault().getLanguage();
 
   private static OrganizationService organizationService;
   
@@ -147,6 +150,14 @@ public class NotificationPluginUtils {
     try {
       UserProfile profile = getOrganizationService().getUserProfileHandler().findUserProfileByName(userId);
       String lang = profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]);
+      if(lang == null || lang.trim().length() == 0) {
+        UserPortalConfigService userPortalConfigService = (UserPortalConfigService) PortalContainer.getInstance().getComponentInstanceOfType(UserPortalConfigService.class);
+        POMSessionManager pomSessionManager = (POMSessionManager) PortalContainer.getInstance().getComponentInstanceOfType(POMSessionManager.class);
+        pomSessionManager.openSession();
+        PortalConfig config = userPortalConfigService.getDataStorage().getPortalConfig(userPortalConfigService.getDefaultPortal());
+        lang = config.getLocale();
+        pomSessionManager.getSession().close();
+      }
       return (lang != null && lang.trim().length() > 0) ? lang : DEFAULT_LANGUAGE;
     } catch (Exception e) {
       return DEFAULT_LANGUAGE;
