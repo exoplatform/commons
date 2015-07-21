@@ -81,7 +81,7 @@
 							<property name="infinispan-configuration" value="${gatein.jcr.lock.cache.config}"/>
 							<property name="jgroups-configuration" value="${gatein.jcr.jgroups.config}"/>
 							<property name="infinispan-cluster-name" value="jcrlock${container.name.suffix}"/>
-							<property name="infinispan-cl-cache.jdbc.table.name" value="jcrlock"/>
+							<property name="infinispan-cl-cache.jdbc.table.name" value="lk"/>
 							<property name="infinispan-cl-cache.jdbc.table.create" value="true"/>
 							<property name="infinispan-cl-cache.jdbc.table.drop" value="false"/>
 							<property name="infinispan-cl-cache.jdbc.id.column" value="id" />
@@ -150,7 +150,7 @@
 							<property name="infinispan-configuration" value="${gatein.jcr.lock.cache.config}"/>
 							<property name="jgroups-configuration" value="${gatein.jcr.jgroups.config}"/>
 							<property name="infinispan-cluster-name" value="jcrlock${container.name.suffix}"/>
-							<property name="infinispan-cl-cache.jdbc.table.name" value="jcrlock"/>
+							<property name="infinispan-cl-cache.jdbc.table.name" value="lk"/>
 							<property name="infinispan-cl-cache.jdbc.table.create" value="true"/>
 							<property name="infinispan-cl-cache.jdbc.table.drop" value="false"/>
 							<property name="infinispan-cl-cache.jdbc.id.column" value="id" />
@@ -218,7 +218,7 @@
 							<property name="infinispan-configuration" value="${gatein.jcr.lock.cache.config}"/>
 							<property name="jgroups-configuration" value="${gatein.jcr.jgroups.config}"/>
 							<property name="infinispan-cluster-name" value="jcrlock${container.name.suffix}"/>
-							<property name="infinispan-cl-cache.jdbc.table.name" value="jcrlock"/>
+							<property name="infinispan-cl-cache.jdbc.table.name" value="lk"/>
 							<property name="infinispan-cl-cache.jdbc.table.create" value="true"/>
 							<property name="infinispan-cl-cache.jdbc.table.drop" value="false"/>
 							<property name="infinispan-cl-cache.jdbc.id.column" value="id" />
@@ -238,6 +238,7 @@
 							<property name="update-storage" value="true"/>
 							<property name="max-buffer-size" value="204800"/>
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/collaboration${container.name.suffix}"/>
+							<property name="db-tablename-suffix" value="COLLAB"/>
 						</properties>
 						<value-storages>
 							<value-storage id="collaboration" class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
@@ -283,7 +284,7 @@
 							<property name="infinispan-configuration" value="${gatein.jcr.lock.cache.config}" />
 							<property name="jgroups-configuration" value="${gatein.jcr.jgroups.config}" />
 							<property name="infinispan-cluster-name" value="jcrlock${container.name.suffix}" />
-							<property name="infinispan-cl-cache.jdbc.table.name" value="jcrlock" />
+							<property name="infinispan-cl-cache.jdbc.table.name" value="lk" />
 							<property name="infinispan-cl-cache.jdbc.table.create" value="true" />
 							<property name="infinispan-cl-cache.jdbc.table.drop" value="false" />
 							<property name="infinispan-cl-cache.jdbc.id.column" value="id" />
@@ -304,6 +305,7 @@
 							<property name="update-storage" value="true"/>
 							<property name="max-buffer-size" value="204800"/>
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/dms-system${container.name.suffix}"/>
+							<property name="db-tablename-suffix" value="DMSSYS"/>
 						</properties>
 						<value-storages>
 							<value-storage id="dms-system" class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
@@ -350,7 +352,7 @@
 							<property name="infinispan-configuration" value="${gatein.jcr.lock.cache.config}" />
 							<property name="jgroups-configuration" value="${gatein.jcr.jgroups.config}" />
 							<property name="infinispan-cluster-name" value="jcrlock${container.name.suffix}" />
-							<property name="infinispan-cl-cache.jdbc.table.name" value="jcrlock" />
+							<property name="infinispan-cl-cache.jdbc.table.name" value="lk" />
 							<property name="infinispan-cl-cache.jdbc.table.create" value="true" />
 							<property name="infinispan-cl-cache.jdbc.table.drop" value="false" />
 							<property name="infinispan-cl-cache.jdbc.id.column" value="id" />
@@ -415,7 +417,7 @@
 							<property name="infinispan-configuration" value="${gatein.jcr.lock.cache.config}" />
 							<property name="jgroups-configuration" value="${gatein.jcr.jgroups.config}" />
 							<property name="infinispan-cluster-name" value="jcrlock${container.name.suffix}" />
-							<property name="infinispan-cl-cache.jdbc.table.name" value="jcrlock" />
+							<property name="infinispan-cl-cache.jdbc.table.name" value="lk" />
 							<property name="infinispan-cl-cache.jdbc.table.create" value="true" />
 							<property name="infinispan-cl-cache.jdbc.table.drop" value="false" />
 							<property name="infinispan-cl-cache.jdbc.id.column" value="id" />
@@ -435,6 +437,7 @@
 							<property name="update-storage" value="true"/>
 							<property name="max-buffer-size" value="204800"/>
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/knowledge${container.name.suffix}"/>
+							<property name="db-tablename-suffix" value="KNOW"/>
 						</properties>
 						<value-storages>
 							<value-storage id="knowledge" class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
@@ -480,7 +483,7 @@
 							<property name="infinispan-configuration" value="${gatein.jcr.lock.cache.config}" />
 							<property name="jgroups-configuration" value="${gatein.jcr.jgroups.config}" />
 							<property name="infinispan-cluster-name" value="jcrlock${container.name.suffix}" />
-							<property name="infinispan-cl-cache.jdbc.table.name" value="jcrlock" />
+							<property name="infinispan-cl-cache.jdbc.table.name" value="lk" />
 							<property name="infinispan-cl-cache.jdbc.table.create" value="true" />
 							<property name="infinispan-cl-cache.jdbc.table.drop" value="false" />
 							<property name="infinispan-cl-cache.jdbc.id.column" value="id" />

@@ -32,7 +32,7 @@
      def reqJS = rcontext.getJavascriptManager().require("SHARED/portal", "portal");
      reqJS.addScripts("portal.UIPortal.initMouseHover('" + uicomponent.id + "');");
 %>  
-<div class="UIContainer UIColumnContainer EdittingContainer ProtectedContainer%>" 
+<div class="UIContainer UIColumnContainer EdittingContainer ProtectedContainer"
         id="${uicomponent.id}" ${cssStyle}>
 <%
   }
@@ -67,6 +67,7 @@
             </div>
             <%} else out.print("<div class='ProtectedContent'>"+_ctx.appRes("UIPortlet.label.protectedContent")+"</div>");%>
         </div>
+        
         
       <%if(portalMode != UIPortalApplication.NORMAL_MODE){%>
         <div class="EDITION-BLOCK EDITION-CONTAINER" style="position: relative; display: none;">
@@ -112,10 +113,8 @@
                 <%/*End InfoBar*/ %>
               </div>
               
-            </div>
-
-        </div>  
+            </div> 
       <%} %>
-
+      
   </div> 
 </div>

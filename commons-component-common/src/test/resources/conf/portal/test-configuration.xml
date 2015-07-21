@@ -17,6 +17,16 @@
 		<type>org.exoplatform.settings.impl.SettingServiceImpl</type>
 	</component>
 
+	<component>
+		<type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+		<init-params>
+			<value-param>
+				<name>persistence.unit.name</name>
+				<value>org.exoplatform.persistence</value>
+			</value-param>
+		</init-params>
+	</component>
+
     <!-- configuration unused : please check why it's declared here (incorrect behavior) -->
 <!--
 	<component>

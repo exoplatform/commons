@@ -286,7 +286,7 @@ public class NotificationUtils {
    */
   public static String removeLinkTitle(String title) {
     Matcher mat = LINK_PATTERN.matcher(title);
-    return mat.replaceAll("<span class=\"text-bold\">$2</span>");
+    return mat.replaceAll("<span class=\"user-name text-bold\">$2</span>");
   }
   
   public static String getProfileUrl(String userId) {
