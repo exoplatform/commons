@@ -217,9 +217,9 @@
         <!-- WebNotificationCountCache -->
         <object-param>
           <name>cache.config.WebNotificationCountCache</name>
-          <description>The JBoss Cache configuration for the Web Notification List Cache</description>
+          <description>The JBoss Cache configuration for the Web Notification Count Cache</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
-            <field name="name"><string>WebNotificationListCache</string></field>
+            <field name="name"><string>WebNotificationCountCache</string></field>
             <field name="strategy"><string>LIRS</string></field>
             <field name="lifespan"><long>${cache.exo.commons.WebNotificationCountCache.ExpirationTimeout:-1}</long></field>
             <field name="maxEntries"><int>${cache.exo.commons.WebNotificationCountCache.MaxNodes:500}</int></field>
