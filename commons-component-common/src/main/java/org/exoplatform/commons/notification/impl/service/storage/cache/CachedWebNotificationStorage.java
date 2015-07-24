@@ -100,6 +100,9 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     if (infoData != null) {
       infoData.updateRead(isRead);
     }
+    if (isRead) {
+      clearWebNotificationCache(notificationId);
+    }
   }
 
   public void updateAllRead(String userId) throws Exception {
@@ -117,6 +120,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
           if (userId.equals(ntf.getTo())) {
             if (isUpdateRead) {
               webData.updateRead(true);
+              clearWebNotificationCache(ntf.getId());
             } else {
               removeIds.add(ntf.getId());
             }
@@ -335,6 +339,16 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   public void clearWebNotificationCountCache(String userId) {
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(userId);
     exoWebNotificationCountCache.remove(key);
+  }
+  
+  /**
+   * Clear the notification from the cache.
+   * @param notifId
+   */
+  public void clearWebNotificationCache(String id) {
+	WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(id);
+	exoWebNotificationCache.remove(key);
+	exoWebNotificationsCache.remove(key);
   }
   
   public void moveTopPopover(NotificationInfo notification) {
