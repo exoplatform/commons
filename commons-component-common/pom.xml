@@ -175,7 +175,6 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
       <version>4.1.12.Final</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -192,6 +191,8 @@
           <include>**/*.properties</include>
           <include>**/*.xml</include>
           <include>**/*.gtmpl</include>
+          <include>**/*.Processor</include>
+          <include>**/*.Integrator</include>
         </includes>
       </resource>
     </resources>

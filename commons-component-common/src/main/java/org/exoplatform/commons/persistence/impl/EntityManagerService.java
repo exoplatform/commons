@@ -25,8 +25,6 @@ import javax.persistence.Persistence;
 
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -45,21 +43,18 @@ import org.exoplatform.services.log.Log;
  */
 public class EntityManagerService implements ComponentRequestLifecycle {
 
-  protected static Log                log      = ExoLogger.getLogger(EntityManagerService.class);
+  private final static Log LOGGER = ExoLogger.getLogger(EntityManagerService.class);
 
   private static EntityManagerFactory entityManagerFactory;
 
-  private ThreadLocal<EntityManager>  instance = new ThreadLocal<EntityManager>();
+  private ThreadLocal<EntityManager>  instance = new ThreadLocal<>();
 
-  private String                      persistenceName;
+  private static final String PERSISTENCE_UNIT_NAME = "exo-pu";
 
-  public EntityManagerService(InitParams params) {
-    ValueParam value = params.getValueParam("persistence.unit.name");
-    persistenceName = value.getValue();
-    entityManagerFactory = Persistence.createEntityManagerFactory(persistenceName);
-    if (log.isInfoEnabled()) {
-      log.info("Created EntityManagerFactory instance: {}", persistenceName);
-      ;
+  public EntityManagerService() {
+    entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Created EntityManagerFactory instance: {}", PERSISTENCE_UNIT_NAME);
     }
   }
 
@@ -107,8 +102,8 @@ public class EntityManagerService implements ComponentRequestLifecycle {
       }
     } catch (RuntimeException e) {
       if (tx != null && tx.isActive()) {
-        if (log.isErrorEnabled()) {
-          log.error("Failed to commit transaction.", e);
+        if (LOGGER.isErrorEnabled()) {
+          LOGGER.error("Failed to commit transaction.", e);
         }
 
         tx.rollback();
@@ -117,8 +112,8 @@ public class EntityManagerService implements ComponentRequestLifecycle {
       em.close();
       instance.set(null);
 
-      if (log.isDebugEnabled()) {
-        log.debug("Ended a request lifecycle of {} component service", EntityManagerService.class.getName());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Ended a request lifecycle of {} component service", EntityManagerService.class.getName());
       }
     }
   }
