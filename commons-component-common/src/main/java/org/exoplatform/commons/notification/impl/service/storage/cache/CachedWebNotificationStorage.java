@@ -80,6 +80,10 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
         Integer current = data.build();
         exoWebNotificationCountCache.put(key, new IntegerData(current + 1));
       }
+      
+      ListWebNotificationsKey listWebNotificationsKey = ListWebNotificationsKey.key(notification.getTo(), true);
+      ListWebNotificationsData  listWebNotificationsData = new ListWebNotificationsData(listWebNotificationsKey);
+      exoWebNotificationsCache.put(listWebNotificationsKey, listWebNotificationsData);
       moveTopPopover(notification);
       moveTopViewAll(notification);
       //
@@ -185,8 +189,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     //
     removeViewAll(notification);
     //
-    WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
-    exoWebNotificationCache.remove(key);
+    clearWebNotificationCache(notificationId);
     //clear badge number in for notification's TO user.
     clearWebNotificationCountCache(notification.getTo());
     //
@@ -345,10 +348,9 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
    * Clear the notification from the cache.
    * @param notifId
    */
-  public void clearWebNotificationCache(String id) {
-	WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(id);
+  public void clearWebNotificationCache(String notificationId) {
+	WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
 	exoWebNotificationCache.remove(key);
-	exoWebNotificationsCache.remove(key);
   }
   
   public void moveTopPopover(NotificationInfo notification) {
