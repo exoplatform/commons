@@ -21,6 +21,17 @@
 		<type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
 	</component>
 
+	<component>
+		<key>PropertyManagerConfigurator</key>
+		<type>org.exoplatform.container.PropertyConfigurator</type>
+		<init-params>
+			<value-param>
+				<name>properties.url</name>
+				<value>classpath:/conf/exo.properties</value>
+			</value-param>
+		</init-params>
+	</component>
+
     <!-- configuration unused : please check why it's declared here (incorrect behavior) -->
 <!--
 	<component>

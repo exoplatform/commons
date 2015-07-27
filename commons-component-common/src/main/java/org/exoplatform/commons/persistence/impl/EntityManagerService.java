@@ -18,11 +18,17 @@
  */
 package org.exoplatform.commons.persistence.impl;
 
+import java.util.Properties;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
+import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.services.log.ExoLogger;
@@ -43,16 +49,25 @@ import org.exoplatform.services.log.Log;
  */
 public class EntityManagerService implements ComponentRequestLifecycle {
 
-  private final static Log LOGGER = ExoLogger.getLogger(EntityManagerService.class);
-
+  public static final String[]        HIBERNATE_PROPERTIES  = new String[] {  "hibernate.show_sql",
+                                                                              "hibernate.format_sql",
+                                                                              "hibernate.use_sql_comments"};
+  private final static Log            LOGGER                = ExoLogger.getLogger(EntityManagerService.class);
+  private static final String         PERSISTENCE_UNIT_NAME = "exo-pu";
   private static EntityManagerFactory entityManagerFactory;
-
-  private ThreadLocal<EntityManager>  instance = new ThreadLocal<>();
-
-  private static final String PERSISTENCE_UNIT_NAME = "exo-pu";
+  private ThreadLocal<EntityManager>  instance              = new ThreadLocal<>();
 
   public EntityManagerService() {
-    entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+    // Get Hibernate properties in eXo global properties
+    final Properties properties = new Properties();
+    for (String propertyName : HIBERNATE_PROPERTIES) {
+      String propertyValue = PropertyManager.getProperty(propertyName);
+      if (StringUtils.isNotBlank(propertyValue)) {
+        properties.put(propertyName, propertyValue);
+        LOGGER.info("Setting [" + propertyName + "] to [" + propertyValue + "]");
+      }
+    }
+    entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, properties);
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("Created EntityManagerFactory instance: {}", PERSISTENCE_UNIT_NAME);
     }
