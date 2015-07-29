@@ -19,10 +19,15 @@
 
 	<component>
 		<type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+	</component>
+
+	<component>
+		<key>PropertyManagerConfigurator</key>
+		<type>org.exoplatform.container.PropertyConfigurator</type>
 		<init-params>
 			<value-param>
-				<name>persistence.unit.name</name>
-				<value>org.exoplatform.persistence</value>
+				<name>properties.url</name>
+				<value>classpath:/conf/exo.properties</value>
 			</value-param>
 		</init-params>
 	</component>
