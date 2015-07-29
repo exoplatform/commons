@@ -36,9 +36,10 @@ public class UserSetting {
   private static UserSetting defaultSetting = null;
 
   public static String EMAIL_CHANNEL = "MAIL_CHANNEL";
+  public static String WEB_CHANNEL = "WEB_CHANNEL";
 
   public enum FREQUENCY {
-    INSTANTLY, DAILY, WEEKLY;
+    INSTANTLY, DAILY, WEEKLY, ONSITE;
 
     public static FREQUENCY getFrequecy(String name) {
       for (int i = 0; i < values().length; ++i) {
@@ -261,6 +262,8 @@ public class UserSetting {
       dailyPlugins.remove(pluginId);
     } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
       addChannelPlugin(EMAIL_CHANNEL, pluginId);
+    } else if (frequencyType.equals(FREQUENCY.ONSITE)) {
+      addChannelPlugin(WEB_CHANNEL, pluginId);
     }
   }
 
@@ -271,6 +274,8 @@ public class UserSetting {
       dailyPlugins.remove(pluginId);
     } else if (frequencyType.equals(FREQUENCY.INSTANTLY)) {
       removeChannelPlugin(EMAIL_CHANNEL, pluginId);
+    } else if (frequencyType.equals(FREQUENCY.ONSITE)) {
+      removeChannelPlugin(WEB_CHANNEL, pluginId);
     }
   }
 
@@ -368,13 +373,7 @@ public class UserSetting {
       List<PluginInfo> plugins = settingService.getAllPlugins();
       for (PluginInfo pluginInfo : plugins) {
         for (String defaultConf : pluginInfo.getDefaultConfig()) {
-          for (String channelId : pluginInfo.getAllChannelActive()) {
-            if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY) {
-              defaultSetting.addChannelPlugin(channelId, pluginInfo.getType());
-            } else {
-              defaultSetting.addPlugin(pluginInfo.getType(), FREQUENCY.getFrequecy(defaultConf));
-            }
-          }
+          defaultSetting.addPlugin(pluginInfo.getType(), FREQUENCY.getFrequecy(defaultConf));
         }
       }
     }
