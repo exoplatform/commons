@@ -52,7 +52,7 @@ public class ExoEntityScanner implements Integrator {
                         SessionFactoryServiceRegistry serviceRegistry) {
     try {
       // get all the exo-entities.idx in classpath
-      Enumeration<URL> urls = ClassLoader.getSystemClassLoader().getResources(ExoEntityProcessor.ENTITIES_IDX_PATH);
+      Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(ExoEntityProcessor.ENTITIES_IDX_PATH);
       while (urls.hasMoreElements()) {
         InputStream stream = urls.nextElement().openStream();
         try {
