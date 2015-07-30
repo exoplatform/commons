@@ -50,7 +50,9 @@ public class ExoEntityProcessor extends AbstractProcessor {
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     Writer writer = null;
-    if (!roundEnv.processingOver()) {
+    if (    (roundEnv != null) &&
+            (roundEnv.getElementsAnnotatedWith(ExoEntity.class)!=null) &&
+            (roundEnv.getElementsAnnotatedWith(ExoEntity.class).size()>0)) {
       try {
         FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", ENTITIES_IDX_PATH);
         writer = file.openWriter();
