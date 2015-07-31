@@ -89,7 +89,7 @@ CKEDITOR.editorConfig = function( config ){
 		['Maximize','-','Cut','Copy','PasteText','-','Undo','Redo','-','Bold','Italic','Underline'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
-		['Blockquote', 'Syntaxhighlight','helpBBCode.btn']
+		['Blockquote', 'Syntaxhighlight','Smiley','helpBBCode.btn']
 	] ;
 
 	config.toolbar_FAQ = [
