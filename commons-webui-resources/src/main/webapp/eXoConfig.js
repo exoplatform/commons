@@ -86,10 +86,10 @@ CKEDITOR.editorConfig = function( config ){
 	] ;
 
 	config.toolbar_Forum = [
-		['Maximize','-','Cut','Copy','PasteText','-','Undo','Redo','-','Bold','Italic','Underline'],
+		['Source','Maximize','-','Cut','Copy','PasteText','-','Undo','Redo','-','Bold','Italic','Underline'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
-		['Blockquote', 'Syntaxhighlight','helpBBCode.btn']
+		['Link','Unlink','-','Blockquote', 'Syntaxhighlight','Smiley','helpBBCode.btn']
 	] ;
 
 	config.toolbar_FAQ = [
