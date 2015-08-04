@@ -373,7 +373,13 @@ public class UserSetting {
       List<PluginInfo> plugins = settingService.getAllPlugins();
       for (PluginInfo pluginInfo : plugins) {
         for (String defaultConf : pluginInfo.getDefaultConfig()) {
-          defaultSetting.addPlugin(pluginInfo.getType(), FREQUENCY.getFrequecy(defaultConf));
+          for (String channelId : pluginInfo.getAllChannelActive()) {
+            if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY && !WEB_CHANNEL.equals(channelId)) {
+              defaultSetting.addChannelPlugin(channelId, pluginInfo.getType());
+            } else {
+              defaultSetting.addPlugin(pluginInfo.getType(), FREQUENCY.getFrequecy(defaultConf));
+            }
+          }          
         }
       }
     }
