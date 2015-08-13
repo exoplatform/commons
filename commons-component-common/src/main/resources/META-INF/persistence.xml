@@ -5,6 +5,6 @@
 
   <persistence-unit name="exo-pu" transaction-type="RESOURCE_LOCAL">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
-      <non-jta-data-source>java:comp/env/exo-jcr_portal</non-jta-data-source>
+      <non-jta-data-source>java:/comp/env/exo-jcr_portal</non-jta-data-source>
   </persistence-unit>
 </persistence>
