@@ -919,8 +919,8 @@ function UIDSUpload() {
     var fileName = file.attr("value").replace(/C:\\fakepath\\/i, '');
 
     if(eXo.commons.DocumentSelector.listFileName.indexOf(fileName) != -1){
-      var documentAuto = "<div id=\"auto-versioning-actions\" class=\"clearfix hidden\">";
-      documentAuto += "<div class=\"pull-left\" style=\"width: 50px;\">Existing file <span class=\"fileName\" >file.png</span></div>";
+      var documentAuto = "<div id=\"auto-versioning-actions\" class=\"alert alert-warning clearfix hidden\">";
+      documentAuto += "<div class=\"fileNameBox\"> <i class=\"uiIconWarning\"></i>Existing file <span class=\"fileName\" >file.png</span></div>";
       documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action cancel\">Cancel </a>";
       documentAuto += "<span class=\"pull-right\">&nbsp;or&nbsp; </span>";
       if(checkVersExistedFile(eXo.commons.DocumentSelector.listFiles, fileName)) {
