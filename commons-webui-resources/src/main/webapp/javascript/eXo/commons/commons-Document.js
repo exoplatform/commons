@@ -27,7 +27,13 @@ function DocumentSelector(){
   this.noDriveLabel = "There is no drive.";
   this.listFiles=[];
   this.listFileName=[];
-  this.existingBehavior = "keepBoth"
+  this.existingBehavior = "keepBoth";
+  this.document_auto_label_existing = eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.existing",  eXo.env.portal.language);
+  this.document_auto_label_cancel   = eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.cancel",  eXo.env.portal.language);
+  this.document_auto_label_or				= eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.or",  eXo.env.portal.language)
+  this.document_auto_label_createVersion = eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.createVersion",  eXo.env.portal.language);
+  this.document_auto_label_replace  = eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.createVersion",  eXo.env.portal.language);
+  this.document_auto_label_keepBoth	= eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.keepBoth",  eXo.env.portal.language);
 };
 
 function DocumentItem(){
@@ -271,7 +277,8 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
       var nodeTypeIcon = nodeType.replace(":", "_") + "48x48Icon Folder";
       var node = fileList[j].getAttribute("name");
       var isVersion = fileList[j].getAttribute("isVersioned");
-      eXo.commons.DocumentSelector.listFiles.push({"name":node, "value":isVersion});
+      var isVersionSupport = fileList[j].getAttribute("isVersionSupport");
+      eXo.commons.DocumentSelector.listFiles.push({"name":node, "value":isVersion, "isVersionSupport":isVersionSupport});
       eXo.commons.DocumentSelector.listFileName.push(node);
       var title = fileList[j].getAttribute("title");
       var size = fileList[j].getAttribute("size");
@@ -918,18 +925,19 @@ function UIDSUpload() {
     if(file.attr("value") == null || file.attr("value") == '') return;
     var fileName = file.attr("value").replace(/C:\\fakepath\\/i, '');
 
-    if(eXo.commons.DocumentSelector.listFileName.indexOf(fileName) != -1){
+    if(eXo.commons.DocumentSelector.listFileName.indexOf(fileName) != -1
+        && checkSupportVersion(eXo.commons.DocumentSelector.listFiles, fileName)){
       var documentAuto = "<div id=\"auto-versioning-actions\" class=\"alert alert-warning clearfix hidden\">";
-      documentAuto += "<div class=\"fileNameBox\"> <i class=\"uiIconWarning\"></i>Existing file <span class=\"fileName\" >file.png</span></div>";
-      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action cancel\">Cancel </a>";
-      documentAuto += "<span class=\"pull-right\">&nbsp;or&nbsp; </span>";
+      documentAuto += "<div class=\"fileNameBox\"> <i class=\"uiIconWarning\"></i>"+eXo.ecm.DocumentSelector.document_auto_label_existing+"<span class=\"fileName\" >file.png</span></div>";
+      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action cancel\">"+eXo.ecm.DocumentSelector.document_auto_label_cancel+"</a>";
+      documentAuto += "<span class=\"pull-right\">&nbsp;"+eXo.ecm.DocumentSelector.document_auto_label_or+"&nbsp; </span>";
       if(checkVersExistedFile(eXo.commons.DocumentSelector.listFiles, fileName)) {
-        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action create-version\">Create a new version</a>";
+        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action create-version\">"+eXo.ecm.DocumentSelector.document_auto_label_createVersion+"</a>";
       }else {
-        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action replace\"> Replace</a>";
+        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action replace\"> "+eXo.ecm.DocumentSelector.document_auto_label_replace+"</a>";
       }
       documentAuto += "<span class=\"pull-right\">,&nbsp;</span>";
-      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action keep-both\">Keep both</a>";
+      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action keep-both\">"+eXo.ecm.DocumentSelector.document_auto_label_keepBoth+"</a>";
       documentAuto += "</div>";
 
       var autoVersionDiv = jQuery("#auto-versioning-actions");
@@ -973,7 +981,14 @@ function UIDSUpload() {
     }
   }
 
-
+  var checkSupportVersion = function(listFiles, fileName){
+    for (var i = 0; i < listFiles.length; i++) {
+      if(listFiles[i].name === fileName && listFiles[i].isVersionSupport === "true"){
+        return true;
+      }
+    }
+    return false;
+  }
 
   var checkVersExistedFile = function(listFiles, fileName){
     for (var i = 0; i < listFiles.length; i++) {
