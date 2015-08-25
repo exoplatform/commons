@@ -173,6 +173,14 @@ public class UserStateServiceTest extends BaseNotificationTestCase {
     assertTrue(date != onlines.get(0).getLastActivity());
     assertEquals(UserStateService.DEFAULT_STATUS, onlines.get(0).getStatus());
   }
+  
+  public void testLastLogin() {
+    assertNull(userStateService.lastLogin());
+    loginUser("user1", true);
+    assertEquals("user1", userStateService.lastLogin().getUserId());
+    loginUser("user2", true);
+    assertEquals("user2", userStateService.lastLogin().getUserId());
+  }
 
   public void testIsOnline() throws Exception {
     long date = new Date().getTime();
