@@ -928,16 +928,16 @@ function UIDSUpload() {
     if(eXo.commons.DocumentSelector.listFileName.indexOf(fileName) != -1
         && checkSupportVersion(eXo.commons.DocumentSelector.listFiles, fileName)){
       var documentAuto = "<div id=\"auto-versioning-actions\" class=\"alert alert-warning clearfix hidden\">";
-      documentAuto += "<div class=\"fileNameBox\"> <i class=\"uiIconWarning\"></i>"+eXo.ecm.DocumentSelector.document_auto_label_existing+"<span class=\"fileName\" >file.png</span></div>";
-      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action cancel\">"+eXo.ecm.DocumentSelector.document_auto_label_cancel+"</a>";
-      documentAuto += "<span class=\"pull-right\">&nbsp;"+eXo.ecm.DocumentSelector.document_auto_label_or+"&nbsp; </span>";
+      documentAuto += "<div class=\"fileNameBox\"> <i class=\"uiIconWarning\"></i>"+eXo.commons.DocumentSelector.document_auto_label_existing+"<span class=\"fileName\" >file.png</span></div>";
+      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action cancel\">"+eXo.commons.DocumentSelector.document_auto_label_cancel+"</a>";
+      documentAuto += "<span class=\"pull-right\">&nbsp;"+eXo.commons.DocumentSelector.document_auto_label_or+"&nbsp; </span>";
       if(checkVersExistedFile(eXo.commons.DocumentSelector.listFiles, fileName)) {
-        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action create-version\">"+eXo.ecm.DocumentSelector.document_auto_label_createVersion+"</a>";
+        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action create-version\">"+eXo.commons.DocumentSelector.document_auto_label_createVersion+"</a>";
       }else {
-        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action replace\"> "+eXo.ecm.DocumentSelector.document_auto_label_replace+"</a>";
+        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action replace\"> "+eXo.commons.DocumentSelector.document_auto_label_replace+"</a>";
       }
       documentAuto += "<span class=\"pull-right\">,&nbsp;</span>";
-      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action keep-both\">"+eXo.ecm.DocumentSelector.document_auto_label_keepBoth+"</a>";
+      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action keep-both\">"+eXo.commons.DocumentSelector.document_auto_label_keepBoth+"</a>";
       documentAuto += "</div>";
 
       var autoVersionDiv = jQuery("#auto-versioning-actions");
