@@ -26,8 +26,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
-import org.exoplatform.commons.utils.CommonsUtils;
+import org.hibernate.ejb.HibernatePersistence;
+
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
@@ -36,8 +36,7 @@ import org.exoplatform.services.log.Log;
 
 /**
  * This service is responsible to create a single EntityManagerFactory, with the
- * persistence unit name passed from service init-params
- * <code>persistence.unit.name</code>.
+ * persistence unit name <code>exo-pu</code>.
  * <p>
  * The service is also bound to use of the RequestLifecycle that there is only
  * one EntityManager will be created at beginning of the request lifecycle. The
@@ -48,18 +47,27 @@ import org.exoplatform.services.log.Log;
  * @version $Revision$
  */
 public class EntityManagerService implements ComponentRequestLifecycle {
-
-  public static final String[]        HIBERNATE_PROPERTIES  = new String[] {  "hibernate.show_sql",
-                                                                              "hibernate.format_sql",
-                                                                              "hibernate.use_sql_comments"};
-  private final static Log            LOGGER                = ExoLogger.getLogger(EntityManagerService.class);
-  private static final String         PERSISTENCE_UNIT_NAME = "exo-pu";
+  private final static Log            LOGGER                  = ExoLogger.getLogger(EntityManagerService.class);
+  private static final String[]       HIBERNATE_PROPERTIES    = new String[] {"hibernate.show_sql",
+          "hibernate.format_sql",
+          "hibernate.use_sql_comments"};
+  private static final String         EXO_JPA_DATASOURCE_NAME = "exo.jpa.datasource_name";
+  private static final String         EXO_JPA_DEFAULT_DATASOURCE_NAME = "java:/comp/env/exo-jpa_portal";
+  private static final String         PERSISTENCE_UNIT_NAME   = "exo-pu";
   private static EntityManagerFactory entityManagerFactory;
-  private ThreadLocal<EntityManager>  instance              = new ThreadLocal<>();
+
+  private ThreadLocal<EntityManager>  instance                = new ThreadLocal<>();
 
   public EntityManagerService() {
-    // Get Hibernate properties in eXo global properties
     final Properties properties = new Properties();
+    // Setting datasource JNDI name
+    String datasourceName = PropertyManager.getProperty(EXO_JPA_DATASOURCE_NAME);
+    if (StringUtils.isBlank(datasourceName)) {
+      datasourceName = EXO_JPA_DEFAULT_DATASOURCE_NAME;
+    }
+    properties.put(HibernatePersistence.NON_JTA_DATASOURCE, datasourceName);
+
+    // Get Hibernate properties in eXo global properties
     for (String propertyName : HIBERNATE_PROPERTIES) {
       String propertyValue = PropertyManager.getProperty(propertyName);
       if (StringUtils.isNotBlank(propertyValue)) {
@@ -67,9 +75,10 @@ public class EntityManagerService implements ComponentRequestLifecycle {
         LOGGER.info("Setting [" + propertyName + "] to [" + propertyValue + "]");
       }
     }
+
     entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, properties);
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Created EntityManagerFactory instance: {}", PERSISTENCE_UNIT_NAME);
+      LOGGER.info("Created EntityManagerFactory instance: {} with datasource {}", PERSISTENCE_UNIT_NAME, datasourceName);
     }
   }
 
@@ -88,7 +97,7 @@ public class EntityManagerService implements ComponentRequestLifecycle {
   /**
    * Return a completely new instance of EntityManager. The EntityManager
    * instance is put in the threadLocal for further use.
-   * 
+   *
    * @return return a completely new instance of EntityManager.
    */
   EntityManager createEntityManager() {
