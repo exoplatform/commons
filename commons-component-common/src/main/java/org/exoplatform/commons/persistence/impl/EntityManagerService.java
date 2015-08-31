@@ -18,6 +18,9 @@
  */
 package org.exoplatform.commons.persistence.impl;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.persistence.EntityManager;
@@ -26,6 +29,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
 
 import org.exoplatform.commons.utils.PropertyManager;
@@ -47,39 +51,50 @@ import org.exoplatform.services.log.Log;
  * @version $Revision$
  */
 public class EntityManagerService implements ComponentRequestLifecycle {
-  private final static Log            LOGGER                  = ExoLogger.getLogger(EntityManagerService.class);
-  private static final String[]       HIBERNATE_PROPERTIES    = new String[] {"hibernate.show_sql",
-          "hibernate.format_sql",
-          "hibernate.use_sql_comments"};
-  private static final String         EXO_JPA_DATASOURCE_NAME = "exo.jpa.datasource_name";
-  private static final String         EXO_JPA_DEFAULT_DATASOURCE_NAME = "java:/comp/env/exo-jpa_portal";
-  private static final String         PERSISTENCE_UNIT_NAME   = "exo-pu";
+  private static final Log            LOGGER                          = ExoLogger.getLogger(EntityManagerService.class);
+  private static final String         EXO_JPA_DATASOURCE_NAME         = "exo.jpa.datasource_name";
+  private static final String         PERSISTENCE_UNIT_NAME           = "exo-pu";
+  private static final String         EXO_PREFIX_FOR_HIB_SETTINGS     = "exo.jpa.";
+
   private static EntityManagerFactory entityManagerFactory;
 
-  private ThreadLocal<EntityManager>  instance                = new ThreadLocal<>();
+  private ThreadLocal<EntityManager>  instance                        = new ThreadLocal<>();
 
   public EntityManagerService() {
     final Properties properties = new Properties();
     // Setting datasource JNDI name
     String datasourceName = PropertyManager.getProperty(EXO_JPA_DATASOURCE_NAME);
-    if (StringUtils.isBlank(datasourceName)) {
-      datasourceName = EXO_JPA_DEFAULT_DATASOURCE_NAME;
+    if (StringUtils.isNotBlank(datasourceName)) {
+      properties.put(HibernatePersistence.NON_JTA_DATASOURCE, datasourceName);
+      LOGGER.info("EntityManagerFactory [{}] - Creating with datasource {}.", PERSISTENCE_UNIT_NAME, datasourceName);
+    } else {
+      LOGGER.info("EntityManagerFactory [{}] - Creating with default datasource.", PERSISTENCE_UNIT_NAME);
     }
-    properties.put(HibernatePersistence.NON_JTA_DATASOURCE, datasourceName);
 
     // Get Hibernate properties in eXo global properties
-    for (String propertyName : HIBERNATE_PROPERTIES) {
-      String propertyValue = PropertyManager.getProperty(propertyName);
+    for (String propertyName : getHibernateAvailableSettings()) {
+      String propertyValue = PropertyManager.getProperty(EXO_PREFIX_FOR_HIB_SETTINGS + propertyName);
       if (StringUtils.isNotBlank(propertyValue)) {
         properties.put(propertyName, propertyValue);
-        LOGGER.info("Setting [" + propertyName + "] to [" + propertyValue + "]");
+        LOGGER.info("EntityManagerFactory [{}] - Setting [{}] to [{}]", PERSISTENCE_UNIT_NAME, propertyName, propertyValue);
       }
     }
 
     entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, properties);
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Created EntityManagerFactory instance: {} with datasource {}", PERSISTENCE_UNIT_NAME, datasourceName);
+    LOGGER.info("EntityManagerFactory [{}] - Created.", PERSISTENCE_UNIT_NAME);
+  }
+
+  private List<String> getHibernateAvailableSettings() {
+    List<String> result = new ArrayList<>();
+    for (Field field : AvailableSettings.class.getDeclaredFields()) {
+      try {
+        result.add((String) field.get(null));
+      } catch (IllegalAccessException e) {
+        // Noting to do: we log and continue
+        LOGGER.error("Error while getting Hibernate available settings.", e);
+      }
     }
+    return result;
   }
 
   /**
