@@ -29,6 +29,9 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.Parameter;
+import org.exoplatform.container.xml.ValueParam;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
 
@@ -60,13 +63,16 @@ public class EntityManagerService implements ComponentRequestLifecycle {
 
   private ThreadLocal<EntityManager>  instance                        = new ThreadLocal<>();
 
-  public EntityManagerService() {
-    final Properties properties = new Properties();
-    // Setting datasource JNDI name
-    String datasourceName = PropertyManager.getProperty(EXO_JPA_DATASOURCE_NAME);
-    if (StringUtils.isNotBlank(datasourceName)) {
-      properties.put(HibernatePersistence.NON_JTA_DATASOURCE, datasourceName);
-      LOGGER.info("EntityManagerFactory [{}] - Creating with datasource {}.", PERSISTENCE_UNIT_NAME, datasourceName);
+  private final Properties properties;
+
+  public EntityManagerService(InitParams initParams) {
+    properties = new Properties();
+
+    if (initParams != null && initParams.getValueParam(EXO_JPA_DATASOURCE_NAME) != null
+            && StringUtils.isNotBlank(initParams.getValueParam(EXO_JPA_DATASOURCE_NAME).getValue())) {
+      ValueParam datasourceNameParameter = initParams.getValueParam(EXO_JPA_DATASOURCE_NAME);
+      properties.put(HibernatePersistence.NON_JTA_DATASOURCE, datasourceNameParameter.getValue());
+      LOGGER.info("EntityManagerFactory [{}] - Creating with datasource {}.", PERSISTENCE_UNIT_NAME, datasourceNameParameter.getValue());
     } else {
       LOGGER.info("EntityManagerFactory [{}] - Creating with default datasource.", PERSISTENCE_UNIT_NAME);
     }
@@ -79,9 +85,14 @@ public class EntityManagerService implements ComponentRequestLifecycle {
         LOGGER.info("EntityManagerFactory [{}] - Setting [{}] to [{}]", PERSISTENCE_UNIT_NAME, propertyName, propertyValue);
       }
     }
+  }
 
-    entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, properties);
-    LOGGER.info("EntityManagerFactory [{}] - Created.", PERSISTENCE_UNIT_NAME);
+  public String getDatasourceName() {
+    return (String) properties.get(HibernatePersistence.NON_JTA_DATASOURCE);
+  }
+
+  public void setDatasourceName(String datasourceName) {
+    properties.put(HibernatePersistence.NON_JTA_DATASOURCE, datasourceName);
   }
 
   private List<String> getHibernateAvailableSettings() {
@@ -116,6 +127,11 @@ public class EntityManagerService implements ComponentRequestLifecycle {
    * @return return a completely new instance of EntityManager.
    */
   EntityManager createEntityManager() {
+    if(entityManagerFactory == null) {
+      entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, properties);
+      LOGGER.info("EntityManagerFactory [{}] - Created.", PERSISTENCE_UNIT_NAME);
+    }
+
     EntityManager em = entityManagerFactory.createEntityManager();
     instance.set(em);
     return em;
