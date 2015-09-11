@@ -1,11 +1,11 @@
 package org.exoplatform.commons.persistence.impl;
 
-import org.exoplatform.commons.api.persistence.Transactional;
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 
 public class TaskService {
   private TaskDao dao = new TaskDao();
 
-  @Transactional
+  @ExoTransactional
   public Task create(Task task) {
     return dao.create(task);
   }

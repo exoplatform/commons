@@ -26,7 +26,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.commons.api.persistence.Transactional;
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 
 /**
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
@@ -62,7 +62,7 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   @Override
-  @Transactional
+  @ExoTransactional
   public List<E> findAll() {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<E> query = cb.createQuery(modelClass);
@@ -76,7 +76,7 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   @Override
-  @Transactional
+  @ExoTransactional
   public E create(E entity) {
     EntityManager em = getEntityManager();
     em.persist(entity);
@@ -84,7 +84,7 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   @Override
-  @Transactional
+  @ExoTransactional
   public void createAll(List<E> entities) {
     EntityManager em = getEntityManager();
     for (E entity : entities) {
@@ -93,14 +93,14 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   @Override
-  @Transactional
+  @ExoTransactional
   public E update(E entity) {
     getEntityManager().merge(entity);
     return entity;
   }
 
   @Override
-  @Transactional
+  @ExoTransactional
   public void updateAll(List<E> entities) {
     for (E entity : entities) {
       getEntityManager().merge(entity);
@@ -108,14 +108,14 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   @Override
-  @Transactional
+  @ExoTransactional
   public void delete(E entity) {
     EntityManager em = getEntityManager();
     em.remove(em.merge(entity));
   }
 
   @Override
-  @Transactional
+  @ExoTransactional
   public void deleteAll(List<E> entities) {
     EntityManager em = getEntityManager();
     for (E entity : entities) {
@@ -124,7 +124,7 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
   }
 
   @Override
-  @Transactional
+  @ExoTransactional
   public void deleteAll() {
     List<E> entities = findAll();
 

@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-public class TransactionalAnnotationTest {
+public class ExoTransactionalAnnotationTest {
 
   @Test
   public void testCreateDaoMethodIsTransactional() {
@@ -90,7 +90,6 @@ public class TransactionalAnnotationTest {
     }
 
     for (Future<Boolean> fut : list) {
-      System.out.println(fut.get());
       assertTrue(fut.get());
     }
     // shut down the executor service now

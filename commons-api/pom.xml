@@ -4,7 +4,7 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>4.3.x-SNAPSHOT</version>
+    <version>4.3.x-commons-task-SNAPSHOT</version>
   </parent>
   <artifactId>commons-api</artifactId>
   <packaging>jar</packaging>
@@ -55,4 +55,30 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <configuration>
+              <compilerArgument>-proc:none</compilerArgument>
+              <includes>
+                <include>**/ExoEntityProcessor*</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-everything-else</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

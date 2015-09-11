@@ -80,6 +80,10 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
         Integer current = data.build();
         exoWebNotificationCountCache.put(key, new IntegerData(current + 1));
       }
+      
+      ListWebNotificationsKey listWebNotificationsKey = ListWebNotificationsKey.key(notification.getTo(), true);
+      ListWebNotificationsData  listWebNotificationsData = new ListWebNotificationsData(listWebNotificationsKey);
+      exoWebNotificationsCache.put(listWebNotificationsKey, listWebNotificationsData);
       moveTopPopover(notification);
       moveTopViewAll(notification);
       //
@@ -100,6 +104,9 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     if (infoData != null) {
       infoData.updateRead(isRead);
     }
+    if (isRead) {
+      clearWebNotificationCache(notificationId);
+    }
   }
 
   public void updateAllRead(String userId) throws Exception {
@@ -117,6 +124,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
           if (userId.equals(ntf.getTo())) {
             if (isUpdateRead) {
               webData.updateRead(true);
+              clearWebNotificationCache(ntf.getId());
             } else {
               removeIds.add(ntf.getId());
             }
@@ -181,8 +189,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     //
     removeViewAll(notification);
     //
-    WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
-    exoWebNotificationCache.remove(key);
+    clearWebNotificationCache(notificationId);
     //clear badge number in for notification's TO user.
     clearWebNotificationCountCache(notification.getTo());
     //
@@ -335,6 +342,15 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   public void clearWebNotificationCountCache(String userId) {
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(userId);
     exoWebNotificationCountCache.remove(key);
+  }
+  
+  /**
+   * Clear the notification from the cache.
+   * @param notifId
+   */
+  public void clearWebNotificationCache(String notificationId) {
+	WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
+	exoWebNotificationCache.remove(key);
   }
   
   public void moveTopPopover(NotificationInfo notification) {

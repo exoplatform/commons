@@ -24,7 +24,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.commons.api.persistence.Transactional;
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 
 import javax.persistence.EntityManager;
 
@@ -33,15 +33,15 @@ import javax.persistence.EntityManager;
  * REQUIRED. Support a current transaction, create a new one if none exists.
  * Analogous to EJB or Spring transaction attribute of the same name.
  *
- * @see org.exoplatform.commons.api.persistence.Transactional
+ * @see ExoTransactional
  * @author <a href="bdechateauvieux@exoplatform.org">Benoit de Chateauvieux</a>
  * @version $Revision$
  */
 @Aspect
-public class TransactionalAspect {
-  private static final Log LOG = ExoLogger.getLogger(TransactionalAspect.class);
+public class ExoTransactionalAspect {
+  private static final Log LOG = ExoLogger.getLogger(ExoTransactionalAspect.class);
 
-  @Around("execution(* *(..)) && @annotation(Transactional)")
+  @Around("execution(* *(..)) && @annotation(org.exoplatform.commons.api.persistence.ExoTransactional)")
   public Object around(ProceedingJoinPoint point) throws Throwable {
     EntityManager entityManager;
     boolean begunTx = false;

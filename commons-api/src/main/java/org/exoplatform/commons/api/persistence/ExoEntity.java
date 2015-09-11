@@ -24,15 +24,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Describe a method as transactional. The only propagation implemented yet is
- * REQUIRED. Support a current transaction, create a new one if none exists.
- * Analogous to EJB or Spring transaction attribute of the same name.
+ * Describe a class as a JPA entity managed by eXo Platform
  *
- * @see org.exoplatform.commons.api.persistence.TransactionalAspect
  * @author <a href="bdechateauvieux@exoplatform.org">Benoit de Chateauvieux</a>
  * @version $Revision$
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Transactional {
+@Target(ElementType.TYPE)
+public @interface ExoEntity {
 }

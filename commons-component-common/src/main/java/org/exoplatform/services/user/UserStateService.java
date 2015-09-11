@@ -16,6 +16,17 @@
  */
 package org.exoplatform.services.user;
 
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Session;
+
 import org.apache.commons.lang.math.NumberUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.cache.CacheService;
@@ -27,14 +38,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityConstants;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Session;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 public class UserStateService {
   private static final Log LOG = ExoLogger.getLogger(UserStateService.class.getName());
@@ -161,19 +164,21 @@ public class UserStateService {
   
   //Get all users online
   public List<UserStateModel> online() {
-    List<UserStateModel> onlineUsers = new ArrayList<UserStateModel>();
+    List<UserStateModel> onlineUsers = new LinkedList<UserStateModel>();
     List<UserStateModel> users = null;
     try {
       ExoCache<Serializable, UserStateModel> userStateCache = getUserStateCache();
       if (userStateCache == null){
         LOG.warn("Cant get online users list from cache. Will return an empty list.");
-        return new ArrayList<UserStateModel>();
+        return new LinkedList<UserStateModel>();
       }
-      users = (List<UserStateModel>) userStateCache.getCachedObjects();     
+      users = (List<UserStateModel>) userStateCache.getCachedObjects();
+      //
+      Collections.sort(users, new LastActivityComparatorASC());
       for (UserStateModel userStateModel : users) {
-        if(isOnline(userStateModel)) {
+        if (isOnline(userStateModel)) {
           onlineUsers.add(userStateModel);
-        }        
+        }
       }
     } catch (Exception e) {
       LOG.error("Exception when getting online user: {}",e);
@@ -189,6 +194,14 @@ public class UserStateService {
     return false;
   }
 
+  public UserStateModel lastLogin() {
+    List<UserStateModel> online = online();
+    if (online.size() > 0) {
+      return online.get(online.size() - 1);
+    }
+    return null;
+  }
+
   private boolean isOnline(UserStateModel model) {
     if (model != null) {
       long iDate = Calendar.getInstance().getTimeInMillis();
@@ -198,8 +211,16 @@ public class UserStateService {
     }
     return false;
   }
-  
-  private ExoCache<Serializable, UserStateModel> getUserStateCache(){
+
+  static public class LastActivityComparatorASC implements Comparator<UserStateModel> {
+    public int compare(UserStateModel u1, UserStateModel u2) {
+      Long date1 = u1.getLastActivity();
+      Long date2 = u2.getLastActivity();
+      return date1.compareTo(date2);
+    }
+  }
+
+  private ExoCache<Serializable, UserStateModel> getUserStateCache() {
     return cacheService.getCacheInstance(UserStateService.class.getName() + CommonsUtils.getRepository().getConfiguration().getName()) ;     
   }
 }
