@@ -16,22 +16,21 @@
  */
 package org.exoplatform.commons.persistence.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Enumeration;
-
 import org.exoplatform.commons.api.persistence.ExoEntityProcessor;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Enumeration;
 
 /**
  * This integrator is called by Hibernate at run time, when JPA creates the PLF
@@ -45,41 +44,49 @@ import org.exoplatform.services.log.Log;
  * @version $Revision$
  */
 public class ExoEntityScanner implements Integrator {
-  private final static Log LOGGER = ExoLogger.getLogger(ExoEntityScanner.class);
+  private static final Log    LOGGER        = ExoLogger.getLogger(ExoEntityScanner.class);
+  private static final String PU_FIELD_NAME = "persistenceUnitName";
 
   public void integrate(Configuration configuration,
                         SessionFactoryImplementor sessionFactory,
                         SessionFactoryServiceRegistry serviceRegistry) {
     try {
-      // get all the exo-entities.idx in classpath
-      Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(ExoEntityProcessor.ENTITIES_IDX_PATH);
-      while (urls.hasMoreElements()) {
-        InputStream stream = urls.nextElement().openStream();
-        try {
-          BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-          String entityClassName;
-          while ((entityClassName = reader.readLine()) != null) {
-            try {
-              if (configuration.getClassMapping(entityClassName) == null) {
-                configuration.addAnnotatedClass(Class.forName(entityClassName));
+      if (isExoPersistenceUnit(configuration)) {
+        // get all the exo-entities.idx in classpath
+        Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(ExoEntityProcessor.ENTITIES_IDX_PATH);
+        while (urls.hasMoreElements()) {
+          InputStream stream = urls.nextElement().openStream();
+          try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            String entityClassName;
+            while ((entityClassName = reader.readLine()) != null) {
+              try {
+                if (configuration.getClassMapping(entityClassName) == null) {
+                  configuration.addAnnotatedClass(Class.forName(entityClassName));
+                }
+              } catch (ClassNotFoundException e) {
+                LOGGER.error("Error while trying to register entity [" + entityClassName + "] in Persistence Unit", e);
               }
-            } catch (ClassNotFoundException e) {
-              LOGGER.error("Error while trying to register entity [" + entityClassName + "] in Persistence Unit", e);
+            }
+          } finally {
+            try {
+              stream.close();
+            } catch (IOException e) {
+              LOGGER.error("Error while closing stream", e);
             }
           }
-        } finally {
-          try {
-            stream.close();
-          } catch (IOException e) {
-            LOGGER.error("Error while closing stream", e);
-          }
-        }
 
+        }
       }
-    } catch (IOException e) {
+    } catch (IOException | IllegalAccessException e) {
       LOGGER.error("Error while loading entities in PLF Persistence Unit", e);
     }
     configuration.buildMappings();
+  }
+
+  private boolean isExoPersistenceUnit(Configuration configuration) throws IllegalAccessException {
+    // this scanner is used only for exo-pu (should have a property named "persistenceUnitName" set to "exo-pu")
+    return EntityManagerService.PERSISTENCE_UNIT_NAME.equals(configuration.getProperty(PU_FIELD_NAME));
   }
 
   public void integrate(MetadataImplementor metadata,
