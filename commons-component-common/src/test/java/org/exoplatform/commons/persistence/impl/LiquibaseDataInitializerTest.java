@@ -33,18 +33,20 @@ public class LiquibaseDataInitializerTest {
     Assert.assertEquals(liquibaseDataInitializer.getDatasourceName(), "datasource1");
   }
 
-  @Test
-  public void shouldUseDefaultDatasourceNameWhenDatasourceNameIsNotDefinedInConfiguration() {
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldThrowExceptionWhenDatasourceNameIsNotDefinedInConfiguration() {
     InitParams initParams = new InitParams();
 
     LiquibaseDataInitializer liquibaseDataInitializer = new LiquibaseDataInitializer(initParams);
-
-    Assert.assertEquals(liquibaseDataInitializer.getDatasourceName(), LiquibaseDataInitializer.LIQUIBASE_DEFAULT_DATASOURCE_NAME);
   }
 
   @Test
   public void shouldSetContextsWhenContextsAreDefinedInConfiguration() {
     InitParams initParams = new InitParams();
+    ValueParam datasourceNameValueParam = new ValueParam();
+    datasourceNameValueParam.setName(LiquibaseDataInitializer.LIQUIBASE_DATASOURCE_PARAM_NAME);
+    datasourceNameValueParam.setValue("datasource1");
+    initParams.addParam(datasourceNameValueParam);
     ValueParam contextsValueParam = new ValueParam();
     contextsValueParam.setName(LiquibaseDataInitializer.LIQUIBASE_CONTEXTS_PARAM_NAME);
     contextsValueParam.setValue("context1");
@@ -58,6 +60,10 @@ public class LiquibaseDataInitializerTest {
   @Test
   public void shouldUseDefaultContextsWhenContextsAreNotDefinedInConfiguration() {
     InitParams initParams = new InitParams();
+    ValueParam datasourceNameValueParam = new ValueParam();
+    datasourceNameValueParam.setName(LiquibaseDataInitializer.LIQUIBASE_DATASOURCE_PARAM_NAME);
+    datasourceNameValueParam.setValue("datasource1");
+    initParams.addParam(datasourceNameValueParam);
 
     LiquibaseDataInitializer liquibaseDataInitializer = new LiquibaseDataInitializer(initParams);
 
@@ -66,8 +72,13 @@ public class LiquibaseDataInitializerTest {
 
   @Test
   public void shouldNotCallLiquibaseWhenNoChangeLogs() throws LiquibaseException {
-    // Init service with default values
-    LiquibaseDataInitializer liquibaseDataInitializer = Mockito.spy(new LiquibaseDataInitializer(null));
+    InitParams initParams = new InitParams();
+    ValueParam datasourceNameValueParam = new ValueParam();
+    datasourceNameValueParam.setName(LiquibaseDataInitializer.LIQUIBASE_DATASOURCE_PARAM_NAME);
+    datasourceNameValueParam.setValue("datasource1");
+    initParams.addParam(datasourceNameValueParam);
+
+    LiquibaseDataInitializer liquibaseDataInitializer = Mockito.spy(new LiquibaseDataInitializer(initParams));
 
     liquibaseDataInitializer.initData();
 
@@ -76,8 +87,13 @@ public class LiquibaseDataInitializerTest {
 
   @Test
   public void shouldCallLiquibaseWhenChangeLogsAreAdded() throws LiquibaseException, SQLException {
-    // Init service with default values
-    LiquibaseDataInitializer liquibaseDataInitializer = Mockito.spy(new LiquibaseDataInitializer(null));
+    InitParams initParams = new InitParams();
+    ValueParam datasourceNameValueParam = new ValueParam();
+    datasourceNameValueParam.setName(LiquibaseDataInitializer.LIQUIBASE_DATASOURCE_PARAM_NAME);
+    datasourceNameValueParam.setValue("datasource1");
+    initParams.addParam(datasourceNameValueParam);
+
+    LiquibaseDataInitializer liquibaseDataInitializer = Mockito.spy(new LiquibaseDataInitializer(initParams));
     Mockito.doNothing().when(liquibaseDataInitializer).applyChangeLog(Mockito.any(Database.class), Mockito.any(String.class));
     Mockito.doReturn(new BasicDataSource()).when(liquibaseDataInitializer).getDatasource(Mockito.any(String.class));
     Mockito.doReturn(null).when(liquibaseDataInitializer).getDatabase(Mockito.any(DataSource.class));

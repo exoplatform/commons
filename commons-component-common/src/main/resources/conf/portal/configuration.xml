@@ -67,7 +67,7 @@
     <init-params>
       <value-param>
         <name>liquibase.datasource</name>
-        <value>${exo.jpa.datasource.name}</value>
+        <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
       </value-param>
       <value-param>
         <name>liquibase.contexts</name>

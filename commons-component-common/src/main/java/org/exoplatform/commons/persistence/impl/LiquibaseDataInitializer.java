@@ -31,7 +31,6 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
 
   public static final String LIQUIBASE_DATASOURCE_PARAM_NAME = "liquibase.datasource";
   public static final String LIQUIBASE_CONTEXTS_PARAM_NAME = "liquibase.contexts";
-  public static final String LIQUIBASE_DEFAULT_DATASOURCE_NAME = "java:/comp/env/exo-jpa_portal";
   public static final String LIQUIBASE_DEFAULT_CONTEXTS = "production";
 
   private String datasourceName;
@@ -41,30 +40,27 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
   private List<ChangeLogsPlugin> changeLogsPlugins = new ArrayList<ChangeLogsPlugin>();
 
   public LiquibaseDataInitializer(InitParams initParams) {
-    if(initParams != null) {
-      ValueParam liquibaseDatasourceNameParam = initParams.getValueParam(LIQUIBASE_DATASOURCE_PARAM_NAME);
-      if (liquibaseDatasourceNameParam != null && liquibaseDatasourceNameParam.getValue() != null) {
-        datasourceName = liquibaseDatasourceNameParam.getValue();
-      } else {
-        datasourceName = LIQUIBASE_DEFAULT_DATASOURCE_NAME;
-      }
-
-      ValueParam liquibaseContextsParam = initParams.getValueParam(LIQUIBASE_CONTEXTS_PARAM_NAME);
-      if (liquibaseContextsParam != null && liquibaseContextsParam.getValue() != null) {
-        liquibaseContexts = liquibaseContextsParam.getValue();
-      } else {
-        liquibaseContexts = LIQUIBASE_DEFAULT_CONTEXTS;
-      }
-
-      LOG.info("LiquibaseDataInitializer created with : datasourceName=" + datasourceName + ", contexts=" + liquibaseContexts);
-    } else {
-      datasourceName = LIQUIBASE_DEFAULT_DATASOURCE_NAME;
-      liquibaseContexts = LIQUIBASE_DEFAULT_CONTEXTS;
-      LOG.info("No InitParams found for LiquibaseDataInitializer - default values are used : datasourceName="
-              + LIQUIBASE_DEFAULT_DATASOURCE_NAME
-              + ", contexts="
-              + LIQUIBASE_DEFAULT_CONTEXTS);
+    if(initParams == null) {
+      throw new IllegalArgumentException("No InitParams found for LiquibaseDataInitializer service. The datasource name ("
+              + LIQUIBASE_DATASOURCE_PARAM_NAME + ") should be defined at least.");
     }
+
+    ValueParam liquibaseDatasourceNameParam = initParams.getValueParam(LIQUIBASE_DATASOURCE_PARAM_NAME);
+    if (liquibaseDatasourceNameParam != null && liquibaseDatasourceNameParam.getValue() != null) {
+      datasourceName = liquibaseDatasourceNameParam.getValue();
+    } else {
+      throw new IllegalArgumentException("Datasource name for LiquibaseDataInitializer must be defined in the init params ("
+              + LIQUIBASE_DATASOURCE_PARAM_NAME + ")");
+    }
+
+    ValueParam liquibaseContextsParam = initParams.getValueParam(LIQUIBASE_CONTEXTS_PARAM_NAME);
+    if (liquibaseContextsParam != null && liquibaseContextsParam.getValue() != null) {
+      liquibaseContexts = liquibaseContextsParam.getValue();
+    } else {
+      liquibaseContexts = LIQUIBASE_DEFAULT_CONTEXTS;
+    }
+
+    LOG.info("LiquibaseDataInitializer created with : datasourceName=" + datasourceName + ", contexts=" + liquibaseContexts);
   }
 
   public String getDatasourceName() {
