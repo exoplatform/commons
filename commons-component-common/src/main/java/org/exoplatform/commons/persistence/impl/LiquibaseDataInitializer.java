@@ -112,13 +112,14 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
   @Override
   public void initData(String datasourceName) {
     if(!changeLogsPlugins.isEmpty()) {
+      Database database = null;
       try {
         LOG.info("Starting data initialization with Liquibase with datasource " + datasourceName);
 
         DataSource datasource = getDatasource(datasourceName);
 
         if(datasource != null) {
-          Database database = getDatabase(datasource);
+          database = getDatabase(datasource);
 
           for (ChangeLogsPlugin changeLogsPlugin : this.changeLogsPlugins) {
             LOG.info("Processing changelogs of " + changeLogsPlugin.getName());
@@ -138,6 +139,14 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
         LOG.error("Error while initializing liquibase database - Cause : " + e.getMessage(), e);
       } catch (SQLException e) {
         LOG.error("Error while getting a JDBC connection from datasource " + datasourceName + " - Cause : " + e.getMessage(), e);
+      } finally {
+        if(database != null) {
+          try {
+            database.close();
+          } catch (DatabaseException e) {
+            LOG.error("Error while closing database connection - Cause : " + e.getMessage(), e);
+          }
+        }
       }
     } else {
       LOG.info("No data to initialize with Liquibase");
