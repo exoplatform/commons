@@ -51,7 +51,7 @@ import java.util.Properties;
 public class EntityManagerService implements ComponentRequestLifecycle {
   public static final String          PERSISTENCE_UNIT_NAME       = "exo-pu";
   private static final Log            LOGGER                      = ExoLogger.getLogger(EntityManagerService.class);
-  private static final String         EXO_JPA_DATASOURCE_NAME     = "exo.jpa.datasource_name";
+  private static final String         EXO_JPA_DATASOURCE_NAME     = "exo.jpa.datasource.name";
   private static final String         EXO_PREFIX_FOR_HIB_SETTINGS = "exo.jpa.";
   private static EntityManagerFactory entityManagerFactory;
 
