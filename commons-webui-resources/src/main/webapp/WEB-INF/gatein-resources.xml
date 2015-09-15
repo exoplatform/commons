@@ -75,5 +75,16 @@
 			<as>jQuery</as>
 		</depends>
 	</module>
+
+	<module>
+		<name>common-utils</name>
+		<script>
+			<path>/javascript/eXo/commons/Utils.js</path>
+		</script>
+		<depends>
+			<module>jquery</module>
+			<as>jQuery</as>
+		</depends>
+	</module>
 </gatein-resources>
 
