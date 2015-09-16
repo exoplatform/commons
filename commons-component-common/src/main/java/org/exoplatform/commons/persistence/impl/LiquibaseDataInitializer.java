@@ -112,41 +112,20 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
   @Override
   public void initData(String datasourceName) {
     if(!changeLogsPlugins.isEmpty()) {
-      Database database = null;
-      try {
-        LOG.info("Starting data initialization with Liquibase with datasource " + datasourceName);
+      LOG.info("Starting data initialization with Liquibase with datasource " + datasourceName);
 
-        DataSource datasource = getDatasource(datasourceName);
+      DataSource datasource = getDatasource(datasourceName);
 
-        if(datasource != null) {
-          database = getDatabase(datasource);
-
-          for (ChangeLogsPlugin changeLogsPlugin : this.changeLogsPlugins) {
-            LOG.info("Processing changelogs of " + changeLogsPlugin.getName());
-            try {
-              for (String changelogsPath : changeLogsPlugin.getChangelogPaths()) {
-                LOG.info("  * processing changelog " + changelogsPath);
-                applyChangeLog(database, changelogsPath);
-              }
-            } catch (LiquibaseException e) {
-              LOG.error("Error while processing changelogs of plugin " + changeLogsPlugin.getName() + " - Cause : " + e.getMessage(), e);
-            }
-          }
-        } else {
-          LOG.error("Data initialization aborted because the datasource " + datasourceName + " has not been found.");
-        }
-      } catch (DatabaseException e) {
-        LOG.error("Error while initializing liquibase database - Cause : " + e.getMessage(), e);
-      } catch (SQLException e) {
-        LOG.error("Error while getting a JDBC connection from datasource " + datasourceName + " - Cause : " + e.getMessage(), e);
-      } finally {
-        if(database != null) {
-          try {
-            database.close();
-          } catch (DatabaseException e) {
-            LOG.error("Error while closing database connection - Cause : " + e.getMessage(), e);
+      if(datasource != null) {
+        for (ChangeLogsPlugin changeLogsPlugin : this.changeLogsPlugins) {
+          LOG.info("Processing changelogs of " + changeLogsPlugin.getName());
+          for (String changelogsPath : changeLogsPlugin.getChangelogPaths()) {
+            LOG.info("  * processing changelog " + changelogsPath);
+            applyChangeLog(datasource, changelogsPath);
           }
         }
+      } else {
+        LOG.error("Data initialization aborted because the datasource " + datasourceName + " has not been found.");
       }
     } else {
       LOG.info("No data to initialize with Liquibase");
@@ -154,26 +133,31 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
   }
 
   /**
-   * Get a Liquibase Database from a Datasource
+   * Apply changelogs with Liquibase
    * @param datasource
-   * @return
-   * @throws DatabaseException
-   * @throws SQLException
-   */
-  protected Database getDatabase(DataSource datasource) throws DatabaseException, SQLException {
-    return DatabaseFactory.getInstance()
-                    .findCorrectDatabaseImplementation(new JdbcConnection(datasource.getConnection()));
-  }
-
-  /**
-   * Apply changelog with Liquibase
-   * @param database
    * @param changelogsPath
    * @throws LiquibaseException
    */
-  protected void applyChangeLog(Database database, String changelogsPath) throws LiquibaseException {
-    Liquibase liquibase = new Liquibase(changelogsPath, new ClassLoaderResourceAccessor(), database);
-    liquibase.update(liquibaseContexts);
+  protected void applyChangeLog(DataSource datasource, String changelogsPath) {
+    Database database = null;
+    try {
+      database = DatabaseFactory.getInstance()
+              .findCorrectDatabaseImplementation(new JdbcConnection(datasource.getConnection()));
+      Liquibase liquibase = new Liquibase(changelogsPath, new ClassLoaderResourceAccessor(), database);
+      liquibase.update(liquibaseContexts);
+    } catch (SQLException e) {
+      LOG.error("Error while getting a JDBC connection from datasource " + datasourceName + " - Cause : " + e.getMessage(), e);
+    } catch (LiquibaseException e) {
+      LOG.error("Error while applying liquibase changelogs " + changelogsPath + " - Cause : " + e.getMessage(), e);
+    } finally {
+      if(database != null) {
+        try {
+          database.close();
+        } catch (DatabaseException e) {
+          LOG.error("Error while closing database connection - Cause : " + e.getMessage(), e);
+        }
+      }
+    }
   }
 
   /**

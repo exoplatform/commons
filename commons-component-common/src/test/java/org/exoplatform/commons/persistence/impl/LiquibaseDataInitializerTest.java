@@ -1,6 +1,5 @@
 package org.exoplatform.commons.persistence.impl;
 
-import liquibase.database.Database;
 import liquibase.exception.LiquibaseException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.exoplatform.container.xml.InitParams;
@@ -70,6 +69,7 @@ public class LiquibaseDataInitializerTest {
     Assert.assertEquals(liquibaseDataInitializer.getContexts(), LiquibaseDataInitializer.LIQUIBASE_DEFAULT_CONTEXTS);
   }
 
+
   @Test
   public void shouldNotCallLiquibaseWhenNoChangeLogs() throws LiquibaseException {
     InitParams initParams = new InitParams();
@@ -82,7 +82,7 @@ public class LiquibaseDataInitializerTest {
 
     liquibaseDataInitializer.initData();
 
-    Mockito.verify(liquibaseDataInitializer, Mockito.never()).applyChangeLog(Mockito.any(Database.class), Mockito.any(String.class));
+    Mockito.verify(liquibaseDataInitializer, Mockito.never()).applyChangeLog(Mockito.any(DataSource.class), Mockito.any(String.class));
   }
 
   @Test
@@ -94,9 +94,8 @@ public class LiquibaseDataInitializerTest {
     initParams.addParam(datasourceNameValueParam);
 
     LiquibaseDataInitializer liquibaseDataInitializer = Mockito.spy(new LiquibaseDataInitializer(initParams));
-    Mockito.doNothing().when(liquibaseDataInitializer).applyChangeLog(Mockito.any(Database.class), Mockito.any(String.class));
+    Mockito.doNothing().when(liquibaseDataInitializer).applyChangeLog(Mockito.any(DataSource.class), Mockito.any(String.class));
     Mockito.doReturn(new BasicDataSource()).when(liquibaseDataInitializer).getDatasource(Mockito.any(String.class));
-    Mockito.doReturn(null).when(liquibaseDataInitializer).getDatabase(Mockito.any(DataSource.class));
 
     List<String> changeLogsPaths = new ArrayList<>(3);
     changeLogsPaths.add("changelog1");
@@ -113,6 +112,6 @@ public class LiquibaseDataInitializerTest {
 
     liquibaseDataInitializer.initData();
 
-    Mockito.verify(liquibaseDataInitializer, Mockito.times(3)).applyChangeLog(Mockito.any(Database.class), Mockito.any(String.class));
+    Mockito.verify(liquibaseDataInitializer, Mockito.times(3)).applyChangeLog(Mockito.any(DataSource.class), Mockito.any(String.class));
   }
 }
