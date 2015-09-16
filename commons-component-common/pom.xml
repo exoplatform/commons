@@ -175,7 +175,12 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
       <version>4.1.12.Final</version>
-      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>
@@ -192,30 +197,38 @@
           <include>**/*.properties</include>
           <include>**/*.xml</include>
           <include>**/*.gtmpl</include>
+          <include>**/*.Processor</include>
+          <include>**/*.Integrator</include>
         </includes>
       </resource>
     </resources>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>aspectj-maven-plugin</artifactId>
+        <groupId>com.jcabi</groupId>
+        <artifactId>jcabi-maven-plugin</artifactId>
+        <version>0.13.1</version>
         <executions>
           <execution>
+            <id>weave-classes</id>
             <goals>
-              <goal>compile</goal>
-              <goal>test-compile</goal>
+              <goal>ajc</goal>
             </goals>
+            <phase>compile</phase>
+            <configuration>
+              <classesDirectory>target/classes</classesDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>weave-test-classes</id>
+            <goals>
+              <goal>ajc</goal>
+            </goals>
+            <phase>test-compile</phase>
+            <configuration>
+              <classesDirectory>target/test-classes</classesDirectory>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-          <complianceLevel>${maven.compiler.target}</complianceLevel>
-          <showWeaveInfo>false</showWeaveInfo>
-          <includes>
-            <include>**/persistence/**/*.java</include>
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

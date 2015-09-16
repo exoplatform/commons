@@ -101,20 +101,20 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     for (int i = 0; i < 20; i++) {
       cachedStorage.save(makeWebNotificationInfo(userId));
     }
-    assertFalse(data.isMax());
+    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 10);
-    assertFalse(data.isMax());
+    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 10);
     //
-    assertEquals(10, onPopoverInfos.size());
-    assertFalse(data.isMax());
+    assertEquals(6, onPopoverInfos.size());
+    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 15);
-    assertFalse(data.isMax());
+    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 15);
     //
-    assertEquals(15, onPopoverInfos.size());
+    assertEquals(11, onPopoverInfos.size());
     //
-    assertFalse(data.isMax());
+    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 30);
     assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 30);
@@ -248,9 +248,9 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     List<NotificationInfo> viewAllInfos = cachedStorage.get(new WebNotificationFilter(userId, false), 0 , 10);
     assertEquals(6, viewAllInfos.size());
     //
-    NotificationInfo lastOnPopoverInfo = onPopoverInfos.get(onPopoverInfos.size() - 1);
+    NotificationInfo lastOnPopoverInfo = onPopoverInfos.get(onPopoverInfos.size() - 5);
     assertEquals(createdFirstInfo.getId(), lastOnPopoverInfo.getId());
-    NotificationInfo lastViewAllInfos = onPopoverInfos.get(onPopoverInfos.size() - 1);
+    NotificationInfo lastViewAllInfos = viewAllInfos.get(viewAllInfos.size() - 1);
     assertEquals(createdFirstInfo.getId(), lastViewAllInfos.getId());
     //
     String newTitle = "The new title";
