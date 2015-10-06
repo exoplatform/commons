@@ -332,6 +332,12 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       try {
         //ensure the message is valid
         if (message.getFrom() == null) {
+          LOG.debug("Sender address is null.");
+          return false;
+        }
+        // the email address between < and > is empty
+        if (message.getFrom().indexOf("<>") > 0) {
+          LOG.debug("Sender address (" + message.getFrom() + ") is empty.");
           return false;
         }
         mailService.sendMessage(message);
