@@ -218,7 +218,7 @@ public class NotificationUtils {
   }
   
   public static boolean isValidEmailAddresses(String addressList){
-    if (addressList == null || addressList.length() < 0)
+    if (addressList == null || addressList.length() <= 0)
       return false;
     addressList = StringUtils.replace(addressList, ";", ",");
     try {

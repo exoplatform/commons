@@ -61,7 +61,7 @@ public class NotificationUtilsTest extends TestCase {
   public void testIsValidEmailAddresses() {
     String emails = "";
     // email is empty
-    assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
+    assertEquals(false, NotificationUtils.isValidEmailAddresses(emails));
     // email only text not @
     emails = "test";
     assertEquals(false, NotificationUtils.isValidEmailAddresses(emails));
