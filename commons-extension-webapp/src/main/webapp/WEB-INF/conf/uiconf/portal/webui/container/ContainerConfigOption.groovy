@@ -42,7 +42,7 @@ import org.exoplatform.webui.core.model.SelectItemOption ;
         "ThreeRowContainerLayout"));
      row.addSelectItemOption(new SelectItemOption("pluginContainer",
         "<container template=\"system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl\">" +
-        "<name>Dynamic Container</name><factory-id>addonContainer</factory-id>" +
+        "<name>DynamicContainer</name><factory-id>addonContainer</factory-id>" +
         "</container>",
         "PluginContainerLayout"));
   templates.add(row);
@@ -71,7 +71,7 @@ import org.exoplatform.webui.core.model.SelectItemOption ;
         "ThreeColumnContainerLayout")) ;
     column.addSelectItemOption(new SelectItemOption("pluginColumnContainer",
        "<container template=\"system:/groovy/portal/webui/container/UIAddOnColumnContainer.gtmpl\">" +
-       "<name>Dynamic Column Container</name><factory-id>addonContainer</factory-id>" +
+       "<name>DynamicColumnContainer</name><factory-id>addonContainer</factory-id>" +
        "</container>",
        "PluginColumnContainerLayout"));
   templates.add(column);  
