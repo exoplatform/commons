@@ -25,6 +25,15 @@ function DocumentSelector(){
   this.selectedItem = null;
   this.noFolderOrFileLabel = "There is no folder or file.";
   this.noDriveLabel = "There is no drive.";
+  this.listFiles=[];
+  this.listFileName=[];
+  this.existingBehavior = "keepBoth";
+  this.document_auto_label_existing = eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.existing",  eXo.env.portal.language);
+  this.document_auto_label_cancel   = eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.cancel",  eXo.env.portal.language);
+  this.document_auto_label_or				= eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.or",  eXo.env.portal.language)
+  this.document_auto_label_createVersion = eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.createVersion",  eXo.env.portal.language);
+  this.document_auto_label_replace  = eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.createVersion",  eXo.env.portal.language);
+  this.document_auto_label_keepBoth	= eXo.ecm.WCMUtils.getBundle("DocumentAuto.label.keepBoth",  eXo.env.portal.language);
 };
 
 function DocumentItem(){
@@ -204,7 +213,8 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
   var folderList = folderContainer.getElementsByTagName("Folder");
   var fileContainer = data.getElementsByTagName("Files")[0];
   var fileList = fileContainer.getElementsByTagName("File");
-
+  eXo.commons.DocumentSelector.listFiles=[];
+  eXo.commons.DocumentSelector.listFileName=[];
   var listRecords = jQuery('#ListRecords');
 
   if ((!fileList || fileList.length <= 0)
@@ -266,6 +276,10 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
       var nodeType = fileList[j].getAttribute("nodeType");
       var nodeTypeIcon = nodeType.replace(":", "_") + "48x48Icon Folder";
       var node = fileList[j].getAttribute("name");
+      var isVersion = fileList[j].getAttribute("isVersioned");
+      var isVersionSupport = fileList[j].getAttribute("isVersionSupport");
+      eXo.commons.DocumentSelector.listFiles.push({"name":node, "value":isVersion, "isVersionSupport":isVersionSupport});
+      eXo.commons.DocumentSelector.listFileName.push(node);
       var title = fileList[j].getAttribute("title");
       var size = fileList[j].getAttribute("size");
       if (size < 1024)
@@ -690,12 +704,12 @@ function UIDSUpload() {
           uploadHTML += "      <a class='BrowseLink' href='javascript:void(0);'>";
           uploadHTML += "        <label for='" + idFile + "' style='width: 26px; height: 26px; display:block'>";
           uploadHTML += "          <i class='uiIconUpload uiIconLightGray'></i>";
-          uploadHTML += "          <input style=\"position:absolute; left:-5000px;\" type='file' name='" + idFile + "' size='1' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
+          uploadHTML += "          <input style=\"position:absolute; left:-5000px;\" type='file' name='" + idFile + "' size='1' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.preUpload(this, " + uploadId + ")' onclick='this.value=null;' />";
           uploadHTML += "        </label>";
           uploadHTML += "      </a>";
         } else {
           uploadHTML += "      <a class=\"BrowseLink actionIcon\" onclick=\"(function(elm) { document.getElementById('" + idFile + "').click();})(this)\">";
-          uploadHTML += "        <i class='uiIconUpload uiIconLightGray'></i><input type='file' name='file' size='1' style='display:none' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
+          uploadHTML += "        <i class='uiIconUpload uiIconLightGray'></i><input type='file' name='file' size='1' style='display:none' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.preUpload(this, " + uploadId + ")' onclick='this.value=null;' />";
           uploadHTML += "      </a>";
         }
     uploadHTML += "    </div>";
@@ -805,7 +819,7 @@ function UIDSUpload() {
 	  url += "action=save" + "&workspaceName=" + selectedItem.workspaceName
 	  + "&driveName=" + selectedItem.driveName + "&currentFolder="
 	  + selectedItem.currentFolder + "&currentPortal=" + eXo.env.portal.portalName + "&language="
-	  + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" + fileName;
+	  + eXo.env.portal.language +"&uploadId=" + uploadId + "&fileName=" + fileName+"&existenceAction="+_module.DocumentSelector.existingBehavior;
           url = encodeURI(url);
 	  var responseText = ajaxAsyncGetRequest(url, false);
 	};
@@ -884,6 +898,107 @@ function UIDSUpload() {
 	  input.value = "false";
 	};
 
+  /**
+   * Pre upload file
+   */
+  UIDSUpload.prototype.preUpload = function(clickEle, id) {
+    var me = _module.UIDSUpload;
+    var selectedItem = _module.DocumentSelector.selectedItem;
+    var container = window.document.getElementById(id);
+    var uploadIFrame = window.document.getElementById(id+"UploadIframe");
+    var uploadFrame = window.document.getElementById(id+"uploadFrame");
+    if (!selectedItem || !selectedItem.driveName) {
+      alert(uploadIFrame.getAttribute("select_drive"));
+      file.value == '';
+      return;
+    }
+
+    var canAddChild = selectedItem.canAddChild;
+    if (canAddChild == "false") {
+      alert(uploadIFrame.getAttribute("permission_required"));
+      file.value == '';
+      return;
+    }
+
+    var form = uploadFrame.contentWindow.document.getElementById(id);
+    var file  = jQuery(clickEle ,form);
+    if(file.attr("value") == null || file.attr("value") == '') return;
+    var fileName = file.attr("value").replace(/C:\\fakepath\\/i, '');
+
+    if(eXo.commons.DocumentSelector.listFileName.indexOf(fileName) != -1
+        && checkSupportVersion(eXo.commons.DocumentSelector.listFiles, fileName)){
+      var documentAuto = "<div id=\"auto-versioning-actions\" class=\"alert alert-warning clearfix hidden\">";
+      documentAuto += "<div class=\"fileNameBox\"> <i class=\"uiIconWarning\"></i>"+eXo.commons.DocumentSelector.document_auto_label_existing+"<span class=\"fileName\" >file.png</span></div>";
+      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action cancel\">"+eXo.commons.DocumentSelector.document_auto_label_cancel+"</a>";
+      documentAuto += "<span class=\"pull-right\">&nbsp;"+eXo.commons.DocumentSelector.document_auto_label_or+"&nbsp; </span>";
+      if(checkVersExistedFile(eXo.commons.DocumentSelector.listFiles, fileName)) {
+        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action create-version\">"+eXo.commons.DocumentSelector.document_auto_label_createVersion+"</a>";
+      }else {
+        documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action replace\"> "+eXo.commons.DocumentSelector.document_auto_label_replace+"</a>";
+      }
+      documentAuto += "<span class=\"pull-right\">,&nbsp;</span>";
+      documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action keep-both\">"+eXo.commons.DocumentSelector.document_auto_label_keepBoth+"</a>";
+      documentAuto += "</div>";
+
+      var autoVersionDiv = jQuery("#auto-versioning-actions");
+      if(autoVersionDiv.length>0) {
+        jQuery("#auto-versioning-actions").remove();
+      }
+      jQuery(documentAuto).insertBefore(jQuery("#UIDocumentSelector #ListRecords"));
+      autoVersionDiv = jQuery("#auto-versioning-actions");
+
+      autoVersionDiv.removeClass("hidden");
+      jQuery("#auto-versioning-actions .fileName").html(fileName);
+
+      jQuery("#auto-versioning-actions .cancel").bind("click", function(){
+        jQuery("#auto-versioning-actions").addClass("hidden");
+      })
+
+      jQuery("#auto-versioning-actions .keep-both").unbind();
+      jQuery("#auto-versioning-actions .keep-both").bind("click", function(){
+        jQuery("#auto-versioning-actions").addClass("hidden");
+        eXo.commons.DocumentSelector.existingBehavior = "keep";
+        eXo.commons.UIDSUpload.upload(clickEle, id);
+      })
+
+      jQuery("#auto-versioning-actions .create-version").unbind();
+      jQuery("#auto-versioning-actions .create-version").bind("click", function(){
+        jQuery("#auto-versioning-actions").addClass("hidden");
+        eXo.commons.DocumentSelector.existingBehavior = "createVersion";
+        eXo.commons.UIDSUpload.upload(clickEle, id);
+      })
+
+      jQuery("#auto-versioning-actions .replace").unbind();
+      jQuery("#auto-versioning-actions .replace").bind("click", function(){
+        jQuery("#auto-versioning-actions").addClass("hidden");
+        eXo.commons.DocumentSelector.existingBehavior = "replace";
+        eXo.commons.UIDSUpload.upload(clickEle, id);
+      })
+
+    }else{
+      eXo.commons.DocumentSelector.existingBehavior = "keep";
+      eXo.commons.UIDSUpload.upload(clickEle, id);
+    }
+  }
+
+  var checkSupportVersion = function(listFiles, fileName){
+    for (var i = 0; i < listFiles.length; i++) {
+      if(listFiles[i].name === fileName && listFiles[i].isVersionSupport === "true"){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  var checkVersExistedFile = function(listFiles, fileName){
+    for (var i = 0; i < listFiles.length; i++) {
+      if(listFiles[i].name === fileName && listFiles[i].value === "true"){
+        return true;
+      }
+    }
+    return false;
+  }
+
 	/**
 	 * Start upload file
 	 * 
@@ -895,22 +1010,8 @@ function UIDSUpload() {
 	UIDSUpload.prototype.upload = function(clickEle, id) {
 	  //var DOMUtil = eXo.core.DOMUtil;
 	  var me = _module.UIDSUpload;
-	  var selectedItem = _module.DocumentSelector.selectedItem;
 	  var container = window.document.getElementById(id);
-	  var uploadIFrame = window.document.getElementById(id+"UploadIframe");
 	  var uploadFrame = window.document.getElementById(id+"uploadFrame");
-	  if (!selectedItem || !selectedItem.driveName) {
-	    alert(uploadIFrame.getAttribute("select_drive"));
-	    file.value == '';
-	    return;
-	  }
-
-	  var canAddChild = selectedItem.canAddChild;
-	  if (canAddChild == "false") {
-	    alert(uploadIFrame.getAttribute("permission_required"));
-	    file.value == '';
-	    return;
-	  }
 
 	  var form = uploadFrame.contentWindow.document.getElementById(id);
 
@@ -934,12 +1035,12 @@ function UIDSUpload() {
 	  var uploadIframe = jQuery("#"+id+"UploadIframe",container);
 	  uploadIframe.hide();
 	
-	 var progressIframe = jQuery("#"+id+"ProgressIframe",container);
-	 progressIframe.hide();
+	  var progressIframe = jQuery("#"+id+"ProgressIframe",container);
+	  progressIframe.hide();
 
-	var tmp = progressIframe.parent();
-	 var temp = tmp.parent();
-	  
+	  var tmp = progressIframe.parent();
+	  var temp = tmp.parent();
+
 	  form.submit() ;
 	  
 	  var list = me.listUpload;
