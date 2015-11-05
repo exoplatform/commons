@@ -155,10 +155,19 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
   }
   
   private void addLastUpdateTime(String userId) throws Exception {
-    Node rootNode = session.getRootNode().getNode("settings").getNode("user").getNode(userId);
-    if(rootNode.canAddMixin("exo:datetime")) {
-      rootNode.addMixin("exo:datetime");
-      rootNode.setProperty("exo:lastModifiedDate", Calendar.getInstance());
+    Node rootNode = session.getRootNode().getNode("settings").getNode("user");
+    Node userNode = null;
+    if (!rootNode.hasNode(userId)) {
+      userNode = rootNode.addNode(userId, "stg:simplecontext");
+    } else {
+      userNode = rootNode.getNode(userId);
+    }
+    if (userNode.canAddMixin("mix:defaultSetting")) {
+      userNode.addMixin("mix:defaultSetting");
+    }
+    if(userNode.canAddMixin("exo:datetime")) {
+      userNode.addMixin("exo:datetime");
+      userNode.setProperty("exo:lastModifiedDate", Calendar.getInstance());
       session.save();
     }
   }

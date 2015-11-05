@@ -52,7 +52,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   private static final Log LOG = ExoLogger.getLogger(UserSettingServiceImpl.class);
 
   /** Setting Scope on Common Setting **/
-  private static final Scope    NOTIFICATION_SCOPE = Scope.GLOBAL;
+  private static final Scope    NOTIFICATION_SCOPE = Scope.GLOBAL.id(null);
   private SettingService        settingService;
   private ChannelManager        channelManager;
 
@@ -474,12 +474,9 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         NodeIterator iter = getDefaultDailyIterator(sProvider, offset, limit);
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          //make sure that have the mixin-type defaultSetting and don't have child node for notification setting
-          if (!node.getNodes().hasNext()) {
-            users.add(UserSetting.getInstance()
-                      .setUserId(node.getName())
-                      .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
-          }
+          users.add(UserSetting.getInstance()
+                    .setUserId(node.getName())
+                    .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
         }
       }
     } catch (Exception e) {

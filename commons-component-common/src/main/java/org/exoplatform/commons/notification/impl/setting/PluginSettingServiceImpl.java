@@ -161,7 +161,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   }
 
   private void saveActivePlugins(String pluginId, String channelIds) {
-    settingService.set(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + pluginId), SettingValue.create(channelIds));
+    settingService.set(Context.GLOBAL, Scope.GLOBAL.id(null), (NAME_SPACES + pluginId), SettingValue.create(channelIds));
   }
 
   private List<String> getSettingPlugins(String pluginId, List<String> defaultValue) {
@@ -173,7 +173,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   }
 
   private String getSetting(String pluginId, String defaultValues) {
-    SettingValue<?> sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL, (NAME_SPACES + pluginId));
+    SettingValue<?> sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), (NAME_SPACES + pluginId));
     String channels = defaultValues;
     String values = "";
     if (sValue != null) {
