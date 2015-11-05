@@ -171,7 +171,9 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
-      if (!userSetting.isChannelActive(MailChannel.ID) || NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+      if (!userSetting.isChannelActive(MailChannel.ID)
+          || NotificationUtils.isDeletedMember(userSetting.getUserId())
+          || !NotificationUtils.isActiveSetting(userSetting.getUserId())) {
         continue;
       }
       
@@ -196,7 +198,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
-      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+      if (NotificationUtils.isDeletedMember(userSetting.getUserId())
+          || !NotificationUtils.isActiveSetting(userSetting.getUserId())) {
         continue;
       }
 

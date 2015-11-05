@@ -32,6 +32,11 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.template.Element;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.template.DigestTemplate;
 import org.exoplatform.commons.notification.template.SimpleElement;
 import org.exoplatform.commons.notification.template.TemplateUtils;
@@ -242,6 +247,16 @@ public class NotificationUtils {
       return false;
     } finally {
       CommonsUtils.endRequest(CommonsUtils.getService(OrganizationService.class));
+    }
+  }
+  
+  public static boolean isActiveSetting(String userId) {
+    try {
+      SettingService settingService = CommonsUtils.getService(SettingService.class);
+      SettingValue<Boolean> value = (SettingValue<Boolean>) settingService.get(Context.USER.id(userId), Scope.GLOBAL, AbstractService.EXO_IS_ACTIVE);
+      return (value.getValue() == null) ? true : value.getValue();
+    } catch (Exception e) {
+      return false;
     }
   }
   
