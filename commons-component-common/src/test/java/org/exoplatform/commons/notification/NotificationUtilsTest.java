@@ -97,6 +97,10 @@ public class NotificationUtilsTest extends TestCase {
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
     emails = "test+test@test.com, demo+aaa@demo.com, ";
     assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
+    emails = "Justin Dickey<justin.dickey@apprentice.university>";
+    assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
+    emails = "eXo Admin<team-cwi@exoplatform.com>";
+    assertEquals(true, NotificationUtils.isValidEmailAddresses(emails));
   }
 
   public void testProcessLinkInActivityTitle() throws Exception {
