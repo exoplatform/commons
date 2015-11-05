@@ -61,8 +61,19 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
     return (E) getEntityManager().find(modelClass, id);
   }
 
+  /**
+   * This method makes 2 calls to getEntityManager():
+   * 1- The first one to get the CriteriaBuilder
+   * 2- The second one to create the query
+   * If there is no EntityManager in the threadLocal (i.e: EntityManagerService.getEntityManager() returns null),
+   * the EntityManagerHolder will return 2 distinct EntityManager instances.
+   * This will result in a org.hibernate.SessionException: Session is closed!.
+   *
+   * Thus, this method shall always be invoked with an EntityManager in the ThreadLocal
+   * (for example, from a request managed by the portal lifecycle or from a method annotated with  @ExoTransactional)
+   */
+  //Another option is to implement something similar to Spring's DeferredQueryInvocationHandler
   @Override
-  @ExoTransactional
   public List<E> findAll() {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<E> query = cb.createQuery(modelClass);
