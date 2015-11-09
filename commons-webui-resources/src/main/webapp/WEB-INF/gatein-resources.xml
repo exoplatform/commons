@@ -78,6 +78,7 @@
 
 	<module>
 		<name>common-utils</name>
+		<as>common_utils</as>
 		<script>
 			<path>/javascript/eXo/commons/Utils.js</path>
 		</script>
