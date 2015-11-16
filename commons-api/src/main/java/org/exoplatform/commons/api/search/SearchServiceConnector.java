@@ -1,12 +1,13 @@
 package org.exoplatform.commons.api.search;
 
-import java.util.Collection;
-
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
+
+import java.util.Collection;
 
 /**
  * Is extended by all SearchService connectors, and allows to build configuration needed by a list of connectors that is used for the Unified Search.
@@ -76,7 +77,7 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
     PropertiesParam param = initParams.getPropertiesParam("constructor.params");
     this.searchType = param.getProperty("searchType");
     this.displayName = param.getProperty("displayName");
-    this.setEnable(Boolean.parseBoolean(param.getProperty("enable")));
+    if (StringUtils.isNotBlank(param.getProperty("enable"))) this.setEnable(Boolean.parseBoolean(param.getProperty("enable")));
   }
 
   /**
