@@ -41,7 +41,7 @@
 		<name>commons-editor</name>
 		<as>ckeditor</as>
 		<script>
-			<path>/ckeditor/commons-Editor.js</path>
+			<path>/ckeditor/ckeditor.js</path>
 		</script>
 	</module>
 	

@@ -155,7 +155,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     return result;
   }
 
-  private String buildEditorLayout() throws Exception {
+  private String buildEditorLayout(WebuiRequestContext context) throws Exception {
     if (toolbar == null) toolbar = BASIC_TOOLBAR;
     if (width == null) width = "98%";
     if (height == null) height = "'200px'";
@@ -174,66 +174,61 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     //
     builder.append("  <textarea style=\"width:1px;height:1px;\" id=\"").append(name).append("\" name=\"").append(name).append("\">")
           .append(value_).append("</textarea>\n");
-
-    builder.append("<script type=\"text/javascript\">\n");
+    builder.append("  </span>");
+    if (isMandatory()) {
+      builder.append("  <span style=\"float:left\"> &nbsp;*</span>");
+    }
+    builder.append("</div>");
+    
+    StringBuilder jsBuilder = new StringBuilder();
     //fix issue INTEG-320
     if (isIgnoreParserHTML() && StringUtils.isNotEmpty(value_)) {
       String value = encodeURLComponent(value_);
-      builder.append(" var textare = document.getElementById('").append(name).append("'); ")
+      jsBuilder.append(" var textare = document.getElementById('").append(name).append("'); ")
              .append(" if(textare) {")
              .append("   var isFirefox = typeof InstallTrigger !== 'undefined';")
              .append("   var value = decodeURIComponent('").append(value).append("');")
              .append("   if(isFirefox) { textare.value = value; } else { textare.innerText = value;}")
              .append(" }");
     }
-    builder.append("    require(['/CommonsResources/ckeditor/ckeditor.js'], function() {")
-           .append("  //<![CDATA[\n")
-           .append("    var instance = CKEDITOR.instances['").append(name).append("'];")
-           .append("    if (instance) { CKEDITOR.remove(instance); instance = null;}\n");
-    
-    builder.append("    CKEDITOR.replace('").append(name).append("', {toolbar:'").append(toolbar).append("', height:")
-           .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
-           .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
-           .append(", forceEnterMode:").append(forceEnterMode)
-           .append(", shiftEnterMode:").append(shiftEnterMode).append("});\n");
 
-    builder.append("    instance = CKEDITOR.instances['" + name + "'];")
-           .append("    instance.on( 'change', function(e) { document.getElementById('").append(name).append("').value = instance.getData(); });\n")
-           //workaround, fix IE case: can not focus to editor
-           .append("  //]]>\n")
-           .append("});")
-//           .append("if(eXo.core.Browser.ie==9 || eXo.core.Browser.ie==10){")
-           .append(" var textare = document.getElementById('").append(name).append("'); ")
-           .append(" var form = textare;")
-           .append(" while (form && (form.nodeName.toLowerCase() != 'form')) { form = form.parentNode;}")
-           .append(" if (form){")
-           .append("  form.textareaName = '").append(name).append("';")
-           .append("  form.onmouseover=function() {")
-           .append("   this.onmouseover='';")
-           .append("   var textare = document.getElementById('").append(name).append("'); ")
-           .append("   textare.style.display='block';")
-           .append("   textare.style.visibility='visible';")
-           .append("   textare.focus();")           
-           .append("   textare.style.display='none';")
-           .append("  }")
-           .append(" }")
-//           .append("}")           
+    jsBuilder
+            .append("var instance = CKEDITOR.instances['").append(name).append("'];\n")
+            .append("if (instance) { ")
+            .append("   CKEDITOR.remove(instance); instance = null;\n")
+            .append("}\n")
 
-           .append("</script>\n");
+            .append("CKEDITOR.replace('").append(name).append("', {toolbar:'Forum', height:'200px', contentsCss:\"/CommonsResources/ckeditor/contents.css\", enterMode:CKEDITOR.ENTER_P, forcePasteAsPlainText: true, forceEnterMode:false, shiftEnterMode:CKEDITOR.ENTER_BR});\n")
+            .append("instance = CKEDITOR.instances['").append(name).append("'];\n")
+            .append("instance.on( 'change', function(e) { \n")
+            .append("   document.getElementById('").append(name).append("').value = instance.getData(); \n")
+            .append("});\n")
 
-    builder.append("  </span>");
+            .append("var textarea = document.getElementById('").append(name).append("'); \n")
+            .append("var form = textarea; \n")
+            .append("while (form && (form.nodeName.toLowerCase() != 'form')) { \n")
+            .append("   form = form.parentNode;\n")
+            .append("} \n")
+            .append("if (form) {\n")
+            .append("   form.textareaName = '").append(name).append("'; \n")
+            .append("   form.onmouseover=function() { \n")
+            .append("     this.onmouseover=''; \n")
+            .append("     var textarea = document.getElementById('").append(name).append("');  \n")  
+            .append("     textarea.style.display='block'; \n")
+            .append("     textarea.style.visibility='visible'; \n")
+            .append("     textarea.focus(); \n")
+            .append("     textarea.style.display='none'; \n")
+            .append("   } \n")
+            .append("} \n");
 
-    if (isMandatory()) {
-      builder.append("  <span style=\"float:left\"> &nbsp;*</span>");
-    }
-    builder.append("</div>");
+    context.getJavascriptManager().require("/CommonsResources/ckeditor/ckeditor.js").addScripts(jsBuilder.toString());
     //
     return builder.toString();
   }
 
   public void processRender(WebuiRequestContext context) throws Exception {
     //
-    context.getWriter().write(buildEditorLayout());
+    context.getWriter().write(buildEditorLayout(context));
   }
 
   public void decode(Object input, WebuiRequestContext context) {
