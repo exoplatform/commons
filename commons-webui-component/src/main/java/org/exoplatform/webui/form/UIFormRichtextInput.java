@@ -197,8 +197,11 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
             .append("if (instance) { ")
             .append("   CKEDITOR.remove(instance); instance = null;\n")
             .append("}\n")
-
-            .append("CKEDITOR.replace('").append(name).append("', {toolbar:'Forum', height:'200px', contentsCss:\"/CommonsResources/ckeditor/contents.css\", enterMode:CKEDITOR.ENTER_P, forcePasteAsPlainText: true, forceEnterMode:false, shiftEnterMode:CKEDITOR.ENTER_BR});\n")
+            .append(" CKEDITOR.replace('").append(name).append("', {toolbar:'").append(toolbar).append("', height:")
+            .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
+            .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
+            .append(", forceEnterMode:").append(forceEnterMode)
+            .append(", shiftEnterMode:").append(shiftEnterMode).append("});\n")
             .append("instance = CKEDITOR.instances['").append(name).append("'];\n")
             .append("instance.on( 'change', function(e) { \n")
             .append("   document.getElementById('").append(name).append("').value = instance.getData(); \n")
