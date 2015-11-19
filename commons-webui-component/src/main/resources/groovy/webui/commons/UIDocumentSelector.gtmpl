@@ -39,8 +39,8 @@
   requireJs.addScripts("jq('#createNew').click(function() {commonDocument.DocumentSelector.newFolder(this);});");
 %>
 <div class="uiDocumentSelector" id="$uicomponent.id">
-  <a style="display:none;" href="javascript:void(0);" onclick="$selectFileLink" class="selectFile"></a>
-  <a style="display:none;" href="javascript:void(0);" onclick="$selectFolderLink" class="selectFolder"></a>
+  <a style="display:none;" href="$selectFileLink" class="selectFile"></a>
+  <a style="display:none;" href="$selectFolderLink" class="selectFolder"></a>
 	<div class="center">
   	<%= _ctx.appRes(uicomponent.id + '.label.select-drive')%>:&nbsp;&nbsp;
   	<% uicomponent.renderChild(UIDropDownControl.class);%>

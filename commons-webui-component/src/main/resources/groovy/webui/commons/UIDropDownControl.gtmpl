@@ -33,12 +33,11 @@
 			<li>
 				<% 
 					String label = _ctx.appRes(uicomponent.getId() + ".item." + option.label);
-					String seletedItem = uicomponent.event(selectedIndex);
 					if(label.length() > 30) {
 				%>
-				<a class="OptionItem" href="javascript:void(0);" onclick="$seletedItem" title="<%=label%>"> <%=label.substring(0,25)%>...</a>
+				<a class="OptionItem" href="<%=uicomponent.event(selectedIndex)%>" title="<%=label%>"> <%=label.substring(0,25)%>...</a>
 				<% } else { %>
-				<a class="OptionItem"  href="javascript:void(0);" onclick="$seletedItem"><%=label%></a>
+				<a class="OptionItem" href="<%=uicomponent.event(selectedIndex)%>"><%=label%></a>
 				<% } %>
 			</li>
 		<% selectedIndex++;}%>
