@@ -927,7 +927,7 @@ function UIDSUpload() {
 
     if(eXo.commons.DocumentSelector.listFileName.indexOf(fileName) != -1
         && checkSupportVersion(eXo.commons.DocumentSelector.listFiles, fileName)){
-      var documentAuto = "<div id=\"auto-versioning-actions\" class=\"alert alert-warning clearfix hidden\">";
+      var documentAuto = "<div id=\"auto-versioning-actions\" class=\"alert alert-warning clearfix\" style=\"display:none\" >";
       documentAuto += "<div class=\"fileNameBox\"> <i class=\"uiIconWarning\"></i>"+eXo.commons.DocumentSelector.document_auto_label_existing+"<span class=\"fileName\" >file.png</span></div>";
       documentAuto += "<a href=\"javascript:void(0)\" class=\"pull-right action cancel\">"+eXo.commons.DocumentSelector.document_auto_label_cancel+"</a>";
       documentAuto += "<span class=\"pull-right\">&nbsp;"+eXo.commons.DocumentSelector.document_auto_label_or+"&nbsp; </span>";
@@ -947,30 +947,30 @@ function UIDSUpload() {
       jQuery(documentAuto).insertBefore(jQuery("#UIDocumentSelector #ListRecords"));
       autoVersionDiv = jQuery("#auto-versioning-actions");
 
-      autoVersionDiv.removeClass("hidden");
+      autoVersionDiv.show();
       jQuery("#auto-versioning-actions .fileName").html(fileName);
 
       jQuery("#auto-versioning-actions .cancel").bind("click", function(){
-        jQuery("#auto-versioning-actions").addClass("hidden");
+        jQuery("#auto-versioning-actions").hide();
       })
 
       jQuery("#auto-versioning-actions .keep-both").unbind();
       jQuery("#auto-versioning-actions .keep-both").bind("click", function(){
-        jQuery("#auto-versioning-actions").addClass("hidden");
+        jQuery("#auto-versioning-actions").hide();
         eXo.commons.DocumentSelector.existingBehavior = "keep";
         eXo.commons.UIDSUpload.upload(clickEle, id);
       })
 
       jQuery("#auto-versioning-actions .create-version").unbind();
       jQuery("#auto-versioning-actions .create-version").bind("click", function(){
-        jQuery("#auto-versioning-actions").addClass("hidden");
+        jQuery("#auto-versioning-actions").hide();
         eXo.commons.DocumentSelector.existingBehavior = "createVersion";
         eXo.commons.UIDSUpload.upload(clickEle, id);
       })
 
       jQuery("#auto-versioning-actions .replace").unbind();
       jQuery("#auto-versioning-actions .replace").bind("click", function(){
-        jQuery("#auto-versioning-actions").addClass("hidden");
+        jQuery("#auto-versioning-actions").hide();
         eXo.commons.DocumentSelector.existingBehavior = "replace";
         eXo.commons.UIDSUpload.upload(clickEle, id);
       })
