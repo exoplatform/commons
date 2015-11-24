@@ -113,12 +113,12 @@ public class NotificationPluginUtils {
   }
 
   public static String getEmailFrom() {
-    SettingValue<?> mail = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, NOTIFICATION_SENDER_EMAIL);
+    SettingValue<?> mail = getSettingService().get(Context.GLOBAL, Scope.GLOBAL.id(null), NOTIFICATION_SENDER_EMAIL);
     return mail != null ? (String) mail.getValue() : System.getProperty("gatein.email.smtp.from", "noreply@exoplatform.com");
   }
 
   public static String getSenderName() {
-    SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, NOTIFICATION_SENDER_NAME);
+    SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL.id(null), NOTIFICATION_SENDER_NAME);
     return name != null ? (String) name.getValue() : System.getProperty("exo.notifications.portalname", "eXo");
   }
   
@@ -127,7 +127,7 @@ public class NotificationPluginUtils {
    * @return
    */
   public static String getBrandingPortalName() {
-    SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, BRANDING_PORTAL_NAME);
+    SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL.id(null), BRANDING_PORTAL_NAME);
     return name != null ? (String) name.getValue() : "eXo";
   }
   

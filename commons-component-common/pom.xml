@@ -85,6 +85,10 @@
       <artifactId>exo.portal.component.common</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.gatein.portal</groupId>
+      <artifactId>exo.portal.webui.portal</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.owasp.antisamy</groupId>
       <artifactId>antisamy</artifactId>
       <exclusions>
@@ -144,6 +148,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>3.3.2</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -174,13 +183,13 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
-      <version>4.1.12.Final</version>
       <exclusions>
         <exclusion>
           <groupId>org.jboss.spec.javax.transaction</groupId>
           <artifactId>jboss-transaction-api_1.1_spec</artifactId>
         </exclusion>
       </exclusions>
+      <version>4.1.12.Final</version>
     </dependency>
   </dependencies>
   <build>

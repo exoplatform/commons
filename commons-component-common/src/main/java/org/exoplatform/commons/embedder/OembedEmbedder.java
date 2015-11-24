@@ -19,6 +19,8 @@ package org.exoplatform.commons.embedder;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.webui.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,6 +56,8 @@ public class OembedEmbedder extends AbstractEmbedder {
   private static final String  EMBED_THUMBNAIL_HEIGHT  = "thumbnail_height";
 
   private static final String  EMBED_THUMBNAIL  = "thumbnail";
+
+  private static final Pattern SECURE_SHORTEN_DAILY_MOTION_PATTERN = Pattern.compile("https://dai\\.ly/.*");
 
   /**
    * constructor
@@ -92,7 +96,20 @@ public class OembedEmbedder extends AbstractEmbedder {
         Matcher matcher = pattern.matcher(url);
         if (matcher.find()) {
           String endpoint = schemeEndpointMap.get(pattern);
-          return new URL(String.format(endpoint, url));
+          String scheme = "http";
+          try {
+            PortalRequestContext portalRequestContext = Util.getPortalRequestContext();
+            scheme = portalRequestContext.getRequest().getScheme();
+          } catch (Exception e) {
+            LOG.info("Cannot get scheme from Portal Request Context");
+          }
+          // COMMONS-400: Workaround for share secure daily motion pattern by using oEmbed
+          // https://www.dailymotion.com/services/oembed?format=json&url=https://dai.ly/xxxxx does not work
+          Matcher shortenMatcher = SECURE_SHORTEN_DAILY_MOTION_PATTERN.matcher(url);
+          if (shortenMatcher.find()) {
+            url = correctURIString(url, "http", true);
+          }
+          return new URL(correctURIString(String.format(endpoint, url),scheme, false));
         }
       }
     } catch (MalformedURLException e) {

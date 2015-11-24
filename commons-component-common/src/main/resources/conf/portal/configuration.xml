@@ -32,16 +32,16 @@
     <type>org.exoplatform.commons.embedder.OembedEmbedder</type>
     <init-params>
       <value-param>
-        <name>https?://www\.dailymotion\.com/video/.*</name>
-        <value>http://www.dailymotion.com/services/oembed?format=json&amp;url=%s&amp;maxwidth=330&amp;maxheight=200</value>
+        <name>http(s)?://(www\.dailymotion\.com\/(embed\/)?video|dai\.ly)/.*</name>
+        <value>//www.dailymotion.com/services/oembed?format=json&amp;url=%s&amp;maxwidth=330&amp;maxheight=200</value>
       </value-param>
       <value-param>
-        <name>https?://vimeo\.com/.*</name>
-        <value>http://vimeo.com/api/oembed.json?url=%s&amp;maxwidth=330&amp;maxheight=200</value>
+        <name>http(s)?://(player.)?vimeo\.com/.*</name>
+        <value>//vimeo.com/api/oembed.json?url=%s&amp;maxwidth=330&amp;maxheight=200</value>
       </value-param>
       <value-param>
         <name>https?://www\.slideshare\.net/.*/.*</name>
-        <value>http://www.slideshare.net/api/oembed/2?url=%s&amp;format=json&amp;maxwidth=330&amp;maxheight=200</value>
+        <value>//www.slideshare.net/api/oembed/2?url=%s&amp;format=json&amp;maxwidth=330&amp;maxheight=200</value>
       </value-param>
       <value-param>
         <name>https?://www\.flickr\.com/photos/.*</name>
@@ -57,6 +57,21 @@
       <value-param>
         <name>(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&amp;v=))((\w|-){11})(?:\S+)?$</name>
         <value>https://www.googleapis.com/youtube/v3/videos?key=%s&amp;part=snippet&amp;id=%s</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
+    <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
+    <init-params>
+      <value-param>
+        <name>liquibase.datasource</name>
+        <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
+      </value-param>
+      <value-param>
+        <name>liquibase.contexts</name>
+        <value>production</value>
       </value-param>
     </init-params>
   </component>

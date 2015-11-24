@@ -118,7 +118,12 @@ public class UserStateService {
       SessionProvider sessionProvider = new SessionProvider(state);
       try {
         Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
-        Node userState = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
+        Node userState;
+        if (userNodeApp.hasNode(VIDEOCALLS_BASE_PATH)) {
+          userState = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
+        } else {
+          userState = userNodeApp.addNode(VIDEOCALLS_BASE_PATH, USER_STATATUS_NODETYPE);
+        }
         model = new UserStateModel();
         model.setUserId(userState.getProperty(USER_ID_PROP).getString());
         model.setLastActivity(userState.getProperty(LAST_ACTIVITY_PROP).getLong());

@@ -17,7 +17,6 @@
 package org.exoplatform.commons.notification.impl.service;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -44,11 +43,8 @@ import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
 
 public class NotificationServiceImpl extends AbstractService implements NotificationService {
   private static final Log LOG = ExoLogger.getLogger(NotificationServiceImpl.class);
@@ -142,7 +138,6 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
      * + limit = 50 time lost: 44873ms user settings 70630ms default user settings.
      * + limit = 100 time lost: 26997ms user settings 60051ms default user settings.
     */
-    List<UserSetting> sentUsers = new ArrayList<UserSetting>();
     long startTime = System.currentTimeMillis();
     int limit = 100;
     int offset = 0;
@@ -153,7 +148,6 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       }
       send(notifContext, userDigestSettings);
       offset += limit;
-      sentUsers.addAll(userDigestSettings);
     }
     LOG.debug("Time to run process users have settings: " + (System.currentTimeMillis() - startTime) + "ms.");
     long startTimeDefault = System.currentTimeMillis();
@@ -166,87 +160,20 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
       }
       sendDefault(notifContext, defaultMixinUsers, defaultConfigPlugins);
       offset += limit;
-      sentUsers.addAll(defaultMixinUsers);
     }
-    //provided the sentUser for excluding to process sending mail
-    //get list of user who has the isActivate = FALSE
-    sentUsers.addAll(this.userService.getUserSettingWithDeactivate());
-    //
-    sendUserWithNoSetting(notifContext, defaultConfigPlugins, sentUsers);
     
     //Clear all stored message
     storage.removeMessageAfterSent();
     LOG.debug("Time to run process users used default settings: " + (System.currentTimeMillis() - startTimeDefault) + "ms.");
   }
 
-  /**
-   * Process these users who isn't existing any setting and default mixin type in the Setting.
-   * Must use the Organization service to get these users and excluded sentUsers
-   * 
-   * @param context
-   * @param defaultSetting
-   * @param sentUsers
-   * @throws Exception
-   */
-  private void sendUserWithNoSetting(NotificationContext context,
-                                         UserSetting defaultSetting,
-                                         List<UserSetting> sentUsers) throws Exception {
-    
-    OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
-    CommonsUtils.startRequest(organizationService);
-    ListAccess<User> allUsers = null;
-    try {
-      allUsers= organizationService.getUserHandler().findAllUsers();
-    } finally {
-      CommonsUtils.endRequest(organizationService);
-    }
-    int size = allUsers.getSize(), limit = 200;
-    int index = 0, length = Math.min(limit, size);
-    //only lazy adding mixin-type(defaultSetting) when the user's size > sent notification's size.
-    if (size > sentUsers.size()) {
-      List<User> addMixinUsers = new ArrayList<User>();
-      List<UserSetting> usersDefaultSettings = new ArrayList<UserSetting>();
-
-      while (index < size && length > 0) {
-        usersDefaultSettings = new ArrayList<UserSetting>();
-        //
-        LOG.debug(String.format("Load from %s to %s, length %s", index, (index + length), length));
-        User[] users = allUsers.load(index, length);
-        if (users.length == 0) {
-          break;
-        }
-        UserSetting userSetting;
-        Calendar cal = Calendar.getInstance();
-        for (int i = 0; i < users.length; i++) {
-          userSetting = UserSetting.getInstance().setUserId(users[i].getUserName());
-          if (!sentUsers.contains(userSetting) && users[i].getCreatedDate()!=null) {
-            //
-            cal.setTime(users[i].getCreatedDate());
-            usersDefaultSettings.add(userSetting.setLastUpdateTime(cal));
-            //
-            addMixinUsers.add(users[i]);
-          }
-        }
-        //
-        sendDefault(context, usersDefaultSettings, defaultSetting);
-
-        index += length;
-        length = Math.min(limit, size - index);
-      }
-
-      LOG.debug("Done sent notification for " + addMixinUsers.size() + " users must addMixin.");
-      //
-      long startTime = System.currentTimeMillis();
-      userService.addMixin(addMixinUsers.toArray(new User[addMixinUsers.size()]));
-      LOG.debug("Done addMixin for " + addMixinUsers.size() + " users, time: " + (System.currentTimeMillis() - startTime) + "ms.");
-    }
-  }
-  
   private void send(NotificationContext context, List<UserSetting> userSettings) {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
-      if (!userSetting.isChannelActive(MailChannel.ID) || NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+      if (!userSetting.isChannelActive(MailChannel.ID)
+          || NotificationUtils.isDeletedMember(userSetting.getUserId())
+          || !NotificationUtils.isActiveSetting(userSetting.getUserId())) {
         continue;
       }
       
@@ -271,7 +198,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
-      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+      if (NotificationUtils.isDeletedMember(userSetting.getUserId())
+          || !NotificationUtils.isActiveSetting(userSetting.getUserId())) {
         continue;
       }
 

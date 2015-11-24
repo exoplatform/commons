@@ -51,10 +51,10 @@
     <!-- **************************************** -->
     <org.exoplatform.depmgt.version>11-SNAPSHOT</org.exoplatform.depmgt.version>
     <!-- JCR Project Dependencies -->
-    <org.exoplatform.kernel.version>2.5.1-GA</org.exoplatform.kernel.version>
-    <org.exoplatform.core.version>2.6.1-GA</org.exoplatform.core.version>
-    <org.exoplatform.ws.version>2.4.1-GA</org.exoplatform.ws.version>
-    <org.exoplatform.jcr.version>1.16.1-GA</org.exoplatform.jcr.version>
+    <org.exoplatform.kernel.version>2.5.4-GA</org.exoplatform.kernel.version>
+    <org.exoplatform.core.version>2.6.4-GA</org.exoplatform.core.version>
+    <org.exoplatform.ws.version>2.4.4-GA</org.exoplatform.ws.version>
+    <org.exoplatform.jcr.version>1.16.4-GA</org.exoplatform.jcr.version>
     <!-- GateIn Project Dependencies -->
     <org.gatein.portal.version>4.3.x-PLF-SNAPSHOT</org.gatein.portal.version>
     <!-- Platform Project Dependencies -->
@@ -289,48 +289,6 @@
         <version>${org.exoplatform.kernel.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <!-- New cometd -->
-      <dependency>
-        <groupId>org.cometd.java</groupId>
-        <artifactId>bayeux-api</artifactId>
-        <version>3.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.cometd.java</groupId>
-        <artifactId>cometd-java-common</artifactId>
-        <version>3.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.cometd.java</groupId>
-        <artifactId>cometd-java-websocket-javax-server</artifactId>
-        <version>3.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.cometd.java</groupId>
-        <artifactId>cometd-java-websocket-common-server</artifactId>
-        <version>3.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.cometd.java</groupId>
-        <artifactId>cometd-java-annotations</artifactId>
-        <version>3.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.cometd.java</groupId>
-        <artifactId>cometd-java-oort</artifactId>
-        <version>3.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.cometd.java</groupId>
-        <artifactId>cometd-java-server</artifactId>
-        <version>3.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.cometd.javascript</groupId>
-        <artifactId>cometd-javascript-jquery</artifactId>
-        <version>3.0.3</version>
-        <type>war</type>
       </dependency>
       <!-- This artifact isn't declared in kernel parent -->
       <!-- We enforce it to have the good version in our packaging -->

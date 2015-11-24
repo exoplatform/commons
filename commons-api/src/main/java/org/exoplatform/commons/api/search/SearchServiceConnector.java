@@ -1,12 +1,13 @@
 package org.exoplatform.commons.api.search;
 
-import java.util.Collection;
-
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
+
+import java.util.Collection;
 
 /**
  * Is extended by all SearchService connectors, and allows to build configuration needed by a list of connectors that is used for the Unified Search.
@@ -15,6 +16,7 @@ import org.exoplatform.container.xml.PropertiesParam;
 public abstract class SearchServiceConnector extends BaseComponentPlugin {
   private String searchType; //search type name
   private String displayName; //for use when rendering
+  private boolean enable = true;
   
   /**
    * Gets a search type.
@@ -51,6 +53,21 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
   }
+  
+  /**
+   * is enable by default
+   */
+  public boolean isEnable() {
+    return enable;
+  }
+
+  /**
+   * set enable by default
+   */
+  public void setEnable(boolean enable) {
+    this.enable = enable;
+  }
+
   /**
    * Initializes a search service connector. The constructor is default that connectors must implement.
    * @param initParams The parameters which are used for initializing the search service connector from configuration.
@@ -60,6 +77,7 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
     PropertiesParam param = initParams.getPropertiesParam("constructor.params");
     this.searchType = param.getProperty("searchType");
     this.displayName = param.getProperty("displayName");
+    if (StringUtils.isNotBlank(param.getProperty("enable"))) this.setEnable(Boolean.parseBoolean(param.getProperty("enable")));
   }
 
   /**
