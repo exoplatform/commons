@@ -184,11 +184,12 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     List<NotificationInfo> messages = new ArrayList<NotificationInfo>();
     Node messageHomeNode = getMessageNodeByPluginId(sProvider, workspace, pluginId);
     NodeIterator iter = getWeeklyNodes(messageHomeNode, userId);
+    Session session = messageHomeNode.getSession();
     while (iter.hasNext()) {
       Node node = iter.nextNode();
       NotificationInfo model = fillModel(node);
       messages.add(model.setTo(userId));
-      removeWeekly(model, node.getPath());
+      removeWeekly(session, model, node.getPath());
     }
     return messages;
   }
@@ -285,9 +286,11 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     }
   }
 
-  private void removeWeekly(NotificationInfo message, String path) throws Exception {
+  private void removeWeekly(Session session, NotificationInfo message, String path) throws Exception {
     if (message.isSendAll() || message.getSendToWeekly().length == 1) {
       putRemoveMap(REMOVE_ALL, path);
+    } else {
+      removeProperty(session, path, NTF_SEND_TO_WEEKLY, message.getTo());
     }
   }
 
