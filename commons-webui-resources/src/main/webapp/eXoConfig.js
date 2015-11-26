@@ -46,7 +46,14 @@ CKEDITOR.editorConfig = function( config ){
 		['Blockquote','-','Link','Unlink', 'ShowBlocks'],		
 		['Style','Format','Font','FontSize','-','Maximize']
 	] ;
-
+	config.toolbar_Comment = [
+  		['Bold','Italic','Underline','Strike','-','NumberedList','BulletedList','Outdent','Indent'],
+  		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+  		'/',
+  		['Blockquote','-','Link','Unlink', 'ShowBlocks'],		
+  		['Style','Format','Font','FontSize','-','Maximize']
+  	] ;
+	
 	config.toolbar_CompleteWCM = [
 		['Source','Templates'],
 		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','-','Undo','Redo'],
