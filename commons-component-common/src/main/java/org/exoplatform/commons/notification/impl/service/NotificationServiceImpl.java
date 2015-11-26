@@ -152,16 +152,18 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     LOG.debug("Time to run process users have settings: " + (System.currentTimeMillis() - startTime) + "ms.");
     long startTimeDefault = System.currentTimeMillis();
     //process for users used default setting
-    offset = 0;
-    while (true) {
-      List<UserSetting> defaultMixinUsers = this.userService.getDigestDefaultSettingForAllUser(offset, limit);
-      if (defaultMixinUsers.size() == 0) {
-        break;
+    if (defaultConfigPlugins.getChannelActives().size() > 0) {
+      offset = 0;
+      while (true) {
+        List<UserSetting> defaultMixinUsers = this.userService.getDigestDefaultSettingForAllUser(offset, limit);
+        if (defaultMixinUsers.size() == 0) {
+          break;
+        }
+        sendDefault(notifContext, defaultMixinUsers, defaultConfigPlugins);
+        offset += limit;
       }
-      sendDefault(notifContext, defaultMixinUsers, defaultConfigPlugins);
-      offset += limit;
     }
-    
+
     //Clear all stored message
     storage.removeMessageAfterSent();
     LOG.debug("Time to run process users used default settings: " + (System.currentTimeMillis() - startTimeDefault) + "ms.");
@@ -198,8 +200,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
-      if (NotificationUtils.isDeletedMember(userSetting.getUserId())
-          || !NotificationUtils.isActiveSetting(userSetting.getUserId())) {
+      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
         continue;
       }
 
