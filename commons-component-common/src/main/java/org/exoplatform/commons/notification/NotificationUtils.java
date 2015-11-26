@@ -253,8 +253,8 @@ public class NotificationUtils {
   public static boolean isActiveSetting(String userId) {
     try {
       SettingService settingService = CommonsUtils.getService(SettingService.class);
-      SettingValue<Boolean> value = (SettingValue<Boolean>) settingService.get(Context.USER.id(userId), Scope.GLOBAL, AbstractService.EXO_IS_ACTIVE);
-      return (value.getValue() == null) ? true : value.getValue();
+      SettingValue<String> value = (SettingValue<String>) settingService.get(Context.USER.id(userId), Scope.GLOBAL, AbstractService.EXO_IS_ACTIVE);
+      return (value == null || value.getValue() == null) ? false : true;
     } catch (Exception e) {
       return false;
     }
