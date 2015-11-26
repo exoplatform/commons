@@ -19,6 +19,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
   public static final String BASIC_TOOLBAR = "Basic";
   public static final String SUPER_BASIC_TOOLBAR = "SuperBasicWCM";
   public static final String INLINE_TOOLBAR = "InlineEdit";
+  public static final String COMMENT_TOOLBAR = "Comment";
   public static final String FORUM_TOOLBAR = "Forum";
   public static final String FAQ_TOOLBAR = "FAQ";
   
