@@ -42,6 +42,7 @@ import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -152,7 +153,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     LOG.debug("Time to run process users have settings: " + (System.currentTimeMillis() - startTime) + "ms.");
     long startTimeDefault = System.currentTimeMillis();
     //process for users used default setting
-    if (defaultConfigPlugins.getChannelActives().size() > 0) {
+    if (defaultConfigPlugins.getDailyPlugins().size() > 0
+        || defaultConfigPlugins.getWeeklyPlugins().size() > 0) {
       offset = 0;
       while (true) {
         List<UserSetting> defaultMixinUsers = this.userService.getDigestDefaultSettingForAllUser(offset, limit);
