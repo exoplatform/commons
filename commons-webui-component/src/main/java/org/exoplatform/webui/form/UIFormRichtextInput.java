@@ -193,19 +193,20 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
              .append(" }");
     }
 
+    String instance = "instance_".concat(String.valueOf(new java.util.Date().getTime()));
     jsBuilder
-            .append("var instance = CKEDITOR.instances['").append(name).append("'];\n")
-            .append("if (instance) { ")
-            .append("   CKEDITOR.remove(instance); instance = null;\n")
+            .append("var ").append(instance).append(" = CKEDITOR.instances['").append(name).append("'];\n")
+        .append("if (").append(instance).append(") { ")
+            .append("   CKEDITOR.remove(").append(instance).append("); ").append(instance).append(" = null;\n")
             .append("}\n")
             .append(" CKEDITOR.replace('").append(name).append("', {toolbar:'").append(toolbar).append("', height:")
             .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
             .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
             .append(", forceEnterMode:").append(forceEnterMode)
             .append(", shiftEnterMode:").append(shiftEnterMode).append("});\n")
-            .append("instance = CKEDITOR.instances['").append(name).append("'];\n")
-            .append("instance.on( 'change', function(e) { \n")
-            .append("   document.getElementById('").append(name).append("').value = instance.getData(); \n")
+            .append(instance).append(" = CKEDITOR.instances['").append(name).append("'];\n")
+            .append(instance).append(".on( 'change', function(e) { \n")
+            .append("document.getElementById('").append(name).append("').value = ").append(instance).append(".getData(); \n")
             .append("});\n")
 
             .append("var textarea = document.getElementById('").append(name).append("'); \n")
