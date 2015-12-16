@@ -36,6 +36,17 @@ public class StringCommonUtilsTest extends TestCase {
     String input1 = "<p><Script>alert(1);</SCRIPT>bbbb</p>";
     String done1 = StringCommonUtils.encodeScriptMarkup(input1);
     assertEquals("<p>&lt;Script&gt;alert(1);&lt;&#x2f;SCRIPT&gt;bbbb</p>", done1);
+    
+    String input2 = "<a onmouseover='alert(document.cookie)'>xxs link</a>";
+    assertEquals("&lt;a onmouseover='alert(document.cookie)'>xxs link&lt;&#x2f;a&gt;",
+                 StringCommonUtils.encodeScriptMarkup(input2));
+    
+    String input3 = "<IMG SRC=/ onerror='alert('XSS')'></img>";
+    assertEquals("&lt;IMG SRC=/ onerror='alert('XSS')'>&lt;&#x2f;img&gt;", StringCommonUtils.encodeScriptMarkup(input3));
+    
+    
+    
+    
   }
 
 }

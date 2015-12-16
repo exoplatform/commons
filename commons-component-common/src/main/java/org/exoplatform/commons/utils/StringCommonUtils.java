@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  */
 public class StringCommonUtils {
 
-  private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("<(/)?[ ]*script[^>]*>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("(<(/|)?[ ]*(script|img|a)>|<(a|img))", Pattern.CASE_INSENSITIVE);
   
   /**
    * Encode the XSS script
