@@ -44,8 +44,8 @@ public class StringCommonUtilsTest extends TestCase {
     String input3 = "<IMG SRC=/ onerror='alert('XSS')'></img>";
     assertEquals("&lt;IMG SRC=/ onerror='alert('XSS')'>&lt;&#x2f;img&gt;", StringCommonUtils.encodeScriptMarkup(input3));
     
-    
-    
+    String input4 = "<p>www<iframe src='javascript:alert('XSS');'></iframe></p>";
+    assertEquals("<p>www&lt;iframe src='javascript:alert('XSS');'>&lt;&#x2f;iframe&gt;</p>", StringCommonUtils.encodeScriptMarkup(input4));
     
   }
 
