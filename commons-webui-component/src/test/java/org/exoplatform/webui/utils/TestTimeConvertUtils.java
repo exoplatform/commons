@@ -173,4 +173,11 @@ public class TestTimeConvertUtils extends TestCase {
     assertEquals("28 Aug, 2011, 03:30 PM", TimeConvertUtils.getFormatDate(calendar.getTime(), "dd MMM, yyyy, hh:mm a", locale));
     assertEquals("28 Aug, 2011, 15:30", TimeConvertUtils.getFormatDate(calendar.getTime(), "dd MMM, yyyy, HH:mm", locale));
   }
+  
+
+  public void testValidJavaVariable() {
+    String input = "123 sdkjh s;:sdlkjh d";
+    assertEquals("_123_sdkjh_s__sdlkjh_d", TimeConvertUtils.santializeJavaVariable(input));
+  }
+  
 }

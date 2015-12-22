@@ -6,6 +6,8 @@ import java.net.URLEncoder;
 
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.webui.application.WebuiRequestContext;
+import org.exoplatform.webui.utils.TimeConvertUtils;
+
 
 /**
  * Created by The eXo Platform SAS
@@ -14,7 +16,7 @@ import org.exoplatform.webui.application.WebuiRequestContext;
  * July 15, 2013
  */
 public class UIFormRichtextInput extends UIFormInputBase<String> {
-
+  
   public static final String FULL_TOOLBAR = "CompleteWCM";
   public static final String BASIC_TOOLBAR = "Basic";
   public static final String SUPER_BASIC_TOOLBAR = "SuperBasicWCM";
@@ -183,49 +185,56 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     
     StringBuilder jsBuilder = new StringBuilder();
     //fix issue INTEG-320
+    String str = name;
+    String variableName = TimeConvertUtils.santializeJavaVariable(str);
+    String textArea = "textarea" + variableName;
+    String textArea1 = "textarea" + variableName;
+    String instance = "instance" + variableName;
+    String form = "form" + variableName;
+    String functionName = "ckeditorGenerate" + variableName;
+    jsBuilder.append("function " + functionName + "() {");
     if (isIgnoreParserHTML() && StringUtils.isNotEmpty(value_)) {
       String value = encodeURLComponent(value_);
-      jsBuilder.append(" var textare = document.getElementById('").append(name).append("'); ")
-             .append(" if(textare) {")
+      jsBuilder.append(" var " + textArea +  " = document.getElementById('").append(name).append("'); ")
+             .append(" if(" + textArea + ") {")
              .append("   var isFirefox = typeof InstallTrigger !== 'undefined';")
              .append("   var value = decodeURIComponent('").append(value).append("');")
-             .append("   if(isFirefox) { textare.value = value; } else { textare.innerText = value;}")
+             .append("   if(isFirefox) { " + textArea + ".value = value; } else { " + textArea + ".innerText = value;}")
              .append(" }");
     }
-
-    String instance = "instance_".concat(String.valueOf(new java.util.Date().getTime()));
     jsBuilder
-            .append("var ").append(instance).append(" = CKEDITOR.instances['").append(name).append("'];\n")
-        .append("if (").append(instance).append(") { ")
-            .append("   CKEDITOR.remove(").append(instance).append("); ").append(instance).append(" = null;\n")
+            .append("var " + instance + " = CKEDITOR.instances['").append(name).append("'];\n")
+            .append("if (" + instance + ") { ")
+            .append("   CKEDITOR.remove(" + instance + "); " + instance + " = null;\n")
             .append("}\n")
             .append(" CKEDITOR.replace('").append(name).append("', {toolbar:'").append(toolbar).append("', height:")
             .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
             .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
             .append(", forceEnterMode:").append(forceEnterMode)
             .append(", shiftEnterMode:").append(shiftEnterMode).append("});\n")
-            .append(instance).append(" = CKEDITOR.instances['").append(name).append("'];\n")
-            .append(instance).append(".on( 'change', function(e) { \n")
-            .append("document.getElementById('").append(name).append("').value = ").append(instance).append(".getData(); \n")
+            .append(instance + " = CKEDITOR.instances['").append(name).append("'];\n")
+            .append(instance +".on( 'change', function(e) { \n")
+            .append("   document.getElementById('").append(name).append("').value = " + instance + ".getData(); \n")
             .append("});\n")
-
-            .append("var textarea = document.getElementById('").append(name).append("'); \n")
-            .append("var form = textarea; \n")
-            .append("while (form && (form.nodeName.toLowerCase() != 'form')) { \n")
-            .append("   form = form.parentNode;\n")
+            
+            .append("var " + form + " = " + textArea + "; \n")
+            .append("while ("+ form + " && (" + form + ".nodeName.toLowerCase() != 'form')) { \n")
+            .append("   "+ form +" = " + form + ".parentNode;\n")
             .append("} \n")
-            .append("if (form) {\n")
-            .append("   form.textareaName = '").append(name).append("'; \n")
-            .append("   form.onmouseover=function() { \n")
+            .append("if (" + form + ") {\n")
+            .append("   " + form + ".textareaName = '").append(name).append("'; \n")
+            .append("   " + form + ".onmouseover=function() { \n")
             .append("     this.onmouseover=''; \n")
-            .append("     var textarea = document.getElementById('").append(name).append("');  \n")  
-            .append("     textarea.style.display='block'; \n")
-            .append("     textarea.style.visibility='visible'; \n")
-            .append("     textarea.focus(); \n")
-            .append("     textarea.style.display='none'; \n")
+            .append("     var " + textArea1 + " = document.getElementById('").append(name).append("');  \n")  
+            .append("     " + textArea1 + ".style.display='block'; \n")
+            .append("     " + textArea1 + ".style.visibility='visible'; \n")
+            .append("     " + textArea1 + ".focus(); \n")
+            .append("     " + textArea1 + ".style.display='none'; \n")
             .append("   } \n")
-            .append("} \n");
-
+            .append("} \n");   
+    //end function   
+    jsBuilder.append("}");
+    jsBuilder.append(functionName + "();");
     context.getJavascriptManager().require("/CommonsResources/ckeditor/ckeditor.js").addScripts(jsBuilder.toString());
     //
     return builder.toString();
@@ -242,5 +251,5 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
       value_ = null;
     }
   }
-
+ 
 }
