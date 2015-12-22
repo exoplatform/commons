@@ -193,10 +193,10 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     String form = "form" + variableName;
     String functionName = "ckeditorGenerate" + variableName;
     jsBuilder.append("function " + functionName + "() {");
+    jsBuilder.append(" var " + textArea +  " = document.getElementById('").append(name).append("'); ");
     if (isIgnoreParserHTML() && StringUtils.isNotEmpty(value_)) {
       String value = encodeURLComponent(value_);
-      jsBuilder.append(" var " + textArea +  " = document.getElementById('").append(name).append("'); ")
-             .append(" if(" + textArea + ") {")
+      jsBuilder.append(" if(" + textArea + ") {")
              .append("   var isFirefox = typeof InstallTrigger !== 'undefined';")
              .append("   var value = decodeURIComponent('").append(value).append("');")
              .append("   if(isFirefox) { " + textArea + ".value = value; } else { " + textArea + ".innerText = value;}")
@@ -233,8 +233,8 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
             .append("   } \n")
             .append("} \n");   
     //end function   
-    jsBuilder.append("}");
-    jsBuilder.append(functionName + "();");
+    jsBuilder.append("}\n");
+    jsBuilder.append(functionName + "();\n");
     context.getJavascriptManager().require("/CommonsResources/ckeditor/ckeditor.js").addScripts(jsBuilder.toString());
     //
     return builder.toString();
