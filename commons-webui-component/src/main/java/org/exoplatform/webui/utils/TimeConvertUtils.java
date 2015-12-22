@@ -229,4 +229,27 @@ public class TimeConvertUtils {
     calendar.setTimeInMillis(System.currentTimeMillis() - gmtoffset);
     return calendar;
   }
+  
+  /**
+   * Cleanup the string to be valid of Java variable
+   * Ex: input = "123 sdkjh s;:sdlkjh d"
+   *     output = "_123_sdkjh_s__sdlkjh_d"
+   * @return
+   */
+  public static String santializeJavaVariable(String input) {
+    String s = input;
+    StringBuilder sb = new StringBuilder();
+    if(!Character.isJavaIdentifierStart(s.charAt(0))) {
+        sb.append("_");
+    }
+    for (char c : s.toCharArray()) {
+        if(!Character.isJavaIdentifierPart(c)) {
+            sb.append("_");
+        } else {
+            sb.append(c);
+        }
+    }
+    
+    return sb.toString();
+  }
 }
