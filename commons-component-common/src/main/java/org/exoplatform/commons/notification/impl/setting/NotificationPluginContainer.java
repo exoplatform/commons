@@ -107,7 +107,7 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
 
   @Override
   public void addChildPlugin(AbstractNotificationChildPlugin plugin) {
-    addPlugin(plugin);
+    registerChildPlugin(plugin);
     //
     List<String> parentIds = plugin.getParentPluginIds();
     PluginKey parentKey;
@@ -145,6 +145,18 @@ public class NotificationPluginContainer implements PluginContainer, Startable {
   }
   
   private void registerPlugin(AbstractNotificationPlugin plugin) {
+    try {
+      String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
+      //String templatePath = "";
+      String template = TemplateUtils.loadGroovyTemplate(templatePath);
+      plugin.setTemplateEngine(gTemplateEngine.createTemplate(template));
+    } catch (Exception e) {
+      LOG.debug("Failed to register notification plugin " + plugin.getId(), e);
+    }
+    pluginMap.put(plugin.getKey(), plugin);
+  }
+  
+  private void registerChildPlugin(AbstractNotificationChildPlugin plugin) {
     try {
       String templatePath = plugin.getPluginConfigs().get(0).getTemplateConfig().getTemplatePath();
       //String templatePath = "";
