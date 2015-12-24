@@ -38,32 +38,29 @@ public class StringCommonUtilsTest extends TestCase {
     assertEquals("<p>&lt;Script&gt;alert(1);&lt;&#x2f;SCRIPT&gt;bbbb</p>", done1);
     
     String input2 = "<a onmouseover='alert(document.cookie)'>xxs link</a>";
-    assertEquals("&lt;a >xxs link&lt;&#x2f;a&gt;",
+    assertEquals("&lt;a 'alert(document.cookie)'>xxs link&lt;&#x2f;a&gt;",
                  StringCommonUtils.encodeScriptMarkup(input2));
     
     String input3 = "<IMG SRC='/' onerror='alert('XSS')'></img>";
-    assertEquals("&lt;IMG >&lt;&#x2f;img&gt;", StringCommonUtils.encodeScriptMarkup(input3));
+    assertEquals("&lt;IMG 'alert('XSS')'>&lt;&#x2f;img&gt;", StringCommonUtils.encodeScriptMarkup(input3));
     
     String input4 = "<p>www<iframe src='javascript:alert('XSS');'></iframe></p>";
-    assertEquals("<p>www&lt;iframe >&lt;&#x2f;iframe&gt;</p>", StringCommonUtils.encodeScriptMarkup(input4));
+    assertEquals("<p>www&lt;iframe ''>&lt;&#x2f;iframe&gt;</p>", StringCommonUtils.encodeScriptMarkup(input4));
     
     String input5 = "<TABLE BACKGROUND=\"javascript:alert('XSS')\">";
-    assertEquals("<TABLE >", StringCommonUtils.encodeScriptMarkup(input5));
+    assertEquals("<TABLE \"javascript:alert('XSS')\">", StringCommonUtils.encodeScriptMarkup(input5));
     
     String input6 = "<DIV STYLE=\"background-image: url(javascript:alert('XSS'))\">";
-    assertEquals("<DIV STYLE=\">", StringCommonUtils.encodeScriptMarkup(input6));
-    
-    String input7 = "<DIV STYLE=\"background-image:\0075\0072\006C\0028'\006a\0061\0076\0061\0073\0063\0072\0069\0070\0074\003a\0061\006c\0065\0072\0074\0028.1027\0058.1053\0053\0027\0029'\0029\">";
-    assertEquals("<DIV STYLE=\">", StringCommonUtils.encodeScriptMarkup(input7));
+    assertEquals("<DIV \"background-image: url(javascript:alert('XSS'))\">", StringCommonUtils.encodeScriptMarkup(input6));
     
     String input8 = "<DIV STYLE=\"background-image: url(&#1;javascript:alert('XSS'))\">";
-    assertEquals("<DIV STYLE=\">", StringCommonUtils.encodeScriptMarkup(input8));
+    assertEquals("<DIV \"background-image: url(&#1;javascript:alert('XSS'))\">", StringCommonUtils.encodeScriptMarkup(input8));
     
     String input9 = "<DIV STYLE=\"width: expression(alert('XSS'));\">";
-    assertEquals("<DIV STYLE=\"width: >", StringCommonUtils.encodeScriptMarkup(input9));
+    assertEquals("<DIV \"width: expression(alert('XSS'));\">", StringCommonUtils.encodeScriptMarkup(input9));
     
     String input10 = "<DIV STYLE=\"width: expression(alert('XSS'));\">";
-    assertEquals("<DIV STYLE=\"width: >", StringCommonUtils.encodeScriptMarkup(input10));
+    assertEquals("<DIV \"width: expression(alert('XSS'));\">", StringCommonUtils.encodeScriptMarkup(input10));
     
     String input11 = "<BASE HREF=\"javascript:alert('XSS');\">";
     assertEquals("<BASE HREF=\"\">", StringCommonUtils.encodeScriptMarkup(input11));
@@ -72,10 +69,10 @@ public class StringCommonUtilsTest extends TestCase {
   public void testRemoveEventAttribute() {
     
     String input3 = "<IMG onerror='alert('XSS')'></img>";
-    assertEquals("&lt;IMG >&lt;&#x2f;img&gt;", StringCommonUtils.encodeScriptMarkup(input3));
+    assertEquals("&lt;IMG 'alert('XSS')'>&lt;&#x2f;img&gt;", StringCommonUtils.encodeScriptMarkup(input3));
     
     String input4 = "<table><tr onmouseover='alert(1)'></tr<table>";
-    assertEquals("<table><tr ></tr<table>", StringCommonUtils.encodeScriptMarkup(input4));
+    assertEquals("<table><tr 'alert(1)'></tr<table>", StringCommonUtils.encodeScriptMarkup(input4));
     
   }
 

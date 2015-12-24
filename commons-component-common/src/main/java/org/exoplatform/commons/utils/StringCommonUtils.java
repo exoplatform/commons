@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  */
 public class StringCommonUtils {
 
-  private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("(<(/|)?[ ]*(script|img|a|iframe|object|embed)>|<(a|img|iframe|object|embed)|((on|background|src|expression).*(\"|'))|((javascript).*(;)))",
+  private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("(<(/|)?[ ]*(script|img|a|iframe|object|embed)>|<(a|img|iframe|object|embed)|((on|background|src|expression|style).*(=))|((javascript).*(;)))",
                                                                     Pattern.CASE_INSENSITIVE);
 
   @SuppressWarnings("serial")
@@ -39,6 +39,7 @@ public class StringCommonUtils {
       add("javascript");
       add("background");
       add("src");
+      add("style");
     }
   };
   
