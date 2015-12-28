@@ -233,7 +233,6 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	  var nodeType = folderList[i].getAttribute("folderType");
 	  var name = folderList[i].getAttribute("name");
 	  var title = folderList[i].getAttribute("title");
-	  title = jQuery("<div/>").html(title).text();  
 	  var titlePath = folderList[i].getAttribute("titlePath");
 	  var folderIcon = "uiIcon16x16FolderDefault " + CssIconFile.getCssClassByType(folderList[i].getAttribute("nodeType"));
 	  var childFolder = folderList[i].getAttribute("currentFolder");
@@ -257,7 +256,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
       'href' : 'javascript:void(0);',
       'rel':'tooltip',
       'data-placement':'bottom',
-      'data-original-title' : title
+      'data-original-title' : jQuery("<div/>").html(title).text()
      }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
      }).append(iconEl).append(title);
@@ -312,7 +311,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	      _module.DocumentSelector.submitSelectedFile(this);
 	     }).append(iconEl);
 
-	     link.tooltip().append(title);
+	     link.tooltip().append(jQuery("<div/>").html(title).text());
 	     var item = jQuery('<li/>', {
 	                              'class' : 'listItem'
 	                            }).append(link);
