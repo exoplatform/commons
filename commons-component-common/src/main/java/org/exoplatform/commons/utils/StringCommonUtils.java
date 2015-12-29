@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
@@ -55,8 +57,9 @@ public class StringCommonUtils {
    */
   public static String encodeScriptMarkup(String input) {
     if (input != null) {
-      Matcher matcher = SCRIPT_TAG_PATTERN.matcher(input);
-      StringBuffer str = new StringBuffer(input.length());
+      String decodeInput = StringEscapeUtils.unescapeHtml(input);
+      Matcher matcher = SCRIPT_TAG_PATTERN.matcher(decodeInput);
+      StringBuffer str = new StringBuffer(decodeInput.length());
       while (matcher.find()) {
         //removes in the case matched in the word list
         if (matchedWord(matcher.group())) {
