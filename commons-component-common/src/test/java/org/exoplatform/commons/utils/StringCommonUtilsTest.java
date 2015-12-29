@@ -55,8 +55,8 @@ public class StringCommonUtilsTest extends TestCase {
     
     
     
-    String input8 = "<DIV STYLE=\"background-image: url(&#1;javascript:alert('XSS'))\">";
-    assertEquals("<DIV \"background-image: url(&#1;('XSS'))\">", StringCommonUtils.encodeScriptMarkup(input8));
+    String input8 = "<DIV STYLE=\"background-image: url(javascript:alert('XSS'))\">";
+    assertEquals("<DIV \"background-image: url(('XSS'))\">", StringCommonUtils.encodeScriptMarkup(input8));
     
     String input9 = "<DIV STYLE=\"width: expression(alert('XSS'));\">";
     assertEquals("<DIV \"width: expression(alert('XSS'));\">", StringCommonUtils.encodeScriptMarkup(input9));
