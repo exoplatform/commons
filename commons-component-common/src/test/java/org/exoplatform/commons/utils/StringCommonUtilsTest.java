@@ -38,23 +38,25 @@ public class StringCommonUtilsTest extends TestCase {
     assertEquals("<p>&lt;Script&gt;alert(1);&lt;&#x2f;SCRIPT&gt;bbbb</p>", done1);
     
     String input2 = "<a onmouseover='alert(document.cookie)'>xxs link</a>";
-    assertEquals("&lt;a 'alert(document.cookie)'>xxs link&lt;&#x2f;a&gt;",
+    assertEquals("<a 'alert(document.cookie)'>xxs link</a>",
                  StringCommonUtils.encodeScriptMarkup(input2));
     
     String input3 = "<IMG SRC='/' onerror='alert('XSS')'></img>";
-    assertEquals("&lt;IMG 'alert('XSS')'>&lt;&#x2f;img&gt;", StringCommonUtils.encodeScriptMarkup(input3));
+    assertEquals("<IMG SRC='/' 'alert('XSS')'></img>", StringCommonUtils.encodeScriptMarkup(input3));
     
     String input4 = "<p>www<iframe src='javascript:alert('XSS');'></iframe></p>";
-    assertEquals("<p>www&lt;iframe ''>&lt;&#x2f;iframe&gt;</p>", StringCommonUtils.encodeScriptMarkup(input4));
+    assertEquals("<p>www&lt;iframe src='('XSS');'>&lt;&#x2f;iframe&gt;</p>", StringCommonUtils.encodeScriptMarkup(input4));
     
     String input5 = "<TABLE BACKGROUND=\"javascript:alert('XSS')\">";
-    assertEquals("<TABLE \"javascript:alert('XSS')\">", StringCommonUtils.encodeScriptMarkup(input5));
+    assertEquals("<TABLE \"('XSS')\">", StringCommonUtils.encodeScriptMarkup(input5));
     
     String input6 = "<DIV STYLE=\"background-image: url(javascript:alert('XSS'))\">";
-    assertEquals("<DIV \"background-image: url(javascript:alert('XSS'))\">", StringCommonUtils.encodeScriptMarkup(input6));
+    assertEquals("<DIV \"background-image: url(('XSS'))\">", StringCommonUtils.encodeScriptMarkup(input6));
+    
+    
     
     String input8 = "<DIV STYLE=\"background-image: url(&#1;javascript:alert('XSS'))\">";
-    assertEquals("<DIV \"background-image: url(&#1;javascript:alert('XSS'))\">", StringCommonUtils.encodeScriptMarkup(input8));
+    assertEquals("<DIV \"background-image: url(&#1;('XSS'))\">", StringCommonUtils.encodeScriptMarkup(input8));
     
     String input9 = "<DIV STYLE=\"width: expression(alert('XSS'));\">";
     assertEquals("<DIV \"width: expression(alert('XSS'));\">", StringCommonUtils.encodeScriptMarkup(input9));
@@ -63,17 +65,24 @@ public class StringCommonUtilsTest extends TestCase {
     assertEquals("<DIV \"width: expression(alert('XSS'));\">", StringCommonUtils.encodeScriptMarkup(input10));
     
     String input11 = "<BASE HREF=\"javascript:alert('XSS');\">";
-    assertEquals("<BASE HREF=\"\">", StringCommonUtils.encodeScriptMarkup(input11));
+    assertEquals("<BASE HREF=\"('XSS');\">", StringCommonUtils.encodeScriptMarkup(input11));
   }
   
   public void testRemoveEventAttribute() {
     
     String input3 = "<IMG onerror='alert('XSS')'></img>";
-    assertEquals("&lt;IMG 'alert('XSS')'>&lt;&#x2f;img&gt;", StringCommonUtils.encodeScriptMarkup(input3));
+    assertEquals("<IMG 'alert('XSS')'></img>", StringCommonUtils.encodeScriptMarkup(input3));
     
     String input4 = "<table><tr onmouseover='alert(1)'></tr<table>";
     assertEquals("<table><tr 'alert(1)'></tr<table>", StringCommonUtils.encodeScriptMarkup(input4));
     
   }
-
+  
+  public void testEncodeImg() throws Exception {
+    String input1 = "<img alt='crying' height='23' src='http://localhost:8080/CommonsResources/ckeditor/plugins/smiley/images/cry_smile.png' title='crying' width='23' onerror='alert('XSS')' onmousemove='alert('XSS1')'/>";
+    assertEquals("<img alt='crying' height='23' src='http://localhost:8080/CommonsResources/ckeditor/plugins/smiley/images/cry_smile.png' title='crying' width='23' 'alert('XSS')' 'alert('XSS1')'/>", StringCommonUtils.encodeScriptMarkup(input1));
+    
+    String input2 = "<img alt='crying' height='23'  title='crying' width='23' background='test' style='javascript:alert('XSS')' onerror='alert('XSS')' onmouseover='' src='http://localhost:8080/CommonsResources/ckeditor/plugins/style/images/cry_smile.png'/>";
+    assertEquals("<img alt='crying' height='23'  title='crying' width='23' 'test' '('XSS')' 'alert('XSS')' '' src='http://localhost:8080/CommonsResources/ckeditor/plugins/style/images/cry_smile.png'/>", StringCommonUtils.encodeScriptMarkup(input2));
+  }
 }
