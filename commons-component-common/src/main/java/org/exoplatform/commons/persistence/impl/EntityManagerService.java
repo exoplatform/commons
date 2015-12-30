@@ -19,11 +19,13 @@
 package org.exoplatform.commons.persistence.impl;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
 
@@ -31,6 +33,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,14 +150,15 @@ public class EntityManagerService implements ComponentRequestLifecycle {
       if (tx.isActive()) {
         tx.commit();
       }
-    } catch (RuntimeException e) {
-      if (tx != null && tx.isActive()) {
-        if (LOGGER.isErrorEnabled()) {
-          LOGGER.error("Failed to commit transaction.", e);
+    } catch (RuntimeException ex) {
+      try {
+        if (tx != null && tx.isActive()) {
+          tx.rollback();
         }
-
-        tx.rollback();
+      } catch (RuntimeException rbEx) {
+        LOGGER.error("Could not roll back transaction", rbEx);
       }
+      throw ex;
     } finally {
       em.close();
       instance.set(null);

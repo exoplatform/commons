@@ -21,12 +21,14 @@ package org.exoplatform.commons.persistence.impl;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 /**
  * Process the Transactional annotation. The only propagation implemented yet is
@@ -59,11 +61,12 @@ public class ExoTransactionalAspect {
     }
 
     // Do we need to start Transaction ?
-    if (entityManager.getTransaction().isActive()) {
+    EntityTransaction tx = entityManager.getTransaction();
+    if (tx.isActive()) {
       LOG.debug("Using current transaction");
     } else {
       LOG.debug("Starting new transaction");
-      entityManager.getTransaction().begin();
+      tx.begin();
       begunTx = true;
     }
     try {
@@ -74,20 +77,27 @@ public class ExoTransactionalAspect {
         throw e;
     } finally {
       // Do we need to end Transaction ?
-      if ((begunTx) && (entityManager.getTransaction().isActive())) {
-        try {
+      try {
+        if ((begunTx) && (tx.isActive())) {
           LOG.debug("Committing current transaction");
-          entityManager.getTransaction().commit();
-        } catch (RuntimeException e) {
-          LOG.error("Failed to commit current transaction. The transaction is rolled back.", e);
-          entityManager.getTransaction().rollback();
+          tx.commit();
+        }
+      } catch (RuntimeException ex) {
+        try {
+          if (tx != null && tx.isActive()) {
+            tx.rollback();
+          }
+        } catch (RuntimeException rbEx) {
+          LOG.error("Could not roll back transaction", rbEx);
+        }
+        throw ex;
+      } finally {
+        // Do we need to close EntityManager ?
+        if (emStarted && (entityManager != null)) {
+          service.closeEntityManager();
         }
       }
 
-      // Do we need to close EntityManager ?
-      if (emStarted && (entityManager != null)) {
-        service.closeEntityManager();
-      }
     }
   }
 
