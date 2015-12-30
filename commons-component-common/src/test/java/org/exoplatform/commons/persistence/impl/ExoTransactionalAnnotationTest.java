@@ -1,6 +1,7 @@
 package org.exoplatform.commons.persistence.impl;
 
 import org.exoplatform.container.PortalContainer;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -76,6 +77,23 @@ public class ExoTransactionalAnnotationTest {
     dao.createWithCommit(new Task());
     // Then
     assertThat(dao.findAll().size(), is(1));
+  }
+
+  @Test
+  public void testCommitFailed() {
+    EntityManagerService service = PortalContainer.getInstance().getComponentInstanceOfType(EntityManagerService.class);
+    assertNull(service.getEntityManager());
+
+    TaskDao dao = new TaskDao();
+    Task task = new Task();
+    task.setId((long) 1); // Invalid set to cause commit failed.
+    try {
+      dao.create(task);
+    } catch (RuntimeException e) {
+      // Expected.
+    }
+
+    assertNull(service.getEntityManager());
   }
 
   @Test
