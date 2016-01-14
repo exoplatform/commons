@@ -152,5 +152,19 @@ public class ExoTransactionalAnnotationTest {
     // Then
     assertThat(dao.findAll().size(), is(0));
   }
-  
+
+  @Test
+  public void test_ifRollbackPreviousTransaction_noErrorToCommitNextTransaction() {
+    // Given
+    PortalContainer container = PortalContainer.getInstance();
+    EntityManagerService service = container.getComponentInstanceOfType(EntityManagerService.class);
+    service.startRequest(container);
+    TaskDao dao = new TaskDao();
+    dao.createWithSetRollbackOnly(new Task());
+    // When
+    dao.create(new Task());
+    // Then
+    service.endRequest(container);
+    assertThat(dao.findAll().size(), is(1));
+  }
 }
