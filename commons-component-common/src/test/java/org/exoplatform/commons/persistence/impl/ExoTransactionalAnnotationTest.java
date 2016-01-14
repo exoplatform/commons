@@ -1,12 +1,10 @@
 package org.exoplatform.commons.persistence.impl;
 
 import org.exoplatform.container.PortalContainer;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.TransactionRequiredException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -144,4 +142,15 @@ public class ExoTransactionalAnnotationTest {
   public void deleteAllTask() {
     new TaskDao().deleteAll();
   }
+
+  @Test
+  public void test_ifRollbackOnlyTrue_transactionRollbackWithNoError() {
+    // Given
+    TaskDao dao = new TaskDao();
+    // When
+    dao.createWithSetRollbackOnly(new Task());
+    // Then
+    assertThat(dao.findAll().size(), is(0));
+  }
+  
 }
