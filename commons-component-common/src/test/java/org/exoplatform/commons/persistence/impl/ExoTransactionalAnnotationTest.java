@@ -95,6 +95,46 @@ public class ExoTransactionalAnnotationTest {
   }
 
   @Test
+  public void testMultipleTransactions() {
+    PortalContainer container = PortalContainer.getInstance();
+    EntityManagerService entityManagerService = container.getComponentInstanceOfType(EntityManagerService.class);
+    entityManagerService.startRequest(container);
+
+    // Given
+    TaskDao dao = new TaskDao();
+    // When
+    try {
+      // create first task
+      Task task1 = new Task();
+      task1.setName("task");
+      dao.create(task1);
+    } catch(Exception e) {
+      fail(e.getMessage());
+    }
+    try {
+      // create second task with the same name -> fails because of unicity constraints on task name
+      Task task2 = new Task();
+      task2.setName("task");
+      dao.create(task2);
+    } catch(Exception e) {
+      // expected exception
+    }
+    try {
+      // create thrid task -> should work since it is in another transaction
+      Task task3 = new Task();
+      task3.setName("other task");
+      dao.create(task3);
+    } catch(Exception e) {
+      fail(e.getMessage());
+    }
+
+    // Then
+    assertThat(dao.findAll().size(), is(2));
+
+    entityManagerService.endRequest(container);
+  }
+
+  @Test
   public void testMultiThreading() throws ExecutionException, InterruptedException {
     ExecutorService executor = Executors.newFixedThreadPool(2);
 
