@@ -1,12 +1,10 @@
 package org.exoplatform.commons.persistence.impl;
 
 import org.exoplatform.container.PortalContainer;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.TransactionRequiredException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -97,6 +95,46 @@ public class ExoTransactionalAnnotationTest {
   }
 
   @Test
+  public void testMultipleTransactions() {
+    PortalContainer container = PortalContainer.getInstance();
+    EntityManagerService entityManagerService = container.getComponentInstanceOfType(EntityManagerService.class);
+    entityManagerService.startRequest(container);
+
+    // Given
+    TaskDao dao = new TaskDao();
+    // When
+    try {
+      // create first task
+      Task task1 = new Task();
+      task1.setName("task");
+      dao.create(task1);
+    } catch(Exception e) {
+      fail(e.getMessage());
+    }
+    try {
+      // create second task with the same name -> fails because of unicity constraints on task name
+      Task task2 = new Task();
+      task2.setName("task");
+      dao.create(task2);
+    } catch(Exception e) {
+      // expected exception
+    }
+    try {
+      // create thrid task -> should work since it is in another transaction
+      Task task3 = new Task();
+      task3.setName("other task");
+      dao.create(task3);
+    } catch(Exception e) {
+      fail(e.getMessage());
+    }
+
+    // Then
+    assertThat(dao.findAll().size(), is(2));
+
+    entityManagerService.endRequest(container);
+  }
+
+  @Test
   public void testMultiThreading() throws ExecutionException, InterruptedException {
     ExecutorService executor = Executors.newFixedThreadPool(2);
 
@@ -143,5 +181,30 @@ public class ExoTransactionalAnnotationTest {
   @Before
   public void deleteAllTask() {
     new TaskDao().deleteAll();
+  }
+
+  @Test
+  public void test_ifRollbackOnlyTrue_transactionRollbackWithNoError() {
+    // Given
+    TaskDao dao = new TaskDao();
+    // When
+    dao.createWithSetRollbackOnly(new Task());
+    // Then
+    assertThat(dao.findAll().size(), is(0));
+  }
+
+  @Test
+  public void test_ifRollbackPreviousTransaction_noErrorToCommitNextTransaction() {
+    // Given
+    PortalContainer container = PortalContainer.getInstance();
+    EntityManagerService service = container.getComponentInstanceOfType(EntityManagerService.class);
+    service.startRequest(container);
+    TaskDao dao = new TaskDao();
+    dao.createWithSetRollbackOnly(new Task());
+    // When
+    dao.create(new Task());
+    // Then
+    service.endRequest(container);
+    assertThat(dao.findAll().size(), is(1));
   }
 }
