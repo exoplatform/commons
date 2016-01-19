@@ -79,8 +79,13 @@ public class ExoTransactionalAspect {
       // Do we need to end Transaction ?
       try {
         if ((begunTx) && (tx.isActive())) {
-          LOG.debug("Committing current transaction");
-          tx.commit();
+          if (!tx.getRollbackOnly()) {
+            LOG.debug("Committing current transaction");
+            tx.commit();
+          } else {
+            LOG.debug("Rollback current transaction set as RollbackOnly");
+            tx.rollback();
+          }
         }
       } catch (RuntimeException ex) {
         try {

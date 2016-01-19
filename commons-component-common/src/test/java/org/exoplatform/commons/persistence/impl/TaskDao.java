@@ -1,9 +1,8 @@
 package org.exoplatform.commons.persistence.impl;
 
-import javax.persistence.Query;
-
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 
+import javax.persistence.Query;
 import java.util.List;
 
 public class TaskDao extends GenericDAOJPAImpl<Task, Long> {
@@ -23,6 +22,12 @@ public class TaskDao extends GenericDAOJPAImpl<Task, Long> {
   public void createWithCommit(Task task) {
     getEntityManager().persist(task);
     getEntityManager().getTransaction().commit();
+  }
+
+  @ExoTransactional
+  public void createWithSetRollbackOnly(Task task) {
+    getEntityManager().persist(task);
+    getEntityManager().getTransaction().setRollbackOnly();
   }
 
   @Override
