@@ -75,8 +75,7 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
      * @param initParams the init params
      * @param configurationManager the configuration manager
      * @param repositoryService the repository service
-     * @param publicationService the publication service
-     * @deprecated use {@link WCMDeploymentPublicationPlugin} instead.
+     * @deprecated use {@link org.exoplatform.services.wcm.extensions.deployment.WCMPublicationDeploymentPlugin} instead.
      */
     @Deprecated
     public XMLDeploymentPlugin(InitParams initParams,
@@ -96,7 +95,7 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
     @SuppressWarnings("unchecked")
     public void deploy(SessionProvider sessionProvider) throws Exception {
       if (LOG.isWarnEnabled()) {
-        LOG.warn(this.getClass() + " is now deprecated, please use WCMDeploymentPublicationPlugin instead!");
+        LOG.warn(this.getClass() + " is now deprecated, please use WCMPublicationDeploymentPlugin instead!");
       }
         ManageableRepository repository = repositoryService.getCurrentRepository();
         Iterator iterator = initParams.getObjectParamIterator();
