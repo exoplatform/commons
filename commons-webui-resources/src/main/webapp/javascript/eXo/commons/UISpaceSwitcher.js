@@ -135,18 +135,19 @@ UISpaceSwitcher.prototype.initSpaceInfoAfterReady = function(uicomponentId, user
   storage.spaceLabel = spaceLabel;
 }
 
-UISpaceSwitcher.prototype.initConfig = function(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize) {
+UISpaceSwitcher.prototype.initConfig = function(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize, appId) {
   jQuery(window).ready(function(){
     var me = eXo.commons.UISpaceSwitcher;
-    me.initConfigAfterReady(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize);
+    me.initConfigAfterReady(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize, appId);
   });
 }
 
-UISpaceSwitcher.prototype.initConfigAfterReady = function(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize) {
+UISpaceSwitcher.prototype.initConfigAfterReady = function(uicomponentId, isShowPortalSpace, isShowUserSpace, isAutoResize, appId) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
   storage.isShowPortalSpace = isShowPortalSpace;
   storage.isShowUserSpace = isShowUserSpace;
+  storage.appId = appId;
 
   // Auto resize
   if (isAutoResize) {
@@ -179,9 +180,13 @@ UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
 UISpaceSwitcher.prototype.getRecentlyVisitedSpace = function(uicomponentId) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
+  var url = storage.recentlyVisitedSpaceRestUrl + "?offset=0";
+  if(storage.appId && storage.appId != null) {
+    url += "&appId=" + storage.appId;
+  }
   jQuery.ajax({
     async : false,
-    url : storage.recentlyVisitedSpaceRestUrl + "?appId=Wiki&offset=0",
+    url : url,
     type : 'GET',
     data : '',
     success : function(data) {
