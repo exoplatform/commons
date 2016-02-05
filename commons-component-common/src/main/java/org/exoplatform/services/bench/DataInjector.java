@@ -28,7 +28,7 @@ import org.exoplatform.services.log.Log;
 /**
  * Created by The eXo Platform SAS
  * 
- * @Author : <a href="mailto:quanglt@exoplatform.com">Le Thanh Quang</a> Jul 20,
+ * @author : <a href="mailto:quanglt@exoplatform.com">Le Thanh Quang</a> Jul 20,
  *         2011
  */
 public abstract class DataInjector extends BaseComponentPlugin {
@@ -74,7 +74,7 @@ public abstract class DataInjector extends BaseComponentPlugin {
   public abstract void inject(HashMap<String , String> params) throws Exception;
   
   /**
-   * This function should be implemented to clear data that is injected before by {@link #inject()}.
+   * This function should be implemented to clear data that is injected before by {@link DataInjector#inject}.
    * @param params parameters for rejecting. They can be query parameters of a HTTP GET request.
    * @throws Exception
    */

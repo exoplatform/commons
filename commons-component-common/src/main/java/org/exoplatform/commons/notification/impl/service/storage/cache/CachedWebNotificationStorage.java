@@ -346,7 +346,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   
   /**
    * Clear the notification from the cache.
-   * @param notifId
+   * @param notificationId
    */
   public void clearWebNotificationCache(String notificationId) {
 	WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);

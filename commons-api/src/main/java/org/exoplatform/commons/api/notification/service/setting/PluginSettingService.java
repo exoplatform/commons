@@ -33,7 +33,7 @@ public interface PluginSettingService {
 
   /**
    * Registers the plugin configuration of a group.
-   * @param pluginConfig The plugin configuration to be registered.
+   * @param groupConfig The plugin configuration to be registered.
    */
   void registerGroupConfig(GroupProviderPlugin groupConfig);
   

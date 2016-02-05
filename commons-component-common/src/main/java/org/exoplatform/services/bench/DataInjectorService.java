@@ -40,7 +40,7 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 
 /**
  * Created by The eXo Platform SAS
- * @Author : <a href="mailto:quanglt@exoplatform.com">Le Thanh Quang</a>
+ * @author : <a href="mailto:quanglt@exoplatform.com">Le Thanh Quang</a>
  * Jul 20, 2011  
  */
 @Path("/bench")

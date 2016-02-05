@@ -166,7 +166,7 @@ public class UserSetting {
   }
 
   /**
-   * @return the all channelPlugins
+   * @param channelPlugins the channelPlugins to set
    */
   public void setAllChannelPlugins(Map<String, List<String>> channelPlugins) {
     this.channelPlugins = channelPlugins;

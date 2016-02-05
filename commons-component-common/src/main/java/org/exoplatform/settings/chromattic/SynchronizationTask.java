@@ -53,7 +53,7 @@ package org.exoplatform.settings.chromattic;
      /**
       * Implementor must provide the task logic here.
       *
-      * @param context the context
+      * @param ctx the context
       * @return a value
       */
      protected abstract V execute(SessionContext ctx);

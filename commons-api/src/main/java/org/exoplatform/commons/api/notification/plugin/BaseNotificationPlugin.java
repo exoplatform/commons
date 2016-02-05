@@ -43,8 +43,7 @@ public abstract class BaseNotificationPlugin extends BaseComponentPlugin {
   
   /**
    * Start the plug in
-   * @param context
-   * @return
+   * @param ctx
    */
   public void start(NotificationContext ctx) {
     
@@ -52,8 +51,7 @@ public abstract class BaseNotificationPlugin extends BaseComponentPlugin {
   
   /**
    * End the plug in
-   * @param context
-   * @return
+   * @param ctx
    */
   public void end(NotificationContext ctx) {
     
@@ -91,7 +89,7 @@ public abstract class BaseNotificationPlugin extends BaseComponentPlugin {
   
   /**
    * Makes MessageInfo from given information what keep inside NotificationContext
-   * @param context
+   * @param ctx
    * @return
    */
   protected abstract NotificationInfo makeNotification(NotificationContext ctx);

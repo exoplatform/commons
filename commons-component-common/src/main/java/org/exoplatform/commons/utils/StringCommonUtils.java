@@ -50,10 +50,10 @@ public class StringCommonUtils {
    *  
    * @param input the given string to encode
    * 
-   * example: "<p><Script>alert(1);</script>bbbb</p>";
+   * example: {@code <p><Script>alert(1);</script>bbbb</p>}
    * CommonUtils.encodeScriptMarkup(input);
-   * result = "<p>&lt;Script&gt;alert(1);&lt;&#x2f;script&gt;bbbb</p>";
-   * @return Only encode the <script> tag. 
+   * result = {@code <p>&lt;Script&gt;alert(1);&lt;&#x2f;script&gt;bbbb</p>}
+   * @return Only encode the {@code <script>} tag.
    */
   public static String encodeScriptMarkup(String input) {
     if (input != null) {

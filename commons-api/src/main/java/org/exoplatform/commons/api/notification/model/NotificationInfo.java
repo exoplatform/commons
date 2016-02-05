@@ -248,7 +248,8 @@ public class NotificationInfo {
   }
 
   /**
-   * @param ownerParameter the ownerParameter to set
+   * @param key the ownerParameter key to set
+   * @param value the ownerParameter value to set
    */
   public NotificationInfo with(String key, String value) {
     this.ownerParameter.put(key, value);
@@ -260,7 +261,7 @@ public class NotificationInfo {
   }
 
   /**
-   * @param arrays the value to set ownerParameter
+   * @param values the value to set ownerParameter
    */
   public NotificationInfo setOwnerParameter(Value[] values) {
     if (values == null || values.length == 0) return this;

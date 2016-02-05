@@ -87,7 +87,6 @@ public class SearchContext {
    * Contructor to create a context for search service
    * @param router
    * @param siteName
-   * @return SearchContext
    * @LevelAPI Experimental 
    */
   public SearchContext(Router router, String siteName) {
@@ -152,7 +151,7 @@ public class SearchContext {
   }
   
   /**
-   * Render link base on router and Map<QualifiedName, String>
+   * Render link base on router and {@literal Map<QualifiedName, String>}
    * @return String
    * @throws Exception
    * @LevelAPI Experimental

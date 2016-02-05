@@ -39,8 +39,9 @@ public interface PluginContainer {
   
   /**
    * Gets all children plugin keys in plugin
-   * 
-   * @param plugin The list of children plugins
+   *
+   * @param parentKey the parent plugin key
+   * @return The list of children plugins
    */
   List<PluginKey> getChildPluginKeys(PluginKey parentKey);
   

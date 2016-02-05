@@ -72,8 +72,7 @@ public class SettingCacheSelector implements CachedObjectSelector<SettingKey,Obj
    * Callback function if select function return true. This function will remove this selected setting key from cache.
    * @param cache	ExoCache 
    * @param key		setting will be removed
-   * @param cinfo	cache info
-   * @return This function will remove specified setting from cache.
+   * @param ocinfo	cache info
    * @LevelAPI Experimental
    */
   @Override  

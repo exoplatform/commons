@@ -61,7 +61,7 @@ public class StatisticsService implements Startable {
     return (StatisticsCollector)this.stats;
   }
   /**
-   * @see StatisticsServicen#isStatisticsEnabled()
+   * @see StatisticsService#isStatisticsEnabled()
    */
   @Managed
   @ManagedDescription("Gets notification statistice is enabled")

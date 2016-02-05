@@ -124,7 +124,7 @@ public class ImageUtil {
      *
      * <p>An instance of <code>IndexColorModel</code> will be created for
      * instances of <code>MultiPixelPackedSampleModel</code>. The colormap
-     * will be a grayscale ramp with <code>1&nbsp;<<&nbsp;numberOfBits</code>
+     * will be a grayscale ramp with {@code 1&nbsp;<<&nbsp;numberOfBits}
      * entries ranging from zero to at most 255.</p>
      *
      * @return An instance of <code>ColorModel</code> that is suitable for

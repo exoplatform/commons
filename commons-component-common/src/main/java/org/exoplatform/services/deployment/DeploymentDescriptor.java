@@ -86,7 +86,7 @@ public class DeploymentDescriptor {
    
   /**
   * set the path of version history file which we want to import
-  * @param versionhistoryPath the path of version history file which we want to import
+  * @param versionHistoryPath the path of version history file which we want to import
   */
   public void setVersionHistoryPath(String versionHistoryPath) {
     this.versionHistoryPath = versionHistoryPath;

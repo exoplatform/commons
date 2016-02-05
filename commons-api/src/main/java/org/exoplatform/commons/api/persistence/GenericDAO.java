@@ -73,8 +73,6 @@ public interface GenericDAO<E, ID extends Serializable> {
   /**
    * Update the entity in the persistence context.
    * If the entity does not already exist, use create(E entity) instead
-   *
-   * @return the just created entity
    */
   void updateAll(List<E> entities);
 

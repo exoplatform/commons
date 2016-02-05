@@ -174,7 +174,7 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
    * 
    * @return a new system session
    * @throws RepositoryConfigurationException 
-   * @throws Exception
+   * @throws RepositoryException
    */
   protected Session getSession() throws RepositoryException, RepositoryConfigurationException {
       return getRepo().getSystemSession(getWorkspace());

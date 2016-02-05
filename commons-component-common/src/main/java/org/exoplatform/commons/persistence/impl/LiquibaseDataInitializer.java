@@ -136,7 +136,6 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
    * Apply changelogs with Liquibase
    * @param datasource
    * @param changelogsPath
-   * @throws LiquibaseException
    */
   protected void applyChangeLog(DataSource datasource, String changelogsPath) {
     Database database = null;

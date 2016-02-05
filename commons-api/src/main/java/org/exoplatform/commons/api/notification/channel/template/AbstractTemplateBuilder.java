@@ -37,7 +37,7 @@ public abstract class AbstractTemplateBuilder {
   private Template engine;
   /**
    * Makes the MessageInfor from given NotificationMessage what keep inside NotificationContext
-   * @param context
+   * @param ctx
    * @return
    */
   protected abstract MessageInfo makeMessage(NotificationContext ctx);
@@ -45,7 +45,7 @@ public abstract class AbstractTemplateBuilder {
   /**
    * Makes the Digest message from given NotificationMessage what keep inside NotificationContext
    * @param ctx
-   * @param wtiter
+   * @param writer
    * @return
    */
   protected abstract boolean makeDigest(NotificationContext ctx, Writer writer);

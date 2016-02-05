@@ -31,7 +31,7 @@ import org.exoplatform.portal.config.serialize.PortletApplication;
 
 /**
  * This class is a workaround, eXo Kernel can't config an object field as array
- * of String <br/>
+ * of String <br>
  * This class also help to simplify the xml configuration
  */
 public class PortletModel extends PortletApplication {

@@ -43,7 +43,7 @@ public abstract class AbstractNotificationPlugin extends BaseNotificationPlugin 
   
   /**
    * Makes the MessageInfor from given NotificationMessage what keep inside NotificationContext
-   * @param context
+   * @param ctx
    * @return
    */
   protected abstract MessageInfo makeMessage(NotificationContext ctx);
@@ -51,7 +51,7 @@ public abstract class AbstractNotificationPlugin extends BaseNotificationPlugin 
   /**
    * Makes the Digest message from given NotificationMessage what keep inside NotificationContext
    * @param ctx
-   * @param wtiter
+   * @param writer
    * @return
    */
   protected abstract boolean makeDigest(NotificationContext ctx, Writer writer);

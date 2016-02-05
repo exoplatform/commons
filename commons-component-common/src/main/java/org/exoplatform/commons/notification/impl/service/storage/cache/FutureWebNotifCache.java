@@ -39,13 +39,13 @@ import org.gatein.common.logging.LoggerFactory;
  * <p>A future cache that prevents the loading of the same resource twice. This should be used when the resource
  * to load is very expensive or cannot be concurrently retrieved (like a classloading).</p>
  *
- * <p>The future cache should be used with the {@link #get(Object, Object)} method, that retrieves an object
+ * <p>The future cache should be used with the {@link #get(Object, long, long)} method, that retrieves an object
  * from the cache and check it contains these elements in within offset and limit. 
  * When the sublist is not found or size less than the limit, then the {@link Loader#retrieve(Object, Object)} method 
  * is used to retrieve the data and then this data is inserted in the cache.</p>
  *
  * <p>The class is abstract and does not implement a cache technology by itself, the cache implementation is delegated
- * to the contractual methods {@link #get(Object)} and {@link #put(Object, Object)}. Those methods are intended
+ * to the contractual methods {@link #get(Object, long, long)} and {@link #put(Object, Object)}. Those methods are intended
  * to be used by the future cache only.</p>
  *
  * <p>The {@link Loader} interface provides a source to retrieve objects to put in the cache. The goal to maintain

@@ -34,7 +34,7 @@ public class WebNotificationSender {
   private final static Log LOG = ExoLogger.getLogger(WebNotificationSender.class);
   private final static String COMETD_CHANNEL = "/eXo/Application/web/NotificationMessage";
   /**
-   * @param identifierId
+   * @param remoteId
    * @param message
    */
   public static void sendJsonMessage(String remoteId, MessageInfo message) {

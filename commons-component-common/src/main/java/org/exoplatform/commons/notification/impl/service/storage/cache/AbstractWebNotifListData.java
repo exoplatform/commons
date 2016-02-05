@@ -37,8 +37,8 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
   
   /**
    * 
+   * @param key
    * @param list
-   * @param listOwnerId the identityId
    */
   public AbstractWebNotifListData(K key, final List<V> list) {
     this.list.addAll(list);
@@ -93,7 +93,7 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
   /**
    * Puts the value at the given index
    * @param value
-   * @param position
+   * @param ownerId
    */
   public void put(int index, V value, String ownerId) {
     beforePut();
@@ -130,7 +130,7 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
   /**
    * Moves the value at the given index
    * @param value
-   * @param position
+   * @param ownerId
    */
   public void move(int index, V value, String ownerId) {
     beforeMove(value);

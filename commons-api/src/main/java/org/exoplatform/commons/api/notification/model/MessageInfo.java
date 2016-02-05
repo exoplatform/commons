@@ -132,7 +132,7 @@ public class MessageInfo {
   }
 
   /**
-   * @param header the header to set
+   * @param subject the subject to set
    */
   public MessageInfo subject(String subject) {
     this.subject = subject;

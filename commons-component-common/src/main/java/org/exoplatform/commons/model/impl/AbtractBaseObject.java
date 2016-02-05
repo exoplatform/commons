@@ -79,9 +79,6 @@ public abstract class AbtractBaseObject implements BaseObject {
     /**
      * Get Object created date
      * @return
-     * @throws RepositoryException 
-     * @throws PathNotFoundException 
-     * @throws ValueFormatException 
      */
     public Calendar getCreatedDate() {
         try {
@@ -105,9 +102,6 @@ public abstract class AbtractBaseObject implements BaseObject {
     /**
      * Get Object last modified date
      * @return
-     * @throws RepositoryException 
-     * @throws PathNotFoundException 
-     * @throws ValueFormatException 
      */
     public Calendar getLastModifiedDate() {
         try {
@@ -131,8 +125,6 @@ public abstract class AbtractBaseObject implements BaseObject {
     /**
      * Get Object Creator
      * @return
-     * @throws RepositoryException 
-     * @throws PathNotFoundException 
      */
     public String getCreator() {
         try {
@@ -152,8 +144,6 @@ public abstract class AbtractBaseObject implements BaseObject {
     /**
      * Get Object Primary Type
      * @return
-     * @throws RepositoryException 
-     * @throws PathNotFoundException 
      */
     public String getPrimaryType() {
         try {
@@ -172,8 +162,6 @@ public abstract class AbtractBaseObject implements BaseObject {
 
     /**
      * Get Object mixin types
-     * @throws RepositoryException 
-     * @throws PathNotFoundException 
      */
     public List<String> getMixinTypes() {
         try {
@@ -201,9 +189,6 @@ public abstract class AbtractBaseObject implements BaseObject {
     /**
      * Get Object UUID
      * @return UUID of current Object
-     * @throws RepositoryException 
-     * @throws PathNotFoundException 
-     * @throws UnsupportedRepositoryOperationException 
      */
     public String getUUID() {
         try {
@@ -239,17 +224,7 @@ public abstract class AbtractBaseObject implements BaseObject {
     }
 
     /**
-     * @throws RepositoryException 
-     * @throws NoSuchWorkspaceException 
-     * @throws LoginException 
-     * @throws NoSuchNodeTypeException 
-     * @throws LockException 
-     * @throws VersionException 
-     * @throws InvalidItemStateException 
-     * @throws ConstraintViolationException 
-     * @throws ItemExistsException 
-     * @throws AccessDeniedException 
-     * 
+     *
      */
     public void save() {
         try {

@@ -28,7 +28,8 @@ import java.lang.annotation.Target;
  * REQUIRED. Support a current transaction, create a new one if none exists.
  * Analogous to EJB or Spring transaction attribute of the same name.
  *
- * @see org.exoplatform.commons.api.persistence.ExoTransactionalAspect
+ * This annotation is handled in org.exoplatform.commons.persistence.impl.ExoTransactionalAspect.
+ *
  * @author <a href="bdechateauvieux@exoplatform.org">Benoit de Chateauvieux</a>
  * @version $Revision$
  */

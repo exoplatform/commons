@@ -34,9 +34,11 @@ import org.junit.Before;
  * StandaloneContainer. <u>Example usage</u> :
  * 
  * <pre>
- * @ConfiguredBy({@ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/custom.xml")
+ *  <code>
+ *    {@literal @}ConfiguredBy({{@literal @}ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/custom.xml")
  *               ,@ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/some.xml")
  *               ,@ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/other.xml")})
+ *  </code>
  * </pre>
  * 
  * @author <a href="mailto:patrice.lamarque@exoplatform.com">Patrice

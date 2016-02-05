@@ -75,8 +75,7 @@ public class XMLDeploymentPlugin extends DeploymentPlugin {
      * @param initParams the init params
      * @param configurationManager the configuration manager
      * @param repositoryService the repository service
-     * @param publicationService the publication service
-     * @deprecated use {@link WCMDeploymentPublicationPlugin} instead.
+     * @deprecated use WCMDeploymentPublicationPlugin instead.
      */
     @Deprecated
     public XMLDeploymentPlugin(InitParams initParams,

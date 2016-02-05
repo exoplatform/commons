@@ -44,14 +44,15 @@ public interface NotificationContext extends Cloneable {
   
   /**
    * Append the argument literal.
-   * @param param
+   * @param argument
+   * @param value
    * @return
    */
   <T> NotificationContext append(ArgumentLiteral<T> argument, Object value);
   
   /**
    * Removes the query parameter.
-   * @param param
+   * @param filter
    * @return
    */
   <T> NotificationContext remove(ArgumentLiteral<T> filter);
@@ -62,7 +63,7 @@ public interface NotificationContext extends Cloneable {
   void clear();
   /**
    * Gets FilterOption which was existing.
-   * @param param
+   * @param argument
    * @return
    */
   <T> T value(ArgumentLiteral<T> argument);

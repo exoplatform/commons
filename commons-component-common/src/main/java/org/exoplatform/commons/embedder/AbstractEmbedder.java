@@ -64,7 +64,7 @@ public abstract class AbstractEmbedder implements Embedder {
   
   /** Correct URI String
    *
-   * @param URI URI string to correct
+   * @param uriString URI string to correct
    * @param scheme scheme to set
    * @param force if force is false, only set again scheme when scheme is missing. Otherwise, always set it
    * @return

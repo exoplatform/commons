@@ -193,7 +193,7 @@ public abstract class AbstractService {
 
   /**
    * Makes the node path for MessageHome node
-   * "/eXoNotification/messageHome/<pluginId>/<DAY_OF_MONTH>/<HOUR_OF_DAY>/"
+   * {@literal "/eXoNotification/messageHome/<pluginId>/<DAY_OF_MONTH>/<HOUR_OF_DAY>/"}
    * 
    * @param sProvider
    * @param pluginId

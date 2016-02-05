@@ -39,9 +39,9 @@ public class NotificationMessageUtils {
   public final static ArgumentLiteral<String> NOT_HIGHLIGHT_COMMENT_PORPERTY = new ArgumentLiteral<String>(String.class, "notHighlightComment");
   
   /**
-   * Gets the number of notifications that are displayed in the popover list.<br/>
+   * Gets the number of notifications that are displayed in the popover list.<br>
    * The first time this method is called, it will retrieve it from the configuration, via the property exo.notification.maxitems,
-   * or default to 8 if the property is not set.<br/>
+   * or default to 8 if the property is not set.<br>
    * If the property is set to an incorrect value (negative number, 0, not a number), the default value is used too.
    * @return the number of items (notifications) that are displayed in the popover list.
    */
