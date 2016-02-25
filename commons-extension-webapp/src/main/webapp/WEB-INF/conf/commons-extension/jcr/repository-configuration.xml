@@ -36,7 +36,7 @@
 							<property name="update-storage" value="true"/>
 							<property name="max-buffer-size" value="204800"/>
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/system${container.name.suffix}"/>
-							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.enabled:true}"/>
+							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.system.enabled:true}"/>
 						</properties>
 						<value-storages>
 							<value-storage id="system"
@@ -107,7 +107,7 @@
 							<property name="swap-directory"
                                       value="${gatein.jcr.data.dir}/swap/portal-system${container.name.suffix}"/>
 							<property name="db-tablename-suffix" value="PSYSTEM"/>
-							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.enabled:true}"/>
+							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.portal-system.enabled:true}"/>
 						</properties>
 						<value-storages>
 							<value-storage id="portal-system"
@@ -177,14 +177,14 @@
 							<property name="max-buffer-size" value="204800"/>
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/portal-work${container.name.suffix}"/>
 							<property name="db-tablename-suffix" value="PWORK"/>
-							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.enabled:true}"/>
+							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.portal-work.enabled:true}"/>
 						</properties>
 						<value-storages>
 							<value-storage id="portal-work"
                                            class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
 								<properties>
 									<property name="path" value="${gatein.jcr.storage.data.dir}/portal-work${container.name.suffix}"/>
-									<property name="enabled" value="${gatein.jcr.storage.enabled:true}"/>
+									<property name="enabled" value="${gatein.jcr.storage.portal-work.enabled:true}"/>
 								</properties>
 								<filters>
 									<filter property-type="Binary"/>
@@ -245,7 +245,7 @@
 							<property name="max-buffer-size" value="204800"/>
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/collaboration${container.name.suffix}"/>
 							<property name="db-tablename-suffix" value="COLLAB"/>
-							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.enabled:true}"/>
+							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.collaboration.enabled:true}"/>
 						</properties>
 						<value-storages>
 							<value-storage id="collaboration" class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
@@ -314,7 +314,7 @@
 							<property name="max-buffer-size" value="204800"/>
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/dms-system${container.name.suffix}"/>
 							<property name="db-tablename-suffix" value="DMSSYS"/>
-							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.enabled:true}"/>
+							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.dms-system.enabled:true}"/>
 						</properties>
 						<value-storages>
 							<value-storage id="dms-system" class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
@@ -382,7 +382,7 @@
 							<property name="update-storage" value="true" />
 							<property name="max-buffer-size" value="204800" />
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/social${container.name.suffix}" />
-							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.enabled:true}"/>
+							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.social.enabled:true}"/>
 						</properties>
 						<value-storages>
 							<value-storage id="social" class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
@@ -450,7 +450,7 @@
 							<property name="max-buffer-size" value="204800"/>
 							<property name="swap-directory" value="${gatein.jcr.data.dir}/swap/knowledge${container.name.suffix}"/>
 							<property name="db-tablename-suffix" value="KNOW"/>
-							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.enabled:true}"/>
+							<property name="acl-bloomfilter-enabled" value="${gatein.jcr.bloomfilter.knowledge.enabled:true}"/>
 						</properties>
 						<value-storages>
 							<value-storage id="knowledge" class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
