@@ -184,7 +184,7 @@
                                            class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
 								<properties>
 									<property name="path" value="${gatein.jcr.storage.data.dir}/portal-work${container.name.suffix}"/>
-									<property name="enabled" value="${gatein.jcr.storage.portal-work.enabled:true}"/>
+									<property name="enabled" value="${gatein.jcr.storage.enabled:true}"/>
 								</properties>
 								<filters>
 									<filter property-type="Binary"/>
