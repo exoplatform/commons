@@ -59,6 +59,8 @@
     <org.gatein.portal.version>4.4.x-PLF-SNAPSHOT</org.gatein.portal.version>
     <!-- Platform Project Dependencies -->
     <org.exoplatform.platform-ui.version>4.4.x-SNAPSHOT</org.exoplatform.platform-ui.version>
+    <!-- COMMONS-469: Override the jcabi version to fix UT problems-->
+    <version.jcabi.plugin>0.13.3-eXo01</version.jcabi.plugin>
   </properties>
   <dependencyManagement>
     <!-- ### NEVER CHANGE THIS ORDER OF DEPMGT ### -->

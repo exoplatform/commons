@@ -215,29 +215,6 @@
       <plugin>
         <groupId>com.jcabi</groupId>
         <artifactId>jcabi-maven-plugin</artifactId>
-        <version>0.13.1</version>
-        <executions>
-          <execution>
-            <id>weave-classes</id>
-            <goals>
-              <goal>ajc</goal>
-            </goals>
-            <phase>compile</phase>
-            <configuration>
-              <classesDirectory>target/classes</classesDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>weave-test-classes</id>
-            <goals>
-              <goal>ajc</goal>
-            </goals>
-            <phase>test-compile</phase>
-            <configuration>
-              <classesDirectory>target/test-classes</classesDirectory>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
