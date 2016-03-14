@@ -16,7 +16,7 @@
  */
 package org.exoplatform.job;
 
-import static org.easymock.EasyMock.createNiceMock;
+import static org.mockito.Mockito.mock;
 
 import java.util.Date;
 
@@ -89,8 +89,8 @@ public class MultiTenancyJobTest extends BaseCommonsTestCase{
   private final class StubJobExecutionContext extends JobExecutionContextImpl {
 
     private StubJobExecutionContext() {
-      super(createNiceMock(Scheduler.class), firedBundle, createNiceMock(Job.class));
+      super(mock(Scheduler.class), firedBundle, mock(Job.class));
     }
 
-  }  
+  }
 }
