@@ -34,10 +34,7 @@ import java.io.IOException;
 import java.net.HttpCookie;
 import java.net.InetSocketAddress;
 import java.security.Principal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 import org.cometd.bayeux.server.BayeuxContext;
@@ -250,6 +247,8 @@ public class ExoWebSocketTransport extends AbstractWebSocketTransport<Session> {
 
     private final InetSocketAddress         remoteAddress;
 
+    private final List<Locale>              locales;
+
     private WebSocketContext(ServletContext context,
                              HandshakeRequest request,
                              Map<String, Object> userProperties) {
@@ -269,6 +268,7 @@ public class ExoWebSocketTransport extends AbstractWebSocketTransport<Session> {
       // Hopefully this will become a standard, for now it's Jetty specific.
       this.localAddress = (InetSocketAddress) userProperties.get("javax.websocket.endpoint.localAddress");
       this.remoteAddress = (InetSocketAddress) userProperties.get("javax.websocket.endpoint.remoteAddress");
+      this.locales = retrieveLocales(userProperties);
     }
 
     @Override
@@ -367,6 +367,19 @@ public class ExoWebSocketTransport extends AbstractWebSocketTransport<Session> {
     @Override
     public String getURL() {
       return url;
+    }
+
+    @Override
+    public List<Locale> getLocales() {
+      return locales;
+    }
+
+    private List<Locale> retrieveLocales(Map<String, Object> userProperties) {
+      @SuppressWarnings("unchecked")
+      List<Locale> localeList = (List<Locale>)userProperties.get("javax.websocket.locales");
+      if (localeList == null || localeList.isEmpty())
+        return Collections.singletonList(Locale.getDefault());
+      return localeList;
     }
   }
 
