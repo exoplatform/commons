@@ -4,7 +4,7 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>4.3.1-M04</version>
+    <version>4.3.x-SNAPSHOT</version>
   </parent>
   <artifactId>commons-webui-resources</artifactId>
   <packaging>war</packaging>
