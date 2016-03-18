@@ -16,9 +16,7 @@
  */
 package org.exoplatform.commons.api.search;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
@@ -27,7 +25,7 @@ import org.exoplatform.commons.api.search.data.SearchResult;
  * Defines a Search API that a driver can implement, and provides the add/get methods to the connector.  
  */
 public abstract class SearchService {
-  private LinkedList<SearchServiceConnector> connectors = new LinkedList<SearchServiceConnector>();
+  private Map<String, SearchServiceConnector> connectors = new LinkedHashMap<>();
   
   /**
    * Gets all current connectors.
@@ -35,7 +33,7 @@ public abstract class SearchService {
    * @LevelAPI Experimental 
    */
   public LinkedList<SearchServiceConnector> getConnectors() {
-    return connectors;
+    return new LinkedList<>(connectors.values());
   }
 
   /**
@@ -44,7 +42,9 @@ public abstract class SearchService {
    * @LevelAPI Experimental 
    */
   public void addConnector(SearchServiceConnector connector) {
-    connectors.add(connector);
+    if(connector != null) {
+      connectors.put(connector.getSearchType(), connector);
+    }
   }
   
   /**
