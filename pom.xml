@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.exoplatform.commons</groupId>
   <artifactId>commons</artifactId>
-  <version>4.3.x-SNAPSHOT</version>
+  <version>4.3.1-M06</version>
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <modules>
@@ -34,7 +34,7 @@
   <scm>
     <connection>scm:git:git://github.com/exoplatform/commons.git</connection>
     <developerConnection>scm:git:git@github.com:exoplatform/commons.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>4.3.1-M06</tag>
     <url>http://fisheye.exoplatform.org/browse/projects/commons</url>
   </scm>
   <properties>
