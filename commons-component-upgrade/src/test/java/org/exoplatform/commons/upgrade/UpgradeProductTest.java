@@ -16,22 +16,24 @@
  */
 package org.exoplatform.commons.upgrade;
 
-import org.exoplatform.commons.testing.BaseCommonsTestCase;
-
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import org.apache.commons.lang.StringUtils;
+
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.info.MissingProductInformationException;
+import org.exoplatform.commons.info.ProductInformations;
+import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.commons.info.MissingProductInformationException;
-import org.exoplatform.commons.info.ProductInformations;
-import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
@@ -141,7 +143,46 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     assertEquals(!ecmsPrevVersion.equals("0"), versionLabels.contains(ecmsVersion + "-X-SNAPSHOT"));
     assertEquals(!ecmsPrevVersion.equals("0"), versionLabels.contains(ecmsVersion + "-X"));
     assertEquals(!ecmsPrevVersion.equals("0"), upgradeNode.hasNode("upgradeFrom" + ecmsPrevVersion));
+  }
+  
+  public void testUpgradeStatus() {
+    InitParams params;
+    ValueParam param;
 
+    // Create upgrade plugin for portal
+    params = new InitParams();
+    param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.portal");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName("plugin.execution.order");
+    param.setValue("1");
+    params.addParameter(param);
+
+    UpgradePluginFromVersionZERO upgradePortalPlugin = new UpgradePluginFromVersionZERO(params);
+    upgradePortalPlugin.setName("portalUpgrade");
+
+    // Create upgrade plugin for ECMS
+    params = new InitParams();
+    param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.platform");
+    params.addParameter(param);
+
+    SettingService settingService = container.getComponentInstanceOfType(SettingService.class);
+    assertNotNull("SettingService is not configured", settingService);
+
+    UpgradePluginStatus upgradeStatus = new UpgradePluginStatus(settingService, params);
+    upgradeStatus.setName("statusUpgrade");
+
+    assertTrue("Status should be != COMPLETED", upgradeStatus.shouldProceedToUpgrade("", ""));
+    upgradeStatus.processUpgrade("", "");
+    assertTrue("Status should be != COMPLETED even after upgrade completion AND UpdateStatusAfterUpgrade = false", upgradeStatus.shouldProceedToUpgrade("", ""));
+    upgradeStatus.setUpdateStatusAfterUpgrade(true);
+    upgradeStatus.processUpgrade("", "");
+    assertFalse("Status should be == COMPLETED after upgrade completion AND UpdateStatusAfterUpgrade = true", upgradeStatus.shouldProceedToUpgrade("", ""));
   }
 
   @Override
@@ -262,4 +303,41 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     }
   }
 
+  public static class UpgradePluginStatus extends UpgradeProductPlugin {
+    
+    private static final String MIGRATION_STATUS_COMPLETED = "COMPLETED";
+    private static final String MIGRATION_STATUS = "Migration_STATUS";
+    boolean updateStatusAfterUpgrade = false;
+
+    public UpgradePluginStatus(SettingService settingService, InitParams initParams) {
+      super(settingService, initParams);
+    }
+
+    @Override
+    public void processUpgrade(String oldVersion, String newVersion) {
+      try {
+        if(updateStatusAfterUpgrade) {
+          storeValueForPlugin(MIGRATION_STATUS, MIGRATION_STATUS_COMPLETED);
+        }
+      } catch (Exception e) {
+        fail();
+      }
+    }
+
+    @Override
+    public boolean shouldProceedToUpgrade(String newVersion, String previousVersion) {
+      String migrationstatus = getValue(MIGRATION_STATUS);
+      return StringUtils.isBlank(migrationstatus) || !MIGRATION_STATUS_COMPLETED.equals(migrationstatus);
+    }
+
+    public void setUpdateStatusAfterUpgrade(boolean updateStatusAfterUpgrade) {
+      this.updateStatusAfterUpgrade = updateStatusAfterUpgrade;
+    }
+
+    public boolean isUpdateStatusAfterUpgrade() {
+      return updateStatusAfterUpgrade;
+    }
+
+  }
+  
 }

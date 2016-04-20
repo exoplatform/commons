@@ -12,6 +12,10 @@ import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.info.ProductInformations;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.component.BaseComponentPlugin;
@@ -20,14 +24,18 @@ import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public abstract class UpgradeProductPlugin extends BaseComponentPlugin implements Comparable<UpgradeProductPlugin> {
+public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
+
+  public static final String  UPGRADE_COMPLETED_STATUS       = "Completed";
 
   private static final Log LOG = ExoLogger.getLogger(UpgradeProductPlugin.class);
   private static final String PRODUCT_GROUP_ID = "product.group.id";
   private static final String OLD_PRODUCT_GROUP_ID = "old.product.group.id";
   private static final String UPGRADE_PLUGIN_EXECUTION_ORDER = "plugin.execution.order";
   private static final String UPGRADE_PLUGIN_ENABLE = "commons.upgrade.{$0}.enable";
-  
+
+  private SettingService      settingService;
+
   private int pluginExecutionOrder;
 
   /**
@@ -36,6 +44,12 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
   protected String productGroupId;
   
   protected String oldProductGroupId;
+
+
+  public UpgradeProductPlugin(SettingService settingService, InitParams initParams) {
+    this(initParams);
+    this.settingService = settingService;
+  }
 
   public UpgradeProductPlugin(InitParams initParams) {
     if (!initParams.containsKey(PRODUCT_GROUP_ID)) {
@@ -167,24 +181,36 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin implement
   public final int hashCode() {
     return this.getName().hashCode();
   }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public int compareTo(UpgradeProductPlugin o) {
-    if(this.equals(o)){
-      //doesn't allow two plugins with the same name
-      return 0;
-    }else if(this.getPluginExecutionOrder() == o.getPluginExecutionOrder()){
-      //execution order doesn't matter in this case
-      return -1;
-      }
-    //execution order will be used in the upgradePlugins' list sorting
-    return (this.getPluginExecutionOrder() - o.getPluginExecutionOrder());
-  }
 
   public int getPluginExecutionOrder() {
     return pluginExecutionOrder;
+  }
+
+  public String getValue(String paramName) {
+    if (settingService == null) {
+      throw new IllegalStateException("SettingService Service is not set");
+    }
+    try {
+      Scope appId = Scope.APPLICATION.id(getName());
+      SettingValue<?> paramValue = settingService.get(Context.GLOBAL, appId, paramName);
+      if (paramValue != null && paramValue.getValue() != null) {
+        return paramValue.getValue().toString();
+      }
+      return null;
+    } finally {
+      Scope.APPLICATION.id(null);
+    }
+  }
+
+  public void storeValueForPlugin(String paramName, String paramValue) {
+    if (settingService == null) {
+      throw new IllegalStateException("SettingService Service is not set");
+    }
+    try {
+      settingService.set(Context.GLOBAL, Scope.APPLICATION.id(getName()), paramName, SettingValue.create(paramValue));
+    } finally {
+      Scope.APPLICATION.id(null);
+    }
   }
 
 }

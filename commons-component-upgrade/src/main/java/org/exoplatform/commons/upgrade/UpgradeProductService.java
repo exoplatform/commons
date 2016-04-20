@@ -1,8 +1,15 @@
 package org.exoplatform.commons.upgrade;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.commons.info.MissingProductInformationException;
 import org.exoplatform.commons.info.ProductInformations;
@@ -19,10 +26,12 @@ public class UpgradeProductService implements Startable {
   private static final String PROCEED_UPGRADE_FIRST_RUN_KEY = "proceedUpgradeWhenFirstRun";
   private static final String PRODUCT_VERSION_ZERO = "0";
 
-  private Set<UpgradeProductPlugin> upgradePlugins = new TreeSet<UpgradeProductPlugin>();
-  private Set<UpgradeProductPlugin> allUpgradePlugins= new TreeSet<UpgradeProductPlugin>();
+  private List<UpgradeProductPlugin> upgradePlugins = new ArrayList<UpgradeProductPlugin>();
+  private Set<UpgradeProductPlugin> allUpgradePlugins= new HashSet<UpgradeProductPlugin>();
   private ProductInformations productInformations = null;
   private boolean proceedUpgradeFirstRun = false;
+
+  private Comparator<UpgradeProductPlugin> pluginsComparator             = null;
 
   /**
    * Constructor called by eXo Kernel
@@ -37,6 +46,34 @@ public class UpgradeProductService implements Startable {
     } else {
       proceedUpgradeFirstRun = Boolean.parseBoolean(initParams.getValueParam(PROCEED_UPGRADE_FIRST_RUN_KEY).getValue());
     }
+    // Gets the execution order property: "commons.upgrade.plugins.order".
+    String pluginsOrder = PropertyManager.getProperty(PLUGINS_ORDER);
+
+    if (StringUtils.isBlank(pluginsOrder)) {
+      // Use plugin execution order of plugins if PLUGINS_ORDER parameter not set
+      LOG.info("Property '{}' wasn't set, use execution order of each plugin.", PLUGINS_ORDER);
+      pluginsComparator = new Comparator<UpgradeProductPlugin>() {
+        public int compare(UpgradeProductPlugin o1, UpgradeProductPlugin o2) {
+          int index1 = o1.getPluginExecutionOrder();
+          index1 = index1 <= 0 ? upgradePlugins.size() : index1;
+          int index2 = o2.getPluginExecutionOrder();
+          index2 = index2 <= 0 ? upgradePlugins.size() : index2;
+          return index1 - index2;
+        }
+      };
+    } else {
+      // If PLUGINS_ORDER parameter is set, use it and ignore plugin execution order
+      final List<String> pluginsOrderList = Arrays.asList(pluginsOrder.split(","));
+      pluginsComparator = new Comparator<UpgradeProductPlugin>() {
+        public int compare(UpgradeProductPlugin o1, UpgradeProductPlugin o2) {
+          int index1 = pluginsOrderList.indexOf(o1.getName());
+          index1 = index1 < 0 ? upgradePlugins.size() : index1;
+          int index2 = pluginsOrderList.indexOf(o2.getName());
+          index2 = index2 < 0 ? upgradePlugins.size() : index2;
+          return index1 - index2;
+        }
+      };
+    }
   }
 
   /**
@@ -45,16 +82,17 @@ public class UpgradeProductService implements Startable {
    * @param upgradeProductPlugin
    */
   public void addUpgradePlugin(UpgradeProductPlugin upgradeProductPlugin) {
-    LOG.info("Add Product UpgradePlugin: name = " + upgradeProductPlugin.getName());
-    if (upgradePlugins.contains(upgradeProductPlugin)) {
-      LOG.warn(upgradeProductPlugin.getName() + " upgrade plugin is duplicated. One of the duplicated plugins will be ignored!");
-    }
     // add only enabled plugins
     if (upgradeProductPlugin.isEnabled()) {
-      upgradePlugins.add(upgradeProductPlugin);
-      allUpgradePlugins.add(upgradeProductPlugin);
+      if (upgradePlugins.contains(upgradeProductPlugin)) {
+        LOG.warn("Duplicated upgrade plugin '{}'.", upgradeProductPlugin.getName());
+      } else {
+        LOG.info("Add Product UpgradePlugin '{}'", upgradeProductPlugin.getName());
+        upgradePlugins.add(upgradeProductPlugin);
+        allUpgradePlugins.add(upgradeProductPlugin);
+      }
     } else {
-      LOG.info("UpgradePlugin: name = '" + upgradeProductPlugin.getName() + "' will be ignored, because it is not enabled.");
+      LOG.info("UpgradePlugin: name = '{}' is disabled.", upgradeProductPlugin.getName());
     }
   }
 
@@ -63,97 +101,49 @@ public class UpgradeProductService implements Startable {
    * ExoContainer
    */
   public void start() {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("start method begin");
-    }
+    if (productInformations.isFirstRun()) {
+      LOG.info("Proceed upgrade on first run = {}", proceedUpgradeFirstRun);
 
-    // Set previous version declaration to Zero,
-    // this will force the upgrade execution on first run
-    if (proceedUpgradeFirstRun) {
+      // If first run of upgrade API, and if disabled on first run, ignore plugins
+      if (!proceedUpgradeFirstRun) {
+        LOG.info("Ignore all upgrade plugins");
+        return;
+      }
+
+      // If first run, set previous version to 0
       productInformations.setPreviousVersionsIfFirstRun(PRODUCT_VERSION_ZERO);
     }
 
-    // Get a JCR Session
-    String currentVersion;
-    try {
-      currentVersion = productInformations.getVersion();
-      String previousVersion = productInformations.getPreviousVersion();
-      if (!previousVersion.equals(currentVersion)) {// The version of
-                                                    // Product server has
-                                                    // changed
-        LOG.info("New version has been detected: proceed upgrading from " + previousVersion + " to " + currentVersion);
-        // Gets the execution order property:
-        // "commons.upgrade.plugins.order".
-        String pluginsOrder = PropertyManager.getProperty(PLUGINS_ORDER);
-        // If the property does not exist, rely on the plugin execution
-        // order: the order of the upgradeProductPlugin in upgradePlugins.
-        if (pluginsOrder == null) {
-          for (UpgradeProductPlugin upgradeProductPlugin : upgradePlugins) {
-            doUpgrade(upgradeProductPlugin, upgradeProductPlugin.getPluginExecutionOrder());
-            LOG.info("Upgrade " + upgradeProductPlugin.getName() + " completed.");
-          }
-        } else {
-          // If the property contains names of upgradeProductPlugins,
-          // execute them with their names' appearance order.
-          String upgradePluginNames[] = pluginsOrder.split(",");
-          for (int i = 0; i < upgradePluginNames.length; i++) {
-            if (upgradePlugins.size() > 0) {
-              Iterator<UpgradeProductPlugin> iterator= upgradePlugins.iterator();
-              while(iterator.hasNext()) {
-                UpgradeProductPlugin upgradeProductPlugin= iterator.next();
-                if (upgradeProductPlugin.getName().equals(upgradePluginNames[i])) {
-                  doUpgrade(upgradeProductPlugin, i);
-                  iterator.remove();
-                  break;
-                }
-              }
-            }
-          }
-          // If the upgradePluginNames array contains less elements than
-          // the upgradePlugins list, execute these remaining plugins.
-          if (upgradePlugins.size() > 0) {
-            for (UpgradeProductPlugin upgradeProductPlugin : upgradePlugins) {
-              doUpgrade(upgradeProductPlugin, -1);
-            }
-          }
-        }
-        // The product has been upgraded, change the product version in the
-        // JCR
-        productInformations.storeProductsInformationsInJCR();
-        LOG.info("Version upgrade completed.");
-      }
-    } catch (MissingProductInformationException missingProductInformationException) {
-      LOG.error("Can't proceed to the upgrade", missingProductInformationException);
-    }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("start method end");
-    }
-  }
+    // Sort the upgrade Plugins to use the execution order
+    Collections.sort(upgradePlugins, pluginsComparator);
 
-  private void doUpgrade(UpgradeProductPlugin upgradeProductPlugin, int order) {
-    try {
-      String currentProductPluginVersion = productInformations.getVersion(upgradeProductPlugin.getProductGroupId());
-      
-      String previousProductPluginVersion ="";
-      try{
-        previousProductPluginVersion= productInformations.getPreviousVersion(upgradeProductPlugin.getOldProductGroupId());
-      }
-      catch (Exception e) {
-         previousProductPluginVersion = productInformations.getPreviousVersion(upgradeProductPlugin.getProductGroupId());
-      }
+    LOG.info("Start transparent upgrade framework");
 
-      //
+    // If the upgradePluginNames array contains less elements than
+    // the upgradePlugins list, execute these remaining plugins.
+    for (int i = 0; i < upgradePlugins.size(); i++) {
+      UpgradeProductPlugin upgradeProductPlugin = upgradePlugins.get(i);
+      String previousProductPluginVersion = getPreviousVersion(upgradeProductPlugin);
+      String currentProductPluginVersion = getCurrentVersion(upgradeProductPlugin);
+
+      // The plugin will determine if it should proceed to upgrade
       if (upgradeProductPlugin.shouldProceedToUpgrade(currentProductPluginVersion, previousProductPluginVersion)) {
         LOG.info("Proceed upgrade plugin: name = " + upgradeProductPlugin.getName() + " from version "
-            + previousProductPluginVersion + " to " + currentProductPluginVersion + " with execution order = " + order);
+            + previousProductPluginVersion + " to " + currentProductPluginVersion);
+        // Product upgrade plugin
         upgradeProductPlugin.processUpgrade(previousProductPluginVersion, currentProductPluginVersion);
+        LOG.info("Upgrade " + upgradeProductPlugin.getName() + " completed.");
       } else {
-        LOG.info("'" + upgradeProductPlugin.getName()
-            + "' upgrade plugin execution will be ignored because shouldProceedToUpgrade = false");
+        LOG.info("Ignore upgrade plugin {} from version {} to {}",
+                 upgradeProductPlugin.getName(),
+                 previousProductPluginVersion,
+                 currentProductPluginVersion);
       }
-    } catch (MissingProductInformationException exception) {
-      LOG.error("The plugin " + upgradeProductPlugin.getName() + " generated an error.", exception);
     }
+
+    productInformations.storeProductsInformationsInJCR();
+
+    LOG.info("Version upgrade completed.");
   }
 
   /**
@@ -177,6 +167,34 @@ public class UpgradeProductService implements Startable {
       UpgradeProductPlugin upgradeProductPlugin= iterator.next();
       upgradePlugins.add(upgradeProductPlugin);
     }
+  }
+
+  private String getCurrentVersion(UpgradeProductPlugin upgradeProductPlugin) {
+    String currentUpgradePluginVersion = null;
+    try {
+      currentUpgradePluginVersion = productInformations.getVersion(upgradeProductPlugin.getName());
+    } catch (MissingProductInformationException e) {
+      try {
+        currentUpgradePluginVersion = productInformations.getVersion(upgradeProductPlugin.getProductGroupId());
+      } catch (MissingProductInformationException e1) {
+        currentUpgradePluginVersion = PRODUCT_VERSION_ZERO;
+      }
+    }
+    return currentUpgradePluginVersion;
+  }
+
+  private String getPreviousVersion(UpgradeProductPlugin upgradeProductPlugin) {
+    String previousUpgradePluginVersion = null;
+    try {
+      previousUpgradePluginVersion = productInformations.getPreviousVersion(upgradeProductPlugin.getName());
+    } catch (MissingProductInformationException e) {
+      try {
+        previousUpgradePluginVersion = productInformations.getPreviousVersion(upgradeProductPlugin.getProductGroupId());
+      } catch (MissingProductInformationException e1) {
+        previousUpgradePluginVersion = PRODUCT_VERSION_ZERO;
+      }
+    }
+    return previousUpgradePluginVersion;
   }
 
 }
