@@ -17,6 +17,7 @@
 package org.exoplatform.commons.utils;
 
 import junit.framework.TestCase;
+import java.io.InputStream;
 
 
 /**
@@ -84,5 +85,15 @@ public class StringCommonUtilsTest extends TestCase {
     
     String input2 = "<img alt='crying' height='23'  title='crying' width='23' background='test' style='javascript:alert('XSS')' onerror='alert('XSS')' onmouseover='' src='http://localhost:8080/CommonsResources/ckeditor/plugins/style/images/cry_smile.png'/>";
     assertEquals("<img alt='crying' height='23'  title='crying' width='23' 'test' '('XSS')' 'alert('XSS')' '' src='http://localhost:8080/CommonsResources/ckeditor/plugins/style/images/cry_smile.png'/>", StringCommonUtils.encodeScriptMarkup(input2));
+  }
+
+  public void testCompressDecompress() throws Exception {
+
+    String initialString = "abcdefghijklmnopqrstuvwxyzabcdeéabcd";
+    InputStream is = StringCommonUtils.compress(initialString);
+    String result = StringCommonUtils.decompress(is);
+
+    assertTrue(result.equals(initialString));
+
   }
 }
