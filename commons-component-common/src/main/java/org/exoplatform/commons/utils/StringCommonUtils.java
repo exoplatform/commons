@@ -16,10 +16,16 @@
  */
 package org.exoplatform.commons.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -33,6 +39,8 @@ public class StringCommonUtils {
 
   private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("(<(/|)?[ ]*(script|iframe|object|embed)>|<(iframe|object|embed)|((background|expression|style)=)|javascript:\\w+|(on\\w+=))",
                                                                     Pattern.CASE_INSENSITIVE);
+
+  private static final int               BUFFER_SIZE           = 32;
 
   @SuppressWarnings("serial")
   private static List<String> MATCHED_WORDS = new ArrayList<String>() {
@@ -85,5 +93,35 @@ public class StringCommonUtils {
     }
     
     return false;
+  }
+
+  public static InputStream compress(String string) throws IOException {
+    ByteArrayOutputStream os = new ByteArrayOutputStream(string.length());
+    GZIPOutputStream gos = new GZIPOutputStream(os);
+    gos.write(string.getBytes());
+    gos.close();
+    byte[] compressed = os.toByteArray();
+    os.close();
+    return new ByteArrayInputStream(compressed);
+  }
+
+  public static String decompress(InputStream is) throws IOException {
+    GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    try {
+
+      byte[] data = new byte[BUFFER_SIZE];
+      int bytesRead;
+
+      while ((bytesRead = gis.read(data)) != -1) {
+        buffer.write(data,0,bytesRead);
+      }
+
+      return new String(buffer.toByteArray());
+    }finally{
+      gis.close();
+      is.close();
+      buffer.close();
+    }
   }
 }

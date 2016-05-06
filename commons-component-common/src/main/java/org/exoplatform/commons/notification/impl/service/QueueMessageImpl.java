@@ -47,6 +47,7 @@ import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.notification.job.SendEmailNotificationJob;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.StringCommonUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.management.annotations.ManagedBy;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
@@ -71,7 +72,6 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private static final String            DELAY_TIME_SYS_KEY    = "conf.notification.service.QueueMessage.period";
   private static final String            DELAY_TIME_KEY        = "period";
   private static final String            CACHE_REPO_NAME       = "repositoryName";
-  private static final int               BUFFER_SIZE           = 32;
   private static int                     LIMIT                 = 20;
   private static long                    sinceTime             = 0;
 
@@ -248,7 +248,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       }
 
       //
-      saveData(messageInfoNode, compress(message.toJSON()));
+      saveData(messageInfoNode, StringCommonUtils.compress(message.toJSON()));
       sessionSave(messageInfoHome);
 
     } catch (Exception e) {
@@ -360,31 +360,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     Node fileNode = node.getNode("datajson");
     Node nodeContent = fileNode.getNode("jcr:content");
     InputStream stream = nodeContent.getProperty("jcr:data").getStream();
-    return decompress(stream);
+    return StringCommonUtils.decompress(stream);
   }
 
-  private static InputStream compress(String string) throws IOException {
-    ByteArrayOutputStream os = new ByteArrayOutputStream(string.length());
-    GZIPOutputStream gos = new GZIPOutputStream(os);
-    gos.write(string.getBytes());
-    gos.close();
-    byte[] compressed = os.toByteArray();
-    os.close();
-    return new ByteArrayInputStream(compressed);
-  }
 
-  private static String decompress(InputStream is) throws IOException {
-    GZIPInputStream gis = new GZIPInputStream(is, BUFFER_SIZE);
-    StringBuilder string = new StringBuilder();
-    byte[] data = new byte[BUFFER_SIZE];
-    int bytesRead;
-    while ((bytesRead = gis.read(data)) != -1) {
-      string.append(new String(data, 0, bytesRead));
-    }
-    gis.close();
-    is.close();
-    return string.toString();
-  }
 
   public String removeAll() {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
