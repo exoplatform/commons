@@ -17,8 +17,10 @@
 package org.exoplatform.commons.utils;
 
 import javax.jcr.Node;
+import javax.jcr.version.Version;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.services.deployment.Utils;
 
@@ -59,7 +61,31 @@ public class TestActivityTypeUtils extends BaseCommonsTestCase {
     ActivityTypeUtils.attachActivityId(testNode, FAKE_ACTIVITY_DI);
     saveNode(testNode);
     assertEquals(true, testNode.isNodeType(ActivityTypeUtils.EXO_ACTIVITY_INFO));
+    assertEquals(FAKE_ACTIVITY_DI, testNode.getProperty(ActivityTypeUtils.EXO_ACTIVITY_ID).getString());        
+  }
+  
+  public void testAttachWithVersion() throws Exception {
+    Node testNode = Utils.makePath(root, ID_TEST, "nt:unstructured");
+    assertNotNull(testNode);
+    testNode.addMixin("mix:versionable");
+    saveNode(testNode);
+    testNode.checkin();
+    
+    //
+    ActivityTypeUtils.attachActivityId(testNode, FAKE_ACTIVITY_DI);
+    assertEquals(true, testNode.isNodeType(ActivityTypeUtils.EXO_ACTIVITY_INFO));
     assertEquals(FAKE_ACTIVITY_DI, testNode.getProperty(ActivityTypeUtils.EXO_ACTIVITY_ID).getString());
+    
+    //parent with mix:versionable
+    testNode.checkout();
+    Node child = Utils.makePath(testNode, "child", "nt:unstructured");
+    assertNotNull(child);
+    saveNode(testNode);
+    testNode.checkin();
+    //
+    ActivityTypeUtils.attachActivityId(child, FAKE_ACTIVITY_DI);
+    assertEquals(true, child.isNodeType(ActivityTypeUtils.EXO_ACTIVITY_INFO));
+    assertEquals(FAKE_ACTIVITY_DI, child.getProperty(ActivityTypeUtils.EXO_ACTIVITY_ID).getString());
   }
 
   public void testGetActivityId() throws Exception {

@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.utils;
 
+import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
@@ -45,16 +46,47 @@ public class ActivityTypeUtils {
    * @param activityId - the activity's id.
    */
   public static void attachActivityId(Node ownerNode, String activityId) {
+    Node verNode = null;
     try {
+      /*
+       * SOC-5359 when attach activityId to versionable node 
+       * for example: ECMS document node, we have to checkout before editing
+       */
+      if (!ownerNode.isCheckedOut()) {
+        verNode = checkout(ownerNode);
+      }
       if (ownerNode.isNodeType(EXO_ACTIVITY_INFO) == false && ownerNode.canAddMixin(EXO_ACTIVITY_INFO)) {
          ownerNode.addMixin(EXO_ACTIVITY_INFO);
       }
       ownerNode.setProperty(EXO_ACTIVITY_ID, activityId);
     } catch (RepositoryException e) {
       LOG.error("Failed to attach activityId " + activityId, e);
+    } finally {
+      if (verNode != null) {
+        try {
+          verNode.save();
+          verNode.checkin();                  
+        } catch (Exception ex) {
+          LOG.error("Can't checkin node", ex);
+        }
+      }
     }
   }
   
+  private static Node checkout(Node ownerNode) throws RepositoryException {
+    if (ownerNode.isNodeType("mix:versionable")) {
+      ownerNode.checkout();
+      return ownerNode;
+    } else {
+      try {
+        return checkout(ownerNode.getParent());
+      } catch (ItemNotFoundException ex) {
+        LOG.debug("no parent for root node");
+        return null;
+      }
+    }
+  }
+
   /**
    * Get value of exo:activityId property in specified node. 
    * If property is not existing then return null.
