@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+
+  <!-- Managing both DB that use sequences and db that use auto increment -->
+  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,sybase,db2,hsqldb"/>
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql"/>
+
+  <!-- Managing auto generation of timestamp by Database -->
+  <property name="now" value="now()" dbms="mysql,hsqldb,postgresql,h2"/>
+  <property name="now" value="sysdate" dbms="oracle"/>
+  <property name="now" value="CURRENT_TIMESTAMP" dbms="mssql"/>
+
+
+  <changeSet author="file" id="1.0.0-1">
+    <createTable tableName="COMMONS_FILES">
+      <column name="FILE_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_COMMONS_FILES_ID"/>
+      </column>
+      <column name="NAME" type="NVARCHAR(550)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="MIMETYPE" type="NVARCHAR(100)"/>
+      <column name="SIZE" type="BIGINT"/>
+      <column name="UPDATED_DATE" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="UPDATER" type="NVARCHAR(100)"/>
+      <column name="CHECKSUM" type="NVARCHAR(100)"/>
+      <column name="DELETED" type="BOOLEAN" defaultValueBoolean="false"/>
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+    </modifySql>
+  </changeSet>
+
+  <changeSet author="file" id="1.0.0-2" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_COMMONS_FILES_FILE_ID" startValue="1"/>
+  </changeSet>
+
+</databaseChangeLog>
