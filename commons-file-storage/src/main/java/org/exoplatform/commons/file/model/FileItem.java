@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.Date;
 
 /**
- *
+ * Object representing a file : information + binary
  */
 public class FileItem {
   protected FileInfo fileInfo;

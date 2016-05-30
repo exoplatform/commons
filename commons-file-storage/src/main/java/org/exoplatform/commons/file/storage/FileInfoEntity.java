@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- *
+ * Entity for File Information
  */
 @Entity(name = "FileInfoEntity")
 @ExoEntity

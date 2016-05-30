@@ -12,7 +12,7 @@ import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.model.FileInfo;
 
 /**
- *
+ *  Binary provider using an in-memory map
  */
 public class MemoryBinaryProvider implements BinaryProvider {
   private Map<Long, byte[]> binaries = new HashMap<>();

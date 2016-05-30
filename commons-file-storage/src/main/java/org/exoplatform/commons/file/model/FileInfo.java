@@ -3,7 +3,7 @@ package org.exoplatform.commons.file.model;
 import java.util.Date;
 
 /**
- *
+ * File information
  */
 public class FileInfo {
   protected Long id;

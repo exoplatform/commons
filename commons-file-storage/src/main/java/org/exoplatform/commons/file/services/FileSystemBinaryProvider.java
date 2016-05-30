@@ -16,7 +16,7 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 
 /**
- *
+ * Binary provider using a file system
  */
 public class FileSystemBinaryProvider implements BinaryProvider {
 
@@ -62,6 +62,18 @@ public class FileSystemBinaryProvider implements BinaryProvider {
     return Files.newInputStream(Paths.get(getFilePath(fileInfo)));
   }
 
+  /**
+   * Write a file to the file system.
+   * The path is build with the root path, and from the checksum of the file. The folder levels are built
+   * from the checkum, and it is also used for the filename. This allows to never update a file, meaning there will
+   * be no concurrent issue when creating or updating a file. If a file with the same path already exists, it means
+   * that this is the same file and there is no need to update it. If a file with the same path does not exist, the
+   * file can be created since it is a nex file or it is an update with a different file binary.
+   * This implies that no deletion of old file versions are done on the fly. A scheduled job is needed for that.
+   * TODO Scheduled job to delete old files
+   * @param file The file to write to the file system
+   * @throws IOException
+   */
   @Override
   public void writeBinary(FileItem file) throws IOException {
      if(file.getFileInfo() == null || StringUtils.isEmpty(file.getFileInfo().getChecksum())) {

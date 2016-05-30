@@ -27,6 +27,12 @@ public class FileServiceImpl implements FileService {
     this.binaryProvider = binaryProvider;
   }
 
+  /**
+   * Get only the file info of the given id
+   * @param id
+   * @return
+   * @throws IOException
+   */
   @Override
   public FileInfo getFileInfo(long id) throws IOException {
     FileInfoEntity fileInfoEntity = fileInfoDAO.find(id);
@@ -47,6 +53,12 @@ public class FileServiceImpl implements FileService {
     return fileInfo;
   }
 
+  /**
+   * Get the file (info + binary) of the given id
+   * @param id
+   * @return
+   * @throws IOException
+   */
   @Override
   public FileItem getFile(long id) throws IOException {
     FileInfoEntity fileInfoEntity = fileInfoDAO.find(id);
@@ -72,6 +84,14 @@ public class FileServiceImpl implements FileService {
     return fileItem;
   }
 
+  /**
+   * Store the file using the provided DAO and binary provider.
+   * This method is transactional, meaning that if the write of the info or of the binary fails,
+   * nothing must be persisted.
+   * @param file
+   * @return
+   * @throws IOException
+   */
   @Override
   public FileItem writeFile(FileItem file) throws IOException {
     FileInfo fileInfo = file.getFileInfo();
