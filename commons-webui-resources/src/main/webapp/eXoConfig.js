@@ -10,7 +10,7 @@ CKEDITOR.eXoPath = CKEDITOR.basePath.substr(0, CKEDITOR.basePath.indexOf("ckedit
 (function() {CKEDITOR.plugins.addExternal('insertPortalLink','/CommonsResources/eXoPlugins/insertPortalLink/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('acceptInline','/eXoWCMResources/eXoPlugins/acceptInline/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('cancelInline','/eXoWCMResources/eXoPlugins/cancelInline/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('helpBBCode','/forumResources/eXoPlugins/helpBBCode/','plugin.js');})();
+(function() {CKEDITOR.plugins.addExternal('helpBBCode','/forum/eXoPlugins/helpBBCode/','plugin.js');})();
 
 CKEDITOR.editorConfig = function( config ){
 	config.extraPlugins = 'content,insertGadget,insertPortalLink,acceptInline,cancelInline,onchange,helpBBCode,syntaxhighlight';
