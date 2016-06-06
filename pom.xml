@@ -30,6 +30,7 @@
     <module>commons-webui-component</module>
     <module>commons-webui-ext</module>
     <module>commons-webui-resources</module>
+    <module>commons-search</module>
   </modules>
   <scm>
     <connection>scm:git:git://github.com/exoplatform/commons.git</connection>
@@ -197,6 +198,11 @@
         <artifactId>commons-webui-resources</artifactId>
         <version>${project.version}</version>
         <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-search</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <!-- Import versions from platform-ui project -->
       <dependency>
