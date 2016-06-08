@@ -1,6 +1,6 @@
 ﻿/**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
 CKEDITOR.plugins.setLang( 'a11yhelp', 'pl', {
@@ -12,12 +12,13 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'pl', {
 		items: [
 			{
 			name: 'Pasek narzędzi edytora',
-			legend: 'Wciśnij ${toolbarFocus} aby przejść do paska narzędzi. Przejdź do następnej i poprzedniej grupy narzędzi używając TAB oraz SHIFT-TAB. Przejdź do następnego i poprzedniego narzędzia używając STRZAŁKI W PRAWO lub STRZAŁKI W LEWO. Wciśnij SPACJĘ lub ENTER, aby aktywować zaznaczone narzędzie.'
+			legend: 'Naciśnij ${toolbarFocus}, by przejść do paska narzędzi. Przejdź do następnej i poprzedniej grupy narzędzi używając TAB oraz SHIFT+TAB. Przejdź do następnego i poprzedniego przycisku paska narzędzi za pomocą STRZAŁKI W PRAWO lub STRZAŁKI W LEWO. Naciśnij SPACJĘ lub ENTER by aktywować przycisk paska narzędzi.'
 		},
 
 			{
 			name: 'Okno dialogowe edytora',
-			legend: 'Będąc w oknie dialogowym wciśnij TAB aby przejść do następnego pola dialogowego, wciśnij SHIFT + TAB aby przejść do poprzedniego pola, wciśnij ENTER aby wysłać dialog, wciśnij ESC aby anulować dialog. Dla okien dialogowych z wieloma zakładkami, wciśnij ALT + F10 aby przejść do listy zakładek. Gdy to zrobisz przejdź do następnej zakładki wciskając TAB lub STRZAŁKĘ W PRAWO. Przejdź do poprzedniej zakładki wciskając SHIFT + TAB lub STRZAŁKĘ W LEWO. Wciśnij SPACJĘ lub ENTER aby wybrać zakładkę.'
+			legend:
+				'Wewnątrz okna dialogowego naciśnij TAB, by przejść do kolejnego elementu tego okna lub SHIFT+TAB, by przejść do poprzedniego elementu okna. Naciśnij ENTER w celu zatwierdzenia opcji okna dialogowego lub ESC w celu anulowania zmian. Jeśli okno dialogowe ma kilka zakładek, do listy zakładek można przejść za pomocą ALT+F10 lub TAB. Gdy lista zakładek jest aktywna, możesz przejść do kolejnej i poprzedniej zakładki za pomocą STRZAŁKI W PRAWO i STRZAŁKI W LEWO.'
 		},
 
 			{
@@ -27,12 +28,12 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'pl', {
 
 			{
 			name: 'Lista w edytorze',
-			legend: 'Inside a list-box, move to next list item with TAB OR DOWN ARROW. Move to previous list item with SHIFT + TAB or UP ARROW. Press SPACE or ENTER to select the list option. Press ESC to close the list-box.' // MISSING
+			legend: 'Wewnątrz listy przejdź do kolejnego elementu listy za pomocą przycisku TAB lub STRZAŁKI W DÓŁ. Przejdź do poprzedniego elementu listy za pomocą SHIFT+TAB lub STRZAŁKI W GÓRĘ. Naciśnij SPACJĘ lub ENTER w celu wybrania opcji z listy. Naciśnij ESC, by zamknąć listę.'
 		},
 
 			{
 			name: 'Pasek ścieżki elementów edytora',
-			legend: 'Naciśnij ${elementsPathFocus} w celu przejścia do paska ścieżki elementów edytora. W celu przejścia do kolejnego elementu naciśnij klawisz Tab lub Strzałki w prawo. W celu przejścia do poprzedniego elementu naciśnij klawisze Shift+Tab lub Strzałki w lewo. By wybrać element w edytorze, użyj klawisza Spacji lub Enter.'
+			legend: 'Naciśnij ${elementsPathFocus} w celu przejścia do paska ścieżki elementów edytora. W celu przejścia do kolejnego elementu naciśnij klawisz TAB lub STRZAŁKI W PRAWO. W celu przejścia do poprzedniego elementu naciśnij klawisze SHIFT+TAB lub STRZAŁKI W LEWO. By wybrać element w edytorze, użyj klawisza SPACJI lub ENTER.'
 		}
 		]
 	},
@@ -81,5 +82,67 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'pl', {
 		}
 		]
 	}
-	]
-});
+	],
+	backspace: 'Backspace',
+	tab: 'Tab',
+	enter: 'Enter',
+	shift: 'Shift',
+	ctrl: 'Ctrl',
+	alt: 'Alt',
+	pause: 'Pause',
+	capslock: 'Caps Lock',
+	escape: 'Escape',
+	pageUp: 'Page Up',
+	pageDown: 'Page Down',
+	end: 'End',
+	home: 'Home',
+	leftArrow: 'Strzałka w lewo',
+	upArrow: 'Strzałka w górę',
+	rightArrow: 'Strzałka w prawo',
+	downArrow: 'Strzałka w dół',
+	insert: 'Insert',
+	'delete': 'Delete',
+	leftWindowKey: 'Lewy klawisz Windows',
+	rightWindowKey: 'Prawy klawisz Windows',
+	selectKey: 'Klawisz wyboru',
+	numpad0: 'Klawisz 0 na klawiaturze numerycznej',
+	numpad1: 'Klawisz 1 na klawiaturze numerycznej',
+	numpad2: 'Klawisz 2 na klawiaturze numerycznej',
+	numpad3: 'Klawisz 3 na klawiaturze numerycznej',
+	numpad4: 'Klawisz 4 na klawiaturze numerycznej',
+	numpad5: 'Klawisz 5 na klawiaturze numerycznej',
+	numpad6: 'Klawisz 6 na klawiaturze numerycznej',
+	numpad7: 'Klawisz 7 na klawiaturze numerycznej',
+	numpad8: 'Klawisz 8 na klawiaturze numerycznej',
+	numpad9: 'Klawisz 9 na klawiaturze numerycznej',
+	multiply: 'Przemnóż',
+	add: 'Plus',
+	subtract: 'Minus',
+	decimalPoint: 'Separator dziesiętny',
+	divide: 'Podziel',
+	f1: 'F1',
+	f2: 'F2',
+	f3: 'F3',
+	f4: 'F4',
+	f5: 'F5',
+	f6: 'F6',
+	f7: 'F7',
+	f8: 'F8',
+	f9: 'F9',
+	f10: 'F10',
+	f11: 'F11',
+	f12: 'F12',
+	numLock: 'Num Lock',
+	scrollLock: 'Scroll Lock',
+	semiColon: 'Średnik',
+	equalSign: 'Znak równości',
+	comma: 'Przecinek',
+	dash: 'Pauza',
+	period: 'Kropka',
+	forwardSlash: 'Ukośnik prawy',
+	graveAccent: 'Akcent słaby',
+	openBracket: 'Nawias kwadratowy otwierający',
+	backSlash: 'Ukośnik lewy',
+	closeBracket: 'Nawias kwadratowy zamykający',
+	singleQuote: 'Apostrof'
+} );

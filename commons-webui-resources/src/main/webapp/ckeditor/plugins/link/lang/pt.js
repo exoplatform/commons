@@ -1,6 +1,6 @@
 ﻿/*
-Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.html or http://ckeditor.com/license
+Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'link', 'pt', {
 	acccessKey: 'Chave de Acesso',
@@ -43,23 +43,23 @@ CKEDITOR.plugins.setLang( 'link', 'pt', {
 	popupResizable: 'Redimensionável',
 	popupScrollBars: 'Barras de deslocamento',
 	popupStatusBar: 'Barra de Estado',
-	popupToolbar: 'Barra de Ferramentas',
+	popupToolbar: 'Barra de ferramentas',
 	popupTop: 'Posição Direita',
 	rel: 'Relação',
 	selectAnchor: 'Seleccionar una referência',
 	styles: 'Estilo',
-	tabIndex: 'Índice de Tubulação',
-	target: 'Destino',
-	targetFrame: '<Frame>',
+	tabIndex: 'Índice de tabulação',
+	target: 'Alvo',
+	targetFrame: '<frame>',
 	targetFrameName: 'Nome do Frame Destino',
-	targetPopup: '<Janela de popup>',
+	targetPopup: '<janela de popup>',
 	targetPopupName: 'Nome da Janela de Popup',
 	title: 'Hiperligação',
 	toAnchor: 'Referência a esta página',
-	toEmail: 'E-Mail',
+	toEmail: 'Email',
 	toUrl: 'URL',
 	toolbar: 'Inserir/Editar Hiperligação',
 	type: 'Tipo de Hiperligação',
 	unlink: 'Eliminar Hiperligação',
 	upload: 'Carregar'
-});
+} );

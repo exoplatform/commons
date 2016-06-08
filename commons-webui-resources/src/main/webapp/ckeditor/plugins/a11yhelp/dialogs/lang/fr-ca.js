@@ -1,6 +1,6 @@
 ﻿/**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
 CKEDITOR.plugins.setLang( 'a11yhelp', 'fr-ca', {
@@ -12,12 +12,13 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'fr-ca', {
 		items: [
 			{
 			name: 'Barre d\'outil de l\'éditeur',
-			legend: 'Appuyer sur ${toolbarFocus} pour accéder à la barre d\'outils. Se déplacer vers les groupes suivant ou précédent de la barre d\'outil avec les touches TAB et SHIFT-TAB. Se déplacer vers les boutons suivant ou précédent de la barre d\'outils avec les touches FLECHE DROITE et FLECHE GAUCHE. Appuyer sur la barre d\'espace ou la touche ENTRER pour activer le bouton de barre d\'outils.'
+			legend: 'Appuyer sur ${toolbarFocus} pour accéder à la barre d\'outils. Se déplacer vers les groupes suivant ou précédent de la barre d\'outil avec les touches TAB et SHIFT+TAB. Se déplacer vers les boutons suivant ou précédent de la barre d\'outils avec les touches FLECHE DROITE et FLECHE GAUCHE. Appuyer sur la barre d\'espace ou la touche ENTRER pour activer le bouton de barre d\'outils.'
 		},
 
 			{
 			name: 'Dialogue de l\'éditeur',
-			legend: 'A l\'intérieur d\'un dialogue, appuyer sur la touche TAB pour naviguer jusqu\'au champ de dalogue suivant, appuyez sur les touches SHIFT + TAB pour revenir au champ précédent, appuyez sur la touche ENTRER pour soumettre le dialogue, appuyer sur la touche ESC pour annuler le dialogue. Pour les dialogues avec plusieurs pages d\'onglets, appuyer sur ALT + F10 pour naviguer jusqu\'à la liste des onglets. Puis se déplacer vers l\'onglet suivant avec la touche TAB ou FLECHE DROITE. Se déplacer vers l\'onglet précédent avec les touches SHIFT + TAB ou FLECHE GAUCHE. Appuyer sur la barre d\'espace ou la touche ENTRER pour sélectionner la page de l\'onglet.'
+			legend:
+				'Inside a dialog, press TAB to navigate to the next dialog element, press SHIFT+TAB to move to the previous dialog element, press ENTER to submit the dialog, press ESC to cancel the dialog. When a dialog has multiple tabs, the tab list can be reached either with ALT+F10 or with TAB as part of the dialog tabbing order. With tab list focused, move to the next and previous tab with RIGHT and LEFT ARROW, respectively.'  // MISSING
 		},
 
 			{
@@ -27,7 +28,7 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'fr-ca', {
 
 			{
 			name: 'Menu déroulant de l\'éditeur',
-			legend: 'A l\'intérieur d\'une liste en menu déroulant, se déplacer vers l\'élément suivant de la liste avec les touches TAB ou FLECHE BAS. Se déplacer vers l\'élément précédent de la liste avec les touches SHIFT + TAB ou FLECHE HAUT. Appuyer sur la BARRE D\'ESPACE ou sur ENTREE pour sélectionner l\'option dans la liste. Appuyer sur ESC pour fermer le menu déroulant.'
+			legend: 'A l\'intérieur d\'une liste en menu déroulant, se déplacer vers l\'élément suivant de la liste avec les touches TAB ou FLECHE BAS. Se déplacer vers l\'élément précédent de la liste avec les touches SHIFT+TAB ou FLECHE HAUT. Appuyer sur la BARRE D\'ESPACE ou sur ENTREE pour sélectionner l\'option dans la liste. Appuyer sur ESC pour fermer le menu déroulant.'
 		},
 
 			{
@@ -81,5 +82,67 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'fr-ca', {
 		}
 		]
 	}
-	]
-});
+	],
+	backspace: 'Backspace', // MISSING
+	tab: 'Tab', // MISSING
+	enter: 'Enter', // MISSING
+	shift: 'Shift', // MISSING
+	ctrl: 'Ctrl', // MISSING
+	alt: 'Alt', // MISSING
+	pause: 'Pause', // MISSING
+	capslock: 'Caps Lock', // MISSING
+	escape: 'Escape', // MISSING
+	pageUp: 'Page Up', // MISSING
+	pageDown: 'Page Down', // MISSING
+	end: 'End', // MISSING
+	home: 'Home', // MISSING
+	leftArrow: 'Left Arrow', // MISSING
+	upArrow: 'Up Arrow', // MISSING
+	rightArrow: 'Right Arrow', // MISSING
+	downArrow: 'Down Arrow', // MISSING
+	insert: 'Insert', // MISSING
+	'delete': 'Delete', // MISSING
+	leftWindowKey: 'Left Windows key', // MISSING
+	rightWindowKey: 'Right Windows key', // MISSING
+	selectKey: 'Select key', // MISSING
+	numpad0: 'Numpad 0', // MISSING
+	numpad1: 'Numpad 1', // MISSING
+	numpad2: 'Numpad 2', // MISSING
+	numpad3: 'Numpad 3', // MISSING
+	numpad4: 'Numpad 4', // MISSING
+	numpad5: 'Numpad 5', // MISSING
+	numpad6: 'Numpad 6', // MISSING
+	numpad7: 'Numpad 7', // MISSING
+	numpad8: 'Numpad 8', // MISSING
+	numpad9: 'Numpad 9', // MISSING
+	multiply: 'Multiply', // MISSING
+	add: 'Add', // MISSING
+	subtract: 'Subtract', // MISSING
+	decimalPoint: 'Decimal Point', // MISSING
+	divide: 'Divide', // MISSING
+	f1: 'F1', // MISSING
+	f2: 'F2', // MISSING
+	f3: 'F3', // MISSING
+	f4: 'F4', // MISSING
+	f5: 'F5', // MISSING
+	f6: 'F6', // MISSING
+	f7: 'F7', // MISSING
+	f8: 'F8', // MISSING
+	f9: 'F9', // MISSING
+	f10: 'F10', // MISSING
+	f11: 'F11', // MISSING
+	f12: 'F12', // MISSING
+	numLock: 'Num Lock', // MISSING
+	scrollLock: 'Scroll Lock', // MISSING
+	semiColon: 'Semicolon', // MISSING
+	equalSign: 'Equal Sign', // MISSING
+	comma: 'Comma', // MISSING
+	dash: 'Dash', // MISSING
+	period: 'Period', // MISSING
+	forwardSlash: 'Forward Slash', // MISSING
+	graveAccent: 'Grave Accent', // MISSING
+	openBracket: 'Open Bracket', // MISSING
+	backSlash: 'Backslash', // MISSING
+	closeBracket: 'Close Bracket', // MISSING
+	singleQuote: 'Single Quote' // MISSING
+} );

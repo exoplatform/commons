@@ -1,9 +1,9 @@
 ﻿/**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
-(function() {
+( function() {
 	var defaultToPixel = CKEDITOR.tools.cssLength;
 
 	var commitValue = function( data ) {
@@ -37,7 +37,7 @@
 				pass = !!( CKEDITOR.dialog.validate.integer()( value ) && value > 0 );
 
 			if ( !pass ) {
-				alert( msg );
+				alert( msg ); // jshint ignore:line
 				this.select();
 			}
 
@@ -65,7 +65,7 @@
 				var styles = dialog.getContentElement( 'advanced', 'advStyles' );
 
 				if ( styles ) {
-					styles.on( 'change', function( evt ) {
+					styles.on( 'change', function() {
 						// Synchronize width value.
 						var width = this.getStyle( 'width', '' ),
 							txtWidth = dialog.getContentElement( 'info', 'txtWidth' );
@@ -77,7 +77,7 @@
 							txtHeight = dialog.getContentElement( 'info', 'txtHeight' );
 
 						txtHeight && txtHeight.setValue( height, true );
-					});
+					} );
 				}
 			},
 
@@ -129,7 +129,6 @@
 					bms = this._.selectedElement && selection.createBookmarks();
 
 				var table = this._.selectedElement || makeElement( 'table' ),
-					me = this,
 					data = {};
 
 				this.commitContent( data, table );
@@ -147,8 +146,7 @@
 							var row = tbody.append( makeElement( 'tr' ) );
 							for ( var j = 0; j < cols; j++ ) {
 								var cell = row.append( makeElement( 'td' ) );
-								if ( !CKEDITOR.env.ie )
-									cell.append( makeElement( 'br' ) );
+								cell.appendBogus();
 							}
 						}
 					}
@@ -159,9 +157,14 @@
 					// Should we make a <thead>?
 					var headers = info.selHeaders;
 					if ( !table.$.tHead && ( headers == 'row' || headers == 'both' ) ) {
-						var thead = new CKEDITOR.dom.element( table.$.createTHead() );
+						var thead = table.getElementsByTag( 'thead' ).getItem( 0 );
 						tbody = table.getElementsByTag( 'tbody' ).getItem( 0 );
 						var theRow = tbody.getElementsByTag( 'tr' ).getItem( 0 );
+
+						if ( !thead ) {
+							thead = new CKEDITOR.dom.element( 'thead' );
+							thead.insertBefore( tbody );
+						}
 
 						// Change TD to TH:
 						for ( i = 0; i < theRow.getChildCount(); i++ ) {
@@ -238,26 +241,24 @@
 				}
 				// Properly restore the selection, (#4822) but don't break
 				// because of this, e.g. updated table caption.
-				else
+				else {
 					try {
-					selection.selectBookmarks( bms );
-				} catch ( er ) {}
+						selection.selectBookmarks( bms );
+					} catch ( er ) {
+					}
+				}
 			},
-			contents: [
-				{
+			contents: [ {
 				id: 'info',
 				label: editor.lang.table.title,
-				elements: [
-					{
+				elements: [ {
 					type: 'hbox',
 					widths: [ null, null ],
 					styles: [ 'vertical-align:top' ],
-					children: [
-						{
+					children: [ {
 						type: 'vbox',
 						padding: 0,
-						children: [
-							{
+						children: [ {
 							type: 'text',
 							id: 'txtRows',
 							'default': 3,
@@ -270,7 +271,7 @@
 							},
 							commit: commitValue
 						},
-							{
+						{
 							type: 'text',
 							id: 'txtCols',
 							'default': 2,
@@ -283,11 +284,11 @@
 							},
 							commit: commitValue
 						},
-							{
+						{
 							type: 'html',
 							html: '&nbsp;'
 						},
-							{
+						{
 							type: 'select',
 							id: 'selHeaders',
 							requiredContent: 'th',
@@ -298,7 +299,7 @@
 								[ editor.lang.table.headersRow, 'row' ],
 								[ editor.lang.table.headersColumn, 'col' ],
 								[ editor.lang.table.headersBoth, 'both' ]
-								],
+							],
 							setup: function( selectedTable ) {
 								// Fill in the headers field.
 								var dialog = this.getDialog();
@@ -322,7 +323,7 @@
 							},
 							commit: commitValue
 						},
-							{
+						{
 							type: 'text',
 							id: 'txtBorder',
 							requiredContent: 'table[border]',
@@ -330,7 +331,7 @@
 							'default': editor.filter.check( 'table[border]' ) ? 1 : 0,
 							label: editor.lang.table.border,
 							controlStyle: 'width:3em',
-							validate: CKEDITOR.dialog.validate[ 'number' ]( editor.lang.table.invalidBorder ),
+							validate: CKEDITOR.dialog.validate.number( editor.lang.table.invalidBorder ),
 							setup: function( selectedTable ) {
 								this.setValue( selectedTable.getAttribute( 'border' ) || '' );
 							},
@@ -341,7 +342,7 @@
 									selectedTable.removeAttribute( 'border' );
 							}
 						},
-							{
+						{
 							id: 'cmbAlign',
 							type: 'select',
 							requiredContent: 'table[align]',
@@ -352,7 +353,7 @@
 								[ editor.lang.common.alignLeft, 'left' ],
 								[ editor.lang.common.alignCenter, 'center' ],
 								[ editor.lang.common.alignRight, 'right' ]
-								],
+							],
 							setup: function( selectedTable ) {
 								this.setValue( selectedTable.getAttribute( 'align' ) || '' );
 							},
@@ -362,18 +363,15 @@
 								else
 									selectedTable.removeAttribute( 'align' );
 							}
-						}
-						]
+						} ]
 					},
-						{
+					{
 						type: 'vbox',
 						padding: 0,
-						children: [
-							{
+						children: [ {
 							type: 'hbox',
 							widths: [ '5em' ],
-							children: [
-								{
+							children: [ {
 								type: 'text',
 								id: 'txtWidth',
 								requiredContent: 'table{width}',
@@ -393,14 +391,12 @@
 									this.setValue( val );
 								},
 								commit: commitValue
-							}
-							]
+							} ]
 						},
-							{
+						{
 							type: 'hbox',
 							widths: [ '5em' ],
-							children: [
-								{
+							children: [ {
 								type: 'text',
 								id: 'txtHeight',
 								requiredContent: 'table{height}',
@@ -420,14 +416,13 @@
 									val && this.setValue( val );
 								},
 								commit: commitValue
-							}
-							]
+							} ]
 						},
-							{
+						{
 							type: 'html',
 							html: '&nbsp;'
 						},
-							{
+						{
 							type: 'text',
 							id: 'txtCellSpace',
 							requiredContent: 'table[cellspacing]',
@@ -445,7 +440,7 @@
 									selectedTable.removeAttribute( 'cellSpacing' );
 							}
 						},
-							{
+						{
 							type: 'text',
 							id: 'txtCellPad',
 							requiredContent: 'table[cellpadding]',
@@ -462,21 +457,18 @@
 								else
 									selectedTable.removeAttribute( 'cellPadding' );
 							}
-						}
-						]
-					}
-					]
+						} ]
+					} ]
 				},
-					{
+				{
 					type: 'html',
 					align: 'right',
 					html: ''
 				},
-					{
+				{
 					type: 'vbox',
 					padding: 0,
-					children: [
-						{
+					children: [ {
 						type: 'text',
 						id: 'txtCaption',
 						requiredContent: 'caption',
@@ -511,10 +503,7 @@
 									captionElement.setHtml( '' );
 								} else {
 									captionElement = new CKEDITOR.dom.element( 'caption', editor.document );
-									if ( table.getChildCount() )
-										captionElement.insertBefore( table.getFirst() );
-									else
-										captionElement.appendTo( table );
+									table.append( captionElement, true );
 								}
 								captionElement.append( new CKEDITOR.dom.text( caption, editor.document ) );
 							} else if ( captionElement.count() > 0 ) {
@@ -523,9 +512,10 @@
 							}
 						}
 					},
-						{
+					{
 						type: 'text',
 						id: 'txtSummary',
+						bidi: true,
 						requiredContent: 'table[summary]',
 						label: editor.lang.table.summary,
 						setup: function( selectedTable ) {
@@ -537,20 +527,17 @@
 							else
 								selectedTable.removeAttribute( 'summary' );
 						}
-					}
-					]
-				}
-				]
+					} ]
+				} ]
 			},
-				dialogadvtab && dialogadvtab.createAdvancedTab( editor, null, 'table' )
-				]
-		};
+			dialogadvtab && dialogadvtab.createAdvancedTab( editor, null, 'table' )
+		] };
 	}
 
 	CKEDITOR.dialog.add( 'table', function( editor ) {
 		return tableDialog( editor, 'table' );
-	});
+	} );
 	CKEDITOR.dialog.add( 'tableProperties', function( editor ) {
 		return tableDialog( editor, 'tableProperties' );
-	});
-})();
+	} );
+} )();

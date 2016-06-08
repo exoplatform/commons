@@ -41,8 +41,23 @@
 		<name>commons-editor</name>
 		<as>ckeditor</as>
 		<script>
-			<path>/ckeditor/ckeditor.js</path>
+			<adapter>
+				(function() {
+				var oldJQuery = window.jQuery;
+				window.jQuery = $;
+				<include>/ckeditor/ckeditor.js</include>
+				<include>/ckeditor/adapters/jquery.js</include>
+				<include>/ckeditor/lang/en.js</include>
+				<include>/ckeditor/styles.js</include>
+				window.jQuery = oldJQuery;
+				return $;
+				})();
+			</adapter>
 		</script>
+		<depends>
+			<module>jquery</module>
+			<as>$</as>
+		</depends>
 	</module>
 	
 	<module>

@@ -1,6 +1,6 @@
-/*
+ï»¿/*
  * @file change event plugin for CKEditor
- * Copyright (C) 2011 Alfonso Martínez de Lizarrondo
+ * Copyright (C) 2011 Alfonso Martï¿½nez de Lizarrondo
  *
  * == BEGIN LICENSE ==
  *

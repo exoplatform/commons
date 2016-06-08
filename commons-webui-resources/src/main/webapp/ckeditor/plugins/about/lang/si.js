@@ -1,6 +1,6 @@
 ﻿/*
-Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.html or http://ckeditor.com/license
+Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'about', 'si', {
 	copy: 'පිටපත් අයිතිය සහ පිටපත් කිරීම;$1 .සියලුම හිමිකම් ඇවිරිණි.',
@@ -9,4 +9,4 @@ CKEDITOR.plugins.setLang( 'about', 'si', {
 	moreInfo: 'බලපත්‍ර තොරතුරු සදහා කරුණාකර අපගේ විද්‍යුත් ලිපිනයට පිවිසෙන්න:',
 	title: 'CKEditor ගැන විස්තර',
 	userGuide: 'CKEditor භාවිතා කිරීම පිළිබඳ '
-});
+} );

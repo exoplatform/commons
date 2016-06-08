@@ -1,13 +1,13 @@
 ﻿/*
-Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.html or http://ckeditor.com/license
+Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'find', 'ca', {
 	find: 'Cerca',
 	findOptions: 'Opcions de Cerca',
 	findWhat: 'Cerca el:',
 	matchCase: 'Distingeix majúscules/minúscules',
-	matchCyclic: 'Match cyclic',
+	matchCyclic: 'Coincidència cíclica',
 	matchWord: 'Només paraules completes',
 	notFoundMsg: 'El text especificat no s\'ha trobat.',
 	replace: 'Reemplaça',
@@ -15,4 +15,4 @@ CKEDITOR.plugins.setLang( 'find', 'ca', {
 	replaceSuccessMsg: '%1 ocurrència/es reemplaçada/es.',
 	replaceWith: 'Reemplaça amb:',
 	title: 'Cerca i reemplaça'
-});
+} );

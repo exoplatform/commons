@@ -1,6 +1,6 @@
 ﻿/**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
 CKEDITOR.plugins.setLang( 'a11yhelp', 'gl', {
@@ -17,7 +17,8 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'gl', {
 
 			{
 			name: 'Editor de diálogo',
-			legend: 'Dentro dun cadro de diálogo, prema a tecla TAB para desprazarse ao campo seguinte do cadro de diálogo, prema MAIÚS + TAB para desprazarse ao campo anterior, prema INTRO para presentar o cadro de diálogo, prema a tecla ESC para cancelar o diálogo. Para os diálogos que teñen varias páxinas, prema ALT + F10 para navegar á lapela da lista. Despois pasar á seguinte lapela con TAB ou FRECHA DEREITA. Para ir á lapela anterior con SHIFT + TAB ou FRECHA ESQUERDA. Prema ESPAZO ou INTRO para seleccionar a lapela da páxina.'
+			legend:
+				'Inside a dialog, press TAB to navigate to the next dialog element, press SHIFT+TAB to move to the previous dialog element, press ENTER to submit the dialog, press ESC to cancel the dialog. When a dialog has multiple tabs, the tab list can be reached either with ALT+F10 or with TAB as part of the dialog tabbing order. With tab list focused, move to the next and previous tab with RIGHT and LEFT ARROW, respectively.'  // MISSING
 		},
 
 			{
@@ -27,12 +28,12 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'gl', {
 
 			{
 			name: 'Lista do editor',
-			legend: 'Dentro dunha lista, móvase ao seguinte elemento da lista con TAB ou FRECHA ABAIXO. Móvase ao elemento anterior da lista con MAIÚS + TAB ou FRECHA ARRIBA. Prema ESPAZO ou INTRO para escoller a opción da lista. Prema ESC para pechar a lista.'
+			legend: 'Dentro dunha lista, móvase ao seguinte elemento da lista con TAB ou FRECHA ABAIXO. Móvase ao elemento anterior da lista con MAIÚS+TAB ou FRECHA ARRIBA. Prema ESPAZO ou INTRO para escoller a opción da lista. Prema ESC para pechar a lista.'
 		},
 
 			{
 			name: 'Barra da ruta ao elemento no editor',
-			legend: 'Prema ${elementsPathFocus} para navegar ata os elementos da barra de ruta. Móvase ao seguinte elemento botón con TAB ou FRECHA DEREITA. Móvase ao botón anterior con MAIÚS + TAB ou FRECHA ESQUERDA. Prema ESPAZO ou INTRO para seleccionar o elemento no editor.'
+			legend: 'Prema ${elementsPathFocus} para navegar ata os elementos da barra de ruta. Móvase ao seguinte elemento botón con TAB ou FRECHA DEREITA. Móvase ao botón anterior con MAIÚS+TAB ou FRECHA ESQUERDA. Prema ESPAZO ou INTRO para seleccionar o elemento no editor.'
 		}
 		]
 	},
@@ -81,5 +82,67 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'gl', {
 		}
 		]
 	}
-	]
-});
+	],
+	backspace: 'Ir atrás',
+	tab: 'Tabulador',
+	enter: 'Intro',
+	shift: 'Maiús',
+	ctrl: 'Ctrl',
+	alt: 'Alt',
+	pause: 'Pausa',
+	capslock: 'Bloq. Maiús',
+	escape: 'Escape',
+	pageUp: 'Páxina arriba',
+	pageDown: 'Páxina abaixo',
+	end: 'Fin',
+	home: 'Inicio',
+	leftArrow: 'Frecha esquerda',
+	upArrow: 'Frecha arriba',
+	rightArrow: 'Frecha dereita',
+	downArrow: 'Frecha abaixo',
+	insert: 'Inserir',
+	'delete': 'Supr',
+	leftWindowKey: 'Tecla Windows esquerda',
+	rightWindowKey: 'Tecla Windows dereita',
+	selectKey: 'Escolla a tecla',
+	numpad0: 'Tec. numérico 0',
+	numpad1: 'Tec. numérico 1',
+	numpad2: 'Tec. numérico 2',
+	numpad3: 'Tec. numérico 3',
+	numpad4: 'Tec. numérico 4',
+	numpad5: 'Tec. numérico 5',
+	numpad6: 'Tec. numérico 6',
+	numpad7: 'Tec. numérico 7',
+	numpad8: 'Tec. numérico 8',
+	numpad9: 'Tec. numérico 9',
+	multiply: 'Multiplicar',
+	add: 'Sumar',
+	subtract: 'Restar',
+	decimalPoint: 'Punto decimal',
+	divide: 'Dividir',
+	f1: 'F1',
+	f2: 'F2',
+	f3: 'F3',
+	f4: 'F4',
+	f5: 'F5',
+	f6: 'F6',
+	f7: 'F7',
+	f8: 'F8',
+	f9: 'F9',
+	f10: 'F10',
+	f11: 'F11',
+	f12: 'F12',
+	numLock: 'Bloq. num.',
+	scrollLock: 'Bloq. despraz.',
+	semiColon: 'Punto e coma',
+	equalSign: 'Signo igual',
+	comma: 'Coma',
+	dash: 'Guión',
+	period: 'Punto',
+	forwardSlash: 'Barra inclinada',
+	graveAccent: 'Acento grave',
+	openBracket: 'Abrir corchete',
+	backSlash: 'Barra invertida',
+	closeBracket: 'Pechar corchete',
+	singleQuote: 'Comiña simple'
+} );

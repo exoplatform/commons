@@ -1,9 +1,9 @@
 ﻿/**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
-(function() {
+( function() {
 	function noBlockLeft( bqBlock ) {
 		for ( var i = 0, length = bqBlock.getChildCount(), child; i < length && ( child = bqBlock.getChild( i ) ); i++ ) {
 			if ( child.type == CKEDITOR.NODE_ELEMENT && child.isBlockBoundary() )
@@ -16,7 +16,7 @@
 		exec: function( editor ) {
 			var state = editor.getCommand( 'blockquote' ).state,
 				selection = editor.getSelection(),
-				range = selection && selection.getRanges( true )[ 0 ];
+				range = selection && selection.getRanges()[ 0 ];
 
 			if ( !range )
 				return;
@@ -84,7 +84,7 @@
 				}
 
 				// The common parent must not be the following tags: table, tbody, tr, ol, ul.
-				var denyTags = { table:1,tbody:1,tr:1,ol:1,ul:1 };
+				var denyTags = { table: 1, tbody: 1, tr: 1, ol: 1, ul: 1 };
 				while ( denyTags[ commonParent.getName() ] )
 					commonParent = commonParent.getParent();
 
@@ -112,8 +112,9 @@
 						}
 
 						docFrag.replace( block );
-					} else
+					} else {
 						paragraphs.push( block );
+					}
 				}
 
 				// Now we have all the blocks to be included in a new blockquote node.
@@ -229,8 +230,11 @@
 	};
 
 	CKEDITOR.plugins.add( 'blockquote', {
-		lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		// jscs:disable maximumLineLength
+		lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,de-ch,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,id,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,tt,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		// jscs:enable maximumLineLength
 		icons: 'blockquote', // %REMOVE_LINE_CORE%
+		hidpi: true, // %REMOVE_LINE_CORE%
 		init: function( editor ) {
 			if ( editor.blockless )
 				return;
@@ -241,7 +245,7 @@
 				label: editor.lang.blockquote.toolbar,
 				command: 'blockquote',
 				toolbar: 'blocks,10'
-			});
+			} );
 		}
-	});
-})();
+	} );
+} )();

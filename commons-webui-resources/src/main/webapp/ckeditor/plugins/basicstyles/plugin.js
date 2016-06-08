@@ -1,11 +1,14 @@
 ﻿/**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
 CKEDITOR.plugins.add( 'basicstyles', {
-	lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+	// jscs:disable maximumLineLength
+	lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,de-ch,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,id,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,tt,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+	// jscs:enable maximumLineLength
 	icons: 'bold,italic,underline,strike,subscript,superscript', // %REMOVE_LINE_CORE%
+	hidpi: true, // %REMOVE_LINE_CORE%
 	init: function( editor ) {
 		var order = 0;
 		// All buttons use the same code to register. So, to avoid
@@ -24,7 +27,7 @@ CKEDITOR.plugins.add( 'basicstyles', {
 				// Listen to contextual style activation.
 				editor.attachStyleStateChange( style, function( state ) {
 					!editor.readOnly && editor.getCommand( commandName ).setState( state );
-				});
+				} );
 
 				// Create the command that can be used to apply the style.
 				editor.addCommand( commandName, new CKEDITOR.styleCommand( style, {
@@ -37,7 +40,7 @@ CKEDITOR.plugins.add( 'basicstyles', {
 						label: buttonLabel,
 						command: commandName,
 						toolbar: 'basicstyles,' + ( order += 10 )
-					});
+					} );
 				}
 			};
 
@@ -96,14 +99,17 @@ CKEDITOR.plugins.add( 'basicstyles', {
 			[ CKEDITOR.CTRL + 66 /*B*/, 'bold' ],
 			[ CKEDITOR.CTRL + 73 /*I*/, 'italic' ],
 			[ CKEDITOR.CTRL + 85 /*U*/, 'underline' ]
-			] );
+		] );
 	}
-});
+} );
 
 // Basic Inline Styles.
 
 /**
  * The style definition that applies the **bold** style to the text.
+ *
+ * Read more in the [documentation](#!/guide/dev_basicstyles)
+ * and see the [SDK sample](http://sdk.ckeditor.com/samples/basicstyles.html).
  *
  *		config.coreStyles_bold = { element: 'b', overrides: 'strong' };
  *
@@ -120,6 +126,9 @@ CKEDITOR.config.coreStyles_bold = { element: 'strong', overrides: 'b' };
 /**
  * The style definition that applies the *italics* style to the text.
  *
+ * Read more in the [documentation](#!/guide/dev_basicstyles)
+ * and see the [SDK sample](http://sdk.ckeditor.com/samples/basicstyles.html).
+ *
  *		config.coreStyles_italic = { element: 'i', overrides: 'em' };
  *
  *		CKEDITOR.config.coreStyles_italic = {
@@ -135,6 +144,9 @@ CKEDITOR.config.coreStyles_italic = { element: 'em', overrides: 'i' };
 /**
  * The style definition that applies the <u>underline</u> style to the text.
  *
+ * Read more in the [documentation](#!/guide/dev_basicstyles)
+ * and see the [SDK sample](http://sdk.ckeditor.com/samples/basicstyles.html).
+ *
  *		CKEDITOR.config.coreStyles_underline = {
  *			element: 'span',
  *			attributes: { 'class': 'Underline' }
@@ -146,11 +158,14 @@ CKEDITOR.config.coreStyles_italic = { element: 'em', overrides: 'i' };
 CKEDITOR.config.coreStyles_underline = { element: 'u' };
 
 /**
- * The style definition that applies the <strike>strike-through</strike> style to the text.
+ * The style definition that applies the <strike>strikethrough</strike> style to the text.
+ *
+ * Read more in the [documentation](#!/guide/dev_basicstyles)
+ * and see the [SDK sample](http://sdk.ckeditor.com/samples/basicstyles.html).
  *
  *		CKEDITOR.config.coreStyles_strike = {
  *			element: 'span',
- *			attributes: { 'class': 'StrikeThrough' },
+ *			attributes: { 'class': 'Strikethrough' },
  *			overrides: 'strike'
  *		};
  *
@@ -161,6 +176,9 @@ CKEDITOR.config.coreStyles_strike = { element: 's', overrides: 'strike' };
 
 /**
  * The style definition that applies the subscript style to the text.
+ *
+ * Read more in the [documentation](#!/guide/dev_basicstyles)
+ * and see the [SDK sample](http://sdk.ckeditor.com/samples/basicstyles.html).
  *
  *		CKEDITOR.config.coreStyles_subscript = {
  *			element: 'span',
@@ -175,6 +193,9 @@ CKEDITOR.config.coreStyles_subscript = { element: 'sub' };
 
 /**
  * The style definition that applies the superscript style to the text.
+ *
+ * Read more in the [documentation](#!/guide/dev_basicstyles)
+ * and see the [SDK sample](http://sdk.ckeditor.com/samples/basicstyles.html).
  *
  *		CKEDITOR.config.coreStyles_superscript = {
  *			element: 'span',

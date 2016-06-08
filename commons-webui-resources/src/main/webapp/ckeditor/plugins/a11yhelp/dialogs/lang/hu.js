@@ -1,6 +1,6 @@
 ﻿/**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
 CKEDITOR.plugins.setLang( 'a11yhelp', 'hu', {
@@ -12,12 +12,13 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'hu', {
 		items: [
 			{
 			name: 'Szerkesztő Eszköztár',
-			legend: 'Nyomjon ${toolbarFocus} hogy kijelölje az eszköztárat. A következő és előző eszköztár csoporthoz a TAB és SHIFT TAB-al juthat el. A következő és előző eszköztár gombhoz a BAL NYÍL vagy JOBB NYÍL gombbal juthat el. Nyomjon SPACE-t vagy ENTER-t hogy aktiválja az eszköztár gombot.'
+			legend: 'Nyomjon ${toolbarFocus} hogy kijelölje az eszköztárat. A következő és előző eszköztár csoporthoz a TAB és SHIFT+TAB-al juthat el. A következő és előző eszköztár gombhoz a BAL NYÍL vagy JOBB NYÍL gombbal juthat el. Nyomjon SPACE-t vagy ENTER-t hogy aktiválja az eszköztár gombot.'
 		},
 
 			{
 			name: 'Szerkesző párbeszéd ablak',
-			legend: 'Párbeszédablakban nyomjon TAB-ot a következő párbeszédmezőhöz ugráshoz, nyomjon SHIFT + TAB-ot az előző mezőhöz ugráshoz, nyomjon ENTER-t a párbeszédablak elfogadásához, nyomjon ESC-et a párbeszédablak elvetéséhez. Azokhoz a párbeszédablakokhoz, amik több fület tartalmaznak, nyomjon ALT + F10-et hogy a fülekre ugorjon. Ezután a TAB-al vagy a JOBB NYÍLLAL a következő fülre ugorhat. Az előző fülre ugráshoz használja a SHIFT + TAB-ot vagy a BAL NYILAT. Nyomjon SPACE-t vagy ENTER-t hogy kijelölje a fület.'
+			legend:
+				'Inside a dialog, press TAB to navigate to the next dialog element, press SHIFT+TAB to move to the previous dialog element, press ENTER to submit the dialog, press ESC to cancel the dialog. When a dialog has multiple tabs, the tab list can be reached either with ALT+F10 or with TAB as part of the dialog tabbing order. With tab list focused, move to the next and previous tab with RIGHT and LEFT ARROW, respectively.'  // MISSING
 		},
 
 			{
@@ -81,5 +82,67 @@ CKEDITOR.plugins.setLang( 'a11yhelp', 'hu', {
 		}
 		]
 	}
-	]
-});
+	],
+	backspace: 'Backspace',
+	tab: 'Tab',
+	enter: 'Enter',
+	shift: 'Shift',
+	ctrl: 'Ctrl',
+	alt: 'Alt',
+	pause: 'Pause',
+	capslock: 'Caps Lock',
+	escape: 'Escape',
+	pageUp: 'Page Up',
+	pageDown: 'Page Down',
+	end: 'End',
+	home: 'Home',
+	leftArrow: 'balra nyíl',
+	upArrow: 'felfelé nyíl',
+	rightArrow: 'jobbra nyíl',
+	downArrow: 'lefelé nyíl',
+	insert: 'Insert',
+	'delete': 'Delete',
+	leftWindowKey: 'bal Windows-billentyű',
+	rightWindowKey: 'jobb Windows-billentyű',
+	selectKey: 'Billentyű választása',
+	numpad0: 'Számbillentyűk 0',
+	numpad1: 'Számbillentyűk 1',
+	numpad2: 'Számbillentyűk 2',
+	numpad3: 'Számbillentyűk 3',
+	numpad4: 'Számbillentyűk 4',
+	numpad5: 'Számbillentyűk 5',
+	numpad6: 'Számbillentyűk 6',
+	numpad7: 'Számbillentyűk 7',
+	numpad8: 'Számbillentyűk 8',
+	numpad9: 'Számbillentyűk 9',
+	multiply: 'Szorzás',
+	add: 'Hozzáadás',
+	subtract: 'Kivonás',
+	decimalPoint: 'Tizedespont',
+	divide: 'Osztás',
+	f1: 'F1',
+	f2: 'F2',
+	f3: 'F3',
+	f4: 'F4',
+	f5: 'F5',
+	f6: 'F6',
+	f7: 'F7',
+	f8: 'F8',
+	f9: 'F9',
+	f10: 'F10',
+	f11: 'F11',
+	f12: 'F12',
+	numLock: 'Num Lock',
+	scrollLock: 'Scroll Lock',
+	semiColon: 'Pontosvessző',
+	equalSign: 'Egyenlőségjel',
+	comma: 'Vessző',
+	dash: 'Kötőjel',
+	period: 'Pont',
+	forwardSlash: 'Perjel',
+	graveAccent: 'Visszafelé dőlő ékezet',
+	openBracket: 'Nyitó szögletes zárójel',
+	backSlash: 'fordított perjel',
+	closeBracket: 'Záró szögletes zárójel',
+	singleQuote: 'szimpla idézőjel'
+} );

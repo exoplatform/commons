@@ -1,11 +1,11 @@
 ﻿/*
-Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.html or http://ckeditor.com/license
+Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'find', 'pt', {
 	find: 'Procurar',
 	findOptions: 'Find Options',
-	findWhat: 'Texto a Procurar:',
+	findWhat: 'Texto a procurar:',
 	matchCase: 'Maiúsculas/Minúsculas',
 	matchCyclic: 'Match cyclic',
 	matchWord: 'Coincidir com toda a palavra',
@@ -15,4 +15,4 @@ CKEDITOR.plugins.setLang( 'find', 'pt', {
 	replaceSuccessMsg: '%1 occurrence(s) replaced.',
 	replaceWith: 'Substituir por:',
 	title: 'Find and Replace'
-});
+} );

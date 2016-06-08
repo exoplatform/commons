@@ -1,13 +1,16 @@
 ﻿/**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
-(function() {
+( function() {
 	CKEDITOR.plugins.add( 'pastefromword', {
 		requires: 'clipboard',
-		lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		// jscs:disable maximumLineLength
+		lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,de-ch,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,id,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,tt,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		// jscs:enable maximumLineLength
 		icons: 'pastefromword,pastefromword-rtl', // %REMOVE_LINE_CORE%
+		hidpi: true, // %REMOVE_LINE_CORE%
 		init: function( editor ) {
 			var commandName = 'pastefromword',
 				// Flag indicate this command is actually been asked instead of a generic pasting.
@@ -26,29 +29,34 @@
 					// Force html mode for incomming paste events sequence.
 					editor.once( 'beforePaste', forceHtmlMode );
 
-					editor.getClipboardData({ title: editor.lang.pastefromword.title }, function( data ) {
+					editor.getClipboardData( { title: editor.lang.pastefromword.title }, function( data ) {
 						// Do not use editor#paste, because it would start from beforePaste event.
-						data && editor.fire( 'paste', { type: 'html', dataValue: data.dataValue } );
+						data && editor.fire( 'paste', {
+							type: 'html',
+							dataValue: data.dataValue,
+							method: 'paste',
+							dataTransfer: CKEDITOR.plugins.clipboard.initPasteDataTransfer()
+						} );
 
 						editor.fire( 'afterCommandExec', {
 							name: commandName,
 							command: cmd,
 							returnValue: !!data
-						});
-					});
+						} );
+					} );
 				}
-			});
+			} );
 
 			// Register the toolbar button.
 			editor.ui.addButton && editor.ui.addButton( 'PasteFromWord', {
 				label: editor.lang.pastefromword.toolbar,
 				command: commandName,
 				toolbar: 'clipboard,50'
-			});
+			} );
 
 			editor.on( 'pasteState', function( evt ) {
 				editor.getCommand( commandName ).setState( evt.data );
-			});
+			} );
 
 			// Features bring by this command beside the normal process:
 			// 1. No more bothering of user about the clean-up.
@@ -62,6 +70,9 @@
 
 				// MS-WORD format sniffing.
 				if ( mswordHtml && ( forceFromWord || ( /(class=\"?Mso|style=\"[^\"]*\bmso\-|w:WordDocument)/ ).test( mswordHtml ) ) ) {
+					// Do not apply paste filter to data filtered by the Word filter (#13093).
+					data.dontFilter = true;
+
 					// If filter rules aren't loaded then cancel 'paste' event,
 					// load them and when they'll get loaded fire new paste event
 					// for which data will be filtered in second execution of
@@ -70,27 +81,21 @@
 						// Event continuation with the original data.
 						if ( isLazyLoad )
 							editor.fire( 'paste', data );
-						else if ( !editor.config.pasteFromWordPromptCleanup || ( forceFromWord || confirm( editor.lang.pastefromword.confirmCleanup ) ) ) {
+						else if ( !editor.config.pasteFromWordPromptCleanup || ( forceFromWord || confirm( editor.lang.pastefromword.confirmCleanup ) ) ) // jshint ignore:line
 							data.dataValue = CKEDITOR.cleanWord( mswordHtml, editor );
-						}
-					});
+
+						// Reset forceFromWord.
+						forceFromWord = 0;
+					} );
 
 					// The cleanup rules are to be loaded, we should just cancel
 					// this event.
 					isLazyLoad && evt.cancel();
 				}
 			}, null, null, 3 );
-
-			function resetFromWord( evt ) {
-				evt && evt.removeListener();
-				editor.removeListener( 'beforePaste', forceHtmlMode );
-				forceFromWord && setTimeout( function() {
-					forceFromWord = 0;
-				}, 0 );
-			}
 		}
 
-	});
+	} );
 
 	function loadFilterRules( editor, path, callback ) {
 		var isLoaded = CKEDITOR.cleanWord;
@@ -110,7 +115,7 @@
 	function forceHtmlMode( evt ) {
 		evt.data.type = 'html';
 	}
-})();
+} )();
 
 
 /**
