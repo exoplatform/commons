@@ -185,6 +185,15 @@
       </exclusions>
       <version>4.1.12.Final</version>
     </dependency>
+    <!-- XSS issues occur in presentation layer when the data is displayed to the end user. -->
+    <!-- Preventing this at apache level is not a valid approach.-->
+    <!-- OWASP Java HTML Sanitizer API is a library (not a filter software) that provides XSS/XEE protection as an API to encode data in presentation layer. -->
+    <!-- Whenever something that is affected from user input is to be displayed, proper encoding should be applied. -->
+    <!-- Moreover, we aim to replace the old lib called AntiSamy by this one -->
+    <dependency>
+      <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+      <artifactId>owasp-java-html-sanitizer</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <resources>

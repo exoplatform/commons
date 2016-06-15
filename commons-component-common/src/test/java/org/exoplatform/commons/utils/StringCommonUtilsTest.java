@@ -17,6 +17,8 @@
 package org.exoplatform.commons.utils;
 
 import junit.framework.TestCase;
+import org.junit.Test;
+
 import java.io.InputStream;
 
 
@@ -95,5 +97,41 @@ public class StringCommonUtilsTest extends TestCase {
 
     assertTrue(result.equals(initialString));
 
+  }
+  public void testHTMLSanitization() throws Exception {
+
+    String initialString = "abcdefghijklmnopqrstuvwxyzabcdeéabcd";
+    InputStream is = StringCommonUtils.compress(initialString);
+    String result = StringCommonUtils.decompress(is);
+
+    assertTrue(result.equals(initialString));
+
+  }
+  @Test
+  public static final void testEmpty() throws Exception {
+    assertEquals("", StringCommonUtils.sanitize(""));
+    assertEquals("", StringCommonUtils.sanitize(null));
+  }
+
+  @Test
+  public static final void testNul() throws Exception {
+    assertEquals(
+            "<a title="
+                    + "\"harmless  SCRIPT&#61;javascript:alert(1) ignored&#61;ignored\">"
+                    + "</a>",
+            StringCommonUtils.sanitize(
+                    "<A TITLE="
+                            + "\"harmless\0  SCRIPT=javascript:alert(1) ignored=ignored\">"
+            ));
+  }
+
+  @Test
+  public static final void testDigitsInAttrNames() throws Exception {
+    // See bug 614 for details.
+    assertEquals(
+            "<div>Hello</div>",
+            StringCommonUtils.sanitize(
+                    "<div style1=\"expression(\'alert(1)\")\">Hello</div>"
+            ));
   }
 }

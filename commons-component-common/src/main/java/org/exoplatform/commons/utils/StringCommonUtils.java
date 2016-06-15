@@ -27,7 +27,13 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import com.google.common.base.Throwables;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.owasp.html.*;
+
+import javax.annotation.Nullable;
 
 /**
  * Created by The eXo Platform SAS
@@ -36,6 +42,9 @@ import org.apache.commons.lang.StringEscapeUtils;
  * Dec 15, 2015  
  */
 public class StringCommonUtils {
+
+    private static final Log LOG = ExoLogger.getLogger(StringCommonUtils.class);
+
 
   private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("(<(/|)?[ ]*(script|iframe|object|embed)>|<(iframe|object|embed)|((background|expression|style)=)|javascript:\\w+|(on\\w+=))",
                                                                     Pattern.CASE_INSENSITIVE);
@@ -123,5 +132,56 @@ public class StringCommonUtils {
       is.close();
       buffer.close();
     }
+  }
+  public static String sanitize(@Nullable String html) throws Exception{
+    StringBuilder sb = new StringBuilder();
+
+      // Set up an output channel to receive the sanitized HTML.
+      HtmlStreamRenderer renderer = HtmlStreamRenderer.create(
+            sb,
+              // Receives notifications on a failure to write to the output.
+            new Handler<IOException>() {
+                public void handle(IOException ex) {
+                    Throwables.propagate(ex);
+                }
+            },
+            // Our HTML parser is very lenient, but this receives
+            // notifications on
+            // truly bizarre inputs.
+            new Handler<String>() {
+                public void handle(String x) {
+                    throw new AssertionError(x);
+                }
+            });
+
+    HtmlSanitizer.Policy policy = new HtmlPolicyBuilder()
+            // Allow these tags.
+            .allowElements(
+                    "a", "b", "br", "div", "i", "iframe", "img", "input", "li",
+                    "ol", "p", "span", "ul", "noscript", "noframes", "noembed", "noxss")
+                    // And these attributes.
+            .allowAttributes(
+                    "dir", "checked", "class", "href", "id", "target", "title", "type")
+            .globally()
+                    // Cleanup IDs and CLASSes and prefix them with p- to move to a separate
+                    // name-space.
+            .allowAttributes("id", "class")
+            .matching(
+                    new AttributePolicy() {
+                      public String apply(
+                              String elementName, String attributeName, String value) {
+                        return value.replaceAll("(?:^|\\s)([a-zA-Z])", " p-$1")
+                                .replaceAll("\\s+", " ")
+                                .trim();
+                      }
+                    })
+            .globally()
+            .allowStyling()
+                    // Don't throw out useless <img> and <input> elements to ease debugging.
+            .allowWithoutAttributes("img", "input")
+            .build(renderer);
+
+    HtmlSanitizer.sanitize(html, policy);
+      return sb.toString();
   }
 }
