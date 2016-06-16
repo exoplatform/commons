@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+               xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+    <!--Declare DataInitializer at RootContainer Level to ensure initData before instantiation of declared service
+        at portalContainer level (for example QuartzSheduler see PLF-6640)-->
+    <component>
+        <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
+        <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
+        <init-params>
+            <value-param>
+                <name>liquibase.datasource</name>
+                <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
+            </value-param>
+            <value-param>
+                <name>liquibase.contexts</name>
+                <value>production</value>
+            </value-param>
+        </init-params>
+    </component>
+</configuration>
