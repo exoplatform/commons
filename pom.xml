@@ -29,7 +29,6 @@
     <module>commons-testing</module>
     <module>commons-webui-component</module>
     <module>commons-webui-ext</module>
-    <module>commons-webui-resources</module>
     <module>commons-search</module>
   </modules>
   <scm>
@@ -186,18 +185,6 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-webui-ext</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.commons</groupId>
-        <artifactId>commons-webui-resources</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-      <dependency>
-        <groupId>org.exoplatform.commons</groupId>
-        <artifactId>commons-webui-resources</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>

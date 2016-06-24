@@ -80,11 +80,11 @@ public class StringCommonUtilsTest extends TestCase {
   }
   
   public void testEncodeImg() throws Exception {
-    String input1 = "<img alt='crying' height='23' src='http://localhost:8080/CommonsResources/ckeditor/plugins/smiley/images/cry_smile.png' title='crying' width='23' onerror='alert('XSS')' onmousemove='alert('XSS1')'/>";
-    assertEquals("<img alt='crying' height='23' src='http://localhost:8080/CommonsResources/ckeditor/plugins/smiley/images/cry_smile.png' title='crying' width='23' 'alert('XSS')' 'alert('XSS1')'/>", StringCommonUtils.encodeScriptMarkup(input1));
+    String input1 = "<img alt='crying' height='23' src='http://localhost:8080/commons-extension/ckeditor/plugins/smiley/images/cry_smile.png' title='crying' width='23' onerror='alert('XSS')' onmousemove='alert('XSS1')'/>";
+    assertEquals("<img alt='crying' height='23' src='http://localhost:8080/commons-extension/ckeditor/plugins/smiley/images/cry_smile.png' title='crying' width='23' 'alert('XSS')' 'alert('XSS1')'/>", StringCommonUtils.encodeScriptMarkup(input1));
     
-    String input2 = "<img alt='crying' height='23'  title='crying' width='23' background='test' style='javascript:alert('XSS')' onerror='alert('XSS')' onmouseover='' src='http://localhost:8080/CommonsResources/ckeditor/plugins/style/images/cry_smile.png'/>";
-    assertEquals("<img alt='crying' height='23'  title='crying' width='23' 'test' '('XSS')' 'alert('XSS')' '' src='http://localhost:8080/CommonsResources/ckeditor/plugins/style/images/cry_smile.png'/>", StringCommonUtils.encodeScriptMarkup(input2));
+    String input2 = "<img alt='crying' height='23'  title='crying' width='23' background='test' style='javascript:alert('XSS')' onerror='alert('XSS')' onmouseover='' src='http://localhost:8080/commons-extension/ckeditor/plugins/style/images/cry_smile.png'/>";
+    assertEquals("<img alt='crying' height='23'  title='crying' width='23' 'test' '('XSS')' 'alert('XSS')' '' src='http://localhost:8080/commons-extension/ckeditor/plugins/style/images/cry_smile.png'/>", StringCommonUtils.encodeScriptMarkup(input2));
   }
 
   public void testCompressDecompress() throws Exception {

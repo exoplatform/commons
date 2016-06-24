@@ -168,7 +168,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
        || CKEDITOR_ENTER_DIV.equals(enterMode) && CKEDITOR_ENTER_P.equals(shiftEnterMode)) {
       forceEnterMode = true;
     }
-    if (css == null) css = "\"/CommonsResources/ckeditor/contents.css\"";
+    if (css == null) css = "\"/commons-extension/ckeditor/contents.css\"";
     if (value_ == null) value_ = "";
 
     StringBuilder builder = new StringBuilder();
@@ -235,7 +235,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     //end function   
     jsBuilder.append("}\n");
     jsBuilder.append(functionName + "();\n");
-    context.getJavascriptManager().require("/CommonsResources/ckeditor/ckeditor.js").addScripts(jsBuilder.toString());
+    context.getJavascriptManager().require("/commons-extension/ckeditor/ckeditor.js").addScripts(jsBuilder.toString());
     //
     return builder.toString();
   }
