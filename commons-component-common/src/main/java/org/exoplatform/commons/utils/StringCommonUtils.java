@@ -20,80 +20,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
- * Dec 15, 2015  
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com Dec
+ * 15, 2015
  */
 public class StringCommonUtils {
 
-  private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("(<(/|)?[ ]*(script|iframe|object|embed)>|<(iframe|object|embed)|((background|expression|style)=)|javascript:\\w+|(on\\w+=))",
-                                                                    Pattern.CASE_INSENSITIVE);
-
-  private static final int               BUFFER_SIZE           = 32;
-
-  @SuppressWarnings("serial")
-  private static List<String> MATCHED_WORDS = new ArrayList<String>() {
-    {
-      add("on");
-      add("javascript");
-      add("background");
-      add("src");
-      add("style");
-    }
-  };
-  
-  /**
-   * Encode the XSS script
-   *  
-   * @param input the given string to encode
-   * 
-   * example: {@code <p><Script>alert(1);</script>bbbb</p>}
-   * CommonUtils.encodeScriptMarkup(input);
-   * result = {@code <p>&lt;Script&gt;alert(1);&lt;&#x2f;script&gt;bbbb</p>}
-   * @return Only encode the {@code <script>} tag.
-   */
-  public static String encodeScriptMarkup(String input) {
-    if (input != null) {
-      String decodeInput = StringEscapeUtils.unescapeHtml(input);
-      Matcher matcher = SCRIPT_TAG_PATTERN.matcher(decodeInput);
-      StringBuffer str = new StringBuffer(decodeInput.length());
-      while (matcher.find()) {
-        //removes in the case matched in the word list
-        if (matchedWord(matcher.group())) {
-          matcher.appendReplacement(str, "");
-        } else {
-          matcher.appendReplacement(str, HTMLEntityEncoder.getInstance().encodeHTMLAttribute(matcher.group()));
-        }
-      }
-      matcher.appendTail(str);
-      input = str.toString();
-    }
-    return input;
-  }
-  
-  private static boolean matchedWord(String input) {
-    if (input == null || input.length() == 0) return true;
-    //
-    String lowerStr = input.toLowerCase();
-    for (String word : MATCHED_WORDS) {
-      if (lowerStr.contains(word)) {
-        return true;
-      }
-    }
-    
-    return false;
-  }
+  private static final int BUFFER_SIZE = 32;
 
   public static InputStream compress(String string) throws IOException {
     ByteArrayOutputStream os = new ByteArrayOutputStream(string.length());
@@ -114,11 +50,11 @@ public class StringCommonUtils {
       int bytesRead;
 
       while ((bytesRead = gis.read(data)) != -1) {
-        buffer.write(data,0,bytesRead);
+        buffer.write(data, 0, bytesRead);
       }
 
       return new String(buffer.toByteArray());
-    }finally{
+    } finally {
       gis.close();
       is.close();
       buffer.close();
