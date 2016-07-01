@@ -18,10 +18,10 @@ public class PlugableUIServiceImpl implements PlugableUIService {
   }
 
   @Override
-  public <R extends RenderContext> Response render(R renderParam) {
-    BaseUIPlugin<R, ?> plugin = getPlugin(renderParam.getPluginType());
+  public <R extends RenderContext> Response render(R renderContext) {
+    BaseUIPlugin<R, ?> plugin = getPlugin(renderContext.getPluginType());
     if (plugin != null) {
-      return plugin.render(renderParam);      
+      return plugin.render(renderContext);
     } else {
       return null;
     }
