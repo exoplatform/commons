@@ -1,13 +1,9 @@
 package org.exoplatform.commons.file.model;
 
 import org.apache.commons.io.IOUtils;
-import org.exoplatform.commons.file.fileSystem.TreeFile;
-import org.exoplatform.commons.file.fileSystem.TreeFileIOChannel;
 import org.exoplatform.commons.file.services.util.FileChecksum;
-import org.exoplatform.commons.utils.PrivilegedFileHelper;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -75,7 +71,7 @@ public class FileItem {
   public void setChecksum(InputStream inputStream) throws Exception {
     try {
       if (inputStream != null) {
-        String checksum = FileChecksum.getMD5Checksum(inputStream);
+        String checksum = FileChecksum.getChecksum(inputStream);
         fileInfo.setChecksum(checksum);
       }
     } catch (IOException e) {

@@ -88,9 +88,9 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
           list.add(add);
         }
       }
-      if (!list.isEmpty()) {
-        nameSpaceDAO.createAll(list);
-      }
+    }
+    if (!list.isEmpty()) {
+      nameSpaceDAO.createAll(list);
     }
     LOG.info("End Init Files nameSpaces ");
   }

@@ -22,6 +22,12 @@ import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
 import org.exoplatform.commons.file.storage.entity.DeletedFileEntity;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import org.exoplatform.services.log.ExoLogger;
+
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by The eXo Platform SAS
@@ -29,4 +35,18 @@ import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
  *          exo@exoplatform.com
  */
 public class DeletedFileDAOImpl extends GenericDAOJPAImpl<DeletedFileEntity, Long> implements DeletedFileDAO{
+
+    private static org.exoplatform.services.log.Log Log = ExoLogger.getLogger(DeletedFileDAOImpl.class);
+
+    @Override
+    public List<DeletedFileEntity> findDeletedFiles(Date date) {
+        TypedQuery<DeletedFileEntity> query = getEntityManager().createNamedQuery("deletedEntity.findDeletedFiles", DeletedFileEntity.class)
+                .setParameter("deletedDate", date);
+        try {
+            return query.getResultList();
+        } catch (NoResultException e) {
+            Log.error("Unable to get deleted file"+ e.getMessage());
+        }
+        return null;
+    }
 }

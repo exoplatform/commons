@@ -52,7 +52,7 @@ public class FileChecksum {
    * @return
    * @throws Exception
    */
-  public static String getMD5Checksum(String string) throws Exception {
+  public static String getChecksum(String string) throws Exception {
     digest.update(string.getBytes());
     byte messageDigest[] = digest.digest();
     //This bytes[] has bytes in decimal format;
@@ -73,7 +73,7 @@ public class FileChecksum {
    * @return
    * @throws Exception
    */
-  public static String getMD5Checksum(InputStream fis) throws Exception {
+  public static String getChecksum(InputStream fis) throws Exception {
     //Create byte array to read data in chunks
     byte[] byteArray = new byte[1024];
     int bytesCount = 0;

@@ -23,6 +23,8 @@ import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -35,6 +37,9 @@ import java.util.List;
  *          exo@exoplatform.com
  */
 public class FileInfoDAOImpl extends GenericDAOJPAImpl<FileInfoEntity, Long> implements FileInfoDAO {
+
+  private static org.exoplatform.services.log.Log Log = ExoLogger.getLogger(FileInfoDAOImpl.class);
+
   @Override
   public List<FileInfoEntity> findDeletedFiles(Date date) {
     TypedQuery<FileInfoEntity> query = getEntityManager().createNamedQuery("fileEntity.findDeletedFiles", FileInfoEntity.class)
@@ -42,6 +47,7 @@ public class FileInfoDAOImpl extends GenericDAOJPAImpl<FileInfoEntity, Long> imp
     try {
       return query.getResultList();
     } catch (NoResultException e) {
+        Log.error("Unable to get deleted file"+ e.getMessage());
     }
     return null;
   }

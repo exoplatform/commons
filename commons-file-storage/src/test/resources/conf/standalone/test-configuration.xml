@@ -73,8 +73,8 @@
     </component>
 
     <component>
-        <key>org.exoplatform.commons.file.fileSystem.ResourceProvider</key>
-        <type>org.exoplatform.commons.file.fileSystem.FileSystemResourceProvider</type>
+        <key>org.exoplatform.commons.file.resource.ResourceProvider</key>
+        <type>org.exoplatform.commons.file.resource.FileSystemResourceProvider</type>
         <init-params>
             <value-param>
                 <name>rootPath</name>

@@ -18,21 +18,78 @@
  */
 package org.exoplatform.commons.file.services.job;
 
+import org.exoplatform.commons.file.resource.ResourceProvider;
+import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
+import org.exoplatform.commons.file.storage.entity.DeletedFileEntity;
+import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
 /**
- * Offers to calculate Checksum
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public class FileStorageCleanJob implements Job {
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-        FileInfoDAO fileInfoDAO= CommonsUtils.getService(FileInfoDAO.class);
+  private static Log    Log              = ExoLogger.getLogger(FileStorageCleanJob.class);
+
+  private static int    defaultRetention = 30;
+
+  @Override
+  public void execute(JobExecutionContext context) throws JobExecutionException {
+    if(Log.isDebugEnabled()) {
+      Log.debug("Start to clean old FileStorage...");
     }
+    FileInfoDAO fileInfoDAO = CommonsUtils.getService(FileInfoDAO.class);
+    DeletedFileDAO deletedFileDAO = CommonsUtils.getService(DeletedFileDAO.class);
+    ResourceProvider resourceProvider = CommonsUtils.getService(ResourceProvider.class);
+    JobDataMap jdatamap = context.getJobDetail().getJobDataMap();
+    int retention = defaultRetention;
+    if (jdatamap != null) {
+      String valueParam = jdatamap.getString(FileStorageCronJob.RETENTION_PARAM);
+      try {
+        retention = Integer.parseInt(valueParam);
+      } catch (NumberFormatException ex) {
+        Log.warn("Invalid param retention-time");
+      }
+    }
+
+    List<FileInfoEntity> list = fileInfoDAO.findDeletedFiles(daysAgo(retention));
+    for (FileInfoEntity file : list) {
+      try {
+        resourceProvider.remove(file.getChecksum());
+        fileInfoDAO.delete(file);
+      } catch (IOException e) {
+        Log.warn("Enable to remove file name" + e.getMessage());
+      }
+    }
+    List<DeletedFileEntity> noParent = deletedFileDAO.findDeletedFiles(daysAgo(retention));
+    for (DeletedFileEntity file : noParent) {
+      try {
+        resourceProvider.remove(file.getFileInfoEntity().getChecksum());
+        deletedFileDAO.delete(file);
+      } catch (IOException e) {
+        Log.warn("Enable to remove file name" + e.getMessage());
+      }
+    }
+    if(Log.isDebugEnabled()) {
+      Log.debug("End to clean old FileStorage...");
+    }
+  }
+
+  private static Date daysAgo(int days) {
+    GregorianCalendar gc = new GregorianCalendar();
+    gc.add(Calendar.DATE, -days);
+    return gc.getTime();
+  }
 }

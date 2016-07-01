@@ -1,9 +1,7 @@
 package org.exoplatform.commons.file.services;
 
-import org.exoplatform.commons.file.fileSystem.BinaryProvider;
-import org.exoplatform.commons.file.fileSystem.ResourceProvider;
+import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.model.FileItem;
-import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.services.impl.FileServiceImpl;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;

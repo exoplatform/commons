@@ -1,8 +1,7 @@
 package org.exoplatform.commons.file.services.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.commons.file.fileSystem.BinaryProvider;
-import org.exoplatform.commons.file.fileSystem.ResourceProvider;
+import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.services.FileService;
@@ -18,11 +17,10 @@ import org.exoplatform.services.log.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * File Service which stores the file metadata in a database, and uses a
- * BinaryProvider to store the file binary. Created by The eXo Platform SAS
+ * ResourceProvider to store the file binary. Created by The eXo Platform SAS
  * Author : eXoPlatform exo@exoplatform.com
  */
 public class FileServiceImpl implements FileService {

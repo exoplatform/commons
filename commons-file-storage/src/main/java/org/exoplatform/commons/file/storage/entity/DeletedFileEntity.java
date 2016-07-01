@@ -30,12 +30,16 @@ import java.util.Date;
  * Author : eXoPlatform
  *          exo@exoplatform.com
  */
-@Entity(name = "DeletedFilesEntity")
+@Entity(name = "DeletedFileEntity")
 @ExoEntity
 @Table(name = "COMMONS_DELETED_FILES")
+
+@NamedQueries(
+        @NamedQuery(name = "deletedEntity.findDeletedFiles", query = "SELECT t FROM DeletedFileEntity t WHERE t.deletedDate < :deletedDate")
+)
 public class DeletedFileEntity {
     @Id
-    @Column(name = "FILE_ID")
+    @Column(name = "ID")
     @SequenceGenerator(name="SEQ_COMMONS_DELETED_FILES_ID", sequenceName="SEQ_COMMONS_DELETED_FILES_ID")
     @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_COMMONS_DELETED_FILES_ID")
     private long id;
@@ -43,9 +47,6 @@ public class DeletedFileEntity {
     @ManyToOne
     @JoinColumn(name = "FILE_ID")
     private FileInfoEntity fileInfoEntity;
-
-    @Column(name = "FILE_ID")
-    private long fileId;
 
     @Column(name = "ORDER_NUM")
     private int orderNum;
@@ -59,10 +60,27 @@ public class DeletedFileEntity {
     public DeletedFileEntity() {
     }
 
-    public DeletedFileEntity(long fileId, int orderNum, String checksum, Date deletedDate) {
-        this.fileId = fileId;
+    public Date getDeletedDate() {
+        return deletedDate;
+    }
+
+    public void setDeletedDate(Date deletedDate) {
+        this.deletedDate = deletedDate;
+    }
+
+    public FileInfoEntity getFileInfoEntity() {
+        return fileInfoEntity;
+    }
+
+    public void setFileInfoEntity(FileInfoEntity fileInfoEntity) {
+        this.fileInfoEntity = fileInfoEntity;
+    }
+
+    public DeletedFileEntity(long id, int orderNum, String checksum, Date deletedDate) {
+        this.id = id;
         this.orderNum = orderNum;
         this.checksum = checksum;
+        this.deletedDate = deletedDate;
     }
 
     public DeletedFileEntity(long id, long fileId, int orderNum, String checksum, Date deletedDate) {
@@ -76,14 +94,6 @@ public class DeletedFileEntity {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(long fileId) {
-        this.fileId = fileId;
     }
 
     public int getOrderNum() {

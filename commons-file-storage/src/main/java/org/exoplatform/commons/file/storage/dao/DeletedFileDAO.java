@@ -22,10 +22,14 @@ import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.commons.file.storage.entity.DeletedFileEntity;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
  */
 public interface DeletedFileDAO extends GenericDAO<DeletedFileEntity, Long> {
+    public List<DeletedFileEntity> findDeletedFiles(Date date);
 }

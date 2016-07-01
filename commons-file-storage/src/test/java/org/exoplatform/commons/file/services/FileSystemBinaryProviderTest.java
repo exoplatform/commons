@@ -1,7 +1,7 @@
 package org.exoplatform.commons.file.services;
 
-import org.exoplatform.commons.file.fileSystem.FileSystemResourceProvider;
-import org.exoplatform.commons.file.fileSystem.ResourceProvider;
+import org.exoplatform.commons.file.resource.FileSystemResourceProvider;
+import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.util.FileChecksum;
