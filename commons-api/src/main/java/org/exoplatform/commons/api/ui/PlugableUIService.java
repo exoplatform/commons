@@ -1,12 +1,14 @@
 package org.exoplatform.commons.api.ui;
 
+import java.util.List;
+
 public interface PlugableUIService {
-  public void addPlugin(BaseUIPlugin<?, ?> plugin);
+  public void addPlugin(BaseUIPlugin plugin);
 
-  public <R extends RenderContext, A extends ActionContext> BaseUIPlugin<R, A> getPlugin(String type);
+  public List<BaseUIPlugin> getPlugin(String type);
 
-  public <R extends RenderContext> Response render(R renderContext);
+  public List<Response> render(RenderContext renderContext);
 
-  public <A extends ActionContext> void processAction(A actionContext);
+  public void processAction(ActionContext actionContext);
 
 }

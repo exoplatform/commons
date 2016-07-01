@@ -1,37 +1,47 @@
 package org.exoplatform.commons.api.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PlugableUIServiceImpl implements PlugableUIService {
-  private Map<String, BaseUIPlugin<?, ?>> plugins = new HashMap<>();
+  private Map<String, List<BaseUIPlugin>> plugins = new HashMap<>();
 
   @Override
-  public void addPlugin(BaseUIPlugin<?, ?> plugin) {
-    plugins.put(plugin.getType(), plugin);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <R extends RenderContext, A extends ActionContext> BaseUIPlugin<R, A> getPlugin(String type) {
-    return (BaseUIPlugin<R, A>)plugins.get(type);
-  }
-
-  @Override
-  public <R extends RenderContext> Response render(R renderContext) {
-    BaseUIPlugin<R, ?> plugin = getPlugin(renderContext.getPluginType());
-    if (plugin != null) {
-      return plugin.render(renderContext);
-    } else {
-      return null;
+  public void addPlugin(BaseUIPlugin plugin) {
+    List<BaseUIPlugin> lst = plugins.get(plugin.getType());
+    if (lst == null) {
+      lst = new ArrayList<>();
+      plugins.put(plugin.getType(), lst);
     }
+    lst.add(plugin);
   }
 
   @Override
-  public <A extends ActionContext> void processAction(A actionContext) {
-    BaseUIPlugin<?, A> plugin = getPlugin(actionContext.getPluginType());
-    if (plugin != null) {
-      plugin.processAction(actionContext);      
+  public List<BaseUIPlugin> getPlugin(String type) {
+    return plugins.get(type);
+  }
+
+  @Override
+  public List<Response> render(RenderContext renderContext) {
+    List<BaseUIPlugin> plugins = getPlugin(renderContext.getPluginType());
+    List<Response> response = new ArrayList<>();
+    if (plugins != null) {
+      for (BaseUIPlugin plugin : plugins) {      
+        response.add(plugin.render(renderContext));
+      }      
+    }
+    return response;
+  }
+
+  @Override
+  public void processAction(ActionContext actionContext) {
+    List<BaseUIPlugin> plugins = getPlugin(actionContext.getPluginType());
+    if (plugins != null) {
+      for (BaseUIPlugin plugin : plugins) {
+        plugin.processAction(actionContext);        
+      }
     }
   }
 }

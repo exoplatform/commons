@@ -19,12 +19,13 @@
 package org.exoplatform.commons.api.ui;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BaseContext {
   private String              pluginType;
 
-  private Map<String, Object> params = new HashMap<String, Object>();
+  private Map<String, List<String>> params = new HashMap<String, List<String>>();
 
   public BaseContext(String pluginType) {
     this.pluginType = pluginType;
@@ -38,11 +39,11 @@ public class BaseContext {
     return pluginType;
   }
 
-  public Map<String, Object> getParams() {
+  public Map<String, List<String>> getParams() {
     return params;
   }
 
-  public void setParams(Map<String, Object> params) {
+  public void setParams(Map<String, List<String>> params) {
     this.params = params;
   }
 }

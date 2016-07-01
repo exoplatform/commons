@@ -20,10 +20,10 @@ package org.exoplatform.commons.api.ui;
 
 import org.exoplatform.container.component.BaseComponentPlugin;
 
-public abstract class BaseUIPlugin<R extends RenderContext, A extends ActionContext> extends BaseComponentPlugin {
-  public abstract Response render(R context);
+public abstract class BaseUIPlugin extends BaseComponentPlugin {
+  public abstract Response render(RenderContext context);
 
-  public abstract void processAction(A context);
+  public abstract void processAction(ActionContext context);
   
   public abstract String getType();
 }
