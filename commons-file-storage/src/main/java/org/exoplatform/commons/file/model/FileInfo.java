@@ -9,16 +9,18 @@ public class FileInfo {
   protected Long id;
   protected String name;
   protected String mimetype;
+  protected String nameSpace;
   protected long size;
   protected Date updatedDate;
   protected String updater;
   protected String checksum;
   protected boolean deleted;
 
-  public FileInfo(Long id, String name, String mimetype, long size, Date updatedDate, String updater, String checksum, boolean deleted) {
+  public FileInfo(Long id, String name, String mimetype, String nameSpace, long size, Date updatedDate, String updater, String checksum, boolean deleted) {
     this.id = id;
     this.name = name;
     this.mimetype = mimetype;
+    this.nameSpace = nameSpace;
     this.size = size;
     this.updatedDate = updatedDate;
     this.updater = updater;
@@ -53,10 +55,16 @@ public class FileInfo {
   public String getChecksum() {
     return checksum;
   }
-
+  public String getNameSpace() {
+    return nameSpace;
+  }
+  public void setNameSpace(String nameSpace) {
+    this.nameSpace = nameSpace;
+  }
   public void setId(Long id) {
     this.id = id;
   }
+
 
   public void setName(String name) {
     this.name = name;

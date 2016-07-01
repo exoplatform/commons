@@ -29,12 +29,21 @@
   </component>
 
   <component>
-    <type>org.exoplatform.commons.file.storage.FileInfoDAO</type>
+    <key>org.exoplatform.commons.file.storage.dao.FileInfoDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.FileInfoDAOImpl</type>
+  </component>
+  <component>
+      <key>org.exoplatform.commons.file.storage.dao.NameSpaceDAO</key>
+      <type>org.exoplatform.commons.file.storage.dao.impl.NameSpaceDAOImpl</type>
+  </component>
+  <component>
+      <key>org.exoplatform.commons.file.storage.dao.DeletedFileDAO</key>
+      <type>org.exoplatform.commons.file.storage.dao.impl.DeletedFileDAOImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.commons.file.services.BinaryProvider</key>
-    <type>org.exoplatform.commons.file.services.FileSystemBinaryProvider</type>
+    <key>org.exoplatform.commons.file.fileSystem.ResourceProvider</key>
+    <type>org.exoplatform.commons.file.fileSystem.FileSystemResourceProvider</type>
     <init-params>
       <value-param>
         <name>rootPath</name>
@@ -45,10 +54,20 @@
 
   <component>
     <key>org.exoplatform.commons.file.services.FileService</key>
-    <type>org.exoplatform.commons.file.services.FileServiceImpl</type>
+    <type>org.exoplatform.commons.file.services.impl.FileServiceImpl</type>
   </component>
 
-  <!-- Data Initialization for Files -->
+  <component>
+    <key>org.exoplatform.commons.file.services.NameSpaceService</key>
+     <type>org.exoplatform.commons.file.services.impl.NameSpaceServiceImpl</type>
+     <init-params>
+         <value-param>
+             <name>default.nameSpace</name>
+             <value>file</value>
+         </value-param>
+     </init-params>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
     <component-plugin>
@@ -63,6 +82,26 @@
         </values-param>
       </init-params>
     </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+        <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
+        <component-plugin profiles="all">
+            <name>AddCronJob</name>
+            <set-method>addCronJob</set-method>
+            <type>org.exoplatform.services.scheduler.CronJob</type>
+            <description>add clean unused files job to the JobSchedulerService</description>
+            <init-params>
+                <properties-param>
+                    <name>cronjob.info</name>
+                    <description>Configuration for remove unused files</description>
+                    <property name="jobName" value="FileStorageCleanJob"/>
+                    <property name="groupName" value="FileStorage"/>
+                    <property name="job" value="org.exoplatform.commons.file.services.job.FileStorageCleanJob"/>
+                    <property name="expression" value="${exo.commons.FileStorageCleanJob.expression:0 0 11 ? * SUN}"/>
+                </properties-param>
+            </init-params>
+        </component-plugin>
   </external-component-plugins>
 
 </configuration>

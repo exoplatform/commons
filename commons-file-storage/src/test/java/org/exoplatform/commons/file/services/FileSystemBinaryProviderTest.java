@@ -1,7 +1,10 @@
 package org.exoplatform.commons.file.services;
 
+import org.exoplatform.commons.file.fileSystem.FileSystemResourceProvider;
+import org.exoplatform.commons.file.fileSystem.ResourceProvider;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
+import org.exoplatform.commons.file.services.util.FileChecksum;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,7 +30,8 @@ public class FileSystemBinaryProviderTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Before
-  public void setup() {
+  public void setup() throws Exception {
+    new FileChecksum();
   }
 
   @Test
@@ -38,103 +42,102 @@ public class FileSystemBinaryProviderTest {
   @Test
   public void shouldWriteBinary() throws Exception {
     // Given
-    FileSystemBinaryProvider fileSystemBinaryProvider = new FileSystemBinaryProvider(folder.getRoot().getPath());
-
+      FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
     // When
-    FileItem file = new FileItem(1L, "file1", "", 1, null, "", false, new ByteArrayInputStream(new byte[]{}));
-    fileSystemBinaryProvider.writeBinary(file);
+    FileItem file = new FileItem(1L, "file1", "", null,  1, null, "", false, new ByteArrayInputStream(new byte[]{}));
+    fileResourceProvider.put(file.getFileInfo().getChecksum(), file.getAsStream());
 
     // Then
-    java.io.File createdFile = new java.io.File(fileSystemBinaryProvider.getFilePath(file.getFileInfo()));
+    java.io.File createdFile = fileResourceProvider.getFile(file.getFileInfo().getChecksum());
     assertTrue(createdFile.exists());
   }
 
   @Test
   public void shouldWriteBinaryWhenFileAlreadyExistsAndBinaryHasChanged() throws Exception {
     // Given
-    FileSystemBinaryProvider fileSystemBinaryProvider = new FileSystemBinaryProvider(folder.getRoot().getPath());
+      FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
-    FileItem file = new FileItem(1L, "file1", "", 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
-    fileSystemBinaryProvider.writeBinary(file);
-    java.io.File createdFile = new java.io.File(fileSystemBinaryProvider.getFilePath(file.getFileInfo()));
+    FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
+    fileResourceProvider.put(file.getFileInfo().getChecksum(), file.getAsStream());
+    java.io.File createdFile = fileResourceProvider.getFile(file.getFileInfo().getChecksum());
     assertTrue(createdFile.exists());
-    file.setInputStream(new ByteArrayInputStream("test-updated".getBytes()));
-    fileSystemBinaryProvider.writeBinary(file);
+    file.setChecksum(new ByteArrayInputStream("test-updated".getBytes()));
+    fileResourceProvider.put(file.getFileInfo().getChecksum(), file.getAsStream());
 
     // Then
-    java.io.File updatedFile = new java.io.File(fileSystemBinaryProvider.getFilePath(file.getFileInfo()));
+    java.io.File updatedFile = fileResourceProvider.getFile(file.getFileInfo().getChecksum());
     assertNotEquals(updatedFile.getAbsolutePath(), createdFile.getAbsolutePath());
   }
 
   @Test
   public void shouldNotWriteBinaryWhenFileAlreadyExistsAndBinaryHasNotChanged() throws Exception {
     // Given
-    FileSystemBinaryProvider fileSystemBinaryProvider = new FileSystemBinaryProvider(folder.getRoot().getPath());
+      FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
-    FileItem file = new FileItem(1L, "file1", "", 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
-    fileSystemBinaryProvider.writeBinary(file);
-    java.io.File createdFile = new java.io.File(fileSystemBinaryProvider.getFilePath(file.getFileInfo()));
+    FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
+    fileResourceProvider.put(file);
+    java.io.File createdFile = new java.io.File(fileResourceProvider.getFilePath(file.getFileInfo()));
     assertTrue(createdFile.exists());
-    fileSystemBinaryProvider.writeBinary(file);
+    fileResourceProvider.put(file);
 
     // Then
-    java.io.File updatedFile = new java.io.File(fileSystemBinaryProvider.getFilePath(file.getFileInfo()));
+    java.io.File updatedFile = new java.io.File(fileResourceProvider.getFilePath(file.getFileInfo()));
     assertEquals(updatedFile.getAbsolutePath(), createdFile.getAbsolutePath());
     // TODO need to verify also that it does not effectively write
     //verify(fileInfoDataStorage, times(1)).update(any(FileInfoEntity.class));
   }
 
-  @Test
+ @Test
   public void shouldDeleteBinary() throws Exception {
     // Given
-    FileSystemBinaryProvider fileSystemBinaryProvider = new FileSystemBinaryProvider(folder.getRoot().getPath());
+     FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
-    FileItem file = new FileItem(1L, "file1", "", 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
-    fileSystemBinaryProvider.writeBinary(file);
-    java.io.File createdFile = new java.io.File(fileSystemBinaryProvider.getFilePath(file.getFileInfo()));
+    FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
+    fileResourceProvider.put(file);
+    java.io.File createdFile = new java.io.File(fileResourceProvider.getFilePath(file.getFileInfo()));
     assertTrue(createdFile.exists());
-    fileSystemBinaryProvider.deleteBinary(file.getFileInfo());
+    fileResourceProvider.remove(file.getFileInfo());
 
     // Then
-    java.io.File deletedFile = new java.io.File(fileSystemBinaryProvider.getFilePath(file.getFileInfo()));
+    java.io.File deletedFile = new java.io.File(fileResourceProvider.getFilePath(file.getFileInfo()));
     assertFalse(deletedFile.exists());
   }
 
-  @Test
+   @Test
   public void shouldThrowExceptionWhenDeletingABinaryWhichDoesNotExist() throws Exception {
     // Given
-    FileSystemBinaryProvider fileSystemBinaryProvider = new FileSystemBinaryProvider(folder.getRoot().getPath());
+       FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
-    FileItem file = new FileItem(1L, "file1", "", 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
+    FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
     exception.expect(FileNotFoundException.class);
-    fileSystemBinaryProvider.deleteBinary(file.getFileInfo());
+    fileResourceProvider.remove(file.getFileInfo());
   }
 
   @Test
   public void shouldReturnPathWhenChecksumIsValid() throws Exception {
     // Given
-    FileSystemBinaryProvider fileSystemBinaryProvider = new FileSystemBinaryProvider(folder.getRoot().getPath());
+      FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
-    FileInfo fileInfo = new FileInfo(1L, "file1", "", 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false);
-    String path = fileSystemBinaryProvider.getFilePath(fileInfo);
+    FileInfo fileInfo = new FileInfo(1L, "file1", "", null, 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false);
+    String path = fileResourceProvider.getFilePath(fileInfo);
 
     // Then
-    assertEquals(folder.getRoot().getPath() + "/d4/1d/d41d8cd98f00b204e9800998ecf8427e", path);
+    assertEquals(folder.getRoot().getPath() + "/d/4/1/d/8/c/d/9/d41d8cd98f00b204e9800998ecf8427e", path);
   }
 
-  @Test
+ @Test
   public void shouldReturnNullWhenChecksumIsNotValid() throws Exception {
     // Given
-    FileSystemBinaryProvider fileSystemBinaryProvider = new FileSystemBinaryProvider(folder.getRoot().getPath());
+    ResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
-    FileInfo fileInfo = new FileInfo(1L, "file1", "", 1, null, "", "", false);
-    String path = fileSystemBinaryProvider.getFilePath(fileInfo);
+    FileInfo fileInfo = new FileInfo(1L, "file1", "", null, 1, null, "", "", false);
+    String path = fileResourceProvider.getFilePath(fileInfo);
 
     // Then
     assertNull(path);

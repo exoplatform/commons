@@ -1,4 +1,4 @@
-package org.exoplatform.commons.file.storage;
+package org.exoplatform.commons.file.storage.entity;
 
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
@@ -6,11 +6,18 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Entity for File Information
+ * Entity for File Information.
+ *
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
  */
 @Entity(name = "FileInfoEntity")
 @ExoEntity
 @Table(name = "COMMONS_FILES")
+@NamedQueries(
+        @NamedQuery(name = "fileEntity.findDeletedFiles", query = "SELECT t FROM FileInfoEntity t WHERE t.deleted = true and t.updatedDate < :updatedDate")
+)
 public class FileInfoEntity {
 
   @Id
@@ -29,6 +36,7 @@ public class FileInfoEntity {
   private long size;
 
   @Column(name = "UPDATED_DATE")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date updatedDate;
 
   @Column(name = "UPDATER")
@@ -39,6 +47,10 @@ public class FileInfoEntity {
 
   @Column(name = "DELETED")
   private boolean deleted;
+
+  @ManyToOne
+  @JoinColumn(name = "NAMESPACE_ID")
+  private NameSpaceEntity nameSpaceEntity;
 
   public FileInfoEntity() {
   }
@@ -120,5 +132,14 @@ public class FileInfoEntity {
 
   public void setDeleted(boolean deleted) {
     this.deleted = deleted;
+  }
+
+  public NameSpaceEntity getNameSpaceEntity() {
+    return nameSpaceEntity;
+  }
+
+  public FileInfoEntity setNameSpaceEntity(NameSpaceEntity nameSpaceEntity) {
+    this.nameSpaceEntity = nameSpaceEntity;
+    return this;
   }
 }

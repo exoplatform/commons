@@ -28,10 +28,6 @@ import org.exoplatform.container.PortalContainer;
 public class FileServiceImplIntegrationTest extends BaseExoTestCase {
 
   protected void setUp() throws IOException {
-    PropertyManager.setProperty("exo.jpa.datasource.name", "java:/comp/env/exo-jpa_portal");
-    Path tempDirectory = Files.createTempDirectory("exo-files");
-    // TODO this property is not well substituted in kernel component
-    PropertyManager.setProperty("exo.files.dir", tempDirectory.toString());
     begin();
   }
 
@@ -40,16 +36,17 @@ public class FileServiceImplIntegrationTest extends BaseExoTestCase {
   }
 
   public void testShouldReturnFile() throws Exception {
-    // Given
     FileService fileService = PortalContainer.getInstance().getComponentInstanceOfType(FileService.class);
-    FileItem createdFile = fileService.writeFile(new FileItem(null, "file1", "plain/text", 1, new Date(), "john", false, new ByteArrayInputStream("test".getBytes())));
-
-    // When
+    FileItem createdFile = fileService.writeFile(new FileItem(null, "file1", "plain/text", null, 1, new Date(), "john", false, new ByteArrayInputStream("test".getBytes())));
     FileItem fetchedFile = fileService.getFile(createdFile.getFileInfo().getId());
     assertNotNull(fetchedFile);
-    assertEquals(1, fetchedFile.getFileInfo().getId().longValue());
     assertEquals("file1", fetchedFile.getFileInfo().getName());
-    InputStream fileStream = fetchedFile.getStream();
+    assertEquals("plain/text", fetchedFile.getFileInfo().getMimetype());
+    assertEquals("john", fetchedFile.getFileInfo().getUpdater());
+    assertEquals(false, fetchedFile.getFileInfo().isDeleted());
+    assertEquals(1, fetchedFile.getFileInfo().getSize());
+    assertEquals("file", fetchedFile.getFileInfo().getNameSpace());
+    InputStream fileStream = fetchedFile.getAsStream();
     assertNotNull(fileStream);
     assertEquals("test", IOUtils.toString(fileStream));
   }

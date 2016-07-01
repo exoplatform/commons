@@ -1,4 +1,4 @@
-package org.exoplatform.commons.file.services;
+package org.exoplatform.commons.file.fileSystem;
 
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.model.FileInfo;
@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
  */
 public interface BinaryProvider {
 
