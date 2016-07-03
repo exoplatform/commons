@@ -19,7 +19,7 @@
 package org.exoplatform.commons.file.dao;
 
 import org.exoplatform.commons.file.CommonsJPAIntegrationTest;
-import org.exoplatform.commons.file.storage.entity.DeletedFileEntity;
+import org.exoplatform.commons.file.storage.entity.OrphanFileEntity;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 import org.junit.After;
@@ -33,12 +33,12 @@ import java.util.List;
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
-public class DeletedFileDAOTest extends CommonsJPAIntegrationTest {
+public class OrphanFileDAOTest extends CommonsJPAIntegrationTest {
   @Override
   @Before
   public void setUp() {
     super.setUp();
-    deletedFileDAO.deleteAll();
+    orphanFileDAO.deleteAll();
     fileInfoDAO.deleteAll();
     nameSpaceDAO.deleteAll();
   }
@@ -46,7 +46,7 @@ public class DeletedFileDAOTest extends CommonsJPAIntegrationTest {
   @Override
   @After
   public void tearDown() {
-    deletedFileDAO.deleteAll();
+    orphanFileDAO.deleteAll();
     fileInfoDAO.deleteAll();
     nameSpaceDAO.deleteAll();
   }
@@ -63,22 +63,22 @@ public class DeletedFileDAOTest extends CommonsJPAIntegrationTest {
 
     assertEquals(list.size(), 1);
 
-    DeletedFileEntity deletedFileEntity = new DeletedFileEntity();
+    OrphanFileEntity deletedFileEntity = new OrphanFileEntity();
     deletedFileEntity.setDeletedDate(daysAgo(60));
     deletedFileEntity.setFileInfoEntity(entity1);
     deletedFileEntity.setChecksum("d41d8cd98f00b204e9800998ecf8427e");
-    deletedFileDAO.create(deletedFileEntity);
+    orphanFileDAO.create(deletedFileEntity);
 
-    DeletedFileEntity deletedFileEntity1 = new DeletedFileEntity();
+    OrphanFileEntity deletedFileEntity1 = new OrphanFileEntity();
     deletedFileEntity1.setDeletedDate(daysAgo(10));
     deletedFileEntity1.setFileInfoEntity(entity1);
     deletedFileEntity1.setChecksum("d41d8cd98f00b204e9800998ecf88899");
-    deletedFileDAO.create(deletedFileEntity1);
+    orphanFileDAO.create(deletedFileEntity1);
 
-    List<DeletedFileEntity> list1 = deletedFileDAO.findDeletedFiles(daysAgo(30));
+    List<OrphanFileEntity> list1 = orphanFileDAO.findDeletedFiles(daysAgo(30));
     assertEquals(1, list1.size());
 
-    DeletedFileEntity deletedFileEntity2 = list1.get(0);
+    OrphanFileEntity deletedFileEntity2 = list1.get(0);
     assertEquals("d41d8cd98f00b204e9800998ecf8427e", deletedFileEntity2.getChecksum());
   }
 

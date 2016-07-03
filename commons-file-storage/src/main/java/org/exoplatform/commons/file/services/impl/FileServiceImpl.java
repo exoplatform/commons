@@ -7,10 +7,10 @@ import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.file.services.util.FileChecksum;
-import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
+import org.exoplatform.commons.file.storage.dao.OrphanFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
-import org.exoplatform.commons.file.storage.entity.DeletedFileEntity;
+import org.exoplatform.commons.file.storage.entity.OrphanFileEntity;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 import org.exoplatform.container.xml.InitParams;
@@ -40,7 +40,7 @@ public class FileServiceImpl implements FileService {
 
   private NameSpaceDAO        nameSpaceDAO;
   
-  private DeletedFileDAO      deletedFileDAO;
+  private OrphanFileDAO orphanFileDAO;
 
   private ResourceProvider    resourceProvider;
 
@@ -50,14 +50,14 @@ public class FileServiceImpl implements FileService {
 
   public FileServiceImpl(FileInfoDAO fileInfoDAO,
                          NameSpaceDAO nameSpaceDAO,
-                         DeletedFileDAO deletedFileDAO,
+                         OrphanFileDAO orphanFileDAO,
                          ResourceProvider resourceProvider,
                          InitParams initParams)
       throws Exception {
     this.fileInfoDAO = fileInfoDAO;
     this.resourceProvider = resourceProvider;
     this.nameSpaceDAO = nameSpaceDAO;
-    this.deletedFileDAO = deletedFileDAO;
+    this.orphanFileDAO = orphanFileDAO;
 
     ValueParam algorithmValueParam = null;
     if (initParams != null) {
@@ -287,11 +287,11 @@ public class FileServiceImpl implements FileService {
           }
           if(old != null && old.getChecksum()!= null && !old.getChecksum().isEmpty())
           {
-            DeletedFileEntity deletedFileEntity=new DeletedFileEntity();
+            OrphanFileEntity deletedFileEntity=new OrphanFileEntity();
             deletedFileEntity.setChecksum(old.getChecksum());
             deletedFileEntity.setFileInfoEntity(old);
             deletedFileEntity.setDeletedDate(new Date());
-            deletedFileDAO.create(deletedFileEntity);
+            orphanFileDAO.create(deletedFileEntity);
           }
           if (resourceProvider.exists(fileInfoEntity.getChecksum())) {
             createdFileInfoEntity = fileInfoDAO.update(fileInfoEntity);

@@ -18,9 +18,8 @@
  */
 package org.exoplatform.commons.file.storage.dao.impl;
 
-import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
-import org.exoplatform.commons.file.storage.entity.DeletedFileEntity;
-import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
+import org.exoplatform.commons.file.storage.dao.OrphanFileDAO;
+import org.exoplatform.commons.file.storage.entity.OrphanFileEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 import org.exoplatform.services.log.ExoLogger;
 
@@ -34,13 +33,13 @@ import java.util.List;
  * Author : eXoPlatform
  *          exo@exoplatform.com
  */
-public class DeletedFileDAOImpl extends GenericDAOJPAImpl<DeletedFileEntity, Long> implements DeletedFileDAO{
+public class OrphanFileDAOImpl extends GenericDAOJPAImpl<OrphanFileEntity, Long> implements OrphanFileDAO {
 
-    private static org.exoplatform.services.log.Log Log = ExoLogger.getLogger(DeletedFileDAOImpl.class);
+    private static org.exoplatform.services.log.Log Log = ExoLogger.getLogger(OrphanFileDAOImpl.class);
 
     @Override
-    public List<DeletedFileEntity> findDeletedFiles(Date date) {
-        TypedQuery<DeletedFileEntity> query = getEntityManager().createNamedQuery("deletedEntity.findDeletedFiles", DeletedFileEntity.class)
+    public List<OrphanFileEntity> findDeletedFiles(Date date) {
+        TypedQuery<OrphanFileEntity> query = getEntityManager().createNamedQuery("deletedEntity.findDeletedFiles", OrphanFileEntity.class)
                 .setParameter("deletedDate", date);
         try {
             return query.getResultList();

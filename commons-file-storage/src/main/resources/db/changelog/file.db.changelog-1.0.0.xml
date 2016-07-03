@@ -56,15 +56,12 @@
   </changeSet>
 
   <changeSet author="file" id="1.0.0-3">
-    <createTable tableName="COMMONS_DELETED_FILES">
+    <createTable tableName="COMMONS_ORPHAN_FILES">
       <column name="ID" type="INT" autoIncrement="${autoIncrement}" startWith="1">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_COMMONS_DELETED_ID"/>
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_COMMONS_ORPHAN_ID"/>
       </column>
       <column name="FILE_ID" type="BIGINT">
-        <constraints nullable="false" foreignKeyName="FK_COMMONS_DELETED_FILE_ID" references="COMMONS_FILES(FILE_ID)"/>
-      </column>
-      <column name="ORDER_NUM" type="INT">
-        <constraints nullable="false"/>
+        <constraints nullable="false" foreignKeyName="FK_COMMONS_ORPHAN_FILE_ID" references="COMMONS_FILES(FILE_ID)"/>
       </column>
       <column name="DELETED_DATE" type="TIMESTAMP">
         <constraints nullable="false"/>

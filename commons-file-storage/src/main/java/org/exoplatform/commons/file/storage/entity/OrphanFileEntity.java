@@ -32,24 +32,21 @@ import java.util.Date;
  */
 @Entity(name = "DeletedFileEntity")
 @ExoEntity
-@Table(name = "COMMONS_DELETED_FILES")
+@Table(name = "COMMONS_ORPHAN_FILES")
 
 @NamedQueries(
         @NamedQuery(name = "deletedEntity.findDeletedFiles", query = "SELECT t FROM DeletedFileEntity t WHERE t.deletedDate < :deletedDate")
 )
-public class DeletedFileEntity {
+public class OrphanFileEntity {
     @Id
     @Column(name = "ID")
-    @SequenceGenerator(name="SEQ_COMMONS_DELETED_FILES_ID", sequenceName="SEQ_COMMONS_DELETED_FILES_ID")
-    @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_COMMONS_DELETED_FILES_ID")
+    @SequenceGenerator(name="SEQ_COMMONS_ORPHAN_FILES_ID", sequenceName="SEQ_COMMONS_ORPHAN_FILES_ID")
+    @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_COMMONS_ORPHAN_FILES_ID")
     private long id;
 
     @ManyToOne
     @JoinColumn(name = "FILE_ID")
     private FileInfoEntity fileInfoEntity;
-
-    @Column(name = "ORDER_NUM")
-    private int orderNum;
 
     @Column(name = "CHECKSUM")
     private String checksum;
@@ -57,7 +54,7 @@ public class DeletedFileEntity {
     @Column(name = "DELETED_DATE")
     private Date deletedDate;
 
-    public DeletedFileEntity() {
+    public OrphanFileEntity() {
     }
 
     public Date getDeletedDate() {
@@ -76,15 +73,14 @@ public class DeletedFileEntity {
         this.fileInfoEntity = fileInfoEntity;
     }
 
-    public DeletedFileEntity(long id, int orderNum, String checksum, Date deletedDate) {
+    public OrphanFileEntity(long id, String checksum, Date deletedDate) {
         this.id = id;
-        this.orderNum = orderNum;
         this.checksum = checksum;
         this.deletedDate = deletedDate;
     }
 
-    public DeletedFileEntity(long id, long fileId, int orderNum, String checksum, Date deletedDate) {
-        this(fileId, orderNum, checksum, deletedDate);
+    public OrphanFileEntity(long id, long fileId, String checksum, Date deletedDate) {
+        this(fileId, checksum, deletedDate);
         this.id = id;
     }
 
@@ -94,14 +90,6 @@ public class DeletedFileEntity {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public int getOrderNum() {
-        return orderNum;
-    }
-
-    public void setOrderNum(int orderNum) {
-        this.orderNum = orderNum;
     }
 
     public String getChecksum() {

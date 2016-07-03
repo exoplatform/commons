@@ -19,9 +19,9 @@
 package org.exoplatform.commons.file.services.job;
 
 import org.exoplatform.commons.file.resource.ResourceProvider;
-import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
+import org.exoplatform.commons.file.storage.dao.OrphanFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
-import org.exoplatform.commons.file.storage.entity.DeletedFileEntity;
+import org.exoplatform.commons.file.storage.entity.OrphanFileEntity;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
@@ -59,7 +59,7 @@ public class FileStorageCleanJob implements Job {
       return;
     try {
       FileInfoDAO fileInfoDAO = CommonsUtils.getService(FileInfoDAO.class);
-      DeletedFileDAO deletedFileDAO = CommonsUtils.getService(DeletedFileDAO.class);
+      OrphanFileDAO deletedFileDAO = CommonsUtils.getService(OrphanFileDAO.class);
       ResourceProvider resourceProvider = CommonsUtils.getService(ResourceProvider.class);
       JobDataMap jdatamap = context.getJobDetail().getJobDataMap();
       int retention = defaultRetention;
@@ -87,8 +87,8 @@ public class FileStorageCleanJob implements Job {
           Log.warn("Enable to remove file name" + e.getMessage());
         }
       }
-      List<DeletedFileEntity> noParent = deletedFileDAO.findDeletedFiles(daysAgo(retention));
-      for (DeletedFileEntity file : noParent) {
+      List<OrphanFileEntity> noParent = deletedFileDAO.findDeletedFiles(daysAgo(retention));
+      for (OrphanFileEntity file : noParent) {
         try {
           resourceProvider.remove(file.getFileInfoEntity().getChecksum());
           deletedFileDAO.delete(file);

@@ -4,7 +4,7 @@ import org.exoplatform.commons.file.resource.FileSystemResourceProvider;
 import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.impl.FileServiceImpl;
-import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
+import org.exoplatform.commons.file.storage.dao.OrphanFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
@@ -42,7 +42,7 @@ public class FileServiceImplTest {
   private NameSpaceDAO nameSpaceDAO;
 
   @Mock
-  private DeletedFileDAO deletedFileDAO;
+  private OrphanFileDAO orphanFileDAO;
 
   @Mock
   private NameSpaceService nameSpaceService;
@@ -54,7 +54,7 @@ public class FileServiceImplTest {
     when(nameSpaceDAO.find(anyLong())).thenReturn(new NameSpaceEntity(1, "file", "Default NameSpace"));
     when(fileInfoDAO.find(anyLong())).thenReturn(new FileInfoEntity(1, "file1", null, 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false).setNameSpaceEntity(new NameSpaceEntity(1, "file", "Default NameSpace")));
    // when(resourceProvider.put(any(FileInfo.class));).thenReturn(new ByteArrayInputStream(new byte[] {}));
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, deletedFileDAO, resourceProvider, null);
+    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, orphanFileDAO, resourceProvider, null);
 
     // When
     FileItem file = fileService.getFile(1);
@@ -68,7 +68,7 @@ public class FileServiceImplTest {
     ResourceProvider resourceProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenReturn(new FileInfoEntity());
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, deletedFileDAO, resourceProvider, null);
+    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, orphanFileDAO, resourceProvider, null);
 
     // When
     fileService.writeFile(new FileItem(null, "file1", "", null,  1, new Date(), "", false, new ByteArrayInputStream("test".getBytes())));
@@ -83,7 +83,7 @@ public class FileServiceImplTest {
     ResourceProvider resourceProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenThrow(Exception.class);
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, deletedFileDAO,  resourceProvider, null);
+    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, orphanFileDAO,  resourceProvider, null);
 
     // When
     FileItem file = new FileItem(null, "file1", "plain/text", null,  1, new Date(), "john", false, new ByteArrayInputStream("test".getBytes()));

@@ -53,8 +53,8 @@
         <type>org.exoplatform.commons.file.storage.dao.impl.NameSpaceDAOImpl</type>
     </component>
     <component>
-        <key>org.exoplatform.commons.file.storage.dao.DeletedFileDAO</key>
-        <type>org.exoplatform.commons.file.storage.dao.impl.DeletedFileDAOImpl</type>
+        <key>org.exoplatform.commons.file.storage.dao.OrphanFileDAO</key>
+        <type>org.exoplatform.commons.file.storage.dao.impl.OrphanFileDAOImpl</type>
     </component>
 
     <component>

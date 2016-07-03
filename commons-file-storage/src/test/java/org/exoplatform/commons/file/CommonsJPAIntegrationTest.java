@@ -19,7 +19,7 @@
 package org.exoplatform.commons.file;
 
 import org.exoplatform.commons.api.persistence.DataInitializer;
-import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
+import org.exoplatform.commons.file.storage.dao.OrphanFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
 import org.exoplatform.component.test.ConfigurationUnit;
@@ -41,7 +41,7 @@ public class CommonsJPAIntegrationTest extends BaseTest {
 
   protected NameSpaceDAO   nameSpaceDAO;
 
-  protected DeletedFileDAO deletedFileDAO;
+  protected OrphanFileDAO orphanFileDAO;
 
   public void setUp() {
     super.setUp();
@@ -53,7 +53,7 @@ public class CommonsJPAIntegrationTest extends BaseTest {
     // Init DAO
     fileInfoDAO = PortalContainer.getInstance().getComponentInstanceOfType(FileInfoDAO.class);
     nameSpaceDAO = PortalContainer.getInstance().getComponentInstanceOfType(NameSpaceDAO.class);
-    deletedFileDAO = PortalContainer.getInstance().getComponentInstanceOfType(DeletedFileDAO.class);
+    orphanFileDAO = PortalContainer.getInstance().getComponentInstanceOfType(OrphanFileDAO.class);
 
     // Clean Data
     cleanDB();
@@ -63,7 +63,7 @@ public class CommonsJPAIntegrationTest extends BaseTest {
   {
     assertNotNull(fileInfoDAO);
     assertNotNull(nameSpaceDAO);
-    assertNotNull(deletedFileDAO);
+    assertNotNull(orphanFileDAO);
   }
 
   public void tearDown() {
@@ -73,7 +73,7 @@ public class CommonsJPAIntegrationTest extends BaseTest {
   }
 
   private void cleanDB() {
-    deletedFileDAO.deleteAll();
+    orphanFileDAO.deleteAll();
     fileInfoDAO.deleteAll();
     nameSpaceDAO.deleteAll();
   }
