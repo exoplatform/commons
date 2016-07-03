@@ -15,8 +15,9 @@ import java.util.Date;
 @Entity(name = "FileInfoEntity")
 @ExoEntity
 @Table(name = "COMMONS_FILES")
-@NamedQueries(
-        @NamedQuery(name = "fileEntity.findDeletedFiles", query = "SELECT t FROM FileInfoEntity t WHERE t.deleted = true and t.updatedDate < :updatedDate")
+@NamedQueries({
+        @NamedQuery(name = "fileEntity.findDeletedFiles", query = "SELECT t FROM FileInfoEntity t WHERE t.deleted = true and t.updatedDate < :updatedDate"),
+        @NamedQuery(name = "fileEntity.getAllByLimitOffset", query = "SELECT t FROM FileInfoEntity t")}
 )
 public class FileInfoEntity {
 

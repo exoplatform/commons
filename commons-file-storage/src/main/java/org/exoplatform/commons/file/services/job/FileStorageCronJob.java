@@ -28,6 +28,7 @@ import org.quartz.JobDataMap;
  */
 public class FileStorageCronJob extends CronJob {
     public static String RETENTION_PARAM  = "retention-time";
+    public static String ENABLED_PARAM ="enabled";
     private JobDataMap jdatamap_;
 
     public FileStorageCronJob(InitParams params) throws Exception {
@@ -36,6 +37,8 @@ public class FileStorageCronJob extends CronJob {
         jdatamap_ = new JobDataMap();
         String days = props.getProperty(RETENTION_PARAM).trim();
         jdatamap_.put(RETENTION_PARAM, days);
+        String state = props.getProperty(ENABLED_PARAM).trim();
+        jdatamap_.put(ENABLED_PARAM, state);
     }
 
     public JobDataMap getJobDataMap() {

@@ -16,5 +16,5 @@ public interface FileInfoDAO extends GenericDAO<FileInfoEntity, Long> {
 
     List<FileInfoEntity> findDeletedFiles(Date date);
 
-    void deleteFileInfoByNameSpace(NameSpaceEntity nameSpaceEntity);
+    List<FileInfoEntity> findAllByPage(int offset, int limit);
 }

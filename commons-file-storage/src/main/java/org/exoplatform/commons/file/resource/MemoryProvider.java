@@ -62,6 +62,11 @@ public class MemoryProvider implements ResourceProvider {
     return "java";
   }
 
+  @Override
+  public String getFilePath(String name) throws IOException {
+    return "java";
+  }
+
   public URL getURL(String name) {
     return null;
   }

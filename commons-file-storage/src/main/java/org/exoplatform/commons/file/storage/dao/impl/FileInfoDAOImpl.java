@@ -44,22 +44,13 @@ public class FileInfoDAOImpl extends GenericDAOJPAImpl<FileInfoEntity, Long> imp
   public List<FileInfoEntity> findDeletedFiles(Date date) {
     TypedQuery<FileInfoEntity> query = getEntityManager().createNamedQuery("fileEntity.findDeletedFiles", FileInfoEntity.class)
                                                          .setParameter("updatedDate", date);
-    try {
-      return query.getResultList();
-    } catch (NoResultException e) {
-        Log.error("Unable to get deleted file"+ e.getMessage());
-    }
-    return null;
+    return query.getResultList();
   }
 
-    @Override
-    public void deleteFileInfoByNameSpace(NameSpaceEntity nameSpaceEntity) {
-        TypedQuery<FileInfoEntity> query = getEntityManager().createNamedQuery("FileInfo.getFileInfoByNameSpace", FileInfoEntity.class)
-                .setParameter("nameSpaceID", nameSpaceEntity.getId());
-        try {
-             query.getSingleResult();
-        } catch (NoResultException e) {
-
-        }
-    }
+  public List<FileInfoEntity> findAllByPage(int offset, int limit) {
+    return getEntityManager().createNamedQuery("fileEntity.getAllByLimitOffset")
+                             .setFirstResult(offset)
+                             .setMaxResults(limit)
+                             .getResultList();
+  }
 }

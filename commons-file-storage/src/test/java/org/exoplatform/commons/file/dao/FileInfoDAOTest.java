@@ -25,10 +25,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
@@ -108,6 +105,26 @@ public class FileInfoDAOTest extends CommonsJPAIntegrationTest {
 
     FileInfoEntity fileInfoEntity=list1.get(0);
     assertEquals("MyDoc1.doc", fileInfoEntity.getName());
+  }
+
+  public void testFindFilesByPage()
+  {
+    NameSpaceEntity nameSpaceEntity = nameSpaceDAO.create(new NameSpaceEntity("file", "default namespace"));
+    List<FileInfoEntity> list = new ArrayList<FileInfoEntity>();
+    FileInfoEntity entity;
+    for(int i = 0; i< 20; i++)
+    {
+      entity = new FileInfoEntity();
+      entity.setName("MyDoc_"+i+".doc");
+      entity.setNameSpaceEntity(nameSpaceEntity);
+      entity.setUpdatedDate(daysAgo(70));
+      list.add(entity);
+    }
+
+    fileInfoDAO.createAll(list);
+    List<FileInfoEntity> result = fileInfoDAO.findAllByPage(15, 10);
+    assertNotNull (result);
+    assertEquals(5,result.size());
   }
 
   private static Date daysAgo(int days) {

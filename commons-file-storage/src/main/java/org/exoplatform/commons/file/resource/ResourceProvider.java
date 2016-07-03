@@ -43,7 +43,9 @@ public interface ResourceProvider {
 
     InputStream getStream(final String name);
 
-    public String getFilePath(final FileInfo fileInfo) throws IOException;
+    String getFilePath(final FileInfo fileInfo) throws IOException;
+
+    String getFilePath(String name) throws IOException;
 
     byte[] getBytes(final String name);
 

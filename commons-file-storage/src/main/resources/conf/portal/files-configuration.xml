@@ -68,6 +68,11 @@
      </init-params>
   </component>
 
+  <component>
+    <key>org.exoplatform.commons.file.services.checker.FileStorageCheckController</key>
+    <type>org.exoplatform.commons.file.services.checker.FileStorageCheckController</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
     <component-plugin>
@@ -104,6 +109,7 @@
                     <name>FileStorageCleanJob.Param</name>
                     <description>General parameters for job</description>
                     <property name="retention-time" value="${exo.commons.FileStorageCleanJob.retention-time:30}"/>
+                    <property name="enabled" value="${exo.commons.FileStorageCleanJob.enabled:true}"/>
                 </properties-param>
             </init-params>
         </component-plugin>

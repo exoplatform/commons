@@ -144,6 +144,14 @@ public class FileSystemResourceProvider implements ResourceProvider {
     return getFile(fileInfo.getChecksum()).getAbsolutePath();
   }
 
+  @Override
+  public String getFilePath(String name) throws IOException {
+    if (name == null || StringUtils.isEmpty(name) || name.length() < 9) {
+      return null;
+    }
+    return getFile(name).getAbsolutePath();
+  }
+
   public void remove(String name) throws IOException {
     PrivilegedAction<Boolean> action = new PrivilegedAction<Boolean>() {
       public Boolean run() {
