@@ -36,12 +36,16 @@ public class PlugableUIServiceImpl implements PlugableUIService {
   }
 
   @Override
-  public void processAction(ActionContext actionContext) {
+  public Response processAction(ActionContext actionContext) {
     List<BaseUIPlugin> plugins = getPlugin(actionContext.getPluginType());
     if (plugins != null) {
       for (BaseUIPlugin plugin : plugins) {
-        plugin.processAction(actionContext);        
+        Response response = plugin.processAction(actionContext);
+        if (response != null) {
+          return response;
+        }        
       }
     }
+    return null;
   }
 }

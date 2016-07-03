@@ -9,6 +9,6 @@ public interface PlugableUIService {
 
   public List<Response> render(RenderContext renderContext);
 
-  public void processAction(ActionContext actionContext);
+  public Response processAction(ActionContext actionContext);
 
 }

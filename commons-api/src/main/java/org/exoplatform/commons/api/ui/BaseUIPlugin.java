@@ -23,7 +23,7 @@ import org.exoplatform.container.component.BaseComponentPlugin;
 public abstract class BaseUIPlugin extends BaseComponentPlugin {
   public abstract Response render(RenderContext context);
 
-  public abstract void processAction(ActionContext context);
+  public abstract Response processAction(ActionContext context);
   
   public abstract String getType();
 }
