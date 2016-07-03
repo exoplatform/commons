@@ -1,13 +1,17 @@
 package org.exoplatform.commons.file.services;
 
+import org.exoplatform.commons.file.resource.FileSystemResourceProvider;
 import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.impl.FileServiceImpl;
+import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -28,6 +32,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FileServiceImplTest {
 
+  @Rule
+  public TemporaryFolder folder = new TemporaryFolder();
+
   @Mock
   private FileInfoDAO fileInfoDAO;
 
@@ -35,18 +42,19 @@ public class FileServiceImplTest {
   private NameSpaceDAO nameSpaceDAO;
 
   @Mock
-  private ResourceProvider resourceProvider;
+  private DeletedFileDAO deletedFileDAO;
 
   @Mock
   private NameSpaceService nameSpaceService;
 
   @Test
   public void shouldReturnFile() throws Exception {
+    ResourceProvider resourceProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(nameSpaceDAO.find(anyLong())).thenReturn(new NameSpaceEntity(1, "file", "Default NameSpace"));
     when(fileInfoDAO.find(anyLong())).thenReturn(new FileInfoEntity(1, "file1", null, 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false).setNameSpaceEntity(new NameSpaceEntity(1, "file", "Default NameSpace")));
    // when(resourceProvider.put(any(FileInfo.class));).thenReturn(new ByteArrayInputStream(new byte[] {}));
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, resourceProvider, null);
+    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, deletedFileDAO, resourceProvider, null);
 
     // When
     FileItem file = fileService.getFile(1);
@@ -57,9 +65,10 @@ public class FileServiceImplTest {
 
   @Test
   public void shouldWriteFile() throws Exception {
+    ResourceProvider resourceProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenReturn(new FileInfoEntity());
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, resourceProvider, null);
+    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, deletedFileDAO, resourceProvider, null);
 
     // When
     fileService.writeFile(new FileItem(null, "file1", "", null,  1, new Date(), "", false, new ByteArrayInputStream("test".getBytes())));
@@ -71,9 +80,10 @@ public class FileServiceImplTest {
 
   @Test
   public void shouldRollbackFileWriteWhenSomethingGoesWrong() throws Exception {
+    ResourceProvider resourceProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenThrow(Exception.class);
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO,  resourceProvider, null);
+    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, deletedFileDAO,  resourceProvider, null);
 
     // When
     FileItem file = new FileItem(null, "file1", "plain/text", null,  1, new Date(), "john", false, new ByteArrayInputStream("test".getBytes()));
@@ -83,10 +93,6 @@ public class FileServiceImplTest {
     } catch(Exception e) {
       // expected exception
     }
-
-    // Then
-    //verify(resourceProvider, times(1)).writeBinary(any(FileItem.class));
-    //verify(resourceProvider, times(1)).deleteBinary(any(FileInfo.class));
     assertNull(createdFile);
   }
 }

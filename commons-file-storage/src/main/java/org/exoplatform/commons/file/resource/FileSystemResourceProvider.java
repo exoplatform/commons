@@ -207,7 +207,7 @@ public class FileSystemResourceProvider implements ResourceProvider {
    *
    * @param name file name.
    * @param data inputStream
-   * @throws IOException
+   * @throws IOException ignals that an I/O exception of some sort has occurred.
    */
   public void put(String name, InputStream data) throws IOException {
     boolean created = FileUtils.createNewFile(getFile(name));

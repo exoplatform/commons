@@ -5,9 +5,12 @@ import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.services.FileService;
+import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.file.services.util.FileChecksum;
+import org.exoplatform.commons.file.storage.dao.DeletedFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
+import org.exoplatform.commons.file.storage.entity.DeletedFileEntity;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 import org.exoplatform.container.xml.InitParams;
@@ -17,10 +20,12 @@ import org.exoplatform.services.log.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * File Service which stores the file metadata in a database, and uses a
- * ResourceProvider to store the file binary. Created by The eXo Platform SAS
+ * ResourceProvider to store the file binary.
+ * Created by The eXo Platform SAS
  * Author : eXoPlatform exo@exoplatform.com
  */
 public class FileServiceImpl implements FileService {
@@ -34,6 +39,8 @@ public class FileServiceImpl implements FileService {
   private FileInfoDAO         fileInfoDAO;
 
   private NameSpaceDAO        nameSpaceDAO;
+  
+  private DeletedFileDAO      deletedFileDAO;
 
   private ResourceProvider    resourceProvider;
 
@@ -43,12 +50,14 @@ public class FileServiceImpl implements FileService {
 
   public FileServiceImpl(FileInfoDAO fileInfoDAO,
                          NameSpaceDAO nameSpaceDAO,
+                         DeletedFileDAO deletedFileDAO,
                          ResourceProvider resourceProvider,
                          InitParams initParams)
       throws Exception {
     this.fileInfoDAO = fileInfoDAO;
     this.resourceProvider = resourceProvider;
     this.nameSpaceDAO = nameSpaceDAO;
+    this.deletedFileDAO = deletedFileDAO;
 
     ValueParam algorithmValueParam = null;
     if (initParams != null) {
@@ -70,9 +79,9 @@ public class FileServiceImpl implements FileService {
   /**
    * Get only the file info of the given id
    * 
-   * @param id
-   * @return
-   * @throws IOException
+   * @param id file id
+   * @return file info
+   * @throws IOException ignals that an I/O exception of some sort has occurred.
    */
   @Override
   public FileInfo getFileInfo(long id) throws IOException {
@@ -98,9 +107,9 @@ public class FileServiceImpl implements FileService {
   /**
    * Get the file (info + binary) of the given id
    * 
-   * @param id
-   * @return
-   * @throws IOException
+   * @param id file id
+   * @return fileItem
+   * @throws Exception ignals that an I/O exception of some sort has occurred.
    */
   @Override
   public FileItem getFile(long id) throws Exception {
@@ -134,18 +143,16 @@ public class FileServiceImpl implements FileService {
    * transactional, meaning that if the write of the info or of the binary
    * fails, nothing must be persisted.
    * 
-   * @param file
-   * @return
-   * @throws IOException
+   * @param file file item
+   * @return updated file item
+   * @throws IOException ignals that an I/O exception of some sort has occurred.
    */
   @Override
-  public FileItem writeFile(FileItem file) throws IOException {
+  public FileItem writeFile(FileItem file) throws FileStorageException, IOException {
     if (file.getFileInfo() == null || StringUtils.isEmpty(file.getFileInfo().getChecksum())) {
       throw new IllegalArgumentException("Checksum is required to persist the binary");
     }
     FileInfo fileInfo = file.getFileInfo();
-    resourceProvider.put(fileInfo.getChecksum(), file.getAsStream());
-    try {
       NameSpaceEntity nSpace;
       if (fileInfo.getNameSpace() != null && !fileInfo.getNameSpace().isEmpty()) {
         nSpace = nameSpaceDAO.getNameSpaceByName(fileInfo.getNameSpace());
@@ -160,14 +167,42 @@ public class FileServiceImpl implements FileService {
                                                          fileInfo.getChecksum(),
                                                          fileInfo.isDeleted());
       fileInfoEntity.setNameSpaceEntity(nSpace);
-      FileInfoEntity createdFileInfoEntity = fileInfoDAO.create(fileInfoEntity);
+      FileStorageTransaction transaction = new FileStorageTransaction(fileInfoEntity);
+      FileInfoEntity createdFileInfoEntity= transaction.towPhaseCommit(2, file.getAsStream()); 
+      if (createdFileInfoEntity != null) {
+        fileInfo.setId(createdFileInfoEntity.getId());
+        file.setFileInfo(fileInfo);
+        return file;
+      }
+    return null;
+  }
+
+  public FileItem updateFile(FileItem file) throws FileStorageException, IOException {
+    if (file.getFileInfo() == null || StringUtils.isEmpty(file.getFileInfo().getChecksum())) {
+      throw new IllegalArgumentException("Checksum is required to persist the binary");
+    }
+    FileInfo fileInfo = file.getFileInfo();
+    NameSpaceEntity nSpace;
+    if (fileInfo.getNameSpace() != null && !fileInfo.getNameSpace().isEmpty()) {
+      nSpace = nameSpaceDAO.getNameSpaceByName(fileInfo.getNameSpace());
+    } else {
+      nSpace = nameSpaceDAO.find(defaultNameSpaceId);
+    }
+    FileInfoEntity fileInfoEntity = new FileInfoEntity(fileInfo.getId(),
+            fileInfo.getName(),
+            fileInfo.getMimetype(),
+            fileInfo.getSize(),
+            fileInfo.getUpdatedDate(),
+            fileInfo.getUpdater(),
+            fileInfo.getChecksum(),
+            fileInfo.isDeleted());
+    fileInfoEntity.setNameSpaceEntity(nSpace);
+    FileStorageTransaction transaction = new FileStorageTransaction(fileInfoEntity);
+    FileInfoEntity createdFileInfoEntity= transaction.towPhaseCommit(0, file.getAsStream());
+    if (createdFileInfoEntity != null) {
       fileInfo.setId(createdFileInfoEntity.getId());
       file.setFileInfo(fileInfo);
       return file;
-    } catch (Exception e) {
-      LOG.error("Error while writing file " + file.getFileInfo().getId() + " - Cause : " + e.getMessage(), e);
-      // something went wrong with the database update, rollback the file write
-      resourceProvider.remove(Long.toString(fileInfo.getId()));
     }
     return null;
   }
@@ -177,14 +212,103 @@ public class FileServiceImpl implements FileService {
    * only a logical deletion
    * 
    * @param id Id of the file to delete
-   * @throws IOException
+   * @return  file Info
    */
   @Override
-  public void deleteFile(long id) throws IOException {
+  public FileInfo deleteFile(long id) {
     FileInfoEntity fileInfoEntity = fileInfoDAO.find(id);
+    FileInfo fileInfo = null;
     if (fileInfoEntity != null) {
       fileInfoEntity.setDeleted(true);
-      fileInfoDAO.update(fileInfoEntity);
+      FileInfoEntity updateFileInfoEntity = fileInfoDAO.update(fileInfoEntity);
+      fileInfo = new FileInfo(updateFileInfoEntity.getId(),
+                              updateFileInfoEntity.getName(),
+                              updateFileInfoEntity.getMimetype(),
+                              updateFileInfoEntity.getNameSpaceEntity().getName(),
+                              updateFileInfoEntity.getSize(),
+                              updateFileInfoEntity.getUpdatedDate(),
+                              updateFileInfoEntity.getUpdater(),
+                              updateFileInfoEntity.getChecksum(),
+                              updateFileInfoEntity.isDeleted());
+    }
+    return fileInfo;
+  }
+
+  private class FileStorageTransaction {
+    /**
+     * Update Operation.
+     */
+    final int              UPDATE = 0;
+
+    /**
+     * Remove Operation.
+     */
+    final int              REMOVE = 1;
+
+    /**
+     * Insert Operation.
+     */
+    final int              INSERT = 2;
+
+    private FileInfoEntity fileInfoEntity;
+
+    public FileStorageTransaction(FileInfoEntity fileInfoEntity) {
+      this.fileInfoEntity = fileInfoEntity;
+    }
+
+    public FileInfoEntity towPhaseCommit(int operation, InputStream inputStream) throws FileStorageException {
+      FileInfoEntity createdFileInfoEntity = null;
+      if (operation == INSERT) {
+        try {
+          resourceProvider.put(fileInfoEntity.getChecksum(), inputStream);
+          if (resourceProvider.exists(fileInfoEntity.getChecksum())) {
+            createdFileInfoEntity = fileInfoDAO.create(fileInfoEntity);
+            return createdFileInfoEntity;
+          } else {
+            throw new FileStorageException("Error while writing file " + fileInfoEntity.getName());
+          }
+        } catch (Exception e) {
+          try {
+            resourceProvider.remove(fileInfoEntity.getChecksum());
+          } catch (IOException e1) {
+            LOG.error("Error while rollback writing file");
+          }
+          throw new FileStorageException("Error while writing file " + fileInfoEntity.getName(), e);
+        }
+
+      } else if (operation == REMOVE) {
+        fileInfoEntity.setDeleted(true);
+        fileInfoDAO.update(fileInfoEntity);
+      } else if (operation == UPDATE) {
+        try {
+          FileInfoEntity old = fileInfoDAO.find(fileInfoEntity.getId());
+          if(old == null || old.getChecksum().isEmpty() || !old.getChecksum().equals(fileInfoEntity.getChecksum())) {
+            resourceProvider.put(fileInfoEntity.getChecksum(), inputStream);
+          }
+          if(old != null && old.getChecksum()!= null && !old.getChecksum().isEmpty())
+          {
+            DeletedFileEntity deletedFileEntity=new DeletedFileEntity();
+            deletedFileEntity.setChecksum(old.getChecksum());
+            deletedFileEntity.setFileInfoEntity(old);
+            deletedFileEntity.setDeletedDate(new Date());
+            deletedFileDAO.create(deletedFileEntity);
+          }
+          if (resourceProvider.exists(fileInfoEntity.getChecksum())) {
+            createdFileInfoEntity = fileInfoDAO.update(fileInfoEntity);
+            return createdFileInfoEntity;
+          } else {
+            throw new FileStorageException("Error while writing file " + fileInfoEntity.getName());
+          }
+        } catch (Exception e) {
+          try {
+            resourceProvider.remove(fileInfoEntity.getChecksum());
+          } catch (IOException e1) {
+            LOG.error("Error while rollback writing file");
+          }
+          throw new FileStorageException("Error while writing file " + fileInfoEntity.getName(), e);
+        }
+      }
+      return null;
     }
   }
 }

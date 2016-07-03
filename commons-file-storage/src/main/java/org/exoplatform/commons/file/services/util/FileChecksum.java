@@ -48,9 +48,9 @@ public class FileChecksum {
   /**
    * MD5-Checksum for a string.
    *
-   * @param string
-   * @return
-   * @throws Exception
+   * @param string chain  to calculate Checksum
+   * @return Checksum
+   * @throws Exception exception
    */
   public static String getChecksum(String string) throws Exception {
     digest.update(string.getBytes());
@@ -69,9 +69,9 @@ public class FileChecksum {
   /**
    * MD5-Checksum for a file.
    *
-   * @param fis
-   * @return
-   * @throws Exception
+   * @param fis InputStream
+   * @return Checksum
+   * @throws Exception exception
    */
   public static String getChecksum(InputStream fis) throws Exception {
     //Create byte array to read data in chunks

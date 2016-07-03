@@ -76,6 +76,9 @@ public final class FileUtils {
 
   /**
    * Read the byte stream as a string assuming a UTF-8 encoding.
+   * @throws IOException Signals that an I/O exception of some sort has occurred.
+   * @param in The InputStream
+   * @return inputStream toString
    */
   @Deprecated
   public static String read(InputStream in) throws IOException {
@@ -152,7 +155,7 @@ public final class FileUtils {
    *
    * @param src the source file or directory
    * @param dst the destination file or directory
-   * @throws IOException
+   * @throws IOException Signals that an I/O exception of some sort has occurred.
    */
   public static void copy(File src, File dst) throws IOException {
     if (src.equals(dst)) {
@@ -194,7 +197,7 @@ public final class FileUtils {
    *
    * @param src the source directory
    * @param dst the destination directory
-   * @throws IOException
+   * @throws IOException Signals that an I/O exception of some sort has occurred.
    */
   public static void copyTree(File src, File dst) throws IOException {
     if (src.isFile()) {
@@ -217,8 +220,8 @@ public final class FileUtils {
    * Tests in privileged mode whether the file or directory denoted by this abstract pathname
    * exists.
    *
-   * @param file
-   * @return
+   * @param file file
+   * @return boolean
    */
   public static boolean exists(final File file)
   {
@@ -235,8 +238,8 @@ public final class FileUtils {
   /**
    * Creates the directory in privileged mode.
    *
-   * @param file
-   * @return
+   * @param file new directory to create
+   * @return boolean
    */
   public static boolean mkdirs(final File file)
   {
@@ -253,9 +256,9 @@ public final class FileUtils {
   /**
    * Create new file.
    *
-   * @param file
-   * @return
-   * @throws IOException
+   * @param file new file
+   * @return boolean
+   * @throws IOException Signals that an I/O exception of some sort has occurred.
    */
   public static boolean createNewFile(final File file) throws IOException
   {

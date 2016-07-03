@@ -51,7 +51,7 @@ public interface ResourceProvider {
 
     void remove(final String name) throws IOException;
 
-    public boolean remove(final FileInfo fileInfo) throws IOException;
+    boolean remove(final FileInfo fileInfo) throws IOException;
 
     boolean exists(final String name) throws IOException;
 
@@ -59,10 +59,6 @@ public interface ResourceProvider {
 
     URL getURL(final String name);
 
-    /**
-     * A string that uniquely identify the location of that store. Two stores are considered equals if their locations
-     * are the same.
-     */
     String getLocation();
 
 }

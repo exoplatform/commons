@@ -16,7 +16,9 @@ public interface FileService {
 
   public FileItem getFile(long id) throws Exception;
 
-  public FileItem writeFile(FileItem file) throws IOException;
+  public FileItem writeFile(FileItem file) throws FileStorageException, IOException;
 
-  public void deleteFile(long id) throws IOException;
+  public FileItem updateFile(FileItem file) throws FileStorageException, IOException;
+
+  public FileInfo deleteFile(long id);
 }
