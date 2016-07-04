@@ -58,6 +58,11 @@
     </component>
 
     <component>
+        <key>org.exoplatform.commons.file.storage.DataStorage</key>
+        <type>org.exoplatform.commons.file.storage.DataStorage</type>
+    </component>
+
+    <component>
         <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
         <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
         <init-params>

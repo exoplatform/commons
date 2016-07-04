@@ -20,10 +20,10 @@ package org.exoplatform.commons.file.services.impl;
 
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.file.model.NameSpace;
 import org.exoplatform.commons.file.services.NameSpacePlugin;
 import org.exoplatform.commons.file.services.NameSpaceService;
-import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
-import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
+import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.picocontainer.Startable;
@@ -44,13 +44,12 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
 
   private List<NameSpacePlugin> nameSpacePlugins       = new ArrayList<NameSpacePlugin>();
 
+  private static String         defaultNameSpace;
 
-  private static String                defaultNameSpace;
+  private DataStorage dataStorage;
 
-  private NameSpaceDAO          nameSpaceDAO;
-
-  public NameSpaceServiceImpl(NameSpaceDAO nameSpaceDAO, InitParams initParams, DataInitializer dataInitializer) {
-    this.nameSpaceDAO = nameSpaceDAO;
+  public NameSpaceServiceImpl(DataStorage dataStorage, InitParams initParams, DataInitializer dataInitializer) {
+    this.dataStorage = dataStorage;
     ValueParam defaultNameSpaceParam = initParams.getValueParam(FILE_DEFAULT_NAMESPACE);
     if (defaultNameSpaceParam != null && defaultNameSpaceParam.getValue() != null) {
       defaultNameSpace = defaultNameSpaceParam.getValue();
@@ -71,26 +70,26 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
   @ExoTransactional
   private void initNameSpace() {
     LOG.info("Start Init Files nameSpaces ");
-    List<NameSpaceEntity> list = new ArrayList<NameSpaceEntity>();
+    List<NameSpace> list = new ArrayList<NameSpace>();
 
     /* Default File nameSpace */
-    NameSpaceEntity nameSpaceEntity = nameSpaceDAO.getNameSpaceByName(defaultNameSpace);
-    if (nameSpaceEntity == null) {
-      NameSpaceEntity add = new NameSpaceEntity(defaultNameSpace, "Default Files NameSpace");
+    NameSpace nameSpace = dataStorage.getNameSpace(defaultNameSpace);
+    if (nameSpace == null) {
+      NameSpace add = new NameSpace(defaultNameSpace, "Default Files NameSpace");
       list.add(add);
     }
     /* Application File nameSpace */
     for (NameSpacePlugin nameSpacePlugin : this.nameSpacePlugins) {
-      for (String nameSpace : nameSpacePlugin.getNameSpaceList().keySet()) {
-        nameSpaceEntity = nameSpaceDAO.getNameSpaceByName(nameSpace);
-        if (nameSpaceEntity == null) {
-          NameSpaceEntity add = new NameSpaceEntity(nameSpace, nameSpacePlugin.getNameSpaceList().get(nameSpace));
+      for (String name : nameSpacePlugin.getNameSpaceList().keySet()) {
+        nameSpace = dataStorage.getNameSpace(name);
+        if (nameSpace == null) {
+          NameSpace add = new NameSpace(name, nameSpacePlugin.getNameSpaceList().get(nameSpace));
           list.add(add);
         }
       }
     }
     if (!list.isEmpty()) {
-      nameSpaceDAO.createAll(list);
+      dataStorage.createNameSpaces(list);
     }
     LOG.info("End Init Files nameSpaces ");
   }

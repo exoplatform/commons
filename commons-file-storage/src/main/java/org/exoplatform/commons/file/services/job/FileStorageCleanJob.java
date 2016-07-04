@@ -18,11 +18,10 @@
  */
 package org.exoplatform.commons.file.services.job;
 
+import org.exoplatform.commons.file.model.FileInfo;
+import org.exoplatform.commons.file.model.OrphanFile;
 import org.exoplatform.commons.file.resource.ResourceProvider;
-import org.exoplatform.commons.file.storage.dao.OrphanFileDAO;
-import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
-import org.exoplatform.commons.file.storage.entity.OrphanFileEntity;
-import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
+import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -58,8 +57,7 @@ public class FileStorageCleanJob implements Job {
     if(!enabled.get())
       return;
     try {
-      FileInfoDAO fileInfoDAO = CommonsUtils.getService(FileInfoDAO.class);
-      OrphanFileDAO deletedFileDAO = CommonsUtils.getService(OrphanFileDAO.class);
+      DataStorage dataStorage = CommonsUtils.getService(DataStorage.class);
       ResourceProvider resourceProvider = CommonsUtils.getService(ResourceProvider.class);
       JobDataMap jdatamap = context.getJobDetail().getJobDataMap();
       int retention = defaultRetention;
@@ -78,20 +76,20 @@ public class FileStorageCleanJob implements Job {
         }
       }
       started.set(true);
-      List<FileInfoEntity> list = fileInfoDAO.findDeletedFiles(daysAgo(retention));
-      for (FileInfoEntity file : list) {
+      List<FileInfo> list = dataStorage.getAllDeletedFiles(daysAgo(retention));
+      for (FileInfo file : list) {
         try {
           resourceProvider.remove(file.getChecksum());
-          fileInfoDAO.delete(file);
+          dataStorage.deleteFileInfo(file.getId());
         } catch (IOException e) {
           Log.warn("Enable to remove file name" + e.getMessage());
         }
       }
-      List<OrphanFileEntity> noParent = deletedFileDAO.findDeletedFiles(daysAgo(retention));
-      for (OrphanFileEntity file : noParent) {
+      List<OrphanFile> noParent = dataStorage.getAllOrphanFile(daysAgo(retention));
+      for (OrphanFile file : noParent) {
         try {
-          resourceProvider.remove(file.getFileInfoEntity().getChecksum());
-          deletedFileDAO.delete(file);
+          resourceProvider.remove(file.getChecksum());
+          dataStorage.deleteOrphanFile(file.getId());
         } catch (IOException e) {
           Log.warn("Enable to remove file name" + e.getMessage());
         }

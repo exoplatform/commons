@@ -18,10 +18,10 @@
  */
 package org.exoplatform.commons.file.services.checker;
 
+import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.services.job.FileStorageCleanJob;
-import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
-import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
+import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.services.log.ExoLogger;
@@ -55,12 +55,12 @@ public class FileStorageCheckController implements Startable {
 
   private static final int   pageSize                      = 20;
 
-  FileInfoDAO                fileInfoDAO;
+  private ResourceProvider           resourceProvider;
 
-  ResourceProvider           resourceProvider;
+  private DataStorage dataStorage;
 
-  public FileStorageCheckController(FileInfoDAO fileInfoDAO, ResourceProvider resourceProvider) {
-    this.fileInfoDAO = fileInfoDAO;
+  public FileStorageCheckController(DataStorage dataStorage, ResourceProvider resourceProvider) {
+    this.dataStorage = dataStorage;
     this.resourceProvider = resourceProvider;
   }
 
@@ -82,7 +82,7 @@ public class FileStorageCheckController implements Startable {
             int offset = 0;
             boolean hasNext = false;
             while (hasNext) {
-              List<FileInfoEntity> list = fileInfoDAO.findAllByPage(offset, pageSize);
+              List<FileInfo> list = dataStorage.getAllFilesInfo(offset, pageSize);
 
               if (list == null && list.isEmpty()) {
                 break;
@@ -90,7 +90,7 @@ public class FileStorageCheckController implements Startable {
               if (list.size() < pageSize) {
                 hasNext = false;
               }
-              for (FileInfoEntity fileInfo : list) {
+              for (FileInfo fileInfo : list) {
                 String checksum = fileInfo.getChecksum();
                 if (checksum != null && !checksum.isEmpty()) {
                   if (!resourceProvider.exists(checksum)) {

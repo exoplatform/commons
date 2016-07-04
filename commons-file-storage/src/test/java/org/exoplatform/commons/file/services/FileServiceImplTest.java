@@ -1,9 +1,12 @@
 package org.exoplatform.commons.file.services;
 
+import org.exoplatform.commons.file.model.FileInfo;
+import org.exoplatform.commons.file.model.NameSpace;
 import org.exoplatform.commons.file.resource.FileSystemResourceProvider;
 import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.impl.FileServiceImpl;
+import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.commons.file.storage.dao.OrphanFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
@@ -45,6 +48,9 @@ public class FileServiceImplTest {
   private OrphanFileDAO orphanFileDAO;
 
   @Mock
+  private DataStorage jpaDataStorage;
+
+  @Mock
   private NameSpaceService nameSpaceService;
 
   @Test
@@ -53,8 +59,8 @@ public class FileServiceImplTest {
     // Given
     when(nameSpaceDAO.find(anyLong())).thenReturn(new NameSpaceEntity(1, "file", "Default NameSpace"));
     when(fileInfoDAO.find(anyLong())).thenReturn(new FileInfoEntity(1, "file1", null, 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false).setNameSpaceEntity(new NameSpaceEntity(1, "file", "Default NameSpace")));
-   // when(resourceProvider.put(any(FileInfo.class));).thenReturn(new ByteArrayInputStream(new byte[] {}));
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, orphanFileDAO, resourceProvider, null);
+    when(jpaDataStorage.getFileInfo(anyLong())).thenReturn(new FileInfo(1L,"file1",null,"file",1,null,"","d41d8cd98f00b204e9800998ecf8427e", false));
+    FileService fileService = new FileServiceImpl(jpaDataStorage, resourceProvider, null);
 
     // When
     FileItem file = fileService.getFile(1);
@@ -68,14 +74,14 @@ public class FileServiceImplTest {
     ResourceProvider resourceProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenReturn(new FileInfoEntity());
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, orphanFileDAO, resourceProvider, null);
+    when(jpaDataStorage.create(any(FileInfo.class), any(NameSpace.class))).thenReturn(new FileInfo(1L,"file1",null,"file",1,null,"","d41d8cd98f00b204e9800998ecf8427e", false));
+    FileService fileService = new FileServiceImpl(jpaDataStorage, resourceProvider, null);
 
     // When
     fileService.writeFile(new FileItem(null, "file1", "", null,  1, new Date(), "", false, new ByteArrayInputStream("test".getBytes())));
 
     // Then
-    verify(fileInfoDAO, times(1)).create(any(FileInfoEntity.class));
-    //verify(resourceProvider, times(1)).writeBinary(any(FileItem.class));
+    verify(jpaDataStorage, times(1)).create(any(FileInfo.class),any(NameSpace.class));
   }
 
   @Test
@@ -83,7 +89,7 @@ public class FileServiceImplTest {
     ResourceProvider resourceProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenThrow(Exception.class);
-    FileService fileService = new FileServiceImpl(fileInfoDAO, nameSpaceDAO, orphanFileDAO,  resourceProvider, null);
+    FileService fileService = new FileServiceImpl(jpaDataStorage,  resourceProvider, null);
 
     // When
     FileItem file = new FileItem(null, "file1", "plain/text", null,  1, new Date(), "john", false, new ByteArrayInputStream("test".getBytes()));
