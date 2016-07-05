@@ -203,7 +203,6 @@ public class FileSystemResourceProvider implements ResourceProvider {
    * path does not exist, the file can be created since it is a nex file or it
    * is an update with a different file binary. This implies that no deletion of
    * old file versions are done on the fly. A scheduled job is needed for that.
-   * TODO Scheduled job to delete old files
    *
    * @param name file name.
    * @param data inputStream

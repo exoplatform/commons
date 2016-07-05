@@ -1,6 +1,7 @@
 package org.exoplatform.commons.file.services.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.file.model.NameSpace;
 import org.exoplatform.commons.file.resource.ResourceProvider;
 import org.exoplatform.commons.file.model.FileItem;
@@ -61,25 +62,11 @@ public class FileServiceImpl implements FileService {
     }
   }
 
-  /**
-   * Get only the file info of the given id
-   * 
-   * @param id file id
-   * @return file info
-   * @throws IOException ignals that an I/O exception of some sort has occurred.
-   */
   @Override
   public FileInfo getFileInfo(long id) throws IOException {
     return dataStorage.getFileInfo(id);
   }
 
-  /**
-   * Get the file (info + binary) of the given id
-   * 
-   * @param id file id
-   * @return fileItem
-   * @throws Exception signals that an I/O exception of some sort has occurred.
-   */
   @Override
   public FileItem getFile(long id) throws Exception {
     FileInfo fileInfo = dataStorage.getFileInfo(id);
@@ -94,16 +81,8 @@ public class FileServiceImpl implements FileService {
     return fileItem;
   }
 
-  /**
-   * Store the file using the provided DAO and binary provider. This method is
-   * transactional, meaning that if the write of the info or of the binary
-   * fails, nothing must be persisted.
-   * 
-   * @param file file item
-   * @return updated file item
-   * @throws IOException ignals that an I/O exception of some sort has occurred.
-   */
   @Override
+  @ExoTransactional
   public FileItem writeFile(FileItem file) throws FileStorageException, IOException {
     if (file.getFileInfo() == null || StringUtils.isEmpty(file.getFileInfo().getChecksum())) {
       throw new IllegalArgumentException("Checksum is required to persist the binary");
@@ -125,6 +104,8 @@ public class FileServiceImpl implements FileService {
     return null;
   }
 
+  @Override
+  @ExoTransactional
   public FileItem updateFile(FileItem file) throws FileStorageException, IOException {
     if (file.getFileInfo() == null || StringUtils.isEmpty(file.getFileInfo().getChecksum())) {
       throw new IllegalArgumentException("Checksum is required to persist the binary");
@@ -146,13 +127,6 @@ public class FileServiceImpl implements FileService {
     return null;
   }
 
-  /**
-   * Delete file with the given id The file is not physically deleted, it is
-   * only a logical deletion
-   * 
-   * @param id Id of the file to delete
-   * @return  file Info
-   */
   @Override
   public FileInfo deleteFile(long id) {
     FileInfo fileInfo= dataStorage.getFileInfo(id);

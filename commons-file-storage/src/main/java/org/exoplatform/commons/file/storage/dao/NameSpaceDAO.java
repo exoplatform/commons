@@ -19,7 +19,6 @@
 package org.exoplatform.commons.file.storage.dao;
 
 import org.exoplatform.commons.api.persistence.GenericDAO;
-import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 
 /**

@@ -19,7 +19,7 @@
 package org.exoplatform.commons.file.model;
 
 /**
- * NameSpae information
+ * NameSpace information
  */
 public class NameSpace {
 

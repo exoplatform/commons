@@ -68,6 +68,9 @@ public class FileStorageCleanJob implements Job {
         } catch (NumberFormatException ex) {
           Log.warn("Invalid param retention-time");
         }
+        //-1: means never deleted
+        if(retention == -1)
+          return;
         valueParam = jdatamap.getString(FileStorageCronJob.ENABLED_PARAM);
         try {
           enabled.set(Boolean.valueOf(valueParam));
