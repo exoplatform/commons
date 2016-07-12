@@ -5,7 +5,7 @@
     <parent>
         <artifactId>commons</artifactId>
         <groupId>org.exoplatform.commons</groupId>
-        <version>4.4.x-html-sanitizer-SNAPSHOT</version>
+        <version>4.4.x-SNAPSHOT</version>
     </parent>
     <artifactId>commons-component-common</artifactId>
     <packaging>jar</packaging>
