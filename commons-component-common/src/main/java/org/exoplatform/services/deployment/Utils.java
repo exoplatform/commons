@@ -16,13 +16,7 @@
  */
 package org.exoplatform.services.deployment;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -34,47 +28,41 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.impl.core.NodeImpl;
 import org.exoplatform.services.jcr.util.VersionHistoryImporter;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.owasp.validator.html.AntiSamy;
-import org.owasp.validator.html.CleanResults;
-import org.owasp.validator.html.Policy;
 
 /**
  * @author benjaminmestrallet
  */
 public class Utils {
-  private final static Log   LOG          = ExoLogger.getLogger(Utils.class);
-  
   public static final String MAPPING_FILE = "mapping.properties";
-  private static final String POLICY_FILE_LOCATION = "jar:/conf/portal/antisamy.xml";
 
-  public static Node makePath(Node rootNode, String path, String nodetype)
-  throws PathNotFoundException, RepositoryException {
+  private final static Log   LOG          = ExoLogger.getLogger(Utils.class);
+
+  public static Node makePath(Node rootNode, String path, String nodetype) throws PathNotFoundException, RepositoryException {
     return makePath(rootNode, path, nodetype, null);
   }
 
   @SuppressWarnings("unchecked")
-  public static Node makePath(Node rootNode, String path, String nodetype, Map permissions)
-  throws PathNotFoundException, RepositoryException {
-    String[] tokens = path.split("/") ;
+  public static Node makePath(Node rootNode, String path, String nodetype, Map permissions) throws PathNotFoundException,
+                                                                                           RepositoryException {
+    String[] tokens = path.split("/");
     Node node = rootNode;
     for (int i = 0; i < tokens.length; i++) {
       String token = tokens[i];
-      if(token.length() > 0) {
-        if(node.hasNode(token)) {
-          node = node.getNode(token) ;
+      if (token.length() > 0) {
+        if (node.hasNode(token)) {
+          node = node.getNode(token);
         } else {
           node = node.addNode(token, nodetype);
-          if (node.canAddMixin("exo:privilegeable")){
+          if (node.canAddMixin("exo:privilegeable")) {
             node.addMixin("exo:privilegeable");
           }
-          if(permissions != null){
-            ((ExtendedNode)node).setPermissions(permissions);
+          if (permissions != null) {
+            ((ExtendedNode) node).setPermissions(permissions);
           }
         }
       }
@@ -217,41 +205,19 @@ public class Utils {
     String[] arrHistoryValue = valueHistory.split(";");
     return arrHistoryValue[0];
   }
-  
-  public static String sanitize(String value) {
-    try {
-      ConfigurationManager configMan = CommonsUtils.getService(ConfigurationManager.class);
-      Policy policy = Policy.getInstance(configMan.getResource(POLICY_FILE_LOCATION));
-      AntiSamy as = new AntiSamy();
-      CleanResults cr = as.scan(value, policy);
-      value = cr.getCleanHTML();
-      return value;
-    } catch(Exception ex) {
-      return value;
-    }
-  }
-  public static String sanitizeSearch(String value) {
-    try {
-      value = sanitize(value);
-      value = value.replaceAll("<iframe", "").replaceAll("<frame", "").replaceAll("<frameset", "");
-      return value;
-    } catch(Exception ex) {
-      return value;
-    }
-  }
-  
+
   /**
    * @deprecated use {@link CommonsUtils#getService(Class)}
    */
   public static <T> T getService(Class<T> clazz) {
     return CommonsUtils.getService(clazz);
   }
-  
+
   /**
    * @deprecated use {@link CommonsUtils#getService(Class, String)}
    */
   public static <T> T getService(Class<T> clazz, String containerName) {
     return CommonsUtils.getService(clazz, containerName);
   }
-  
+
 }
