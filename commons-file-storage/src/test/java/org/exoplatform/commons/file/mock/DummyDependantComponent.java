@@ -38,6 +38,7 @@ public class DummyDependantComponent implements Startable {
   @Override
   public void start() {
     // nothing
+    System.out.println("Start here");
   }
 
   @Override

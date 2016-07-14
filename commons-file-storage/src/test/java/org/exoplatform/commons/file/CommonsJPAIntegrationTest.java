@@ -47,13 +47,14 @@ public class CommonsJPAIntegrationTest extends BaseTest {
     super.setUp();
 
     // make sure data are well initialized for each test
-    DataInitializer dataInitializer = PortalContainer.getInstance().getComponentInstanceOfType(DataInitializer.class);
+
+    DataInitializer dataInitializer = getService(DataInitializer.class);
     dataInitializer.initData();
 
     // Init DAO
-    fileInfoDAO = PortalContainer.getInstance().getComponentInstanceOfType(FileInfoDAO.class);
-    nameSpaceDAO = PortalContainer.getInstance().getComponentInstanceOfType(NameSpaceDAO.class);
-    orphanFileDAO = PortalContainer.getInstance().getComponentInstanceOfType(OrphanFileDAO.class);
+    fileInfoDAO = getService(FileInfoDAO.class);
+    nameSpaceDAO = getService(NameSpaceDAO.class);
+    orphanFileDAO = getService(OrphanFileDAO.class);
 
     // Clean Data
     cleanDB();

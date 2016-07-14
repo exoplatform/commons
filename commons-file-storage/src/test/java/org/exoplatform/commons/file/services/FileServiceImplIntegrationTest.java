@@ -36,7 +36,7 @@ public class FileServiceImplIntegrationTest extends BaseExoTestCase {
   }
 
   public void testShouldReturnFile() throws Exception {
-    FileService fileService = PortalContainer.getInstance().getComponentInstanceOfType(FileService.class);
+    FileService fileService = getContainer().getComponentInstanceOfType(FileService.class);
     FileItem createdFile = fileService.writeFile(new FileItem(null, "file1", "plain/text", null, 1, new Date(), "john", false, new ByteArrayInputStream("test".getBytes())));
     FileItem fetchedFile = fileService.getFile(createdFile.getFileInfo().getId());
     assertNotNull(fetchedFile);

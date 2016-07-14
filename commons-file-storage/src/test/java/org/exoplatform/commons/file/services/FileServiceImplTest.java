@@ -12,6 +12,11 @@ import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -19,6 +24,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.transaction.Transaction;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 
@@ -52,6 +60,31 @@ public class FileServiceImplTest {
 
   @Mock
   private NameSpaceService nameSpaceService;
+
+  @Mock
+  private PortalContainer portalContainer;
+
+  @Mock
+  private EntityManagerService emService;
+  @Mock
+  private EntityManager em;
+  @Mock
+  private EntityTransaction transaction;
+
+  @Before
+  public void setUp() throws Exception {
+    // Mock service to pass the ExoTransactionalAspect
+    ExoContainerContext.setCurrentContainer(portalContainer);
+    when(portalContainer.getComponentInstanceOfType(EntityManagerService.class)).thenReturn(emService);
+    when(emService.getEntityManager()).thenReturn(em);
+    when(em.getTransaction()).thenReturn(transaction);
+    when(transaction.isActive()).thenReturn(true);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    ExoContainerContext.setCurrentContainer(null);
+  }
 
   @Test
   public void shouldReturnFile() throws Exception {
