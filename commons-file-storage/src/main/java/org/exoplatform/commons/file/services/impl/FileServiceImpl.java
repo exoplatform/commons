@@ -36,7 +36,7 @@ public class FileServiceImpl implements FileService {
 
   private FileChecksum        fileChecksum;
 
-  private static long         defaultNameSpaceId = -1;
+  //private static long         defaultNameSpaceId = -1;
 
   public FileServiceImpl(DataStorage dataStorage,
                          ResourceProvider resourceProvider,
@@ -56,10 +56,10 @@ public class FileServiceImpl implements FileService {
       this.fileChecksum = new FileChecksum(algorithmValueParam.getValue());
     }
 
-    NameSpace nameSpace= dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
+    /*NameSpace nameSpace= dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
     if (nameSpace != null) {
       defaultNameSpaceId = nameSpace.getId();
-    }
+    }*/
   }
 
   @Override
@@ -92,7 +92,8 @@ public class FileServiceImpl implements FileService {
       if (fileInfo.getNameSpace() != null && !fileInfo.getNameSpace().isEmpty()) {
         nSpace = dataStorage.getNameSpace(fileInfo.getNameSpace());
       } else {
-        nSpace = dataStorage.getNameSpace(defaultNameSpaceId);
+        nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
+        //nSpace = dataStorage.getNameSpace(defaultNameSpaceId);
       }
       FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
       FileInfo createdFileInfoEntity= transaction.towPhaseCommit(2, file.getAsStream());
@@ -115,7 +116,8 @@ public class FileServiceImpl implements FileService {
     if (fileInfo.getNameSpace() != null && !fileInfo.getNameSpace().isEmpty()) {
       nSpace = dataStorage.getNameSpace(fileInfo.getNameSpace());
     } else {
-      nSpace = dataStorage.getNameSpace(defaultNameSpaceId);
+      nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
+      //nSpace = dataStorage.getNameSpace(defaultNameSpaceId);
     }
     FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
     FileInfo createdFileInfoEntity= transaction.towPhaseCommit(0, file.getAsStream());

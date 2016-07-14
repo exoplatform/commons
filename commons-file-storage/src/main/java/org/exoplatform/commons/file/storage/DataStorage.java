@@ -18,6 +18,7 @@
  */
 package org.exoplatform.commons.file.storage;
 
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.NameSpace;
 import org.exoplatform.commons.file.model.OrphanFile;
@@ -67,6 +68,7 @@ public class DataStorage {
     return convertNameSpace(nameSpaceEntity);
   }
 
+  @ExoTransactional
   public NameSpace getNameSpace(String name) {
     NameSpaceEntity nameSpaceEntity = nameSpaceDAO.getNameSpaceByName(name);
     return convertNameSpace(nameSpaceEntity);
@@ -114,6 +116,9 @@ public class DataStorage {
                                                        fileInfo.getUpdater(),
                                                        fileInfo.getChecksum(),
                                                        fileInfo.isDeleted());
+    NameSpaceEntity nsEntity = nameSpaceDAO.getNameSpaceByName(fileInfo.getNameSpace());
+    fileInfoEntity.setNameSpaceEntity(nsEntity);
+
     FileInfoEntity updated = fileInfoDAO.update(fileInfoEntity);
     return convertFileEntityToFileInfo(updated);
   }
