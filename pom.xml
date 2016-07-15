@@ -192,6 +192,11 @@
         <artifactId>commons-search</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-file-storage</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- Import versions from platform-ui project -->
       <dependency>
         <groupId>org.exoplatform.platform-ui</groupId>
