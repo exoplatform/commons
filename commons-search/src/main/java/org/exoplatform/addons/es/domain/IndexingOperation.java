@@ -40,7 +40,8 @@ import java.util.Date;
 public class IndexingOperation implements Serializable {
 
   @Id
-  @GeneratedValue
+  @SequenceGenerator(name="SEQ_ES_INDEXING_QUEUE_ID", sequenceName="SEQ_ES_INDEXING_QUEUE_ID")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_ES_INDEXING_QUEUE_ID")
   @Column(name = "OPERATION_ID")
   private Long id;
 
