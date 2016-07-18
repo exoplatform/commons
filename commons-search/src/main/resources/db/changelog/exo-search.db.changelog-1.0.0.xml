@@ -34,4 +34,9 @@
       </column>
     </createTable>
   </changeSet>
+
+  <changeSet author="exo-es-search" id="1.0.0-2" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_ES_INDEXING_QUEUE_ID" startValue="1"/>
+  </changeSet>
+
 </databaseChangeLog>
