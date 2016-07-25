@@ -43,7 +43,7 @@ public class FileSystemResourceProvider implements BinaryProvider {
 
   protected File              root;
 
-  private TreeFileIOChannel   treeFileIOChannel = null;
+  private TreeFileUtils treeFileUtils = null;
 
   public FileSystemResourceProvider(String rootPath) throws Exception {
     if (StringUtils.isEmpty(rootPath)) {
@@ -59,7 +59,7 @@ public class FileSystemResourceProvider implements BinaryProvider {
     if (!FileUtils.exists(root)) {
       FileUtils.mkdirs(root);
     }
-    treeFileIOChannel = new TreeFileIOChannel(new File(rootPath));
+    treeFileUtils = new TreeFileUtils(new File(rootPath));
   }
 
   public FileSystemResourceProvider(InitParams initParams) throws Exception {
@@ -85,7 +85,7 @@ public class FileSystemResourceProvider implements BinaryProvider {
     if (!FileUtils.exists(root)) {
       FileUtils.mkdirs(root);
     }
-    treeFileIOChannel = new TreeFileIOChannel(new File(rootPath));
+    treeFileUtils = new TreeFileUtils(new File(rootPath));
   }
 
   public File getRoot() {
@@ -93,7 +93,7 @@ public class FileSystemResourceProvider implements BinaryProvider {
   }
 
   public final File getFile(String name) throws IOException {
-    return treeFileIOChannel.getFile(name);
+    return treeFileUtils.getFile(name);
   }
 
   public boolean exists(String name) throws IOException {

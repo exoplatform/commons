@@ -37,6 +37,7 @@ public interface FileService {
    * @param file file item
    * @return updated file item
    * @throws IOException signals that an I/O exception of some sort has occurred.
+   * @throws FileStorageException signals that an error occur on save resource.
    */
   public FileItem writeFile(FileItem file) throws FileStorageException, IOException;
 
@@ -48,6 +49,7 @@ public interface FileService {
    * @param file file item
    * @return updated file item
    * @throws IOException signals that an I/O exception of some sort has occurred.
+   * @throws FileStorageException signals that an error occur on save resource.
    */
   public FileItem updateFile(FileItem file) throws FileStorageException, IOException;
 

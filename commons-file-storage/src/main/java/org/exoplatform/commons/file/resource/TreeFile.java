@@ -25,9 +25,10 @@ import org.exoplatform.services.log.Log;
 import java.io.File;
 
 /*
+* TreeFile implementation : Override delete File operation.
 * Created by The eXo Platform SAS
 * Author : eXoPlatform
-*          exo@exoplatform.co
+*          exo@exoplatform.com
 */
 public class TreeFile extends File {
   private static Log        fLog             = ExoLogger.getLogger("org.exoplatform.commons.file.resource.TreeFile");

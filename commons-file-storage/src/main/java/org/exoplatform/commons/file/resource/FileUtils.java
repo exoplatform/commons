@@ -20,23 +20,18 @@ package org.exoplatform.commons.file.resource;
 
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;;
 import java.io.OutputStream;
-import java.net.URL;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
-
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
 import org.exoplatform.commons.utils.SecurityHelper;
 
 /**
- * This is an utility class
+ * This is an utility class : File operation
  *
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
@@ -66,152 +61,41 @@ public final class FileUtils {
     return new byte[preferredSize];
   }
 
-  public static void copy(InputStream in, OutputStream out) throws IOException {
-    byte[] buffer = createBuffer(in.available());
-    int read;
-    while ((read = in.read(buffer)) != -1) {
-      out.write(buffer, 0, read);
-    }
-  }
-
   /**
-   * Read the byte stream as a string assuming a UTF-8 encoding.
-   * @throws IOException Signals that an I/O exception of some sort has occurred.
-   * @param in The InputStream
-   * @return inputStream toString
-   */
-  @Deprecated
-  public static String read(InputStream in) throws IOException {
-    // UTF-8 should be configured as the default "file.encoding".
-    return IOUtils.toString(in, Charsets.UTF_8);
-  }
-
-  public static byte[] readBytes(URL url) throws IOException {
-    return readBytes(url.openStream());
-  }
-
-  public static byte[] readBytes(InputStream in) throws IOException {
-    byte[] buffer = createBuffer(in.available());
-    int w = 0;
-    try {
-      int read = 0;
-      int len;
-      do {
-        w += read;
-        len = buffer.length - w;
-        if (len <= 0) { // resize buffer
-          byte[] b = new byte[buffer.length + BUFFER_SIZE];
-          System.arraycopy(buffer, 0, b, 0, w);
-          buffer = b;
-          len = buffer.length - w;
-        }
-      } while ((read = in.read(buffer, w, len)) != -1);
-    } finally {
-      in.close();
-    }
-    if (buffer.length > w) { // compact buffer
-      byte[] b = new byte[w];
-      System.arraycopy(buffer, 0, b, 0, w);
-      buffer = b;
-    }
-    return buffer;
-  }
-
-  public static void writeFile(File file, byte[] buf) throws IOException {
-    writeFile(file, buf, false);
-  }
-
-  public static void writeFile(File file, byte[] buf, boolean append) throws IOException {
-    FileOutputStream fos = null;
-    try {
-      fos = new FileOutputStream(file, append);
-      fos.write(buf);
-    } finally {
-      if (fos != null) {
-        fos.close();
-      }
-    }
-  }
-
-  public static void copyToFile(InputStream in, File file) throws IOException {
-    OutputStream out = null;
-    try {
-      out = new FileOutputStream(file);
-      byte[] buffer = createBuffer(in.available());
-      int read;
-      while ((read = in.read(buffer)) != -1) {
-        out.write(buffer, 0, read);
-      }
-    } finally {
-      if (out != null) {
-        out.close();
-      }
-    }
-  }
-
-  /**
-   * Copies source to destination. If source and destination are the same, does
-   * nothing. Both single files and directories are handled.
+   * Create new file.
    *
-   * @param src the source file or directory
-   * @param dst the destination file or directory
+   * @param file new file
+   * @return boolean
    * @throws IOException Signals that an I/O exception of some sort has occurred.
    */
-  public static void copy(File src, File dst) throws IOException {
-    if (src.equals(dst)) {
-      return;
-    }
-    if (src.isFile()) {
-      copyFile(src, dst);
-    } else {
-      copyTree(src, dst);
-    }
-  }
-
-  public static void copy(File[] src, File dst) throws IOException {
-    for (File file : src) {
-      copy(file, dst);
-    }
-  }
-
-  public static void copyFile(File src, File dst) throws IOException {
-    if (dst.isDirectory()) {
-      dst = new File(dst, src.getName());
-    }
-    FileInputStream in = null;
-    FileOutputStream out = null;
-    try {
-      out = new FileOutputStream(dst);
-      in = new FileInputStream(src);
-      copy(in, out);
-    } finally {
-      IOUtils.closeQuietly(in);
-      IOUtils.closeQuietly(out);
-    }
-  }
-
-  /**
-   * Copies recursively source to destination.
-   * <p>
-   * The source file is assumed to be a directory.
-   *
-   * @param src the source directory
-   * @param dst the destination directory
-   * @throws IOException Signals that an I/O exception of some sort has occurred.
-   */
-  public static void copyTree(File src, File dst) throws IOException {
-    if (src.isFile()) {
-      copyFile(src, dst);
-    } else if (src.isDirectory()) {
-      if (dst.exists()) {
-        dst = new File(dst, src.getName());
-        dst.mkdir();
-      } else { // allows renaming dest dir
-        dst.mkdirs();
+  public static boolean createNewFile(final File file) throws IOException
+  {
+    PrivilegedExceptionAction<Boolean> action = new PrivilegedExceptionAction<Boolean>()
+    {
+      public Boolean run() throws Exception
+      {
+        return file.createNewFile();
       }
-      File[] files = src.listFiles();
-      for (File file : files) {
-        copyTree(file, dst);
+    };
+    try
+    {
+      return SecurityHelper.doPrivilegedExceptionAction(action);
+    }
+    catch (PrivilegedActionException pae)
+    {
+      Throwable cause = pae.getCause();
+
+      if (cause instanceof IOException)
+      {
+        throw (IOException)cause;
+      }
+      else if (cause instanceof RuntimeException)
+      {
+        throw (RuntimeException)cause;
+      }
+      else
+      {
+        throw new RuntimeException(cause);
       }
     }
   }
@@ -254,41 +138,84 @@ public final class FileUtils {
   }
 
   /**
-   * Create new file.
+   * Reads bytes of data from the input stream into
+   * an array of bytes.
    *
-   * @param file new file
-   * @return boolean
-   * @throws IOException Signals that an I/O exception of some sort has occurred.
+   * @param in InputStream
+   * @throws IOException signals that an I/O exception of some sort has occurred.
+   * @return byte array
    */
-  public static boolean createNewFile(final File file) throws IOException
-  {
-    PrivilegedExceptionAction<Boolean> action = new PrivilegedExceptionAction<Boolean>()
-    {
-      public Boolean run() throws Exception
-      {
-        return file.createNewFile();
-      }
-    };
-    try
-    {
-      return SecurityHelper.doPrivilegedExceptionAction(action);
+  public static byte[] readBytes(InputStream in) throws IOException {
+    byte[] buffer = createBuffer(in.available());
+    int w = 0;
+    try {
+      int read = 0;
+      int len;
+      do {
+        w += read;
+        len = buffer.length - w;
+        if (len <= 0) { // resize buffer
+          byte[] b = new byte[buffer.length + BUFFER_SIZE];
+          System.arraycopy(buffer, 0, b, 0, w);
+          buffer = b;
+          len = buffer.length - w;
+        }
+      } while ((read = in.read(buffer, w, len)) != -1);
+    } finally {
+      in.close();
     }
-    catch (PrivilegedActionException pae)
-    {
-      Throwable cause = pae.getCause();
+    if (buffer.length > w) { // compact buffer
+      byte[] b = new byte[w];
+      System.arraycopy(buffer, 0, b, 0, w);
+      buffer = b;
+    }
+    return buffer;
+  }
 
-      if (cause instanceof IOException)
-      {
-        throw (IOException)cause;
+  /**
+   * Writes bytes from the specified inputStream to output stream.
+   *
+   * @param in InputStream
+   * @param file file
+   * @throws IOException signals that an I/O exception of some sort has occurred.
+   */
+  public static void copyToFile(InputStream in, File file) throws IOException {
+    OutputStream out = null;
+    try {
+      out = new FileOutputStream(file);
+      byte[] buffer = createBuffer(in.available());
+      int read;
+      while ((read = in.read(buffer)) != -1) {
+        out.write(buffer, 0, read);
       }
-      else if (cause instanceof RuntimeException)
-      {
-        throw (RuntimeException)cause;
-      }
-      else
-      {
-        throw new RuntimeException(cause);
+    } finally {
+      if (out != null) {
+        out.close();
       }
     }
   }
+
+  /**
+   * Writes bytes from byte array to output stream.
+   *
+   * @param buf byte array
+   * @param file file
+   * @throws IOException signals that an I/O exception of some sort has occurred.
+   */
+  public static void writeFile(File file, byte[] buf) throws IOException {
+    writeFile(file, buf, false);
+  }
+
+  private static void writeFile(File file, byte[] buf, boolean append) throws IOException {
+    FileOutputStream fos = null;
+    try {
+      fos = new FileOutputStream(file, append);
+      fos.write(buf);
+    } finally {
+      if (fos != null) {
+        fos.close();
+      }
+    }
+  }
+
 }

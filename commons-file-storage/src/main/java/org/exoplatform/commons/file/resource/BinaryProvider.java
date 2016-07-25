@@ -31,7 +31,7 @@ import java.net.URL;
  *
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.co
+ *          exo@exoplatform.com
  */
 public interface BinaryProvider {
 
