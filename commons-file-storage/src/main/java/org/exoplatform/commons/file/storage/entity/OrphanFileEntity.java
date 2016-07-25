@@ -32,7 +32,7 @@ import java.util.Date;
  */
 @Entity(name = "DeletedFileEntity")
 @ExoEntity
-@Table(name = "COMMONS_ORPHAN_FILES")
+@Table(name = "FILES_ORPHAN_FILES")
 
 @NamedQueries(
         @NamedQuery(name = "deletedEntity.findDeletedFiles", query = "SELECT t FROM DeletedFileEntity t WHERE t.deletedDate < :deletedDate")
@@ -40,8 +40,8 @@ import java.util.Date;
 public class OrphanFileEntity {
     @Id
     @Column(name = "ID")
-    @SequenceGenerator(name="SEQ_COMMONS_ORPHAN_FILES_ID", sequenceName="SEQ_COMMONS_ORPHAN_FILES_ID")
-    @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_COMMONS_ORPHAN_FILES_ID")
+    @SequenceGenerator(name="SEQ_FILES_ORPHAN_FILES_ID", sequenceName="SEQ_FILES_ORPHAN_FILES_ID")
+    @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_FILES_ORPHAN_FILES_ID")
     private long id;
 
     @ManyToOne

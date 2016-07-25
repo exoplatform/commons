@@ -57,7 +57,7 @@ public class TreeFile extends File {
     boolean res = false;
     String fpPath = fp.getAbsolutePath();
     String rootPath = rootDir.getAbsolutePath();
-    if (fpPath.startsWith(rootPath) && fpPath.length() > rootPath.length())
+    if (fpPath.startsWith(rootPath) && fpPath.length() > rootPath.length()) {
       if (fp.isDirectory()) {
         String[] ls = fp.list();
         if (ls != null && ls.length <= 0) {
@@ -68,8 +68,10 @@ public class TreeFile extends File {
             cleaner.addFile(new TreeFile(fp.getAbsolutePath(), cleaner, rootDir));
           }
         }
-      } else
+      } else {
         fLog.warn("Parent can not be a file but found " + fp.getAbsolutePath());
+      }
+    }
     return res;
   }
 }

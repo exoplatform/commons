@@ -32,17 +32,17 @@ public class FileChecksum {
 
   private static String       defaultAlgorithm = "MD5";
 
-  private static MessageDigest digest;
+  private static String digestAlgorithm;
 
   public FileChecksum(String algorithm) throws NoSuchAlgorithmException {
     if (algorithm != null && !algorithm.isEmpty())
-      this.digest = java.security.MessageDigest.getInstance(algorithm);
+      this.digestAlgorithm = algorithm;
     else
-      this.digest = java.security.MessageDigest.getInstance(defaultAlgorithm);
+      this.digestAlgorithm =  defaultAlgorithm;
   }
 
   public FileChecksum() throws NoSuchAlgorithmException {
-    this.digest = java.security.MessageDigest.getInstance(defaultAlgorithm);
+    this.digestAlgorithm = defaultAlgorithm;
   }
 
   /**
@@ -53,6 +53,7 @@ public class FileChecksum {
    * @throws Exception exception
    */
   public static String getChecksum(String string) throws Exception {
+    MessageDigest digest = java.security.MessageDigest.getInstance(digestAlgorithm);
     digest.update(string.getBytes());
     byte messageDigest[] = digest.digest();
     //This bytes[] has bytes in decimal format;
@@ -74,6 +75,7 @@ public class FileChecksum {
    * @throws Exception exception
    */
   public static String getChecksum(InputStream fis) throws Exception {
+    MessageDigest digest = java.security.MessageDigest.getInstance(digestAlgorithm);
     //Create byte array to read data in chunks
     byte[] byteArray = new byte[1024];
     int bytesCount = 0;

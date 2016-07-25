@@ -16,9 +16,9 @@
 
 
   <changeSet author="file" id="1.0.0-1">
-    <createTable tableName="COMMONS_NAMESPACES">
+    <createTable tableName="FILES_NAMESPACES">
       <column name="NAMESPACE_ID" type="INT" autoIncrement="${autoIncrement}" startWith="1">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_COMMONS_NAMESPACES_ID"/>
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_FILES_NAMESPACES_ID"/>
       </column>
       <column name="NAME" type="NVARCHAR(10)">
         <constraints nullable="false"/>
@@ -31,12 +31,12 @@
   </changeSet>
 
   <changeSet author="file" id="1.0.0-2">
-    <createTable tableName="COMMONS_FILES">
+    <createTable tableName="FILES_FILES">
       <column name="FILE_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_COMMONS_FILES_ID"/>
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_FILES_FILES_ID"/>
       </column>
       <column name="NAMESPACE_ID" type="INT">
-        <constraints nullable="false" foreignKeyName="FK_COMMONS_FILES_NAMESPACE_ID" references="COMMONS_NAMESPACES(NAMESPACE_ID)"/>
+        <constraints nullable="false" foreignKeyName="FK_FILES_FILES_NAMESPACE_ID" references="FILES_NAMESPACES(NAMESPACE_ID)"/>
       </column>
       <column name="NAME" type="NVARCHAR(550)">
         <constraints nullable="false"/>
@@ -56,12 +56,12 @@
   </changeSet>
 
   <changeSet author="file" id="1.0.0-3">
-    <createTable tableName="COMMONS_ORPHAN_FILES">
+    <createTable tableName="FILES_ORPHAN_FILES">
       <column name="ID" type="INT" autoIncrement="${autoIncrement}" startWith="1">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_COMMONS_ORPHAN_ID"/>
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_FILES_ORPHAN_ID"/>
       </column>
       <column name="FILE_ID" type="BIGINT">
-        <constraints nullable="false" foreignKeyName="FK_COMMONS_ORPHAN_FILE_ID" references="COMMONS_FILES(FILE_ID)"/>
+        <constraints nullable="false" foreignKeyName="FK_FILES_ORPHAN_FILE_ID" references="FILES_FILES(FILE_ID)"/>
       </column>
       <column name="DELETED_DATE" type="TIMESTAMP">
         <constraints nullable="false"/>
@@ -74,15 +74,15 @@
   </changeSet>
 
   <changeSet author="file" id="1.0.0-4" dbms="oracle,postgresql">
-    <createSequence sequenceName="SEQ_COMMONS_FILES_FILE_ID" startValue="1"/>
+    <createSequence sequenceName="SEQ_FILES_FILES_FILE_ID" startValue="1"/>
   </changeSet>
 
   <changeSet author="file" id="1.0.0-5" dbms="oracle,postgresql">
-    <createSequence sequenceName="SEQ_COMMONS_NAMESPACES_NAMESPACE_ID" startValue="1"/>
+    <createSequence sequenceName="SEQ_FILES_NAMESPACES_NAMESPACE_ID" startValue="1"/>
   </changeSet>
 
   <changeSet author="file" id="1.0.0-6" dbms="oracle,postgresql">
-    <createSequence sequenceName="SEQ_COMMONS_DELETED_FILES_ID" startValue="1"/>
+    <createSequence sequenceName="SEQ_FILES_DELETED_FILES_ID" startValue="1"/>
   </changeSet>
 
 </databaseChangeLog>

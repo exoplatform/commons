@@ -29,7 +29,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MemoryProvider implements ResourceProvider {
+public class MemoryProvider implements BinaryProvider {
 
   protected final Map<String, byte[]> store;
 

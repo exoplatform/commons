@@ -58,20 +58,6 @@ public class TreeFileIOChannel {
     return tfile;
   }
 
-  protected File[] getFiles(final String propertyId) throws IOException {
-    final File dir = new File(rootDir.getAbsolutePath() + buildPath(propertyId));
-    String[] fileNames = dir.list();
-    File[] files = new File[0];
-    if (fileNames != null) {
-      files = new File[fileNames.length];
-
-      for (int i = 0; i < fileNames.length; i++) {
-        files[i] = new TreeFile(dir.getAbsolutePath() + File.separator + fileNames[i], cleaner, rootDir);
-      }
-    }
-    return files;
-  }
-
   protected String makeFilePath(final String resourceId) {
     return buildPath(resourceId) + File.separator + resourceId;
   }

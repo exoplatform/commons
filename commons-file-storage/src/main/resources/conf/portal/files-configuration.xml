@@ -47,12 +47,12 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.file.resource.ResourceProvider</key>
+    <key>org.exoplatform.commons.file.resource.BinaryProvider</key>
     <type>org.exoplatform.commons.file.resource.FileSystemResourceProvider</type>
     <init-params>
       <value-param>
         <name>rootPath</name>
-        <value>${exo.files.dir}</value>
+        <value>${exo.data.dir}/files</value>
       </value-param>
     </init-params>
   </component>
@@ -67,7 +67,7 @@
      <type>org.exoplatform.commons.file.services.impl.NameSpaceServiceImpl</type>
      <init-params>
          <value-param>
-             <name>default.nameSpace</name>
+             <name>default.namespace</name>
              <value>file</value>
          </value-param>
      </init-params>

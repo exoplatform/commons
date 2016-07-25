@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity(name = "FileInfoEntity")
 @ExoEntity
-@Table(name = "COMMONS_FILES")
+@Table(name = "FILES_FILES")
 @NamedQueries({
         @NamedQuery(name = "fileEntity.findDeletedFiles", query = "SELECT t FROM FileInfoEntity t WHERE t.deleted = true and t.updatedDate < :updatedDate"),
         @NamedQuery(name = "fileEntity.getAllByLimitOffset", query = "SELECT t FROM FileInfoEntity t")}
@@ -23,8 +23,8 @@ public class FileInfoEntity {
 
   @Id
   @Column(name = "FILE_ID")
-  @SequenceGenerator(name="SEQ_COMMONS_FILES_FILE_ID", sequenceName="SEQ_COMMONS_FILES_FILE_ID")
-  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_COMMONS_FILES_FILE_ID")
+  @SequenceGenerator(name="SEQ_FILES_FILES_FILE_ID", sequenceName="SEQ_FILES_FILES_FILE_ID")
+  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_FILES_FILES_FILE_ID")
   private long id;
 
   @Column(name = "NAME")

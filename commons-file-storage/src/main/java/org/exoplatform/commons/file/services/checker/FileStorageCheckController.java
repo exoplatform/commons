@@ -19,7 +19,7 @@
 package org.exoplatform.commons.file.services.checker;
 
 import org.exoplatform.commons.file.model.FileInfo;
-import org.exoplatform.commons.file.resource.ResourceProvider;
+import org.exoplatform.commons.file.resource.BinaryProvider;
 import org.exoplatform.commons.file.services.job.FileStorageCleanJob;
 import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.commons.utils.PropertyManager;
@@ -55,13 +55,13 @@ public class FileStorageCheckController implements Startable {
 
   private static final int   pageSize                      = 20;
 
-  private ResourceProvider           resourceProvider;
+  private BinaryProvider           binaryProvider;
 
   private DataStorage dataStorage;
 
-  public FileStorageCheckController(DataStorage dataStorage, ResourceProvider resourceProvider) {
+  public FileStorageCheckController(DataStorage dataStorage, BinaryProvider resourceProvider) {
     this.dataStorage = dataStorage;
-    this.resourceProvider = resourceProvider;
+    this.binaryProvider = resourceProvider;
   }
 
   @Managed
@@ -93,10 +93,10 @@ public class FileStorageCheckController implements Startable {
               for (FileInfo fileInfo : list) {
                 String checksum = fileInfo.getChecksum();
                 if (checksum != null && !checksum.isEmpty()) {
-                  if (!resourceProvider.exists(checksum)) {
+                  if (!binaryProvider.exists(checksum)) {
                     isConsistent = false;
                     report.writeLine("File not exist in file storage File ID : " + fileInfo.getId() + " File name : "
-                        + fileInfo.getName() + " , Path : " + resourceProvider.getFilePath(fileInfo.getChecksum()));
+                        + fileInfo.getName() + " , Path : " + binaryProvider.getFilePath(fileInfo.getChecksum()));
                   }
                 } else {
                   isConsistent = false;

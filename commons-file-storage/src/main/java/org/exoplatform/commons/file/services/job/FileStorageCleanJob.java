@@ -20,7 +20,7 @@ package org.exoplatform.commons.file.services.job;
 
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.OrphanFile;
-import org.exoplatform.commons.file.resource.ResourceProvider;
+import org.exoplatform.commons.file.resource.BinaryProvider;
 import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
@@ -58,7 +58,7 @@ public class FileStorageCleanJob implements Job {
       return;
     try {
       DataStorage dataStorage = CommonsUtils.getService(DataStorage.class);
-      ResourceProvider resourceProvider = CommonsUtils.getService(ResourceProvider.class);
+      BinaryProvider binaryProvider = CommonsUtils.getService(BinaryProvider.class);
       JobDataMap jdatamap = context.getJobDetail().getJobDataMap();
       int retention = defaultRetention;
       if (jdatamap != null) {
@@ -82,7 +82,7 @@ public class FileStorageCleanJob implements Job {
       List<FileInfo> list = dataStorage.getAllDeletedFiles(daysAgo(retention));
       for (FileInfo file : list) {
         try {
-          resourceProvider.remove(file.getChecksum());
+          binaryProvider.remove(file.getChecksum());
           dataStorage.deleteFileInfo(file.getId());
         } catch (IOException e) {
           Log.warn("Enable to remove file name" + e.getMessage());
@@ -91,7 +91,7 @@ public class FileStorageCleanJob implements Job {
       List<OrphanFile> noParent = dataStorage.getAllOrphanFile(daysAgo(retention));
       for (OrphanFile file : noParent) {
         try {
-          resourceProvider.remove(file.getChecksum());
+          binaryProvider.remove(file.getChecksum());
           dataStorage.deleteOrphanFile(file.getId());
         } catch (IOException e) {
           Log.warn("Enable to remove file name" + e.getMessage());

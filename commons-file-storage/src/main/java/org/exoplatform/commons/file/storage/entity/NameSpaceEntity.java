@@ -32,7 +32,7 @@ import java.util.List;
  */
 @Entity(name = "NameSpaceEntity")
 @ExoEntity
-@Table(name = "COMMONS_NAMESPACES")
+@Table(name = "FILES_NAMESPACES")
 
 @NamedQueries(
         @NamedQuery(name = "nameSpace.getNameSpaceByName", query = "SELECT t FROM NameSpaceEntity t WHERE t.name = :name")
@@ -40,8 +40,8 @@ import java.util.List;
 public class NameSpaceEntity {
     @Id
     @Column(name = "NAMESPACE_ID")
-    @SequenceGenerator(name="SEQ_COMMONS_NAMESPACES_NAMESPACE_ID", sequenceName="SEQ_COMMONS_NAMESPACES_NAMESPACE_ID")
-    @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_COMMONS_NAMESPACES_NAMESPACE_ID")
+    @SequenceGenerator(name="SEQ_FILES_NAMESPACES_NAMESPACE_ID", sequenceName="SEQ_FILES_NAMESPACES_NAMESPACE_ID")
+    @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_FILES_NAMESPACES_NAMESPACE_ID")
     private long id;
 
     @Column(name = "NAME")

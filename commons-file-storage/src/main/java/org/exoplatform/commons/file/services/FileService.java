@@ -25,9 +25,9 @@ public interface FileService {
    *
    * @param id file id
    * @return fileItem
-   * @throws Exception signals that an I/O exception of some sort has occurred.
+   * @throws FileStorageException signals that an I/O exception of some sort has occurred.
    */
-  public FileItem getFile(long id) throws Exception;
+  public FileItem getFile(long id) throws FileStorageException;
 
   /**
    * Store the file using the provided DAO and binary provider. This method is

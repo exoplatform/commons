@@ -35,7 +35,7 @@ import java.security.PrivilegedAction;
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 
-public class FileSystemResourceProvider implements ResourceProvider {
+public class FileSystemResourceProvider implements BinaryProvider {
 
   private static final Log    log               = LogFactory.getLog(FileSystemResourceProvider.class);
 

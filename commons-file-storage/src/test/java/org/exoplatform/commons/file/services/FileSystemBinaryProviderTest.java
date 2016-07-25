@@ -1,7 +1,7 @@
 package org.exoplatform.commons.file.services;
 
 import org.exoplatform.commons.file.resource.FileSystemResourceProvider;
-import org.exoplatform.commons.file.resource.ResourceProvider;
+import org.exoplatform.commons.file.resource.BinaryProvider;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.util.FileChecksum;
@@ -133,7 +133,7 @@ public class FileSystemBinaryProviderTest {
  @Test
   public void shouldReturnNullWhenChecksumIsNotValid() throws Exception {
     // Given
-    ResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
+     BinaryProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
     FileInfo fileInfo = new FileInfo(1L, "file1", "", null, 1, null, "", "", false);

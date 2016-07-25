@@ -78,7 +78,7 @@
     </component>
 
     <component>
-        <key>org.exoplatform.commons.file.resource.ResourceProvider</key>
+        <key>org.exoplatform.commons.file.resource.BinaryProvider</key>
         <type>org.exoplatform.commons.file.resource.FileSystemResourceProvider</type>
         <init-params>
             <value-param>

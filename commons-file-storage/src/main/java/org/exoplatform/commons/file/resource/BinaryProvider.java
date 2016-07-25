@@ -33,7 +33,7 @@ import java.net.URL;
  * Author : eXoPlatform
  *          exo@exoplatform.co
  */
-public interface ResourceProvider {
+public interface BinaryProvider {
 
     void put(final String name, final InputStream data) throws IOException;
 

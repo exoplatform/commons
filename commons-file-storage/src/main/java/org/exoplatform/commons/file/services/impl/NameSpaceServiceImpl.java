@@ -40,7 +40,7 @@ import java.util.List;
 public class NameSpaceServiceImpl implements NameSpaceService, Startable {
   private static final Logger   LOG                    = LoggerFactory.getLogger(NameSpaceService.class);
 
-  private static final String   FILE_DEFAULT_NAMESPACE = "default.nameSpace";
+  private static final String   FILE_DEFAULT_NAMESPACE = "default.namespace";
 
   private List<NameSpacePlugin> nameSpacePlugins       = new ArrayList<NameSpacePlugin>();
 
@@ -83,7 +83,7 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
       for (String name : nameSpacePlugin.getNameSpaceList().keySet()) {
         nameSpace = dataStorage.getNameSpace(name);
         if (nameSpace == null) {
-          NameSpace add = new NameSpace(name, nameSpacePlugin.getNameSpaceList().get(nameSpace));
+          NameSpace add = new NameSpace(name, nameSpacePlugin.getNameSpaceList().get(name));
           list.add(add);
         }
       }
