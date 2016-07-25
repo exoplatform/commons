@@ -77,10 +77,10 @@ public class FileStorageCheckController implements Startable {
       SecurityHelper.doPrivilegedAction(new PrivilegedAction<Boolean>() {
         public Boolean run() {
           try {
-            LOG.info("Start File Storage Check Consistency : ");
+            LOG.info("Start File Storage Check Consistency");
             boolean isConsistent = true;
             int offset = 0;
-            boolean hasNext = false;
+            boolean hasNext = true;
             while (hasNext) {
               List<FileInfo> list = dataStorage.getAllFilesInfo(offset, pageSize);
 
