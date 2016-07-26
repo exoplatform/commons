@@ -7,6 +7,7 @@ package org.exoplatform.commons.api.search.data;
  */
 public class SearchResult {
   private String url;  //url of this result
+  private String previewUrl;  //preview url of this result
   private String title; //title to be displayed on UI
   private String excerpt; //the excerpt to be displayed on UI
   private String detail; //details information
@@ -30,6 +31,24 @@ public class SearchResult {
   public void setUrl(String url) {
     this.url = url;
   }
+
+  /**
+   * Get preview url of result
+   * @return String
+   * @LevelAPI Experimental
+   */
+  public String getPreviewUrl() {
+    return previewUrl;
+  }
+  /**
+   * Set preview url for result
+   * @param previewUrl
+   * @LevelAPI Experimental
+   */
+  public void setPreviewUrl(String previewUrl) {
+    this.previewUrl = previewUrl;
+  }
+
   /**
    * Get title of result
    * @return String
@@ -150,6 +169,25 @@ public class SearchResult {
     this.date = date;
     this.relevancy = relevancy;
   }
+
+  /**
+   * Constructor that helps to create search result by the unique way
+   * (keeping the other constructor without previewUrl for backward compatibility reasons)
+   * @param url Url of this result
+   * @param previewUrl Preview url of this result
+   * @param title Title to be displayed on UI
+   * @param excerpt The excerpt to be displayed on UI
+   * @param detail Details information
+   * @param imageUrl An image to be displayed on UI
+   * @param date Created or modified date, for sorting on UI
+   * @param relevancy The result's relevancy, for sorting on UI
+   * @LevelAPI Experimental
+   */
+  public SearchResult(String url, String previewUrl, String title, String excerpt, String detail, String imageUrl, long date, long relevancy) {
+    this(url, title, excerpt, detail, imageUrl, date, relevancy);
+    this.previewUrl = previewUrl;
+  }
+
   @Override
   public String toString() {
     return String.format("SearchResult {url=%s, relevancy=%s}", url, relevancy);
