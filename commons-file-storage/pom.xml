@@ -42,7 +42,7 @@
         <configuration>
           <systemProperties>
             <property>
-              <name>exo.files.dir</name>
+              <name>exo.data.dir</name>
               <value>target/exo-files</value>
             </property>
           </systemProperties>
