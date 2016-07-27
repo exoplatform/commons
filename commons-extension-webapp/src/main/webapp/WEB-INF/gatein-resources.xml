@@ -4,7 +4,24 @@
 									xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
 									xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
 
-
+    <portal-skin>
+      <skin-name>Default</skin-name>
+      <skin-module>jquery-ui</skin-module>
+      <css-path>/skin/css/jquery-ui.css</css-path>
+      <css-priority>1</css-priority>
+    </portal-skin>
+    <portal-skin>
+      <skin-name>Default</skin-name>
+      <skin-module>jquery-mention</skin-module>
+      <css-path>/skin/css/jquery.mention.css</css-path>
+      <css-priority>1</css-priority>
+    </portal-skin>
+    <portal-skin>
+      <skin-name>Default</skin-name>
+      <skin-module>selectize</skin-module>
+      <css-path>/skin/css/selectize.css</css-path>
+      <css-priority>1</css-priority>
+    </portal-skin>
 
 	<module>
 		<name>commons-document</name>
@@ -102,5 +119,63 @@
 			<as>jQuery</as>
 		</depends>
 	</module>
+	
+	<module>
+      <name>suggester</name>
+      <script>
+        <path>/javascript/eXo/suggester/suggester.js</path>
+      </script>
+      <depends>
+        <module>jquery</module>
+      </depends>
+      <depends>
+        <module>jqueryMention</module>
+      </depends>
+      <depends>
+        <module>selectize2</module>
+      </depends>
+    </module>
+    <module>
+      <name>jqueryMention</name>
+      <script>
+        <path>/javascript/eXo/suggester/jquery.mention.js</path>
+      </script>
+      <depends>
+        <module>jquery</module>
+      </depends>
+      <depends>
+        <module>jqueryAutoComplete</module>
+      </depends>
+    </module>
+    <module>
+      <name>jqueryAutoComplete</name>
+      <script>
+        <path>/javascript/eXo/suggester/jquery-ui-autocomplete.js</path>
+      </script>
+      <depends>
+        <module>jquery</module>
+        <as>jQuery</as>      
+      </depends>
+    </module>
+    <module>
+      <name>selectize2</name>
+      <script>
+        <adapter>
+          (function($) {
+            var oldJQuery = this.jQuery;
+            this.jQuery = $;
+  
+            <include>/javascript/eXo/suggester/selectize.js</include>
+  
+            var selectize = this.Selectize;
+            this.jQuery = oldJQuery;
+            return selectize;
+          })($);
+        </adapter>
+      </script>
+      <depends>
+        <module>jquery</module>      
+      </depends>
+    </module>
 </gatein-resources>
 
