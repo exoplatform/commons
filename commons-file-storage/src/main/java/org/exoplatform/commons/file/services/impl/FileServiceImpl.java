@@ -21,27 +21,23 @@ import java.security.SecureRandom;
 
 /**
  * File Service which stores the file metadata in a database, and uses a
- * BinaryProvider to store the file binary.
- * Created by The eXo Platform SAS
+ * BinaryProvider to store the file binary. Created by The eXo Platform SAS
  * Author : eXoPlatform exo@exoplatform.com
  */
 public class FileServiceImpl implements FileService {
 
-  private static final Log    LOG                = ExoLogger.getLogger(FileServiceImpl.class);
+  private static final Log    LOG             = ExoLogger.getLogger(FileServiceImpl.class);
 
-  private static final String Algorithm_PARAM    = "Algorithm";
+  private static final String Algorithm_PARAM = "Algorithm";
 
-  private DataStorage dataStorage;
+  private DataStorage         dataStorage;
 
-  private BinaryProvider    binaryProvider;
+  private BinaryProvider      binaryProvider;
 
   private FileChecksum        fileChecksum;
 
-  public FileServiceImpl(DataStorage dataStorage,
-                         BinaryProvider resourceProvider,
-                         InitParams initParams)
-      throws Exception {
-    this.dataStorage= dataStorage;
+  public FileServiceImpl(DataStorage dataStorage, BinaryProvider resourceProvider, InitParams initParams) throws Exception {
+    this.dataStorage = dataStorage;
     this.binaryProvider = resourceProvider;
 
     ValueParam algorithmValueParam = null;
@@ -73,9 +69,8 @@ public class FileServiceImpl implements FileService {
       fileItem = new FileItem(fileInfo, null);
       InputStream inputStream = binaryProvider.getStream(fileInfo.getChecksum());
       fileItem.setInputStream(inputStream);
-    }
-    catch (Exception e){
-      throw new FileStorageException("Cannot get File Item ID="+id,e);
+    } catch (Exception e) {
+      throw new FileStorageException("Cannot get File Item ID=" + id, e);
     }
 
     return fileItem;
@@ -88,21 +83,21 @@ public class FileServiceImpl implements FileService {
       throw new IllegalArgumentException("Checksum is required to persist the binary");
     }
     FileInfo fileInfo = file.getFileInfo();
-      NameSpace nSpace;
-      if (fileInfo.getNameSpace() != null && !fileInfo.getNameSpace().isEmpty()) {
-        nSpace = dataStorage.getNameSpace(fileInfo.getNameSpace());
-      } else {
-        nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
-      }
-    //Add suffix to checksum
-      fileInfo.setChecksum(fileInfo.getChecksum()+getRandom());
-      FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
-      FileInfo createdFileInfoEntity= transaction.towPhaseCommit(2, file.getAsStream());
-      if (createdFileInfoEntity != null) {
-        fileInfo.setId(createdFileInfoEntity.getId());
-        file.setFileInfo(fileInfo);
-        return file;
-      }
+    NameSpace nSpace;
+    if (fileInfo.getNameSpace() != null && !fileInfo.getNameSpace().isEmpty()) {
+      nSpace = dataStorage.getNameSpace(fileInfo.getNameSpace());
+    } else {
+      nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
+    }
+    // Add suffix to checksum
+    fileInfo.setChecksum(fileInfo.getChecksum() + getRandom());
+    FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
+    FileInfo createdFileInfoEntity = transaction.towPhaseCommit(2, file.getAsStream());
+    if (createdFileInfoEntity != null) {
+      fileInfo.setId(createdFileInfoEntity.getId());
+      file.setFileInfo(fileInfo);
+      return file;
+    }
     return null;
   }
 
@@ -120,7 +115,7 @@ public class FileServiceImpl implements FileService {
       nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
     }
     FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
-    FileInfo createdFileInfoEntity= transaction.towPhaseCommit(0, file.getAsStream());
+    FileInfo createdFileInfoEntity = transaction.towPhaseCommit(0, file.getAsStream());
     if (createdFileInfoEntity != null) {
       fileInfo.setId(createdFileInfoEntity.getId());
       file.setFileInfo(fileInfo);
@@ -131,31 +126,31 @@ public class FileServiceImpl implements FileService {
 
   @Override
   public FileInfo deleteFile(long id) {
-    FileInfo fileInfo= dataStorage.getFileInfo(id);
-    if(fileInfo != null)
-    {
+    FileInfo fileInfo = dataStorage.getFileInfo(id);
+    if (fileInfo != null) {
       fileInfo.setDeleted(true);
     }
     return dataStorage.updateFileInfo(fileInfo);
   }
-  /*Manage two phase commit :file storage and datasource*/
+
+  /* Manage two phase commit :file storage and datasource */
   private class FileStorageTransaction {
     /**
      * Update Operation.
      */
-    final int              UPDATE = 0;
+    final int         UPDATE = 0;
 
     /**
      * Remove Operation.
      */
-    final int              REMOVE = 1;
+    final int         REMOVE = 1;
 
     /**
      * Insert Operation.
      */
-    final int              INSERT = 2;
+    final int         INSERT = 2;
 
-    private FileInfo fileInfo;
+    private FileInfo  fileInfo;
 
     private NameSpace nameSpace;
 
@@ -179,7 +174,7 @@ public class FileServiceImpl implements FileService {
           }
         } catch (Exception e) {
           try {
-            if(created) {
+            if (created) {
               binaryProvider.remove(fileInfo.getChecksum());
             }
           } catch (IOException e1) {
@@ -194,20 +189,20 @@ public class FileServiceImpl implements FileService {
       } else if (operation == UPDATE) {
         try {
           boolean updated = false;
-          FileInfo oldFile= dataStorage.getFileInfo(fileInfo.getId());
-          if(oldFile == null || oldFile.getChecksum().isEmpty() || !getChecksumPrefix(oldFile.getChecksum()).equals(fileInfo.getChecksum())) {
-            fileInfo.setChecksum(fileInfo.getChecksum()+getRandom());
+          FileInfo oldFile = dataStorage.getFileInfo(fileInfo.getId());
+          if (oldFile == null || oldFile.getChecksum().isEmpty()
+              || !getChecksumPrefix(oldFile.getChecksum()).equals(fileInfo.getChecksum())) {
+            fileInfo.setChecksum(fileInfo.getChecksum() + getRandom());
             binaryProvider.put(fileInfo.getChecksum(), inputStream);
             updated = true;
-          }
-          else{
+          } else {
             fileInfo.setChecksum(oldFile.getChecksum());
           }
           if (updated) {
             dataStorage.createOrphanFile(oldFile);
           }
           if (binaryProvider.exists(fileInfo.getChecksum())) {
-            createdFileInfoEntity =dataStorage.updateFileInfo(fileInfo);
+            createdFileInfoEntity = dataStorage.updateFileInfo(fileInfo);
             return createdFileInfoEntity;
           } else {
             throw new FileStorageException("Error while writing file " + fileInfo.getName());
@@ -224,18 +219,19 @@ public class FileServiceImpl implements FileService {
       return null;
     }
   }
-  /**Internal methods*/
-  private long getRandom(){
+
+  /** Internal methods */
+  private long getRandom() {
     SecureRandom secureRandom = new SecureRandom();
-    long n= secureRandom.nextInt();
+    long n = secureRandom.nextInt();
     return Math.abs(n);
   }
 
-  private String getChecksumPrefix(String checksum){
-    String prefix ="";
-    if(checksum != null && !checksum.isEmpty()){
-      prefix= checksum.substring(0, 32);
+  private String getChecksumPrefix(String checksum) {
+    String prefix = "";
+    if (checksum != null && !checksum.isEmpty()) {
+      prefix = checksum.substring(0, 32);
     }
-    return prefix ;
+    return prefix;
   }
 }

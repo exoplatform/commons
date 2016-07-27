@@ -44,17 +44,17 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
 
   private List<NameSpacePlugin> nameSpacePlugins       = new ArrayList<NameSpacePlugin>();
 
-  private static String         defaultNameSpace;
+  private static String         defaultNamespace;
 
-  private DataStorage dataStorage;
+  private DataStorage           dataStorage;
 
   public NameSpaceServiceImpl(DataStorage dataStorage, InitParams initParams, DataInitializer dataInitializer) {
     this.dataStorage = dataStorage;
     ValueParam defaultNameSpaceParam = initParams.getValueParam(FILE_DEFAULT_NAMESPACE);
     if (defaultNameSpaceParam != null && defaultNameSpaceParam.getValue() != null) {
-      defaultNameSpace = defaultNameSpaceParam.getValue();
+      defaultNamespace = defaultNameSpaceParam.getValue();
     } else {
-      defaultNameSpace = "file";
+      defaultNamespace = "file";
     }
   }
 
@@ -72,13 +72,13 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
     LOG.info("Start Init Files nameSpaces ");
     List<NameSpace> list = new ArrayList<NameSpace>();
 
-    /* Default File nameSpace */
-    NameSpace nameSpace = dataStorage.getNameSpace(defaultNameSpace);
+    /* Default File namespace */
+    NameSpace nameSpace = dataStorage.getNameSpace(defaultNamespace);
     if (nameSpace == null) {
-      NameSpace add = new NameSpace(defaultNameSpace, "Default Files NameSpace");
+      NameSpace add = new NameSpace(defaultNamespace, "Default Files NameSpace");
       list.add(add);
     }
-    /* Application File nameSpace */
+    /* Application File namespace */
     for (NameSpacePlugin nameSpacePlugin : this.nameSpacePlugins) {
       for (String name : nameSpacePlugin.getNameSpaceList().keySet()) {
         nameSpace = dataStorage.getNameSpace(name);
@@ -95,7 +95,7 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
   }
 
   public static String getDefaultNameSpace() {
-    return defaultNameSpace;
+    return defaultNamespace;
   }
 
   @Override

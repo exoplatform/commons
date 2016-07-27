@@ -37,13 +37,13 @@ import java.security.PrivilegedAction;
 
 public class FileSystemResourceProvider implements BinaryProvider {
 
-  private static final Log    log               = LogFactory.getLog(FileSystemResourceProvider.class);
+  private static final Log    log             = LogFactory.getLog(FileSystemResourceProvider.class);
 
-  private static final String ROOT_PATH_PARAM   = "rootPath";
+  private static final String ROOT_PATH_PARAM = "rootPath";
 
   protected File              root;
 
-  private TreeFileUtils treeFileUtils = null;
+  private TreeFileUtils       treeFileUtils   = null;
 
   public FileSystemResourceProvider(String rootPath) throws Exception {
     if (StringUtils.isEmpty(rootPath)) {
@@ -233,7 +233,7 @@ public class FileSystemResourceProvider implements BinaryProvider {
       return true;
     }
     if (obj instanceof FileSystemResourceProvider) {
-        FileSystemResourceProvider store = (FileSystemResourceProvider) obj;
+      FileSystemResourceProvider store = (FileSystemResourceProvider) obj;
       return store.root.equals(root);
     }
     return false;

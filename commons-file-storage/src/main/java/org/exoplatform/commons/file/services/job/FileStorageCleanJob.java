@@ -41,20 +41,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public class FileStorageCleanJob implements Job {
-  private static Log    Log              = ExoLogger.getLogger(FileStorageCleanJob.class);
+  private static Log           Log              = ExoLogger.getLogger(FileStorageCleanJob.class);
 
-  private static int    defaultRetention = 30;
+  private static int           defaultRetention = 30;
 
-  private static AtomicBoolean enabled = new AtomicBoolean(true);
+  private static AtomicBoolean enabled          = new AtomicBoolean(true);
 
-  private static AtomicBoolean started = new AtomicBoolean(false);
+  private static AtomicBoolean started          = new AtomicBoolean(false);
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    if(Log.isDebugEnabled()) {
+    if (Log.isDebugEnabled()) {
       Log.debug("Start to clean old FileStorage...");
     }
-    if(!enabled.get())
+    if (!enabled.get())
       return;
     try {
       DataStorage dataStorage = CommonsUtils.getService(DataStorage.class);
@@ -68,8 +68,8 @@ public class FileStorageCleanJob implements Job {
         } catch (NumberFormatException ex) {
           Log.warn("Invalid param retention-time");
         }
-        //-1: means never deleted
-        if(retention == -1)
+        // -1: means never deleted
+        if (retention == -1)
           return;
         valueParam = jdatamap.getString(FileStorageCronJob.ENABLED_PARAM);
         try {
@@ -80,12 +80,12 @@ public class FileStorageCleanJob implements Job {
       }
       started.set(true);
       List<FileInfo> list = dataStorage.getAllDeletedFiles(daysAgo(retention));
-      if(list.size()>0) {
+      if (list.size() > 0) {
         Log.info("Remove deleted files size =" + list.size());
       }
       for (FileInfo file : list) {
         try {
-          Log.info("remove File path= "+binaryProvider.getFilePath(file));
+          Log.info("remove File path= " + binaryProvider.getFilePath(file));
           binaryProvider.remove(file.getChecksum());
           dataStorage.deleteFileInfo(file.getId());
         } catch (IOException e) {
@@ -93,12 +93,12 @@ public class FileStorageCleanJob implements Job {
         }
       }
       List<OrphanFile> noParent = dataStorage.getAllOrphanFile(daysAgo(retention));
-      if(noParent.size()>0) {
+      if (noParent.size() > 0) {
         Log.info("Remove Orphan files size =" + noParent.size());
       }
       for (OrphanFile file : noParent) {
         try {
-          Log.info("remove File path= "+binaryProvider.getFilePath(file.getChecksum()));
+          Log.info("remove File path= " + binaryProvider.getFilePath(file.getChecksum()));
           binaryProvider.remove(file.getChecksum());
           dataStorage.deleteOrphanFile(file.getId());
         } catch (IOException e) {
@@ -108,8 +108,7 @@ public class FileStorageCleanJob implements Job {
       if (Log.isDebugEnabled()) {
         Log.debug("End to clean old FileStorage...");
       }
-    }
-    finally {
+    } finally {
       started.set(false);
     }
   }

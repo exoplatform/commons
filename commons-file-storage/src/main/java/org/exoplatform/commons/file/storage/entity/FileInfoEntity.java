@@ -6,48 +6,44 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Entity for File Information.
- *
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Entity for File Information. Created by The eXo Platform SAS Author :
+ * eXoPlatform exo@exoplatform.com
  */
 @Entity(name = "FileInfoEntity")
 @ExoEntity
 @Table(name = "FILES_FILES")
 @NamedQueries({
-        @NamedQuery(name = "fileEntity.findDeletedFiles", query = "SELECT t FROM FileInfoEntity t WHERE t.deleted = true and t.updatedDate < :updatedDate"),
-        @NamedQuery(name = "fileEntity.getAllByLimitOffset", query = "SELECT t FROM FileInfoEntity t")}
-)
+    @NamedQuery(name = "fileEntity.findDeletedFiles", query = "SELECT t FROM FileInfoEntity t WHERE t.deleted = true and t.updatedDate < :updatedDate"),
+    @NamedQuery(name = "fileEntity.getAllByLimitOffset", query = "SELECT t FROM FileInfoEntity t") })
 public class FileInfoEntity {
 
   @Id
   @Column(name = "FILE_ID")
-  @SequenceGenerator(name="SEQ_FILES_FILES_FILE_ID", sequenceName="SEQ_FILES_FILES_FILE_ID")
-  @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_FILES_FILES_FILE_ID")
-  private long id;
+  @SequenceGenerator(name = "SEQ_FILES_FILES_FILE_ID", sequenceName = "SEQ_FILES_FILES_FILE_ID")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_FILES_FILE_ID")
+  private long            id;
 
   @Column(name = "NAME")
-  private String name;
+  private String          name;
 
   @Column(name = "MIMETYPE")
-  private String mimetype;
+  private String          mimetype;
 
   @Column(name = "SIZE")
-  private long size;
+  private long            size;
 
   @Column(name = "UPDATED_DATE")
   @Temporal(TemporalType.TIMESTAMP)
-  private Date updatedDate;
+  private Date            updatedDate;
 
   @Column(name = "UPDATER")
-  private String updater;
+  private String          updater;
 
   @Column(name = "CHECKSUM")
-  private String checksum;
+  private String          checksum;
 
   @Column(name = "DELETED")
-  private boolean deleted;
+  private boolean         deleted;
 
   @ManyToOne
   @JoinColumn(name = "NAMESPACE_ID")
@@ -56,7 +52,13 @@ public class FileInfoEntity {
   public FileInfoEntity() {
   }
 
-  public FileInfoEntity(String name, String mimetype, long size, Date updatedDate, String updater, String checksum, boolean deleted) {
+  public FileInfoEntity(String name,
+                        String mimetype,
+                        long size,
+                        Date updatedDate,
+                        String updater,
+                        String checksum,
+                        boolean deleted) {
     this.name = name;
     this.mimetype = mimetype;
     this.size = size;
@@ -66,7 +68,14 @@ public class FileInfoEntity {
     this.deleted = deleted;
   }
 
-  public FileInfoEntity(long id, String name, String mimetype, long size, Date updatedDate, String updater, String checksum, boolean deleted) {
+  public FileInfoEntity(long id,
+                        String name,
+                        String mimetype,
+                        long size,
+                        Date updatedDate,
+                        String updater,
+                        String checksum,
+                        boolean deleted) {
     this(name, mimetype, size, updatedDate, updater, checksum, deleted);
     this.id = id;
   }

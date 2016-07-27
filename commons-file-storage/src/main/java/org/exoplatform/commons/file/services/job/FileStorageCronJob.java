@@ -27,21 +27,23 @@ import org.quartz.JobDataMap;
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public class FileStorageCronJob extends CronJob {
-    public static String RETENTION_PARAM  = "retention-time";
-    public static String ENABLED_PARAM ="enabled";
-    private JobDataMap jdatamap_;
+  public static String RETENTION_PARAM = "retention-time";
 
-    public FileStorageCronJob(InitParams params) throws Exception {
-        super(params);
-        ExoProperties props = params.getPropertiesParam("FileStorageCleanJob.Param").getProperties();
-        jdatamap_ = new JobDataMap();
-        String days = props.getProperty(RETENTION_PARAM).trim();
-        jdatamap_.put(RETENTION_PARAM, days);
-        String state = props.getProperty(ENABLED_PARAM).trim();
-        jdatamap_.put(ENABLED_PARAM, state);
-    }
+  public static String ENABLED_PARAM   = "enabled";
 
-    public JobDataMap getJobDataMap() {
-        return jdatamap_;
-    }
+  private JobDataMap   jdatamap_;
+
+  public FileStorageCronJob(InitParams params) throws Exception {
+    super(params);
+    ExoProperties props = params.getPropertiesParam("FileStorageCleanJob.Param").getProperties();
+    jdatamap_ = new JobDataMap();
+    String days = props.getProperty(RETENTION_PARAM).trim();
+    jdatamap_.put(RETENTION_PARAM, days);
+    String state = props.getProperty(ENABLED_PARAM).trim();
+    jdatamap_.put(ENABLED_PARAM, state);
+  }
+
+  public JobDataMap getJobDataMap() {
+    return jdatamap_;
+  }
 }

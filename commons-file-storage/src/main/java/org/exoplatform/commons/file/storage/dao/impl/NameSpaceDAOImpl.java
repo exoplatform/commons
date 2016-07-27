@@ -27,18 +27,16 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
-public class NameSpaceDAOImpl extends GenericDAOJPAImpl<NameSpaceEntity, Long> implements NameSpaceDAO{
-    public NameSpaceEntity getNameSpaceByName(String name) {
-        TypedQuery<NameSpaceEntity> query = getEntityManager().createNamedQuery("nameSpace.getNameSpaceByName", NameSpaceEntity.class)
-                .setParameter("name", name);
-        try {
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+public class NameSpaceDAOImpl extends GenericDAOJPAImpl<NameSpaceEntity, Long> implements NameSpaceDAO {
+  public NameSpaceEntity getNameSpaceByName(String name) {
+    TypedQuery<NameSpaceEntity> query = getEntityManager().createNamedQuery("nameSpace.getNameSpaceByName", NameSpaceEntity.class)
+                                                          .setParameter("name", name);
+    try {
+      return query.getSingleResult();
+    } catch (NoResultException e) {
+      return null;
     }
+  }
 }

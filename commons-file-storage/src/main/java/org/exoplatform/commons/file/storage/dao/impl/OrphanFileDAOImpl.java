@@ -29,23 +29,23 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public class OrphanFileDAOImpl extends GenericDAOJPAImpl<OrphanFileEntity, Long> implements OrphanFileDAO {
 
-    private static org.exoplatform.services.log.Log Log = ExoLogger.getLogger(OrphanFileDAOImpl.class);
+  private static org.exoplatform.services.log.Log Log = ExoLogger.getLogger(OrphanFileDAOImpl.class);
 
-    @Override
-    public List<OrphanFileEntity> findDeletedFiles(Date date) {
-        TypedQuery<OrphanFileEntity> query = getEntityManager().createNamedQuery("deletedEntity.findDeletedFiles", OrphanFileEntity.class)
-                .setParameter("deletedDate", date);
-        try {
-            return query.getResultList();
-        } catch (NoResultException e) {
-            Log.error("Unable to get deleted file"+ e.getMessage());
-        }
-        return null;
+  @Override
+  public List<OrphanFileEntity> findDeletedFiles(Date date) {
+    TypedQuery<OrphanFileEntity> query = getEntityManager()
+                                                           .createNamedQuery("deletedEntity.findDeletedFiles",
+                                                                             OrphanFileEntity.class)
+                                                           .setParameter("deletedDate", date);
+    try {
+      return query.getResultList();
+    } catch (NoResultException e) {
+      Log.error("Unable to get deleted file" + e.getMessage());
     }
+    return null;
+  }
 }

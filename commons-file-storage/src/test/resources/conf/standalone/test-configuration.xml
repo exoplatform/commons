@@ -98,7 +98,7 @@
         <type>org.exoplatform.commons.file.services.impl.NameSpaceServiceImpl</type>
         <init-params>
             <value-param>
-                <name>default.nameSpace</name>
+                <name>default.namespace</name>
                 <value>file</value>
             </value-param>
         </init-params>

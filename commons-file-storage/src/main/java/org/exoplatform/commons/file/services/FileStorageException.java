@@ -20,34 +20,28 @@ package org.exoplatform.commons.file.services;
 
 /**
  * An exception that represents any type of exception persisted File Storage
- *
- * Created by The eXo Platform SAS
- * Author : eXoPlatform exo@exoplatform.com
- *
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public class FileStorageException extends Exception {
 
-    /**
-     * {@inheritDoc}
-     */
-    public FileStorageException(String message)
-    {
-        super(message);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public FileStorageException(String message) {
+    super(message);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public FileStorageException(Throwable cause)
-    {
-        super(cause);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public FileStorageException(Throwable cause) {
+    super(cause);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-    public FileStorageException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public FileStorageException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

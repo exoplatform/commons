@@ -6,9 +6,7 @@ import org.exoplatform.commons.file.model.FileItem;
 import java.io.IOException;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public interface FileService {
   /**
@@ -25,7 +23,8 @@ public interface FileService {
    *
    * @param id file id
    * @return fileItem
-   * @throws FileStorageException signals that an I/O exception of some sort has occurred.
+   * @throws FileStorageException signals that an I/O exception of some sort has
+   *           occurred.
    */
   public FileItem getFile(long id) throws FileStorageException;
 
@@ -36,19 +35,21 @@ public interface FileService {
    *
    * @param file file item
    * @return updated file item
-   * @throws IOException signals that an I/O exception of some sort has occurred.
+   * @throws IOException signals that an I/O exception of some sort has
+   *           occurred.
    * @throws FileStorageException signals that an error occur on save resource.
    */
   public FileItem writeFile(FileItem file) throws FileStorageException, IOException;
 
   /**
-   * Update the stored file using the provided DAO and binary provider. This method is
-   * transactional, meaning that if the write of the info or of the binary
-   * fails, nothing must be persisted.
+   * Update the stored file using the provided DAO and binary provider. This
+   * method is transactional, meaning that if the write of the info or of the
+   * binary fails, nothing must be persisted.
    *
    * @param file file item
    * @return updated file item
-   * @throws IOException signals that an I/O exception of some sort has occurred.
+   * @throws IOException signals that an I/O exception of some sort has
+   *           occurred.
    * @throws FileStorageException signals that an error occur on save resource.
    */
   public FileItem updateFile(FileItem file) throws FileStorageException, IOException;
@@ -58,7 +59,7 @@ public interface FileService {
    * only a logical deletion
    *
    * @param id Id of the file to delete
-   * @return  file Info
+   * @return file Info
    */
   public FileInfo deleteFile(long id);
 }

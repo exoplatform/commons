@@ -24,77 +24,72 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Entity for NameSpace.
- *
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Entity for NameSpace. Created by The eXo Platform SAS Author : eXoPlatform
+ * exo@exoplatform.com
  */
 @Entity(name = "NameSpaceEntity")
 @ExoEntity
 @Table(name = "FILES_NAMESPACES")
 
-@NamedQueries(
-        @NamedQuery(name = "nameSpace.getNameSpaceByName", query = "SELECT t FROM NameSpaceEntity t WHERE t.name = :name")
-)
+@NamedQueries(@NamedQuery(name = "nameSpace.getNameSpaceByName", query = "SELECT t FROM NameSpaceEntity t WHERE t.name = :name"))
 public class NameSpaceEntity {
-    @Id
-    @Column(name = "NAMESPACE_ID")
-    @SequenceGenerator(name="SEQ_FILES_NAMESPACES_NAMESPACE_ID", sequenceName="SEQ_FILES_NAMESPACES_NAMESPACE_ID")
-    @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_FILES_NAMESPACES_NAMESPACE_ID")
-    private long id;
+  @Id
+  @Column(name = "NAMESPACE_ID")
+  @SequenceGenerator(name = "SEQ_FILES_NAMESPACES_NAMESPACE_ID", sequenceName = "SEQ_FILES_NAMESPACES_NAMESPACE_ID")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_NAMESPACES_NAMESPACE_ID")
+  private long                 id;
 
-    @Column(name = "NAME")
-    private String name;
+  @Column(name = "NAME")
+  private String               name;
 
-    @Column(name = "DESCRIPTION")
-    private String description;
+  @Column(name = "DESCRIPTION")
+  private String               description;
 
-    @OneToMany(mappedBy = "nameSpaceEntity", fetch = FetchType.LAZY)
-    private List<FileInfoEntity> filesInfo;
+  @OneToMany(mappedBy = "nameSpaceEntity", fetch = FetchType.LAZY)
+  private List<FileInfoEntity> filesInfo;
 
-    public NameSpaceEntity() {
-    }
+  public NameSpaceEntity() {
+  }
 
-    public NameSpaceEntity(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
+  public NameSpaceEntity(String name, String description) {
+    this.name = name;
+    this.description = description;
+  }
 
-    public NameSpaceEntity(long id, String name, String description) {
-        this(name, description);
-        this.id = id;
-    }
+  public NameSpaceEntity(long id, String name, String description) {
+    this(name, description);
+    this.id = id;
+  }
 
-    public long getId() {
-        return id;
-    }
+  public long getId() {
+    return id;
+  }
 
-    public void setId(long id) {
-        this.id = id;
-    }
+  public void setId(long id) {
+    this.id = id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public List<FileInfoEntity> getFilesInfo() {
-        return filesInfo;
-    }
+  public List<FileInfoEntity> getFilesInfo() {
+    return filesInfo;
+  }
 
-    public void setFilesInfo(List<FileInfoEntity> filesInfo) {
-        this.filesInfo = filesInfo;
-    }
+  public void setFilesInfo(List<FileInfoEntity> filesInfo) {
+    this.filesInfo = filesInfo;
+  }
 }

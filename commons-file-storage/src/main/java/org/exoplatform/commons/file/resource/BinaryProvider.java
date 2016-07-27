@@ -26,39 +26,36 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * When implementing a resource store you should implement equals and hashCode method. A store is equals to another if
- * the store location is the same.
- *
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * When implementing a resource store you should implement equals and hashCode
+ * method. A store is equals to another if the store location is the same.
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public interface BinaryProvider {
 
-    void put(final String name, final InputStream data) throws IOException;
+  void put(final String name, final InputStream data) throws IOException;
 
-    void put(final FileItem fileItem) throws IOException;
+  void put(final FileItem fileItem) throws IOException;
 
-    void put(final String name, final byte[] data) throws IOException;
+  void put(final String name, final byte[] data) throws IOException;
 
-    InputStream getStream(final String name);
+  InputStream getStream(final String name);
 
-    String getFilePath(final FileInfo fileInfo) throws IOException;
+  String getFilePath(final FileInfo fileInfo) throws IOException;
 
-    String getFilePath(String name) throws IOException;
+  String getFilePath(String name) throws IOException;
 
-    byte[] getBytes(final String name);
+  byte[] getBytes(final String name);
 
-    void remove(final String name) throws IOException;
+  void remove(final String name) throws IOException;
 
-    boolean remove(final FileInfo fileInfo) throws IOException;
+  boolean remove(final FileInfo fileInfo) throws IOException;
 
-    boolean exists(final String name) throws IOException;
+  boolean exists(final String name) throws IOException;
 
-    long lastModified(String name) throws IOException;
+  long lastModified(String name) throws IOException;
 
-    URL getURL(final String name);
+  URL getURL(final String name);
 
-    String getLocation();
+  String getLocation();
 
 }

@@ -8,13 +8,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public interface FileInfoDAO extends GenericDAO<FileInfoEntity, Long> {
 
-    List<FileInfoEntity> findDeletedFiles(Date date);
+  List<FileInfoEntity> findDeletedFiles(Date date);
 
-    List<FileInfoEntity> findAllByPage(int offset, int limit);
+  List<FileInfoEntity> findAllByPage(int offset, int limit);
 }

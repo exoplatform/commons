@@ -55,9 +55,9 @@ public class FileStorageCheckController implements Startable {
 
   private static final int   pageSize                      = 20;
 
-  private BinaryProvider           binaryProvider;
+  private BinaryProvider     binaryProvider;
 
-  private DataStorage dataStorage;
+  private DataStorage        dataStorage;
 
   public FileStorageCheckController(DataStorage dataStorage, BinaryProvider resourceProvider) {
     this.dataStorage = dataStorage;
@@ -104,7 +104,7 @@ public class FileStorageCheckController implements Startable {
                       + fileInfo.getName() + " , Path : ");
                 }
               }
-              offset+=pageSize;
+              offset += pageSize;
             }
             if (isConsistent) {
               report.writeLine(REPORT_CONSISTENT_MESSAGE);

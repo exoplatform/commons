@@ -25,10 +25,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public interface OrphanFileDAO extends GenericDAO<OrphanFileEntity, Long> {
-    public List<OrphanFileEntity> findDeletedFiles(Date date);
+  public List<OrphanFileEntity> findDeletedFiles(Date date);
 }

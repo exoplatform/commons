@@ -28,18 +28,14 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
-@ConfiguredBy({
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/files-configuration.xml"),
-        @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-configuration.xml")
-})
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/files-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-configuration.xml") })
 public class CommonsJPAIntegrationTest extends BaseTest {
-  protected FileInfoDAO    fileInfoDAO;
+  protected FileInfoDAO   fileInfoDAO;
 
-  protected NameSpaceDAO   nameSpaceDAO;
+  protected NameSpaceDAO  nameSpaceDAO;
 
   protected OrphanFileDAO orphanFileDAO;
 
@@ -60,8 +56,7 @@ public class CommonsJPAIntegrationTest extends BaseTest {
     cleanDB();
   }
 
-  public void testInit()
-  {
+  public void testInit() {
     assertNotNull(fileInfoDAO);
     assertNotNull(nameSpaceDAO);
     assertNotNull(orphanFileDAO);

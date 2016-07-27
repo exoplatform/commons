@@ -22,10 +22,8 @@ import org.exoplatform.commons.api.persistence.GenericDAO;
 import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
 public interface NameSpaceDAO extends GenericDAO<NameSpaceEntity, Long> {
-    NameSpaceEntity getNameSpaceByName(String name);
+  NameSpaceEntity getNameSpaceByName(String name);
 }

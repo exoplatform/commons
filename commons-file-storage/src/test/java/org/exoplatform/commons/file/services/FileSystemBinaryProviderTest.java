@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 public class FileSystemBinaryProviderTest {
 
   @Rule
-  public TemporaryFolder folder = new TemporaryFolder();
+  public TemporaryFolder         folder    = new TemporaryFolder();
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
@@ -42,9 +42,9 @@ public class FileSystemBinaryProviderTest {
   @Test
   public void shouldWriteBinary() throws Exception {
     // Given
-      FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
+    FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
     // When
-    FileItem file = new FileItem(1L, "file1", "", null,  1, null, "", false, new ByteArrayInputStream(new byte[]{}));
+    FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream(new byte[] {}));
     fileResourceProvider.put(file.getFileInfo().getChecksum(), file.getAsStream());
 
     // Then
@@ -55,7 +55,7 @@ public class FileSystemBinaryProviderTest {
   @Test
   public void shouldWriteBinaryWhenFileAlreadyExistsAndBinaryHasChanged() throws Exception {
     // Given
-      FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
+    FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
     FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
@@ -73,7 +73,7 @@ public class FileSystemBinaryProviderTest {
   @Test
   public void shouldNotWriteBinaryWhenFileAlreadyExistsAndBinaryHasNotChanged() throws Exception {
     // Given
-      FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
+    FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
     FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
@@ -86,13 +86,13 @@ public class FileSystemBinaryProviderTest {
     java.io.File updatedFile = new java.io.File(fileResourceProvider.getFilePath(file.getFileInfo()));
     assertEquals(updatedFile.getAbsolutePath(), createdFile.getAbsolutePath());
     // TODO need to verify also that it does not effectively write
-    //verify(fileInfoDataStorage, times(1)).update(any(FileInfoEntity.class));
+    // verify(fileInfoDataStorage, times(1)).update(any(FileInfoEntity.class));
   }
 
- @Test
+  @Test
   public void shouldDeleteBinary() throws Exception {
     // Given
-     FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
+    FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
     FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
@@ -106,10 +106,10 @@ public class FileSystemBinaryProviderTest {
     assertFalse(deletedFile.exists());
   }
 
-   @Test
+  @Test
   public void shouldThrowExceptionWhenDeletingABinaryWhichDoesNotExist() throws Exception {
     // Given
-       FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
+    FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
     FileItem file = new FileItem(1L, "file1", "", null, 1, null, "", false, new ByteArrayInputStream("test".getBytes()));
@@ -120,7 +120,7 @@ public class FileSystemBinaryProviderTest {
   @Test
   public void shouldReturnPathWhenChecksumIsValid() throws Exception {
     // Given
-      FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
+    FileSystemResourceProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
     FileInfo fileInfo = new FileInfo(1L, "file1", "", null, 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false);
@@ -130,10 +130,10 @@ public class FileSystemBinaryProviderTest {
     assertEquals(folder.getRoot().getPath() + "/d/4/1/d/8/c/d/9/d41d8cd98f00b204e9800998ecf8427e", path);
   }
 
- @Test
+  @Test
   public void shouldReturnNullWhenChecksumIsNotValid() throws Exception {
     // Given
-     BinaryProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
+    BinaryProvider fileResourceProvider = new FileSystemResourceProvider(folder.getRoot().getPath());
 
     // When
     FileInfo fileInfo = new FileInfo(1L, "file1", "", null, 1, null, "", "", false);

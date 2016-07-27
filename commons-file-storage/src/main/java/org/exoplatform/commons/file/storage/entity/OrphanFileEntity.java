@@ -24,79 +24,74 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Entity for Deleted Files.
- *
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
+ * Entity for Deleted Files. Created by The eXo Platform SAS Author :
+ * eXoPlatform exo@exoplatform.com
  */
 @Entity(name = "DeletedFileEntity")
 @ExoEntity
 @Table(name = "FILES_ORPHAN_FILES")
 
-@NamedQueries(
-        @NamedQuery(name = "deletedEntity.findDeletedFiles", query = "SELECT t FROM DeletedFileEntity t WHERE t.deletedDate < :deletedDate")
-)
+@NamedQueries(@NamedQuery(name = "deletedEntity.findDeletedFiles", query = "SELECT t FROM DeletedFileEntity t WHERE t.deletedDate < :deletedDate"))
 public class OrphanFileEntity {
-    @Id
-    @Column(name = "ID")
-    @SequenceGenerator(name="SEQ_FILES_ORPHAN_FILES_ID", sequenceName="SEQ_FILES_ORPHAN_FILES_ID")
-    @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_FILES_ORPHAN_FILES_ID")
-    private long id;
+  @Id
+  @Column(name = "ID")
+  @SequenceGenerator(name = "SEQ_FILES_ORPHAN_FILES_ID", sequenceName = "SEQ_FILES_ORPHAN_FILES_ID")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_ORPHAN_FILES_ID")
+  private long           id;
 
-    @ManyToOne
-    @JoinColumn(name = "FILE_ID")
-    private FileInfoEntity fileInfoEntity;
+  @ManyToOne
+  @JoinColumn(name = "FILE_ID")
+  private FileInfoEntity fileInfoEntity;
 
-    @Column(name = "CHECKSUM")
-    private String checksum;
+  @Column(name = "CHECKSUM")
+  private String         checksum;
 
-    @Column(name = "DELETED_DATE")
-    private Date deletedDate;
+  @Column(name = "DELETED_DATE")
+  private Date           deletedDate;
 
-    public OrphanFileEntity() {
-    }
+  public OrphanFileEntity() {
+  }
 
-    public Date getDeletedDate() {
-        return deletedDate;
-    }
+  public Date getDeletedDate() {
+    return deletedDate;
+  }
 
-    public void setDeletedDate(Date deletedDate) {
-        this.deletedDate = deletedDate;
-    }
+  public void setDeletedDate(Date deletedDate) {
+    this.deletedDate = deletedDate;
+  }
 
-    public FileInfoEntity getFileInfoEntity() {
-        return fileInfoEntity;
-    }
+  public FileInfoEntity getFileInfoEntity() {
+    return fileInfoEntity;
+  }
 
-    public void setFileInfoEntity(FileInfoEntity fileInfoEntity) {
-        this.fileInfoEntity = fileInfoEntity;
-    }
+  public void setFileInfoEntity(FileInfoEntity fileInfoEntity) {
+    this.fileInfoEntity = fileInfoEntity;
+  }
 
-    public OrphanFileEntity(long id, String checksum, Date deletedDate) {
-        this.id = id;
-        this.checksum = checksum;
-        this.deletedDate = deletedDate;
-    }
+  public OrphanFileEntity(long id, String checksum, Date deletedDate) {
+    this.id = id;
+    this.checksum = checksum;
+    this.deletedDate = deletedDate;
+  }
 
-    public OrphanFileEntity(long id, long fileId, String checksum, Date deletedDate) {
-        this(fileId, checksum, deletedDate);
-        this.id = id;
-    }
+  public OrphanFileEntity(long id, long fileId, String checksum, Date deletedDate) {
+    this(fileId, checksum, deletedDate);
+    this.id = id;
+  }
 
-    public long getId() {
-        return id;
-    }
+  public long getId() {
+    return id;
+  }
 
-    public void setId(long id) {
-        this.id = id;
-    }
+  public void setId(long id) {
+    this.id = id;
+  }
 
-    public String getChecksum() {
-        return checksum;
-    }
+  public String getChecksum() {
+    return checksum;
+  }
 
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
-    }
+  public void setChecksum(String checksum) {
+    this.checksum = checksum;
+  }
 }

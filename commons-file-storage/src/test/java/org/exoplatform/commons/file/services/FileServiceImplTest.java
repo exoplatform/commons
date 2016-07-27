@@ -43,32 +43,34 @@ import static org.mockito.Mockito.when;
 public class FileServiceImplTest {
 
   @Rule
-  public TemporaryFolder folder = new TemporaryFolder();
+  public TemporaryFolder       folder = new TemporaryFolder();
 
   @Mock
-  private FileInfoDAO fileInfoDAO;
+  private FileInfoDAO          fileInfoDAO;
 
   @Mock
-  private NameSpaceDAO nameSpaceDAO;
+  private NameSpaceDAO         nameSpaceDAO;
 
   @Mock
-  private OrphanFileDAO orphanFileDAO;
+  private OrphanFileDAO        orphanFileDAO;
 
   @Mock
-  private DataStorage jpaDataStorage;
+  private DataStorage          jpaDataStorage;
 
   @Mock
-  private NameSpaceService nameSpaceService;
+  private NameSpaceService     nameSpaceService;
 
   @Mock
-  private PortalContainer portalContainer;
+  private PortalContainer      portalContainer;
 
   @Mock
   private EntityManagerService emService;
+
   @Mock
-  private EntityManager em;
+  private EntityManager        em;
+
   @Mock
-  private EntityTransaction transaction;
+  private EntityTransaction    transaction;
 
   @Before
   public void setUp() throws Exception {
@@ -90,8 +92,25 @@ public class FileServiceImplTest {
     BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(nameSpaceDAO.find(anyLong())).thenReturn(new NameSpaceEntity(1, "file", "Default NameSpace"));
-    when(fileInfoDAO.find(anyLong())).thenReturn(new FileInfoEntity(1, "file1", null, 1, null, "", "d41d8cd98f00b204e9800998ecf8427e", false).setNameSpaceEntity(new NameSpaceEntity(1, "file", "Default NameSpace")));
-    when(jpaDataStorage.getFileInfo(anyLong())).thenReturn(new FileInfo(1L,"file1",null,"file",1,null,"","d41d8cd98f00b204e9800998ecf8427e", false));
+    when(fileInfoDAO.find(anyLong())).thenReturn(new FileInfoEntity(1,
+                                                                    "file1",
+                                                                    null,
+                                                                    1,
+                                                                    null,
+                                                                    "",
+                                                                    "d41d8cd98f00b204e9800998ecf8427e",
+                                                                    false).setNameSpaceEntity(new NameSpaceEntity(1,
+                                                                                                                  "file",
+                                                                                                                  "Default NameSpace")));
+    when(jpaDataStorage.getFileInfo(anyLong())).thenReturn(new FileInfo(1L,
+                                                                        "file1",
+                                                                        null,
+                                                                        "file",
+                                                                        1,
+                                                                        null,
+                                                                        "",
+                                                                        "d41d8cd98f00b204e9800998ecf8427e",
+                                                                        false));
     FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, null);
 
     // When
@@ -106,14 +125,30 @@ public class FileServiceImplTest {
     BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenReturn(new FileInfoEntity());
-    when(jpaDataStorage.create(any(FileInfo.class), any(NameSpace.class))).thenReturn(new FileInfo(1L,"file1",null,"file",1,null,"","d41d8cd98f00b204e9800998ecf8427e", false));
+    when(jpaDataStorage.create(any(FileInfo.class), any(NameSpace.class))).thenReturn(new FileInfo(1L,
+                                                                                                   "file1",
+                                                                                                   null,
+                                                                                                   "file",
+                                                                                                   1,
+                                                                                                   null,
+                                                                                                   "",
+                                                                                                   "d41d8cd98f00b204e9800998ecf8427e",
+                                                                                                   false));
     FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, null);
 
     // When
-    fileService.writeFile(new FileItem(null, "file1", "", null,  1, new Date(), "", false, new ByteArrayInputStream("test".getBytes())));
+    fileService.writeFile(new FileItem(null,
+                                       "file1",
+                                       "",
+                                       null,
+                                       1,
+                                       new Date(),
+                                       "",
+                                       false,
+                                       new ByteArrayInputStream("test".getBytes())));
 
     // Then
-    verify(jpaDataStorage, times(1)).create(any(FileInfo.class),any(NameSpace.class));
+    verify(jpaDataStorage, times(1)).create(any(FileInfo.class), any(NameSpace.class));
   }
 
   @Test
@@ -121,14 +156,22 @@ public class FileServiceImplTest {
     BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenThrow(Exception.class);
-    FileService fileService = new FileServiceImpl(jpaDataStorage,  binaryProvider, null);
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, null);
 
     // When
-    FileItem file = new FileItem(null, "file1", "plain/text", null,  1, new Date(), "john", false, new ByteArrayInputStream("test".getBytes()));
+    FileItem file = new FileItem(null,
+                                 "file1",
+                                 "plain/text",
+                                 null,
+                                 1,
+                                 new Date(),
+                                 "john",
+                                 false,
+                                 new ByteArrayInputStream("test".getBytes()));
     FileItem createdFile = null;
     try {
       createdFile = fileService.writeFile(file);
-    } catch(Exception e) {
+    } catch (Exception e) {
       // expected exception
     }
     assertNull(createdFile);

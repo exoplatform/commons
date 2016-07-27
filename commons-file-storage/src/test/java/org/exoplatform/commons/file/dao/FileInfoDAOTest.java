@@ -70,8 +70,7 @@ public class FileInfoDAOTest extends CommonsJPAIntegrationTest {
     assertEquals(result.isDeleted(), false);
   }
 
-  public void testFindDeletedFile()
-  {
+  public void testFindDeletedFile() {
     NameSpaceEntity nameSpaceEntity = nameSpaceDAO.create(new NameSpaceEntity("file", "default namespace"));
     FileInfoEntity entity1 = new FileInfoEntity();
     entity1.setName("MyDoc.doc");
@@ -101,21 +100,19 @@ public class FileInfoDAOTest extends CommonsJPAIntegrationTest {
     assertEquals(list.size(), 3);
 
     List<FileInfoEntity> list1 = fileInfoDAO.findDeletedFiles(daysAgo(30));
-    assertEquals(1,list1.size());
+    assertEquals(1, list1.size());
 
-    FileInfoEntity fileInfoEntity=list1.get(0);
+    FileInfoEntity fileInfoEntity = list1.get(0);
     assertEquals("MyDoc1.doc", fileInfoEntity.getName());
   }
 
-  public void testFindFilesByPage()
-  {
+  public void testFindFilesByPage() {
     NameSpaceEntity nameSpaceEntity = nameSpaceDAO.create(new NameSpaceEntity("file", "default namespace"));
     List<FileInfoEntity> list = new ArrayList<FileInfoEntity>();
     FileInfoEntity entity;
-    for(int i = 0; i< 20; i++)
-    {
+    for (int i = 0; i < 20; i++) {
       entity = new FileInfoEntity();
-      entity.setName("MyDoc_"+i+".doc");
+      entity.setName("MyDoc_" + i + ".doc");
       entity.setNameSpaceEntity(nameSpaceEntity);
       entity.setUpdatedDate(daysAgo(70));
       list.add(entity);
@@ -123,8 +120,8 @@ public class FileInfoDAOTest extends CommonsJPAIntegrationTest {
 
     fileInfoDAO.createAll(list);
     List<FileInfoEntity> result = fileInfoDAO.findAllByPage(15, 10);
-    assertNotNull (result);
-    assertEquals(5,result.size());
+    assertNotNull(result);
+    assertEquals(5, result.size());
   }
 
   private static Date daysAgo(int days) {
