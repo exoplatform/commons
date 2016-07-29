@@ -1,16 +1,46 @@
 (function($) {  
   var $input, $editable;
   
-  $.widget('exo.mention', {
+  var type = {
+      TAG : "tag",
+      MIX : "mix"
+  };
+  
+  var providers = {};
+  function loadFromProvider(term, response) {
+    var p = [];
+    
+    $.each(providers, function(idx, elm) {
+      if ($.inArray(elm, this.options.optionsProviders)) {
+        if (!$.inArray(providers[elm], p)) {
+          p.push(providers[elm]);
+        }
+      }
+    });
+    
+    var items = [];
+    $.each(p, function(idx, provider) {
+      provider.call(this, term, function(results) {
+        if (results && results.length) {
+          items = items.concat(results);
+        }
+      });
+    });
+    response.call(this, items);
+  }
+  
+  $.widget('suggester', {
     options : {
-      type : 0,
-      source : []
+      type : type.MIX,
+      source : [],
+      optionProviders : [],
+      showAvatar : true
     },
     _create : function() {
       $input = this.element;
       $input.hide();
       
-      if (this.options.type === 1) {
+      if (this.options.type.toLowerCase() === type.MIX) {
         log('creating jquery.mention input');
         
         $editable = $('<div id="' + $input.attr('id') + '_editable" contenteditable="true"></div>');
@@ -21,23 +51,48 @@
         }
         
         var source = this.options.source;
-        if (source && $.isFunction(source)) {
-          this.options.source = function(request, response) {
-            source.call(this, request.term, response);
+        if (source) {
+          if ($.isFunction(source)) {
+            this.options.source = function(request, response) {
+              source.call(this, request.term, response);
+            }            
           }
+        } else if (this.options.optionProviders && this.options.optionProviders.length) {
+          var _this = this;
+          this.options.source = function(request, response) {
+            loadFromProvider.call(_this, request.term, response);
+          };
         }
         
         $editable.mentionsInput(this.options);
 
         if (this.options.renderMenuItem) {
-          $editable.editablecomplete('instance')._renderItem = this.options.renderMenuItem;
+          $editable.editablecomplete('instance')._renderItem = function(ul, item) {
+            var tpl = this.options.renderMenuItem.call(this, item);
+            $(ul).append(tpl);
+          }
+        } else if (this.options.showAvatar) {
+          $editable.editablecomplete('instance')._renderItem = function(ul, item) {
+            var anchor, li, regexp, value;
+            li = $('<li>');
+            anchor = $('<a>').appendTo(li);
+            if (item.image) {
+              anchor.append("<img  width=\"20px\" height=\"20px\" src=\"" + item.image + "\" />");
+            } else {
+              anchor.append('<img width="20px" height="20px" src="/eXoSkin/skin/images/system/SpaceAvtDefault.png">');
+            }
+            regexp = new RegExp("(" + escapeRegExp(this.searchTerm) + ")", "gi");
+            value = item.value.replace(regexp, "<strong>$&</strong>");
+            anchor.append(value);
+            return li.appendTo(ul);
+          }
         }
 
         if (this.options.renderItem) {
           $editable.data('mentionsInput').mentionTpl = this.options.renderItem;
         } else {
           $editable.data('mentionsInput').mentionTpl = function(mention) {
-            var tpl = '<span data-mention="' + mention.uid + '">' + mention.label + 
+            var tpl = '<span data-mention="' + mention.uid + '">' + mention.value + 
             '<i class="uiIconClose uiIconLightGray" onclick="this.parentNode.parentNode.removeChild(this.parentNode)"></i></span>';
             return tpl;
           }
@@ -67,7 +122,18 @@
         if (this.options.create === null) {
           this.options.create = true;
         }
+
+        if (this.options.selectedItems) {
+          this.options.items = this.options.selectedItems;
+        }
         
+        if (!this.options.source && this.options.optionProviders && this.options.optionProviders.length) {
+          var _this = this;
+          this.options.source = function(term, response) {
+            loadFromProvider.call(_this, term, response);
+          };
+        }
+
         if (this.options.source) {
           var source = this.options.source;
           if ($.isArray(source)) {
@@ -99,7 +165,16 @@
           this.options.render = {
               option: this.options.renderMenuItem
           };
-        }        
+        } else if (this.options.showAvatar) {
+          this.options.render = {
+              option: function(data, escape) {
+                var tpl = '<div data-value="' + data.uid + '" data-selectable="" class="option">';
+                var img = data.image || '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
+                tpl += '<img width="20px" height="20px" src="' + img + '"> ' + data.value + '</div>';
+                 return tpl;
+              }
+          };
+        }
         
         if (this.options.renderItem) {
           if (!this.options.render) {
@@ -109,6 +184,9 @@
         }
         $input.selectize(this.options);
       }
+    },
+    addProvider: function(name, provider) {
+      providers[name] = provider;
     },
     getValue : function() {
       if (this.options.type === 0) {
@@ -124,7 +202,7 @@
         return $editable.mentionsInput('setValue', val);
       }
     },
-    getMentions: function() {
+    getSuggests: function() {
       if (this.options.type === 0) {
         return $input[0].selectize.getValue();
       } else {
@@ -133,11 +211,19 @@
     }
   });
   
+  $.fn.suggester.type = type;
+  
   function log(msg) {
     if (window.console && window.console.log) {
       window.console.log(msg);
     }
   }
+  
+  function escapeRegExp(str) {
+    var specials;
+    specials = /[.*+?|()\[\]{}\\$^]/g;
+    return str.replace(specials, "\\$&");
+  };
   
   return $;
 })($);
