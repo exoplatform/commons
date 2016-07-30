@@ -1,3 +1,104 @@
+/**
+ *    - This is a wrapper of selectize.js (http://selectize.github.io/selectize.js/) and jquery.mention (https://github.com/ivirabyan/jquery-mentions)
+ *    - The purpose is providing a simple jquery ui widget that help to suggest user input, autocompletion with customer data provider and custom menu 
+ * and tag rendering 
+ * 
+ *    - This plugin is aim to provide a simple, easy to use, and consistent in eXo PLF. 
+ *    - It's created by jquery UI widget factory (https://jqueryui.com/widget/). So the api follow jquery UI widget api design pattern, 
+ * anyone that know jquery UI widget should be familiar with this plugin
+ *    
+ *    - Quickstart: this sample will create an input that suggest "username" from what user type
+ *                    $(input).suggester({
+ *                          type: 'tag',
+ *                          source: [{uid: 1, value: 'root'},
+ *                                      {uid: 2, value: 'demo}]
+ *                     );
+ * 
+ *    - Available options:
+ *      
+ *      type:        choose to create a mix or tag component
+ *      
+ *                      'tag'   - create selectize component
+ *                      'mix'  -  create jquery.mention component, this is the default
+ *      
+ *      showAvatar   - boolean that decide if avatar is shown in the autocomplete menu. Default: true      
+ *      
+ *      source:     data source of the autocomplete
+ *      
+ *                      array        -  array of json objects {uid: '1', value: 'test', image: '/path/to/img.png'}
+ *                      url            -  an url (js string) point to the webservice that return data source (same structure as array of json above)  
+ *                         
+ *                      $(input).suggester({
+ *                          source: 'http://localhost:8080/portal/rest/path/to/users.json'
+ *                      });
+ *                       
+ *                      function   -  loader function, receive 2 parameters: term --> what user is typing, and callback --> function that receive the response data  
+ *                                      
+ *                      $(input).suggester({
+ *                          source: function(term, callback) {
+ *                              //query for data 
+ *                              var data = findData(term);                                            
+ *                              //now response
+ *                              callback(data);
+ *                          }
+ *                      }); 
+ *   
+ *      optionProviders  - Another option besize "source". Provider can be "shared" between suggester widget instance
+ *                               - this is an array of provider names ['exo:chat', 'exo:social', 'exo:task']
+ *                              
+ *                     $(input1).suggester({
+ *                        optionProviders: ['exo:social']
+ *                     });
+ *                     
+ *                     //add provider
+ *                     //this need 2 parameters: provider name, and the loader function --> same as the loader function of "source"
+ *                     $(input1).suggester('addProvider', 'exo:social', function(term, callback) {
+ *                          //repsonse data...
+ *                     });
+ *                     
+ *                     //now reuse in other input. Dont need to add provider again
+ *                     $(input2).suggester({
+ *                        optionProviders: ['exo:social']
+ *                     });
+ *                      
+ *      renderMenuItem  - provide custom render the autocomplete menu item
+ *                                 - this function receive param: item --> the current data json {uid: 1, value: 'root', image: 'path/to/img.png'}
+ *                                 - this function must return the html of the menu item
+ *      
+ *                     //let say we want to display the avatar in difference position
+ *                     $(input).suggester({
+ *                        source: [{uid: 1, value: 'root', image: 'path/to/img.png'}],
+ *                        
+ *                         renderMenuItem: function(item) {
+ *                            return '<li>' + item.value + '<img src="' + item.image + '"></img></li>'
+ *                         }
+ *                     });
+ *                      
+ *      renderItem         - provide custom render for selected item
+ *                                - work the same as renderMenuItem function, receive json data item, and return html
+ *                                
+ *   - Available function:
+ *   
+ *      getValue              - return current value of the input
+ *                      
+ *                      $(input).suggester({
+ *                          //initialize the suggester        
+ *                      });                      
+ *                      //get the value after user fill the input
+ *                      var val = $(input).suggester('getValue');
+ *      
+ *      setValue                - set value of the input programatically
+ *                      
+ *                      $(input).suggester({
+ *                          //initialize the suggester        
+ *                      });                      
+ *                      //set the value after user fill the input
+ *                      $(input).suggester('setValue', '@root');
+ *                      
+ *      getSuggests          - return selected items, this is for mix suggester that when the getValue method return both selected items mixed with other text
+ *      
+ *      addProvider           - register provider, need 2 parameters: name, and the loader function. Lets take a look at the sample of optionProviders
+ */
 (function($) {  
   var $input, $editable;
   
