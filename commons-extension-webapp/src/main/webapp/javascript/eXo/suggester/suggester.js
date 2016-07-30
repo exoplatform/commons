@@ -7,29 +7,35 @@
   };
   
   var providers = {};
+  var items = [];
   function loadFromProvider(term, response) {
-    var p = [];
+    var p = {};    
+    var _this = this; 
     
-    $.each(providers, function(idx, elm) {
-      if ($.inArray(elm, this.options.optionsProviders)) {
-        if (!$.inArray(providers[elm], p)) {
-          p.push(providers[elm]);
+    $.each(providers, function(name, provider) {
+      if ($.inArray(name, _this.options.optionsProviders)) {
+        if (!p[name]) {
+          p[name] = provider;          
         }
       }
     });
     
-    var items = [];
-    $.each(p, function(idx, provider) {
-      provider.call(this, term, function(results) {
-        if (results && results.length) {
-          items = items.concat(results);
-        }
-      });
+    $.each(p, function(name, provider) {      
+      if ($.isFunction(provider)) {
+        provider.call(this, term,  function(results) {
+          if (results && results.length) {
+            $.each(results, function(idx, elm) {
+              items[items.length] = elm;
+            });
+          }
+        });
+      }
     });
     response.call(this, items);
+    items = [];
   }
   
-  $.widget('suggester', {
+  $.widget('exo.suggester', {
     options : {
       type : type.MIX,
       source : [],
@@ -51,7 +57,7 @@
         }
         
         var source = this.options.source;
-        if (source) {
+        if (source && source.length) {
           if ($.isFunction(source)) {
             this.options.source = function(request, response) {
               source.call(this, request.term, response);
@@ -104,7 +110,7 @@
         
         $editable.on('change.mentionsInput keyup', function() {
           var val = $editable.mentionsInput('getValue');          
-          val = val.replace('<br>', '');
+          val = val.replace(/<br>/g, '');
           $input.val(val);
         });
       } else {
@@ -127,7 +133,7 @@
           this.options.items = this.options.selectedItems;
         }
         
-        if (!this.options.source && this.options.optionProviders && this.options.optionProviders.length) {
+        if (!this.options.source && this.options.source.length && this.options.optionProviders && this.options.optionProviders.length) {
           var _this = this;
           this.options.source = function(term, response) {
             loadFromProvider.call(_this, term, response);
@@ -192,7 +198,7 @@
       if (this.options.type === 0) {
         return $input[0].selectize.getValue();
       } else {
-        return $editable.mentionsInput('getValue');
+        return $editable.mentionsInput('getValue').replace(/<br>/g, '');
       }
     },
     setValue : function(val) {
@@ -210,8 +216,6 @@
       }
     }
   });
-  
-  $.fn.suggester.type = type;
   
   function log(msg) {
     if (window.console && window.console.log) {
