@@ -53,7 +53,7 @@ public class FileServiceImpl implements FileService {
   }
 
   @Override
-  public FileInfo getFileInfo(long id) throws IOException {
+  public FileInfo getFileInfo(long id){
     return dataStorage.getFileInfo(id);
   }
 

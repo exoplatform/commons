@@ -58,6 +58,10 @@ public class FileItem {
       return null;
   }
 
+  public byte[] getAsByte(){
+    return data;
+  }
+
   public void setInputStream(InputStream inputStream) throws IOException {
     if (inputStream != null) {
       this.data = IOUtils.toByteArray(inputStream);

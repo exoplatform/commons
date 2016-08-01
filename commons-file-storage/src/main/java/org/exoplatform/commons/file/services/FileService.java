@@ -14,9 +14,8 @@ public interface FileService {
    *
    * @param id file id
    * @return file info
-   * @throws IOException ignals that an I/O exception of some sort has occurred.
    */
-  public FileInfo getFileInfo(long id) throws IOException;
+  public FileInfo getFileInfo(long id);
 
   /**
    * Get the file (info + binary) of the given id
