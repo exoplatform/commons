@@ -82,7 +82,7 @@
   </changeSet>
 
   <changeSet author="file" id="1.0.0-6" dbms="oracle,postgresql">
-    <createSequence sequenceName="SEQ_FILES_DELETED_FILES_ID" startValue="1"/>
+    <createSequence sequenceName="SEQ_FILES_ORPHAN_FILES_ID" startValue="1"/>
   </changeSet>
 
 </databaseChangeLog>
