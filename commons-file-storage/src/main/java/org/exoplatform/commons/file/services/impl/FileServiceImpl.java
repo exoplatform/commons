@@ -92,7 +92,7 @@ public class FileServiceImpl implements FileService {
     // Add suffix to checksum
     fileInfo.setChecksum(fileInfo.getChecksum() + getRandom());
     FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
-    FileInfo createdFileInfoEntity = transaction.towPhaseCommit(2, file.getAsStream());
+    FileInfo createdFileInfoEntity = transaction.twoPhaseCommit(2, file.getAsStream());
     if (createdFileInfoEntity != null) {
       fileInfo.setId(createdFileInfoEntity.getId());
       file.setFileInfo(fileInfo);
@@ -115,7 +115,7 @@ public class FileServiceImpl implements FileService {
       nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
     }
     FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
-    FileInfo createdFileInfoEntity = transaction.towPhaseCommit(0, file.getAsStream());
+    FileInfo createdFileInfoEntity = transaction.twoPhaseCommit(0, file.getAsStream());
     if (createdFileInfoEntity != null) {
       fileInfo.setId(createdFileInfoEntity.getId());
       file.setFileInfo(fileInfo);
@@ -159,7 +159,7 @@ public class FileServiceImpl implements FileService {
       this.nameSpace = nameSpace;
     }
 
-    public FileInfo towPhaseCommit(int operation, InputStream inputStream) throws FileStorageException {
+    public FileInfo twoPhaseCommit(int operation, InputStream inputStream) throws FileStorageException {
       FileInfo createdFileInfoEntity = null;
       if (operation == INSERT) {
         boolean created = false;
