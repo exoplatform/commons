@@ -78,7 +78,7 @@
   </changeSet>
 
   <changeSet author="file" id="1.0.0-5" dbms="oracle,postgresql">
-    <createSequence sequenceName="SEQ_FILES_NAMESPACES_NAMESPACE_ID" startValue="1"/>
+    <createSequence sequenceName="SEQ_FILES_NS_NAMESPACE_ID" startValue="1"/>
   </changeSet>
 
   <changeSet author="file" id="1.0.0-6" dbms="oracle,postgresql">
