@@ -84,6 +84,15 @@ public class SearchContext {
   }
 
   /**
+   * Get site type
+   * @return String
+   * @LevelAPI Experimental
+   */
+  public String getSiteType() {
+    return qualifiedName.get(RouterParams.SITE_TYPE.create());
+  }
+
+  /**
    * Contructor to create a context for search service
    * @param router
    * @param siteName
