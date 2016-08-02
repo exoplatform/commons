@@ -35,8 +35,8 @@ import java.util.List;
 public class NameSpaceEntity {
   @Id
   @Column(name = "NAMESPACE_ID")
-  @SequenceGenerator(name = "SEQ_FILES_NAMESPACES_NAMESPACE_ID", sequenceName = "SEQ_FILES_NAMESPACES_NAMESPACE_ID")
-  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_NAMESPACES_NAMESPACE_ID")
+  @SequenceGenerator(name = "SEQ_FILES_NS_NAMESPACE_ID", sequenceName = "SEQ_FILES_NS_NAMESPACE_ID")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_FILES_NS_NAMESPACE_ID")
   private long                 id;
 
   @Column(name = "NAME")
