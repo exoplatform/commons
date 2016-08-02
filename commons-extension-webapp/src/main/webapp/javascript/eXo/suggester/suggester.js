@@ -200,7 +200,7 @@
         } else {
           $editable.data('mentionsInput').mentionTpl = function(mention) {
             var tpl = '<span data-mention="' + mention.uid + '">' + mention.value + 
-            '<i class="uiIconClose uiIconLightGray" onclick="this.parentNode.parentNode.removeChild(this.parentNode)"></i></span>';
+            '<i class="uiIconClose uiIconLightGray" onclick="this.parentNode.parentNode.removeChild(this.parentNode)"> </i></span>';
             return tpl;
           }
         }
