@@ -51,11 +51,12 @@ public class FileStorageCleanJob implements Job {
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
-    if (Log.isDebugEnabled()) {
-      Log.debug("Start to clean old FileStorage...");
-    }
-    if (!enabled.get())
+    Log.info("Start to clean old FileStorage...");
+
+    if (!enabled.get()) {
+      Log.info("Job disabled");
       return;
+    }
     try {
       DataStorage dataStorage = CommonsUtils.getService(DataStorage.class);
       BinaryProvider binaryProvider = CommonsUtils.getService(BinaryProvider.class);
@@ -66,7 +67,7 @@ public class FileStorageCleanJob implements Job {
         try {
           retention = Integer.parseInt(valueParam);
         } catch (NumberFormatException ex) {
-          Log.warn("Invalid param retention-time");
+          Log.warn("Invalid param retention-time value={}", valueParam);
         }
         // -1: means never deleted
         if (retention == -1)
@@ -75,45 +76,43 @@ public class FileStorageCleanJob implements Job {
         try {
           enabled.set(Boolean.valueOf(valueParam));
         } catch (Exception ex) {
-          Log.warn("Invalid param enabled");
+          Log.warn("Invalid param enabled value={}", valueParam);
         }
       }
       started.set(true);
       /**Remove Orphan files*/
       List<OrphanFile> noParent = dataStorage.getAllOrphanFile(daysAgo(retention));
       if (noParent.size() > 0) {
-        Log.info("Remove Orphan files size =" + noParent.size());
+        Log.info("Remove Orphan files size={}", noParent.size());
       }
       for (OrphanFile file : noParent) {
         try {
-          Log.info("remove File path= " + binaryProvider.getFilePath(file.getChecksum()));
+          Log.info("remove File path={}", binaryProvider.getFilePath(file.getChecksum()));
           if(dataStorage.sharedChecksum(file.getChecksum()) == 0) {
             binaryProvider.remove(file.getChecksum());
           }
           dataStorage.deleteOrphanFile(file.getId());
         } catch (IOException e) {
-          Log.warn("Enable to remove file name" + e.getMessage());
+          Log.warn("Unable to remove file name {}", e.getMessage());
         }
       }
       /**Remove Deleted files*/
       List<FileInfo> list = dataStorage.getAllDeletedFiles(daysAgo(retention));
       if (list.size() > 0) {
-        Log.info("Remove deleted files size =" + list.size());
+        Log.info("Remove deleted files size={}", list.size());
       }
       for (FileInfo file : list) {
         try {
-          Log.info("remove File path= " + binaryProvider.getFilePath(file));
+          Log.info("remove File path={}", binaryProvider.getFilePath(file));
           if(dataStorage.sharedChecksum(file.getChecksum()) == 1) {
             binaryProvider.remove(file.getChecksum());
           }
           dataStorage.deleteFileInfo(file.getId());
         } catch (IOException e) {
-          Log.warn("Enable to remove file name" + e.getMessage());
+          Log.warn("Unable to remove file name {}", e.getMessage());
         }
       }
-      if (Log.isDebugEnabled()) {
-        Log.debug("End to clean old FileStorage...");
-      }
+      Log.info("End to clean old FileStorage...");
     } finally {
       started.set(false);
     }
