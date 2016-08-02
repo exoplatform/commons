@@ -13,6 +13,7 @@ import java.util.Date;
 @ExoEntity
 @Table(name = "FILES_FILES")
 @NamedQueries({
+    @NamedQuery(name = "fileEntity.findByChecksum", query = "SELECT t FROM FileInfoEntity t WHERE t.checksum = :checksum"),
     @NamedQuery(name = "fileEntity.findDeletedFiles", query = "SELECT t FROM FileInfoEntity t WHERE t.deleted = true and t.updatedDate < :updatedDate"),
     @NamedQuery(name = "fileEntity.getAllByLimitOffset", query = "SELECT t FROM FileInfoEntity t") })
 public class FileInfoEntity {

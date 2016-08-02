@@ -62,6 +62,11 @@ public class DataStorage {
     }
     return listFilesInfo;
   }
+    
+  public int sharedChecksum(String checksum) {
+    List<FileInfoEntity> result = fileInfoDAO.findFilesByChecksum(checksum);
+    return result.size();
+  }
 
   public NameSpace getNameSpace(long id) {
     NameSpaceEntity nameSpaceEntity = nameSpaceDAO.find(id);

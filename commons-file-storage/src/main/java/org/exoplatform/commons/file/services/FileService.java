@@ -2,6 +2,7 @@ package org.exoplatform.commons.file.services;
 
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
+import org.exoplatform.commons.file.services.util.FileChecksum;
 
 import java.io.IOException;
 

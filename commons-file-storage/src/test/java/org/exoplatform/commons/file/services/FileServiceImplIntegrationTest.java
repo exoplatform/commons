@@ -141,7 +141,7 @@ public class FileServiceImplIntegrationTest extends BaseExoTestCase {
     } while (counter.get() < 10);
 
     File file = new File(binaryProvider.getFilePath(fileItem.getFileInfo().getChecksum()));
-    assertEquals(11, file.getParentFile().list().length);
+    assertEquals(1, file.getParentFile().list().length);
   }
 
   public void testConcurrentUpdateFile() throws Exception {

@@ -8,16 +8,13 @@ import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.file.services.FileStorageException;
-import org.exoplatform.commons.file.services.util.FileChecksum;
 import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.SecureRandom;
 
 /**
  * File Service which stores the file metadata in a database, and uses a
@@ -28,28 +25,13 @@ public class FileServiceImpl implements FileService {
 
   private static final Log    LOG             = ExoLogger.getLogger(FileServiceImpl.class);
 
-  private static final String Algorithm_PARAM = "Algorithm";
-
   private DataStorage         dataStorage;
 
   private BinaryProvider      binaryProvider;
 
-  private FileChecksum        fileChecksum;
-
   public FileServiceImpl(DataStorage dataStorage, BinaryProvider resourceProvider, InitParams initParams) throws Exception {
     this.dataStorage = dataStorage;
     this.binaryProvider = resourceProvider;
-
-    ValueParam algorithmValueParam = null;
-    if (initParams != null) {
-      algorithmValueParam = initParams.getValueParam(Algorithm_PARAM);
-    }
-
-    if (algorithmValueParam == null) {
-      this.fileChecksum = new FileChecksum();
-    } else {
-      this.fileChecksum = new FileChecksum(algorithmValueParam.getValue());
-    }
   }
 
   @Override
@@ -89,8 +71,6 @@ public class FileServiceImpl implements FileService {
     } else {
       nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
     }
-    // Add suffix to checksum
-    fileInfo.setChecksum(fileInfo.getChecksum() + getRandom());
     FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
     FileInfo createdFileInfoEntity = transaction.twoPhaseCommit(2, file.getAsStream());
     if (createdFileInfoEntity != null) {
@@ -164,9 +144,11 @@ public class FileServiceImpl implements FileService {
       if (operation == INSERT) {
         boolean created = false;
         try {
-          binaryProvider.put(fileInfo.getChecksum(), inputStream);
-          if (binaryProvider.exists(fileInfo.getChecksum())) {
+          if (!binaryProvider.exists(fileInfo.getChecksum())) {
+            binaryProvider.put(fileInfo.getChecksum(), inputStream);
             created = true;
+          }
+          if (binaryProvider.exists(fileInfo.getChecksum())) {
             createdFileInfoEntity = dataStorage.create(fileInfo, nameSpace);
             return createdFileInfoEntity;
           } else {
@@ -191,14 +173,13 @@ public class FileServiceImpl implements FileService {
           boolean updated = false;
           FileInfo oldFile = dataStorage.getFileInfo(fileInfo.getId());
           if (oldFile == null || oldFile.getChecksum().isEmpty()
-              || !getChecksumPrefix(oldFile.getChecksum()).equals(fileInfo.getChecksum())) {
-            fileInfo.setChecksum(fileInfo.getChecksum() + getRandom());
-            binaryProvider.put(fileInfo.getChecksum(), inputStream);
+              || !oldFile.getChecksum().equals(fileInfo.getChecksum())) {
+            if (!binaryProvider.exists(fileInfo.getChecksum())) {
+              binaryProvider.put(fileInfo.getChecksum(), inputStream);
+            }
             updated = true;
-          } else {
-            fileInfo.setChecksum(oldFile.getChecksum());
           }
-          if (updated) {
+          if (updated && dataStorage.sharedChecksum(oldFile.getChecksum()) ==1) {
             dataStorage.createOrphanFile(oldFile);
           }
           if (binaryProvider.exists(fileInfo.getChecksum())) {
@@ -220,18 +201,4 @@ public class FileServiceImpl implements FileService {
     }
   }
 
-  /** Internal methods */
-  private long getRandom() {
-    SecureRandom secureRandom = new SecureRandom();
-    long n = secureRandom.nextInt();
-    return Math.abs(n);
-  }
-
-  private String getChecksumPrefix(String checksum) {
-    String prefix = "";
-    if (checksum != null && !checksum.isEmpty()) {
-      prefix = checksum.substring(0, 32);
-    }
-    return prefix;
-  }
 }

@@ -45,7 +45,14 @@ public class FileInfoDAOImpl extends GenericDAOJPAImpl<FileInfoEntity, Long> imp
     return query.getResultList();
   }
 
-  public List<FileInfoEntity> findAllByPage(int offset, int limit) {
+    @Override
+    public List<FileInfoEntity> findFilesByChecksum(String checksum) {
+        TypedQuery<FileInfoEntity> query = getEntityManager().createNamedQuery("fileEntity.findByChecksum", FileInfoEntity.class)
+                .setParameter("checksum", checksum);
+        return query.getResultList();
+    }
+
+    public List<FileInfoEntity> findAllByPage(int offset, int limit) {
     return getEntityManager().createNamedQuery("fileEntity.getAllByLimitOffset")
                              .setFirstResult(offset)
                              .setMaxResults(limit)

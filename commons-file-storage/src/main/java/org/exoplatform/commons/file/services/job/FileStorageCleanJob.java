@@ -79,19 +79,7 @@ public class FileStorageCleanJob implements Job {
         }
       }
       started.set(true);
-      List<FileInfo> list = dataStorage.getAllDeletedFiles(daysAgo(retention));
-      if (list.size() > 0) {
-        Log.info("Remove deleted files size =" + list.size());
-      }
-      for (FileInfo file : list) {
-        try {
-          Log.info("remove File path= " + binaryProvider.getFilePath(file));
-          binaryProvider.remove(file.getChecksum());
-          dataStorage.deleteFileInfo(file.getId());
-        } catch (IOException e) {
-          Log.warn("Enable to remove file name" + e.getMessage());
-        }
-      }
+      /**Remove Orphan files*/
       List<OrphanFile> noParent = dataStorage.getAllOrphanFile(daysAgo(retention));
       if (noParent.size() > 0) {
         Log.info("Remove Orphan files size =" + noParent.size());
@@ -99,8 +87,26 @@ public class FileStorageCleanJob implements Job {
       for (OrphanFile file : noParent) {
         try {
           Log.info("remove File path= " + binaryProvider.getFilePath(file.getChecksum()));
-          binaryProvider.remove(file.getChecksum());
+          if(dataStorage.sharedChecksum(file.getChecksum()) == 0) {
+            binaryProvider.remove(file.getChecksum());
+          }
           dataStorage.deleteOrphanFile(file.getId());
+        } catch (IOException e) {
+          Log.warn("Enable to remove file name" + e.getMessage());
+        }
+      }
+      /**Remove Deleted files*/
+      List<FileInfo> list = dataStorage.getAllDeletedFiles(daysAgo(retention));
+      if (list.size() > 0) {
+        Log.info("Remove deleted files size =" + list.size());
+      }
+      for (FileInfo file : list) {
+        try {
+          Log.info("remove File path= " + binaryProvider.getFilePath(file));
+          if(dataStorage.sharedChecksum(file.getChecksum()) == 1) {
+            binaryProvider.remove(file.getChecksum());
+          }
+          dataStorage.deleteFileInfo(file.getId());
         } catch (IOException e) {
           Log.warn("Enable to remove file name" + e.getMessage());
         }

@@ -14,5 +14,7 @@ public interface FileInfoDAO extends GenericDAO<FileInfoEntity, Long> {
 
   List<FileInfoEntity> findDeletedFiles(Date date);
 
+  List<FileInfoEntity> findFilesByChecksum(String checksum);
+
   List<FileInfoEntity> findAllByPage(int offset, int limit);
 }

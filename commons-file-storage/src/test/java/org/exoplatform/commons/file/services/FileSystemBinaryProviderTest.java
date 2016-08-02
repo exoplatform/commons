@@ -4,7 +4,6 @@ import org.exoplatform.commons.file.resource.FileSystemResourceProvider;
 import org.exoplatform.commons.file.resource.BinaryProvider;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
-import org.exoplatform.commons.file.services.util.FileChecksum;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +30,6 @@ public class FileSystemBinaryProviderTest {
 
   @Before
   public void setup() throws Exception {
-    new FileChecksum();
   }
 
   @Test

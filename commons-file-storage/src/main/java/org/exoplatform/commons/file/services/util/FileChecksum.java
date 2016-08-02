@@ -18,6 +18,8 @@
  */
 package org.exoplatform.commons.file.services.util;
 
+import org.exoplatform.commons.utils.PropertyManager;
+
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,21 +30,20 @@ import java.security.NoSuchAlgorithmException;
  * Author : eXoPlatform
  *          exo@exoplatform.com
  */
-public class FileChecksum {
+public final class FileChecksum {
 
   private static String       defaultAlgorithm = "MD5";
 
+  private static final String                ALGORITHM_FILE_CHECKSUM_PROPERTY_NAME          = "exo.file-rdbms.algorithm.checksum";
+
   private static String digestAlgorithm;
 
-  public FileChecksum(String algorithm) throws NoSuchAlgorithmException {
+  static {
+    String algorithm= PropertyManager.getProperty(ALGORITHM_FILE_CHECKSUM_PROPERTY_NAME);
     if (algorithm != null && !algorithm.isEmpty())
-      this.digestAlgorithm = algorithm;
+      digestAlgorithm = algorithm;
     else
-      this.digestAlgorithm =  defaultAlgorithm;
-  }
-
-  public FileChecksum() throws NoSuchAlgorithmException {
-    this.digestAlgorithm = defaultAlgorithm;
+      digestAlgorithm =  defaultAlgorithm;
   }
 
   /**
