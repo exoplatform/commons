@@ -26,23 +26,12 @@
  *      source:     data source of the autocomplete
  *      
  *                      array        -  array of json objects {uid: '1', value: 'test', image: '/path/to/img.png'}  s
- *                       
- *                      function   -  loader function, receive 2 parameters: term --> what user is typing, and callback --> function that receive the response data  
- *                                      
- *                      $(input).suggester({
- *                          source: function(term, callback) {
- *                              //query for data 
- *                              var data = findData(term);                                            
- *                              //now response
- *                              callback(data);
- *                          }
- *                      }); 
  *   
- *      optionProviders  - Another option besize "source". Provider can be "shared" between suggester widget instance
+ *      sourceProviders  - Another option besize "source". Provider can be "shared" between suggester widget instance
  *                               - this is an array of provider names ['exo:chat', 'exo:social', 'exo:task']
  *                              
  *                     $(input1).suggester({
- *                        optionProviders: ['exo:social']
+ *                        sourceProviders: ['exo:social']
  *                     });
  *                     
  *                     //add provider
@@ -58,7 +47,7 @@
  *                     
  *                     //now reuse in other input. Dont need to add provider again
  *                     $(input2).suggester({
- *                        optionProviders: ['exo:social']
+ *                        sourceProviders: ['exo:social']
  *                     });
  *                      
  *      renderMenuItem  - provide custom render the autocomplete menu item
@@ -97,7 +86,7 @@
  *                      
  *      getSuggests          - return selected items, this is for mix suggester that when the getValue method return both selected items mixed with other text
  *      
- *      addProvider           - register provider, need 2 parameters: name, and the loader function. Lets take a look at the sample of optionProviders
+ *      addProvider           - register provider, need 2 parameters: name, and the loader function. Lets take a look at the sample of sourceProviders
  */
 (function($) {  
   var $input, $editable;
@@ -140,16 +129,14 @@
     options : {
       type : type.MIX,
       source : [],
-      optionProviders : [],
+      sourceProviders : [],
       showAvatar : true
     },
     _create : function() {
       $input = this.element;
       $input.hide();
       
-      if (this.options.type.toLowerCase() === type.MIX) {
-        log('creating jquery.mention input');
-        
+      if (this.options.type.toLowerCase() === type.MIX) {        
         $editable = $('<div id="' + $input.attr('id') + '_editable" contenteditable="true"></div>');
         $input.after($editable);
         
@@ -158,13 +145,7 @@
         }
         
         var source = this.options.source;
-        if (source && source.length) {
-          if ($.isFunction(source)) {
-            this.options.source = function(request, response) {
-              source.call(this, request.term, response);
-            }            
-          }
-        } else if (this.options.optionProviders && this.options.optionProviders.length) {
+        if (!(source || source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
           var _this = this;
           this.options.source = function(request, response) {
             loadFromProvider.call(_this, request.term, response);
@@ -214,9 +195,7 @@
           val = val.replace(/<br>/g, '');
           $input.val(val);
         });
-      } else {
-        log('creating selectize input');
-        
+      } else {        
         if (!this.options.valueField) {
           this.options.valueField = 'uid';
         }
@@ -234,7 +213,7 @@
           this.options.items = this.options.selectedItems;
         }
         
-        if (!this.options.source && this.options.source.length && this.options.optionProviders && this.options.optionProviders.length) {
+        if (!(this.options.source || this.options.source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
           var _this = this;
           this.options.source = function(term, response) {
             loadFromProvider.call(_this, term, response);
@@ -296,13 +275,7 @@
         return $editable.mentionsInput('getMentions');
       }
     }
-  });
-  
-  function log(msg) {
-    if (window.console && window.console.log) {
-      window.console.log(msg);
-    }
-  }
+  });  
   
   function escapeRegExp(str) {
     var specials;
