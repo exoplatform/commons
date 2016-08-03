@@ -4,27 +4,27 @@
 									xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
 									xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
 
-    <portal-skin>
-      <skin-name>Default</skin-name>
-      <skin-module>jquery-ui</skin-module>
-      <css-path>/skin/css/jquery-ui.css</css-path>
-      <css-priority>1</css-priority>
-    </portal-skin>
-    <portal-skin>
-      <skin-name>Default</skin-name>
-      <skin-module>jquery-mention</skin-module>
-      <css-path>/skin/css/jquery.mention.css</css-path>
-      <css-priority>1</css-priority>
-    </portal-skin>
-    <portal-skin>
-      <skin-name>Default</skin-name>
-      <skin-module>selectize</skin-module>
-      <css-path>/skin/css/selectize.css</css-path>
-      <css-priority>1</css-priority>
-    </portal-skin>
+       <portal-skin>
+         <skin-name>Default</skin-name>
+         <skin-module>jquery-ui</skin-module>
+         <css-path>/skin/css/jquery-ui.css</css-path>
+         <css-priority>1</css-priority>
+       </portal-skin>
+       <portal-skin>
+         <skin-name>Default</skin-name>
+         <skin-module>jquery-mention</skin-module>
+         <css-path>/skin/css/jquery.mention.css</css-path>
+         <css-priority>1</css-priority>
+       </portal-skin>
+       <portal-skin>
+         <skin-name>Default</skin-name>
+         <skin-module>selectize</skin-module>
+         <css-path>/skin/css/selectize.css</css-path>
+         <css-priority>1</css-priority>
+       </portal-skin>
 
 	<module>
-		<name>commons-document</name>
+               <name>commons-document</name>
 		<as>doc</as>
 		<script>
 			<path>/javascript/eXo/commons/commons-Document.js</path>

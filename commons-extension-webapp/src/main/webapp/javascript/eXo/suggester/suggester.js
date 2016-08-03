@@ -25,12 +25,7 @@
  *      
  *      source:     data source of the autocomplete
  *      
- *                      array        -  array of json objects {uid: '1', value: 'test', image: '/path/to/img.png'}
- *                      url            -  an url (js string) point to the webservice that return data source (same structure as array of json above)  
- *                         
- *                      $(input).suggester({
- *                          source: 'http://localhost:8080/portal/rest/path/to/users.json'
- *                      });
+ *                      array        -  array of json objects {uid: '1', value: 'test', image: '/path/to/img.png'}  s
  *                       
  *                      function   -  loader function, receive 2 parameters: term --> what user is typing, and callback --> function that receive the response data  
  *                                      
@@ -53,7 +48,12 @@
  *                     //add provider
  *                     //this need 2 parameters: provider name, and the loader function --> same as the loader function of "source"
  *                     $(input1).suggester('addProvider', 'exo:social', function(term, callback) {
- *                          //repsonse data...
+ *                          //query for data 
+ *                          var data = findInSocial(term);                                            
+ *                          
+ *                          //now response
+ *                          //data = [{uid: 1, value: 'root', image: '/path/to/img'}, {uid: 2, value: 'demo', image: 'path/to/avatar.png'}]
+ *                          callback(data);
  *                     });
  *                     
  *                     //now reuse in other input. Dont need to add provider again
@@ -245,26 +245,6 @@
           var source = this.options.source;
           if ($.isArray(source)) {
             this.options.options = this.options.source;            
-          } else {
-            this.options.options = [];
-            this.options.onType = function() {
-              $input[0].selectize.load(function(callback) {
-                if ($.isFunction(source)) {
-                  source.call(this, this.currentResults.query, callback);
-                } else {
-                  $.ajax({
-                    url : source,
-                    data: 'term=' + this.currentResults.query,
-                    success: function(response) {
-                      callback(repsonse);
-                    }, 
-                    error: function() {
-                      callback([]);
-                    }
-                  });
-                }
-              });
-            }
           }
         }
         
