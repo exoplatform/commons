@@ -111,7 +111,7 @@ public class FileServiceImplTest {
                                                                         "",
                                                                         "d41d8cd98f00b204e9800998ecf8427e",
                                                                         false));
-    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, null);
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider);
 
     // When
     FileItem file = fileService.getFile(1);
@@ -134,7 +134,7 @@ public class FileServiceImplTest {
                                                                                                    "",
                                                                                                    "d41d8cd98f00b204e9800998ecf8427e",
                                                                                                    false));
-    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, null);
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider);
 
     // When
     fileService.writeFile(new FileItem(null,
@@ -156,7 +156,7 @@ public class FileServiceImplTest {
     BinaryProvider binaryProvider = new FileSystemResourceProvider(folder.getRoot().getAbsolutePath());
     // Given
     when(fileInfoDAO.create(any(FileInfoEntity.class))).thenThrow(Exception.class);
-    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider, null);
+    FileService fileService = new FileServiceImpl(jpaDataStorage, binaryProvider);
 
     // When
     FileItem file = new FileItem(null,

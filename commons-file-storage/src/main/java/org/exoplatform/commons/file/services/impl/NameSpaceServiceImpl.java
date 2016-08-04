@@ -18,6 +18,7 @@
  */
 package org.exoplatform.commons.file.services.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.file.model.NameSpace;
@@ -92,6 +93,18 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
       dataStorage.createNameSpaces(list);
     }
     LOG.info("End Init Files nameSpaces ");
+  }
+
+  @Override
+  @ExoTransactional
+  public void createNameSpace(String name, String description) {
+    if (!StringUtils.isEmpty(name)) {
+      NameSpace nameSpace = dataStorage.getNameSpace(name);
+      if (nameSpace == null) {
+        NameSpace add = new NameSpace(name, description);
+        dataStorage.createNameSpace(add);
+      }
+    }
   }
 
   public static String getDefaultNameSpace() {

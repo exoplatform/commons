@@ -9,7 +9,6 @@ import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.file.services.FileStorageException;
 import org.exoplatform.commons.file.storage.DataStorage;
-import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -29,7 +28,7 @@ public class FileServiceImpl implements FileService {
 
   private BinaryProvider      binaryProvider;
 
-  public FileServiceImpl(DataStorage dataStorage, BinaryProvider resourceProvider, InitParams initParams) throws Exception {
+  public FileServiceImpl(DataStorage dataStorage, BinaryProvider resourceProvider) throws Exception {
     this.dataStorage = dataStorage;
     this.binaryProvider = resourceProvider;
   }
