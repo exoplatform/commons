@@ -82,6 +82,8 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
     /* Application File namespace */
     for (NameSpacePlugin nameSpacePlugin : this.nameSpacePlugins) {
       for (String name : nameSpacePlugin.getNameSpaceList().keySet()) {
+        LOG.info("{} declares the namespace {}", nameSpacePlugin.getName(), name);
+
         nameSpace = dataStorage.getNameSpace(name);
         if (nameSpace == null) {
           NameSpace add = new NameSpace(name, nameSpacePlugin.getNameSpaceList().get(name));
