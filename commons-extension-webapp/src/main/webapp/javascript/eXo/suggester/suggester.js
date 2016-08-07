@@ -145,7 +145,7 @@
         }
         
         var source = this.options.source;
-        if (!(source || source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
+        if (!(source && source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
           var _this = this;
           this.options.source = function(request, response) {
             loadFromProvider.call(_this, request.term, response);
@@ -213,7 +213,7 @@
           this.options.items = this.options.selectedItems;
         }
         
-        if (!(this.options.source || this.options.source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
+        if (!(this.options.source && this.options.source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
           var _this = this;
           this.options.source = function(term, response) {
             loadFromProvider.call(_this, term, response);
@@ -224,6 +224,13 @@
           var source = this.options.source;
           if ($.isArray(source)) {
             this.options.options = this.options.source;            
+          } else {
+            this.options.options = [];
+            this.options.onType = function() {
+              $input[0].selectize.load(function(callback) {
+                source.call(this, this.currentResults.query, callback);
+              });
+            }
           }
         }
         
