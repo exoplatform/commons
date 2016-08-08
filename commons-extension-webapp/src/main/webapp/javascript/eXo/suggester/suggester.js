@@ -101,18 +101,17 @@
   function loadFromProvider(term, response) {
     var p = {};    
     var _this = this; 
-    
     $.each(providers, function(name, provider) {
-      if ($.inArray(name, _this.options.optionsProviders)) {
+      if ($.inArray(name, _this.options.sourceProviders)) {
         if (!p[name]) {
-          p[name] = provider;          
+          p[name] = provider;
         }
       }
     });
-    
+
     $.each(p, function(name, provider) {      
       if ($.isFunction(provider)) {
-        provider.call(this, term,  function(results) {
+        provider.call(_this, term,  function(results) {
           if (results && results.length) {
             $.each(results, function(idx, elm) {
               items[items.length] = elm;
@@ -136,7 +135,12 @@
       $input = this.element;
       $input.hide();
       
-      if (this.options.type.toLowerCase() === type.MIX) {        
+      if (this.options.providers) {
+        $.each(this.options.providers, function(name, provider) {
+          providers[name] = provider;
+        });
+      }
+      if (this.options.type.toLowerCase() === type.MIX) {
         $editable = $('<div id="' + $input.attr('id') + '_editable" contenteditable="true"></div>');
         $input.after($editable);
         
@@ -213,11 +217,15 @@
           this.options.items = this.options.selectedItems;
         }
         
+        var _this = this;
         if (!(this.options.source && this.options.source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
-          var _this = this;
           this.options.source = function(term, response) {
             loadFromProvider.call(_this, term, response);
           };
+        }
+        
+        if (this.options.preload) {
+          this.options.load = loadFromProvider;          
         }
 
         if (this.options.source) {
@@ -228,7 +236,10 @@
             this.options.options = [];
             this.options.onType = function() {
               $input[0].selectize.load(function(callback) {
-                source.call(this, this.currentResults.query, callback);
+                source.call(this, this.currentResults.query, function() {
+                  callback.apply(this, arguments);
+                  $input[0].selectize.refreshOptions(true);
+                });
               });
             }
           }
