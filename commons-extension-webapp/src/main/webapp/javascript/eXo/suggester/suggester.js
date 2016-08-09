@@ -100,8 +100,11 @@
   function loadFromProvider(term, response) {
     var p = [];    
     var _this = this; 
+    
+    var sourceProviders = this.settings && this.settings.sourceProviders;
+    sourceProviders = sourceProviders || (this.options && this.options.sourceProviders); 
     $.each(providers, function(name, provider) {
-      if ($.inArray(name, _this.options.sourceProviders) != -1) {
+      if ($.inArray(name, sourceProviders) != -1) {
         if (!p[name]) {
           p[p.length] = provider;
         }
@@ -229,9 +232,7 @@
         
         var _this = this;
         if (!(this.options.source && this.options.source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
-          this.options.source = function(term, response) {
-            loadFromProvider.call(_this, term, response);
-          };
+          this.options.source = loadFromProvider;
         }
         
         if (this.options.preload) {
