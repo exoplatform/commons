@@ -97,31 +97,41 @@
   };
   
   var providers = {};
-  var items = [];
   function loadFromProvider(term, response) {
-    var p = {};    
+    var p = [];    
     var _this = this; 
     $.each(providers, function(name, provider) {
-      if ($.inArray(name, _this.options.sourceProviders)) {
+      if ($.inArray(name, _this.options.sourceProviders) != -1) {
         if (!p[name]) {
-          p[name] = provider;
+          p[p.length] = provider;
         }
       }
     });
-
-    $.each(p, function(name, provider) {      
+        
+    var items = [];
+    //
+    for (var i = 0; i < p.length; i++) {
+      var provider = p[i];
       if ($.isFunction(provider)) {
         provider.call(_this, term,  function(results) {
-          if (results && results.length) {
-            $.each(results, function(idx, elm) {
-              items[items.length] = elm;
-            });
-          }
+          finish(results);
         });
       }
-    });
-    response.call(this, items);
-    items = [];
+    }
+    
+    var count = 0;
+    var finish = function(results) {
+      if (results && results.length) {
+        $.each(results, function(idx, elm) {
+          items[items.length] = elm;
+        });
+      }
+      
+      if (++count == p.length) {
+        response.call(this, items);        
+      }
+    }
+
   }
   
   $.widget('exo.suggester', {
@@ -225,7 +235,7 @@
         }
         
         if (this.options.preload) {
-          this.options.load = loadFromProvider;          
+          this.options.load = loadFromProvider;
         }
 
         if (this.options.source) {
@@ -234,14 +244,15 @@
             this.options.options = this.options.source;            
           } else {
             this.options.options = [];
-            this.options.onType = function() {
-              $input[0].selectize.load(function(callback) {
-                source.call(this, this.currentResults.query, function() {
-                  callback.apply(this, arguments);
-                  $input[0].selectize.refreshOptions(true);
-                });
-              });
-            }
+            this.options.load = source;            
+//            this.options.onType = function() {
+//              $input[0].selectize.load(function(callback) {
+//                source.call(this, this.currentResults.query, function() {
+//                  callback.apply(this, arguments);
+//                  $input[0].selectize.refreshOptions(true);
+//                });
+//              });
+//            }
           }
         }
         
