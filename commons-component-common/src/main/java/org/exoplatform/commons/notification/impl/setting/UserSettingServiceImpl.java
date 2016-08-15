@@ -17,6 +17,7 @@
 package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -427,6 +428,13 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * @throws Exception
    */
   private UserSetting fillModel(Node node) throws Exception {
+    if(!node.getParent().hasProperty( EXO_LAST_MODIFIED_DATE)){
+      if(node.getParent().canAddMixin("exo:modify")) {
+        node.getParent().addMixin("exo:modify");
+	  }
+	  node.getParent().setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+	  node.getParent().save();
+	}
     UserSetting model = UserSetting.getInstance();
     model.setUserId(node.getParent().getName());
     model.setDailyPlugins(getValues(node, EXO_DAILY));
@@ -474,6 +482,13 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         NodeIterator iter = getDefaultDailyIterator(sProvider, offset, limit);
         while (iter.hasNext()) {
           Node node = iter.nextNode();
+          if(!node.hasProperty( EXO_LAST_MODIFIED_DATE)){
+            if(node.canAddMixin("exo:modify")) {
+              node.addMixin("exo:modify");
+            }
+            node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+            node.save();
+          }
           users.add(UserSetting.getInstance()
                     .setUserId(node.getName())
                     .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
