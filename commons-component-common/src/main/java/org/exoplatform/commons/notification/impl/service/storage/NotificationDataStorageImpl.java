@@ -247,21 +247,21 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   private NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
     if(!node.hasProperty(EXO_LAST_MODIFIED_DATE) && node.canAddMixin(EXO_MODIFY)){
-        node.addMixin(EXO_MODIFY);
-        node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
-        node.save();
-      }
-      NotificationInfo message = NotificationInfo.instance()
-        .setFrom(node.getProperty(NTF_FROM).getString())
-        .setOrder(Integer.valueOf(node.getProperty(NTF_ORDER).getString()))
-        .key(node.getProperty(NTF_PROVIDER_TYPE).getString())
-        .setOwnerParameter(node.getProperty(NTF_OWNER_PARAMETER).getValues())
-        .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_DAILY).getValues()))
-        .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
-        .setLastModifiedDate(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate())
-        .setId(node.getName());
-		
-      return message;
+      node.addMixin(EXO_MODIFY);
+      node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+      node.save();
+    }
+    NotificationInfo message = NotificationInfo.instance()
+      .setFrom(node.getProperty(NTF_FROM).getString())
+      .setOrder(Integer.valueOf(node.getProperty(NTF_ORDER).getString()))
+      .key(node.getProperty(NTF_PROVIDER_TYPE).getString())
+      .setOwnerParameter(node.getProperty(NTF_OWNER_PARAMETER).getValues())
+      .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_DAILY).getValues()))
+      .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
+      .setLastModifiedDate(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate())
+      .setId(node.getName());
+      
+    return message;
   }
 
   private void putRemoveMap(String key, String value) {
