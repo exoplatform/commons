@@ -17,12 +17,11 @@
 package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Session;
+import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
@@ -427,8 +426,23 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * @throws Exception
    */
   private UserSetting fillModel(Node node) throws Exception {
+    Node parentNode = node.getParent();
+    if(!parentNode.hasProperty(EXO_LAST_MODIFIED_DATE)) {
+      if(parentNode.isNodeType(EXO_MODIFY)) {
+        parentNode.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+        parentNode.save();
+      }
+      else if(parentNode.canAddMixin(EXO_MODIFY)) {
+        parentNode.addMixin(EXO_MODIFY);
+        parentNode.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+        parentNode.save();
+      }
+      else {
+        LOG.warn("Cannot add mixin to node '{}'.", parentNode.getPath());
+      }
+    }
     UserSetting model = UserSetting.getInstance();
-    model.setUserId(node.getParent().getName());
+    model.setUserId(parentNode.getName());
     model.setDailyPlugins(getValues(node, EXO_DAILY));
     model.setWeeklyPlugins(getValues(node, EXO_WEEKLY));
     //
@@ -439,7 +453,11 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       model.setChannelPlugins(channel.getId(), getValues(node, getChannelProperty(channel.getId())));
     }
     //
-    model.setLastUpdateTime(node.getParent().getProperty(EXO_LAST_MODIFIED_DATE).getDate());
+    if(parentNode.hasProperty(EXO_LAST_MODIFIED_DATE) ){
+      model.setLastUpdateTime(parentNode.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
+    } else {
+      model.setLastUpdateTime(Calendar.getInstance());
+    }
     //
     if (node.hasProperty(EXO_IS_ENABLED)) {
       model.setEnabled(Boolean.valueOf(node.getProperty(EXO_IS_ENABLED).getString()));
@@ -474,6 +492,20 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         NodeIterator iter = getDefaultDailyIterator(sProvider, offset, limit);
         while (iter.hasNext()) {
           Node node = iter.nextNode();
+          if(!node.hasProperty(EXO_LAST_MODIFIED_DATE)) {
+            if(node.isNodeType(EXO_MODIFY)) {
+              node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+              node.save();
+            }
+            else if(node.canAddMixin(EXO_MODIFY)) {
+              node.addMixin(EXO_MODIFY);
+              node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+              node.save();
+            }
+            else {
+              LOG.warn("Cannot add mixin to node '{}'.", node.getPath());
+            }
+          }
           users.add(UserSetting.getInstance()
                     .setUserId(node.getName())
                     .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));

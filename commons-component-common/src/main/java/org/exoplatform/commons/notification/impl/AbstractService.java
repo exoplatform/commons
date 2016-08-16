@@ -125,6 +125,8 @@ public abstract class AbstractService {
   public static final String EXO_DATE_CREATED         = "exo:dateCreated";
 
   public static final String EXO_LAST_MODIFIED_DATE   = "exo:lastModifiedDate";
+  
+  public static final String EXO_MODIFY   = "exo:modify";
 
   public static final String JCR_ROOT                 = "/jcr:root";
 
