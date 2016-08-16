@@ -246,10 +246,19 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   private NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
-    if(!node.hasProperty(EXO_LAST_MODIFIED_DATE) && node.canAddMixin(EXO_MODIFY)){
-      node.addMixin(EXO_MODIFY);
-      node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
-      node.save();
+    if(!node.hasProperty(EXO_LAST_MODIFIED_DATE)) {
+      if(node.isNodeType(EXO_MODIFY)) {
+        node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+        node.save();
+      }
+      else if(node.canAddMixin(EXO_MODIFY)) {
+        node.addMixin(EXO_MODIFY);
+        node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+        node.save();
+      }
+      else {
+        LOG.warn("Cannot add mixin to node '{}'.", node.getPath());
+      }
     }
     NotificationInfo message = NotificationInfo.instance()
       .setFrom(node.getProperty(NTF_FROM).getString())
@@ -260,7 +269,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
       .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
       .setLastModifiedDate(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate())
       .setId(node.getName());
-      
+
     return message;
   }
 
