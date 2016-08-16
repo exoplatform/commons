@@ -42,7 +42,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="MIMETYPE" type="NVARCHAR(100)"/>
-      <column name="SIZE" type="BIGINT"/>
+      <column name="FILE_SIZE" type="BIGINT"/>
       <column name="UPDATED_DATE" type="TIMESTAMP">
         <constraints nullable="false"/>
       </column>

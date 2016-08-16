@@ -30,7 +30,7 @@ public class FileInfoEntity {
   @Column(name = "MIMETYPE")
   private String          mimetype;
 
-  @Column(name = "SIZE")
+  @Column(name = "FILE_SIZE")
   private long            size;
 
   @Column(name = "UPDATED_DATE")
