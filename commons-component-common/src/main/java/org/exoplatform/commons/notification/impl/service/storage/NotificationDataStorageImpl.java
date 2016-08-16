@@ -246,10 +246,8 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   private NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
-    if(!node.hasProperty( EXO_LAST_MODIFIED_DATE)){
-        if(node.canAddMixin("exo:modify")) {
-          node.addMixin("exo:modify");
-        }
+    if(!node.hasProperty(EXO_LAST_MODIFIED_DATE) && node.canAddMixin(EXO_MODIFY)){
+        node.addMixin(EXO_MODIFY);
         node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
         node.save();
       }

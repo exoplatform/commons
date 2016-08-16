@@ -428,15 +428,14 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * @throws Exception
    */
   private UserSetting fillModel(Node node) throws Exception {
-    if(!node.getParent().hasProperty( EXO_LAST_MODIFIED_DATE)){
-      if(node.getParent().canAddMixin("exo:modify")) {
-        node.getParent().addMixin("exo:modify");
-	  }
-	  node.getParent().setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
-	  node.getParent().save();
+	Node parentNode = node.getParent();
+    if(!parentNode.hasProperty(EXO_LAST_MODIFIED_DATE) && parentNode.canAddMixin(EXO_MODIFY)){
+      parentNode.addMixin(EXO_MODIFY);
+      parentNode.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
+      parentNode.save();
 	}
     UserSetting model = UserSetting.getInstance();
-    model.setUserId(node.getParent().getName());
+    model.setUserId(parentNode.getName());
     model.setDailyPlugins(getValues(node, EXO_DAILY));
     model.setWeeklyPlugins(getValues(node, EXO_WEEKLY));
     //
@@ -447,7 +446,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       model.setChannelPlugins(channel.getId(), getValues(node, getChannelProperty(channel.getId())));
     }
     //
-    model.setLastUpdateTime(node.getParent().getProperty(EXO_LAST_MODIFIED_DATE).getDate());
+    model.setLastUpdateTime(parentNode.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
     //
     if (node.hasProperty(EXO_IS_ENABLED)) {
       model.setEnabled(Boolean.valueOf(node.getProperty(EXO_IS_ENABLED).getString()));
@@ -482,10 +481,8 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         NodeIterator iter = getDefaultDailyIterator(sProvider, offset, limit);
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          if(!node.hasProperty( EXO_LAST_MODIFIED_DATE)){
-            if(node.canAddMixin("exo:modify")) {
-              node.addMixin("exo:modify");
-            }
+          if(!node.hasProperty(EXO_LAST_MODIFIED_DATE) && node.canAddMixin(EXO_MODIFY)){
+            node.addMixin(EXO_MODIFY);
             node.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
             node.save();
           }
