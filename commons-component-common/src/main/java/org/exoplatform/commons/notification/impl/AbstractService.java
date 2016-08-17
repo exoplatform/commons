@@ -111,6 +111,8 @@ public abstract class AbstractService {
   public static final String NTF_SEND_TO_MONTHLY      = "ntf:sendToMonthly";
 
   public static final String NTF_LAST_MODIFIED_DATE   = "ntf:lastModifiedDate";
+  
+  public static final String EXO_MODIFY   = "exo:modify";
 
   public static final String MIX_DEFAULT_SETTING      = "mix:defaultSetting";
 
