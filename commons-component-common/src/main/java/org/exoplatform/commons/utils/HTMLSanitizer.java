@@ -296,6 +296,11 @@ abstract public class HTMLSanitizer {
                                                                                                                                         "colgroup",
                                                                                                                                         "fieldset",
                                                                                                                                         "legend")
+
+                                                                                                                                 //Allows the named elements for xwiki input
+                                                                                                                                .allowElements("wikiimage","wikilink","wikimacro")
+                                                                                                                                .allowAttributes("wikiparam")
+                                                                                                                                .globally()
                                                                                                                                 .toFactory();
 
   /**
