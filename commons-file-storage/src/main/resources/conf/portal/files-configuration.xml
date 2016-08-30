@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+
+    Copyright (C) 2009 eXo Platform SAS.
+
+    This is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as
+    published by the Free Software Foundation; either version 2.1 of
+    the License, or (at your option) any later version.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this software; if not, write to the Free
+    Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+    02110-1301 USA, or see the FSF site: http://www.fsf.org.
+
+-->
+<configuration
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+        xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+
+  <component>
+    <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.storage.dao.FileInfoDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.FileInfoDAOImpl</type>
+  </component>
+  <component>
+      <key>org.exoplatform.commons.file.storage.dao.NameSpaceDAO</key>
+      <type>org.exoplatform.commons.file.storage.dao.impl.NameSpaceDAOImpl</type>
+  </component>
+  <component>
+      <key>org.exoplatform.commons.file.storage.dao.OrphanFileDAO</key>
+      <type>org.exoplatform.commons.file.storage.dao.impl.OrphanFileDAOImpl</type>
+  </component>
+
+  <component>
+        <key>org.exoplatform.commons.file.storage.DataStorage</key>
+        <type>org.exoplatform.commons.file.storage.DataStorage</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.resource.BinaryProvider</key>
+    <type>org.exoplatform.commons.file.resource.FileSystemResourceProvider</type>
+    <init-params>
+      <value-param>
+        <name>rootPath</name>
+        <value>${exo.data.dir}/files</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.services.FileService</key>
+    <type>org.exoplatform.commons.file.services.impl.FileServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.services.NameSpaceService</key>
+     <type>org.exoplatform.commons.file.services.impl.NameSpaceServiceImpl</type>
+     <init-params>
+         <value-param>
+             <name>default.namespace</name>
+             <value>file</value>
+         </value-param>
+     </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.file.services.checker.FileStorageCheckController</key>
+    <type>org.exoplatform.commons.file.services.checker.FileStorageCheckController</type>
+  </component>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
+    <component-plugin>
+      <name>FilesChangeLogsPlugin</name>
+      <set-method>addChangeLogsPlugin</set-method>
+      <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+      <init-params>
+        <values-param>
+          <name>changelogs</name>
+          <description>Change logs of files</description>
+          <value>db/changelog/file.db.changelog-1.0.0.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+        <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
+        <component-plugin profiles="all">
+            <name>AddCronJob</name>
+            <set-method>addCronJob</set-method>
+            <type>org.exoplatform.commons.file.services.job.FileStorageCronJob</type>
+            <description>add clean unused files job to the JobSchedulerService</description>
+            <init-params>
+                <properties-param>
+                    <name>cronjob.info</name>
+                    <description>Configuration for remove unused files</description>
+                    <property name="jobName" value="FileStorageCleanJob"/>
+                    <property name="groupName" value="FileStorage"/>
+                    <property name="job" value="org.exoplatform.commons.file.services.job.FileStorageCleanJob"/>
+                    <property name="expression" value="${exo.commons.FileStorageCleanJob.expression:0 0 11 ? * SUN}"/>
+                </properties-param>
+                <properties-param>
+                    <name>FileStorageCleanJob.Param</name>
+                    <description>General parameters for job</description>
+                    <property name="retention-time" value="${exo.commons.FileStorageCleanJob.retention-time:30}"/>
+                    <property name="enabled" value="${exo.commons.FileStorageCleanJob.enabled:true}"/>
+                </properties-param>
+            </init-params>
+        </component-plugin>
+  </external-component-plugins>
+
+</configuration>
