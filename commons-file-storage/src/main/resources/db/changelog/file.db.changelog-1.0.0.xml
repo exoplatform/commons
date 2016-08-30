@@ -43,7 +43,7 @@
       </column>
       <column name="MIMETYPE" type="NVARCHAR(100)"/>
       <column name="FILE_SIZE" type="BIGINT"/>
-      <column name="UPDATED_DATE" type="TIMESTAMP">
+      <column name="UPDATED_DATE" type="TIMESTAMP" defaultValueComputed="${now}">
         <constraints nullable="false"/>
       </column>
       <column name="UPDATER" type="NVARCHAR(100)"/>
@@ -63,7 +63,7 @@
       <column name="FILE_ID" type="BIGINT">
         <constraints nullable="false" foreignKeyName="FK_FILES_ORPHAN_FILE_ID" references="FILES_FILES(FILE_ID)"/>
       </column>
-      <column name="DELETED_DATE" type="TIMESTAMP">
+      <column name="DELETED_DATE" type="TIMESTAMP" defaultValueComputed="${now}">
         <constraints nullable="false"/>
       </column>
       <column name="CHECKSUM" type="NVARCHAR(100)"/>

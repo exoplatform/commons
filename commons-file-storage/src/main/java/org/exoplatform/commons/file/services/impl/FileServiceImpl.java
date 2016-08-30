@@ -43,7 +43,7 @@ public class FileServiceImpl implements FileService {
     FileItem fileItem;
     FileInfo fileInfo = dataStorage.getFileInfo(id);
 
-    if (StringUtils.isEmpty(fileInfo.getChecksum())) {
+    if (fileInfo == null || StringUtils.isEmpty(fileInfo.getChecksum())) {
       return null;
     }
     try {
