@@ -39,6 +39,10 @@ public class StringCommonUtils {
 
   private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("(<(/|)?[ ]*(script|iframe|object|embed)>|<(iframe|object|embed)|((background|expression|style)=)|javascript:\\w+|(on\\w+=))",
                                                                     Pattern.CASE_INSENSITIVE);
+  private static final String  MACRO_START_TAG    = "startmacro";
+  private static final String  MACRO_END_TAG    = "stopmacro";
+  private static final Pattern MACRO_REGEX      =
+          Pattern.compile("<!--" + MACRO_START_TAG + "(.*?)-->(.*?)<!--" + MACRO_END_TAG + "-->",Pattern.DOTALL);
 
   private static final int               BUFFER_SIZE           = 32;
 
@@ -80,6 +84,52 @@ public class StringCommonUtils {
       input = str.toString();
     }
     return input;
+  }
+
+  /**
+   * Encode the XSS script from xhtmlContent of wiki page and skip encoding macro as a trusted third party    
+   *  
+   * @param input the given string to encode
+   * 
+   */
+  public static String encodeWikiScriptMarkup(String input) {
+	  if (input != null) {
+	      String decodeInput = StringEscapeUtils.unescapeHtml(input);
+	      Matcher matcher = SCRIPT_TAG_PATTERN.matcher(decodeInput);
+	      StringBuffer str = new StringBuffer(decodeInput.length());
+	      Matcher macroMatcher = MACRO_REGEX.matcher(decodeInput);	  
+	      ArrayList<Integer> startIndex = new ArrayList<Integer>();
+	      ArrayList<Integer> endIndex = new ArrayList<Integer>();
+			while (macroMatcher.find()) {
+				startIndex.add(macroMatcher.start());
+				endIndex.add(macroMatcher.end());
+			}
+	      boolean skip=false;	      
+			while (matcher.find()) {
+				int styleStartPos = matcher.start();
+				for (int i = 0; i < startIndex.size(); i++) {
+					int firstIndex = startIndex.get(i);
+					int lastIndex = endIndex.get(i);
+					if (styleStartPos > firstIndex && styleStartPos < lastIndex)
+
+						skip = true;
+
+				}
+				if (!skip) {
+					if (matchedWord(matcher.group())) {
+						matcher.appendReplacement(str, "");
+					} else {
+						matcher.appendReplacement(str,
+								HTMLEntityEncoder.getInstance()
+										.encodeHTMLAttribute(matcher.group()));
+					}
+					skip = false;
+				}
+			}
+	      matcher.appendTail(str);
+	      input = str.toString();
+	    }
+	    return input;
   }
   
   private static boolean matchedWord(String input) {
