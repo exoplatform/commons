@@ -93,45 +93,43 @@ public class StringCommonUtils {
    * 
    */
   public static String encodeWikiScriptMarkup(String input) {
-	  if (input != null) {
-	      String decodeInput = StringEscapeUtils.unescapeHtml(input);
-	      Matcher matcher = SCRIPT_TAG_PATTERN.matcher(decodeInput);
-	      StringBuffer str = new StringBuffer(decodeInput.length());
-	      Matcher macroMatcher = MACRO_REGEX.matcher(decodeInput);	  
-	      ArrayList<Integer> startIndex = new ArrayList<Integer>();
-	      ArrayList<Integer> endIndex = new ArrayList<Integer>();
-			while (macroMatcher.find()) {
-				startIndex.add(macroMatcher.start());
-				endIndex.add(macroMatcher.end());
-			}
-	      boolean skip=false;	      
-			while (matcher.find()) {
-				int styleStartPos = matcher.start();
-				for (int i = 0; i < startIndex.size(); i++) {
-					int firstIndex = startIndex.get(i);
-					int lastIndex = endIndex.get(i);
-					if (styleStartPos > firstIndex && styleStartPos < lastIndex)
+    if (input != null) {
+      String decodeInput = StringEscapeUtils.unescapeHtml(input);
+      Matcher matcher = SCRIPT_TAG_PATTERN.matcher(decodeInput);
+      StringBuffer str = new StringBuffer(decodeInput.length());
+      Matcher macroMatcher = MACRO_REGEX.matcher(decodeInput);
+      ArrayList<Integer> startIndex = new ArrayList<Integer>();
+      ArrayList<Integer> endIndex = new ArrayList<Integer>();
+      while (macroMatcher.find()) {
+        startIndex.add(macroMatcher.start());
+        endIndex.add(macroMatcher.end());
+      }
+      boolean skip = false;
+      while (matcher.find()) {
+        int styleStartPos = matcher.start();
+        for (int i = 0; i < startIndex.size(); i++) {
+          int firstIndex = startIndex.get(i);
+          int lastIndex = endIndex.get(i);
+          if (styleStartPos > firstIndex && styleStartPos < lastIndex)
 
-						skip = true;
+            skip = true;
 
-				}
-				if (!skip) {
-					if (matchedWord(matcher.group())) {
-						matcher.appendReplacement(str, "");
-					} else {
-						matcher.appendReplacement(str,
-								HTMLEntityEncoder.getInstance()
-										.encodeHTMLAttribute(matcher.group()));
-					}
-					skip = false;
-				}
-			}
-	      matcher.appendTail(str);
-	      input = str.toString();
-	    }
-	    return input;
+        }
+        if (!skip) {
+          if (matchedWord(matcher.group())) {
+            matcher.appendReplacement(str, "");
+          } else {
+            matcher.appendReplacement(str, HTMLEntityEncoder.getInstance().encodeHTMLAttribute(matcher.group()));
+          }
+          skip = false;
+        }
+      }
+      matcher.appendTail(str);
+      input = str.toString();
+    }
+    return input;
   }
-  
+
   private static boolean matchedWord(String input) {
     if (input == null || input.length() == 0) return true;
     //

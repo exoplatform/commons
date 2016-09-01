@@ -71,87 +71,65 @@ public class StringCommonUtilsTest extends TestCase {
   }
   
   
-	public void testencodeWikiScriptMarkup() {
-		String input = "<p>test</p>\n"
-				+ "<!--startmacro:section|-||-|test-->\n"
-				+ "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test&nbsp;</p>\n"
-				+ "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n"
-				+ "</div>\n"
-				+ "<!--stopmacro-->\n"
-				+ "<p><br/></p>\n"
-				+ "<p>\n"
-				+ "   <!--startmacro:code|-|language=\"java\" title=\"test\"|-|include java.h--><span class=\"box\"><span class=\"code\">include java.<span style=\"color: #658b00; \">h</span></span></span><!--stopmacro--><br/>\n"
-				+ "</p>\n" + "<p><em>test</em></p>";
-		String done = StringCommonUtils.encodeWikiScriptMarkup(input);
-		assertEquals(
-				"<p>test</p>\n"
-						+ "<!--startmacro:section|-||-|test-->\n"
-						+ "<div>\n"
-						+ "   <div style=\"float:left;width:99.9%;\">\n"
-						+ "      <p>test </p>\n"
-						+ "   </div>\n"
-						+ "   <div style=\"clear:both\"></div>\n"
-						+ "</div>\n"
-						+ "<!--stopmacro-->\n"
-						+ "<p><br/></p>\n"
-						+ "<p>\n"
-						+ "   <!--startmacro:code|-|language=\"java\" title=\"test\"|-|include java.h--><span class=\"box\"><span class=\"code\">include java.<span style=\"color: #658b00; \">h</span></span></span><!--stopmacro--><br/>\n"
-						+ "</p>\n" + "<p><em>test</em></p>", done);
+  public void testencodeWikiScriptMarkup() {
+    String input = "<p>test</p>\n"
+        + "<!--startmacro:section|-||-|test-->\n"
+        + "<div>\n"
+        + "   <div style=\"float:left;width:99.9%;\">\n"
+        + "      <p>test&nbsp;</p>\n"
+        + "   </div>\n"
+        + "   <div style=\"clear:both\"></div>\n"
+        + "</div>\n"
+        + "<!--stopmacro-->\n"
+        + "<p><br/></p>\n"
+        + "<p>\n"
+        + "   <!--startmacro:code|-|language=\"java\" title=\"test\"|-|include java.h--><span class=\"box\"><span class=\"code\">include java.<span style=\"color: #658b00; \">h</span></span></span><!--stopmacro--><br/>\n"
+        + "</p>\n" + "<p><em>test</em></p>";
+    String done = StringCommonUtils.encodeWikiScriptMarkup(input);
+    assertEquals("<p>test</p>\n"
+                     + "<!--startmacro:section|-||-|test-->\n"
+                     + "<div>\n"
+                     + "   <div style=\"float:left;width:99.9%;\">\n"
+                     + "      <p>test </p>\n"
+                     + "   </div>\n"
+                     + "   <div style=\"clear:both\"></div>\n"
+                     + "</div>\n"
+                     + "<!--stopmacro-->\n"
+                     + "<p><br/></p>\n"
+                     + "<p>\n"
+                     + "   <!--startmacro:code|-|language=\"java\" title=\"test\"|-|include java.h--><span class=\"box\"><span class=\"code\">include java.<span style=\"color: #658b00; \">h</span></span></span><!--stopmacro--><br/>\n"
+                     + "</p>\n" + "<p><em>test</em></p>",
+                 done);
 
-		String input1 = "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n" + "</div>\n"
-				+ "<!--stopmacro-->\n"
-				+ "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n" + "</div>\n"
-				+ "<!--stopmacro-->";
+    String input1 = "<!--startmacro:section|-||-|test-->\n" + "<div>\n" + "   <div style=\"float:left;width:99.9%;\">\n"
+        + "      <p>test</p>\n" + "   </div>\n" + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->\n"
+        + "<!--startmacro:section|-||-|test-->\n" + "<div>\n" + "   <div style=\"float:left;width:99.9%;\">\n"
+        + "      <p>test</p>\n" + "   </div>\n" + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->";
 
-		String done1 = StringCommonUtils.encodeWikiScriptMarkup(input1);
-		assertEquals("<!--startmacro:section|-||-|test-->\n" + "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n" + "</div>\n"
-				+ "<!--stopmacro-->\n"
-				+ "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n" + "</div>\n"
-				+ "<!--stopmacro-->", done1);
+    String done1 = StringCommonUtils.encodeWikiScriptMarkup(input1);
+    assertEquals("<!--startmacro:section|-||-|test-->\n" + "<div>\n" + "   <div style=\"float:left;width:99.9%;\">\n"
+                     + "      <p>test</p>\n" + "   </div>\n" + "   <div style=\"clear:both\"></div>\n" + "</div>\n"
+                     + "<!--stopmacro-->\n" + "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
+                     + "   <div style=\"float:left;width:99.9%;\">\n" + "      <p>test</p>\n" + "   </div>\n"
+                     + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->",
+                 done1);
 
-		String input2 = "<div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n" + "</div>\n"
-				+ "<!--stopmacro-->\n"
-				+ "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n" + "</div>\n"
-				+ "<!--stopmacro-->";
+    String input2 = "<div style=\"float:left;width:99.9%;\">\n" + "      <p>test</p>\n" + "   </div>\n"
+        + "<!--startmacro:section|-||-|test-->\n" + "<div>\n" + "   <div style=\"float:left;width:99.9%;\">\n"
+        + "      <p>test</p>\n" + "   </div>\n" + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->\n"
+        + "<!--startmacro:section|-||-|test-->\n" + "<div>\n" + "   <div style=\"float:left;width:99.9%;\">\n"
+        + "      <p>test</p>\n" + "   </div>\n" + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->";
 
-		String done2 = StringCommonUtils.encodeWikiScriptMarkup(input2);
-		assertEquals("<div \"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n" + "</div>\n"
-				+ "<!--stopmacro-->\n"
-				+ "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
-				+ "   <div style=\"float:left;width:99.9%;\">\n"
-				+ "      <p>test</p>\n" + "   </div>\n"
-				+ "   <div style=\"clear:both\"></div>\n" + "</div>\n"
-				+ "<!--stopmacro-->", done2);
+    String done2 = StringCommonUtils.encodeWikiScriptMarkup(input2);
+    assertEquals("<div \"float:left;width:99.9%;\">\n" + "      <p>test</p>\n" + "   </div>\n"
+                     + "<!--startmacro:section|-||-|test-->\n" + "<div>\n" + "   <div style=\"float:left;width:99.9%;\">\n"
+                     + "      <p>test</p>\n" + "   </div>\n" + "   <div style=\"clear:both\"></div>\n" + "</div>\n"
+                     + "<!--stopmacro-->\n" + "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
+                     + "   <div style=\"float:left;width:99.9%;\">\n" + "      <p>test</p>\n" + "   </div>\n"
+                     + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->",
+                 done2);
 
-	}
+  }
   
   public void testRemoveEventAttribute() {
     
