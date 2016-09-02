@@ -56,6 +56,10 @@ public class PluginStatisticService {
   private long postActivitySpaceCreatedMessageCount = 0;
   private long postActivitySpaceCreatedNotifCount = 0;
   private long postActivitySpaceCreatedDigestCount = 0;
+
+  private long shareDocumentCreatedMessageCount = 0;
+  private long shareDocumentCreatedNotifCount = 0;
+  private long shareDocumentCreatedDigestCount = 0;
   
   private long relationshipRecievedCreatedMessageCount = 0;
   private long relationshipRecievedCreatedNotifCount = 0;

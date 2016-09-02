@@ -594,7 +594,23 @@
             </field>
           </object>
         </object-param>
-       
+
+        <object-param>
+          <name>group.documents</name>
+          <description>The information of group documents</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
+            <field name="id">
+              <string>documents</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.group.Documents</string>
+            </field>
+            <field name="order">
+              <string>5</string>
+            </field>
+          </object>
+        </object-param>
+
         <object-param>
           <name>group.other</name>
           <description>The information of group activity other</description>
