@@ -111,16 +111,13 @@ public class StringCommonUtils {
           int firstIndex = startIndex.get(i);
           int lastIndex = endIndex.get(i);
           if (styleStartPos > firstIndex && styleStartPos < lastIndex)
-
             skip = true;
-
         }
         if (!skip) {
-          if (matchedWord(matcher.group())) {
+          if (matchedWord(matcher.group()))
             matcher.appendReplacement(str, "");
-          } else {
+          else
             matcher.appendReplacement(str, HTMLEntityEncoder.getInstance().encodeHTMLAttribute(matcher.group()));
-          }
           skip = false;
         }
       }

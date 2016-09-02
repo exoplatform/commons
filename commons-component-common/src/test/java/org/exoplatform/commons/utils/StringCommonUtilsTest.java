@@ -17,7 +17,6 @@
 package org.exoplatform.commons.utils;
 
 import junit.framework.TestCase;
-
 import java.io.InputStream;
 
 
@@ -128,6 +127,25 @@ public class StringCommonUtilsTest extends TestCase {
                      + "   <div style=\"float:left;width:99.9%;\">\n" + "      <p>test</p>\n" + "   </div>\n"
                      + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->",
                  done2);
+
+    String input3 = "<p><Script>alert(1);</script>bbbb</p>" + "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
+        + "   <div style=\"float:left;width:99.9%;\">\n" + "      <p>test</p>\n" + "   </div>\n"
+        + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->\n";
+
+    String done3 = StringCommonUtils.encodeWikiScriptMarkup(input3);
+    assertEquals("<p>&lt;Script&gt;alert(1);&lt;&#x2f;script&gt;bbbb</p>" + "<!--startmacro:section|-||-|test-->\n" + "<div>\n"
+        + "   <div style=\"float:left;width:99.9%;\">\n" + "      <p>test</p>\n" + "   </div>\n"
+        + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->\n", done3);
+
+    String input4 = "<TABLE BACKGROUND=\"javascript:alert('XSS')\">" + "<p><Script>alert(1);</script>bbbb</p>"
+        + "<!--startmacro:section|-||-|test-->\n" + "<div>\n" + "   <div style=\"float:left;width:99.9%;\">\n"
+        + "      <p>test</p>\n" + "   </div>\n" + "   <div style=\"clear:both\"></div>\n" + "</div>\n" + "<!--stopmacro-->\n";
+    String done4 = StringCommonUtils.encodeWikiScriptMarkup(input4);
+    assertEquals("<TABLE \"('XSS')\">" + "<p>&lt;Script&gt;alert(1);&lt;&#x2f;script&gt;bbbb</p>"
+                     + "<!--startmacro:section|-||-|test-->\n" + "<div>\n" + "   <div style=\"float:left;width:99.9%;\">\n"
+                     + "      <p>test</p>\n" + "   </div>\n" + "   <div style=\"clear:both\"></div>\n" + "</div>\n"
+                     + "<!--stopmacro-->\n",
+                 done4);
 
   }
   
