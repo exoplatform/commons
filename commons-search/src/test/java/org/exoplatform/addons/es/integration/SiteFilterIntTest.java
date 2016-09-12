@@ -34,6 +34,7 @@ import org.exoplatform.addons.es.index.impl.ElasticIndexingOperationProcessor;
 import org.exoplatform.addons.es.index.impl.ElasticIndexingServiceConnector;
 import org.exoplatform.addons.es.search.ElasticSearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.security.ConversationState;
@@ -67,6 +68,7 @@ public class SiteFilterIntTest extends BaseIntegrationTest {
   private IndexingOperationProcessor indexingOperationProcessor;
   private ElasticSearchServiceConnector elasticSearchServiceConnector;
   private IndexingOperationDAO dao;
+  private EntityManagerService entityManagerService;
   private ElasticIndexingServiceConnector testConnector;
 
   @BeforeClass
@@ -105,7 +107,9 @@ public class SiteFilterIntTest extends BaseIntegrationTest {
     //IndexService
     dao = new IndexingOperationDAOImpl();
     ElasticContentRequestBuilder builder = new ElasticContentRequestBuilder();
-    indexingOperationProcessor = new ElasticIndexingOperationProcessor(dao, elasticIndexingClient, builder, new ElasticIndexingAuditTrail(), null);
+    entityManagerService = new EntityManagerService();
+    entityManagerService.startRequest(null);
+    indexingOperationProcessor = new ElasticIndexingOperationProcessor(dao, elasticIndexingClient, builder, new ElasticIndexingAuditTrail(), entityManagerService, null);
     indexingOperationProcessor.addConnector(testConnector);
 
     //Search connector
@@ -113,6 +117,11 @@ public class SiteFilterIntTest extends BaseIntegrationTest {
 
     //Set identity
     setCurrentIdentity(USERNAME);
+  }
+
+  @After
+  public void tearDown() {
+    entityManagerService.endRequest(null);
   }
 
   private void setCurrentIdentity(String userId, String... memberships) {

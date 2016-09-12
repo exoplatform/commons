@@ -17,15 +17,13 @@ import org.exoplatform.addons.es.index.impl.ElasticIndexingOperationProcessor;
 import org.exoplatform.addons.es.index.impl.ElasticIndexingServiceConnector;
 import org.exoplatform.addons.es.search.ElasticSearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -55,6 +53,8 @@ public class PermissionsFilterIntTest extends BaseIntegrationTest {
   private ElasticSearchServiceConnector elasticSearchServiceConnector;
 
   private IndexingOperationDAO            dao;
+
+  private EntityManagerService entityManagerService;
 
   private ElasticIndexingServiceConnector wikiConnector;
 
@@ -94,12 +94,19 @@ public class PermissionsFilterIntTest extends BaseIntegrationTest {
     // IndexService
     dao = new IndexingOperationDAOImpl();
     ElasticContentRequestBuilder builder = new ElasticContentRequestBuilder();
-    indexingOperationProcessor = new ElasticIndexingOperationProcessor(dao, elasticIndexingClient, builder, new ElasticIndexingAuditTrail(), null);
+    entityManagerService = new EntityManagerService();
+    entityManagerService.startRequest(null);
+    indexingOperationProcessor = new ElasticIndexingOperationProcessor(dao, elasticIndexingClient, builder, new ElasticIndexingAuditTrail(), entityManagerService, null);
     indexingOperationProcessor.addConnector(wikiConnector);
     indexingOperationProcessor.start();
 
     // Search connector
     elasticSearchServiceConnector = new ElasticSearchServiceConnector(getInitConnectorParams(), elasticSearchingClient);
+  }
+
+  @After
+  public void tearDown() {
+    entityManagerService.endRequest(null);
   }
 
   private void setCurrentIdentity(String userId, String... memberships) {

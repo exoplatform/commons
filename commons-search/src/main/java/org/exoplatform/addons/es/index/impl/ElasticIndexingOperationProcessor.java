@@ -26,6 +26,8 @@ import org.exoplatform.addons.es.domain.OperationType;
 import org.exoplatform.addons.es.index.IndexingOperationProcessor;
 import org.exoplatform.addons.es.index.IndexingServiceConnector;
 import org.exoplatform.commons.api.persistence.DataInitializer;
+import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -53,6 +55,7 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
   private final ElasticIndexingClient        elasticIndexingClient;
   private final ElasticContentRequestBuilder elasticContentRequestBuilder;
   private final ElasticIndexingAuditTrail    auditTrail;
+  private final EntityManagerService         entityManagerService;
   private Integer                            batchNumber                         = BATCH_NUMBER_DEFAULT;
   private Integer                            requestSizeLimit                    = REQUEST_SIZE_LIMIT_DEFAULT;
   private int                                reindexBatchSize                    = REINDEXING_BATCH_SIZE_DEFAULT_VALUE;
@@ -61,9 +64,11 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
                                            ElasticIndexingClient elasticIndexingClient,
                                            ElasticContentRequestBuilder elasticContentRequestBuilder,
                                            ElasticIndexingAuditTrail auditTrail,
+                                           EntityManagerService entityManagerService,
                                            DataInitializer dataInitializer) {
     this.indexingOperationDAO = indexingOperationDAO;
     this.auditTrail = auditTrail;
+    this.entityManagerService = entityManagerService;
     this.elasticIndexingClient = elasticIndexingClient;
     this.elasticContentRequestBuilder = elasticContentRequestBuilder;
     if (StringUtils.isNotBlank(PropertyManager.getProperty(BATCH_NUMBER_PROPERTY_NAME))) {
@@ -97,7 +102,13 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
    * Handle the Indexing queue Get all data in the indexing queue, transform
    * them to ES requests, send requests to ES This method is ONLY called by the
    * job scheduler. This method is not annotated with @ExoTransactional because
-   * we don't want it to be executed in one transaction. Every
+   * we don't want it to be executed in one transaction.
+   *
+   * A request lifecycle is started and ended for all jobs, it is done by
+   * org.exoplatform.services.scheduler.impl.JobEnvironmentConfigListener. It
+   * means that we have 1 entity manager per job execution. Because of that, we
+   * have to take care of cleaning the persistence context regularly to avoid
+   * to have too big sessions and bad performances.
    */
   @Override
   public void process() {
@@ -138,6 +149,10 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
     // timestamp older than the timestamp of
     // start of processing
     indexingOperationDAO.deleteAllIndexingOperationsHavingIdLessThanOrEqual(maxIndexingOperationId);
+
+    // clear entity manager content after each bulk
+    entityManagerService.getEntityManager().clear();
+
     return indexingOperations.size();
   }
 
@@ -286,43 +301,51 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
    * @param indexingQueueSorted Temporary inMemory IndexingQueue
    */
   private void processReindexAll(Map<OperationType, Map<String, List<IndexingOperation>>> indexingQueueSorted) {
-    List<IndexingOperation> operations;
-    List<String> ids;
-    int numberIndexed;
-    int offset;
-
     if (indexingQueueSorted.containsKey(OperationType.REINDEX_ALL)) {
       for (String entityType : indexingQueueSorted.get(OperationType.REINDEX_ALL).keySet()) {
         if (indexingQueueSorted.get(OperationType.REINDEX_ALL).containsKey(entityType)) {
           for (IndexingOperation indexingOperation : indexingQueueSorted.get(OperationType.REINDEX_ALL).get(entityType)) {
-            long startTime = System.currentTimeMillis();
-            // 1- Delete all documents in ES (and purge the indexing queue)
-            indexingOperationDAO.create(new IndexingOperation(null, entityType, OperationType.DELETE_ALL));
-            // 2- Get all the documents ID
-            IndexingServiceConnector connector = getConnectors().get(indexingOperation.getEntityType());
-            // 3- Inject as a CUD operation
-            offset = 0;
-            do {
-              ids = connector.getAllIds(offset, reindexBatchSize);
-              if (ids == null) {
-                numberIndexed = 0;
-              } else {
-                operations = new ArrayList<>(ids.size());
-                for (String id : ids) {
-                  operations.add(new IndexingOperation(id, entityType, OperationType.CREATE));
-                }
-                indexingOperationDAO.createAll(operations);
-                numberIndexed = ids.size();
-                offset += reindexBatchSize;
-              }
-            } while (numberIndexed == reindexBatchSize);
-            // 4- log in Audit Trail
-            auditTrail.audit(ElasticIndexingAuditTrail.REINDEX_ALL, null, null, entityType, null, null, (System.currentTimeMillis()-startTime));
+            reindexAllByEntityType(indexingOperation.getEntityType());
+            // clear entity manager content
+            entityManagerService.getEntityManager().clear();
           }
         }
       }
       indexingQueueSorted.remove(OperationType.REINDEX_ALL);
     }
+  }
+
+  /**
+   * Reindex all the entities of the given entity type.
+   *
+   * @param entityType Entity type of the entities to reindex
+   */
+  @ExoTransactional
+  private void reindexAllByEntityType(String entityType) {
+    long startTime = System.currentTimeMillis();
+    // 1- Delete all documents in ES (and purge the indexing queue)
+    indexingOperationDAO.create(new IndexingOperation(null, entityType, OperationType.DELETE_ALL));
+    // 2- Get all the documents ID
+    IndexingServiceConnector connector = getConnectors().get(entityType);
+    // 3- Inject as a CUD operation
+    int offset = 0;
+    int numberIndexed;
+    do {
+      List<String> ids = connector.getAllIds(offset, reindexBatchSize);
+      if (ids == null) {
+        numberIndexed = 0;
+      } else {
+        List<IndexingOperation> operations = new ArrayList<>(ids.size());
+        for (String id : ids) {
+          operations.add(new IndexingOperation(id, entityType, OperationType.CREATE));
+        }
+        indexingOperationDAO.createAll(operations);
+        numberIndexed = ids.size();
+        offset += reindexBatchSize;
+      }
+    } while (numberIndexed == reindexBatchSize);
+    // 4- log in Audit Trail
+    auditTrail.audit(ElasticIndexingAuditTrail.REINDEX_ALL, null, null, entityType, null, null, (System.currentTimeMillis()-startTime));
   }
 
   private void deleteOperationsForTypesBefore(OperationType[] operations,

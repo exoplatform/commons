@@ -25,6 +25,7 @@ import org.exoplatform.addons.es.domain.IndexingOperation;
 import org.exoplatform.addons.es.domain.OperationType;
 import org.exoplatform.addons.es.index.impl.ElasticIndexingOperationProcessor;
 import org.exoplatform.addons.es.index.impl.ElasticIndexingServiceConnector;
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,10 +72,14 @@ public class ElasticOperationProcessorTest {
   @Mock
   private ElasticContentRequestBuilder elasticContentRequestBuilder;
 
+  private EntityManagerService entityManagerService;
+
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
-    elasticIndexingOperationProcessor = new ElasticIndexingOperationProcessor(indexingOperationDAO, elasticIndexingClient, elasticContentRequestBuilder, auditTrail, null);
+    entityManagerService = new EntityManagerService();
+    entityManagerService.startRequest(null);
+    elasticIndexingOperationProcessor = new ElasticIndexingOperationProcessor(indexingOperationDAO, elasticIndexingClient, elasticContentRequestBuilder, auditTrail, entityManagerService, null);
     initElasticServiceConnector();
   }
 
@@ -88,6 +93,7 @@ public class ElasticOperationProcessorTest {
   @After
   public void clean() {
     elasticIndexingOperationProcessor.getConnectors().clear();
+    entityManagerService.endRequest(null);
   }
 
   /*
