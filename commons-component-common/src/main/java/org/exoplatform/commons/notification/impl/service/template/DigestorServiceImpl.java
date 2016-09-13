@@ -98,7 +98,7 @@ public class DigestorServiceImpl implements DigestorService {
         int endIndex = li_attribute.indexOf(";", beginIndex) + 1;
         String replacedStr = li_attribute.substring(beginIndex, endIndex);
         digestMessageList = digestMessageList
-            .replace(replacedStr, "margin: 0; background-color: #F9F9F9; padding: 15px 20px;");
+            .replace(replacedStr, "margin: 0; padding: 15px 20px;");
       }
 
       DigestInfo digestInfo = new DigestInfo(jobContext, userSetting);
