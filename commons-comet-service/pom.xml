@@ -8,7 +8,7 @@
   </parent>
   <artifactId>commons-comet-service</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons - Comet Services</name>
+  <name>eXo PLF:: Commons - Comet Services</name>
   <properties>
     <!-- All tests are broken here :( -->
     <!-- These are IT tests that must be reviewed -->
@@ -32,8 +32,8 @@
       <artifactId>exo.kernel.container</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>javax.servlet</groupId>
           <artifactId>javax.servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -54,24 +54,24 @@
       <artifactId>exo.jcr.component.core</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>xml-apis</groupId>
           <artifactId>xml-apis</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>xml-apis</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>xml-apis-ext</artifactId>
+          <groupId>xml-apis</groupId>
         </exclusion>
         <exclusion>
-          <groupId>javax.xml.stream</groupId>
           <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.javaee</groupId>
           <artifactId>jboss-transaction-api</artifactId>
+          <groupId>org.jboss.javaee</groupId>
         </exclusion>
         <exclusion>
-          <groupId>org.ow2.spec.ee</groupId>
           <artifactId>ow2-jta-1.1-spec</artifactId>
+          <groupId>org.ow2.spec.ee</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -142,10 +142,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-     <groupId>javax.websocket</groupId>
-     <artifactId>javax.websocket-api</artifactId>
-     <version>1.0</version>
-     <scope>provided</scope>
+      <groupId>javax.websocket</groupId>
+      <artifactId>javax.websocket-api</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
     </dependency>
     <!-- New Cometd -->
     <dependency>

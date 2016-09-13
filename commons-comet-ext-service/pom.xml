@@ -7,7 +7,7 @@
     <version>4.4.x-SNAPSHOT</version>
   </parent>
   <artifactId>commons-comet-ext-service</artifactId>
-  <name>eXo Commons - Comet Ext Service (test only)</name>
+  <name>eXo PLF:: Commons - Comet Ext Service (test only)</name>
   <description>for test only</description>
   <dependencies>
     <dependency>

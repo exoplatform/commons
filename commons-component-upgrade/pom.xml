@@ -7,7 +7,7 @@
     <version>4.4.x-SNAPSHOT</version>
   </parent>
   <artifactId>commons-component-upgrade</artifactId>
-  <name>eXo Commons - Transparent Upgrade Framework</name>
+  <name>eXo PLF:: Commons - Transparent Upgrade Framework</name>
   <dependencies>
     <dependency>
       <groupId>javax.jcr</groupId>
@@ -22,22 +22,22 @@
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-component-product</artifactId>
     </dependency>
-      <dependency>
-       <groupId>org.exoplatform.commons</groupId>
-       <artifactId>commons-api</artifactId>
-     </dependency>
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.core</artifactId>
       <exclusions>
-        <exclusion>          
-          <groupId>xml-apis</groupId>
+        <exclusion>
           <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
         </exclusion>
         <exclusion>
-		  <groupId>xml-apis</groupId>
-          <artifactId>xml-apis-ext</artifactId>          
-        </exclusion>        
+          <artifactId>xml-apis-ext</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

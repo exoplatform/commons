@@ -9,7 +9,7 @@
   <artifactId>commons-gifbackport</artifactId>
   <version>4.4.x-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>eXo Commons - Component GIF plugin backport</name>
+  <name>eXo PLF:: Commons - Component GIF plugin backport</name>
   <description>eXo javax.imageio GIF plugin backport</description>
   <dependencies>
     <dependency>

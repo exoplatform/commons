@@ -8,7 +8,7 @@
   </parent>
   <artifactId>commons-testing</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons - Testing</name>
+  <name>eXo PLF:: Commons - Testing</name>
   <dependencies>
     <dependency>
       <groupId>javax.jcr</groupId>
@@ -31,22 +31,22 @@
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.core</artifactId>
       <exclusions>
-        <exclusion>          
-          <groupId>xml-apis</groupId>
+        <exclusion>
           <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
         </exclusion>
         <exclusion>
-		  <groupId>xml-apis</groupId>
-          <artifactId>xml-apis-ext</artifactId>          
-        </exclusion>        
+          <artifactId>xml-apis-ext</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
-      <!-- remove it after migration to jcr 1.16.x-->
-      <dependency>
-          <groupId>org.exoplatform.kernel</groupId>
-          <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v5</artifactId>
-      </dependency>
-      <!-- End remove-->
+    <!-- remove it after migration to jcr 1.16.x-->
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v5</artifactId>
+    </dependency>
+    <!-- End remove-->
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.commons</artifactId>

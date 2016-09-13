@@ -11,7 +11,7 @@
   <artifactId>commons</artifactId>
   <version>4.4.x-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>eXo Commons</name>
+  <name>eXo PLF:: Commons</name>
   <modules>
     <module>commons-api</module>
     <module>commons-comet-ext-service</module>
@@ -81,8 +81,8 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons</artifactId>
         <version>${project.version}</version>
-        <classifier>source-release</classifier>
         <type>zip</type>
+        <classifier>source-release</classifier>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>

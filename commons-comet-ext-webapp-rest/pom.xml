@@ -8,6 +8,6 @@
   </parent>
   <artifactId>commons-comet-ext-webapp-rest</artifactId>
   <packaging>war</packaging>
-  <name>eXo Commons - Comet Ext REST WebApp (test only)</name>
+  <name>eXo PLF:: Commons - Comet Ext REST WebApp (test only)</name>
   <description>ext REST web application for test</description>
 </project>

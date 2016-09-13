@@ -8,7 +8,7 @@
   </parent>
   <artifactId>commons-file-storage</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons - Common File Storage</name>
+  <name>eXo PLF:: Commons - Common File Storage</name>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>

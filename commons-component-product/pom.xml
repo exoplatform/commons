@@ -8,7 +8,7 @@
   </parent>
   <artifactId>commons-component-product</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons - Product Informations</name>
+  <name>eXo PLF:: Commons - Product Informations</name>
   <description>Product informations: version, revision and build numbers</description>
   <dependencies>
     <dependency>
@@ -19,26 +19,26 @@
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.core</artifactId>
       <exclusions>
-        <exclusion>          
-          <groupId>xml-apis</groupId>
+        <exclusion>
           <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
         </exclusion>
         <exclusion>
-		  <groupId>xml-apis</groupId>
-          <artifactId>xml-apis-ext</artifactId>          
-        </exclusion>        
+          <artifactId>xml-apis-ext</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.ext</artifactId>
     </dependency>
-      <!-- remove it after migration to jcr 1.16.x-->
-      <dependency>
-          <groupId>org.exoplatform.kernel</groupId>
-          <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v5</artifactId>
-      </dependency>
-      <!-- End remove-->
+    <!-- remove it after migration to jcr 1.16.x-->
+    <dependency>
+      <groupId>org.exoplatform.kernel</groupId>
+      <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v5</artifactId>
+    </dependency>
+    <!-- End remove-->
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.commons</artifactId>

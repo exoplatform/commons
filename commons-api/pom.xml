@@ -8,25 +8,25 @@
   </parent>
   <artifactId>commons-api</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons - API</name>
+  <name>eXo PLF:: Commons - API</name>
   <dependencies>
     <dependency>
-     <groupId>javax.websocket</groupId>
-     <artifactId>javax.websocket-api</artifactId>
-     <version>1.0</version>
-     <scope>provided</scope>
+      <groupId>javax.websocket</groupId>
+      <artifactId>javax.websocket-api</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-webui-component</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.gatein.portal</groupId>
           <artifactId>exo.portal.webui.portal</artifactId>
+          <groupId>org.gatein.portal</groupId>
         </exclusion>
         <exclusion>
-          <groupId>org.gatein.portal</groupId>
           <artifactId>exo.portal.component.common</artifactId>
+          <groupId>org.gatein.portal</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -34,14 +34,14 @@
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.core</artifactId>
       <exclusions>
-        <exclusion>          
-          <groupId>xml-apis</groupId>
+        <exclusion>
           <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
         </exclusion>
         <exclusion>
-		  <groupId>xml-apis</groupId>
-          <artifactId>xml-apis-ext</artifactId>          
-        </exclusion>        
+          <artifactId>xml-apis-ext</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -55,7 +55,6 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>

@@ -8,7 +8,7 @@
   </parent>
   <artifactId>commons-juzu-ajax-sample</artifactId>
   <packaging>jar</packaging>
-  <name>eXo Commons - Juzu Ajax Sample Application</name>
+  <name>eXo PLF:: Commons - Juzu Ajax Sample Application</name>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
