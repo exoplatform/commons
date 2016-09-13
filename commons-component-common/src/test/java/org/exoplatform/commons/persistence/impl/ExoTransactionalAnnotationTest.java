@@ -155,6 +155,9 @@ public class ExoTransactionalAnnotationTest {
   private class MyCallable implements Callable<Boolean> {
     @Override
     public Boolean call() throws Exception {
+      // Make sure the container has been created
+      PortalContainer.getInstance();
+
       // Given
       TaskDao dao = new TaskDao();
       // When

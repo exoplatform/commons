@@ -18,7 +18,7 @@
  */
 package org.exoplatform.commons.persistence.impl;
 
-import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -54,7 +54,7 @@ public class EntityManagerHolder {
       boolean emStarted = false;
       EntityManager entityManager = null;
 
-      EntityManagerService service = PortalContainer.getInstance().getComponentInstanceOfType(EntityManagerService.class);
+      EntityManagerService service = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(EntityManagerService.class);
       try {
         entityManager = service.getEntityManager();
         if (entityManager == null) {

@@ -22,6 +22,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -50,7 +51,7 @@ public class ExoTransactionalAspect {
     boolean emStarted = false;
 
     // Do we need to start EntityManager ?
-    EntityManagerService service = PortalContainer.getInstance().getComponentInstanceOfType(EntityManagerService.class);
+    EntityManagerService service = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(EntityManagerService.class);
     entityManager = service.getEntityManager();
     if (entityManager == null) {
       LOG.debug("Injecting new PersistenceContext");

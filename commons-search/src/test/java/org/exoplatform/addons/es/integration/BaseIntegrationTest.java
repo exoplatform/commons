@@ -48,6 +48,7 @@ import org.exoplatform.addons.es.client.ElasticIndexingAuditTrail;
 import org.exoplatform.addons.es.client.ElasticIndexingClient;
 import org.exoplatform.addons.es.client.ElasticSearchingClient;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.junit.AfterClass;
@@ -98,6 +99,9 @@ public class BaseIntegrationTest {
 
   @Before
   public void setup() {
+    // Make sure a container has been created
+    PortalContainer.getInstance();
+
     // Reset data
     deleteAllIndexesInES();
   }
