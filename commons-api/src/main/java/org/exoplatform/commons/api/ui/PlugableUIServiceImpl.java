@@ -19,13 +19,13 @@ public class PlugableUIServiceImpl implements PlugableUIService {
   }
 
   @Override
-  public List<BaseUIPlugin> getPlugin(String type) {
+  public List<BaseUIPlugin> getPlugins(String type) {
     return plugins.get(type);
   }
 
   @Override
   public List<Response> render(RenderContext renderContext) {
-    List<BaseUIPlugin> plugins = getPlugin(renderContext.getPluginType());
+    List<BaseUIPlugin> plugins = getPlugins(renderContext.getPluginType());
     List<Response> response = new ArrayList<>();
     if (plugins != null) {
       for (BaseUIPlugin plugin : plugins) {      
@@ -37,7 +37,7 @@ public class PlugableUIServiceImpl implements PlugableUIService {
 
   @Override
   public Response processAction(ActionContext actionContext) {
-    List<BaseUIPlugin> plugins = getPlugin(actionContext.getPluginType());
+    List<BaseUIPlugin> plugins = getPlugins(actionContext.getPluginType());
     if (plugins != null) {
       for (BaseUIPlugin plugin : plugins) {
         Response response = plugin.processAction(actionContext);

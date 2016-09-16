@@ -382,9 +382,6 @@
       if (!settings.searchField) {
         settings.searchField = [settings.labelField];
       }
-      if (settings.create === null) {
-        settings.create = true;
-      }
 
       if (settings.selectedItems) {
         settings.items = settings.selectedItems;
