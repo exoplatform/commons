@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 /**
  *
  */
-public class ElasticIndexingAttachmentIntegrationTest extends BaseIntegrationTest {
+public class ElasticIndexingAttachmentIntegrationTest extends BaseESIntegrationTest {
 
   private final static String MC23Quotes =
       "Some people want it to happen, some wish it would happen, others make it happen.";

@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
  * Created by The eXo Platform SAS Author : Thibault Clement
  * tclement@exoplatform.com 9/11/15
  */
-public class ElasticSearchingIntegrationTest extends BaseIntegrationTest {
+public class ElasticSearchingIntegrationTest extends BaseESIntegrationTest {
 
   ElasticSearchServiceConnector elasticSearchServiceConnector;
 

@@ -59,8 +59,8 @@ import org.junit.BeforeClass;
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  * 10/1/15
  */
-public class BaseIntegrationTest {
-  private static final Log LOGGER = ExoLogger.getExoLogger(BaseIntegrationTest.class);
+public class BaseESIntegrationTest {
+  private static final Log LOGGER = ExoLogger.getExoLogger(BaseESIntegrationTest.class);
   protected static Node node;
 
   private static boolean propertiesSet;

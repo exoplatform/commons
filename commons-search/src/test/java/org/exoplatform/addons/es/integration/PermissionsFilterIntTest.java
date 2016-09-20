@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  * 9/9/15
  */
-public class PermissionsFilterIntTest extends BaseIntegrationTest {
+public class PermissionsFilterIntTest extends BaseESIntegrationTest {
   private static Connection               conn;
 
   private static Liquibase                liquibase;

@@ -59,7 +59,7 @@ import static org.mockito.Mockito.when;
  * tclement@exoplatform.com
  * 10/2/15
  */
-public class SiteFilterIntTest extends BaseIntegrationTest {
+public class SiteFilterIntTest extends BaseESIntegrationTest {
 
   private static final String USERNAME = "thib";
 

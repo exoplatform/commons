@@ -37,7 +37,7 @@ import java.util.concurrent.ExecutionException;
  * tclement@exoplatform.com
  * 8/20/15
  */
-public class ElasticIndexingIntegrationTest extends BaseIntegrationTest {
+public class ElasticIndexingIntegrationTest extends BaseESIntegrationTest {
 
   @Test
   public void testCreateNewIndex() throws ExecutionException, InterruptedException {
