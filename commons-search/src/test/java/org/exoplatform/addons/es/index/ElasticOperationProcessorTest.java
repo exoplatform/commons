@@ -26,6 +26,7 @@ import org.exoplatform.addons.es.domain.OperationType;
 import org.exoplatform.addons.es.index.impl.ElasticIndexingOperationProcessor;
 import org.exoplatform.addons.es.index.impl.ElasticIndexingServiceConnector;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
+import org.exoplatform.container.PortalContainer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,6 +78,10 @@ public class ElasticOperationProcessorTest {
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
+
+    // Make sure a portal container is started
+    PortalContainer.getInstance();
+
     entityManagerService = new EntityManagerService();
     entityManagerService.startRequest(null);
     elasticIndexingOperationProcessor = new ElasticIndexingOperationProcessor(indexingOperationDAO, elasticIndexingClient, elasticContentRequestBuilder, auditTrail, entityManagerService, null);
