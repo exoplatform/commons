@@ -48,6 +48,12 @@
     <!-- **************************************** -->
     <jenkins.job.name>commons-master-ci</jenkins.job.name>
     <!-- **************************************** -->
+    <!-- Build Settings                           -->
+    <!-- **************************************** -->
+    <skipTests>false</skipTests>
+    <skipUTests>${skipTests}</skipUTests>
+    <skipITests>${skipTests}</skipITests>
+    <!-- **************************************** -->
     <!-- Dependencies versions                    -->
     <!-- **************************************** -->
     <org.exoplatform.depmgt.version>12-SNAPSHOT</org.exoplatform.depmgt.version>
@@ -325,6 +331,20 @@
           <configuration>
             <!-- Don't include libraries into Web Archives -->
             <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <skipTests>${skipUTests}</skipTests>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <skipTests>${skipITests}</skipTests>
           </configuration>
         </plugin>
       </plugins>
