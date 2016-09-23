@@ -99,6 +99,30 @@ public class ElasticIndexingAttachmentIntegrationTest extends BaseESIntegrationT
   }
 
   @Test
+  public void testDeleteAllDocuments() {
+    //Given
+    elasticIndexingClient.sendCreateIndexRequest("test", "");
+    elasticIndexingClient.sendCreateTypeRequest("test", "attachment", getAttachmentMapping());
+    assertEquals(0, documentNumber());
+    String bulkRequest = "{ \"create\" : { \"_index\" : \"test\", \"_type\" : \"attachment\", \"_id\" : \"1\" } }\n" +
+        "{ " +
+        "\"title\" : \"Sample CV in English\"," +
+        "\"file\" : \"" + new String(Base64.encodeBase64(MC23Quotes.getBytes())) + "\"" +
+        " }\n";
+
+    //When
+    elasticIndexingClient.sendCUDRequest(bulkRequest);
+
+    node.client().admin().indices().prepareRefresh().execute().actionGet();
+
+    elasticIndexingClient.sendDeleteAllDocsOfTypeRequest("test", "attachment");
+    node.client().admin().indices().prepareRefresh().execute().actionGet();
+
+    // Then
+    assertEquals(0, documentNumber());
+  }
+
+  @Test
   public void testSearchAttachment() {
     //Given
     elasticIndexingClient.sendCreateIndexRequest("test", "");
