@@ -9,7 +9,7 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
                 label: 'Link',
                 elements: [
                     {
-                        type: 'text',
+                        type: 'textarea',
                         id: 'text',
                         label: 'Text',
                         validate: CKEDITOR.dialog.validate.notEmpty( "Text field cannot be empty." )
