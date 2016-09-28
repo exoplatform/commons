@@ -5,7 +5,7 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
         minHeight: 200,
         contents: [
             {
-                id: 'tab-basic',
+                id: 'tab',
                 label: 'Link',
                 elements: [
                     {
@@ -26,9 +26,9 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
         onOk: function() {
             var dialog = this;
 
-            var simpleLink = editor.document.createElement( 'simpleLink' );
-            simpleLink.setAttribute( 'text', dialog.getValueOf( 'tab-basic', 'text' ) );
-            simpleLink.setText( dialog.getValueOf( 'tab-basic', 'link' ) );
+            var simpleLink = editor.document.createElement( 'a' );
+            simpleLink.setAttribute( 'href', dialog.getValueOf( 'tab', 'link' ) );
+            simpleLink.setText( dialog.getValueOf( 'tab', 'text' ) );
 
             editor.insertElement(simpleLink);
         }
