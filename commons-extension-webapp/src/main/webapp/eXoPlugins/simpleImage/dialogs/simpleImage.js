@@ -12,7 +12,7 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                         type: 'text',
                         id: 'imgUrl',
                         label: 'Image URL',
-                        validate: CKEDITOR.dialog.validate.notEmpty( "Image URL cannot be empty." ),
+                        validate: CKEDITOR.dialog.validate.notEmpty( "Image URL cannot be empty!" ),
                         setup: function(element) {
                             this.setValue(element.getText());
                         },
@@ -24,7 +24,7 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                         type: 'text',
                         id: 'description',
                         label: 'Description',
-                        validate: CKEDITOR.dialog.validate.notEmpty( "Description cannot be empty." ),
+                        validate: CKEDITOR.dialog.validate.notEmpty( "Description cannot be empty!" ),
                         setup: function(element) {
                             this.setValue(element.getAttribute("href") );
                         },
@@ -43,7 +43,7 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                             [ editor.lang.common.alignLeft, 'left' ],
                             [ editor.lang.common.alignRight, 'right' ]
                         ],
-                        validate: CKEDITOR.dialog.validate.notEmpty( "Aligment cannot be empty." ),
+                        validate: CKEDITOR.dialog.validate.notEmpty( "Aligment cannot be empty!" ),
                         setup: function(element) {
                             this.setValue(element.getAttribute("href") );
                         },
