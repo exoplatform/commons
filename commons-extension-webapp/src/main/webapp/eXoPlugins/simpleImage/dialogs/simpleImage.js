@@ -45,19 +45,16 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                         ],
                         validate: CKEDITOR.dialog.validate.notEmpty( "Aligment cannot be empty!" ),
                         setup: function(element) {
-                            var style = element.getAttribute("style");
-                            if (style) {
-                                var styles = style.split(";");
-                                for (var i = 0; i < styles.length; i++) {
-                                    var st = styles[i].split(":");
-                                    if (st.length > 1 && st[0]==='float') {
-                                        this.setValue(st[1]);
-                                        break;
-                                    }
-                                }
+                            var clazz = element.getAttribute("class");
+                            if (clazz === "pull-left") {
+                                this.setValue("left");
+                            } else if (clazz === "pull-right") {
+                                this.setValue("right");
                             }
+
                         },
                         commit: function(element) {
+                            element.setAttribute("class", "pull-" + this.getValue());
                             element.setAttribute("style", "float:" + this.getValue());
                         }
                     },
