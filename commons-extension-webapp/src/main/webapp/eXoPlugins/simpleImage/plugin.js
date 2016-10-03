@@ -4,22 +4,22 @@ CKEDITOR.plugins.add( 'simpleImage',
     init : function( editor ) {
         editor.addCommand( 'simpleImage', new CKEDITOR.dialogCommand( 'simpleImageDialog' ) );
         editor.ui.addButton( 'simpleImage', {
-            label: 'Link',
+            label: 'image',
             command: 'simpleImage',
         });
         
         if ( editor.contextMenu ) {
-            editor.addMenuGroup( 'linkGroup' );
-            editor.addMenuItem( 'linkItem', {
-                label: 'Link',
+            editor.addMenuGroup( 'imageGroup' );
+            editor.addMenuItem( 'imageItem', {
+                label: 'Image',
                 icon: this.path + 'icons/simpleImage.png',
                 command: 'simpleImage',
-                group: 'linkGroup'
+                group: 'imageGroup'
             });
 
             editor.contextMenu.addListener( function( element ) {
                 if ( element) {
-                    return { linkItem: CKEDITOR.TRISTATE_OFF };
+                    return { imageItem: CKEDITOR.TRISTATE_OFF };
                 }
             });
         };

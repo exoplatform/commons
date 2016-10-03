@@ -14,10 +14,10 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                         label: 'Image URL',
                         validate: CKEDITOR.dialog.validate.notEmpty( "Image URL cannot be empty!" ),
                         setup: function(element) {
-                            this.setValue(element.getText());
+                            this.setValue(element.getAttribute("src"));
                         },
                         commit: function(element) {
-                            element.setText(this.getValue());
+                            element.setAttribute("src", this.getValue());
                         }
                     },
                     {
@@ -26,10 +26,10 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                         label: 'Description',
                         validate: CKEDITOR.dialog.validate.notEmpty( "Description cannot be empty!" ),
                         setup: function(element) {
-                            this.setValue(element.getAttribute("href") );
+                            this.setValue(element.getAttribute("title") );
                         },
                         commit: function(element) {
-                            element.setAttribute("href", this.getValue());
+                            element.setAttribute("title", this.getValue());
                         }
                     },
                     {
@@ -45,10 +45,20 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                         ],
                         validate: CKEDITOR.dialog.validate.notEmpty( "Aligment cannot be empty!" ),
                         setup: function(element) {
-                            this.setValue(element.getAttribute("href") );
+                            var style = element.getAttribute("style");
+                            if (style) {
+                                var styles = style.split(";");
+                                for (var i = 0; i < styles.length; i++) {
+                                    var st = styles[i].split(":");
+                                    if (st.length > 1 && st[0]==='float') {
+                                        this.setValue(st[1]);
+                                        break;
+                                    }
+                                }
+                            }
                         },
                         commit: function(element) {
-                            element.setAttribute("href", this.getValue());
+                            element.setAttribute("style", "float:" + this.getValue());
                         }
                     },
                     {
@@ -78,11 +88,11 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
             var element = selection.getStartElement();
 
             if ( element )
-                element = element.getAscendant( 'a', true );
+                element = element.getAscendant( 'img', true );
 
-            if ( !element || element.getName() != 'a' ) {
-                element = editor.document.createElement( 'a' );
-                element.setText(selection.getSelectedText());
+            if ( !element || element.getName() != 'img' ) {
+                element = editor.document.createElement( 'img' );
+//                element.setText(selection.getSelectedText());
                 this.insertMode = true;
             }
             else
