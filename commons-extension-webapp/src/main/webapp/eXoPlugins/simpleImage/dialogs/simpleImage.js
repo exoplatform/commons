@@ -26,13 +26,17 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                             var imagePreviewError = CKEDITOR.document.getById('imagePreviewErrorId');
                             imagePreviewLoader.setAttribute("style", "background-color: #8D8D8D; margin-left:20%;");
                             imagePreviewError.hide();
+                            preview.hide();
+                            imagePreviewLoader.show();
                             if (this.getValue() && this.getValue().trim().length > 0) {
+                                imagePreviewLoader.show();
                                 imagePreviewLoaderIcon.show();
                                 preview.setAttribute("src", this.getValue());
                                 preview.on("load", function() {
                                     preview.show();
-                                    imagePreviewLoaderIcon.hide();
                                     imagePreviewLoader.setAttribute("style", "background-color: white; margin-left:20%;");
+                                    imagePreviewLoader.hide();
+                                    imagePreviewLoaderIcon.hide();
                                 });
                                 preview.on("error", function() {
                                     preview.hide();
