@@ -94,7 +94,7 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                                     '<div id="' + 'imagePreviewLoaderIconId' + '" class="loading" style="background: url(\'/eXoSkin/skin/images/themes/default/Loading/loadingProgressBar.gif\') no-repeat center; display:none; width:100%;height:100%">&nbsp;</div>' +
                                     '<span id="' + 'imagePreviewErrorId' + '" class="error" style="display:none; color:red; position:absolute; top: 30%; left: 20%">Error: image url incorrect!</span>' +
                                 '</div>' +
-                                '<div><table><tr><td>' +
+                                '<div style="width:230px;margin-left:20%"><table><tr><td>' +
                                     '<a href="javascript:void(0)" target="_blank" onclick="return false;" id="' + 'previewLinkId' + '">' +
                                     '<img style="display:none" id="' + 'previewImageId' + '" alt="" /></a>' +
                                 // jscs:disable maximumLineLength
