@@ -25,5 +25,12 @@ CKEDITOR.plugins.add( 'simpleImage',
         };
 
         CKEDITOR.dialog.add( 'simpleImageDialog', this.path + 'dialogs/simpleImage.js' );
+        
+        editor.on( 'doubleclick', function( evt ) {
+            var element = evt.data.element;
+
+            if ( element.is( 'img' ) && !element.data( 'cke-realelement' ) && !element.isReadOnly() )
+                evt.data.dialog = 'simpleImageDialog';
+        } );
     }
 });
