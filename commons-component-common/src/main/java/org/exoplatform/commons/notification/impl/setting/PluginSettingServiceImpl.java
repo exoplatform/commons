@@ -136,6 +136,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       for (PluginInfo pluginInfo : groupPlugin.getPluginInfos()) {
         pluginInfo.setChannelActives(getSettingPlugins(pluginInfo.getType()));
       }
+      Collections.sort(groupPlugin.getPluginInfos(), new ComparatorASC());
       groupProviders.add(groupPlugin);
     }
     Collections.sort(groupProviders, new ComparatorASC());
@@ -267,6 +268,11 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       if (o1 instanceof PluginConfig) {
         Integer order1 = Integer.valueOf(((PluginConfig) o1).getOrder());
         Integer order2 = Integer.valueOf(((PluginConfig) o2).getOrder());
+        return order1.compareTo(order2);
+      }
+      if (o1 instanceof PluginInfo) {
+        Integer order1 = ((PluginInfo) o1).getOrder();
+        Integer order2 = ((PluginInfo) o2).getOrder();
         return order1.compareTo(order2);
       }
       return 0;

@@ -18,6 +18,11 @@ package org.exoplatform.commons.notification.template;
 
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.api.notification.template.TemplateTransformer;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.resources.ResourceBundleService;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Created by The eXo Platform SAS
@@ -39,10 +44,19 @@ public class SimpleTemplateTransformer implements TemplateTransformer {
   public String transform(TemplateContext context) {
     String got = template;
     String newKey = "";
+    Locale locale = new Locale(context.getLanguage());
+    ResourceBundleService resourceBundleService = CommonsUtils.getService(ResourceBundleService.class);
+    ResourceBundle resourceBundle = resourceBundleService.getResourceBundle("locale.extension.SocialIntegration",
+        locale);
     //
     for (String key : context.keySet()) {
       newKey = key.indexOf("$") == 0 ? key : "$" + key;
-      got = got.replace(newKey, (String) context.get(key));
+      if (context.get(key).toString().startsWith("$UIShareDocuments")) {
+        String localized = context.get(key).toString().replace("$", "");
+        got = got.replace(newKey, resourceBundle.getString(localized));
+      } else {
+        got = got.replace(newKey, (String) context.get(key));
+      }
     }
     return got;
   }
