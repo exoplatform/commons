@@ -67,6 +67,7 @@ public class WebNotificationServiceImpl implements WebNotificationService {
     AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(WebChannel.ID));
     //
     for (NotificationInfo notification : gotList) {
+      notification.setOnPopOver(filter.isOnPopover());
       AbstractTemplateBuilder builder = channel.getTemplateBuilder(notification.getKey());
       MessageInfo msg = builder.buildMessage(ctx.setNotificationInfo(notification));
       if (msg != null && msg.getBody() != null && !msg.getBody().isEmpty()) {
