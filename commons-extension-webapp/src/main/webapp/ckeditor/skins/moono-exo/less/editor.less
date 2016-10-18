@@ -1,5 +1,5 @@
-@import "mixins";
 @import "variables";
+@import "mixins";
 
 // Color variables (appears count calculates by raw css)
 @color1: #f2f2f2; // Appears 13 times
@@ -124,7 +124,7 @@
 }
 .cke_inner {
   -webkit-touch-callout:none;
-  background: @white;
+  background: transparent;
   .border-radius(5px);
   display:block;
   padding:0;
@@ -157,8 +157,10 @@
 }
 .cke_bottom {
   background-image:linear-gradient(to bottom,@color19,@color7);
-  background:@color7;
+  background: @headingColor;
   border-top:1px solid @color11;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
   .box-shadow(0 1px 0 @white inset);
   display: none;
   filter:progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr='@color19',endColorstr='@color7');
@@ -1064,7 +1066,7 @@ textarea.cke_source {
   white-space:pre-wrap;
 }
 .cke_wysiwyg_frame {
-  background-color: @white;
+  background-color: transparent;
 }
 .cke_notifications_area {
   pointer-events:none;
@@ -1616,6 +1618,9 @@ a.cke_button_on, .cke_combo_on a.cke_combo_button {
     //box-shadow: 0 1px 1px rgba(0,0,0,.2) inset,0 1px 0 rgba(0,0,0,.2);
     //.box-shadow( 0 1px 10px @color4 inset, 0 1px 0 @color4);
   }
+}
+.cke_button__textcolor_icon {
+  background: url(plugins/colorbutton/icons/textcolor.png) no-repeat 0 0 !important;
 }
 /*
 .cke_combo_on a.cke_combo_button {

@@ -35,5 +35,28 @@
   </dependencies>
   <build>
     <finalName>commons-extension</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.lesscss</groupId>
+        <artifactId>lesscss-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>ckeditor</id>
+            <configuration>
+              <!-- SourceDirectory shouldn't exist and we should have as default the lesss folder in /src/main/less     -->
+              <sourceDirectory>${project.basedir}/src/main/webapp/ckeditor/skins/moono-exo/less</sourceDirectory>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}/ckeditor/skins/moono-exo</outputDirectory>
+              <compress>true</compress>
+              <includes>
+                <include>*.less</include>
+              </includes>
+            </configuration>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>
