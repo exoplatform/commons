@@ -14,7 +14,7 @@
             </value-param>
             <value-param>
                 <name>liquibase.contexts</name>
-                <value>production</value>
+                <value>${exo.liquibase.contexts:production}</value>
             </value-param>
         </init-params>
     </component>

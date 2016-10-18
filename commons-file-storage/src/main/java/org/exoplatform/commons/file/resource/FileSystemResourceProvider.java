@@ -32,7 +32,7 @@ import java.net.URL;
 import java.security.PrivilegedAction;
 
 /**
- * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
+ * This class provide file system implementation of the File RDBMS API.
  */
 
 public class FileSystemResourceProvider implements BinaryProvider {

@@ -18,15 +18,11 @@
  */
 package org.exoplatform.commons.file.storage.dao.impl;
 
-import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.entity.FileInfoEntity;
-import org.exoplatform.commons.file.storage.entity.NameSpaceEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.Date;
 import java.util.List;

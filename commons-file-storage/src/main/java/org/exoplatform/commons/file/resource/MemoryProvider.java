@@ -68,7 +68,7 @@ public class MemoryProvider implements BinaryProvider {
   }
 
   public URL getURL(String name) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   public long lastModified(String name) {

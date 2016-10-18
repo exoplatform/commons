@@ -85,4 +85,51 @@
     <createSequence sequenceName="SEQ_FILES_ORPHAN_FILES_ID" startValue="1"/>
   </changeSet>
 
+  <changeSet author="file" id="1.0.0-7">
+    <createTable tableName="FILES_BINARY">
+      <column name="BLOB_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_FILES_BLOB_ID"/>
+      </column>
+      <column name="NAME" type="NVARCHAR(100)">
+        <constraints nullable="false"  unique="true"/>
+      </column>
+      <column name="DATA" type="LONGBLOB"/>
+      <column name="UPDATED_DATE" type="TIMESTAMP" defaultValueComputed="${now}"/>
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+    </modifySql>
+  </changeSet>
+
+  <changeSet author="file" id="1.0.0-8" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_FILES_BINARY_BLOB_ID" startValue="1"/>
+  </changeSet>
+
+  <changeSet author="file" id="1.0.0-9">
+    <createIndex tableName="FILES_FILES" indexName="IDX_FILES_FILES_01">
+      <column name="CHECKSUM"/>
+    </createIndex>
+    <createIndex tableName="FILES_FILES" indexName="IDX_FILES_FILES_02">
+      <column name="DELETED"/>
+      <column name="UPDATED_DATE"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="file" id="1.0.0-10">
+    <createIndex tableName="FILES_NAMESPACES" indexName="IDX_FILES_NAMESPACES_01">
+      <column name="NAME"/>
+    </createIndex>
+  </changeSet>
+  <changeSet author="file" id="1.0.0-11">
+    <createIndex tableName="FILES_ORPHAN_FILES" indexName="IDX_FILES_ORPHAN_FILES_01">
+      <column name="DELETED_DATE"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="file" id="1.0.0-12" dbms="mysql,mssql,h2,sybase,db2,hsqldb,postgresql">
+    <createIndex tableName="FILES_BINARY" indexName="IDX_FILES_BINARY_01">
+      <column name="NAME"/>
+    </createIndex>
+  </changeSet>
+
 </databaseChangeLog>

@@ -33,26 +33,44 @@
     <type>org.exoplatform.commons.file.storage.dao.impl.FileInfoDAOImpl</type>
   </component>
   <component>
-      <key>org.exoplatform.commons.file.storage.dao.NameSpaceDAO</key>
-      <type>org.exoplatform.commons.file.storage.dao.impl.NameSpaceDAOImpl</type>
+    <key>org.exoplatform.commons.file.storage.dao.NameSpaceDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.NameSpaceDAOImpl</type>
   </component>
   <component>
-      <key>org.exoplatform.commons.file.storage.dao.OrphanFileDAO</key>
-      <type>org.exoplatform.commons.file.storage.dao.impl.OrphanFileDAOImpl</type>
+    <key>org.exoplatform.commons.file.storage.dao.OrphanFileDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.OrphanFileDAOImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.commons.file.storage.dao.FileBinaryDAO</key>
+    <type>org.exoplatform.commons.file.storage.dao.impl.FileBinaryDAOImpl</type>
   </component>
 
   <component>
-        <key>org.exoplatform.commons.file.storage.DataStorage</key>
-        <type>org.exoplatform.commons.file.storage.DataStorage</type>
+    <key>org.exoplatform.commons.file.storage.DataStorage</key>
+    <type>org.exoplatform.commons.file.storage.DataStorage</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.file.resource.FileSystemResourceProvider</type>
+      <init-params>
+        <value-param>
+          <name>rootPath</name>
+          <value>${exo.data.dir}/files</value>
+        </value-param>
+      </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.file.resource.RdbmsResourceProvider</type>
   </component>
 
   <component>
     <key>org.exoplatform.commons.file.resource.BinaryProvider</key>
-    <type>org.exoplatform.commons.file.resource.FileSystemResourceProvider</type>
+    <type>org.exoplatform.commons.file.resource.BinaryProviderDelegate</type>
     <init-params>
       <value-param>
-        <name>rootPath</name>
-        <value>${exo.data.dir}/files</value>
+        <name>storageType</name>
+        <value>${exo.files.binaries.storage.type:fs}</value>
       </value-param>
     </init-params>
   </component>
@@ -118,6 +136,40 @@
                 </properties-param>
             </init-params>
         </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+      <target-component>org.exoplatform.commons.file.resource.BinaryProvider</target-component>
+          <component-plugin>
+              <name>ResourceProviderPlugin</name>
+              <set-method>addResourceProviderPlugin</set-method>
+              <type>org.exoplatform.commons.file.resource.ResourceProviderPlugin</type>
+              <init-params>
+                  <value-param>
+                      <name>storageType</name>
+                      <value>fs</value>
+                  </value-param>
+                  <value-param>
+                      <name>class</name>
+                      <value>org.exoplatform.commons.file.resource.FileSystemResourceProvider</value>
+                  </value-param>
+              </init-params>
+          </component-plugin>
+          <component-plugin>
+              <name>ResourceProviderPlugin</name>
+              <set-method>addResourceProviderPlugin</set-method>
+              <type>org.exoplatform.commons.file.resource.ResourceProviderPlugin</type>
+              <init-params>
+                  <value-param>
+                      <name>storageType</name>
+                      <value>rdbms</value>
+                  </value-param>
+                  <value-param>
+                      <name>class</name>
+                      <value>org.exoplatform.commons.file.resource.RdbmsResourceProvider</value>
+                  </value-param>
+              </init-params>
+          </component-plugin>
   </external-component-plugins>
 
 </configuration>

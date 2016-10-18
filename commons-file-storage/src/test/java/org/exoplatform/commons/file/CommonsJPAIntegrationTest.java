@@ -19,13 +19,13 @@
 package org.exoplatform.commons.file;
 
 import org.exoplatform.commons.api.persistence.DataInitializer;
+import org.exoplatform.commons.file.storage.dao.FileBinaryDAO;
 import org.exoplatform.commons.file.storage.dao.OrphanFileDAO;
 import org.exoplatform.commons.file.storage.dao.FileInfoDAO;
 import org.exoplatform.commons.file.storage.dao.NameSpaceDAO;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.container.PortalContainer;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
@@ -39,6 +39,8 @@ public class CommonsJPAIntegrationTest extends BaseTest {
 
   protected OrphanFileDAO orphanFileDAO;
 
+  protected FileBinaryDAO fileBinaryDAO;
+
   public void setUp() {
     super.setUp();
 
@@ -51,6 +53,7 @@ public class CommonsJPAIntegrationTest extends BaseTest {
     fileInfoDAO = getService(FileInfoDAO.class);
     nameSpaceDAO = getService(NameSpaceDAO.class);
     orphanFileDAO = getService(OrphanFileDAO.class);
+    fileBinaryDAO = getService(FileBinaryDAO.class);
 
     // Clean Data
     cleanDB();
@@ -60,6 +63,7 @@ public class CommonsJPAIntegrationTest extends BaseTest {
     assertNotNull(fileInfoDAO);
     assertNotNull(nameSpaceDAO);
     assertNotNull(orphanFileDAO);
+    assertNotNull(fileBinaryDAO);
   }
 
   public void tearDown() {
@@ -72,5 +76,6 @@ public class CommonsJPAIntegrationTest extends BaseTest {
     orphanFileDAO.deleteAll();
     fileInfoDAO.deleteAll();
     nameSpaceDAO.deleteAll();
+    fileBinaryDAO.deleteAll();
   }
 }

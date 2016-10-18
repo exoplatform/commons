@@ -62,9 +62,10 @@ public class FileItem {
     return data;
   }
 
-  public void setInputStream(InputStream inputStream) throws IOException {
+  public void setInputStream(InputStream inputStream) throws Exception {
     if (inputStream != null) {
       this.data = IOUtils.toByteArray(inputStream);
+      setChecksum(new ByteArrayInputStream(data));
     }
   }
 
@@ -73,13 +74,9 @@ public class FileItem {
   }
 
   public void setChecksum(InputStream inputStream) throws Exception {
-    try {
       if (inputStream != null) {
         String checksum = FileChecksum.getChecksum(inputStream);
         fileInfo.setChecksum(checksum);
       }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }
