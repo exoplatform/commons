@@ -8,11 +8,10 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 
 .cke_dialog_body {
   z-index: 1;
-  background: #eaeaea;
-  border: 1px solid #b2b2b2;
-  border-bottom-color: #999;
-  border-radius: 3px;
-  box-shadow: 0 0 3px rgba(0, 0, 0, .15)
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
 }
 
 .cke_dialog strong {
@@ -20,14 +19,14 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 }
 
 .cke_dialog_title {
-  font-size: 13px;
-  cursor: move;
-  position: relative;
-  color: #474747;
-  border-bottom: 1px solid #999;
-  padding: 6px 10px;
-  border-radius: 2px 2px 0 0;
-  background-color: #ccc
+  line-height: 35px;
+  background-color: #f0f0f0;
+  box-shadow: inset 0 -1px 0 #cccccc;
+  border-bottom: 0px solid #f0f0f0;
+  border-radius: 4px 4px 0 0;
+  padding: 0px 9px 0 15px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .cke_dialog_spinner {
@@ -89,12 +88,13 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 }
 
 .cke_dialog_footer {
-  text-align: right;
-  position: relative;
-  border: 0;
-  outline: 1px solid #bfbfbf;
-  border-radius: 0 0 2px 2px;
-  background-color: #ccc
+  margin-left: -15px;
+  margin-right: -15px;
+  padding-bottom: 0;
+  border-top: 1px solid #cccccc;
+  text-align: center;
+  padding: 15px 0;
+  margin-top: 15px;
 }
 
 .cke_rtl .cke_dialog_footer {
@@ -314,18 +314,16 @@ input.cke_dialog_ui_input_text:focus, input.cke_dialog_ui_input_password:focus, 
 
 a.cke_dialog_ui_button {
   display: inline-block;
-  *display: inline;
-  *zoom: 1;
-  padding: 4px 0;
-  margin: 0;
-  text-align: center;
-  color: #333;
-  vertical-align: middle;
-  cursor: pointer;
-  border: 1px solid #b6b6b6;
-  border-bottom-color: #999;
+  color: #333333;
+  padding: 3px 0px;
+  border: 1px solid #cccccc;
   border-radius: 3px;
-  background: #e4e4e4
+  background-image: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  background-repeat: repeat-x;
+  background-color: #f9f9f9;
+  line-height: 20px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 span.cke_dialog_ui_button {
@@ -333,8 +331,9 @@ span.cke_dialog_ui_button {
 }
 
 a.cke_dialog_ui_button:hover {
-  border-color: #9e9e9e;
-  background-color: #b6b6b6
+  background-color: #f0f0f0;
+  transition: background-position 0.1s linear;
+  background-position: 0 -15px;
 }
 
 a.cke_dialog_ui_button:active {
@@ -364,14 +363,18 @@ a.cke_dialog_ui_button:active {
 
 a.cke_dialog_ui_button_ok {
   color: #fff;
-  text-shadow: 0 -1px 0 #55830c;
-  border-color: #62a60a #62a60a #4d9200;
-  background: #69b10b
+  background-image: linear-gradient(to bottom, #578dc9, #2f5e92);
+  background-repeat: repeat-x;
+  background-color: #477ab3;
+  border: 1px solid #224469;
+  font-family: "Helvetica Neue Bold", Helvetica, Lucida, Arial, sans-serif;
 }
 
 a.cke_dialog_ui_button_ok:hover {
-  border-color: #5b9909 #5b9909 #478500;
-  background: #88be14
+  background-color: #2f5e92;
+  background-image: linear-gradient(to bottom, #578dc9, #2f5e92);
+  background-position: 0 -15px;
+  transition: background-position 0.1s linear;
 }
 
 a.cke_dialog_ui_button_ok.cke_disabled {
@@ -380,7 +383,8 @@ a.cke_dialog_ui_button_ok.cke_disabled {
 }
 
 a.cke_dialog_ui_button_ok.cke_disabled span {
-  color: #e0e8d1
+  color: #e0e8d1;
+  font-weight: bold;
 }
 
 a.cke_dialog_ui_button span {
@@ -388,7 +392,7 @@ a.cke_dialog_ui_button span {
 }
 
 a.cke_dialog_ui_button_ok span {
-  text-shadow: 0 -1px 0 #55830c
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
 span.cke_dialog_ui_button {
