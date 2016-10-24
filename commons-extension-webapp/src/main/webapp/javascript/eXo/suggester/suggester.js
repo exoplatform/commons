@@ -244,7 +244,7 @@
       highlighter: function(li, query) {
         li = $('<div></div>').append(li).html();
         return atWhoCallback.highlighter.call(this, li, query);
-      },
+      }
     },
     functionOverrides: {
       // This method just copy from AtWho library to add some more customization
