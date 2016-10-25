@@ -248,7 +248,7 @@
       // This method just copy from AtWho library to add some more customization
       insert: function(content, $li) {
         var suffix;
-        suffix = (suffix = this.getOpt('suffix')) === "" ? suffix : suffix || "\u00A0";
+        suffix = (suffix = this.getOpt('suffix')) === "" ? suffix : suffix || "\u200D\u00A0";
         var idField = this.getOpt('idField') || 'uid';
         var data = $li.data('item-data');
         var uid = data[idField] || data.id;
@@ -268,7 +268,7 @@
           }
           range.collapse(false);
           var suffixNode;
-          range.insertNode(suffixNode = this.app.document.createTextNode("\u200D" + suffix));
+          range.insertNode(suffixNode = this.app.document.createTextNode(suffix));
           //range.insertNode(suffixNode = this.app.document.createTextNode(" "));
           this._setRange('after', suffixNode, range);
         }
