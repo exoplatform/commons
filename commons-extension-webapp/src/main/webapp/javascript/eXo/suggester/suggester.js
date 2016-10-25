@@ -21,8 +21,6 @@
  *                      'tag'   - create selectize component
  *                      'mix'  -  create jquery.mention component, this is the default
  *      
- *      showAvatar   - boolean that decide if avatar is shown in the autocomplete menu. Default: true      
- *      
  *      source:     data source of the autocomplete
  *      
  *                      array        -  array of json objects {uid: '1', value: 'test', image: '/path/to/img.png'}  s
@@ -363,7 +361,9 @@
         settings.callbacks.tplEval = function(tpl, item, phase) {
           var args = arguments;
           if (phase === "onDisplay" && listItemRender) {
-            return listItemRender.call(app, item);
+            var $li = $('<li class="option">');
+            $li.html(listItemRender.call(app, item));
+            return $li;
           } else if (phase == "onInsert" && insertRender){
             return insertRender.call(app, item);
           }
@@ -408,15 +408,8 @@
 
       if (settings.renderMenuItem) {
         settings.render = {
-          option: settings.renderMenuItem
-        };
-      } else if (settings.showAvatar) {
-        settings.render = {
-          option: function(data, escape) {
-            var tpl = '<div data-value="' + data.uid + '" data-selectable="" class="option">';
-            var img = data.image || '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
-            tpl += '<img width="20px" height="20px" src="' + img + '"> ' + data.value + '</div>';
-            return tpl;
+          option: function(item, escape) {
+            return '<div class="option">' + settings.renderMenuItem.call(app, item, escape) + '</div>';
           }
         };
       }
