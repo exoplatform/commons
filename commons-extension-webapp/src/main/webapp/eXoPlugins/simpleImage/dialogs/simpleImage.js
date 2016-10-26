@@ -1,4 +1,5 @@
 CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
+    var dialogId = Math.floor(Math.random() * 100000);
     return {
         title: 'Select Picture',
         minWidth: 400,
@@ -20,10 +21,10 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                             element.setAttribute("src", this.getValue());
                         },
                         onChange: function() {
-                            var preview = CKEDITOR.document.getById('previewImageId');
-                            var imagePreviewLoader = CKEDITOR.document.getById('imagePreviewLoaderId');
-                            var imagePreviewLoaderIcon = CKEDITOR.document.getById('imagePreviewLoaderIconId');
-                            var imagePreviewError = CKEDITOR.document.getById('imagePreviewErrorId');
+                            var preview = CKEDITOR.document.getById('previewImageId' + dialogId);
+                            var imagePreviewLoader = CKEDITOR.document.getById('imagePreviewLoaderId' + dialogId);
+                            var imagePreviewLoaderIcon = CKEDITOR.document.getById('imagePreviewLoaderIconId' + dialogId);
+                            var imagePreviewError = CKEDITOR.document.getById('imagePreviewErrorId' + dialogId);
                             imagePreviewLoader.setAttribute("style", "background-color: #8D8D8D; margin-left:20%;");
                             imagePreviewError.hide();
                             preview.hide();
@@ -94,13 +95,13 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                             id: 'htmlPreview',
                             style: 'width:95%;',
                             html: '<div>' + CKEDITOR.tools.htmlEncode( editor.lang.common.preview ) + '<br>' +
-                                '<div id="' + 'imagePreviewLoaderId' + '" class="ImagePreviewLoader" style="background-color: #8D8D8D; margin-left:20%;">' + 
-                                    '<div id="' + 'imagePreviewLoaderIconId' + '" class="loading" style="background: url(\'/eXoSkin/skin/images/themes/default/Loading/loadingProgressBar.gif\') no-repeat center; display:none; width:100%;height:100%">&nbsp;</div>' +
-                                    '<span id="' + 'imagePreviewErrorId' + '" class="error" style="display:none; color:red; position:absolute; top: 30%; left: 20%">Error: image url incorrect!</span>' +
+                                '<div id="' + 'imagePreviewLoaderId' + dialogId + '" class="ImagePreviewLoader" style="background-color: #8D8D8D; margin-left:20%;">' + 
+                                    '<div id="' + 'imagePreviewLoaderIconId' + dialogId + '" class="loading" style="background: url(\'/eXoSkin/skin/images/themes/default/Loading/loadingProgressBar.gif\') no-repeat center; display:none; width:100%;height:100%">&nbsp;</div>' +
+                                    '<span id="' + 'imagePreviewErrorId' + dialogId + '" class="error" style="display:none; color:red; position:absolute; top: 30%; left: 20%">Error: image url incorrect!</span>' +
                                 '</div>' +
                                 '<div style="width:230px;margin-left:20%"><table><tr><td>' +
-                                    '<a href="javascript:void(0)" target="_blank" onclick="return false;" id="' + 'previewLinkId' + '">' +
-                                    '<img style="display:none" id="' + 'previewImageId' + '" alt="" /></a>' +
+                                    '<a href="javascript:void(0)" target="_blank" onclick="return false;" id="' + 'previewLinkId' + dialogId + '">' +
+                                    '<img style="display:none" id="' + 'previewImageId' + dialogId + '" alt="" /></a>' +
                                 // jscs:disable maximumLineLength
                                     ("") +
                                 // jscs:enable maximumLineLength
