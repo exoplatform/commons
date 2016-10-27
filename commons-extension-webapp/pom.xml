@@ -33,4 +33,7 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <build>
+    <finalName>commons-extension</finalName>
+  </build>
 </project>

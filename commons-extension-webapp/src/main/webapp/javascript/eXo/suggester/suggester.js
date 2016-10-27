@@ -21,8 +21,6 @@
  *                      'tag'   - create selectize component
  *                      'mix'  -  create jquery.mention component, this is the default
  *      
- *      showAvatar   - boolean that decide if avatar is shown in the autocomplete menu. Default: true      
- *      
  *      source:     data source of the autocomplete
  *      
  *                      array        -  array of json objects {uid: '1', value: 'test', image: '/path/to/img.png'}  s
@@ -112,6 +110,19 @@
     });
         
     var items = [];
+    var count = 0;
+    var finish = function(results) {
+      if (results && results.length) {
+        $.each(results, function(idx, elm) {
+          items[items.length] = elm;
+        });
+      }
+
+      if (++count == p.length) {
+        response.call(this, items);
+      }
+    };
+
     //
     for (var i = 0; i < p.length; i++) {
       var provider = p[i];
@@ -121,192 +132,300 @@
         });
       }
     }
-    
-    var count = 0;
-    var finish = function(results) {
-      if (results && results.length) {
-        $.each(results, function(idx, elm) {
-          items[items.length] = elm;
-        });
-      }
-      
-      if (++count == p.length) {
-        response.call(this, items);        
-      }
-    }
 
   }
-  
-  $.widget('exo.suggester', {
-    options : {
-      type : type.MIX,
-      source : [],
-      sourceProviders : [],
-      showAvatar : true
-    },
-    _create : function() {
-      $input = this.element;
-      $input.hide();
-      
-      if (this.options.providers) {
-        $.each(this.options.providers, function(name, provider) {
-          providers[name] = provider;
-        });
-      }
-      if (this.options.type.toLowerCase() === type.MIX) {
-        $editable = $('<div id="' + $input.attr('id') + '_editable" contenteditable="true"></div>');
-        $input.after($editable);
-        
-        this.options.autocomplete = {
-            appendTo: $input.parent()
-        }
-        
-        var source = this.options.source;
-        if (!(source && source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
-          var _this = this;
-          this.options.source = function(request, response) {
-            loadFromProvider.call(_this, request.term, response);
-          };
-        }
-        
-        $editable.mentionsInput(this.options);
 
-        if (this.options.renderMenuItem) {
-          $editable.editablecomplete('instance')._renderItem = function(ul, item) {
-            var tpl = this.options.renderMenuItem.call(this, item);
-            $(ul).append(tpl);
-          }
-        } else if (this.options.showAvatar) {
-          $editable.editablecomplete('instance')._renderItem = function(ul, item) {
-            var anchor, li, regexp, value;
-            li = $('<li>');
-            anchor = $('<a>').appendTo(li);
-            if (item.image) {
-              anchor.append("<img  width=\"20px\" height=\"20px\" src=\"" + item.image + "\" />");
-            } else {
-              anchor.append('<img width="20px" height="20px" src="/eXoSkin/skin/images/system/SpaceAvtDefault.png">');
-            }
-            regexp = new RegExp("(" + escapeRegExp(this.searchTerm) + ")", "gi");
-            value = item.value.replace(regexp, "<strong>$&</strong>");
-            anchor.append(value);
-            return li.appendTo(ul);
-          }
-        }
+  var App = (function() {
+    function App(input) {
+      this.$input = input;
+    }
+    return App;
+  })();
 
-        if (this.options.renderItem) {
-          $editable.data('mentionsInput').mentionTpl = this.options.renderItem;
-        } else {
-          $editable.data('mentionsInput').mentionTpl = function(mention) {
-            var tpl = '<span data-mention="' + mention.uid + '">' + mention.value + 
-            '<i class="uiIconClose uiIconLightGray" onclick="this.parentNode.parentNode.removeChild(this.parentNode)"> </i></span>';
-            return tpl;
-          }
-        }
-        
-        $editable.data('mentionsInput')._markupMention = function(mention) {
-          return "@" + mention.uid;
-        };
-        
-        $editable.on('change.mentionsInput keyup', function() {
-          var val = $editable.mentionsInput('getValue');          
-          val = val.replace(/<br>/g, '');
-          $input.val(val);
-        });
-      } else {        
-        if (!this.options.valueField) {
-          this.options.valueField = 'uid';
-        }
-        if (!this.options.labelField) {
-          this.options.labelField = 'value';
-        }
-        if (!this.options.searchField) {
-          this.options.searchField = [this.options.labelField];
-        }
-        if (this.options.create === null) {
-          this.options.create = true;
-        }
-
-        if (this.options.selectedItems) {
-          this.options.items = this.options.selectedItems;
-        }
-        
-        var _this = this;
-        if (!(this.options.source && this.options.source.length) && this.options.sourceProviders && this.options.sourceProviders.length) {
-          this.options.source = loadFromProvider;
-        }
-        
-        if (this.options.preload) {
-          this.options.load = loadFromProvider;
-        }
-
-        if (this.options.source) {
-          var source = this.options.source;
-          if ($.isArray(source)) {
-            this.options.options = this.options.source;            
-          } else {
-            this.options.options = [];
-            this.options.load = source;            
-//            this.options.onType = function() {
-//              $input[0].selectize.load(function(callback) {
-//                source.call(this, this.currentResults.query, function() {
-//                  callback.apply(this, arguments);
-//                  $input[0].selectize.refreshOptions(true);
-//                });
-//              });
-//            }
-          }
-        }
-        
-        if (this.options.renderMenuItem) {
-          this.options.render = {
-              option: this.options.renderMenuItem
-          };
-        } else if (this.options.showAvatar) {
-          this.options.render = {
-              option: function(data, escape) {
-                var tpl = '<div data-value="' + data.uid + '" data-selectable="" class="option">';
-                var img = data.image || '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
-                tpl += '<img width="20px" height="20px" src="' + img + '"> ' + data.value + '</div>';
-                 return tpl;
-              }
-          };
-        }
-        
-        if (this.options.renderItem) {
-          if (!this.options.render) {
-            this.options.render = {};
-          }
-          this.options.render.item = this.options.renderItem;
-        }
-        $input.selectize(this.options);
-      }
-    },
+  var API = {
     addProvider: function(name, provider) {
       providers[name] = provider;
     },
     getValue : function() {
-      if (this.options.type === 0) {
-        return $input[0].selectize.getValue();
+      if (this.settings.type === type.TAG) {
+        return this.$input[0].selectize.getValue();
       } else {
-        return $editable.mentionsInput('getValue').replace(/<br>/g, '');
+        var content = this.$editable ? this.$editable.html() : this.$input.html();
+        return API.replaceMentions.call(this, content);
       }
     },
     setValue : function(val) {
-      if (this.options.type === 0) {
-        return $input[0].selectize.setValue(val);
+      if (this.settings.type === type.TAG) {
+        return this.$input[0].selectize.setValue(val);
       } else {
-        return $editable.mentionsInput('setValue', val);
+        $.error("Method setValue is not supported with type=mix");
+      }
+    },
+    clearValue: function() {
+      this.$input.html('');
+      if (this.$editable) {
+        this.$editable.html('');
       }
     },
     getSuggests: function() {
-      if (this.options.type === 0) {
-        return $input[0].selectize.getValue();
+      if (this.settings.type === type.TAG) {
+        return this.$input[0].selectize.getValue();
       } else {
-        return $editable.mentionsInput('getMentions');
+        var content = this.$input.html();
+        var at = this.settings.at;
+        var mentions = [];
+
+        var $content = $('<div>' + content + '</div>');
+        $content.find('[data-atwho-at-value]').each(function() {
+          var value = $(this).attr('data-atwho-at-value');
+          value = value.trim();
+          if (value && value.charAt(0) != at) {
+            value = at + value;
+          }
+          mentions.push(value);
+        });
+        return mentions;
+      }
+    },
+    replaceMentions: function(content) {
+      if (this.settings.type === type.TAG) {
+        return content;
+      } else {
+        var at = this.settings.at;
+        var $content = $('<div>' + content + '</div>');
+        $content.find('[data-atwho-at-value]').each(function() {
+          var value = $(this).attr('data-atwho-at-value');
+          value = value.trim();
+          if (value && value.charAt(0) != at) {
+            value = at + value;
+          }
+          // This is work-around due to sometime the mention process can not process if has the close tag right after mention like this <p>@root</p>
+          $(this).replaceWith(value + ' ');
+        });
+        content = $content.html();
+        content = content.replace(/\u00a0/ig, '');
+        content = content.replace(/\u200d/ig, '');
+        return content;
       }
     }
-  });  
-  
+  };
+
+  var atWhoCallback = $.fn.atwho["default"].callbacks;
+  var defaultAtConfig = {
+    at: "@",
+    searchKey: 'value',
+    acceptSpaceBar: true,
+    minLen: 1,
+    callbacks: {
+      matcher: function(flag, subtext, should_startWithSpace, acceptSpaceBar) {
+        subtext = subtext.trim();
+        var _a, _y, match, regexp, space;
+        flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        if (should_startWithSpace) {
+          flag = '(?:^|\\s)' + flag;
+        }
+        _a = decodeURI("%C3%80");
+        _y = decodeURI("%C3%BF");
+        space = acceptSpaceBar ? "\ " : "";
+        regexp = new RegExp(flag + "([A-Za-z" + _a + "-" + _y + "0-9_" + space + "\'\.\+\-]*)$|" + flag + "([^\\x00-\\xff]*)$", 'gi');
+        match = regexp.exec(subtext);
+        if (match) {
+          var a = match[2] || match[1];
+          return a;
+        } else {
+          return null;
+        }
+      },
+      sorter: function(query, items, searchKey) {
+        return items;
+      },
+      highlighter: function(li, query) {
+        li = $('<div></div>').append(li).html();
+        return atWhoCallback.highlighter.call(this, li, query);
+      }
+    },
+    functionOverrides: {
+      // This method just copy from AtWho library to add some more customization
+      insert: function(content, $li) {
+        var suffix;
+        suffix = (suffix = this.getOpt('suffix')) === "" ? suffix : suffix || "\u00A0";
+        var idField = this.getOpt('idField') || 'uid';
+        var data = $li.data('item-data');
+        var uid = data[idField] || data.id;
+        this.query.el
+            .removeClass('atwho-query')
+            .addClass('atwho-inserted')
+            .html(content)
+            .attr('data-atwho-at-query', "" + data['atwho-at'] + this.query.text)
+            .attr('data-atwho-at-value', "" + uid + '')
+            .attr('contenteditable', "false")
+            .on('click', '.remove', function(e) {
+              $(this).closest('[data-atwho-at-query]').remove();
+            });
+        if (range = this._getRange()) {
+          if (this.query.el.length) {
+            range.setEndAfter(this.query.el[0]);
+          }
+          range.collapse(false);
+          var suffixNode;
+          range.insertNode(suffixNode = this.app.document.createTextNode("\u200D" + suffix));
+          //range.insertNode(suffixNode = this.app.document.createTextNode(" "));
+          this._setRange('after', suffixNode, range);
+        }
+        if (!this.$inputor.is(':focus')) {
+          this.$inputor.focus();
+        }
+        return this.$inputor.change();
+      }
+    }
+  };
+
+  $.fn.suggester = function(settings) {
+    var _args = arguments;
+    var app, $this;
+    if (!(app = ($this = $(this)).data("suggester"))) {
+      $this.data('suggester', (app = new App(this)));
+    }
+    var $input = $this, $editable;
+
+    if (!(typeof settings === 'object' || !settings)) {
+      if (API[settings]) {
+        var result = API[settings].apply(app, Array.prototype.slice.call(_args, 1));
+        return result;
+      } else {
+        return $.error("Method " + method + " does not exist on eXo suggester");
+      }
+      return;
+    }
+
+    if (!settings) settings = {};
+    if (settings.providers) {
+      $.each(settings.providers, function(name, provider) {
+        providers[name] = provider;
+      });
+    }
+
+    if (settings.type !== type.TAG) {
+      if (settings.callbacks == undefined) {
+        settings.callbacks = {};
+      }
+
+      //TODO: Need to create contentEditable or not?
+      if (this.is('[contentEditable]')) {
+        $editable = $input;
+      } else {
+        $editable = $('<div id="' + $input.attr('id') + '_editable" class="exo-suggester-editable ui-autocomplete-input" contenteditable="true"></div>');
+        $input.after($editable);
+        $input.hide();
+        app.$editable = $editable;
+      }
+
+      settings = $.extend(true, {}, defaultAtConfig, settings);
+      if (settings.iframe) {
+        $editable.atwho('setIframe', settings.iframe);
+      }
+
+      var source = settings.source;
+      if (!(source && source.length) && settings.sourceProviders && settings.sourceProviders.length) {
+        settings.source = function(query, callback) {
+          loadFromProvider.call(app, query, callback);
+        };
+      } else if ($.isArray(settings.source)){
+        settings.data = source;
+        settings.source = null;
+      }
+      settings.callbacks.remoteFilter = settings.source;
+
+      var listItemRender = false, insertRender = false;
+      if (settings.renderMenuItem) {
+        var render = settings.renderMenuItem;
+        if (typeof render === 'string') {
+          settings.displayTpl = render;
+        } else if ($.isFunction(render)){
+          listItemRender = render;
+        }
+      };
+
+      if (settings.renderItem) {
+        var render = settings.renderItem;
+        if (typeof render === 'string') {
+          settings.insertTpl = render;
+        } else if ($.isFunction(render)){
+          insertRender = render;
+        }
+      } else {
+        settings.insertTpl = '<span>${value}<a href="#" class="remove"><i class="uiIconClose uiIconLightGray">x</i></a></span>';
+      }
+
+      if (listItemRender || insertRender) {
+        settings.callbacks.tplEval = function(tpl, item, phase) {
+          var args = arguments;
+          if (phase === "onDisplay" && listItemRender) {
+            var $li = $('<li class="option">');
+            $li.html(listItemRender.call(app, item));
+            return $li;
+          } else if (phase == "onInsert" && insertRender){
+            return insertRender.call(app, item);
+          }
+          return atWhoCallback.tplEval(tpl, item);
+        };
+      }
+
+      app.atWho = $editable.atwho(settings);
+    } else {
+      if (!settings.valueField) {
+        settings.valueField = 'uid';
+      }
+      if (!settings.labelField) {
+        settings.labelField = 'value';
+      }
+      if (!settings.searchField) {
+        settings.searchField = [settings.labelField];
+      }
+
+      if (settings.selectedItems) {
+        settings.items = settings.selectedItems;
+      }
+
+      var _this = this;
+      if (!(settings.source && settings.source.length) && settings.sourceProviders && settings.sourceProviders.length) {
+        settings.source = loadFromProvider;
+      }
+
+      if (settings.preload) {
+        settings.load = loadFromProvider;
+      }
+
+      if (settings.source) {
+        var source = settings.source;
+        if ($.isArray(source)) {
+          settings.options = settings.source;
+        } else {
+          settings.options = [];
+          settings.load = source;
+        }
+      }
+
+      if (settings.renderMenuItem) {
+        settings.render = {
+          option: function(item, escape) {
+            return '<div class="option">' + settings.renderMenuItem.call(app, item, escape) + '</div>';
+          }
+        };
+      }
+
+      if (settings.renderItem) {
+        if (!settings.render) {
+          settings.render = {};
+        }
+        settings.render.item = settings.renderItem;
+      }
+      $input.selectize(settings);
+    }
+
+    app.settings = settings;
+  };
+
   function escapeRegExp(str) {
     var specials;
     specials = /[.*+?|()\[\]{}\\$^]/g;

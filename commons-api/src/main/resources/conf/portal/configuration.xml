@@ -28,6 +28,11 @@
     <type>org.exoplatform.commons.api.websocket.ExtensibleWSFilter</type>
   </component>
   
+  <component>
+    <key>org.exoplatform.commons.api.ui.PlugableUIService</key>
+    <type>org.exoplatform.commons.api.ui.PlugableUIServiceImpl</type>
+  </component>
+  
   <!-- sample configuration 
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.websocket.ExtensibleWSFilter</target-component>
