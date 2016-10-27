@@ -1,4 +1,4 @@
-require(['SHARED/jquery'],function($) {
+require(['SHARED/jquery', 'SHARED/suggester'],function($) {
   var defaultOptions = {
     type: 'mix'
   };
