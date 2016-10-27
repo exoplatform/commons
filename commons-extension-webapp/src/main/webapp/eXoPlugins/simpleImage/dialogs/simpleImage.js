@@ -53,7 +53,6 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                         type: 'text',
                         id: 'description',
                         label: 'Description',
-                        validate: CKEDITOR.dialog.validate.notEmpty( "Description cannot be empty!" ),
                         setup: function(element) {
                             this.setValue(element.getAttribute("title") );
                         },
