@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GroupProvider {
@@ -89,6 +90,7 @@ public class GroupProvider {
    * @param pluginInfos the pluginInfos to set
    */
   public void setPluginInfos(List<PluginInfo> pluginInfos) {
+    Collections.sort(pluginInfos, new OrderComparatorASC());
     this.pluginInfos = pluginInfos;
   }
 
@@ -97,6 +99,7 @@ public class GroupProvider {
    */
   public void addPluginInfo(PluginInfo pluginInfo) {
     this.pluginInfos.add(pluginInfo);
+    Collections.sort(pluginInfos, new OrderComparatorASC());
   }
 
 }

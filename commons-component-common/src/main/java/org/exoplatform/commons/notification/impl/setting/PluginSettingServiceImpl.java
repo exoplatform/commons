@@ -18,7 +18,6 @@ package org.exoplatform.commons.notification.impl.setting;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ import javax.jcr.Node;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.model.GroupProvider;
+import org.exoplatform.commons.api.notification.model.OrderComparatorASC;
 import org.exoplatform.commons.api.notification.model.PluginInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
@@ -136,10 +136,9 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       for (PluginInfo pluginInfo : groupPlugin.getPluginInfos()) {
         pluginInfo.setChannelActives(getSettingPlugins(pluginInfo.getType()));
       }
-      Collections.sort(groupPlugin.getPluginInfos(), new ComparatorASC());
       groupProviders.add(groupPlugin);
     }
-    Collections.sort(groupProviders, new ComparatorASC());
+    Collections.sort(groupProviders, new OrderComparatorASC());
     return groupProviders;
   }
 
@@ -208,7 +207,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   @Override
   public List<String> getActivePluginIds(String channelId) {
     Set<String> activePluginIds = new HashSet<String>();
-    Collections.sort(pluginConfigs, new ComparatorASC());
+    Collections.sort(pluginConfigs, new OrderComparatorASC());
     for (PluginConfig pluginConfig : pluginConfigs) {
       if (pluginConfig.isChildPlugin() == false && isActive(channelId, pluginConfig.getPluginId())) {
         activePluginIds.add(pluginConfig.getPluginId());
@@ -254,28 +253,6 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       LOG.error("Failed to create parent Node for plugin " + pluginId);
     } finally {
       sProvider.close();
-    }
-  }
-
-  private class ComparatorASC implements Comparator<Object> {
-    @Override
-    public int compare(Object o1, Object o2) {
-      if (o1 instanceof GroupProvider) {
-        Integer order1 = ((GroupProvider) o1).getOrder();
-        Integer order2 = ((GroupProvider) o2).getOrder();
-        return order1.compareTo(order2);
-      }
-      if (o1 instanceof PluginConfig) {
-        Integer order1 = Integer.valueOf(((PluginConfig) o1).getOrder());
-        Integer order2 = Integer.valueOf(((PluginConfig) o2).getOrder());
-        return order1.compareTo(order2);
-      }
-      if (o1 instanceof PluginInfo) {
-        Integer order1 = ((PluginInfo) o1).getOrder();
-        Integer order2 = ((PluginInfo) o2).getOrder();
-        return order1.compareTo(order2);
-      }
-      return 0;
     }
   }
 
