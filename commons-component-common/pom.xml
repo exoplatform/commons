@@ -137,6 +137,15 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- Diff engine - http://www.suigeneris.org/kb/display/jrcs/JRCS+Home -->
+    <dependency>
+      <groupId>org.suigeneris</groupId>
+      <artifactId>jrcs.diff</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ecs</groupId>
+      <artifactId>ecs</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>

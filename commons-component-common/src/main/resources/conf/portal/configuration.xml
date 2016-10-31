@@ -19,6 +19,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.commons.diff.DiffService</key>
+    <type>org.exoplatform.commons.diff.DiffService</type>
+  </component>
+  
+  <component>
     <key>org.exoplatform.services.user.UserStateService</key>
      <type>org.exoplatform.services.user.UserStateService</type>
   </component>
