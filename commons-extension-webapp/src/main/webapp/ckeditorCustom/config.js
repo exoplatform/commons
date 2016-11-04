@@ -90,30 +90,28 @@ CKEDITOR.editorConfig = function( config ) {
                 if (peopleSearchCached[query]) {
                     callback.call(this, peopleSearchCached[query]);
                 } else {
-                    var url = window.location.protocol + '//' + window.location.host + '/' + eXo.social.portal.rest + '/social/people/getprofile/data.json?search=' + query;
-                    $.getJSON(url, function(responseData) {
-                        responseData = _.filter(responseData, function(item) {
-                            return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
+                    require(['SHARED/jquery'], function($) {
+                        var url = window.location.protocol + '//' + window.location.host + '/' + eXo.social.portal.rest + '/social/people/getprofile/data.json?search=' + query;
+                        $.getJSON(url, function(responseData) {
+                            var result = [];
+                            for (var i = 0; i < responseData.length; i++) {
+                                var d = responseData[i];
+                                var item = {
+                                    uid: d.id.substr(1),
+                                    name: d.name,
+                                    avatar: d.avatar
+                                };
+                                result.push(item);
+                            }
+
+                            peopleSearchCached[query] = result;
+                            if (peopleSearchCached[query].length == 0) {
+                                lastNoResultQuery = query;
+                            } else {
+                                lastNoResultQuery = false;
+                            }
+                            callback.call(this, peopleSearchCached[query]);
                         });
-
-                        var result = [];
-                        for (var i = 0; i < responseData.length; i++) {
-                            var d = responseData[i];
-                            var item = {
-                                uid: d.id.substr(1),
-                                name: d.name,
-                                avatar: d.avatar
-                            };
-                            result.push(item);
-                        }
-
-                        peopleSearchCached[query] = result;
-                        if (peopleSearchCached[query].length == 0) {
-                            lastNoResultQuery = query;
-                        } else {
-                            lastNoResultQuery = false;
-                        }
-                        callback.call(this, peopleSearchCached[query]);
                     });
                 }
             }
