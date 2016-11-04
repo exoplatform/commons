@@ -2,18 +2,30 @@ require(['SHARED/jquery', 'SHARED/suggester'],function($) {
   var defaultOptions = {
     type: 'mix'
   };
+  var suggesterShowing = false;
 
   var fillingCharSequence = CKEDITOR.tools.repeat( '\u200b', 7 );
   function initSuggester(editor, config) {
-    // WYSIWYG mode when switching from source mode
+    var $inputor = false;
+
     if (editor.mode != 'source') {
       editor.document.getBody().$.contentEditable = true;
       config = $.extend(true, {}, config, {iframe: editor.window.getFrame().$});
-      $(editor.document.getBody().$).suggester(config);
+      $inputor = $(editor.document.getBody().$);
+      $inputor.suggester(config);
+    } else {
+      $inputor = $(editor.container.$).find(".cke_source");
+      $inputor.suggester(config);
     }
-    // Source mode when switching from WYSIWYG
-    else {
-      $(editor.container.$).find(".cke_source").suggester(config);
+
+    if ($inputor) {
+      var alias = config.alias ? '-' + config.alias + '.atwho' : '.atwho';
+      $inputor.on('shown' + alias, function() {
+        suggesterShowing = true;
+      });
+      $inputor.on('hidden' + alias, function() {
+        suggesterShowing = false;
+      });
     }
   }
 
@@ -45,6 +57,11 @@ require(['SHARED/jquery', 'SHARED/suggester'],function($) {
       editor.on('getData', function(evt) {
         var data = evt.data;
         data.dataValue = getContent(evt.editor, data.dataValue);
+      });
+      editor.on( 'key', function( event ) {
+        if (suggesterShowing && (event.data.keyCode == 13 || event.data.keyCode == 10)) {
+          event.cancel();
+        }
       });
     }
   });
