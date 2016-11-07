@@ -155,30 +155,24 @@
   overflow:hidden;
   .border-bottom-radius(5px);
 }
-.cke_bottom_hidden {
-  height: 0px;
-  border-top: 0px !important;
-  padding: 0px !important;
-}
 .cke_bottom {
   background-image:linear-gradient(to bottom,@color19,@color7);
   background: @headingColor;
-  border-top:1px solid @color11;
+  border-top: none;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   .box-shadow(0 1px 0 @white inset);
   filter:progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr='@color19',endColorstr='@color7');
   overflow:hidden;
-  padding:6px 8px 2px;
   position:relative;
   display: block;
   height: 0;
-  box-sizing: border-box;
+  padding: 0;
+  .box-sizing(border-box);
 
-  &.cke_bottom_hidden {
-    border-color: transparent;
-    padding-top: 0;
-    padding-bottom: 0;
+  &.cke_bottom_visible {
+    padding: 6px 8px 2px;
+    border-top:1px solid @color11;
   }
 }
 .cke_browser_ios {

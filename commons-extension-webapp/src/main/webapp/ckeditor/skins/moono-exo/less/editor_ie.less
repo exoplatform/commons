@@ -108,14 +108,22 @@
 }
 
 .cke_bottom {
-  padding: 6px 8px 2px;
   position: relative;
-  border-top: 1px solid #bfbfbf;
+  border-top: none;
   box-shadow: 0 1px 0 #fff inset;
   background: #f8f8f8;
   filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#ebebeb', endColorstr='#cfd1cf');
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+  height: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  &.cke_bottom_visible {
+    padding: 6px 8px 2px;
+    border-top:1px solid #bfbfbf;
+  }
 }
 
 .cke_browser_ios .cke_contents {
