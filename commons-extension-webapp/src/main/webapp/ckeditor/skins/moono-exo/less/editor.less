@@ -171,7 +171,7 @@
   .box-sizing(border-box);
 
   &.cke_bottom_visible {
-    padding: 6px 8px 2px;
+    padding: 5px 8px 3px;
     border-top:1px solid @color11;
   }
 }
@@ -633,7 +633,7 @@ a:hover.cke_colorauto,a:hover.cke_colormore,a:focus.cke_colorauto,a:focus.cke_co
   float:left;
   border-right: 1px solid @borderColor;
   //height: @toolBarHeight;
-  padding: 2px;
+  padding: 0 2px;
 }
 .cke_toolbar:last-child {
   border-right: none;
@@ -1592,16 +1592,6 @@ legend.cke_voice_label {
   height: 14px;
 }
 
-// Removing delimitation between style buttons and color button
-.cke_toolbar {
-  &:nth-child(2) {
-    border-right: none;
-    padding-right: 0;
-  }
-  &:nth-child(3) {
-    padding-left: 0;
-  }
-}
 
 a.cke_button, a.cke_combo_button {
   margin: 1px 2px;
