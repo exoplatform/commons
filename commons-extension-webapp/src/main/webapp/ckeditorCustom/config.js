@@ -23,7 +23,8 @@ CKEDITOR.editorConfig = function( config ) {
     CKEDITOR.plugins.addExternal('simpleLink','/commons-extension/eXoPlugins/simpleLink/','plugin.js');
     CKEDITOR.plugins.addExternal('simpleImage','/commons-extension/eXoPlugins/simpleImage/','plugin.js');
     CKEDITOR.plugins.addExternal('suggester','/commons-extension/eXoPlugins/suggester/','plugin.js');
-    config.extraPlugins = 'simpleLink,simpleImage,suggester';
+    CKEDITOR.plugins.addExternal('hideBottomToolbar','/commons-extension/eXoPlugins/hideBottomToolbar/','plugin.js');
+    config.extraPlugins = 'simpleLink,simpleImage,suggester,hideBottomToolbar';
     config.skin = 'moono-exo,/commons-extension/ckeditor/skins/moono-exo/';
     // %REMOVE_END%
 
@@ -70,6 +71,9 @@ CKEDITOR.editorConfig = function( config ) {
     config.autoGrow_minHeight = 110;
 
     config.language = eXo.env.portal.language || 'en';
+
+    //This is config for hideBottomToolbar plugin
+    config.showBottomToolbar = true;
 
     // Here is configure for suggester
     var peopleSearchCached = {};
