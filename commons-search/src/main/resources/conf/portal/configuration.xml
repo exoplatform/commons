@@ -26,25 +26,25 @@
     xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.exoplatform.addons.es.index.IndexingService</key>
-    <type>org.exoplatform.addons.es.index.impl.QueueIndexingService</type>
+    <key>org.exoplatform.commons.search.index.IndexingService</key>
+    <type>org.exoplatform.commons.search.index.impl.QueueIndexingService</type>
   </component>
 
   <component>
-    <key>org.exoplatform.addons.es.index.IndexingOperationProcessor</key>
-    <type>org.exoplatform.addons.es.index.impl.ElasticIndexingOperationProcessor</type>
+    <key>org.exoplatform.commons.search.index.IndexingOperationProcessor</key>
+    <type>org.exoplatform.commons.search.index.impl.ElasticIndexingOperationProcessor</type>
   </component>
 
   <component>
-    <type>org.exoplatform.addons.es.client.ElasticSearchingClient</type>
+    <type>org.exoplatform.commons.search.es.client.ElasticSearchingClient</type>
   </component>
 
   <component>
-    <type>org.exoplatform.addons.es.client.ElasticIndexingClient</type>
+    <type>org.exoplatform.commons.search.es.client.ElasticIndexingClient</type>
   </component>
 
   <component>
-    <type>org.exoplatform.addons.es.client.ElasticContentRequestBuilder</type>
+    <type>org.exoplatform.commons.search.es.client.ElasticContentRequestBuilder</type>
   </component>
 
   <component>
@@ -52,16 +52,16 @@
   </component>
 
   <component>
-      <type>org.exoplatform.addons.es.client.ElasticIndexingAuditTrail</type>
+      <type>org.exoplatform.commons.search.es.client.ElasticIndexingAuditTrail</type>
   </component>
 
   <component>
-    <key>org.exoplatform.addons.es.dao.IndexingOperationDAO</key>
-    <type>org.exoplatform.addons.es.dao.impl.IndexingOperationDAOImpl</type>
+    <key>org.exoplatform.commons.search.dao.IndexingOperationDAO</key>
+    <type>org.exoplatform.commons.search.dao.impl.IndexingOperationDAOImpl</type>
   </component>
 
   <component>
-    <type>org.exoplatform.addons.es.rest.IndexingManagementRestServiceV1</type>
+    <type>org.exoplatform.commons.search.rest.IndexingManagementRestServiceV1</type>
   </component>
 
   <external-component-plugins>
@@ -77,7 +77,7 @@
           <description>details of the execution of the bulk indexing job</description>
           <property name="jobName" value="ESBulkIndexer"/>
           <property name="groupName" value="ElasticSearch"/>
-          <property name="job" value="org.exoplatform.addons.es.job.BulkIndexingJob"/>
+          <property name="job" value="org.exoplatform.commons.search.job.BulkIndexingJob"/>
           <property name="repeatCount" value="0"/>
           <property name="period" value="${exo.es.bulk.job.period:5000}"/><!-- default 5 seconds -->
           <property name="startTime" value="+60000"/><!-- start after 1 minute delay -->
