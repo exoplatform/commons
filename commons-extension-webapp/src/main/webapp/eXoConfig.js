@@ -8,6 +8,7 @@ CKEDITOR.eXoPath = CKEDITOR.basePath.substr(0, CKEDITOR.basePath.indexOf("ckedit
 (function() {CKEDITOR.plugins.addExternal('content','/eXoWCMResources/eXoPlugins/content/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('insertGadget','/commons-extension/eXoPlugins/insertGadget/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('insertPortalLink','/commons-extension/eXoPlugins/insertPortalLink/','plugin.js');})();
+(function() {CKEDITOR.plugins.addExternal('simpleLink','/commons-extension/eXoPlugins/simpleLink/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('acceptInline','/eXoWCMResources/eXoPlugins/acceptInline/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('cancelInline','/eXoWCMResources/eXoPlugins/cancelInline/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('helpBBCode','/forum/eXoPlugins/helpBBCode/','plugin.js');})();
