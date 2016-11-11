@@ -1,4 +1,4 @@
-﻿﻿﻿﻿/*
+﻿/*
 	eXo config plugins
 */
 
@@ -37,7 +37,7 @@ CKEDITOR.editorConfig = function( config ){
 		['Image','Flash','Table','SpecialChar'],
 		['TextColor','BGColor'],
 		['Maximize', 'ShowBlocks'],
-		['Style','Format','Font','FontSize']
+		['Styles','Format','Font','FontSize']
 	] ;
 
 	config.toolbar_Basic = [
@@ -45,14 +45,14 @@ CKEDITOR.editorConfig = function( config ){
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 		'/',
 		['Blockquote','-','Link','Unlink', 'ShowBlocks'],		
-		['Style','Format','Font','FontSize','-','Maximize']
+		['Styles','Format','Font','FontSize','-','Maximize']
 	] ;
 	config.toolbar_Comment = [
   		['Bold','Italic','Underline','Strike','-','NumberedList','BulletedList','Outdent','Indent'],
   		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
   		'/',
   		['Blockquote','-','Link','Unlink', 'ShowBlocks'],		
-  		['Style','Format','Font','FontSize','-','Maximize']
+  		['Styles','Format','Font','FontSize','-','Maximize']
   	] ;
 	
 	config.toolbar_CompleteWCM = [
@@ -60,7 +60,7 @@ CKEDITOR.editorConfig = function( config ){
 		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','-','Undo','Redo'],
 		['insertGadget.btn','Flash','Table','SpecialChar', 'content.btn', 'Image'], 		['Bold','Italic','Underline','Strike','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','NumberedList','BulletedList','-','TextColor','BGColor','-','RemoveFormat'],
 		['Link','insertPortalLink.btn','Unlink','Anchor'],		
-		['Style','Format','Font','FontSize', '-' ,'Maximize']
+		['Styles','Format','Font','FontSize', '-' ,'Maximize']
 	] ;
 	
 	config.toolbar_BasicWCM = [
@@ -68,7 +68,7 @@ CKEDITOR.editorConfig = function( config ){
     ['-','NumberedList','BulletedList','Outdent','Indent'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Blockquote'],
 		['-','Link','Unlink','insertPortalLink.btn','content.btn', 'Image'],
-    ['-','Maximize','ShowBlocks','Style','Format','Font','FontSize']
+    ['-','Maximize','ShowBlocks','Styles','Format','Font','FontSize']
 	] ;
 
 	config.toolbar_SuperBasicWCM = [
@@ -84,13 +84,13 @@ CKEDITOR.editorConfig = function( config ){
 		'/',
                 ['NumberedList','BulletedList','-','TextColor','BGColor','-','RemoveFormat'],		
 		['Link','insertPortalLink.btn','Unlink','Anchor'],		
-		['Style','Format','Font','FontSize'],
+		['Styles','Format','Font','FontSize'],
 		['-','acceptInline.btn','cancelInline.btn']
 	] ;
 	config.toolbar_InlineEditTitle = [
 		['Bold','Italic','Underline','Strike'],    		
 		['-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Blockquote'],
-    		['-','Style','Format','Font','FontSize']
+    		['-','Styles','Format','Font','FontSize']
 	] ;
 
 	config.toolbar_Forum = [
