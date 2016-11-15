@@ -310,15 +310,7 @@
         settings.callbacks = {};
       }
 
-      //TODO: Need to create contentEditable or not?
-      if (this.is('[contentEditable]')) {
-        $editable = $input;
-      } else {
-        $editable = $('<div id="' + $input.attr('id') + '_editable" class="exo-suggester-editable ui-autocomplete-input" contenteditable="true"></div>');
-        $input.after($editable);
-        $input.hide();
-        app.$editable = $editable;
-      }
+      $editable = $input;
 
       settings = $.extend(true, {}, defaultAtConfig, settings);
       if (settings.iframe) {
