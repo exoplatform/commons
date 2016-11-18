@@ -29,7 +29,11 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
                             this.setValue(element.getAttribute("href") );
                         },
                         commit: function(element) {
-                            element.setAttribute("href", this.getValue());
+                            var url = this.getValue();
+                            if (url && !url.match(/^(\/|((https?|ftp|file):\/\/))/ig)) {
+                                url = "http://" + url;
+                            }
+                            element.setAttribute("href", url);
                         }
                     }
                 ]
