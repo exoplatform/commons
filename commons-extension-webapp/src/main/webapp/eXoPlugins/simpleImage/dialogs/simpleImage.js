@@ -4,6 +4,7 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
         title: 'Select Picture',
         minWidth: 400,
         minHeight: 400,
+        resizable: CKEDITOR.DIALOG_RESIZE_NONE,
         contents: [
             {
                 id: 'tab',
