@@ -43,6 +43,7 @@
 				(function() {
 				var oldJQuery = window.jQuery;
 				window.jQuery = $;
+				window.CKEDITOR_BASEPATH = '/commons-extension/ckeditor/';
 				<include>/ckeditor/ckeditor.js</include>
 				<include>/ckeditor/adapters/jquery.js</include>
 				<include>/ckeditor/lang/en.js</include>
