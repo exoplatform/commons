@@ -3,6 +3,7 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
         title: 'Link',
         minWidth: 400,
         minHeight: 200,
+        resizable: CKEDITOR.DIALOG_RESIZE_NONE,
         contents: [
             {
                 id: 'tab',
