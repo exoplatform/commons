@@ -1,4 +1,12 @@
 CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
+    function isBase64Image(imageLink) {
+        if (!imageLink) return false;
+        if (imageLink.match(/^data:image\/([a-zA-Z]+);base64/ig)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     var dialogId = Math.floor(Math.random() * 100000);
     return {
         title: 'Select Picture',
@@ -19,7 +27,11 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                             this.setValue(element.getAttribute("src"));
                         },
                         commit: function(element) {
-                            element.setAttribute("src", this.getValue());
+                            var val = this.getValue();
+                            if (isBase64Image(val)) {
+                                val = "";
+                            }
+                            element.setAttribute("src", val);
                         },
                         onChange: function() {
                             var preview = CKEDITOR.document.getById('previewImageId' + dialogId);
@@ -31,20 +43,28 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                             preview.hide();
                             imagePreviewLoader.show();
                             if (this.getValue() && this.getValue().trim().length > 0) {
-                                imagePreviewLoader.show();
-                                imagePreviewLoaderIcon.show();
-                                preview.setAttribute("src", this.getValue());
-                                preview.on("load", function() {
-                                    preview.show();
-                                    imagePreviewLoader.setAttribute("style", "background-color: white; margin-left:20%;");
-                                    imagePreviewLoader.hide();
-                                    imagePreviewLoaderIcon.hide();
-                                });
-                                preview.on("error", function() {
+                                if (isBase64Image(this.getValue())) {
                                     preview.hide();
                                     imagePreviewLoaderIcon.hide();
+                                    imagePreviewError.setHtml('Base64 image is not supported');
                                     imagePreviewError.show();
-                                });
+                                } else {
+                                    imagePreviewLoader.show();
+                                    imagePreviewLoaderIcon.show();
+                                    preview.setAttribute("src", this.getValue());
+                                    preview.on("load", function() {
+                                        preview.show();
+                                        imagePreviewLoader.setAttribute("style", "background-color: white; margin-left:20%;");
+                                        imagePreviewLoader.hide();
+                                        imagePreviewLoaderIcon.hide();
+                                    });
+                                    preview.on("error", function() {
+                                        preview.hide();
+                                        imagePreviewLoaderIcon.hide();
+                                        imagePreviewError.setHtml('Error: image url incorrect!');
+                                        imagePreviewError.show();
+                                    });
+                                }
                             } else {
                                 imagePreviewLoaderIcon.hide();
                             }
@@ -97,7 +117,7 @@ CKEDITOR.dialog.add( 'simpleImageDialog', function( editor ) {
                             html: '<div>' + CKEDITOR.tools.htmlEncode( editor.lang.common.preview ) + '<br>' +
                                 '<div id="' + 'imagePreviewLoaderId' + dialogId + '" class="ImagePreviewLoader" style="background-color: #8D8D8D; margin-left:20%;">' + 
                                     '<div id="' + 'imagePreviewLoaderIconId' + dialogId + '" class="loading" style="background: url(\'/eXoSkin/skin/images/themes/default/Loading/loadingProgressBar.gif\') no-repeat center; display:none; width:100%;height:100%">&nbsp;</div>' +
-                                    '<span id="' + 'imagePreviewErrorId' + dialogId + '" class="error" style="display:none; color:red; position:absolute; top: 30%; left: 20%">Error: image url incorrect!</span>' +
+                                    '<span id="' + 'imagePreviewErrorId' + dialogId + '" class="error" style="display:none; color:red; position:absolute; top: 30%; left: 0; right: 0;text-align: center">Error: image url incorrect!</span>' +
                                 '</div>' +
                                 '<div style="width:230px;margin-left:20%"><table><tr><td>' +
                                     '<a href="javascript:void(0)" target="_blank" onclick="return false;" id="' + 'previewLinkId' + dialogId + '">' +
