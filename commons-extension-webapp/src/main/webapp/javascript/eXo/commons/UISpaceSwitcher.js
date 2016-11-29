@@ -180,7 +180,7 @@ UISpaceSwitcher.prototype.initSpaceData = function(uicomponentId) {
 UISpaceSwitcher.prototype.getRecentlyVisitedSpace = function(uicomponentId) {
   var me = eXo.commons.UISpaceSwitcher;
   var storage = me.dataStorage[uicomponentId];
-  var url = storage.recentlyVisitedSpaceRestUrl + "?offset=0";
+  var url = storage.recentlyVisitedSpaceRestUrl + "?offset=0&limit=5";
   if(storage.appId && storage.appId != null) {
     url += "&appId=" + storage.appId;
   }
