@@ -93,7 +93,10 @@ CKEDITOR.editorConfig = function( config ) {
                     callback.call(this, peopleSearchCached[query]);
                 } else {
                     require(['SHARED/jquery'], function($) {
-                        var url = window.location.protocol + '//' + window.location.host + '/' + eXo.social.portal.rest + '/social/people/getprofile/data.json?search=' + query;
+                        var userName = eXo.social.portal.userName;
+                        var typeOfRelation = config.typeOfRelation;
+                        var activityId = config.activityId;
+                        var url = window.location.protocol + '//' + window.location.host + '/' + eXo.social.portal.rest + '/social/people/suggest.json?nameToSearch=' + query + '&currentUser=' + userName + '&typeOfRelation=' + typeOfRelation + '&activityId=' + activityId;
                         $.getJSON(url, function(responseData) {
                             var result = [];
                             for (var i = 0; i < responseData.length; i++) {
