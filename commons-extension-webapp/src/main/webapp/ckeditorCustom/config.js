@@ -94,8 +94,8 @@ CKEDITOR.editorConfig = function( config ) {
                 } else {
                     require(['SHARED/jquery'], function($) {
                         var userName = eXo.social.portal.userName;
-                        var typeOfRelation = config.typeOfRelation;
-                        var activityId = config.activityId;
+                        var typeOfRelation = CKEDITOR.currentInstance.config.typeOfRelation;
+                        var activityId = CKEDITOR.currentInstance.config.activityId;
                         var url = window.location.protocol + '//' + window.location.host + '/' + eXo.social.portal.rest + '/social/people/suggest.json?nameToSearch=' + query + '&currentUser=' + userName + '&typeOfRelation=' + typeOfRelation + '&activityId=' + activityId;
                         $.getJSON(url, function(responseData) {
                             var result = [];
