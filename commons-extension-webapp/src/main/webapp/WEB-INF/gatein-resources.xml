@@ -45,6 +45,8 @@
 				window.jQuery = $;
 				window.CKEDITOR_BASEPATH = '/commons-extension/ckeditor/';
 				<include>/ckeditor/ckeditor.js</include>
+				// force compatible version in any case to make sure the editor will initialize
+				CKEDITOR.env.isCompatible = true;
 				<include>/ckeditor/adapters/jquery.js</include>
 				<include>/ckeditor/lang/en.js</include>
 				<include>/ckeditor/styles.js</include>
