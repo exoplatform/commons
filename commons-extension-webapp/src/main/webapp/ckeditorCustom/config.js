@@ -3,8 +3,6 @@
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
-// force compatible version in any case to make sure the editor will initialize
-CKEDITOR.env.isCompatible = true;
 // force env when using the eXo Android app (the eXo Android app uses a custom user agent which
 // is not known by CKEditor and which makes it not initialize the editor)
 var userAgent = navigator.userAgent.toLowerCase();
