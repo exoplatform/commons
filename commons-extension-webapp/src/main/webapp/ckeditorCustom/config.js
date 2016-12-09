@@ -94,10 +94,13 @@ CKEDITOR.editorConfig = function( config ) {
                 } else {
                     require(['SHARED/jquery'], function($) {
                         var userName = eXo.social.portal.userName;
+                        var activityId = CKEDITOR.currentInstance.config.activityId;
                         var typeOfRelation = CKEDITOR.currentInstance.config.typeOfRelation;
                         var spaceURL = CKEDITOR.currentInstance.config.spaceURL;
-                        var activityId = CKEDITOR.currentInstance.config.activityId;
-                        var url = window.location.protocol + '//' + window.location.host + '/' + eXo.social.portal.rest + '/social/people/suggest.json?nameToSearch=' + query + '&currentUser=' + userName + '&typeOfRelation=' + typeOfRelation + '&spaceURL=' + spaceURL + '&activityId=' + activityId;
+                        var url = window.location.protocol + '//' + window.location.host + '/' + eXo.social.portal.rest + '/social/people/suggest.json?nameToSearch=' + query + '&currentUser=' + userName + '&typeOfRelation=' + typeOfRelation + '&spaceURL=' + spaceURL;
+                        if (CKEDITOR.currentInstance.config.activityId) {
+                            url += '&activityId=' + activityId;
+                        }
                         $.getJSON(url, function(responseData) {
                             var result = [];
                             for (var i = 0; i < responseData.length; i++) {
