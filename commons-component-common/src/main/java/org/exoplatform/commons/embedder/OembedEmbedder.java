@@ -57,7 +57,7 @@ public class OembedEmbedder extends AbstractEmbedder {
 
   private static final String  EMBED_THUMBNAIL  = "thumbnail";
 
-  private static final Pattern SECURE_SHORTEN_DAILY_MOTION_PATTERN = Pattern.compile("https://dai\\.ly/.*");
+  private static final Pattern SHORTEN_DAILY_MOTION_PATTERN = Pattern.compile("http://dai\\.ly/.*");
 
   /**
    * constructor
@@ -103,11 +103,12 @@ public class OembedEmbedder extends AbstractEmbedder {
           } catch (Exception e) {
             LOG.info("Cannot get scheme from Portal Request Context");
           }
-          // COMMONS-400: Workaround for share secure daily motion pattern by using oEmbed
-          // https://www.dailymotion.com/services/oembed?format=json&url=https://dai.ly/xxxxx does not work
-          Matcher shortenMatcher = SECURE_SHORTEN_DAILY_MOTION_PATTERN.matcher(url);
+          // COMMONS-513: Workaround for sharing non-secure dailymotion short link pattern.
+          // https://www.dailymotion.com/services/oembed?format=json&url=http://dai.ly/xxxxx does not work. Instead,
+          // https://www.dailymotion.com/services/oembed?format=json&url=https://dai.ly/xxxxx is working.
+          Matcher shortenMatcher = SHORTEN_DAILY_MOTION_PATTERN.matcher(url);
           if (shortenMatcher.find()) {
-            url = correctURIString(url, "http", true);
+            url = correctURIString(url, "https", true);
           }
           return new URL(correctURIString(String.format(endpoint, url),scheme, false));
         }
