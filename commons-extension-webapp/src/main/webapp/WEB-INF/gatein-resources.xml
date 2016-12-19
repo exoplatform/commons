@@ -162,5 +162,11 @@
 			<module>jqueryCaret</module>
 		</depends>
 	</module>
+	<module>
+		<name>es6promise</name>
+		<script>
+		  <path>/javascript/es6-promise.js</path>
+		</script>
+	</module>
 </gatein-resources>
 
