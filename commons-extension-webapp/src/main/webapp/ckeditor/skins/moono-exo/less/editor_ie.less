@@ -77,7 +77,8 @@
   display: block;
   -webkit-touch-callout: none;
   background: transparent;
-  padding: 0
+  padding: 0;
+  border-radius: 5px;
 }
 
 .cke_float {
@@ -121,8 +122,8 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   &.cke_bottom_visible {
-    padding: 6px 8px 2px;
-    border-top:1px solid #bfbfbf;
+    padding: 5px 8px 3px;
+    border-top: 1px solid #bfbfbf;
   }
 }
 
@@ -342,7 +343,13 @@ a:hover.cke_colorauto, a:hover.cke_colormore, a:focus.cke_colorauto, a:focus.cke
 }
 
 .cke_toolbar {
-  float: left
+  float: left;
+  border-right: 1px solid #b6b6b6;
+  padding: 0;
+  margin-left: 5px;
+  &:last-child {
+    border-right: none;
+  }
 }
 
 .cke_rtl .cke_toolbar {
@@ -351,14 +358,7 @@ a:hover.cke_colorauto, a:hover.cke_colormore, a:focus.cke_colorauto, a:focus.cke
 
 .cke_toolgroup {
   float: left;
-  margin: 0 6px 5px 0;
-  border: 1px solid #a6a6a6;
-  border-bottom-color: #979797;
-  border-radius: 3px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, .5), 0 0 2px rgba(255, 255, 255, .15) inset, 0 1px 0 rgba(255, 255, 255, .15) inset;
-  background: #e4e4e4;
-  background-image: linear-gradient(to bottom, #fff, #e4e4e4);
-  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#ffffff', endColorstr='#e4e4e4')
+  margin: 0 6px 0 0;
 }
 
 .cke_hc .cke_toolgroup {
@@ -375,20 +375,32 @@ a:hover.cke_colorauto, a:hover.cke_colormore, a:focus.cke_colorauto, a:focus.cke
 
 a.cke_button {
   display: inline-block;
-  height: 18px;
   padding: 4px 6px;
-  outline: 0;
+  outline: none;
   cursor: default;
   float: left;
-  border: 0
-}
+  margin: 0 1px;
 
-.cke_ltr .cke_button:last-child, .cke_rtl .cke_button:first-child {
-  border-radius: 0 2px 2px 0
-}
-
-.cke_ltr .cke_button:first-child, .cke_rtl .cke_button:last-child {
-  border-radius: 2px 0 0 2px
+  &.cke_button_on {
+    border: 1px solid #9d9d9d;
+    background-color: #c5c5c5;
+    border-radius: 3px;
+    outline: none;
+  }
+  &.cke_button_off {
+    background: none;
+    border: 1px solid rgba(0, 0, 0, 0);
+    border-radius: 3px;
+    &:hover {
+      background: none;
+      box-shadow: none;
+      border: 1px solid #9d9d9d;
+    }
+  }
+  .cke_button_icon {
+    border: none;
+    margin: 0;
+  }
 }
 
 .cke_rtl .cke_button {
@@ -399,13 +411,6 @@ a.cke_button {
   border: 1px solid black;
   padding: 3px 5px;
   margin: -2px 4px 0 -2px
-}
-
-a.cke_button_on {
-  box-shadow: 0 1px 5px rgba(0, 0, 0, .6) inset, 0 1px 0 rgba(0, 0, 0, .2);
-  background: #b5b5b5;
-  background-image: linear-gradient(to bottom, #aaa, #cacaca);
-  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#aaaaaa', endColorstr='#cacaca')
 }
 
 .cke_hc .cke_button_on, .cke_hc a.cke_button_off:hover, .cke_hc a.cke_button_off:focus, .cke_hc a.cke_button_off:active, .cke_hc a.cke_button_disabled:hover, .cke_hc a.cke_button_disabled:focus, .cke_hc a.cke_button_disabled:active {
@@ -421,10 +426,6 @@ a.cke_button_on {
   opacity: .5
 }
 
-a.cke_button_on:hover, a.cke_button_on:focus, a.cke_button_on:active {
-  box-shadow: 0 1px 6px rgba(0, 0, 0, .7) inset, 0 1px 0 rgba(0, 0, 0, .2)
-}
-
 a.cke_button_off:hover, a.cke_button_off:focus, a.cke_button_off:active, a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:active {
   box-shadow: 0 0 1px rgba(0, 0, 0, .3) inset;
   background: #ccc;
@@ -437,7 +438,7 @@ a.cke_button_off:hover, a.cke_button_off:focus, a.cke_button_off:active, a.cke_b
   background-repeat: no-repeat;
   margin-top: 1px;
   width: 16px;
-  height: 16px;
+  line-height: 17px;
   float: left;
   display: inline-block
 }
@@ -1012,7 +1013,11 @@ textarea.cke_source {
 }
 
 .cke_chrome {
-  visibility: inherit
+  border-radius: 5px;
+  border:1px solid #b6b6b6;
+  display:block;
+  padding:0;
+  visibility:inherit;
 }
 
 .cke_voice_label {
