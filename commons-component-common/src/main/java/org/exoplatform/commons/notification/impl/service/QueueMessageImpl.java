@@ -16,9 +16,6 @@
  */
 package org.exoplatform.commons.notification.impl.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,8 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -73,7 +68,6 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   private static final String            DELAY_TIME_KEY        = "period";
   private static final String            CACHE_REPO_NAME       = "repositoryName";
   private static int                     LIMIT                 = 20;
-  private static long                    sinceTime             = 0;
 
   private int                            MAX_TO_SEND;
   private long                           DELAY_TIME;
@@ -214,18 +208,10 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       NodeIterator iterator = getMessageInfoNodes(sProvider);
       while (iterator.hasNext()) {
         Node node = iterator.nextNode();
-        long createdTime = Long.parseLong(node.getName());
-        if ((sinceTime == 0 || sinceTime < createdTime)) {
-          MessageInfo messageInfo = getMessageInfo(node);
-          messageInfo.setId(node.getUUID());
-          messages.add(messageInfo);
+        MessageInfo messageInfo = getMessageInfo(node);
+        messageInfo.setId(node.getUUID());
+        messages.add(messageInfo);
 
-          sinceTime = createdTime;
-        } else {
-          sinceTime = 0;
-          messages.clear();
-          break;
-        }
       }
     } catch (Exception e) {
       LOG.warn("Failed to load message.");
