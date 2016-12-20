@@ -248,7 +248,19 @@ public class MessageInfo {
   
   @Override
   public int hashCode() {
-    return id.hashCode();
+
+    int result = 17;
+    result = 31 * result + (id != null ? id.hashCode() : 0);
+    result = 31 * result + (from != null ? from.hashCode() : 0);
+    result = 31 * result + (to != null ? to.hashCode() : 0);
+    result = 31 * result + (body != null ? body.hashCode() : 0);
+    result = 31 * result + (subject != null ? subject.hashCode() : 0);
+    result = 31 * result + (footer != null ? footer.hashCode() : 0);
+    result = 31 * result + pluginId.hashCode();
+    result = 31 * result + Long.hashCode(createdTime);
+    result = 31 * result + numberOnBadge;
+
+    return result;
   }
   
 }
