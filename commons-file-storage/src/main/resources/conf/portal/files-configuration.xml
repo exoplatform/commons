@@ -55,7 +55,7 @@
       <init-params>
         <value-param>
           <name>rootPath</name>
-          <value>${exo.data.dir}/files</value>
+          <value>${exo.files.storage.dir}</value>
         </value-param>
       </init-params>
   </component>
