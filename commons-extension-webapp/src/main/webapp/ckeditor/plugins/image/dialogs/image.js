@@ -564,8 +564,13 @@
 								style: 'display:inline-block;margin-top:14px;',
 								align: 'center',
 								label: editor.lang.common.browseServer,
-								hidden: true,
+								onClick: function(){
+									window.open('/eXoWCMResources/eXoPlugins/content/content.html?insertContentType=Image&viewType=thumbnail&components='+previewImageId+'&currentInstance='+editor.name,'WCMGadgetSelector','width=1024,height=600');
+									window.popup_opened = true;
+								},
+								hidden: false,
 								filebrowser: 'info:txtUrl'
+
 							} ]
 						} ]
 					},
