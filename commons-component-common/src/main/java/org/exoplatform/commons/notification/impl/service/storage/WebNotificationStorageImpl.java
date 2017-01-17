@@ -219,6 +219,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public boolean remove(long seconds) {
+    boolean removed = false;
     boolean created = NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     Calendar cal = Calendar.getInstance();
@@ -234,6 +235,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       while (it.hasNext()) {
         Node node = it.nextNode();
         node.remove();
+        removed = true;
         //
         session.save();
       }
@@ -243,7 +245,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     } finally {
       NotificationSessionManager.closeSessionProvider(created);
     }
-    return true;
+    return removed;
   }
   
   @Override
