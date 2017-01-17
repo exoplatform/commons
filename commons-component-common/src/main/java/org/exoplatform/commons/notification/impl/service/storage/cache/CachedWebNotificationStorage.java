@@ -234,11 +234,15 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
 
   @Override
   public boolean remove(long seconds) {
+    boolean removed = false;
     try {
-      return storage.remove(seconds);
+      removed = storage.remove(seconds);
+      return removed;
     } finally {
-      exoWebNotificationCache.clearCache();
-      exoWebNotificationCountCache.clearCache();
+      if(removed) {
+        exoWebNotificationCache.clearCache();
+        exoWebNotificationCountCache.clearCache();
+      }
     }
   }
 
