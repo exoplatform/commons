@@ -202,30 +202,36 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       Session session = getSession(sProvider, workspace);
       Node userHomeNode = getUserSettingHome(session);
       Node userNode;
-      lock.lock();
       for (int i = 0; i < users.length; ++i) {
-        User user = users[i];
-        if (user == null || user.getUserName() == null) {
-          continue;
-        }
-        if (userHomeNode.hasNode(user.getUserName())) {
-          userNode = userHomeNode.getNode(user.getUserName());
-        } else {
-          userNode = userHomeNode.addNode(user.getUserName(), STG_SIMPLE_CONTEXT);
-        }
-        if (userNode.canAddMixin(MIX_DEFAULT_SETTING)) {
-          userNode.addMixin(MIX_DEFAULT_SETTING);
-          LOG.debug("Done to addMixin default setting for user: " + user.getUserName());
-        }
-        if ((i + 1) % 200 == 0) {
-          session.save();
+        try {
+          User user = users[i];
+          if (user == null || user.getUserName() == null) {
+            continue;
+          }
+          if (userHomeNode.hasNode(user.getUserName())) {
+            userNode = userHomeNode.getNode(user.getUserName());
+            if (userNode.canAddMixin(MIX_DEFAULT_SETTING)) {
+              lock.lock();
+              userNode.addMixin(MIX_DEFAULT_SETTING);
+            }
+          } else {
+            lock.lock();
+            userNode = userHomeNode.addNode(user.getUserName(), STG_SIMPLE_CONTEXT);
+            userNode.addMixin(MIX_DEFAULT_SETTING);
+          }
+
+          if ((i + 1) % 200 == 0) {
+            session.save();
+          }
+        } finally {
+          if(lock.isHeldByCurrentThread()) {
+            lock.unlock();
+          }
         }
       }
       session.save();
     } catch (Exception e) {
       LOG.error("Failed to addMixin for user notification setting", e);
-    } finally {
-      lock.unlock();
     }
   }
 
