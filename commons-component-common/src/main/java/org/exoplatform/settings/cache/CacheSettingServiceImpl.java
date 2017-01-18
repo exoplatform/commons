@@ -16,6 +16,9 @@
  */
 package org.exoplatform.settings.cache;
 
+import org.gatein.common.logging.Logger;
+import org.gatein.common.logging.LoggerFactory;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
@@ -31,8 +34,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.settings.cache.selector.SettingCacheSelector;
 import org.exoplatform.settings.impl.SettingServiceImpl;
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
@@ -66,7 +67,11 @@ public class CacheSettingServiceImpl implements SettingService {
     Loader<SettingKey, SettingValue, SettingServiceImpl> loader = new Loader<SettingKey, SettingValue, SettingServiceImpl>() {
       @Override
       public SettingValue retrieve(SettingServiceImpl service, SettingKey key) throws Exception {
-        return service.get(key.getContext(), key.getScope(), key.getKey());
+        SettingValue<?> settingValue = service.get(key.getContext(), key.getScope(), key.getKey());
+        if(settingValue == null) {
+          settingValue = NullSettingValue.getInstance();
+        }
+        return settingValue;
       }
     };
     futureExoCache = new FutureExoCache<SettingKey, SettingValue, SettingServiceImpl>(loader,
@@ -99,7 +104,11 @@ public class CacheSettingServiceImpl implements SettingService {
    */
   @Override
   public SettingValue<?> get(Context context, Scope scope, String key) {
-    return futureExoCache.get(service, new SettingKey(context, scope, key));
+    SettingValue<?> settingValue = futureExoCache.get(service, new SettingKey(context, scope, key));
+    if(settingValue == NullSettingValue.getInstance()) {
+      return null;
+    }
+    return settingValue;
   }
 
   /** 
