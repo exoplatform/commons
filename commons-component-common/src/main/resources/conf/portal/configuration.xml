@@ -202,13 +202,14 @@
         </object-param>
         <!-- UserStateService -->
         <object-param>
-          <name>org.exoplatform.services.user.UserStateService</name>
-          <description>The Exo Cache configuration for the User State Service Cache</description>
-          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+          <name>UserStateService</name>
+          <description>The JBoss Cache configuration for the UserStateService</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>UserStateService</string></field>
-            <field name="maxSize"><int>${cache.exo.commons.UserStateService.MaxNodes:5000}</int></field>
-            <field name="liveTime"><long>${cache.exo.commons.UserStateService.ExpirationTimeout:600000}</long></field>
-            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${cache.exo.commons.UserStateService.MaxNodes:5000}</int></field>
+            <field name="lifespan"><long>${cache.exo.commons.UserStateService.ExpirationTimeout:600000}</long></field>
+            <field name="replicated"><boolean>false</boolean></field>
           </object>
         </object-param>
         <!-- SettingService -->
@@ -292,8 +293,8 @@
         </object-param>
         <!-- UserStateService -->
         <object-param>
-          <name>org.exoplatform.services.user.UserStateService</name>
-          <description>The JBoss Cache configuration for the navigation service</description>
+          <name>UserStateService</name>
+          <description>The JBoss Cache configuration for the UserStateService</description>
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>UserStateService</string></field>
             <field name="strategy"><string>LIRS</string></field>

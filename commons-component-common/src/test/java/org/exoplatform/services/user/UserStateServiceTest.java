@@ -16,7 +16,6 @@
  */
 package org.exoplatform.services.user;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -24,14 +23,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.jcr.Node;
-
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
-import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.cache.ExoCache;
-import org.exoplatform.services.jcr.core.ManageableRepository;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
@@ -43,98 +35,51 @@ import org.exoplatform.services.security.MembershipEntry;
  * Apr 22, 2014  
  */
 public class UserStateServiceTest extends BaseNotificationTestCase {
-  private final String WORKSPACE_COLLABORATION = "collaboration";
-  
-  private static String VIDEOCALLS_BASE_PATH = "VideoCalls";
-  private static String USER_STATATUS_NODETYPE = "exo:userState";
-  
-  private static String USER_ID_PROP = "exo:userId";
-  private static String LAST_ACTIVITY_PROP = "exo:lastActivity";
-  private static String STATUS_PROP = "exo:status";
-  
+  private String SUPER_USER = "root";
+
   private UserStateService userStateService;
-  private NodeHierarchyCreator nodeHierarchyCreator;
   
   @Override
   public void setUp() throws Exception {
     super.setUp();
     //
-    loginUser(session.getUserID(), false);
+    loginUser(SUPER_USER, false);
 
     userStateService = getService(UserStateService.class);
-    nodeHierarchyCreator = getService(NodeHierarchyCreator.class);
-
-    ManageableRepository repo = repositoryService.getRepository(REPO_NAME);
-    repo.getConfiguration().setDefaultWorkspaceName(WORKSPACE_COLLABORATION);
-    session = repo.getSystemSession(WORKSPACE_COLLABORATION);
-    root = session.getRootNode();
   }
 
   protected void tearDown() throws Exception {
-    ManageableRepository repo  = repositoryService.getRepository(REPO_NAME);
-    repo.getConfiguration().setDefaultWorkspaceName(WORKSPACE_NAME);
     //
-    ExoCache<Serializable, UserStateModel> cache = getService(CacheService.class)
-        .getCacheInstance(UserStateService.class.getName() + REPO_NAME);
-    //
-    cache.clearCache();
+    userStateService.userStateCache.clearCache();
   }
 
-  public void testSave() throws Exception {
-    UserStateModel userModel = 
-        new UserStateModel(session.getUserID(),
-                           new Date().getTime(),
-                           UserStateService.DEFAULT_STATUS);
-    userStateService.save(userModel);
-
-    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
-    try {
-      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, session.getUserID());
-      assertTrue(userNodeApp.hasNode(VIDEOCALLS_BASE_PATH));
-
-      Node videoCallNode = userNodeApp.getNode(VIDEOCALLS_BASE_PATH);
-      assertTrue(videoCallNode.isNodeType(USER_STATATUS_NODETYPE));
-
-      assertTrue(videoCallNode.hasProperty(USER_ID_PROP));
-      assertEquals(userModel.getUserId(), videoCallNode.getProperty(USER_ID_PROP).getString());
-
-      assertTrue(videoCallNode.hasProperty(LAST_ACTIVITY_PROP));
-      assertEquals(userModel.getLastActivity(), videoCallNode.getProperty(LAST_ACTIVITY_PROP).getLong());
-
-      assertTrue(videoCallNode.hasProperty(STATUS_PROP));
-      assertEquals(userModel.getStatus(), videoCallNode.getProperty(STATUS_PROP).getString());
-    } finally {
-      sessionProvider.close();
-    }
-  }
-  
   public void testGetUserState() throws Exception {
     UserStateModel userModel = 
-        new UserStateModel(session.getUserID(),
+        new UserStateModel(SUPER_USER,
                            new Date().getTime(),
                            UserStateService.DEFAULT_STATUS);
 
     userStateService.save(userModel);
-    UserStateModel model1 = userStateService.getUserState(session.getUserID() + "temp");
+    UserStateModel model1 = userStateService.getUserState(SUPER_USER + "temp");
     assertNull(model1);
 
-    UserStateModel model2 = userStateService.getUserState(session.getUserID());
+    UserStateModel model2 = userStateService.getUserState(SUPER_USER);
     assertNotNull(model2);
 
-    assertEquals(session.getUserID(), model2.getUserId());
+    assertEquals(SUPER_USER, model2.getUserId());
     assertEquals(userModel.getLastActivity(), model2.getLastActivity());
     assertEquals(UserStateService.DEFAULT_STATUS, model2.getStatus());
   }
   
   public void testPing() throws Exception {
     UserStateModel userModel = 
-        new UserStateModel(session.getUserID(),
+        new UserStateModel(SUPER_USER,
                            new Date().getTime(),
                            UserStateService.DEFAULT_STATUS);
     userStateService.save(userModel);
     userStateService.ping(userModel.getUserId());
 
-    assertTrue(userModel.getLastActivity() != userStateService.getUserState(session.getUserID()).getLastActivity());
+    assertNotSame(userModel.getLastActivity(), userStateService.getUserState(SUPER_USER).getLastActivity());
 
     Calendar currentTime = new GregorianCalendar();
     Calendar time = (Calendar) currentTime.clone();
@@ -144,33 +89,38 @@ public class UserStateServiceTest extends BaseNotificationTestCase {
     userStateService.save(userModel);
     userStateService.ping(userModel.getUserId());
 
-    assertTrue(userModel.getLastActivity() != userStateService.getUserState(session.getUserID()).getLastActivity());
+    assertNotSame(userModel.getLastActivity(), userStateService.getUserState(SUPER_USER).getLastActivity());
 
     //
     loginUser("mary", true);
     assertTrue(userStateService.getUserState("mary").getStatus().equals(UserStateService.DEFAULT_STATUS));
     //
     loginUser("demo", false);
+
     // get status of user Mary by current user Demo
+    assertNotNull("User state of 'mary' is null while it was pinged before", userStateService.getUserState("mary"));
+    assertNotNull("User state status of 'mary' is null while it was pinged before", userStateService.getUserState("mary").getStatus());
     assertTrue(userStateService.getUserState("mary").getStatus().equals(UserStateService.DEFAULT_STATUS));
     // get status of user Demo by anonymous user
     ConversationState.setCurrent(null);
+
     assertNull(userStateService.getUserState("demo"));
   }
   
   public void testOnline() throws Exception {
     long date = new Date().getTime();
     UserStateModel userModel = 
-        new UserStateModel(session.getUserID(),
+        new UserStateModel(SUPER_USER,
                            date,
                            UserStateService.DEFAULT_STATUS);
     userStateService.save(userModel);
     userStateService.ping(userModel.getUserId());
+
     //
     List<UserStateModel> onlines = userStateService.online();
     assertEquals(1, onlines.size());
-    assertEquals(session.getUserID(), onlines.get(0).getUserId());
-    assertTrue(date != onlines.get(0).getLastActivity());
+    assertEquals(SUPER_USER, onlines.get(0).getUserId());
+    assertNotSame(date, onlines.get(0).getLastActivity());
     assertEquals(UserStateService.DEFAULT_STATUS, onlines.get(0).getStatus());
   }
   
@@ -178,6 +128,7 @@ public class UserStateServiceTest extends BaseNotificationTestCase {
     assertNull(userStateService.lastLogin());
     loginUser("user1", true);
     assertEquals("user1", userStateService.lastLogin().getUserId());
+
     loginUser("user2", true);
     assertEquals("user2", userStateService.lastLogin().getUserId());
   }
@@ -185,12 +136,13 @@ public class UserStateServiceTest extends BaseNotificationTestCase {
   public void testIsOnline() throws Exception {
     long date = new Date().getTime();
     UserStateModel userModel = 
-        new UserStateModel(session.getUserID(),
+        new UserStateModel(SUPER_USER,
                            date,
                            UserStateService.DEFAULT_STATUS);
     userStateService.save(userModel);
     userStateService.ping(userModel.getUserId());
-    assertTrue(userStateService.isOnline(session.getUserID()));
+
+    assertTrue(userStateService.isOnline(SUPER_USER));
     //
     assertFalse(userStateService.isOnline("demo"));
     //
@@ -210,5 +162,4 @@ public class UserStateServiceTest extends BaseNotificationTestCase {
       userStateService.ping(userId);
     }
   }
-
 }
