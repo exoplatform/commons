@@ -52,7 +52,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   private static final Log LOG = ExoLogger.getLogger(UserSettingServiceImpl.class);
 
   /** Setting Scope on Common Setting **/
-  private static final Scope    NOTIFICATION_SCOPE = Scope.GLOBAL;
+  private static final Scope    NOTIFICATION_SCOPE = Scope.GLOBAL.id(null);
   private SettingService        settingService;
   private ChannelManager        channelManager;
 
@@ -456,12 +456,21 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
         NodeIterator iter = getDefaultDailyIterator(sProvider, offset, limit);
         while (iter.hasNext()) {
           Node node = iter.nextNode();
-          //make sure that have the mixin-type defaultSetting and don't have child node for notification setting
-          if (!node.getNodes().hasNext()) {
-            users.add(UserSetting.getInstance()
-                      .setUserId(node.getName())
-                      .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
+          //Remove mixin-type defaultSetting if user have settings.
+          if (node.hasNode(NOTIFICATION_SCOPE.name().toLowerCase())) {
+            if (node.getNode(NOTIFICATION_SCOPE.name().toLowerCase()).hasProperty(EXO_DAILY)) {
+              try {
+                node.removeMixin(MIX_DEFAULT_SETTING);
+                node.save();
+              } catch (Exception e) {
+                LOG.debug("Failed to remove mixin type " + MIX_DEFAULT_SETTING, e);
+              }
+              continue;
+            }
           }
+          users.add(UserSetting.getInstance()
+                    .setUserId(node.getName())
+                    .setLastUpdateTime(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate()));
         }
       }
     } catch (Exception e) {
