@@ -1,5 +1,9 @@
 package org.exoplatform.commons.utils;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.exoplatform.commons.api.settings.ExoFeatureService;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
@@ -14,6 +18,15 @@ import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserStatus;
+import org.exoplatform.services.security.ConversationRegistry;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityConstants;
+import org.exoplatform.services.security.StateKey;
 
 public class CommonsUtils {
 	
@@ -21,6 +34,77 @@ public class CommonsUtils {
 
 	public static final String CONFIGURED_TENANT_MASTER_HOST_KEY = "tenant.masterhost";
 	public static final String CONFIGURED_DOMAIN_URL_KEY = "gatein.email.domain.url";
+
+  public static OrganizationService getOrganizationService(){
+    return (OrganizationService)ExoContainerContext.getCurrentContainer().getComponentInstance(OrganizationService.class) ;
+  }
+
+  public static ConversationRegistry getConversationRegistry() {
+    return (ConversationRegistry) ExoContainerContext.getCurrentContainer().getComponentInstance(ConversationRegistry.class);
+  }
+
+  /**
+   * Gets the user state enabled/disabled from ConversationRegistry, if not found,
+   * get it from OrgnizationService
+   * 
+   * @param userId username
+   * @return true if enabled, else false
+   * @throws Exception if an error occured during requesting the user from OrganizationService
+   */
+  public static boolean isUserEnabled(String userId) throws Exception {
+    if(IdentityConstants.ANONIM.equals(userId) || IdentityConstants.SYSTEM.equals(userId)) {
+      return true;
+    }
+    ConversationState conversationState = getConversationState(userId);
+    User user = conversationState == null ? null : (User) conversationState.getAttribute("UserProfile");
+    if(user != null) {
+      return user.isEnabled();
+    }
+    return getOrganizationService().getUserHandler().findUserByName(userId, UserStatus.ANY).isEnabled();
+  }
+
+  /**
+   * Get the last added ConversationState of a given user.
+   * 
+   * @param userId username
+   * @return ConversationState entity of user
+   */
+  public static ConversationState getConversationState(String userId) {
+    ConversationRegistry conversationRegistry = getConversationRegistry();
+    if(conversationRegistry == null) {
+      return null;
+    }
+    List<StateKey> stateKeys = conversationRegistry.getStateKeys(userId);
+    ConversationState conversationState = null;
+    if(stateKeys != null && !stateKeys.isEmpty()) {
+      // get last conversation state of connected user
+      StateKey stateKey = stateKeys.get(stateKeys.size() - 1);
+      conversationState = conversationRegistry.getState(stateKey);
+    }
+    return conversationState;
+  }
+
+  /**
+   * Gets groups of user from ConversationRegistry, if not found,
+   * get it from OrgnizationService
+   * 
+   * @param userId username
+   * @return a collection of group Id of type String
+   * @throws Exception if an error occured during requesting the user from OrganizationService
+   */
+  public static Collection<String> getGroupsOfUser(String userId) throws Exception {
+    Collection<String> groupIDs = null;
+
+    ConversationState conversationState = CommonsUtils.getConversationState(userId);
+    Identity identity = conversationState == null ? null : conversationState.getIdentity();
+    if(identity == null) {
+      Collection<Group> groups = getOrganizationService().getGroupHandler().findGroupsOfUser(userId);
+      groupIDs = groups.stream().map(Group::getId).collect(Collectors.toSet());
+    } else {
+      groupIDs = identity.getGroups();
+    }
+    return groupIDs;
+  }
 
     /**
      * Gets the system session provider.
