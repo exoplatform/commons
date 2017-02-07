@@ -16,24 +16,29 @@
  */
 package org.exoplatform.commons.search.es.client;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Created by The eXo Platform SAS Author : Thibault Clement
@@ -121,10 +126,13 @@ public abstract class ElasticClient {
       }
     }
 
-    if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+    int statusCode = httpResponse.getStatusLine().getStatusCode();
+    if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
       throw new ElasticClientAuthenticationException();
+    } else if (statusCode != HttpStatus.SC_OK) {
+      throw new ElasticClientException("Unexpected response from ES, code = " + statusCode + ", content = " + response);
     }
-    return new ElasticResponse(response, httpResponse.getStatusLine().getStatusCode());
+    return new ElasticResponse(response, statusCode);
   }
 
   private void logResultDependingOnStatusCode(String url, ElasticResponse response) {
@@ -143,25 +151,34 @@ public abstract class ElasticClient {
 
   private HttpClient getHttpClient() {
     // Check if Basic Authentication need to be used
+    HttpClientConnectionManager clientConnectionManager = getClientConnectionManager();
+    HttpClientBuilder httpClientBuilder = HttpClients.custom()
+        .setConnectionManager(clientConnectionManager)
+        .setConnectionReuseStrategy(new DefaultConnectionReuseStrategy())
+        .setMaxConnPerRoute(100);
     if (StringUtils.isNotBlank(getEsUsernameProperty())) {
-      DefaultHttpClient httpClient = new DefaultHttpClient(getClientConnectionManager());
-      httpClient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-                                                         new UsernamePasswordCredentials(getEsUsernameProperty(),
-                                                                                         getEsPasswordProperty()));
-      LOG.debug("Basic authentication for ES activated with username = {} and password = {}",
-                getEsUsernameProperty(),
-                getEsPasswordProperty());
+      CredentialsProvider credsProvider = new BasicCredentialsProvider();
+      credsProvider.setCredentials(
+              new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
+              new UsernamePasswordCredentials(getEsUsernameProperty(),
+                                              getEsPasswordProperty()));
+
+      HttpClient httpClient = httpClientBuilder
+          .setDefaultCredentialsProvider(credsProvider)
+          .build();
+      LOG.debug("Basic authentication for ES activated with username = {}",
+                getEsUsernameProperty());
       return httpClient;
     } else {
       LOG.debug("Basic authentication for ES not activated");
-      return new DefaultHttpClient(getClientConnectionManager());
+      return httpClientBuilder.build();
     }
   }
 
   protected abstract String getEsUsernameProperty();
 
   protected abstract String getEsPasswordProperty();
-  
-  protected abstract ClientConnectionManager getClientConnectionManager();
+
+  protected abstract HttpClientConnectionManager getClientConnectionManager();
 
 }
