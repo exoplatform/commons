@@ -129,8 +129,6 @@ public abstract class ElasticClient {
     int statusCode = httpResponse.getStatusLine().getStatusCode();
     if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
       throw new ElasticClientAuthenticationException();
-    } else if (statusCode != HttpStatus.SC_OK) {
-      throw new ElasticClientException("Unexpected response from ES, code = " + statusCode + ", content = " + response);
     }
     return new ElasticResponse(response, statusCode);
   }
