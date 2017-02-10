@@ -4,7 +4,7 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>4.5.x-SNAPSHOT</version>
+    <version>5.0.x-SNAPSHOT</version>
   </parent>
   <artifactId>commons-juzu-ajax-sample</artifactId>
   <packaging>jar</packaging>
@@ -24,7 +24,7 @@
         </exclusion>
         <exclusion>
           <artifactId>exo.portal.component.portal</artifactId>
-          <groupId>org.gatein.portal</groupId>
+          <groupId>org.exoplatform.gatein.portal</groupId>
         </exclusion>
       </exclusions>
     </dependency>
