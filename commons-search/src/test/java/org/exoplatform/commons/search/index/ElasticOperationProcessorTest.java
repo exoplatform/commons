@@ -247,6 +247,38 @@ public class ElasticOperationProcessorTest {
     verifyNoMoreInteractions(elasticContentRequestBuilder);
   }
 
+  @Test
+  public void process_ifAllOperationsInQueue_requestShouldContinueOnException() throws ParseException {
+    //Given
+    elasticIndexingOperationProcessor.getConnectors().put("post1", elasticIndexingServiceConnector);
+    elasticIndexingOperationProcessor.getConnectors().put("post2", elasticIndexingServiceConnector);
+    elasticIndexingOperationProcessor.getConnectors().put("post3", elasticIndexingServiceConnector);
+
+    List<IndexingOperation> indexingOperations = new ArrayList<>();
+
+    IndexingOperation delete = new IndexingOperation("1","post1",OperationType.DELETE);
+    delete.setId(2L);
+    indexingOperations.add(delete);
+
+    IndexingOperation create = new IndexingOperation("2","post2",OperationType.CREATE);
+    create.setId(1L);
+    indexingOperations.add(create);
+
+    IndexingOperation update = new IndexingOperation("3","post3",OperationType.UPDATE);
+    update.setId(3L);
+    indexingOperations.add(update);
+
+    //When an exception is thrown during process
+    doThrow(new RuntimeException("Fake error")).when(elasticContentRequestBuilder).getDeleteDocumentRequestContent(elasticIndexingServiceConnector, "1");
+    when(indexingOperationDAO.findAllFirst(anyInt())).thenReturn(indexingOperations);
+    elasticIndexingOperationProcessor.process();
+
+    //Then Operation C and U was called
+    verify(elasticContentRequestBuilder).getDeleteDocumentRequestContent(any(ElasticIndexingServiceConnector.class), eq("1"));
+    verify(elasticContentRequestBuilder).getCreateDocumentRequestContent(any(ElasticIndexingServiceConnector.class), eq("2"));
+    verify(elasticContentRequestBuilder).getUpdateDocumentRequestContent(any(ElasticIndexingServiceConnector.class), eq("3"));
+  }
+
   //test the result of operation processing on the operation still in queue
 
   @Test

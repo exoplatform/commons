@@ -191,16 +191,33 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
 
     // Process Delete document operation
     if (indexingQueueSorted.containsKey(OperationType.DELETE)) {
-      for (String entityType : indexingQueueSorted.get(OperationType.DELETE).keySet()) {
-        for (IndexingOperation deleteIndexQueue : indexingQueueSorted.get(OperationType.DELETE).get(entityType)) {
-          bulkRequest += elasticContentRequestBuilder.getDeleteDocumentRequestContent((ElasticIndexingServiceConnector) getConnectors().get(deleteIndexQueue.getEntityType()),
-                                                                                      deleteIndexQueue.getEntityId());
+      Map<String, List<IndexingOperation>> deleteIndexingOperationsMap = indexingQueueSorted.get(OperationType.DELETE);
+      for (String entityType : deleteIndexingOperationsMap.keySet()) {
+        List<IndexingOperation> deleteIndexingOperationsList = deleteIndexingOperationsMap.get(entityType);
+        if (deleteIndexingOperationsList == null || deleteIndexingOperationsList.isEmpty()) {
+          continue;
+        }
+        Iterator<IndexingOperation> deleteIndexingOperationsIterator = deleteIndexingOperationsList.iterator();
+        while (deleteIndexingOperationsIterator.hasNext()) {
+          IndexingOperation deleteIndexQueue = deleteIndexingOperationsIterator.next();
+          try {
+            bulkRequest += elasticContentRequestBuilder.getDeleteDocumentRequestContent((ElasticIndexingServiceConnector) getConnectors().get(deleteIndexQueue.getEntityType()),
+                                                                                        deleteIndexQueue.getEntityId());
+          } catch(Exception e) {
+            LOG.warn("Error while *deleting* index entry of entity, type = " + entityType + ", id =" + (deleteIndexQueue == null ? null : deleteIndexQueue.getEntityId()) + ", cause:", e);
+          }
+
+          // Delete added indexation operation from queue even if the request fails
+          deleteIndexingOperationsIterator.remove();
+
           // Remove the object from other create or update operations planned
           // before the timestamp of the delete operation
           deleteOperationsByEntityIdForTypesBefore(new OperationType[] { OperationType.CREATE },
                                                    indexingQueueSorted,
                                                    deleteIndexQueue);
           deleteOperationsByEntityIdForTypes(new OperationType[] { OperationType.UPDATE }, indexingQueueSorted, deleteIndexQueue);
+          // Check if the bulk request limit size is already reached
+          bulkRequest = checkBulkRequestSizeReachedLimitation(bulkRequest);
         }
       }
       // Remove the delete operations from the map
@@ -209,10 +226,25 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
 
     // Process Create document operation
     if (indexingQueueSorted.containsKey(OperationType.CREATE)) {
-      for (String entityType : indexingQueueSorted.get(OperationType.CREATE).keySet()) {
-        for (IndexingOperation createIndexQueue : indexingQueueSorted.get(OperationType.CREATE).get(entityType)) {
-          bulkRequest += elasticContentRequestBuilder.getCreateDocumentRequestContent((ElasticIndexingServiceConnector) getConnectors().get(createIndexQueue.getEntityType()),
-                                                                                      createIndexQueue.getEntityId());
+      Map<String, List<IndexingOperation>> createIndexingOperationsMap = indexingQueueSorted.get(OperationType.CREATE);
+      for (String entityType : createIndexingOperationsMap.keySet()) {
+        List<IndexingOperation> createIndexingOperationsList = createIndexingOperationsMap.get(entityType);
+        if (createIndexingOperationsList == null || createIndexingOperationsList.isEmpty()) {
+          continue;
+        }
+        Iterator<IndexingOperation> createIndexingOperationsIterator = createIndexingOperationsList.iterator();
+        while (createIndexingOperationsIterator.hasNext()) {
+          IndexingOperation createIndexQueue = createIndexingOperationsIterator.next();
+          try {
+            bulkRequest += elasticContentRequestBuilder.getCreateDocumentRequestContent((ElasticIndexingServiceConnector) getConnectors().get(createIndexQueue.getEntityType()),
+                                                                                        createIndexQueue.getEntityId());
+          } catch(Exception e) {
+            LOG.warn("Error while *creating* index entry of entity, type = " + entityType + ", id =" + (createIndexQueue == null ? null : createIndexQueue.getEntityId()) + ", cause:", e);
+          }
+
+          // Delete added indexation operation from queue even if the request fails
+          createIndexingOperationsIterator.remove();
+
           // Remove the object from other update operations for this entityId
           deleteOperationsByEntityIdForTypes(new OperationType[] { OperationType.UPDATE }, indexingQueueSorted, createIndexQueue);
           // Check if the bulk request limit size is already reached
@@ -225,10 +257,25 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
 
     // Process Update document operation
     if (indexingQueueSorted.containsKey(OperationType.UPDATE)) {
-      for (String entityType : indexingQueueSorted.get(OperationType.UPDATE).keySet()) {
-        for (IndexingOperation updateIndexQueue : indexingQueueSorted.get(OperationType.UPDATE).get(entityType)) {
-          bulkRequest += elasticContentRequestBuilder.getUpdateDocumentRequestContent((ElasticIndexingServiceConnector) getConnectors().get(updateIndexQueue.getEntityType()),
-                                                                                      updateIndexQueue.getEntityId());
+      Map<String, List<IndexingOperation>> updateIndexingOperationsMap = indexingQueueSorted.get(OperationType.UPDATE);
+      for (String entityType : updateIndexingOperationsMap.keySet()) {
+        List<IndexingOperation> updateIndexingOperationsList = updateIndexingOperationsMap.get(entityType);
+        if (updateIndexingOperationsList == null || updateIndexingOperationsList.isEmpty()) {
+          continue;
+        }
+        Iterator<IndexingOperation> updateIndexingOperationsIterator = updateIndexingOperationsList.iterator();
+        while (updateIndexingOperationsIterator.hasNext()) {
+          IndexingOperation updateIndexQueue = updateIndexingOperationsIterator.next();
+          try {
+            bulkRequest += elasticContentRequestBuilder.getUpdateDocumentRequestContent((ElasticIndexingServiceConnector) getConnectors().get(updateIndexQueue.getEntityType()),
+                                                                                        updateIndexQueue.getEntityId());
+          } catch(Exception e) {
+            LOG.warn("Error while *updating* index entry of entity, type = " + entityType + ", id =" + (updateIndexQueue == null ? null : updateIndexQueue.getEntityId()) + ", cause:", e);
+          }
+
+          // Delete added indexation operation from queue even if the request fails
+          updateIndexingOperationsIterator.remove();
+
           // Check if the bulk request limit size is already reached
           bulkRequest = checkBulkRequestSizeReachedLimitation(bulkRequest);
         }
