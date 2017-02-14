@@ -12,6 +12,10 @@ import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.definition.PortalContainerConfig;
 import org.exoplatform.container.xml.PortalContainerInfo;
+import org.exoplatform.portal.application.PortalRequestContext;
+import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
@@ -213,7 +217,22 @@ public class CommonsUtils {
       //
       return sysDomain;
     }
-    
+
+    public static SiteKey getCurrentSite() {
+      PortalRequestContext pContext = null;
+      try {
+        pContext = Util.getPortalRequestContext();
+      } catch (NullPointerException e) {
+        pContext = null;
+      }
+      if (pContext != null) {
+        return pContext.getSiteKey();
+      } else {
+        UserPortalConfigService portalConfig = getService(UserPortalConfigService.class);
+        return SiteKey.portal(portalConfig.getDefaultPortal());
+      }
+    }
+
     public static void startRequest(Object service)
     {
       if(service instanceof ComponentRequestLifecycle) {
