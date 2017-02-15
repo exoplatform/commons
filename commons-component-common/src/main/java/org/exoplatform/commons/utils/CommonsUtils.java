@@ -218,7 +218,11 @@ public class CommonsUtils {
       return sysDomain;
     }
 
-    public static SiteKey getCurrentSite() {
+  /**
+   * Get {@link SiteKey} of current site
+   * @return currentSite if available or default site in otherwise
+   */
+  public static SiteKey getCurrentSite() {
       PortalRequestContext pContext = null;
       try {
         pContext = Util.getPortalRequestContext();
