@@ -66,6 +66,7 @@
     <org.gatein.portal.version>4.4.x-PLF-SNAPSHOT</org.gatein.portal.version>
     <!-- Platform Project Dependencies -->
     <org.exoplatform.platform-ui.version>4.4.x-SNAPSHOT</org.exoplatform.platform-ui.version>
+    <org.powermock.version>1.6.5</org.powermock.version>
   </properties>
   <dependencyManagement>
     <!-- ### NEVER CHANGE THIS ORDER OF DEPMGT ### -->
@@ -294,6 +295,21 @@
         <version>${org.exoplatform.kernel.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock</artifactId>
+        <version>${org.powermock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-module-junit4</artifactId>
+        <version>${org.powermock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-mockito</artifactId>
+        <version>${org.powermock.version}</version>
       </dependency>
       <!-- This artifact isn't declared in kernel parent -->
       <!-- We enforce it to have the good version in our packaging -->
