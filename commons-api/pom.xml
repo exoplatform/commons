@@ -21,10 +21,6 @@
       <artifactId>commons-webui-component</artifactId>
       <exclusions>
         <exclusion>
-          <artifactId>exo.portal.webui.portal</artifactId>
-          <groupId>org.gatein.portal</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>exo.portal.component.common</artifactId>
           <groupId>org.gatein.portal</groupId>
         </exclusion>

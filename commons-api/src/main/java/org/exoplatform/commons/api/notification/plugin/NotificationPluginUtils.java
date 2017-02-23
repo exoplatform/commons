@@ -29,12 +29,12 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
-import org.exoplatform.services.organization.UserProfile;
+import org.exoplatform.portal.localization.LocaleContextInfoUtils;
+import org.exoplatform.services.resources.LocaleContextInfo;
+import org.exoplatform.services.resources.LocalePolicy;
 
 public class NotificationPluginUtils {
-
-  public static final String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
-
+  
   private static OrganizationService organizationService;
   
   private static SettingService settingService;
@@ -143,16 +143,14 @@ public class NotificationPluginUtils {
    * @return
    */
   public static String getLanguage(String userId) {
-    startRequest(getOrganizationService());
-    try {
-      UserProfile profile = getOrganizationService().getUserProfileHandler().findUserProfileByName(userId);
-      String lang = profile.getAttribute(UserProfile.PERSONAL_INFO_KEYS[8]);
-      return (lang != null && lang.trim().length() > 0) ? lang : DEFAULT_LANGUAGE;
-    } catch (Exception e) {
-      return DEFAULT_LANGUAGE;
-    } finally {
-      endRequest(getOrganizationService());
+    LocaleContextInfo  localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(userId);
+    LocalePolicy localePolicy = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(LocalePolicy.class);
+    String lang = null;
+    if(localePolicy != null) {
+      Locale locale = localePolicy.determineLocale(localeCtx);
+      lang = locale.getLanguage();
     }
+    return lang;
   }
 
   public static OrganizationService getOrganizationService() {
