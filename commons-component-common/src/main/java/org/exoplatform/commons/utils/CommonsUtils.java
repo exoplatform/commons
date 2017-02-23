@@ -89,6 +89,31 @@ public class CommonsUtils {
   }
 
   /**
+   * Get the last {@link User} instance added in ConversationState of a given user
+   * 
+   * @param userId
+   * @return {@link User}
+   * @throws Exception thrown when an exception occurs while getting user from IDM store
+   */
+  public static User getUser(String userId) throws Exception {
+    User user = null;
+    ConversationRegistry conversationRegistry = getConversationRegistry();
+    if(conversationRegistry != null) {
+      List<StateKey> stateKeys = conversationRegistry.getStateKeys(userId);
+      if (stateKeys != null && !stateKeys.isEmpty()) {
+        // get last conversation state
+        StateKey stateKey = stateKeys.get(stateKeys.size() - 1);
+        ConversationState conversationState = conversationRegistry.getState(stateKey);
+        user = conversationState == null ? null : (User) conversationState.getAttribute("UserProfile");
+      }
+    }
+    if (user == null) {
+      user = getOrganizationService().getUserHandler().findUserByName(userId, UserStatus.ANY);
+    }
+    return user;
+  }
+
+  /**
    * Gets groups of user from ConversationRegistry, if not found,
    * get it from OrgnizationService
    * 
