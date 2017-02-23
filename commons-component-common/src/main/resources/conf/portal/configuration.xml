@@ -42,7 +42,7 @@
       </value-param>
       <value-param>
         <name>https?://www\.slideshare\.net/.*/.*</name>
-        <value>//www.slideshare.net/api/oembed/2?url=%s&amp;format=json&amp;maxwidth=330&amp;maxheight=200</value>
+        <value>https://www.slideshare.net/api/oembed/2?url=%s&amp;format=json&amp;maxwidth=330&amp;maxheight=200</value>
       </value-param>
       <value-param>
         <name>https?://www\.flickr\.com/photos/.*</name>
