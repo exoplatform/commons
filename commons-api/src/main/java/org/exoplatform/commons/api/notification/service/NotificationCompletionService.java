@@ -27,10 +27,12 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.picocontainer.Startable;
+
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 
-public class NotificationCompletionService {
+public class NotificationCompletionService implements Startable {
 
   private final String THREAD_NUMBER_KEY = "thread-number";
 
@@ -129,6 +131,17 @@ public class NotificationCompletionService {
       if (Thread.interrupted()) throw new RuntimeException();
 
       runnable.run();
+    }
+  }
+
+  @Override
+  public void start() {
+  }
+
+  @Override
+  public void stop() {
+    if(executor instanceof ExecutorService) {
+      ((ExecutorService) executor).shutdown();
     }
   }
 }
