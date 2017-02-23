@@ -105,7 +105,7 @@ public class CacheSettingServiceImpl implements SettingService {
   @Override
   public SettingValue<?> get(Context context, Scope scope, String key) {
     SettingValue<?> settingValue = futureExoCache.get(service, new SettingKey(context, scope, key));
-    if(settingValue == NullSettingValue.getInstance()) {
+    if(settingValue == NullSettingValue.getInstance() || settingValue.getValue() == null) {
       return null;
     }
     return settingValue;

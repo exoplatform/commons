@@ -28,10 +28,14 @@ public class ScopeCacheKey implements Serializable {
 
   public final static ScopeCacheKey NULL = new ScopeCacheKey();
 
-  private final String scope;
+  private String scope;
 
   public ScopeCacheKey() {
-    scope = getCurrentRepositoryName();
+    try {
+      scope = getCurrentRepositoryName();
+    } catch (Exception e) {
+      scope = "repository";
+    }
   }
 
   public String getScope() {

@@ -16,9 +16,12 @@
  */
 package org.exoplatform.services.user;
 
+import java.io.Serializable;
 
-public class UserStateModel {
-  
+
+public class UserStateModel implements Serializable {
+  private static final long serialVersionUID = -416451728545284362L;
+
   private String userId = null;
       
   private long lastActivity = 0;
