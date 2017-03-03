@@ -250,7 +250,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     //
     NotificationInfo lastOnPopoverInfo = onPopoverInfos.get(onPopoverInfos.size() - 5);
     assertEquals(createdFirstInfo.getId(), lastOnPopoverInfo.getId());
-    NotificationInfo lastViewAllInfos = viewAllInfos.get(viewAllInfos.size() - 1);
+    NotificationInfo lastViewAllInfos = viewAllInfos.get(viewAllInfos.size() - 5);
     assertEquals(createdFirstInfo.getId(), lastViewAllInfos.getId());
     //
     String newTitle = "The new title";
