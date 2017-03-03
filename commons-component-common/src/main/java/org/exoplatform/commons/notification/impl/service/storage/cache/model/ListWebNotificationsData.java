@@ -28,6 +28,7 @@ import org.exoplatform.commons.notification.impl.service.storage.cache.AbstractW
  * @version $Revision$
  */
 public class ListWebNotificationsData extends AbstractWebNotifListData<ListWebNotificationsKey, String> implements Serializable {
+  private static final long serialVersionUID = 8112235570835563995L;
 
   public ListWebNotificationsData(ListWebNotificationsKey listWebNotifInfosKey, List<String> list) {
     super(listWebNotifInfosKey, list);
