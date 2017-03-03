@@ -80,15 +80,21 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
         Integer current = data.build();
         exoWebNotificationCountCache.put(key, new IntegerData(current + 1));
       }
-      
-      ListWebNotificationsKey listWebNotificationsKey = ListWebNotificationsKey.key(notification.getTo(), true);
-      ListWebNotificationsData  listWebNotificationsData = new ListWebNotificationsData(listWebNotificationsKey);
-      exoWebNotificationsCache.put(listWebNotificationsKey, listWebNotificationsData);
+
+      removeWebNotificationsEntry(notification, true);
+      removeWebNotificationsEntry(notification, false);
+
       moveTopPopover(notification);
       moveTopViewAll(notification);
       //
       clearIsMaxOnWebNotificationsData(notification.getTo(), false);
     }
+  }
+
+  private void removeWebNotificationsEntry(NotificationInfo notification, boolean isPopup) {
+    ListWebNotificationsKey listWebNotificationsKey = ListWebNotificationsKey.key(notification.getTo(), isPopup);
+    ListWebNotificationsData  listWebNotificationsData = new ListWebNotificationsData(listWebNotificationsKey);
+    exoWebNotificationsCache.put(listWebNotificationsKey, listWebNotificationsData);
   }
 
   @Override
