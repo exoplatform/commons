@@ -24,6 +24,7 @@
     <module>commons-component-upgrade</module>
     <module>commons-extension-webapp</module>
     <module>commons-gifbackport</module>
+    <module>commons-jpa-dao</module>
     <module>commons-juzu</module>
     <module>commons-juzu-ajax-sample</module>
     <module>commons-testing</module>

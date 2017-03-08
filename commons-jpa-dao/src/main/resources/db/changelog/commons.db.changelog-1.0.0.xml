@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+
+  <!-- Managing both DB that use sequences and db that use auto increment -->
+  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,sybase,db2,hsqldb"/>
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql"/>
+
+  <!-- Managing auto generation of timestamp by Database -->
+  <property name="now" value="now()" dbms="mysql,hsqldb,postgresql,h2"/>
+  <property name="now" value="sysdate" dbms="oracle"/>
+  <property name="now" value="CURRENT_TIMESTAMP" dbms="mssql"/>
+
+
+  <changeSet author="commons" id="1.0.0-2">
+    <createTable tableName="STG_CONTEXT">
+      <column name="STG_CONTEXT_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_STG_CONTEXT_ID"/>
+      </column>
+      <column name="STG_CONTEXT_TYPE" type="NVARCHAR(200)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="STG_CONTEXT_NAME" type="NVARCHAR(550)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+    </modifySql>
+  </changeSet>
+
+  <changeSet author="commons" id="1.0.0-3">
+    <createTable tableName="STG_SCOPE">
+      <column name="STG_SCOPE_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_STG_SCOPE_ID"/>
+      </column>
+      <column name="STG_SCOPE_TYPE" type="NVARCHAR(200)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="STG_SCOPE_NAME" type="NVARCHAR(550)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+    </modifySql>
+  </changeSet>
+
+  <changeSet author="commons" id="1.0.0-1">
+    <createTable tableName="STG_SETTINGS">
+      <column name="STG_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_STG_SETTINGS_ID"/>
+      </column>
+      <column name="STG_NAME" type="NVARCHAR(550)"/>
+      <column name="STG_VALUE" type="NVARCHAR(200)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="STG_CONTEXT" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="FK_SETTINGS_CONTEXT" references="STG_CONTEXT(STG_CONTEXT_ID)" />
+      </column>
+      <column name="STG_SCOPE" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="FK_SETTINGS_SCOPE" references="STG_SCOPE(STG_SCOPE_ID)" />
+      </column>
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+    </modifySql>
+  </changeSet>
+
+  <changeSet author="commons" id="1.0.0-4" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_STG_SETTINGS_COMMON_ID" startValue="1"/>
+  </changeSet>
+
+  <changeSet author="commons" id="1.0.0-5" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_STG_CONTEXT_COMMON_ID" startValue="1"/>
+  </changeSet>
+
+  <changeSet author="commons" id="1.0.0-6" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_STG_SCOPE_COMMON_ID" startValue="1"/>
+  </changeSet>
+</databaseChangeLog>
