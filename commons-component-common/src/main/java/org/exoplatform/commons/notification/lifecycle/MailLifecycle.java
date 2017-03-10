@@ -16,24 +16,24 @@
  */
 package org.exoplatform.commons.notification.lifecycle;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.lifecycle.AbstractNotificationLifecycle;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.channel.MailChannel;
-import org.exoplatform.commons.notification.impl.service.QueueMessageImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by The eXo Platform SAS
@@ -120,7 +120,7 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
       MessageInfo msg = builder.buildMessage(ctx);
       if (msg != null) {
         if (NotificationUtils.isValidEmailAddresses(msg.getTo()) == true) {
-          CommonsUtils.getService(QueueMessageImpl.class).sendMessage(msg.makeEmailNotification());
+          CommonsUtils.getService(QueueMessage.class).sendMessage(msg.makeEmailNotification());
         } else {
           LOG.warn(String.format("The email %s is not valid for sending notification", msg.getTo()));
         }

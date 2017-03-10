@@ -16,16 +16,9 @@
  */
 package org.exoplatform.settings.cache;
 
-import org.gatein.common.logging.Logger;
-import org.gatein.common.logging.LoggerFactory;
-
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
-import org.exoplatform.commons.api.settings.data.Context;
-import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.api.settings.data.SettingContext;
-import org.exoplatform.commons.api.settings.data.SettingKey;
-import org.exoplatform.commons.api.settings.data.SettingScope;
+import org.exoplatform.commons.api.settings.data.*;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.cache.future.FutureExoCache;
@@ -34,14 +27,16 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.settings.cache.selector.SettingCacheSelector;
 import org.exoplatform.settings.impl.SettingServiceImpl;
+import org.gatein.common.logging.Logger;
+import org.gatein.common.logging.LoggerFactory;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
  * Nov 15, 2012
- * CacheSettingServiceImpl is implemented for application which uses cache. CacheSettingServiceImpl contains also settingService for database. 
- * In case of saving and removing setting properties, CacheSettingService will effect the change in cache and database. 
+ * CacheSettingServiceImpl is implemented for application which uses cache. CacheSettingServiceImpl contains also settingService for database.
+ * In case of saving and removing setting properties, CacheSettingService will effect the change in cache and database.
  * Otherwise, it will search setting properties in cache at first and then in database, that allows to improve performance.
- * @LevelAPI Experimental    
+ * @LevelAPI Experimental
  */
 public class CacheSettingServiceImpl implements SettingService {
   /** Logger */

@@ -16,10 +16,6 @@
  */
 package org.exoplatform.commons.notification.impl.command;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
@@ -29,8 +25,14 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NotificationExecutorImpl implements NotificationExecutor {
   
@@ -66,15 +68,13 @@ public class NotificationExecutorImpl implements NotificationExecutor {
       Callable<Boolean> task = new Callable<Boolean>() {
         @Override
         public Boolean call() throws Exception {
-          boolean created = NotificationSessionManager.createSystemProvider();
           try {
+            ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
             notificationService.process(create(ctx, command));
           } catch (Exception e) {
             LOG.warn("Process NotificationInfo is failed: " + e.getMessage(), e);
             LOG.debug(e.getMessage(), e);
             return false;
-          } finally {
-            NotificationSessionManager.closeSessionProvider(created);
           }
           //
           return true;

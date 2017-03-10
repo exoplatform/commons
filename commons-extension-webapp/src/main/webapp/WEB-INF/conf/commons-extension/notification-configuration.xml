@@ -40,17 +40,18 @@
   
   <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
-    <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.JPANotificationDataStorage</type>
   </component>
 
   <component profiles="all">
-    <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorageImpl</key>
-    <type>org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl</type>
+    <key>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</key>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
   </component>
 
   <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
-    <type>org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage</type>
+    <!--<type>org.exoplatform.commons.notification.impl.jpa.cache.RDBMSCachedWebNotificationStorage</type>-->
+    <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
   </component>
   
   <component profiles="all">
@@ -70,7 +71,7 @@
 
   <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
-    <type>org.exoplatform.commons.notification.impl.setting.UserSettingServiceImpl</type>
+    <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
   </component>
 
   <component profiles="all">
@@ -114,7 +115,7 @@
 
 	<component profiles="all">
 		<key>org.exoplatform.commons.api.notification.service.QueueMessage</key>
-		<type>org.exoplatform.commons.notification.impl.service.QueueMessageImpl</type>
+		<type>org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl</type>
 		<init-params>
 			<value-param>
 				<name>numberOfMailPerBatch</name> <!-- Max number of mails to send in the configured period of time -->

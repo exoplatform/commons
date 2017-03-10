@@ -16,12 +16,11 @@
  */
 package org.exoplatform.commons.api.settings.data;
 
-import java.io.Serializable;
-
-import javax.jcr.RepositoryException;
-
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.jcr.RepositoryService;
+
+import javax.jcr.RepositoryException;
+import java.io.Serializable;
 
 /**
  * Associates setting properties with a specified context (GLOBAL/USER).
@@ -69,8 +68,12 @@ public class SettingContext implements Serializable {
 
     if (obj instanceof SettingContext) {
       SettingContext dest = (SettingContext) obj;
-      return this.repositoryName.equals(dest.getRepositoryName())
-          && this.getContextPath().equals(dest.getContextPath());
+      if (this.repositoryName == null) {
+        return this.getContextPath().equals(dest.getContextPath());
+      } else {
+        return this.repositoryName.equals(dest.getRepositoryName())
+            && this.getContextPath().equals(dest.getContextPath());
+      }
     }
     return false;
   }
@@ -79,9 +82,13 @@ public class SettingContext implements Serializable {
    */
   @Override
   public int hashCode() {
-    int result = repositoryName.hashCode();
-    result = 31 * result + ContextPath.hashCode();
-    return result;
+    if (repositoryName != null) {
+      int result = repositoryName.hashCode();
+      result = 31 * result + ContextPath.hashCode();
+      return result;
+    } else {
+      return ContextPath.hashCode();
+    }
   }
   /**
    * Gets path of the SettingContext object.
@@ -114,7 +121,7 @@ public class SettingContext implements Serializable {
     RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
                                                                              .getComponentInstanceOfType(RepositoryService.class);
     try {
-      return repositoryService.getCurrentRepository().getConfiguration().getName();
+      return (repositoryService == null ? null : repositoryService.getCurrentRepository().getConfiguration().getName());
     } catch (RepositoryException e) {
       throw new RuntimeException(e);
     }

@@ -18,4 +18,21 @@
             </value-param>
         </init-params>
     </component>
+
+    <!-- Data Initialization -->
+    <external-component-plugins>
+        <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
+        <component-plugin>
+            <name>CommonsChangeLogsPlugin</name>
+            <set-method>addChangeLogsPlugin</set-method>
+            <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+            <init-params>
+                <values-param>
+                    <name>changelogs</name>
+                    <description>Change logs of commons</description>
+                    <value>db/changelog/commons.db.changelog-1.0.0.xml</value>
+                </values-param>
+            </init-params>
+        </component-plugin>
+    </external-component-plugins>
 </configuration>

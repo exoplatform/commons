@@ -9,6 +9,7 @@ import org.exoplatform.component.test.ContainerScope;
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-cluster-configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
 public class StartableClusterAwareTest extends BaseCommonsTestCase {
+
     public static int nbRunningA = 0;
     public static int nbRunningB = 0;
     public static int nbRunningC = 0;

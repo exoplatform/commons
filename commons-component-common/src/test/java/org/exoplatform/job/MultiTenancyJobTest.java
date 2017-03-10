@@ -55,11 +55,11 @@ public class MultiTenancyJobTest extends BaseCommonsTestCase {
 
   public void testExecute(){
 
-      try {
-        impl.execute(context);
-      } catch (JobExecutionException e) {
-        fail("testExecute");
-      }
+    try {
+      impl.execute(context);
+    } catch (JobExecutionException e) {
+      fail("testExecute");
+    }
 
   }
 
@@ -75,7 +75,6 @@ public class MultiTenancyJobTest extends BaseCommonsTestCase {
     }
 
   }*/
-
 
   private JobExecutionContext createContext(JobDetail jobDetail) {
     firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTriggerImpl(), null, false, new Date(), new Date(), new Date(), new Date());

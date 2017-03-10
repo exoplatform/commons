@@ -81,6 +81,93 @@ public class SettingServiceImpl implements SettingService {
     return null;
   }
 
+// TODO
+  // ** for migration service of settings **
+//  public List<String> getAllSettings() {
+//    return new SynchronizationTask<List<String>>() {
+//      @Override
+//      protected List<String> execute(SessionContext ctx) {
+//
+//        List<String> settings = new LinkedList<String>();
+//        SimpleContextEntity contextEntity = null;
+//        SettingsRoot settingsRoot = ctx.getSession().findByPath(SettingsRoot.class, "settings");
+//        for (ContextEntity contextEntity1 : settingsRoot.getContexts().values()) {
+//          if (contextEntity1 instanceof SimpleContextEntity) { // Global Settings
+//            for (ScopeEntity s : ((SimpleContextEntity) contextEntity1).getScopes().values()) {
+//              for (String setting : s.getProperties().keySet()) {
+//                settings.add( )
+//              }
+//            }
+//
+//          }
+//
+//        }
+//        switch(c) {
+//          case GLOBAL:
+//            contextEntity = (SimpleContextEntity) settingsRoot.getContext(c.name().toLowerCase());
+//            break;
+//          case USER:
+//            SubContextEntity userContextEntity = (SubContextEntity) settingsRoot.getContext(c.name().toLowerCase());
+//            contextEntity = userContextEntity.getContext(c.getId());
+//            break;
+//        }
+//        ScopeEntity scopeEntity = contextEntity.getScope(s.name().toLowerCase());
+//        if (scopeEntity == null) {
+//          scopeEntity = ctx.getSession().insert(contextEntity, ScopeEntity.class, s.name().toLowerCase());
+//        }
+//
+//        if (s.getId() == null) {
+//          return scopeEntity;
+//        } else {
+//          ScopeEntity scopeInstanceEntity = scopeEntity.getInstance(s.getId());
+//          if (scopeInstanceEntity == null) {
+//            return ctx.getSession().insert(scopeEntity, ScopeEntity.class, s.getId());
+//          }
+//        }
+//
+//        return null;
+//      }
+//    }.executeWith(chromatticLifeCycle);
+//
+//    if (got instanceof Long) {
+//      return SettingValue.create((Long) got);
+//    } else if (got instanceof String) {
+//      return SettingValue.create((String) got);
+//    }
+//    else if (got instanceof Double) {
+//      return SettingValue.create((Double) got);
+//    }
+//    else if (got instanceof Boolean) {
+//      return SettingValue.create((Boolean) got);
+//    }
+//    return null;
+//  }
+//
+//
+//  private Map<String,ContextEntity> getAllContexts() {
+//    return new SynchronizationTask<Map<String,ContextEntity>>() {
+//      @Override
+//      protected Map<String, ContextEntity> execute(SessionContext ctx) {
+//        return ctx.getSession().findByPath(SettingsRoot.class,"settings").getContexts();
+//      }
+//    }.executeWith(chromatticLifeCycle);
+//  }
+//
+//  private List<String> getAllGlobalSettings() {
+//    return new SynchronizationTask<List<String>>() {
+//      @Override
+//      protected List<String> execute(SessionContext ctx) {
+//        // Root
+//        SettingsRoot settings = ctx.getSession().findByPath(SettingsRoot.class, "settings");
+//        SimpleContextEntity contextEntity = (SimpleContextEntity) settings.getContext(Context.GLOBAL.name());
+//        for (ScopeEntity scopeEntity : contextEntity.getScopes().values()) {
+//
+//        }
+////        return (List<ScopeEntity>) contextEntity.getScopes().values();
+//      }
+//    }.executeWith(chromatticLifeCycle);
+//  }
+
   private ScopeEntity createScope(final Context c, final Scope s) {
 
     return new SynchronizationTask<ScopeEntity>() {

@@ -2,6 +2,8 @@ package org.exoplatform.commons.notification.job;
 
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.quartz.JobDataMap;
@@ -17,6 +19,7 @@ public class WebNotificationJob extends NotificationJob {
     long startTime = System.currentTimeMillis();
     long liveDays = getLiveTime(context.getJobDetail().getJobDataMap());
     //
+    ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
     dataStorage.remove(liveDays);
     //
     LOG.info("Done clear web notifications for all users, time: " + (System.currentTimeMillis() - startTime) + "ms.");

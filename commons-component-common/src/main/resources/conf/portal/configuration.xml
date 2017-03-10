@@ -4,18 +4,58 @@
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
+    <key>org.exoplatform.commons.api.settings.SettingService</key>
+    <type>org.exoplatform.settings.jpa.cache.RDBMSCacheSettingServiceImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.settings.jpa.dao.SettingContextDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.settings.jpa.dao.SettingScopeDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.settings.jpa.dao.SettingsDAO</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailParamsDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailDigestDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailNotifDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailQueueDAO</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebParamsDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO</type>
+  </component>
+
+  <!--<component>-->
+    <!--<type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>-->
+  <!--</component>-->
+
+  <component>
     <key>org.exoplatform.commons.api.event.EventManager</key>
     <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.settings.impl.SettingServiceImpl</key>
     <type>org.exoplatform.settings.impl.SettingServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.settings.SettingService</key>
-    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
   </component>
 
   <component>

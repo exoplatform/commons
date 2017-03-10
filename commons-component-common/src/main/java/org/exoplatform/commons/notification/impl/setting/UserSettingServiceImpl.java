@@ -16,15 +16,6 @@
  */
 package org.exoplatform.commons.notification.impl.setting;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.jcr.*;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
@@ -46,6 +37,16 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.impl.UserImpl;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Session;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class UserSettingServiceImpl extends AbstractService implements UserSettingService {
   private static final Log LOG = ExoLogger.getLogger(UserSettingServiceImpl.class);
@@ -146,7 +147,11 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     }
     SettingValue<?> value = getSettingValue(userId, EXO_LAST_READ_DATE);
     if (value != null) {
-      model.setLastReadDate((Long) value.getValue());
+      if (value.getValue() instanceof Long) {
+        model.setLastReadDate((Long) value.getValue());
+      } else {
+        model.setLastReadDate((Long) Long.parseLong((String)value.getValue()));
+      }
     } else {
       saveLastReadDate(userId, 0l);
     }
@@ -411,7 +416,6 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * Gets plugin's ID by propertyName
    * 
    * @param node
-   * @param frequency
    * @return
    * @throws Exception
    */

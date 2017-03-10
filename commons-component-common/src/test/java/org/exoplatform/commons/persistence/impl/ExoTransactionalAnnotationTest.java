@@ -226,8 +226,10 @@ public class ExoTransactionalAnnotationTest extends BaseTest {
     PortalContainer container = PortalContainer.getInstance();
     EntityManagerService service = container.getComponentInstanceOfType(EntityManagerService.class);
     service.startRequest(container);
+
     TaskDao dao = new TaskDao();
     int initialSize = dao.findAll().size();
+
     dao.createWithSetRollbackOnly(new Task());
     // When
     dao.create(new Task());

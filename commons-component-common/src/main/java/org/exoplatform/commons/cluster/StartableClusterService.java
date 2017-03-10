@@ -14,11 +14,13 @@ import org.exoplatform.container.spi.ComponentAdapter;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.settings.impl.SettingServiceImpl;
 import org.picocontainer.Startable;
 
 import java.security.PrivilegedAction;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * This service allow to running a specific service (implements StartableClusterAware interface) on one cluster node.
@@ -67,7 +69,7 @@ public class StartableClusterService implements Startable {
     }
 
 
-    public StartableClusterService(InitParams initParams, ExoContainerContext containerContext, SettingServiceImpl settingService) {
+    public StartableClusterService(InitParams initParams, ExoContainerContext containerContext, SettingService settingService) {
         this.container = containerContext.getContainer();
         this.settingService = settingService;
         if (initParams.getValueParam(CLUSTER_CHECK_PERIOD) != null) {
@@ -205,8 +207,6 @@ public class StartableClusterService implements Startable {
      * @param value node name
      */
     private void updateServiceSettings(String key, String value) {
-        SettingServiceImpl settingServiceImpl = CommonsUtils.getService(SettingServiceImpl.class);
-        boolean created = settingServiceImpl.startSynchronization();
         try {
             settingService.set(Context.GLOBAL, Scope.GLOBAL.id(CLUSTER_SERVICE_SETTING_GLOBAL_KEY), key, SettingValue.create(value));
             try {
@@ -216,7 +216,6 @@ public class StartableClusterService implements Startable {
             }
         } finally {
             Scope.GLOBAL.id(null);
-            settingServiceImpl.stopSynchronization(created);
         }
     }
 

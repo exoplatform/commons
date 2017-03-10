@@ -83,10 +83,16 @@ public class SettingKey extends SettingScope {
    */
   @Override
   public int hashCode() {
-    int result = super.repositoryName.hashCode();
-    result = 31 * result + scopePath.hashCode();
-    result = 31 * result + key.hashCode();
-    return result;
+    if (super.repositoryName != null) {
+      int result = super.repositoryName.hashCode();
+      result = 31 * result + scopePath.hashCode();
+      result = 31 * result + key.hashCode();
+      return result;
+    } else {
+      int result = scopePath.hashCode();
+      result = 31 * result + key.hashCode();
+      return result;
+    }
   }
 
 }

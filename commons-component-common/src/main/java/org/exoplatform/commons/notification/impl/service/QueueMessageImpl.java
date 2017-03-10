@@ -16,23 +16,6 @@
  */
 package org.exoplatform.commons.notification.impl.service;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Session;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-import javax.jcr.query.QueryResult;
-
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
@@ -57,6 +40,16 @@ import org.exoplatform.services.scheduler.PeriodInfo;
 import org.json.JSONObject;
 import org.picocontainer.Startable;
 import org.quartz.JobDataMap;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Session;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 @ManagedBy(SendEmailService.class)
 public class QueueMessageImpl extends AbstractService implements QueueMessage, Startable {
@@ -91,7 +84,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 20);
     DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120) * 1000;
   }
-  
+
   public void setManagementView(SendEmailService managementView) {
     this.sendEmailService = managementView;
   }
@@ -313,6 +306,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     return null;
   }
 
+  @Override
   public boolean sendMessage(Message message) {
     if (sendEmailService.isOn() == false) {
       try {

@@ -17,6 +17,7 @@
 package org.exoplatform.commons.api.notification.service;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.services.mail.Message;
 
 public interface QueueMessage {
 
@@ -31,4 +32,11 @@ public interface QueueMessage {
    * Peek the message from queue and send
    */
   void send() ;
+
+  /**
+   * Sends the message using mail service
+   * @param message the message to be sent
+   * @return true if the message is sent or mail service is off
+   */
+  boolean sendMessage(Message message);
 }
