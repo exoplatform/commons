@@ -83,4 +83,34 @@ public class CommonsUtilsMockingTest {
     assertEquals("user_site", site.getName());
     assertEquals(SiteType.USER, site.getType());
   }
+
+  public void testShouldReturnDefaultPortalOwner() {
+    UserPortalConfigService userPortalConfig = mock(UserPortalConfigService.class);
+    when(userPortalConfig.getDefaultPortal()).thenReturn("intranet");
+
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(UserPortalConfigService.class)).thenReturn(userPortalConfig);
+    when(CommonsUtils.getCurrentSite()).thenCallRealMethod();
+
+    String portalOwner = CommonsUtils.getCurrentPortalOwner();
+    assertEquals("intranet", portalOwner);
+  }
+
+  public void testShouldReturnCurrentPortalOwner() {
+    UserPortalConfigService userPortalConfig = mock(UserPortalConfigService.class);
+    when(userPortalConfig.getDefaultPortal()).thenReturn("intranet");
+
+    PortalRequestContext requestContext = mock(PortalRequestContext.class);
+
+    PowerMockito.mockStatic(Util.class);
+    when(Util.getPortalRequestContext()).thenReturn(requestContext);
+
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(UserPortalConfigService.class)).thenReturn(userPortalConfig);
+    when(CommonsUtils.getCurrentSite()).thenCallRealMethod();
+
+    when(requestContext.getPortalOwner()).thenReturn("current_portal_owner");
+    String portalOwner = CommonsUtils.getCurrentPortalOwner();
+    assertEquals("current_portal_owner", portalOwner);
+  }
 }
