@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.notification.template;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.notification.NotificationUtils;
 
@@ -41,5 +42,9 @@ public class GroovyElement extends SimpleElement {
       }
     }
     return value;
+  }
+
+  public String escapeHTML(String str) {
+    return StringEscapeUtils.escapeHtml(str);
   }
 }
