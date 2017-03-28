@@ -245,6 +245,29 @@ public class CommonsUtils {
     }
 
   /**
+   * Get current portal owner
+   * @return current portal owner
+   */
+  public static String getCurrentPortalOwner() {
+    PortalRequestContext pContext = null;
+    try {
+      pContext = Util.getPortalRequestContext();
+    } catch (NullPointerException e) {
+      pContext = null;
+    }
+    if (pContext != null) {
+      return pContext.getPortalOwner();
+    } else {
+      UserPortalConfigService portalConfig = getService(UserPortalConfigService.class);
+      if (portalConfig != null) {
+        return portalConfig.getDefaultPortal();
+      } else {
+        return DEFAULT_SITE;
+      }
+    }
+  }
+
+  /**
    * Get {@link SiteKey} of current site
    * @return currentSite if available or default site in otherwise
    */
