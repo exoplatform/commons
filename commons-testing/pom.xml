@@ -39,14 +39,12 @@
           <artifactId>xml-apis-ext</artifactId>
           <groupId>xml-apis</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>org.jboss.logging</groupId>
+          <artifactId>jboss-logging</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
-    <!-- remove it after migration to jcr 1.16.x-->
-    <dependency>
-      <groupId>org.exoplatform.kernel</groupId>
-      <artifactId>exo.kernel.component.ext.cache.impl.infinispan.v5</artifactId>
-    </dependency>
-    <!-- End remove-->
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.commons</artifactId>
@@ -94,6 +92,11 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <!-- To replace the excluded old version -->
