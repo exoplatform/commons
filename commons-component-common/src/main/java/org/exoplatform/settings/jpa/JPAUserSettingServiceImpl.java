@@ -174,31 +174,8 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
     }
   }
 
-  /**
-   * TODO
-   * not used
-   *
-   * When has any changes on the user's default setting.
-   * We must remove the mix type for user setting.
-   *
-   * @param userId the userId for removing
-   */
-  private void removeMixin(String userId) {
-//    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
-//    try {
-//      Session session = getSession(sProvider, workspace);
-//      Node userHomeNode = session.getRootNode().getNode(SETTING_USER_PATH);
-//      if (userHomeNode.hasNode(userId)) {
-//        Node userNode = userHomeNode.getNode(userId);
-//        if (userNode.isNodeType(MIX_DEFAULT_SETTING)) {
-//          userNode.removeMixin(MIX_DEFAULT_SETTING);
-//          sessionSave(userNode);
-//        }
-//      }
-//    } catch (Exception e) {
-//      LOG.error("Failed to remove mixin for default setting of user: " + userId, e);
-//    }
-  }
+
+  private void removeMixin(String userId) {}
 
   @Override
   @ExoTransactional

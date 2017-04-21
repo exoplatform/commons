@@ -259,9 +259,9 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @Override
   @ExoTransactional
   public void hidePopover(String notificationId) {
-    WebNotifEntity webNotifEntity = webNotifDAO.find(Long.valueOf(notificationId));
-    if (webNotifEntity != null) {
-      try {
+    try {
+      WebNotifEntity webNotifEntity = webNotifDAO.find(Long.valueOf(notificationId));
+      if (webNotifEntity != null) {
         WebUsersEntity webUsersEntity = webNotifEntity.getReceiver();
         webUsersEntity.setShowPopover(false);
         webUsersDAO.update(webUsersEntity);
@@ -274,9 +274,11 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
           }
         }
         webNotifDAO.update(webNotifEntity);
-      } catch (Exception e) {
-        LOG.error("Failed to update the read notification Id: " + notificationId, e);
       }
+    } catch (NumberFormatException e) {
+      //nothing to log
+    } catch (Exception e) {
+      LOG.error("Failed to update the read notification Id: " + notificationId, e);
     }
   }
 

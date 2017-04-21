@@ -16,8 +16,6 @@
  */
 package org.exoplatform.commons.notification.lifecycle;
 
-import java.util.Calendar;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
@@ -31,6 +29,8 @@ import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
+import java.util.Calendar;
 
 /**
  * Created by The eXo Platform SAS
@@ -56,11 +56,12 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
       if (userSetting.isActive(WebChannel.ID, pluginId)) {
         ctx.setWritingProcess(true);
         NotificationInfo notif = notification.clone(true).setTo(userId).setLastModifiedDate(Calendar.getInstance());
-        //build message
-        MessageInfo msg = buildMessageInfo(ctx.setNotificationInfo(notif));
-        ctx.append(WebChannel.MESSAGE_INFO, msg);
+        ctx.setNotificationInfo(notif);
         //store
         store(ctx.getNotificationInfo());
+        //build message
+        MessageInfo msg = buildMessageInfo(ctx);
+        ctx.append(WebChannel.MESSAGE_INFO, msg);
         //send
         getChannel().dispatch(ctx, userId);
       }

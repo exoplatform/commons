@@ -5,6 +5,7 @@ import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.notification.impl.jpa.email.dao.MailNotifDAO;
 import org.exoplatform.commons.notification.impl.jpa.email.dao.MailQueueDAO;
 import org.exoplatform.commons.notification.impl.jpa.email.entity.MailQueueEntity;
 import org.exoplatform.commons.notification.impl.jpa.service.JPASendEmailService;
@@ -60,11 +61,14 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
 
   private SettingsDAO settingsDAO;
 
+  private MailNotifDAO mailNotifDAO;
+
 
   public JPAQueueMessageImpl(InitParams params, DataInitializer dataInitializer) {
     this.mailService = CommonsUtils.getService(MailService.class);
     this.mailQueueDAO = PortalContainer.getInstance().getComponentInstanceOfType(MailQueueDAO.class);
     this.settingsDAO = PortalContainer.getInstance().getComponentInstanceOfType(SettingsDAO.class);
+    this.mailNotifDAO = PortalContainer.getInstance().getComponentInstanceOfType(MailNotifDAO.class);
 
     MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 20);
     DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120) * 1000;
@@ -233,45 +237,16 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
   }
 
   public String removeAll() {
-    //TODO
-//    int t = 0, j = 0;
-//    String pli="";
-//    try {
-//      //
-//      LOG.trace("Removing messages: ");
-//      mailNotifDAO.deleteAll();
-//      LOG.trace("Done to removed messages! ");
-//      //
-//      LOG.trace("Removing notification info... ");
-//      NodeIterator it = root.getNode("eXoNotification/messageHome").getNodes();
-//      List<String> pluginPaths = new ArrayList<String>();
-//      while (it.hasNext()) {
-//        pluginPaths.add(it.nextNode().getPath());
-//      }
-//      session.logout();
-//      for (String string : pluginPaths) {
-//        pli = string;
-//        LOG.trace("Remove notification info on plugin: " + pli);
-//        //
-//        session = getSession(sProvider, configuration.getWorkspace());
-//        it = ((Node) session.getItem(string)).getNodes();
-//        while (it.hasNext()) {
-//          NodeIterator hIter = it.nextNode().getNodes();
-//          j = removeNodes(session, hIter);
-//          t += j;
-//        }
-//        LOG.trace("Removed " + j + " nodes info on plugin: " + pli);
-//        session.logout();
-//      }
-//
-//      return "Done to removed " + t + " nodes!";
-//    } catch (Exception e) {
-//      LOG.trace("Removed " + j + " nodes info on plugin: " + pli);
-//      LOG.trace("Removed all " + t + " nodes.");
-//      LOG.debug("Failed to remove all data of feature notification." + e.getMessage());
-//    } finally {
-//      sProvider.close();
-//    }
+    try {
+      //
+      LOG.trace("Removing messages: ");
+      mailNotifDAO.deleteAll();
+      LOG.trace("Done to removed messages! ");
+
+      return "Done to removed all stored messages!";
+    } catch (Exception e) {
+      LOG.debug("Failed to remove all data of feature notification." + e.getMessage());
+    }
     return "Failed to remove all. Please, try again !";
   }
 
