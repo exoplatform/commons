@@ -45,6 +45,9 @@
     <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO</type>
   </component>
 
+  <component profiles="all">
+    <type>org.exoplatform.settings.migration.SettingsMigration</type>
+  </component>
   <!--<component>-->
     <!--<type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>-->
   <!--</component>-->

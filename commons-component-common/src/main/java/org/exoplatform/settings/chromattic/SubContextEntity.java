@@ -1,9 +1,9 @@
 package org.exoplatform.settings.chromattic;
 
-import java.util.Map;
-
 import org.chromattic.api.annotations.OneToMany;
 import org.chromattic.api.annotations.PrimaryType;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
@@ -12,7 +12,7 @@ import org.chromattic.api.annotations.PrimaryType;
 public abstract class SubContextEntity extends ContextEntity {
 
   @OneToMany
-  protected abstract Map<String, SimpleContextEntity> getContexts();
+  public abstract Map<String, SimpleContextEntity> getContexts();
 
   public SimpleContextEntity getContext(String contextName) {
     return getContexts().get(contextName);

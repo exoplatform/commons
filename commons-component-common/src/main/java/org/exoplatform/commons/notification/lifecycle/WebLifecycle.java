@@ -57,11 +57,12 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
         ctx.setWritingProcess(true);
         NotificationInfo notif = notification.clone(true).setTo(userId).setLastModifiedDate(Calendar.getInstance());
         ctx.setNotificationInfo(notif);
-        //store
-        store(ctx.getNotificationInfo());
         //build message
         MessageInfo msg = buildMessageInfo(ctx);
         ctx.append(WebChannel.MESSAGE_INFO, msg);
+        //store
+        store(ctx.getNotificationInfo());
+        ctx.value(WebChannel.MESSAGE_INFO).setId(ctx.getNotificationInfo().getId());
         //send
         getChannel().dispatch(ctx, userId);
       }

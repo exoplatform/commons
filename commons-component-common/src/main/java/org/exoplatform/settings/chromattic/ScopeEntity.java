@@ -14,7 +14,7 @@ import java.util.Map;
 public abstract class ScopeEntity {
 
   @OneToMany
-  protected abstract Map<String, ScopeEntity> getInstances();
+  public abstract Map<String, ScopeEntity> getInstances();
 
   @Properties
   public abstract Map<String, Object> getProperties();

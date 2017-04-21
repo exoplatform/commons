@@ -161,16 +161,24 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
 
   private boolean isDigestWeeklySent(MailNotifEntity mailNotifEntity, String userId) {
     boolean found = false;
-    for (MailDigestEntity digestEntity : mailNotifEntity.getMailDigestSent()) {
-      found = (digestEntity.getType().equals(DIGEST_WEEKLY) && digestEntity.getUser().equals(userId));
+    for (MailDigestEntity mailDigestEntity : mailNotifEntity.getMailDigestSent()) {
+      found = mailDigestEntity.getNotification().equals(mailNotifEntity) && mailDigestEntity.getType().equals("weekly")
+          && mailDigestEntity.getUser().equals(userId);
+      if (found) {
+        break;
+      }
     }
     return found;
   }
 
   private boolean isDigestDailySent(MailNotifEntity mailNotifEntity, String userId) {
     boolean found = false;
-    for (MailDigestEntity digestEntity : mailNotifEntity.getMailDigestSent()) {
-      found = (digestEntity.getType().equals(DIGEST_DAILY) && digestEntity.getUser().equals(userId));
+    for (MailDigestEntity mailDigestEntity : mailNotifEntity.getMailDigestSent()) {
+      found = mailDigestEntity.getNotification().equals(mailNotifEntity) && mailDigestEntity.getType().equals("daily")
+      && mailDigestEntity.getUser().equals(userId);
+      if (found) {
+        break;
+      }
     }
     return found;
   }

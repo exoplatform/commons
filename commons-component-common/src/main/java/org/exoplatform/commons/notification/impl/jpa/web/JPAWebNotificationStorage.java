@@ -46,6 +46,7 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   private static final String SPACE_INVITATION_PLUGIN = "SpaceInvitationPlugin";
   private static final String REQUEST_JOIN_SPACE_PLUGIN = "RequestJoinSpacePlugin";
   private static final String ACTIVITY_COMMENT_PLUGIN = "ActivityCommentPlugin";
+  private static final String LIKE_PLUGIN = "LikePlugin";
   private static final String STATUS_PARAMETER = "status";
 
   public JPAWebNotificationStorage(WebNotifDAO webNotifDAO, WebParamsDAO webParamsDAO, WebUsersDAO webUsersDAO,
@@ -82,9 +83,21 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
           && notification.getOwnerParameter().containsKey(STATUS_PARAMETER)) {
         String notifId = notification.getTitle().split("data-id=\"")[1].split("\"")[0];
         webNotifEntity = webNotifDAO.find(Long.parseLong(notifId));
+        Map<String, String> params = notification.getOwnerParameter();
+        params.putIfAbsent("resetNumberOnBadge", "true");
+        notification.setOwnerParameter(params);
       } else if (notification.getKey().getId().equals(ACTIVITY_COMMENT_PLUGIN)) {
         webNotifEntity = webNotifDAO.findWebNotifsOfUserByParam(notification.getTo(),
             ACTIVITY_COMMENT_PLUGIN, notification.getOwnerParameter().get("activityId"), "activityId");
+        Map<String, String> params = notification.getOwnerParameter();
+        params.remove("resetNumberOnBadge");
+        notification.setOwnerParameter(params);
+      } else if (notification.getKey().getId().equals(LIKE_PLUGIN)) {
+        webNotifEntity = webNotifDAO.findWebNotifsOfUserByParam(notification.getTo(),
+            LIKE_PLUGIN, notification.getOwnerParameter().get("activityId"), "activityId");
+        Map<String, String> params = notification.getOwnerParameter();
+        params.remove("resetNumberOnBadge");
+        notification.setOwnerParameter(params);
       }
       if (webNotifEntity != null) {
         webNotifDAO.delete(webNotifEntity);
@@ -113,18 +126,16 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
         Set<WebParamsEntity> set = new HashSet<WebParamsEntity>();
         if (ownerParameter != null && !ownerParameter.isEmpty()) {
           for (String key : ownerParameter.keySet()) {
-            if (!key.equals("resetNumberOnBadge")) {
-              String propertyName = key.replace(NTF_NAME_SPACE, "");
-              //fill WebParamsEntity with data from notification
-              WebParamsEntity webParamsEntity = new WebParamsEntity();
-              webParamsEntity.setName(propertyName);
-              webParamsEntity.setValue(ownerParameter.get(key));
-              set.add(webParamsEntity);
-              webParamsEntity.setNotification(webNotifEntity);
-              webParamsDAO.create(webParamsEntity);
-              webUsersEntity.setShowPopover(Boolean.parseBoolean(ownerParameter.get(NTF_SHOW_POPOVER)) || isCountOnPopover);
-              webUsersEntity.setRead(Boolean.parseBoolean(ownerParameter.get(NTF_READ)));
-            }
+            String propertyName = key.replace(NTF_NAME_SPACE, "");
+            //fill WebParamsEntity with data from notification
+            WebParamsEntity webParamsEntity = new WebParamsEntity();
+            webParamsEntity.setName(propertyName);
+            webParamsEntity.setValue(ownerParameter.get(key));
+            set.add(webParamsEntity);
+            webParamsEntity.setNotification(webNotifEntity);
+            webParamsDAO.create(webParamsEntity);
+            webUsersEntity.setShowPopover(Boolean.parseBoolean(ownerParameter.get(NTF_SHOW_POPOVER)) || isCountOnPopover);
+            webUsersEntity.setRead(Boolean.parseBoolean(ownerParameter.get(NTF_READ)));
           }
         }
 
@@ -236,6 +247,10 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @ExoTransactional
   public void markRead(String notificationId) {
     WebNotifEntity webNotifEntity = webNotifDAO.find(Long.valueOf(notificationId));
+    if (webNotifEntity == null) {
+      //it is a relationship or request join accepted notification
+      webNotifEntity = webNotifDAO.find(Long.valueOf(notificationId)+1);
+    }
     if (webNotifEntity != null) {
       try {
         WebUsersEntity webUsersEntity = webNotifEntity.getReceiver();
