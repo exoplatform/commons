@@ -48,7 +48,7 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
     try {
       MailNotifEntity notifEntity = new MailNotifEntity();
 
-      notifEntity.setSender(message.getFrom());
+      notifEntity.setSender(message.getFrom().isEmpty() ? message.getValueOwnerParameter("sender") : message.getFrom());
       notifEntity.setOrder(message.getOrder());
       notifEntity.setType(message.getKey().getId());
       notifEntity.setCreationDate(message.getDateCreated());
