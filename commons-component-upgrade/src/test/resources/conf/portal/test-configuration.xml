@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
-	xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+			   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+			   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
- <component>
-    <key>org.exoplatform.portal.config.UserACL</key>
-    <type>org.exoplatform.portal.config.UserACL</type>
-    <init-params>
-      <value-param>
-        <name>super.user</name>
-        <description>administrator</description>
-        <value>root</value>
-      </value-param>
+	<component>
+		<key>org.exoplatform.portal.config.UserACL</key>
+		<type>org.exoplatform.portal.config.UserACL</type>
+		<init-params>
+			<value-param>
+				<name>super.user</name>
+				<description>administrator</description>
+				<value>root</value>
+			</value-param>
 
-      <value-param>
-        <name>portal.administrator.groups</name>
-        <description>administrator</description>
-        <value>/platform/administrators</value>
-      </value-param>
-    </init-params>
-  </component>
+			<value-param>
+				<name>portal.administrator.groups</name>
+				<description>administrator</description>
+				<value>/platform/administrators</value>
+			</value-param>
+		</init-params>
+	</component>
 
 	<component>
 		<key>org.exoplatform.services.jcr.ext.distribution.DataDistributionManager</key>
@@ -54,18 +54,14 @@
 	</component>
 
 	<component>
-		<key>org.exoplatform.commons.chromattic.ChromatticManager</key>
-		<type>org.exoplatform.commons.chromattic.ChromatticManager</type>
+		<type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
 	</component>
-
-	<component>
-		<key>org.exoplatform.settings.impl.SettingServiceImpl</key>
-		<type>org.exoplatform.settings.impl.SettingServiceImpl</type>
-	</component>
-
 	<component>
 		<key>org.exoplatform.commons.api.settings.SettingService</key>
-		<type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
+		<type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
+	</component>
+	<component>
+		<type>org.exoplatform.jpa.mock.DummyDependantComponent</type>
 	</component>
 
 	<component>
@@ -80,6 +76,19 @@
 		</init-params>
 	</component>
 
+	<component>
+		<type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+	</component>
+
+	<component>
+		<type>org.exoplatform.settings.jpa.dao.SettingContextDAO</type>
+	</component>
+	<component>
+		<type>org.exoplatform.settings.jpa.dao.SettingScopeDAO</type>
+	</component>
+	<component>
+		<type>org.exoplatform.settings.jpa.dao.SettingsDAO</type>
+	</component>
 	<component>
 		<key>org.exoplatform.commons.api.persistence.DataInitializer</key>
 		<type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
@@ -202,33 +211,6 @@
 		</component-plugin>
 	</external-component-plugins>
 
-	<external-component-plugins>
-		<target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
-		<component-plugin>
-			<name>chromattic</name>
-			<set-method>addLifeCycle</set-method>
-			<type>org.exoplatform.commons.chromattic.ChromatticLifeCycle</type>
-			<init-params>
-				<value-param>
-					<name>domain-name</name>
-					<value>setting</value>
-				</value-param>
-				<value-param>
-					<name>workspace-name</name>
-					<value>portal-test</value>
-				</value-param>
-				<values-param>
-					<name>entities</name>
-					<value>org.exoplatform.settings.chromattic.SettingsRoot</value>
-					<value>org.exoplatform.settings.chromattic.ContextEntity</value>
-					<value>org.exoplatform.settings.chromattic.SimpleContextEntity</value>
-					<value>org.exoplatform.settings.chromattic.SubContextEntity</value>
-					<value>org.exoplatform.settings.chromattic.ScopeEntity</value>
-				</values-param>
-			</init-params>
-		</component-plugin>
-	</external-component-plugins>
-
 	<!-- Upgrade plugin for ECMS: Only upgrade if previous version > ZERO -->
 	<external-component-plugins>
 		<target-component>org.exoplatform.commons.upgrade.UpgradeProductService</target-component>
@@ -262,7 +244,7 @@
 					<name>cms.configuration</name>
 					<description>configuration for the cms path</description>
 					<object
-						type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
+							type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
 						<field name="repository">
 							<string>repository</string>
 						</field>
@@ -277,7 +259,7 @@
 							<collection type="java.util.ArrayList">
 								<value>
 									<object
-										type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">
+											type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">
 										<field name="alias">
 											<string>upgradeProductTest</string>
 										</field>
@@ -295,7 +277,7 @@
 											<collection type="java.util.ArrayList">
 												<value>
 													<object
-														type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">
+															type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">
 														<field name="identity">
 															<string>any</string>
 														</field>
@@ -337,7 +319,7 @@
 					<name>cms.configuration</name>
 					<description>configuration for the cms path</description>
 					<object
-						type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
+							type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
 						<field name="repository">
 							<string>repository</string>
 						</field>
@@ -352,7 +334,7 @@
 							<collection type="java.util.ArrayList">
 								<value>
 									<object
-										type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">
+											type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">
 										<field name="alias">
 											<string>exoApplicationDataNode</string>
 										</field>
@@ -370,7 +352,7 @@
 											<collection type="java.util.ArrayList">
 												<value>
 													<object
-														type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">
+															type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">
 														<field name="identity">
 															<string>any</string>
 														</field>
@@ -396,34 +378,6 @@
 						</field>
 					</object>
 				</object-param>
-			</init-params>
-		</component-plugin>
-	</external-component-plugins>
-	<external-component-plugins>
-		<target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
-		<component-plugin>
-			<name>add.nodeType</name>
-			<set-method>addPlugin</set-method>
-			<type>org.exoplatform.services.jcr.impl.AddNodeTypePlugin</type>
-			<init-params>
-				<values-param>
-					<name>autoCreatedInNewRepository</name>
-					<description>Node types configuration file</description>
-					<value>classpath:/conf/settings-nodetypes.xml</value>
-					<value>classpath:/conf/notification-nodetypes.xml</value>
-				</values-param>
-			</init-params>
-		</component-plugin>
-		<component-plugin>
-			<name>add.namespaces</name>
-			<set-method>addPlugin</set-method>
-			<type>org.exoplatform.services.jcr.impl.AddNamespacesPlugin</type>
-			<init-params>
-				<properties-param>
-					<name>namespaces</name>
-					<property name="stg" value="http://www.gatein.org/jcr/stg/1.0/" />
-					<property name="ntf" value="http://www.gatein.org/jcr/ntf/1.0/" />
-				</properties-param>
 			</init-params>
 		</component-plugin>
 	</external-component-plugins>

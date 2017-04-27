@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.jpa.impl;
+package org.exoplatform.jpa.settings.impl;
 
 import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.api.settings.SettingListener;
@@ -24,6 +24,7 @@ import org.exoplatform.commons.api.settings.data.*;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.jpa.BaseTest;
 import org.exoplatform.settings.jpa.JPASettingServiceImpl;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.security.ConversationState;

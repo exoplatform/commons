@@ -48,7 +48,7 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
     try {
       MailNotifEntity notifEntity = new MailNotifEntity();
 
-      notifEntity.setSender(message.getFrom().isEmpty() ? message.getValueOwnerParameter("sender") : message.getFrom());
+      notifEntity.setSender(message.getFrom());
       notifEntity.setOrder(message.getOrder());
       notifEntity.setType(message.getKey().getId());
       notifEntity.setCreationDate(message.getDateCreated());
@@ -161,11 +161,13 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
 
   private boolean isDigestWeeklySent(MailNotifEntity mailNotifEntity, String userId) {
     boolean found = false;
-    for (MailDigestEntity mailDigestEntity : mailNotifEntity.getMailDigestSent()) {
-      found = mailDigestEntity.getNotification().equals(mailNotifEntity) && mailDigestEntity.getType().equals("weekly")
-          && mailDigestEntity.getUser().equals(userId);
-      if (found) {
-        break;
+    if (mailNotifEntity.getMailDigestSent() != null) {
+      for (MailDigestEntity mailDigestEntity : mailNotifEntity.getMailDigestSent()) {
+        found = mailDigestEntity.getNotification().equals(mailNotifEntity) && mailDigestEntity.getType().equals("weekly")
+            && mailDigestEntity.getUser().equals(userId);
+        if (found) {
+          break;
+        }
       }
     }
     return found;
@@ -173,11 +175,13 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
 
   private boolean isDigestDailySent(MailNotifEntity mailNotifEntity, String userId) {
     boolean found = false;
-    for (MailDigestEntity mailDigestEntity : mailNotifEntity.getMailDigestSent()) {
-      found = mailDigestEntity.getNotification().equals(mailNotifEntity) && mailDigestEntity.getType().equals("daily")
-      && mailDigestEntity.getUser().equals(userId);
-      if (found) {
-        break;
+    if (mailNotifEntity.getMailDigestSent() != null) {
+      for (MailDigestEntity mailDigestEntity : mailNotifEntity.getMailDigestSent()) {
+        found = mailDigestEntity.getNotification().equals(mailNotifEntity) && mailDigestEntity.getType().equals("daily")
+            && mailDigestEntity.getUser().equals(userId);
+        if (found) {
+          break;
+        }
       }
     }
     return found;

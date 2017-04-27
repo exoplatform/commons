@@ -5,7 +5,7 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.settings.jpa.entity.ContextEntity;
 import org.exoplatform.settings.jpa.entity.ScopeEntity;
 import org.exoplatform.settings.jpa.entity.SettingsEntity;
-import org.exoplatform.jpa.impl.CommonsDAOJPAImplTest;
+import org.exoplatform.jpa.CommonsDAOJPAImplTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
  */
 public class SettingsDAOTest extends CommonsDAOJPAImplTest {
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     super.setUp();
     settingsDAO.deleteAll();
   }

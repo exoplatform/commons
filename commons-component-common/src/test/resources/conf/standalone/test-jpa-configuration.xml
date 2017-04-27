@@ -72,6 +72,15 @@
     </component>
 
     <component>
+        <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
+    </component>
+
+    <component>
+        <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
+        <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
+    </component>
+
+    <component>
         <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
     </component>
 

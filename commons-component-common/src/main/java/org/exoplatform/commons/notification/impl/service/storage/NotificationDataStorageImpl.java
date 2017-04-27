@@ -16,14 +16,6 @@
  */
 package org.exoplatform.commons.notification.impl.service.storage;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.jcr.*;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
@@ -38,6 +30,16 @@ import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
+import javax.jcr.Item;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Session;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class NotificationDataStorageImpl extends AbstractService implements NotificationDataStorage {
   private static final Log         LOG              = ExoLogger.getLogger(NotificationDataStorageImpl.class);
@@ -235,7 +237,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     return it;
   }
 
-  private NotificationInfo fillModel(Node node) throws Exception {
+  public NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
     if(!node.hasProperty(EXO_LAST_MODIFIED_DATE)) {
       if(node.isNodeType(EXO_MODIFY)) {

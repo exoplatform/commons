@@ -110,7 +110,7 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
         //fill WebNotifEntity with data from notification
         webNotifEntity.setType(notification.getKey().getId());
         webNotifEntity.setText(notification.getTitle());
-        webNotifEntity.setSender(notification.getFrom().isEmpty() ? notification.getValueOwnerParameter("sender") : notification.getFrom());
+        webNotifEntity.setSender(notification.getFrom());
         webNotifEntity.setOwner(notification.getTo());
         webNotifEntity.setCreationDate(notification.getDateCreated());
 

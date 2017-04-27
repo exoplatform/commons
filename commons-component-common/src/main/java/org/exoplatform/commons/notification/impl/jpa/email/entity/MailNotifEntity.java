@@ -4,6 +4,7 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 
 import javax.persistence.*;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -105,6 +106,9 @@ public class MailNotifEntity {
   }
 
   public void addMailDigestSent(MailDigestEntity digestSent) {
+    if (this.digestSent == null) {
+      this.digestSent = new HashSet<MailDigestEntity>();
+    }
     this.digestSent.add(digestSent);
   }
 

@@ -43,7 +43,8 @@ import java.util.List;
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com May
  * 31, 2012
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test-configuration.xml") })
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test-configuration.xml") })
 
 public class UpgradeProductTest extends BaseCommonsTestCase {
 
@@ -118,9 +119,9 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   }
 
   public void testProcessUpgrade() throws PathNotFoundException,
-                                  RepositoryException,
-                                  RepositoryConfigurationException,
-                                  MissingProductInformationException {
+      RepositoryException,
+      RepositoryConfigurationException,
+      MissingProductInformationException {
 
     ProductInformations prodInfo = (ProductInformations) container.getComponentInstanceOfType(ProductInformations.class);
 
@@ -138,7 +139,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
     // Verify upgrade portal plugin: only upgrade from version 0
     assertEquals(portalPrevVersion.equals("0"),
-                 versionLabels.contains(portalVersion + "-ZERO-SNAPSHOT"));
+        versionLabels.contains(portalVersion + "-ZERO-SNAPSHOT"));
     assertEquals(portalPrevVersion.equals("0"), versionLabels.contains(portalVersion + "-ZERO"));
     assertEquals(portalPrevVersion.equals("0"), upgradeNode.hasNode("upgradeFromZERO"));
 
@@ -147,7 +148,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     assertEquals(!ecmsPrevVersion.equals("0"), versionLabels.contains(ecmsVersion + "-X"));
     assertEquals(!ecmsPrevVersion.equals("0"), upgradeNode.hasNode("upgradeFrom" + ecmsPrevVersion));
   }
-  
+
   public void testUpgradeStatus() {
     InitParams params;
     ValueParam param;
@@ -193,7 +194,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   }
 
   private static Node getUpgradeProductTestNode() throws RepositoryException,
-                                                 RepositoryConfigurationException {
+      RepositoryConfigurationException {
 
     PortalContainer container = PortalContainer.getInstance();
 

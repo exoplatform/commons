@@ -285,7 +285,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     return null;
   }
 
-  private MessageInfo getMessageInfo(Node messageInfoNode) {
+  public MessageInfo getMessageInfo(Node messageInfoNode) {
     try {
       String messageJson = getDataJson(messageInfoNode);
       JSONObject object = new JSONObject(messageJson);

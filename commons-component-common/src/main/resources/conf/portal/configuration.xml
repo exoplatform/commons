@@ -5,10 +5,6 @@
 
   <component>
     <key>org.exoplatform.commons.api.settings.SettingService</key>
-    <type>org.exoplatform.settings.jpa.cache.RDBMSCacheSettingServiceImpl</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
   </component>
 
@@ -48,9 +44,65 @@
   <component profiles="all">
     <type>org.exoplatform.settings.migration.SettingsMigration</type>
   </component>
-  <!--<component>-->
-    <!--<type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>-->
-  <!--</component>-->
+
+  <component profiles="all">
+    <type>org.exoplatform.commons.notification.impl.migration.MailNotificationsMigration</type>
+  </component>
+
+  <component profiles="all">
+    <type>org.exoplatform.commons.notification.impl.migration.WebNotificationsMigration</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.JPANotificationDataStorage</type>
+  </component>
+
+  <component profiles="all">
+    <type>org.exoplatform.commons.notification.NotificationConfiguration</type>
+    <init-params>
+      <value-param>
+        <name>workspace</name>
+        <value>portal-system</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component profiles="all">
+    <key>org.exoplatform.commons.api.notification.service.QueueMessage</key>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl</type>
+    <init-params>
+      <value-param>
+        <name>numberOfMailPerBatch</name> <!-- Max number of mails to send in the configured period of time -->
+        <value>${conf.notification.service.QueueMessage.numberOfMailPerBatch:30}</value>
+      </value-param>
+      <value-param>
+        <name>period</name><!-- The interval in seconds between two executions of the send mail job -->
+        <value>${conf.notification.service.QueueMessage.period:60}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
+  </component>
+
+  <component profiles="all">
+    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
+    <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
+  </component>
+
+  <component profiles="all">
+    <key>org.exoplatform.commons.api.notification.channel.ChannelManager</key>
+    <type>org.exoplatform.commons.notification.channel.ChannelManagerImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl</type>
+  </component>
 
   <component>
     <key>org.exoplatform.commons.api.event.EventManager</key>
@@ -319,6 +371,37 @@
             <field name="replicated"><boolean>true</boolean></field>
           </object>
         </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
+    <component-plugin>
+      <name>bind.datasource</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.naming.BindReferencePlugin</type>
+      <init-params>
+        <value-param>
+          <name>bind-name</name>
+          <value>java:/comp/env/exo-jpa_portal</value>
+        </value-param>
+        <value-param>
+          <name>class-name</name>
+          <value>javax.sql.DataSource</value>
+        </value-param>
+        <value-param>
+          <name>factory</name>
+          <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+        </value-param>
+        <properties-param>
+          <name>ref-addresses</name>
+          <description>ref-addresses</description>
+          <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+          <property name="url" value="jdbc:hsqldb:mem:db1" />
+          <property name="username" value="sa" />
+          <property name="password" value="" />
+        </properties-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>

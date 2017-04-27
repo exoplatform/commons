@@ -107,7 +107,6 @@
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_ID"/>
       </column>
       <column name="NTF_SENDER" type="NVARCHAR(550)">
-        <constraints nullable="false"/>
       </column>
       <column name="NTF_TYPE" type="NVARCHAR(550)">
         <constraints nullable="false"/>
@@ -190,7 +189,6 @@
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIF_ID"/>
       </column>
       <column name="NTF_SENDER" type="NVARCHAR(550)">
-        <constraints nullable="false"/>
       </column>
       <column name="NTF_TYPE" type="NVARCHAR(550)">
         <constraints nullable="false"/>
