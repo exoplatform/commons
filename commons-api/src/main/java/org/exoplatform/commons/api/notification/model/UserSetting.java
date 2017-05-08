@@ -16,18 +16,13 @@
  */
 package org.exoplatform.commons.api.notification.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.container.PortalContainer;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * User setting notification
@@ -100,14 +95,16 @@ public class UserSetting {
    * @return
    */
   public List<String> getChannelActives() {
-    return channelActives;
+
+    return channelActives == null ? new ArrayList<String>() : channelActives;
   }
   
   /**
    * @return
    */
   public boolean isChannelActive(String channelId) {
-    return channelActives.contains(channelId);
+
+    return channelActives != null && channelActives.contains(channelId);
   }
 
   /**
@@ -115,6 +112,9 @@ public class UserSetting {
    */
   public void setChannelActive(String channelId) {
     if(!isChannelActive(channelId)) {
+      if (channelActives == null) {
+        channelActives = new ArrayList<String>();
+      }
       channelActives.add(channelId);
     }
   }
@@ -132,6 +132,9 @@ public class UserSetting {
    * @param channelActives
    */
   public void setChannelActives(List<String> channelActives) {
+    if (this.channelActives == null) {
+      this.channelActives = new ArrayList<String>();
+    }
     this.channelActives = channelActives;
   }
 
