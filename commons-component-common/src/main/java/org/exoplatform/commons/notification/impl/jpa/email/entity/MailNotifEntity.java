@@ -30,21 +30,21 @@ import java.util.Set;
 })
 public class MailNotifEntity {
   @Id
-  @Column(name = "NTF_EMAIL_NOTIF_ID")
+  @Column(name = "EMAIL_NOTIF_ID")
   @SequenceGenerator(name="SEQ_NTF_EMAIL_NOTIF", sequenceName="SEQ_NTF_EMAIL_NOTIF")
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_NTF_EMAIL_NOTIF")
   private long id;
 
-  @Column(name = "NTF_SENDER")
+  @Column(name = "SENDER")
   private String sender;
 
-  @Column(name = "NTF_TYPE")
+  @Column(name = "TYPE")
   private String type;
 
-  @Column(name = "NTF_CREATION_DATE")
+  @Column(name = "CREATION_DATE")
   private Calendar creationDate;
 
-  @Column(name = "NTF_ORDER")
+  @Column(name = "SENDING_ORDER")
   private int order;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "mailNotification")

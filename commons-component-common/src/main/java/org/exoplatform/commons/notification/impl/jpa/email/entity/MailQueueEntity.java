@@ -21,25 +21,25 @@ public class MailQueueEntity {
   @GeneratedValue(strategy= GenerationType.AUTO, generator="SEQ_NTF_EMAIL_QUEUE")
   private long id;
 
-  @Column(name = "EMAIL_CREATION_DATE")
+  @Column(name = "CREATION_DATE")
   private Long creationDate;
 
-  @Column(name = "EMAIL_TYPE")
+  @Column(name = "TYPE")
   private String type;
 
-  @Column(name = "EMAIL_FROM")
+  @Column(name = "SENDER")
   private String from;
 
-  @Column(name = "EMAIL_TO")
+  @Column(name = "RECEIVER")
   private String to;
 
-  @Column(name = "EMAIL_SUBJECT")
+  @Column(name = "SUBJECT")
   private String subject;
 
-  @Column(name = "EMAIL_BODY")
+  @Column(name = "BODY")
   private String body;
 
-  @Column(name = "EMAIL_FOOTER")
+  @Column(name = "FOOTER")
   private String footer;
 
   public long getId() {

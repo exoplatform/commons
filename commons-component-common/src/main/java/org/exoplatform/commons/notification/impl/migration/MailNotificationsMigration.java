@@ -1,12 +1,12 @@
 package org.exoplatform.commons.notification.impl.migration;
 
-import org.exoplatform.commons.api.notification.service.QueueMessage;
+import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.cluster.StartableClusterAware;
 import org.exoplatform.commons.notification.impl.jpa.email.JPANotificationDataStorage;
 import org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl;
-import org.exoplatform.commons.notification.impl.service.QueueMessageImpl;
 import org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.StringCommonUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -16,11 +16,13 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.scheduler.JobSchedulerService;
 import org.jgroups.util.DefaultThreadFactory;
+import org.json.JSONObject;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,7 +40,6 @@ public class MailNotificationsMigration implements StartableClusterAware {
 
   //JCR storage
   private NotificationDataStorageImpl jcrNotificationDataStorage;
-  private QueueMessage jcrQueueMessage;
 
   private ExecutorService executorServiceMail;
   private ExecutorService executorServiceQueue;
@@ -49,11 +50,10 @@ public class MailNotificationsMigration implements StartableClusterAware {
   private static Boolean isMailNotifsMigrated = false;
 
   public MailNotificationsMigration( NotificationDataStorageImpl jcrNotificationDataStorage, JPANotificationDataStorage jpaNotificationDataStorage,
-                                     JPAQueueMessageImpl jpaQueueMessage, QueueMessage jcrQueueMessage) {
+                                     JPAQueueMessageImpl jpaQueueMessage) {
     this.jpaNotificationDataStorage = jpaNotificationDataStorage;
     this.jpaQueueMessage = jpaQueueMessage;
     this.jcrNotificationDataStorage = jcrNotificationDataStorage;
-    this.jcrQueueMessage = jcrQueueMessage;
 
     schedulerService = CommonsUtils.getService(JobSchedulerService.class);
 
@@ -175,8 +175,36 @@ public class MailNotificationsMigration implements StartableClusterAware {
     NodeIterator iterator = getMessageInfoNodes();
     while (iterator.hasNext()) {
       Node node = iterator.nextNode();
-      jpaQueueMessage.put(((QueueMessageImpl)jcrQueueMessage).getMessageInfo(node));
+      jpaQueueMessage.put(getMessageInfo(node));
     }
+  }
+
+  private MessageInfo getMessageInfo(Node node) {
+    try {
+      String messageJson = getDataJson(node);
+      JSONObject object = new JSONObject(messageJson);
+      MessageInfo info = new MessageInfo();
+      info.pluginId(object.optString("pluginId"))
+          .from(object.getString("from"))
+          .to(object.getString("to"))
+          .subject(object.getString("subject"))
+          .body(object.getString("body"))
+          .footer(object.optString("footer"))
+          .setCreatedTime(object.getLong("createdTime"));
+      //
+      return info;
+    } catch (Exception e) {
+      LOG.warn("Failed to map message between node and model.");
+      LOG.debug(e.getMessage(), e);
+    }
+    return null;
+  }
+
+  private String getDataJson(Node node) throws Exception {
+    Node fileNode = node.getNode("datajson");
+    Node nodeContent = fileNode.getNode("jcr:content");
+    InputStream stream = nodeContent.getProperty("jcr:data").getStream();
+    return StringCommonUtils.decompress(stream);
   }
 
   private NodeIterator getMessageInfoNodes() {

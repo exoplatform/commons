@@ -63,24 +63,24 @@ import java.util.Set;
 })
 public class WebNotifEntity {
   @Id
-  @Column(name = "NTF_WEB_NOTIF_ID")
+  @Column(name = "WEB_NOTIF_ID")
   @SequenceGenerator(name="SEQ_NTF_WEB_NOTIFS", sequenceName="SEQ_NTF_WEB_NOTIFS")
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_NTF_WEB_NOTIFS")
   private long id;
 
-  @Column(name = "NTF_SENDER")
+  @Column(name = "SENDER")
   private String sender;
 
-  @Column(name = "NTF_TYPE")
+  @Column(name = "TYPE")
   private String type;
 
-  @Column(name = "NTF_CREATION_DATE")
+  @Column(name = "CREATION_DATE")
   private Calendar creationDate;
 
-  @Column(name = "NTF_OWNER")
+  @Column(name = "OWNER")
   private String owner;
 
-  @Column(name = "NTF_TEXT")
+  @Column(name = "TEXT")
   private String text;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "webNotification")

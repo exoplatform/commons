@@ -26,6 +26,8 @@ import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.*;
 import org.exoplatform.commons.event.impl.EventManagerImpl;
 import org.exoplatform.services.listener.Event;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.settings.jpa.dao.SettingContextDAO;
 import org.exoplatform.settings.jpa.dao.SettingScopeDAO;
 import org.exoplatform.settings.jpa.dao.SettingsDAO;
@@ -47,6 +49,8 @@ import static org.exoplatform.settings.jpa.EntityConverter.convertScopeToScopeEn
  */
 public class JPASettingServiceImpl implements SettingService {
 
+  private static final Log LOG                   = ExoLogger.getLogger(JPASettingServiceImpl.class);
+
   private SettingsDAO settingsDAO;
   private SettingContextDAO settingContextDAO;
   private SettingScopeDAO settingScopeDAO;
@@ -66,8 +70,14 @@ public class JPASettingServiceImpl implements SettingService {
   @Override
   @ExoTransactional
   public void set(Context context, Scope scope, String key, SettingValue<?> value) {
-    ContextEntity contextEntity = settingContextDAO.getContext(convertContextToContextEntity(context));
+    ContextEntity c = convertContextToContextEntity(context);
+    ContextEntity contextEntity = settingContextDAO.getContext(c);
     if (contextEntity == null) {
+      if (c == null) {
+        LOG.info("=== contextEntity not found, because null ===");
+      } else {
+        LOG.info("=== contextEntity not found, with contextType = " + c.getType() + "  and contextName = " + c.getName());
+      }
       contextEntity = settingContextDAO.create(convertContextToContextEntity(context));
     }
     ScopeEntity scopeEntity = settingScopeDAO.getScope(convertScopeToScopeEntity(scope));

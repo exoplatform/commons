@@ -16,25 +16,25 @@ import java.util.Calendar;
 @Table(name = "NTF_WEB_NOTIFS_USERS")
 public class WebUsersEntity {
   @Id
-  @Column(name = "NTF_WEB_NOTIFS_USERS_ID")
+  @Column(name = "WEB_NOTIFS_USERS_ID")
   @SequenceGenerator(name="SEQ_NTF_WEB_USERS", sequenceName="SEQ_NTF_WEB_USERS")
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_NTF_WEB_USERS")
   private long id;
 
   @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "NTF_WEB_NOTIF_ID")
+  @JoinColumn(name = "WEB_NOTIF_ID")
   private WebNotifEntity webNotifications;
 
-  @Column(name = "NTF_RECEIVER")
+  @Column(name = "RECEIVER")
   private String receiver;
 
-  @Column(name = "NTF_UPDATE_DATE")
+  @Column(name = "UPDATE_DATE")
   private Calendar updateDate;
 
-  @Column(name = "NTF_READ")
+  @Column(name = "READ")
   private boolean read;
 
-  @Column(name = "NTF_SHOW_POPOVER")
+  @Column(name = "SHOW_POPOVER")
   private boolean showPopover;
 
   public long getId() {

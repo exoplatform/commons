@@ -31,19 +31,19 @@ import javax.persistence.*;
 @Table(name = "NTF_WEB_NOTIFS_PARAMS")
 public class WebParamsEntity {
   @Id
-  @Column(name = "NTF_WEB_NOTIF_PARAMS_ID")
+  @Column(name = "WEB_NOTIF_PARAMS_ID")
   @SequenceGenerator(name="SEQ_NTF_WEB_PARAMS", sequenceName="SEQ_NTF_WEB_PARAMS")
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_NTF_WEB_PARAMS")
   private long id;
 
-  @Column(name = "NTF_PARAM_NAME")
+  @Column(name = "PARAM_NAME")
   private String name;
 
-  @Column(name = "NTF_PARAM_VALUE")
+  @Column(name = "PARAM_VALUE")
   private String value;
 
   @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "NTF_WEB_NOTIF_ID")
+  @JoinColumn(name = "WEB_NOTIF_ID")
   private WebNotifEntity webNotification;
 
   public long getId() {

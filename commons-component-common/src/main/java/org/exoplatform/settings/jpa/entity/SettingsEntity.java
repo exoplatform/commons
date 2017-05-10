@@ -53,43 +53,27 @@ import javax.persistence.*;
     @NamedQuery(name = "commons.getUserSettingsWithDeactivate", query = "SELECT s FROM SettingsEntity s " +
         "WHERE (s.context.name= :user) " +
         "AND (s.name= :isActive AND s.value='') " +
-        "OR (s.name= :isEnabled AND s.value IS NOT NULL AND s.value='false') "),
-//    @NamedQuery(name = "commons.getUserSettingsForDigest", query = "SELECT s1 FROM SettingsEntity s1 " +
-////        "WHERE s1.id IN " +
-////        "(SELECT s2.id FROM SettingsEntity s2 WHERE s2.name= :exoIsActive AND s2.value LIKE :emailChannel " +
-////        "AND s2.id IN " +
-////        "(SELECT s3.id FROM SettingsEntity s3 WHERE s3.name= :exoIsEnabled AND (s3.value='true' or s3.value IS NULL)" +
-////        "AND s3.context.type= :contextType))" +
-////        "AND s1.name= :frequency AND s1.value IS NOT NULL ")SELECT s1 FROM SettingsEntity s1 " +
-//        "JOIN  s1 s2 " +
-//        "JOIN  s2 s3 " +
-//        "WHERE s3.name= :exoIsEnabled AND (s3.value='true' or s3.value IS NULL) " +
-//        "AND s3.context.type= :contextType " +
-//        "AND s2.name= :exoIsActive AND s2.value LIKE :emailChannel " +
-//        "AND s1.name= :frequency AND s1.value IS NOT NULL ")
-////        "JOIN (SELECT s2 FROM SettingsEntity s2 WHERE s2.name= :exoIsActive AND s2.value LIKE :emailChannel) AS T1 " +
-////        "JOIN (SELECT s3 FROM SettingsEntity s3 WHERE s3.name= :exoIsEnabled AND (s3.STG_VALUE='true' or s3.STG_VALUE IS NULL)) AS T2 " +
-////        "WHERE s1.name= :frequency AND s1.value IS NOT NULL ")
+        "OR (s.name= :isEnabled AND s.value IS NOT NULL AND s.value='false') ")
 })
 public class SettingsEntity {
   @Id
-  @Column(name = "STG_ID")
+  @Column(name = "SETTING_ID")
   @SequenceGenerator(name="SEQ_STG_SETTINGS_COMMON_ID", sequenceName="SEQ_STG_SETTINGS_COMMON_ID")
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_STG_SETTINGS_COMMON_ID")
   private long id;
 
-  @Column(name = "STG_NAME")
+  @Column(name = "NAME")
   private String name;
 
-  @Column(name = "STG_VALUE")
+  @Column(name = "VALUE")
   private String value;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "STG_CONTEXT")
+  @JoinColumn(name = "CONTEXT_ID")
   private ContextEntity context;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "STG_SCOPE")
+  @JoinColumn(name = "SCOPE_ID")
   private ScopeEntity scope;
 
 

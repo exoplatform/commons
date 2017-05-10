@@ -42,9 +42,8 @@ public class WebNotificationsMigration implements StartableClusterAware {
   private SessionProvider sProvider;
   private NodeHierarchyCreator nodeHierarchyCreator;
   private OrganizationService organizationService;
+  private static List<String> allUsers = new LinkedList<String>();
 
-  private static Boolean isWebNotifsMigrated = false;
-  private static List<String> users = new LinkedList<String>();
 
   public WebNotificationsMigration(JPAWebNotificationStorage jpaWebNotificationStorage, WebNotificationStorageImpl jcrWebNotificationStorage) {
     this.jpaWebNotificationStorage = jpaWebNotificationStorage;
@@ -68,47 +67,48 @@ public class WebNotificationsMigration implements StartableClusterAware {
     nodeHierarchyCreator = (NodeHierarchyCreator) container.getComponentInstanceOfType(NodeHierarchyCreator.class);
     try {
       sProvider = SessionProvider.createSystemProvider();
-      ListAccess<User> list = organizationService.getUserHandler().findAllUsers();
-      for (User user : list.load(0, list.getSize())) {
-        users.add(user.getUserName());
-      }
     } catch (Exception e) {
       LOG.error("Error while getting Notification nodes for Notifications migration - Cause : " + e.getMessage(), e);
       return;
     }
-    if (!hasWebNotifDataToMigrate()) {
-      LOG.info("No Web notification data to migrate from JCR to RDBMS");
-      return;
-    }
-    //migration of mail notifications data from JCR to RDBMS is done as a background task
+    //migration of web notifications data from JCR to RDBMS is done as a background task
     getExecutorServiceWeb().submit(new Callable<Void>() {
       @Override
       public Void call() {
+        int pageSize = 20;
+        int current = 0;
         try {
+          ListAccess<User> allUsersListAccess = organizationService.getUserHandler().findAllUsers();
           ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+          int totalUsers = allUsersListAccess.getSize();
+          LOG.info("    Number of users = " + totalUsers);
+          User[] users;
           LOG.info("=== Start migration of Web Notifications data from JCR");
           long startTime = System.currentTimeMillis();
-          for (String userId : users) {
-            migrateWebNotifDataOfUser(nodeHierarchyCreator.getUserApplicationNode(sProvider, userId));
-          }
+          do {
+            LOG.info("    Progression of users web notifications migration : " + current + "/" + totalUsers);
+            if (current + pageSize > totalUsers) {
+              pageSize = totalUsers - current;
+            }
+            users = allUsersListAccess.load(current, pageSize);
+            for (User user : users) {
+              String userName = user.getUserName();
+              if (!hasWebNotifDataToMigrate(userName)) {
+                LOG.info("No Web notification data to migrate from JCR to RDBMS for user: " + userName);
+                continue;
+              }
+              migrateWebNotifDataOfUser(nodeHierarchyCreator.getUserApplicationNode(sProvider, userName));
+              allUsers.add(userName);
+
+            }
+            current += users.length;
+          } while(users != null && users.length > 0);
           long endTime = System.currentTimeMillis();
           LOG.info("=== Migration of Web Notification data done in " + (endTime - startTime) + " ms");
-          isWebNotifsMigrated = true;
         } catch (Exception e) {
           LOG.error("Error while migrating Web Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
-          isWebNotifsMigrated = false;
         }
-        try {
-          if (isWebNotifsMigrated) {
-            LOG.info("=== Start cleaning Web notifications data from JCR");
-            long startTime = System.currentTimeMillis();
-            deleteJcrWebNotifications();
-            long endTime = System.currentTimeMillis();
-            LOG.info("=== Web notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-          }
-        } catch (Exception e) {
-          LOG.error("Error while cleaning Web notifications JCR data to RDBMS - Cause : " + e.getMessage(), e);
-        }
+        deleteJcrWebNotifications();
         return null;
       }
     });
@@ -128,27 +128,33 @@ public class WebNotificationsMigration implements StartableClusterAware {
       jpaWebNotificationStorage.save(jcrWebNotificationStorage.fillModel(node));
   }
 
-  private void deleteJcrWebNotifications() throws Exception {
-    for (String userId : users) {
+  private void deleteJcrWebNotifications() {
+    LOG.info("=== Start Cleaning Web Notifications data from JCR");
+    long startTime = System.currentTimeMillis();
+    for (String userId : allUsers) {
+      try {
         Node node = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId).getNode("notifications").getNode("web");
         node.remove();
         node.getSession().save();
+      } catch (Exception e) {
+        LOG.error("Error while cleaning Web notifications JCR data to RDBMS of user: " + userId + " - Cause : " + e.getMessage(), e);
+      }
     }
+    long endTime = System.currentTimeMillis();
+    LOG.info("=== Web notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
   }
 
-  private boolean hasWebNotifDataToMigrate() {
-    for (String userId : users) {
-      try {
-        Node node = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId).getNode("notifications");
-        if (node.hasNode("web")) {
-          return true;
-        }
-      } catch (PathNotFoundException e) {
-        return false;
-      } catch (Exception e) {
-        LOG.error("Error while verifying if web notification nodes exist in JCR - Cause : " + e.getMessage(), e);
+  private boolean hasWebNotifDataToMigrate(String userName) {
+    try {
+      Node node = nodeHierarchyCreator.getUserApplicationNode(sProvider, userName).getNode("notifications");
+      if (node.hasNode("web")) {
         return true;
       }
+    } catch (PathNotFoundException e) {
+      return false;
+    } catch (Exception e) {
+      LOG.error("Error while verifying if web notification nodes exist in JCR - Cause : " + e.getMessage(), e);
+      return true;
     }
     return false;
   }

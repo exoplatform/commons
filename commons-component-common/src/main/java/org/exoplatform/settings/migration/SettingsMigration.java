@@ -1,5 +1,6 @@
 package org.exoplatform.settings.migration;
 
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
@@ -61,28 +62,28 @@ public class SettingsMigration implements StartableClusterAware {
       getExecutorService().submit(new Callable<Void>() {
         @Override
         public Void call() throws Exception {
-          try {
-            LOG.info("=== Start cleaning Settings data from JCR");
-            long startTime = System.currentTimeMillis();
-            deleteJcrSettings();
-            long endTime = System.currentTimeMillis();
-            LOG.info("=== Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-
-          } catch (Exception e) {
-            LOG.error("Error while cleaning Settings JCR data to RDBMS - Cause : " + e.getMessage(), e);
-          }
+          LOG.info("=== Start cleaning Settings data from JCR");
+          long startTime = System.currentTimeMillis();
+          deleteJcrSettings();
+          long endTime = System.currentTimeMillis();
+          LOG.info("=== Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
           return null;
         }
       });
     }
   }
 
-  private void deleteJcrSettings() {
-    new SynchronizationTask<Boolean>() {
+  private Boolean deleteJcrSettings() {
+    return new SynchronizationTask<Boolean>() {
       @Override
       protected Boolean execute(SessionContext ctx) {
         try {
-          ctx.getSession().remove(ctx.getSession().findByPath(SettingsRoot.class, "settings"));
+          for (String scope : getGlobalSettings()) {
+            deleteGlobalSettings(scope);
+          }
+          for (String user : getUserSettings()) {
+            deleteUserSettings(user);
+          }
           return true;
         } catch (Exception e) {
           return false;
@@ -122,45 +123,84 @@ public class SettingsMigration implements StartableClusterAware {
     return new SynchronizationTask<Set<String>>() {
       @Override
       protected Set<String> execute(SessionContext ctx) {
-
         SimpleContextEntity userSettings = ctx.getSession().findByPath(SimpleContextEntity.class, "settings/user/" + user);
         return userSettings.getScopes().keySet();
       }
     }.executeWith(chromatticLifeCycle);
   }
 
-  private Boolean migrateGlobalSettingsOfGlobalSpecificScopes(String scope) {
-    return new SynchronizationTask<Boolean>() {
+  private ScopeEntity getSpecificScope(String scope) {
+    return new SynchronizationTask<ScopeEntity>() {
       @Override
-      protected Boolean execute(SessionContext ctx) {
-
-        // Root
+      protected ScopeEntity execute(SessionContext ctx) {
         ScopeEntity globalSettings = ctx.getSession().findByPath(ScopeEntity.class, "settings/global/" + scope);
-        for (String instance : globalSettings.getInstances().keySet()) {
-          for (String key : globalSettings.getInstance(instance).getProperties().keySet()) {
-            jpaSettingService.set(Context.GLOBAL, getScope(scope, instance), key, new SettingValue<>(globalSettings.getInstance(instance).getValue(key)));
-          }
-        }
-        return true;
+        return globalSettings;
       }
     }.executeWith(chromatticLifeCycle);
   }
 
-  private Boolean migrateUserSettingsOfSpecificScope(String user, String scope) {
+  @ExoTransactional
+  private Boolean migrateGlobalSettingsOfGlobalSpecificScopes(String scope) {
+    ScopeEntity scopeEntity = getSpecificScope(scope);
+    for (String instance : scopeEntity.getInstances().keySet()) {
+      for (String key : scopeEntity.getInstance(instance).getProperties().keySet()) {
+        jpaSettingService.set(Context.GLOBAL, getScope(scope, instance), key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+      }
+    }
+    return true;
+  }
+
+  private Boolean deleteGlobalSettings(String scope) {
     return new SynchronizationTask<Boolean>() {
       @Override
       protected Boolean execute(SessionContext ctx) {
-
-        // Root
-        ScopeEntity globalSettings = ctx.getSession().findByPath(ScopeEntity.class, "settings/user/" + user + "/" + scope);
-        for (String instance : globalSettings.getInstances().keySet()) {
-          for (String key : globalSettings.getInstance(instance).getProperties().keySet()) {
-            jpaSettingService.set(Context.GLOBAL, getScope(scope, instance), key, new SettingValue<>(globalSettings.getInstance(instance).getValue(key)));
-          }
+        try {
+          ctx.getSession().remove(ctx.getSession().findByPath(ScopeEntity.class, "settings/global/" + scope));
+          ctx.getSession().save();
+          return true;
+        } catch (Exception e) {
+          LOG.error("Cannot remove JCR settings of scope: " + scope + " - cause: " + e.getCause(), e);
+          return false;
         }
-        return true;
       }
     }.executeWith(chromatticLifeCycle);
+  }
+
+  private Boolean deleteUserSettings(String user) {
+    return new SynchronizationTask<Boolean>() {
+      @Override
+      protected Boolean execute(SessionContext ctx) {
+        try {
+          ctx.getSession().remove(ctx.getSession().findByPath(SimpleContextEntity.class, "settings/user/" + user));
+          ctx.getSession().save();
+          return true;
+        } catch (Exception e) {
+          LOG.error("Cannot remove JCR settings of user: " + user + " - cause: " + e.getCause(), e);
+          return false;
+        }
+      }
+    }.executeWith(chromatticLifeCycle);
+  }
+
+  private ScopeEntity getScopeOfUser(String user, String scope) {
+    return new SynchronizationTask<ScopeEntity>() {
+      @Override
+      protected ScopeEntity execute(SessionContext ctx) {
+        ScopeEntity globalSettings = ctx.getSession().findByPath(ScopeEntity.class, "settings/user/" + user + "/" + scope);
+        return globalSettings;
+      }
+    }.executeWith(chromatticLifeCycle);
+  }
+
+  @ExoTransactional
+  private Boolean migrateUserSettingsOfSpecificScope(String user, String scope) {
+    ScopeEntity scopeEntity = getScopeOfUser(user, scope);
+    for (String instance : scopeEntity.getInstances().keySet()) {
+      for (String key : scopeEntity.getInstance(instance).getProperties().keySet()) {
+        jpaSettingService.set(Context.USER.id(user), getScope(scope, instance), key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+      }
+    }
+    return true;
   }
 
   private Boolean hasDataToMigrate() {
@@ -191,32 +231,42 @@ public class SettingsMigration implements StartableClusterAware {
     }.executeWith(chromatticLifeCycle);
   }
 
-  public Boolean migrateGlobalSettingsOfGlobalScopes(String scope) {
-    return new SynchronizationTask<Boolean>() {
+  public ScopeEntity getGlobalScope(String scope) {
+    return new SynchronizationTask<ScopeEntity>() {
       @Override
-      protected Boolean execute(SessionContext ctx) {
-
+      protected ScopeEntity execute(SessionContext ctx) {
         ScopeEntity globalSettings = ctx.getSession().findByPath(ScopeEntity.class, "settings/global/" + scope);
-        for (String key : globalSettings.getProperties().keySet()) {
-          jpaSettingService.set(Context.GLOBAL, getScope(scope, null), key, new SettingValue<>(globalSettings.getValue(key)));
-        }
-        return true;
+        return globalSettings;
       }
     }.executeWith(chromatticLifeCycle);
   }
 
-  public Boolean migrateUserSettingsOfGlobalScope(String user, String scope) {
-    return new SynchronizationTask<Boolean>() {
-      @Override
-      protected Boolean execute(SessionContext ctx) {
+  @ExoTransactional
+  public Boolean migrateGlobalSettingsOfGlobalScopes(String scope) {
+    ScopeEntity scopeEntity = getGlobalScope(scope);
+    for (String key : scopeEntity.getProperties().keySet()) {
+      jpaSettingService.set(Context.GLOBAL, getScope(scope, null), key, new SettingValue<>(scopeEntity.getValue(key)));
+    }
+    return true;
+  }
 
+  public ScopeEntity getGlobalScopeOfUser(String user, String scope) {
+    return new SynchronizationTask<ScopeEntity>() {
+      @Override
+      protected ScopeEntity execute(SessionContext ctx) {
         ScopeEntity globalSettings = ctx.getSession().findByPath(ScopeEntity.class, "settings/user/" + user + "/" + scope);
-        for (String key : globalSettings.getProperties().keySet()) {
-          jpaSettingService.set(Context.GLOBAL, getScope(scope, null), key, new SettingValue<>(globalSettings.getValue(key)));
-        }
-        return true;
+        return globalSettings;
       }
     }.executeWith(chromatticLifeCycle);
+  }
+
+  @ExoTransactional
+  public Boolean migrateUserSettingsOfGlobalScope(String user, String scope) {
+    ScopeEntity scopeEntity = getGlobalScopeOfUser(user, scope);
+    for (String key : scopeEntity.getProperties().keySet()) {
+      jpaSettingService.set(Context.USER.id(user), getScope(scope, null), key, new SettingValue<>(scopeEntity.getValue(key)));
+    }
+    return true;
   }
 
   private Scope getScope(String scope, String id) {

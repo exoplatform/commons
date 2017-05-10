@@ -19,19 +19,19 @@ import javax.persistence.*;
 })
 public class MailDigestEntity {
   @Id
-  @Column(name = "NTF_EMAIL_NOTIF_DIGEST_ID")
+  @Column(name = "EMAIL_NOTIF_DIGEST_ID")
   @SequenceGenerator(name="SEQ_NTF_EMAIL_DIGEST", sequenceName="SEQ_NTF_EMAIL_DIGEST")
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_NTF_EMAIL_DIGEST")
   private long id;
 
   @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "NTF_EMAIL_NOTIF_ID")
+  @JoinColumn(name = "EMAIL_NOTIF_ID")
   private MailNotifEntity notification;
 
-  @Column(name = "NTF_DIGEST_TYPE")
+  @Column(name = "DIGEST_TYPE")
   private String type;
 
-  @Column(name = "NTF_DIGEST_TO_USER")
+  @Column(name = "DIGEST_TO_USER")
   private String user;
 
   public long getId() {

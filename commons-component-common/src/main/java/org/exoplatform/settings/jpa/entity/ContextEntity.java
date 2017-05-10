@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @Entity(name = "ContextEntity")
 @ExoEntity
-@Table(name = "STG_CONTEXT")
+@Table(name = "STG_CONTEXTS")
 @NamedQueries({
     @NamedQuery(name = "commons.getContext", query = "SELECT c FROM ContextEntity c " +
         "WHERE c.name = :name " +
@@ -23,15 +23,15 @@ import java.util.Set;
 })
 public class ContextEntity {
   @Id
-  @Column(name = "STG_CONTEXT_ID")
+  @Column(name = "CONTEXT_ID")
   @SequenceGenerator(name="SEQ_STG_CONTEXT_COMMON_ID", sequenceName="SEQ_STG_CONTEXT_COMMON_ID")
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_STG_CONTEXT_COMMON_ID")
   private long id;
 
-  @Column(name = "STG_CONTEXT_NAME")
+  @Column(name = "NAME")
   private String name;
 
-  @Column(name = "STG_CONTEXT_TYPE")
+  @Column(name = "TYPE")
   private String type;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "context")

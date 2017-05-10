@@ -81,11 +81,16 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
           || notification.getKey().getId().equals(SPACE_INVITATION_PLUGIN)
           || notification.getKey().getId().equals(REQUEST_JOIN_SPACE_PLUGIN))
           && notification.getOwnerParameter().containsKey(STATUS_PARAMETER)) {
-        String notifId = notification.getTitle().split("data-id=\"")[1].split("\"")[0];
-        webNotifEntity = webNotifDAO.find(Long.parseLong(notifId));
-        Map<String, String> params = notification.getOwnerParameter();
-        params.putIfAbsent("resetNumberOnBadge", "true");
-        notification.setOwnerParameter(params);
+        if (!notification.getTitle().isEmpty()) {
+          String notifId = notification.getTitle().split("data-id=\"")[1].split("\"")[0];
+          try {
+            webNotifEntity = webNotifDAO.find(Long.parseLong(notifId));
+            Map<String, String> params = notification.getOwnerParameter();
+            params.putIfAbsent("resetNumberOnBadge", "true");
+            notification.setOwnerParameter(params);
+          } catch (NumberFormatException e) {
+          }
+        }
       } else if (notification.getKey().getId().equals(ACTIVITY_COMMENT_PLUGIN)) {
         webNotifEntity = webNotifDAO.findWebNotifsOfUserByParam(notification.getTo(),
             ACTIVITY_COMMENT_PLUGIN, notification.getOwnerParameter().get("activityId"), "activityId");

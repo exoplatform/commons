@@ -16,14 +16,14 @@
 
 <!-- SETTINGS -->
   <changeSet author="commons" id="1.0.0-1">
-    <createTable tableName="STG_CONTEXT">
-      <column name="STG_CONTEXT_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+    <createTable tableName="STG_CONTEXTS">
+      <column name="CONTEXT_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_STG_CONTEXT_ID"/>
       </column>
-      <column name="STG_CONTEXT_TYPE" type="NVARCHAR(200)">
+      <column name="TYPE" type="NVARCHAR(200)">
         <constraints nullable="false"/>
       </column>
-      <column name="STG_CONTEXT_NAME" type="NVARCHAR(200)">
+      <column name="NAME" type="NVARCHAR(200)">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -33,14 +33,14 @@
   </changeSet>
 
   <changeSet author="commons" id="1.0.0-2">
-    <createTable tableName="STG_SCOPE">
-      <column name="STG_SCOPE_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+    <createTable tableName="STG_SCOPES">
+      <column name="SCOPE_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_STG_SCOPE_ID"/>
       </column>
-      <column name="STG_SCOPE_TYPE" type="NVARCHAR(200)">
+      <column name="TYPE" type="NVARCHAR(200)">
         <constraints nullable="false"/>
       </column>
-      <column name="STG_SCOPE_NAME" type="NVARCHAR(200)">
+      <column name="NAME" type="NVARCHAR(200)">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -51,13 +51,13 @@
 
   <changeSet author="commons" id="1.0.0-3">
     <createTable tableName="STG_SETTINGS">
-      <column name="STG_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+      <column name="SETTING_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_STG_SETTINGS_ID"/>
       </column>
-      <column name="STG_NAME" type="NVARCHAR(200)"/>
-      <column name="STG_VALUE" type="CLOB"/>
-      <column name="STG_CONTEXT" type="BIGINT"/>
-      <column name="STG_SCOPE" type="BIGINT"/>
+      <column name="NAME" type="NVARCHAR(200)"/>
+      <column name="VALUE" type="CLOB"/>
+      <column name="CONTEXT_ID" type="BIGINT"/>
+      <column name="SCOPE_ID" type="BIGINT"/>
     </createTable>
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
@@ -77,23 +77,23 @@
   </changeSet>
 
   <changeSet author="commons" id="1.0.0-7">
-    <addForeignKeyConstraint baseColumnNames="STG_CONTEXT" baseTableName="STG_SETTINGS"
+    <addForeignKeyConstraint baseColumnNames="CONTEXT_ID" baseTableName="STG_SETTINGS"
                              constraintName="FK_STG_SETTINGS_CONTEXT_01" deferrable="false" initiallyDeferred="false"
                              onDelete="SET NULL" onUpdate="NO ACTION"
-                             referencedColumnNames="STG_CONTEXT_ID" referencedTableName="STG_CONTEXT"/>
+                             referencedColumnNames="CONTEXT_ID" referencedTableName="STG_CONTEXTS"/>
   </changeSet>
   <changeSet author="commons" id="1.0.0-8">
-    <addForeignKeyConstraint baseColumnNames="STG_SCOPE" baseTableName="STG_SETTINGS"
+    <addForeignKeyConstraint baseColumnNames="SCOPE_ID" baseTableName="STG_SETTINGS"
                              constraintName="FK_STG_SETTINGS_SCOPE_01" deferrable="false" initiallyDeferred="false"
                              onDelete="SET NULL" onUpdate="NO ACTION"
-                             referencedColumnNames="STG_SCOPE_ID" referencedTableName="STG_SCOPE"/>
+                             referencedColumnNames="SCOPE_ID" referencedTableName="STG_SCOPES"/>
   </changeSet>
   <changeSet author="commons" id="1.0.0-9">
-    <addUniqueConstraint columnNames="STG_CONTEXT_TYPE, STG_CONTEXT_NAME" tableName="STG_CONTEXT"
+    <addUniqueConstraint columnNames="TYPE, NAME" tableName="STG_CONTEXTS"
                          constraintName="UK_STG_CONTEXT_01"/>
   </changeSet>
   <changeSet author="commons" id="1.0.0-10">
-    <addUniqueConstraint columnNames="STG_SCOPE_TYPE, STG_SCOPE_NAME" tableName="STG_SCOPE"
+    <addUniqueConstraint columnNames="TYPE, NAME" tableName="STG_SCOPES"
                          constraintName="UK_STG_SCOPE_01"/>
   </changeSet>
 
@@ -101,18 +101,18 @@
   <!-- email notifications -->
   <changeSet author="commons" id="1.0.0-11">
     <createTable tableName="NTF_EMAIL_NOTIFS">
-      <column name="NTF_EMAIL_NOTIF_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+      <column name="EMAIL_NOTIF_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_ID"/>
       </column>
-      <column name="NTF_SENDER" type="NVARCHAR(550)">
+      <column name="SENDER" type="NVARCHAR(550)">
       </column>
-      <column name="NTF_TYPE" type="NVARCHAR(550)">
+      <column name="TYPE" type="NVARCHAR(550)">
         <constraints nullable="false"/>
       </column>
-      <column name="NTF_CREATION_DATE" type="TIMESTAMP">
+      <column name="CREATION_DATE" type="TIMESTAMP">
         <constraints nullable="false"/>
       </column>
-      <column name="NTF_ORDER" type="NVARCHAR(550)">
+      <column name="SENDING_ORDER" type="NVARCHAR(550)">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -123,14 +123,14 @@
 
   <changeSet author="commons" id="1.0.0-12">
     <createTable tableName="NTF_EMAIL_NOTIFS_PARAMS">
-      <column name="NTF_EMAIL_NOTIF_PARAMS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+      <column name="EMAIL_NOTIF_PARAMS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_PARAMS_ID"/>
       </column>
-      <column name="NTF_EMAIL_NOTIF_ID" type="BIGINT">
+      <column name="EMAIL_NOTIF_ID" type="BIGINT">
         <!--<constraints nullable="false"/>-->
       </column>
-      <column name="NTF_PARAM_NAME" type="NVARCHAR(550)"/>
-      <column name="NTF_PARAM_VALUE" type="NVARCHAR(550)"/>
+      <column name="PARAM_NAME" type="NVARCHAR(550)"/>
+      <column name="PARAM_VALUE" type="CLOB"/>
     </createTable>
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
@@ -139,14 +139,14 @@
 
   <changeSet author="commons" id="1.0.0-13">
     <createTable tableName="NTF_EMAIL_NOTIFS_DIGEST">
-      <column name="NTF_EMAIL_NOTIF_DIGEST_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+      <column name="EMAIL_NOTIF_DIGEST_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_DIGEST_ID"/>
       </column>
-      <column name="NTF_EMAIL_NOTIF_ID" type="BIGINT">
+      <column name="EMAIL_NOTIF_ID" type="BIGINT">
         <!--<constraints nullable="false"/>-->
       </column>
-      <column name="NTF_DIGEST_TYPE" type="NVARCHAR(550)"/>
-      <column name="NTF_DIGEST_TO_USER" type="NVARCHAR(550)"/>
+      <column name="DIGEST_TYPE" type="NVARCHAR(550)"/>
+      <column name="DIGEST_TO_USER" type="NVARCHAR(550)"/>
     </createTable>
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
@@ -167,37 +167,37 @@
 
 
   <changeSet author="commons" id="1.0.0-17">
-    <addForeignKeyConstraint baseColumnNames="NTF_EMAIL_NOTIF_ID" baseTableName="NTF_EMAIL_NOTIFS_PARAMS"
+    <addForeignKeyConstraint baseColumnNames="EMAIL_NOTIF_ID" baseTableName="NTF_EMAIL_NOTIFS_PARAMS"
                              constraintName="FK_NTF_EMAIL_NOTIFS_PARAMS_01" deferrable="false" initiallyDeferred="false"
                              onDelete="SET NULL" onUpdate="NO ACTION"
-                             referencedColumnNames="NTF_EMAIL_NOTIF_ID" referencedTableName="NTF_EMAIL_NOTIFS"/>
+                             referencedColumnNames="EMAIL_NOTIF_ID" referencedTableName="NTF_EMAIL_NOTIFS"/>
   </changeSet>
 
   <changeSet author="commons" id="1.0.0-18">
-    <addForeignKeyConstraint baseColumnNames="NTF_EMAIL_NOTIF_ID" baseTableName="NTF_EMAIL_NOTIFS_DIGEST"
+    <addForeignKeyConstraint baseColumnNames="EMAIL_NOTIF_ID" baseTableName="NTF_EMAIL_NOTIFS_DIGEST"
                              constraintName="FK_NTF_EMAIL_NOTIFS_DIGEST_01" deferrable="false" initiallyDeferred="false"
                              onDelete="SET NULL" onUpdate="NO ACTION"
-                             referencedColumnNames="NTF_EMAIL_NOTIF_ID" referencedTableName="NTF_EMAIL_NOTIFS"/>
+                             referencedColumnNames="EMAIL_NOTIF_ID" referencedTableName="NTF_EMAIL_NOTIFS"/>
   </changeSet>
 
   <!-- web notifications -->
   <changeSet author="commons" id="1.0.0-19">
     <createTable tableName="NTF_WEB_NOTIFS">
-      <column name="NTF_WEB_NOTIF_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+      <column name="WEB_NOTIF_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIF_ID"/>
       </column>
-      <column name="NTF_SENDER" type="NVARCHAR(550)">
+      <column name="SENDER" type="NVARCHAR(550)">
       </column>
-      <column name="NTF_TYPE" type="NVARCHAR(550)">
+      <column name="TYPE" type="NVARCHAR(550)">
         <constraints nullable="false"/>
       </column>
-      <column name="NTF_CREATION_DATE" type="TIMESTAMP">
+      <column name="CREATION_DATE" type="TIMESTAMP">
         <constraints nullable="false"/>
       </column>
-      <column name="NTF_OWNER" type="NVARCHAR(550)">
+      <column name="OWNER" type="NVARCHAR(550)">
         <constraints nullable="false"/>
       </column>
-      <column name="NTF_TEXT" type="CLOB">
+      <column name="TEXT" type="CLOB">
       </column>
     </createTable>
     <modifySql dbms="mysql">
@@ -207,14 +207,14 @@
 
   <changeSet author="commons" id="1.0.0-20">
     <createTable tableName="NTF_WEB_NOTIFS_PARAMS">
-      <column name="NTF_WEB_NOTIF_PARAMS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+      <column name="WEB_NOTIF_PARAMS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIF_PARAMS_ID"/>
       </column>
-      <column name="NTF_WEB_NOTIF_ID" type="BIGINT">
+      <column name="WEB_NOTIF_ID" type="BIGINT">
         <!--<constraints nullable="false"/>-->
       </column>
-      <column name="NTF_PARAM_NAME" type="NVARCHAR(550)"/>
-      <column name="NTF_PARAM_VALUE" type="NVARCHAR(550)"/>
+      <column name="PARAM_NAME" type="NVARCHAR(550)"/>
+      <column name="PARAM_VALUE" type="CLOB"/>
     </createTable>
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
@@ -223,16 +223,16 @@
 
   <changeSet author="commons" id="1.0.0-21">
     <createTable tableName="NTF_WEB_NOTIFS_USERS">
-      <column name="NTF_WEB_NOTIFS_USERS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+      <column name="WEB_NOTIFS_USERS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIFS_USERS_ID"/>
       </column>
-      <column name="NTF_WEB_NOTIF_ID" type="BIGINT">
+      <column name="WEB_NOTIF_ID" type="BIGINT">
         <!--<constraints nullable="false"/>-->
       </column>
-      <column name="NTF_RECEIVER" type="NVARCHAR(550)"/>
-      <column name="NTF_UPDATE_DATE" type="TIMESTAMP"/>
-      <column name="NTF_READ" type="BOOLEAN"/>
-      <column name="NTF_SHOW_POPOVER" type="BOOLEAN"/>
+      <column name="RECEIVER" type="NVARCHAR(550)"/>
+      <column name="UPDATE_DATE" type="TIMESTAMP"/>
+      <column name="READ" type="BOOLEAN"/>
+      <column name="SHOW_POPOVER" type="BOOLEAN"/>
     </createTable>
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
@@ -253,17 +253,17 @@
 
 
   <changeSet author="commons" id="1.0.0-25">
-    <addForeignKeyConstraint baseColumnNames="NTF_WEB_NOTIF_ID" baseTableName="NTF_WEB_NOTIFS_PARAMS"
+    <addForeignKeyConstraint baseColumnNames="WEB_NOTIF_ID" baseTableName="NTF_WEB_NOTIFS_PARAMS"
                              constraintName="FK_NTF_WEB_NOTIFS_PARAMS_01" deferrable="false" initiallyDeferred="false"
                              onDelete="SET NULL" onUpdate="NO ACTION"
-                             referencedColumnNames="NTF_WEB_NOTIF_ID" referencedTableName="NTF_WEB_NOTIFS"/>
+                             referencedColumnNames="WEB_NOTIF_ID" referencedTableName="NTF_WEB_NOTIFS"/>
   </changeSet>
 
   <changeSet author="commons" id="1.0.0-26">
-    <addForeignKeyConstraint baseColumnNames="NTF_WEB_NOTIF_ID" baseTableName="NTF_WEB_NOTIFS_USERS"
+    <addForeignKeyConstraint baseColumnNames="WEB_NOTIF_ID" baseTableName="NTF_WEB_NOTIFS_USERS"
                              constraintName="FK_NTF_WEB_NOTIFS_USERS_01" deferrable="false" initiallyDeferred="false"
                              onDelete="SET NULL" onUpdate="NO ACTION"
-                             referencedColumnNames="NTF_WEB_NOTIF_ID" referencedTableName="NTF_WEB_NOTIFS"/>
+                             referencedColumnNames="WEB_NOTIF_ID" referencedTableName="NTF_WEB_NOTIFS"/>
   </changeSet>
 
   <!-- email queue -->
@@ -272,13 +272,13 @@
       <column name="EMAIL_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_EMAIL_ID"/>
       </column>
-      <column name="EMAIL_CREATION_DATE" type="BIGINT"/>
-      <column name="EMAIL_TYPE" type="NVARCHAR(550)"/>
-      <column name="EMAIL_FROM" type="NVARCHAR(550)"/>
-      <column name="EMAIL_TO" type="NVARCHAR(550)"/>
-      <column name="EMAIL_SUBJECT" type="NVARCHAR(550)"/>
-      <column name="EMAIL_BODY" type="CLOB"/>
-      <column name="EMAIL_FOOTER" type="NVARCHAR(550)"/>
+      <column name="CREATION_DATE" type="BIGINT"/>
+      <column name="TYPE" type="NVARCHAR(550)"/>
+      <column name="SENDER" type="NVARCHAR(550)"/>
+      <column name="RECEIVER" type="NVARCHAR(550)"/>
+      <column name="SUBJECT" type="NVARCHAR(550)"/>
+      <column name="BODY" type="CLOB"/>
+      <column name="FOOTER" type="NVARCHAR(550)"/>
     </createTable>
     <modifySql dbms="mysql">
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>

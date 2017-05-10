@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @Entity(name = "ScopeEntity")
 @ExoEntity
-@Table(name = "STG_SCOPE")
+@Table(name = "STG_SCOPES")
 @NamedQueries({
     @NamedQuery(name = "commons.getScope", query = "SELECT s FROM ScopeEntity s " +
         "WHERE s.name = :name " +
@@ -24,15 +24,15 @@ import java.util.Set;
 })
 public class ScopeEntity {
   @Id
-  @Column(name = "STG_SCOPE_ID")
+  @Column(name = "SCOPE_ID")
   @SequenceGenerator(name="SEQ_STG_SCOPE_COMMON_ID", sequenceName="SEQ_STG_SCOPE_COMMON_ID")
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_STG_SCOPE_COMMON_ID")
   private long id;
 
-  @Column(name = "STG_SCOPE_NAME")
+  @Column(name = "NAME")
   private String name;
 
-  @Column(name = "STG_SCOPE_TYPE")
+  @Column(name = "TYPE")
   private String type;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "scope")
