@@ -10,19 +10,33 @@ import org.exoplatform.services.log.Log;
  * 10/28/15
  */
 public class ElasticIndexingAuditTrail {
-  public static final String REINDEX_ALL  = "reindex_all";
-  public static final String DELETE_ALL   = "delete_all";
-  public static final String CREATE_INDEX = "create_index";
-  public static final String CREATE_TYPE  = "create_type";
-  public static final String DELETE_TYPE  = "delete_type";
-  public static final String SEARCH_TYPE  = "search_type";
+  public static final String  REINDEX_ALL         = "reindex_all";
 
-  private static final Log   AUDIT_TRAIL  = ExoLogger.getExoLogger("org.exoplatform.es.audittrail");
+  public static final String  DELETE_ALL          = "delete_all";
 
-  private static final char  SEPARATOR    = ';';
-  private static final String LOG_PATTERN = "{}"+StringUtils.repeat(SEPARATOR+"{}",6);
+  public static final String  CREATE_INDEX        = "create_index";
 
-  static boolean isError(Integer httpStatusCode) {
+  public static final String  CREATE_INDEX_ALIAS        = "create_index_alias";
+
+  public static final String  CREATE_TYPE         = "create_type";
+
+  public static final String  DELETE_TYPE         = "delete_type";
+
+  public static final String  REINDEX_TYPE         = "reindex_type";
+
+  public static final String  SEARCH_TYPE         = "search_type";
+
+  public static final String  CREATE_PIPELINE     = "create_pipeline";
+
+  public static final String  CREATE_DOC_PIPELINE = "create_doc_pipeline";
+
+  private static final Log    AUDIT_TRAIL         = ExoLogger.getExoLogger("org.exoplatform.es.audittrail");
+
+  private static final char   SEPARATOR           = ';';
+
+  private static final String LOG_PATTERN         = "{}" + StringUtils.repeat(SEPARATOR + "{}", 6);
+
+  public static boolean isError(Integer httpStatusCode) {
     return (httpStatusCode != null) && ((httpStatusCode < 200) || (httpStatusCode > 299));
   }
 

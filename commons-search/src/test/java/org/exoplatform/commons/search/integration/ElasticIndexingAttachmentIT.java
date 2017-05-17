@@ -17,6 +17,9 @@
 package org.exoplatform.commons.search.integration;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
+import org.json.simple.JSONObject;
+
 import org.exoplatform.commons.search.es.ElasticSearchServiceConnector;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.container.xml.InitParams;
@@ -59,7 +62,7 @@ public class ElasticIndexingAttachmentIT extends BaseElasticsearchIT {
     constructorParams.setProperty("searchType", "attachment");
     constructorParams.setProperty("displayName", "attachment");
     constructorParams.setProperty("index", "test");
-    constructorParams.setProperty("searchFields", "file.content,title");
+    constructorParams.setProperty("searchFields", "attachment.content,title");
     params.addParam(constructorParams);
     return params;
   }
@@ -73,7 +76,22 @@ public class ElasticIndexingAttachmentIT extends BaseElasticsearchIT {
     elasticIndexingClient.sendCreateTypeRequest("test", "attachment", getAttachmentMapping());
     //Then
     assertTrue(typeExists("test", "attachment"));
+  }
 
+  @Test
+  public void testCreateNewPipeline() {
+    //Given
+    elasticIndexingClient.sendCreateIndexRequest("test", "");
+    assertFalse(typeExists("test", "attachment"));
+    elasticIndexingClient.sendCreateTypeRequest("test", "attachment", getAttachmentMapping());
+
+    node.client().admin().indices().prepareRefresh().execute().actionGet();
+    assertTrue(typeExists("test", "attachment"));
+    //When
+    elasticIndexingClient.sendCreateAttachmentPipelineRequest("test", "attachment", "attachment", getAttachmentProcessor());
+    node.client().admin().indices().prepareRefresh().execute().actionGet();
+    //Then
+    assertTrue(pipelineExists("attachment"));
   }
 
   @Test
@@ -81,15 +99,14 @@ public class ElasticIndexingAttachmentIT extends BaseElasticsearchIT {
     //Given
     elasticIndexingClient.sendCreateIndexRequest("test", "");
     elasticIndexingClient.sendCreateTypeRequest("test", "attachment", getAttachmentMapping());
+    elasticIndexingClient.sendCreateAttachmentPipelineRequest("test", "attachment", "attachment", getAttachmentProcessor());
     assertEquals(0, documentNumber());
-    String bulkRequest = "{ \"create\" : { \"_index\" : \"test\", \"_type\" : \"attachment\", \"_id\" : \"1\" } }\n" +
-        "{ " +
-        "\"title\" : \"Sample CV in English\"," +
-        "\"file\" : \"" + new String(Base64.encodeBase64(MC23Quotes.getBytes())) + "\"" +
-        " }\n";
+    String attachmentDoc = "{ \"title\" : \"Sample CV in English\"," +
+                          "\"file\" : \"" + new String(Base64.encodeBase64(MC23Quotes.getBytes())) + "\"" +
+                          " }\n";
 
     //When
-    elasticIndexingClient.sendCUDRequest(bulkRequest);
+    elasticIndexingClient.sendCreateDocOnPipeline("test", "attachment", "1", "attachment", attachmentDoc);
     node.client().admin().indices().prepareRefresh().execute().actionGet();
 
 
@@ -103,15 +120,15 @@ public class ElasticIndexingAttachmentIT extends BaseElasticsearchIT {
     //Given
     elasticIndexingClient.sendCreateIndexRequest("test", "");
     elasticIndexingClient.sendCreateTypeRequest("test", "attachment", getAttachmentMapping());
+    elasticIndexingClient.sendCreateAttachmentPipelineRequest("test", "attachment", "attachment", getAttachmentProcessor());
     assertEquals(0, documentNumber());
-    String bulkRequest = "{ \"create\" : { \"_index\" : \"test\", \"_type\" : \"attachment\", \"_id\" : \"1\" } }\n" +
-        "{ " +
+    String bulkRequest = "{ " +
         "\"title\" : \"Sample CV in English\"," +
         "\"file\" : \"" + new String(Base64.encodeBase64(MC23Quotes.getBytes())) + "\"" +
         " }\n";
 
     //When
-    elasticIndexingClient.sendCUDRequest(bulkRequest);
+    elasticIndexingClient.sendCreateDocOnPipeline("test", "attachment", "1", "attachment", bulkRequest);
 
     node.client().admin().indices().prepareRefresh().execute().actionGet();
 
@@ -127,17 +144,19 @@ public class ElasticIndexingAttachmentIT extends BaseElasticsearchIT {
     //Given
     elasticIndexingClient.sendCreateIndexRequest("test", "");
     elasticIndexingClient.sendCreateTypeRequest("test", "attachment", getAttachmentMapping());
+    elasticIndexingClient.sendCreateAttachmentPipelineRequest("test", "attachment", "attachment", getAttachmentProcessor());
     assertEquals(0, documentNumber());
-    String bulkRequest = "{ \"create\" : { \"_index\" : \"test\", \"_type\" : \"attachment\", \"_id\" : \"1\" } }\n" +
-        "{ " +
-        "\"title\" : \"Michael Jordan quotes\", " +
+
+    String bulkRequest = "{\"title\" : \"Michael Jordan quotes\", " +
         "\"file\" : \""+ new String(Base64.encodeBase64(MC23Quotes.getBytes())) + "\", " +
         "\"permissions\" : [\"TCL\"]" +
-            " }\n";
+        " }\n";
 
     //When
-    elasticIndexingClient.sendCUDRequest(bulkRequest);
+    elasticIndexingClient.sendCreateDocOnPipeline("test", "attachment", "1", "attachment", bulkRequest);
+
     node.client().admin().indices().prepareRefresh().execute().actionGet();
+
     List<SearchResult> searchResults = new ArrayList<>(elasticSearchServiceConnector.search(null,
         "people",
         null,
@@ -146,27 +165,48 @@ public class ElasticIndexingAttachmentIT extends BaseElasticsearchIT {
         null,
         null));
 
+    node.client().admin().indices().prepareRefresh().execute().actionGet();
+
     //Then
     assertEquals(1, documentNumber());
     assertNotNull(searchResults);
     assertEquals(1, searchResults.size());
-    assertEquals("... Some <strong>people</strong> want it to happen, some wish it would happen, others make it happen.\n", searchResults.get(0).getExcerpt());
-
+    assertEquals("... Some <strong>people</strong> want it to happen, some wish it would happen, others make it happen.", searchResults.get(0).getExcerpt());
   }
 
   private String getAttachmentMapping() {
     return "{\"properties\" : {\n" +
         "      \"file\" : {\n" +
-        "        \"type\" : \"attachment\",\n" +
-        "        \"fields\" : {\n" +
-        "          \"title\" : { \"store\" : \"yes\" },\n" +
-        "          \"content\" : { \"term_vector\":\"with_positions_offsets\", \"store\":\"yes\" }\n" +
+        "        \"type\" : \"text\"\n," +
+        "        \"index\" : \"false\"\n" +
+        "      },\n" +
+        "      \"title\" : { \n" +
+        "         \"store\" : \"true\",\n" +
+        "         \"type\" : \"text\"\n" +
+        "      }\n," +
+        "      \"attachment\" : {\n" +
+        "        \"properties\" : {\n" +
+        "          \"content\" : { \"term_vector\":\"with_positions_offsets\", \"store\":\"true\", \"type\" : \"text\"}\n" +
         "        }\n" +
         "      },\n" +
-        "      \"permissions\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\" }\n" +
+        "      \"permissions\" : {\"type\" : \"keyword\" }\n" +
         "    }" +
         "}";
   }
 
-}
+  private String getAttachmentProcessor() {
+    JSONObject fieldJSON = new JSONObject();
+    fieldJSON.put("field", "file");
+    fieldJSON.put("indexed_chars", -1);
+    fieldJSON.put("properties", new JSONArray(Collections.singleton("content")));
 
+    JSONObject attachmentJSON = new JSONObject();
+    attachmentJSON.put("attachment", fieldJSON);
+
+    JSONObject processorJSON = new JSONObject();
+    processorJSON.put("description", "Attachment processor");
+    processorJSON.put("processors", new JSONArray(Collections.singleton(attachmentJSON)));
+    return processorJSON.toJSONString();
+  }
+
+}

@@ -19,7 +19,9 @@
 
 package org.exoplatform.commons.search.integration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -27,6 +29,7 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.SortedMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,15 +38,23 @@ import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.cluster.metadata.AliasOrIndex;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.mapper.attachments.MapperAttachmentsPlugin;
+import org.elasticsearch.index.reindex.ReindexPlugin;
+import org.elasticsearch.ingest.IngestService;
+import org.elasticsearch.ingest.attachment.IngestAttachmentPlugin;
 import org.elasticsearch.node.Node;
-
-import org.elasticsearch.plugin.deletebyquery.DeleteByQueryPlugin;
+import org.elasticsearch.node.NodeValidationException;
 import org.elasticsearch.plugins.Plugin;
+import org.elasticsearch.transport.Netty4Plugin;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+
 import org.exoplatform.commons.search.es.client.ElasticIndexingAuditTrail;
 import org.exoplatform.commons.search.es.client.ElasticIndexingClient;
 import org.exoplatform.commons.search.es.client.ElasticSearchingClient;
@@ -51,9 +62,8 @@ import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+
+import sun.util.logging.resources.logging;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
@@ -111,7 +121,11 @@ public class BaseElasticsearchIT {
     // Close ES Node
     if(node != null) {
       LOGGER.info("Embedded ES instance - Stopping");
-      node.close();
+      try {
+        node.close();
+      } catch (Exception e) {
+        LOGGER.error("Embedded ES instance can't be stopped", e);
+      }
       LOGGER.info("Embedded ES instance - Stopped");
     }
 
@@ -143,20 +157,31 @@ public class BaseElasticsearchIT {
 
     // Init ES
     LOGGER.info("Embedded ES instance - Starting on port " + esPort);
-    Settings.Builder elasticsearchSettings = Settings.settingsBuilder()
-            .put(Node.HTTP_ENABLED, true)
-            .put("network.host", "127.0.0.1")
+    Settings.Builder elasticsearchSettings = Settings.builder()
+            .put("http.enabled", true)
+            .put("network.host", "_local_")
             .put("http.port", esPort)
-            .put("name", "esEmbeddedForTests" + esPort)
+            .put("node.name", "esEmbeddedForTests" + esPort)
+            .put("node.master", true)
+            .put("node.data", true)
+            .put("path.logs", "logs")
+            .put("transport.type", "local")
+            .put("http.type", "netty4")
+            .put("script.inline", false)
+            .put("script.stored", false)
+            .put("script.file", false)
             .put("path.home", "target/es")
-            .put("path.data", "target/es")
-            .put("plugins.load_classpath_plugins", true);
+            .put("path.data", "target/es");
 
     Environment environment = new Environment(elasticsearchSettings.build());
     Collection plugins = new ArrayList<>();
-    Collections.<Class<? extends Plugin>>addAll(plugins, MapperAttachmentsPlugin.class, DeleteByQueryPlugin.class);
+    Collections.<Class<? extends Plugin>>addAll(plugins, Netty4Plugin.class, IngestAttachmentPlugin.class, ReindexPlugin.class);
     node = new EmbeddedNode(environment, Version.CURRENT, plugins);
-    node.start();
+    try {
+      node.start();
+    } catch (NodeValidationException e) {
+      LOGGER.error("Embedded ES instance couldn't start", e);
+    }
     //node = nodeBuilder().local(true).settings(elasticsearchSettings.build()).node();
     node.client().admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
     assertNotNull(node);
@@ -165,7 +190,7 @@ public class BaseElasticsearchIT {
     // Set URL of server in property
     NodesInfoRequest nodesInfoRequest = new NodesInfoRequest().transport(true);
     NodesInfoResponse response = node.client().admin().cluster().nodesInfo(nodesInfoRequest).actionGet();
-    NodeInfo nodeInfo = response.iterator().next();
+    NodeInfo nodeInfo = response.getNodes().iterator().next();
     InetSocketTransportAddress address = (InetSocketTransportAddress) nodeInfo.getHttp().getAddress().publishAddress();
     String url = "http://" + address.address().getHostName() + ":" + address.address().getPort();
     PropertyManager.setProperty("exo.es.index.server.url", url);
@@ -202,16 +227,23 @@ public class BaseElasticsearchIT {
   }
 
   protected void deleteAllIndexesInES() {
-    SortedMap<String, AliasOrIndex> aliasAndIndexLookup = node.client().admin().cluster()
-            .prepareState().execute().actionGet().getState().getMetaData().getAliasAndIndexLookup();
-    for (String alias: aliasAndIndexLookup.keySet()) {
-      node.client().admin().indices().prepareDelete(alias).execute().actionGet();
+    node.client().admin().indices().prepareRefresh().execute().actionGet();
+    ImmutableOpenMap<String, IndexMetaData> indices = node.client().admin().cluster()
+            .prepareState().execute().actionGet().getState().getMetaData().getIndices();
+    Iterator<String> keysIt = indices.keysIt();
+    while (keysIt.hasNext()) {
+      String index = keysIt.next();
+      node.client().admin().indices().prepareDelete(index).execute().actionGet();
     }
     node.client().admin().indices().prepareRefresh().execute().actionGet();
   }
 
   protected boolean typeExists(String index, String type) {
     return node.client().admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists();
+  }
+
+  protected boolean pipelineExists(String pipelineName) {
+    return node.injector().getInstance(IngestService.class).getPipelineStore().get(pipelineName) != null;
   }
 
   protected long documentNumber() {

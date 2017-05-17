@@ -17,11 +17,12 @@
 package org.exoplatform.commons.search.index.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONObject;
+
 import org.exoplatform.commons.search.index.IndexingServiceConnector;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
-import org.json.simple.JSONObject;
 
 /**
  * Created by The eXo Platform SAS
@@ -31,18 +32,26 @@ import org.json.simple.JSONObject;
  */
 public abstract class ElasticIndexingServiceConnector extends IndexingServiceConnector {
 
-  private static final Integer REPLICAS_NUMBER_DEFAULT = 1;
+  private static final Integer REPLICAS_NUMBER_DEFAULT = 0;
   private static final String REPLICAS_NUMBER_PROPERTY_NAME = "exo.es.indexing.replica.number.default";
   private static final Integer SHARDS_NUMBER_DEFAULT = 5;
   private static final String SHARDS_PROPERTY_NAME = "exo.es.indexing.shard.number.default";
 
-  protected String index;
+  protected String indexAlias;
+  protected String currentIndex;
+  protected String previousIndex;
+  protected boolean reindexOnUpgrade;
   protected Integer shards = SHARDS_NUMBER_DEFAULT;
   protected Integer replicas = REPLICAS_NUMBER_DEFAULT;
 
   public ElasticIndexingServiceConnector(InitParams initParams) {
     PropertiesParam param = initParams.getPropertiesParam("constructor.params");
-    this.index = param.getProperty("index");
+    String reindexOnUpgradeString = param.getProperty("reindexOnUpgrade");
+    this.reindexOnUpgrade = StringUtils.isNotBlank(reindexOnUpgradeString) && reindexOnUpgradeString.trim().equalsIgnoreCase("true");
+
+    this.indexAlias = param.getProperty("index_alias");
+    this.currentIndex = param.getProperty("index_current");
+    this.previousIndex = param.getProperty("index_previous");
     setType(param.getProperty("type"));
     //Get number of replicas in connector declaration or exo properties
     if (StringUtils.isNotBlank(param.getProperty("replica.number"))) {
@@ -53,7 +62,7 @@ public abstract class ElasticIndexingServiceConnector extends IndexingServiceCon
     }
     //Get number of shards in connector declaration or exo properties
     if (StringUtils.isNotBlank(param.getProperty("shard.number"))) {
-      this.replicas = Integer.valueOf(param.getProperty("shard.number"));
+      this.shards = Integer.valueOf(param.getProperty("shard.number"));
     }
     else if (StringUtils.isNotBlank(PropertyManager.getProperty(SHARDS_PROPERTY_NAME))) {
       this.shards = Integer.valueOf(PropertyManager.getProperty(SHARDS_PROPERTY_NAME));
@@ -66,8 +75,8 @@ public abstract class ElasticIndexingServiceConnector extends IndexingServiceCon
    * {
      "type_name" : {
        "properties" : {
-         "permissions" : {"type" : "string", "index" : "not_analyzed" },
-         "sites" : {"type" : "string", "index" : "not_analyzed" }
+         "permissions" : {"type" : "keyword"},
+         "sites" : {"type" : "keyword"}
        }
      }
    }
@@ -80,13 +89,16 @@ public abstract class ElasticIndexingServiceConnector extends IndexingServiceCon
   public String getMapping() {
 
       JSONObject notAnalyzedField = new JSONObject();
-      notAnalyzedField.put("type", "string");
-      notAnalyzedField.put("index", "not_analyzed");
+      notAnalyzedField.put("type", "text");
+      notAnalyzedField.put("index", false);
+
+      JSONObject keywordMapping = new JSONObject();
+      keywordMapping.put("type", "keyword");
 
       JSONObject properties = new JSONObject();
-      properties.put("permissions", notAnalyzedField);
+      properties.put("permissions", keywordMapping);
+      properties.put("sites", keywordMapping);
       properties.put("url", notAnalyzedField);
-      properties.put("sites", notAnalyzedField);
 
       JSONObject mappingProperties = new JSONObject();
       mappingProperties.put("properties",properties);
@@ -98,11 +110,27 @@ public abstract class ElasticIndexingServiceConnector extends IndexingServiceCon
   }
 
   public String getIndex() {
-    return index;
+    return indexAlias;
   }
 
   public void setIndex(String index) {
-    this.index = index;
+    this.indexAlias = index;
+  }
+
+  public String getCurrentIndex() {
+    return currentIndex;
+  }
+
+  public String getPreviousIndex() {
+    return previousIndex;
+  }
+
+  public void setPreviousIndex(String previousIndex) {
+    this.previousIndex = previousIndex;
+  }
+
+  public boolean isReindexOnUpgrade() {
+    return reindexOnUpgrade;
   }
 
   public Integer getShards() {
@@ -124,6 +152,18 @@ public abstract class ElasticIndexingServiceConnector extends IndexingServiceCon
   @Override
   public String delete(String id) {
     return id;
+  }
+
+  public boolean isNeedIngestPipeline() {
+    return false;
+  }
+
+  public String getPipelineName() {
+    return null;
+  }
+
+  public String getAttachmentProcessor() {
+    return null;
   }
 }
 

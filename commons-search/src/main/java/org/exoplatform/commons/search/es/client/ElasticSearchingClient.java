@@ -1,8 +1,13 @@
 package org.exoplatform.commons.search.es.client;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.services.log.ExoLogger;
@@ -31,8 +36,6 @@ public class ElasticSearchingClient extends ElasticClient {
     }
   }
 
-
-
   public String sendRequest(String esQuery, String index, String type) {
     long startTime = System.currentTimeMillis();
     StringBuilder url = new StringBuilder();
@@ -45,10 +48,34 @@ public class ElasticSearchingClient extends ElasticClient {
     ElasticResponse elasticResponse = sendHttpPostRequest(url.toString(), esQuery);
     String response = elasticResponse.getMessage();
     int statusCode = elasticResponse.getStatusCode();
-    if (ElasticIndexingAuditTrail.isError(statusCode)) {
+    if (ElasticIndexingAuditTrail.isError(statusCode) || StringUtils.isBlank(response)) {
+      if(StringUtils.isBlank(response)) {
+        response = "Empty response was sent by ES";
+      }
       auditTrail.logRejectedSearchOperation(ElasticIndexingAuditTrail.SEARCH_TYPE, index, type, statusCode, response, (System.currentTimeMillis() - startTime));
-    }
-    else {
+    } else {
+      JSONParser parser = new JSONParser();
+      Map json = null;
+      try {
+        json = (Map)parser.parse(response);
+      } catch (ParseException e) {
+        auditTrail.logRejectedSearchOperation(ElasticIndexingAuditTrail.SEARCH_TYPE,
+                                              index,
+                                              type,
+                                              statusCode,
+                                              "Error parsing response to JSON, content = " + response,
+                                              (System.currentTimeMillis() - startTime));
+        throw new IllegalStateException("Error occured while requesting ES HTTP code: '" + statusCode
+            + "', Error parsing response to JSON format, content = '" + response + "'", e );
+      }
+      Long status = json.get("status") == null ? null : (Long) json.get("status");
+      String error = json.get("error") == null ? null : (String) ((JSONObject) json.get("error")).get("reason");
+      Integer httpStatusCode = status == null ? null : status.intValue();
+      if (ElasticIndexingAuditTrail.isError(httpStatusCode)) {
+        auditTrail.logRejectedSearchOperation(ElasticIndexingAuditTrail.SEARCH_TYPE, index, type, httpStatusCode, error, (System.currentTimeMillis() - startTime));
+        throw new IllegalStateException("Error occured while requesting ES HTTP error code: '" + statusCode + "', HTTP response: '"
+            + response + "'");
+      }
       if (auditTrail.isFullLogEnabled()) {
         auditTrail.logAcceptedSearchOperation(ElasticIndexingAuditTrail.SEARCH_TYPE, index, type, statusCode, response, (System.currentTimeMillis() - startTime));
       }

@@ -37,6 +37,7 @@ import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.persistence.impl.EntityManagerService;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
@@ -109,7 +110,12 @@ public class SiteFilterIT extends BaseElasticsearchIT {
     ElasticContentRequestBuilder builder = new ElasticContentRequestBuilder();
     entityManagerService = new EntityManagerService();
     entityManagerService.startRequest(null);
-    indexingOperationProcessor = new ElasticIndexingOperationProcessor(dao, elasticIndexingClient, builder, new ElasticIndexingAuditTrail(), entityManagerService, null);
+    InitParams initParams = new InitParams();
+    ValueParam param = new ValueParam();
+    param.setName("es.version");
+    param.setValue(EmbeddedNode.ES_VERSION);
+    initParams.addParameter(param);
+    indexingOperationProcessor = new ElasticIndexingOperationProcessor(dao, elasticIndexingClient, builder, new ElasticIndexingAuditTrail(), entityManagerService, null, initParams);
     indexingOperationProcessor.addConnector(testConnector);
 
     //Search connector

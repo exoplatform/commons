@@ -47,7 +47,45 @@ public class ElasticIndexingIT extends BaseElasticsearchIT {
     elasticIndexingClient.sendCreateIndexRequest("blog", "");
     //Then
     assertTrue(node.client().admin().indices().prepareExists("blog").execute().actionGet().isExists());
+    assertTrue(elasticIndexingClient.sendIsIndexExistsRequest("blog"));
+  }
 
+  @Test
+  public void testCreateNewIndexAlias() throws ExecutionException, InterruptedException {
+    // Given
+    assertFalse(node.client().admin().indices().prepareExists("blog").execute().actionGet().isExists());
+    // When
+    elasticIndexingClient.sendCreateIndexRequest("blog", "");
+    elasticIndexingClient.sendCreateIndexAliasRequest("blog", null, "blog_alias");
+    // Then
+    assertTrue(node.client().admin().indices().prepareAliasesExist("blog_alias").execute().actionGet().isExists());
+    assertTrue(elasticIndexingClient.sendGetIndexAliasesRequest("blog").contains("blog_alias"));
+  }
+
+  @Test
+  public void testMoveIndexAliasToAnotherIndex() throws ExecutionException, InterruptedException {
+    // Given
+    assertFalse(node.client().admin().indices().prepareExists("blog").execute().actionGet().isExists());
+    assertFalse(node.client().admin().indices().prepareExists("blog_v2").execute().actionGet().isExists());
+    // When
+    elasticIndexingClient.sendCreateIndexRequest("blog", "");
+    elasticIndexingClient.sendCreateIndexRequest("blog_v2", "");
+    elasticIndexingClient.sendCreateIndexAliasRequest("blog_v2", "blog", "blog_alias");
+    // Then
+    assertTrue(node.client().admin().indices().prepareAliasesExist("blog_alias").execute().actionGet().isExists());
+    assertTrue(elasticIndexingClient.sendGetIndexAliasesRequest("blog_v2").contains("blog_alias"));
+    assertFalse(elasticIndexingClient.sendGetIndexAliasesRequest("blog").contains("blog_alias"));
+  }
+
+  @Test
+  public void testDeleteIndex() throws ExecutionException, InterruptedException {
+    // Given
+    assertFalse(node.client().admin().indices().prepareExists("blog").execute().actionGet().isExists());
+    // When
+    elasticIndexingClient.sendCreateIndexRequest("blog", "");
+    elasticIndexingClient.sendDeleteIndexRequest("blog");
+    // Then
+    assertFalse(node.client().admin().indices().prepareExists("blog").execute().actionGet().isExists());
   }
 
   @Test
@@ -59,7 +97,7 @@ public class ElasticIndexingIT extends BaseElasticsearchIT {
     elasticIndexingClient.sendCreateTypeRequest("blog", "post", "{\"post\" : {}}");
     //Then
     assertTrue(typeExists("blog", "post"));
-
+    assertTrue(elasticIndexingClient.sendIsTypeExistsRequest("blog", "post"));
   }
 
   @Test
@@ -81,7 +119,31 @@ public class ElasticIndexingIT extends BaseElasticsearchIT {
 
     //Then
     assertEquals(3, documentNumber());
+  }
 
+  @Test
+  public void testCountObjectsInIndex() throws ExecutionException, InterruptedException {
+    // Given
+    assertFalse(node.client().admin().indices().prepareExists("blog").execute().actionGet().isExists());
+    // When
+    elasticIndexingClient.sendCreateIndexRequest("blog", "");
+    elasticIndexingClient.sendCreateIndexAliasRequest("blog", null, "blog_alias");
+    elasticIndexingClient.sendCreateTypeRequest("blog", "post", "{\"post\" : {}}");
+    String bulkRequest = "{ \"create\" : { \"_index\" : \"blog\", \"_type\" : \"post\", \"_id\" : \"1\" } }\n" +
+        "{ \"field1\" : \"value1\" }\n" +
+        "{ \"create\" : { \"_index\" : \"blog\", \"_type\" : \"post\", \"_id\" : \"2\" } }\n" +
+        "{ \"field1\" : \"value2\" }\n" +
+        "{ \"create\" : { \"_index\" : \"blog\", \"_type\" : \"post\", \"_id\" : \"3\" } }\n" +
+        "{ \"field1\" : \"value3\" }\n";
+    elasticIndexingClient.sendCUDRequest(bulkRequest);
+
+    //Elasticsearch has near real-time search: document changes are not visible to search immediately,
+    // but will become visible within 1 second
+    node.client().admin().indices().prepareRefresh().execute().actionGet();
+
+    //Then
+    assertEquals(3, documentNumber());
+    assertEquals(3, elasticIndexingClient.sendCountIndexObjectsRequest("blog_alias"));
   }
 
   @Test

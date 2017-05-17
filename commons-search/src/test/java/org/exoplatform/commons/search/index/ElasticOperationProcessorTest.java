@@ -16,17 +16,31 @@
 */
 package org.exoplatform.commons.search.index;
 
-import org.exoplatform.commons.search.es.client.ElasticContentRequestBuilder;
-import org.exoplatform.commons.search.es.client.ElasticIndexingAuditTrail;
-import org.exoplatform.commons.search.es.client.ElasticIndexingClient;
-import org.exoplatform.commons.search.dao.IndexingOperationDAO;
-import org.exoplatform.commons.search.domain.Document;
-import org.exoplatform.commons.search.domain.IndexingOperation;
-import org.exoplatform.commons.search.domain.OperationType;
-import org.exoplatform.commons.search.index.impl.ElasticIndexingOperationProcessor;
-import org.exoplatform.commons.search.index.impl.ElasticIndexingServiceConnector;
-import org.exoplatform.commons.persistence.impl.EntityManagerService;
-import org.exoplatform.container.PortalContainer;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,15 +51,20 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import org.exoplatform.commons.persistence.impl.EntityManagerService;
+import org.exoplatform.commons.search.dao.IndexingOperationDAO;
+import org.exoplatform.commons.search.domain.Document;
+import org.exoplatform.commons.search.domain.IndexingOperation;
+import org.exoplatform.commons.search.domain.OperationType;
+import org.exoplatform.commons.search.es.client.ElasticContentRequestBuilder;
+import org.exoplatform.commons.search.es.client.ElasticIndexingAuditTrail;
+import org.exoplatform.commons.search.es.client.ElasticIndexingClient;
+import org.exoplatform.commons.search.index.impl.ElasticIndexingOperationProcessor;
+import org.exoplatform.commons.search.index.impl.ElasticIndexingServiceConnector;
+import org.exoplatform.commons.search.integration.EmbeddedNode;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 
 /**
  * Created by The eXo Platform SAS
@@ -84,7 +103,12 @@ public class ElasticOperationProcessorTest {
 
     entityManagerService = new EntityManagerService();
     entityManagerService.startRequest(null);
-    elasticIndexingOperationProcessor = new ElasticIndexingOperationProcessor(indexingOperationDAO, elasticIndexingClient, elasticContentRequestBuilder, auditTrail, entityManagerService, null);
+    InitParams initParams = new InitParams();
+    ValueParam param = new ValueParam();
+    param.setName("es.version");
+    param.setValue(EmbeddedNode.ES_VERSION);
+    initParams.addParameter(param);
+    elasticIndexingOperationProcessor = new ElasticIndexingOperationProcessor(indexingOperationDAO, elasticIndexingClient, elasticContentRequestBuilder, auditTrail, entityManagerService, null, initParams);
     initElasticServiceConnector();
   }
 
@@ -124,17 +148,6 @@ public class ElasticOperationProcessorTest {
     elasticIndexingOperationProcessor.addConnector(elasticIndexingServiceConnector);
     //Then
     assertEquals(1, elasticIndexingOperationProcessor.getConnectors().size());
-  }
-
-  @Test
-  public void addConnectRor_ifNewConnector_initIndexingQueueCreated() {
-    //Given
-    IndexingOperation indexingOperation = new IndexingOperation(null,"post", OperationType.INIT);
-    //When
-    elasticIndexingOperationProcessor.addConnector(elasticIndexingServiceConnector);
-    elasticIndexingOperationProcessor.start();
-    //Then
-    verify(indexingOperationDAO, times(1)).create(indexingOperation);
   }
 
   @Test

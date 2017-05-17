@@ -55,7 +55,7 @@ public class ElasticSearchingIT extends BaseElasticsearchIT {
     assertEquals(0, documentNumber());
 
     String mapping = "{ \"properties\" : " + "   {\"permissions\" : "
-        + "       {\"type\" : \"string\", \"index\" : \"not_analyzed\"}" + "   }" + "}";
+        + "       {\"type\" : \"keyword\"}" + "   }" + "}";
     CreateIndexRequestBuilder cirb = node.client().admin().indices().prepareCreate("test").addMapping("type1", mapping);
     cirb.execute().actionGet();
     String bulkRequest = "{ \"create\" : { \"_index\" : \"test\", \"_type\" : \"type1\", \"_id\" : \"1\" } }\n"
@@ -90,7 +90,7 @@ public class ElasticSearchingIT extends BaseElasticsearchIT {
     // Given
     assertEquals(0, documentNumber());
     String mapping = "{ \"properties\" : " + "   {\"permissions\" : "
-        + "       {\"type\" : \"string\", \"index\" : \"not_analyzed\"}" + "   }" + "}";
+        + "       {\"type\" : \"keyword\"}" + "   }" + "}";
     CreateIndexRequestBuilder cirb = node.client().admin().indices().prepareCreate("test").addMapping("type1", mapping);
     cirb.execute().actionGet();
     String bulkRequest = "{ \"create\" : { \"_index\" : \"test\", \"_type\" : \"type1\", \"_id\" : \"1\" } }\n"
@@ -129,7 +129,7 @@ public class ElasticSearchingIT extends BaseElasticsearchIT {
 
     //Create two types
     String mapping = "{ \"properties\" : " + "   {\"permissions\" : "
-        + "       {\"type\" : \"string\", \"index\" : \"not_analyzed\"}" + "   }" + "}";
+        + "       {\"type\" : \"keyword\"}" + "   }" + "}";
     CreateIndexRequestBuilder cirb = node.client().admin().indices().prepareCreate("test");
     cirb.execute().actionGet();
 
@@ -182,7 +182,7 @@ public class ElasticSearchingIT extends BaseElasticsearchIT {
 
     //Create two types
     String mapping = "{ \"properties\" : " + "   {\"permissions\" : "
-        + "       {\"type\" : \"string\", \"index\" : \"not_analyzed\"}" + "   }" + "}";
+        + "       {\"type\" : \"keyword\"}" + "   }" + "}";
 
     CreateIndexRequestBuilder cirb = node.client().admin().indices().prepareCreate("test").addMapping("type1", mapping);
     cirb.execute().actionGet();
@@ -226,7 +226,7 @@ public class ElasticSearchingIT extends BaseElasticsearchIT {
 
     //Create two types
     String mapping = "{ \"properties\" : " + "   {\"permissions\" : "
-        + "       {\"type\" : \"string\", \"index\" : \"not_analyzed\"}" + "   }" + "}";
+        + "       {\"type\" : \"keyword\"}" + "   }" + "}";
 
     CreateIndexRequestBuilder cirb = node.client().admin().indices().prepareCreate("test").addMapping("type1", mapping);
     cirb.execute().actionGet();

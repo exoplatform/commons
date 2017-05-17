@@ -29,6 +29,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
+
 import org.exoplatform.commons.search.es.client.ElasticClientAuthenticationException;
 import org.exoplatform.commons.search.es.client.ElasticIndexingAuditTrail;
 import org.exoplatform.commons.search.es.client.ElasticIndexingClient;
@@ -55,6 +56,8 @@ public class ElasticIndexingClientTest {
   private HttpClient httpClient;
   @Mock
   private ElasticIndexingAuditTrail auditTrail;
+  @Captor
+  private ArgumentCaptor<HttpPut> httpPutRequestCaptor;
   @Captor
   private ArgumentCaptor<HttpPost> httpPostRequestCaptor;
   @Captor
@@ -98,8 +101,8 @@ public class ElasticIndexingClientTest {
     //When
     elasticIndexingClient.sendDeleteAllDocsOfTypeRequest("index", "type");
     //Then
-    verify(httpClient).execute(httpDeleteRequestCaptor.capture());
-    assertEquals("http://127.0.0.1:9200/index/type/_query?q=*", httpDeleteRequestCaptor.getValue().getURI().toString());
+    verify(httpClient).execute(httpPostRequestCaptor.capture());
+    assertEquals("http://127.0.0.1:9200/index/type/_delete_by_query?conflicts=proceed&wait_for_completion=true", httpPostRequestCaptor.getValue().getURI().toString());
   }
 
   @Test
@@ -226,9 +229,9 @@ public class ElasticIndexingClientTest {
     //When
     elasticIndexingClient.sendCreateIndexRequest("myIndex", "mySettings");
     //Then
-    verify(httpClient, times(2)).execute(httpPostRequestCaptor.capture());
-    assertEquals("http://127.0.0.1:9200/myIndex", httpPostRequestCaptor.getValue().getURI().toString());
-    assertEquals("mySettings", IOUtils.toString(httpPostRequestCaptor.getValue().getEntity().getContent()));
+    verify(httpClient, times(2)).execute(httpPutRequestCaptor.capture());
+    assertEquals("http://127.0.0.1:9200/myIndex", httpPutRequestCaptor.getValue().getURI().toString());
+    assertEquals("mySettings", IOUtils.toString(httpPutRequestCaptor.getValue().getEntity().getContent()));
     verifyNoMoreInteractions(httpClient);
   }
 

@@ -49,7 +49,6 @@ public class ElasticContentRequestBuilder {
     indexProperties.put("number_of_shards", String.valueOf(connector.getShards()));
     indexProperties.put("number_of_replicas", String.valueOf(connector.getReplicas()));
 
-
     JSONObject indexSettings = new JSONObject();
     for (String setting: indexProperties.keySet()) {
       indexSettings.put(setting, indexProperties.get(setting));
@@ -74,7 +73,27 @@ public class ElasticContentRequestBuilder {
 
     String request =  indexJSON.toJSONString();
 
-    LOG.debug("Create index request to ES: \n " + request);
+    LOG.debug("Create index request to ES: \n {}", request);
+    return request;
+  }
+
+  /**
+   *
+   * Get a deleteAll ES query
+   *
+   * @return JSON containing a delete request
+   *
+   */
+  public String getDeleteAllDocumentsRequestContent() {
+
+    JSONObject deleteAllRequest = new JSONObject();
+    JSONObject deleteQueryRequest = new JSONObject();
+    deleteQueryRequest.put("match_all", new JSONObject());
+    deleteAllRequest.put("query", deleteQueryRequest);
+
+    String request = deleteAllRequest.toJSONString();
+
+    LOG.debug("Delete All request to ES: \n {}", request);
     return request;
   }
 
@@ -96,7 +115,7 @@ public class ElasticContentRequestBuilder {
 
     String request =  deleteRequest.toJSONString()+"\n";
 
-    LOG.debug("Delete request to ES: \n " + request);
+    LOG.debug("Delete request to ES: \n {}", request);
     return request;
   }
 
@@ -125,7 +144,29 @@ public class ElasticContentRequestBuilder {
 
     String request = createRequest.toJSONString() + "\n" + document.toJSON() + "\n";
 
-    LOG.debug("Create request to ES: \n " + request);
+    LOG.debug("Create request to ES: \n {}", request);
+
+    return request;
+  }
+
+  /**
+   *
+   * Get an ES create/update document content to put into a pipeline
+   * The content of the request will update the full document (and not partially)
+   * 
+   * For instance:
+   * 
+   * { "field1" : "value3" }
+   *
+   * @return JSON containing a create/update Document to inject to a pipeline
+   *
+   */
+  public String getCreatePipelineDocumentRequestContent(ElasticIndexingServiceConnector connector, String id) {
+    Document document = connector.update(id);
+
+    String request = document.toJSON();
+
+    LOG.debug("Create Pipeline document request to ES: \n {}", request);
 
     return request;
   }
@@ -152,7 +193,7 @@ public class ElasticContentRequestBuilder {
 
     String request = updateRequest.toJSONString() + "\n" + document.toJSON() + "\n";
 
-    LOG.debug("Update request to ES: \n " + request);
+    LOG.debug("Update request to ES: \n {}", request);
 
     return request;
   }

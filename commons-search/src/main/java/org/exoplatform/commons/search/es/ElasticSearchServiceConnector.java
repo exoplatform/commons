@@ -53,6 +53,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   //ES connector information
   //Index is optional: if null, search on all the cluster
   private String index;
+
   //Type is optional: if null, search on all the index
   private String type;
   private List<String> searchFields;
@@ -116,7 +117,6 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     String esQuery = buildQuery(query, sites, offset, limit, sort, order);
     String jsonResponse = this.client.sendRequest(esQuery, this.index, this.type);
     return buildResult(jsonResponse, context);
-
   }
 
   /**
@@ -181,15 +181,20 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     esQuery.append("                      " + getPermissionFilter() + "\n");
     esQuery.append("                      ]\n");
     esQuery.append("                    }\n");
-    esQuery.append("                  },\n");
-    esQuery.append("                  {\n");
-    esQuery.append("                   \"bool\" : {\n");
-    esQuery.append("                     \"should\" : [\n");
-    esQuery.append("                      " + getSitesFilter(sites) + "\n");
-    esQuery.append("                       ]\n");
-    esQuery.append("                    }\n");
-    esQuery.append("                  }");
-    esQuery.append(getAdditionalFilters(filters));
+    esQuery.append("                  }\n");
+    String sitesFilter = getSitesFilter(sites);
+    if(StringUtils.isNotBlank(sitesFilter)) {
+      esQuery.append("                  ,{\n");
+      esQuery.append("                   \"bool\" : {\n");
+      esQuery.append("                     \"should\" : \n");
+      esQuery.append("                      " + sitesFilter + "\n");
+      esQuery.append("                    }\n");
+      esQuery.append("                  }");
+    }
+    String additionalFilters = getAdditionalFilters(filters);
+    if(StringUtils.isNotBlank(additionalFilters)) {
+      esQuery.append(additionalFilters);
+    }
     esQuery.append("                  \n");
     esQuery.append("                ]\n");
     esQuery.append("              }\n");
@@ -318,7 +323,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
 
   /**
    * Check if a specific term of a field exist
-   * Note that this field should be set as not_analyzed
+   * Note that this field should be set as not analyzed (index = false)
    *
    * @param field
    * @param value
@@ -361,21 +366,29 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   }
 
   protected String getPermissionFilter() {
+    StringBuilder permissionSB = new StringBuilder();
     Set<String> membershipSet = getUserMemberships();
     if ((membershipSet != null) && (membershipSet.size()>0)) {
       String memberships = StringUtils.join(membershipSet.toArray(new String[membershipSet.size()]), "|");
-      return "{\n" +
-          "  \"term\" : { \"permissions\" : \"" + getCurrentUser() + "\" }\n" +
-          "},\n" +
-          "{\n" +
-          "  \"regexp\" : { \"permissions\" : \"" + memberships + "\" }\n" +
-          "}";
+      permissionSB.append("{\n")
+      .append("  \"term\" : { \"permissions\" : \"")
+      .append(getCurrentUser())
+      .append("\" }\n")
+      .append("},\n")
+      .append("{\n")
+      .append("  \"regexp\" : { \"permissions\" : \"")
+      .append(memberships)
+      .append("\" }\n")
+      .append("}");
     }
     else {
-      return "{\n" +
-          "  \"term\" : { \"permissions\" : \"" + getCurrentUser() + "\" }\n" +
-          "}";
+      permissionSB.append("{\n")
+      .append("  \"term\" : { \"permissions\" : \"")
+      .append(getCurrentUser())
+      .append("\" }\n")
+      .append("}");
     }
+    return permissionSB.toString();
   }
 
   protected String getSitesFilter(Collection<String> sitesCollection) {
@@ -385,23 +398,26 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
         sites.add("\"" + site + "\"");
       }
       String sitesList = "["+StringUtils.join(sites,",")+"]";
-      return "{\n" +
-          "  \"not\": {\n" +
-          "    \"exists\" : { \"field\" : \"sites\" }\n" +
-          "  }\n" +
+      return " [ { \"bool\" : {\n" +
+          "         \"must_not\": {\n" +
+          "           \"exists\" : { \"field\" : \"sites\" }\n" +
+          "         }\n" +
+          "       }\n" +
           "},\n" +
           "{\n" +
           "  \"terms\" : { \n" +
           "    \"sites\" : " + sitesList + "\n" +
           "  }\n" +
-          "}";
+          "} ]";
     }
     else {
-      return "{\n" +
-          "  \"not\": {\n" +
-          "    \"exists\" : { \"field\" : \"sites\" }\n" +
+      return " { \"bool\" : " +
+          "{\n" +
+          "  \"must_not\": {\n" +
+          "      \"exists\" : { \"field\" : \"sites\" }\n" +
+          "   }\n" +
           "  }\n" +
-          "}";
+          "}\n";
     }
   }
 

@@ -30,7 +30,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -68,9 +70,27 @@ public abstract class ElasticClient {
 
     try {
       HttpPost httpTypeRequest = new HttpPost(url);
-      httpTypeRequest.setEntity(new StringEntity(content, "UTF-8"));
+      if(StringUtils.isNotBlank(content)) {
+        httpTypeRequest.setEntity(new StringEntity(content, ContentType.APPLICATION_JSON));
+      }
       response = handleHttpResponse(client.execute(httpTypeRequest));
       LOG.debug("Sent request to ES:\n Method = POST \nURI =  {} \nContent = {}", url, content);
+      logResultDependingOnStatusCode(url, response);
+    } catch (IOException e) {
+      throw new ElasticClientException(e);
+    }
+    return response;
+  }
+
+  protected ElasticResponse sendHttpPutRequest(String url, String content) {
+    ElasticResponse response;
+    try {
+      HttpPut httpTypeRequest = new HttpPut(url);
+      if(StringUtils.isNotBlank(content)) {
+        httpTypeRequest.setEntity(new StringEntity(content, ContentType.APPLICATION_JSON));
+      }
+      response = handleHttpResponse(client.execute(httpTypeRequest));
+      LOG.debug("Sent request to ES:\n Method = PUT \nURI =  '{}' \nContent = '{}'", url, content);
       logResultDependingOnStatusCode(url, response);
     } catch (IOException e) {
       throw new ElasticClientException(e);
