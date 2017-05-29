@@ -4,8 +4,10 @@ import org.exoplatform.commons.cluster.StartableClusterAware;
 import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage;
 import org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.log.ExoLogger;
@@ -84,6 +86,8 @@ public class WebNotificationsMigration implements StartableClusterAware {
           LOG.info("    Number of users = " + totalUsers);
           User[] users;
           LOG.info("=== Start migration of Web Notifications data from JCR");
+          ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+          RequestLifeCycle.begin(currentContainer);
           long startTime = System.currentTimeMillis();
           do {
             LOG.info("    Progression of users web notifications migration : " + current + "/" + totalUsers);
@@ -92,6 +96,8 @@ public class WebNotificationsMigration implements StartableClusterAware {
             }
             users = allUsersListAccess.load(current, pageSize);
             for (User user : users) {
+              RequestLifeCycle.end();
+              RequestLifeCycle.begin(currentContainer);
               String userName = user.getUserName();
               if (!hasWebNotifDataToMigrate(userName)) {
                 LOG.info("No Web notification data to migrate from JCR to RDBMS for user: " + userName);
@@ -107,6 +113,8 @@ public class WebNotificationsMigration implements StartableClusterAware {
           LOG.info("=== Migration of Web Notification data done in " + (endTime - startTime) + " ms");
         } catch (Exception e) {
           LOG.error("Error while migrating Web Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+        } finally {
+          RequestLifeCycle.end();
         }
         deleteJcrWebNotifications();
         return null;
