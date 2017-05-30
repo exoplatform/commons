@@ -10,11 +10,11 @@ import javax.persistence.*;
  *          exo@exoplatform.com
  * Mar 07, 2017
  */
-@Entity(name = "MailDigestEntity")
+@Entity(name = "NotificationsMailDigestEntity")
 @ExoEntity
 @Table(name = "NTF_EMAIL_NOTIFS_DIGEST")
 @NamedQueries({
-    @NamedQuery(name = "commons.findDigestByNotifAndType", query = "SELECT m FROM MailDigestEntity m " +
+    @NamedQuery(name = "commons.findDigestByNotifAndType", query = "SELECT m FROM NotificationsMailDigestEntity m " +
         "WHERE m.notification= :notifId AND m.type= :digestType")
 })
 public class MailDigestEntity {

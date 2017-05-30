@@ -24,37 +24,6 @@
         </init-params>
     </component>
 
-    <external-component-plugins>
-        <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
-        <component-plugin>
-            <name>bind.datasource</name>
-            <set-method>addPlugin</set-method>
-            <type>org.exoplatform.services.naming.BindReferencePlugin</type>
-            <init-params>
-                <value-param>
-                    <name>bind-name</name>
-                    <value>java:/comp/env/exo-jpa_portal</value>
-                </value-param>
-                <value-param>
-                    <name>class-name</name>
-                    <value>javax.sql.DataSource</value>
-                </value-param>
-                <value-param>
-                    <name>factory</name>
-                    <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
-                </value-param>
-                <properties-param>
-                    <name>ref-addresses</name>
-                    <description>ref-addresses</description>
-                    <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-                    <property name="url" value="jdbc:hsqldb:mem:db1" />
-                    <property name="username" value="sa" />
-                    <property name="password" value="" />
-                </properties-param>
-            </init-params>
-        </component-plugin>
-    </external-component-plugins>
-
     <!-- Data Initialization -->
     <external-component-plugins>
         <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
@@ -66,7 +35,8 @@
                 <values-param>
                     <name>changelogs</name>
                     <description>Change logs of commons</description>
-                    <value>db/changelog/commons.db.changelog-1.0.0.xml</value>
+                    <value>db/changelog/settings.db.changelog-1.0.0.xml</value>
+                    <value>db/changelog/notifications.db.changelog-1.0.0.xml</value>
                 </values-param>
             </init-params>
         </component-plugin>

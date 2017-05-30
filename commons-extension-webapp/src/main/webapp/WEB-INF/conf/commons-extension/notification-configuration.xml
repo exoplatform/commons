@@ -119,11 +119,11 @@
 		<init-params>
 			<value-param>
 				<name>numberOfMailPerBatch</name> <!-- Max number of mails to send in the configured period of time -->
-				<value>${conf.notification.service.QueueMessage.numberOfMailPerBatch:30}</value>
+				<value>${exo.notification.service.QueueMessage.numberOfMailPerBatch:30}</value>
 			</value-param>
 			<value-param>
 				<name>period</name><!-- The interval in seconds between two executions of the send mail job -->
-				<value>${conf.notification.service.QueueMessage.period:60}</value>
+				<value>${exo.notification.service.QueueMessage.period:60}</value>
 			</value-param>
 		</init-params>
 	</component>

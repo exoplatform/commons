@@ -26,7 +26,7 @@ import javax.persistence.*;
  *          exo@exoplatform.com
  * Mar 07, 2017
  */
-@Entity(name = "MailParamsEntity")
+@Entity(name = "NotificationsMailParamsEntity")
 @ExoEntity
 @Table(name = "NTF_EMAIL_NOTIFS_PARAMS")
 public class MailParamsEntity {

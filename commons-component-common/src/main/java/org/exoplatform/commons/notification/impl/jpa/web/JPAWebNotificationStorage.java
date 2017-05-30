@@ -6,7 +6,6 @@ import org.exoplatform.commons.api.notification.service.setting.UserSettingServi
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
-import org.exoplatform.commons.notification.impl.jpa.cache.RDBMSCachedWebNotificationStorage;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebParamsDAO;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO;
@@ -117,13 +116,13 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
         webNotifEntity.setText(notification.getTitle());
         webNotifEntity.setSender(notification.getFrom());
         webNotifEntity.setOwner(notification.getTo());
-        webNotifEntity.setCreationDate(notification.getDateCreated());
+        webNotifEntity.setCreationDate(notification.getDateCreated().getTime());
 
         //fill WebUsersEntity with data from notification
         webUsersEntity.setReceiver(notification.getTo());
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(notification.getLastModifiedDate());
-        webUsersEntity.setUpdateDate(calendar);
+        webUsersEntity.setUpdateDate(calendar.getTime());
         webUsersEntity.setNotification(webNotifEntity);
         webUsersDAO.create(webUsersEntity);
 
@@ -215,7 +214,7 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
     long delayTime = System.currentTimeMillis() - (seconds * 1000);
     cal.setTimeInMillis(delayTime);
     try {
-      for (WebNotifEntity webNotifEntity : webNotifDAO.findWebNotifsByLastUpdatedDate(cal)) {
+      for (WebNotifEntity webNotifEntity : webNotifDAO.findWebNotifsByLastUpdatedDate(cal.getTime())) {
         webNotifDAO.delete(webNotifEntity);
         removed = true;
       }
@@ -233,12 +232,10 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @Override
   @ExoTransactional
   public boolean remove(String userId, long seconds) {
-    Calendar cal = Calendar.getInstance();
     long delayTime = System.currentTimeMillis() - (seconds * 1000);
-    cal.setTimeInMillis(delayTime);
 
     try {
-      for (WebNotifEntity webNotifEntity : webNotifDAO.findWebNotifsOfUserByLastUpdatedDate(userId, cal)) {
+      for (WebNotifEntity webNotifEntity : webNotifDAO.findWebNotifsOfUserByLastUpdatedDate(userId, new Date(delayTime))) {
         webNotifDAO.delete(webNotifEntity);
       }
     } catch (Exception e) {
@@ -308,13 +305,8 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
       //
       userSettingService.saveLastReadDate(userId, System.currentTimeMillis());
       //
-      if (getWebNotificationStorage() instanceof RDBMSCachedWebNotificationStorage) {
-        RDBMSCachedWebNotificationStorage cacheStorage = (RDBMSCachedWebNotificationStorage) getWebNotificationStorage();
-        cacheStorage.updateAllRead(userId);
-      } else {
-        for (WebNotifEntity webNotifEntity : getNewMessage(userId, 0)) {
-          markRead(String.valueOf(webNotifEntity.getId()));
-        }
+      for (WebNotifEntity webNotifEntity : getNewMessage(userId, 0)) {
+        markRead(String.valueOf(webNotifEntity.getId()));
       }
     } catch (Exception e) {
       LOG.error("Failed to update the all read for userId:" + userId, e);
@@ -350,7 +342,7 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
       Calendar calendar = Calendar.getInstance();
       calendar.setTimeInMillis(lastReadDate);
 
-      List<WebNotifEntity> list = webNotifDAO.findUnreadNotification(pluginId, owner, activityId, calendar);
+      List<WebNotifEntity> list = webNotifDAO.findUnreadNotification(pluginId, owner, activityId, calendar.getTime());
 
       if (list.size() > 0) {
         return getWebNotificationStorage().get(String.valueOf(list.get(0).getId()));

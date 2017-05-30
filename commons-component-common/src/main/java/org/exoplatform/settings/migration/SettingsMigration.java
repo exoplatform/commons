@@ -8,17 +8,29 @@ import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
 import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.commons.chromattic.SessionContext;
 import org.exoplatform.commons.cluster.StartableClusterAware;
+import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.commons.utils.RDBMSMigrationUtils;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.settings.chromattic.*;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.settings.chromattic.ScopeEntity;
+import org.exoplatform.settings.chromattic.SimpleContextEntity;
+import org.exoplatform.settings.chromattic.SubContextEntity;
+import org.exoplatform.settings.chromattic.SynchronizationTask;
 import org.exoplatform.settings.jpa.JPASettingServiceImpl;
-import org.jgroups.util.DefaultThreadFactory;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import static org.exoplatform.commons.utils.CommonsUtils.getService;
 
 /**
  * Created by exo on 4/18/17.
@@ -30,101 +42,195 @@ public class SettingsMigration implements StartableClusterAware {
   //Service
   private JPASettingServiceImpl jpaSettingService;
   private ChromatticLifeCycle chromatticLifeCycle;
-  private ExecutorService executorService;
+  private OrganizationService organizationService;
 
+  private static List<String> allUsers = new LinkedList<String>();
+  private static List<String> errorUserSettings = new LinkedList<String>();
+  private static List<String> errorGlobalSettings = new LinkedList<String>();
+  //scope of user settings migration
+  public static final String SETTINGS_MIGRATION_USER_KEY = "SETTINGS_MIGRATION_USER";
+  //status of jcr user settings data (true if jcr user settings data is migrated)
+  public static final String SETTINGS_JCR_DATA_USER_MIGRATED_KEY = "SETTINGS_JCR_DATA_USER_MIGRATED";
+  //status of settings migration (true if migration completed successfully)
+  public static final String SETTINGS_RDBMS_MIGRATION_DONE = "SETTINGS_RDBMS_MIGRATION_DONE";
 
 
   public SettingsMigration(JPASettingServiceImpl jpaSettingService) {
     this.jpaSettingService = jpaSettingService;
     ChromatticManager chromatticManager = PortalContainer.getInstance().getComponentInstanceOfType(ChromatticManager.class);
     chromatticLifeCycle = (ChromatticLifeCycle) chromatticManager.getLifeCycle("setting");
-    this.executorService = Executors.newSingleThreadExecutor(new DefaultThreadFactory("SETTINGS-MIGRATION-RDBMS", false, false));
-  }
-
-  public ExecutorService getExecutorService() {
-    return executorService;
-  }
-
-  public void setExecutorService(ExecutorService executorService) {
-    this.executorService = executorService;
+    this.organizationService = getService(OrganizationService.class);
   }
 
   @Override
   public void start() {
 
     //First check to see if the JCR still contains settings data. If not, migration is skipped
-    if (!hasDataToMigrate()) {
-      LOG.info("No settings data to migrate from JCR to RDBMS");
-      return;
-    }
-    if(migrateAllSettings()) {
+    if (!hasGlobalSettingsToMigrate()) {
+      LOG.info("No global settings data to migrate from JCR to RDBMS");
+    } else {
+      migrateGlobalSettings();
       //Deletion of settings data in JCR is done as a background task
-      getExecutorService().submit(new Callable<Void>() {
+      RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
         @Override
         public Void call() throws Exception {
-          LOG.info("=== Start cleaning Settings data from JCR");
+          LOG.info("=== Start cleaning Global Settings data from JCR");
           long startTime = System.currentTimeMillis();
-          deleteJcrSettings();
+          deleteJcrGlobalSettings();
           long endTime = System.currentTimeMillis();
-          LOG.info("=== Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+          LOG.info("=== Global Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+          return null;
+        }
+      });
+    }
+    if (!hasUserSettingsToMigrate()) {
+      LOG.info("No user settings data to migrate from JCR to RDBMS");
+    } else {
+      migrateUserSettings();
+    }
+    if (getJCRUserSettingsToRemove() != null) {
+      RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+        @Override
+        public Void call() throws Exception {
+          LOG.info("=== Start cleaning User Settings data from JCR");
+          long startTime = System.currentTimeMillis();
+          deleteJcrUserSettings();
+          long endTime = System.currentTimeMillis();
+          LOG.info("=== User Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+          if (chromatticLifeCycle.getManager().getSynchronization() != null) {
+            chromatticLifeCycle.getManager().endRequest(true);
+          }
           return null;
         }
       });
     }
   }
 
-  private Boolean deleteJcrSettings() {
+  private Boolean deleteJcrGlobalSettings() {
     return new SynchronizationTask<Boolean>() {
       @Override
       protected Boolean execute(SessionContext ctx) {
         try {
           for (String scope : getGlobalSettings()) {
-            deleteGlobalSettings(scope);
-          }
-          for (String user : getUserSettings()) {
-            deleteUserSettings(user);
-          }
-          return true;
-        } catch (Exception e) {
-          return false;
-        }
-      }
-    }.executeWith(chromatticLifeCycle);
-  }
-
-  private Boolean migrateAllSettings() {
-    return new SynchronizationTask<Boolean>() {
-      @Override
-      protected Boolean execute(SessionContext ctx) {
-        try {
-          LOG.info("=== Start migration of Settings data from JCR to RDBMS");
-          for (String scope : getGlobalSettings()) {
-            migrateGlobalSettingsOfGlobalScopes(scope);
-            migrateGlobalSettingsOfGlobalSpecificScopes(scope);
-          }
-          for (String user : getUserSettings()) {
-            for (String userScope : getUserScopesSettings(user)) {
-              migrateUserSettingsOfGlobalScope(user, userScope);
-              migrateUserSettingsOfSpecificScope(user, userScope);
+            if (!errorGlobalSettings.contains(scope)) {
+              deleteGlobalSettings(scope);
             }
           }
-          LOG.info("Settings data migrated");
           return true;
         } catch (Exception e) {
-          LOG.error("Cannot migrate Settings data - cause: " +e.getMessage(), e);
           return false;
         }
       }
     }.executeWith(chromatticLifeCycle);
   }
 
+  private Boolean deleteJcrUserSettings() {
+    return new SynchronizationTask<Boolean>() {
+      @Override
+      protected Boolean execute(SessionContext ctx) {
+        try {
+          for (String user : getJCRUserSettingsToRemove()) {
+            if (!errorUserSettings.contains(user) && isSettingsMigrated(user)) {
+              LOG.info(" removing JCR settings of user: " + user);
+              if (deleteUserSettings(user)) {
+                jpaSettingService.remove(Context.USER.id(user), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
+                LOG.info(" done removing JCR settings of user: " + user);
+              }
+            }
+          }
+          return true;
+        } catch (Exception e) {
+          return false;
+        }
+      }
+    }.executeWith(chromatticLifeCycle);
+  }
+
+  private Boolean migrateGlobalSettings() {
+    return new SynchronizationTask<Boolean>() {
+      @Override
+      protected Boolean execute(SessionContext ctx) {
+        LOG.info("=== Start migration of Global Settings data from JCR to RDBMS");
+        long startTime = System.currentTimeMillis();
+        for (String scope : getGlobalSettings()) {
+          migrateGlobalSettingsOfGlobalScopes(scope);
+          migrateGlobalSettingsOfGlobalSpecificScopes(scope);
+        }
+        long endTime = System.currentTimeMillis();
+        LOG.info("Global Settings data migrated in " + (endTime - startTime) + " ms");
+        return true;
+      }
+    }.executeWith(chromatticLifeCycle);
+  }
+
+  private Boolean migrateUserSettings() {
+    int pageSize = 20;
+    int current = 0;
+    try {
+      ListAccess<User> allUsersListAccess = organizationService.getUserHandler().findAllUsers();
+      ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+      int totalUsers = allUsersListAccess.getSize();
+      LOG.info("    Number of users = " + totalUsers);
+      User[] users;
+      LOG.info("=== Start migration of User Settings data from JCR");
+      ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+      RequestLifeCycle.begin(currentContainer);
+      long startTime = System.currentTimeMillis();
+      do {
+        LOG.info("    Progression of users settings migration : " + current + "/" + totalUsers);
+        if (current + pageSize > totalUsers) {
+          pageSize = totalUsers - current;
+        }
+        users = allUsersListAccess.load(current, pageSize);
+        for (User user : users) {
+          RequestLifeCycle.end();
+          RequestLifeCycle.begin(currentContainer);
+          String userName = user.getUserName();
+          if (!isSettingsMigrated(userName)) {
+            for (String userScope : getUserScopesSettings(userName)) {
+              migrateUserSettingsOfGlobalScope(userName, userScope);
+              migrateUserSettingsOfSpecificScope(userName, userScope);
+            }
+            allUsers.add(userName);
+            if (errorUserSettings.contains(userName)) {
+              jpaSettingService.set(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, SettingValue.create("false"));
+            } else {
+              jpaSettingService.set(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
+            }
+          }
+        }
+        current += users.length;
+      } while(users != null && users.length > 0);
+      long endTime = System.currentTimeMillis();
+      LOG.info("User Settings data migrated in " + (endTime - startTime) + " ms");
+      if (!errorUserSettings.isEmpty()) {
+        jpaSettingService.set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY, SettingValue.create("true"));
+      } else {
+        jpaSettingService.set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY, SettingValue.create("false"));
+      }
+      return true;
+    } catch (Exception e) {
+      LOG.error("Error while migrating user settings data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+      return false;
+    } finally {
+      RequestLifeCycle.end();
+      if (chromatticLifeCycle.getManager().getSynchronization() != null) {
+        chromatticLifeCycle.getManager().endRequest(true);
+      }
+    }
+  }
+
+  private boolean isSettingsMigrated(String userName) {
+    SettingValue<?> setting = jpaSettingService.get(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
+    return (setting != null && setting.getValue().equals("true"));
+  }
 
   private Set<String> getUserScopesSettings(String user) {
     return new SynchronizationTask<Set<String>>() {
       @Override
       protected Set<String> execute(SessionContext ctx) {
         SimpleContextEntity userSettings = ctx.getSession().findByPath(SimpleContextEntity.class, "settings/user/" + user);
-        return userSettings.getScopes().keySet();
+        return (userSettings == null ? new HashSet<String>() : userSettings.getScopes().keySet());
       }
     }.executeWith(chromatticLifeCycle);
   }
@@ -143,8 +249,15 @@ public class SettingsMigration implements StartableClusterAware {
   private Boolean migrateGlobalSettingsOfGlobalSpecificScopes(String scope) {
     ScopeEntity scopeEntity = getSpecificScope(scope);
     for (String instance : scopeEntity.getInstances().keySet()) {
+      Scope specificScope = getScope(scope, instance);
       for (String key : scopeEntity.getInstance(instance).getProperties().keySet()) {
-        jpaSettingService.set(Context.GLOBAL, getScope(scope, instance), key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+        try {
+          jpaSettingService.set(Context.GLOBAL, specificScope, key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+        } catch (Exception e) {
+          errorGlobalSettings.add(scope);
+          LOG.error("Cannot migrate Global Settings data of specific scope: "+scope+" - cause: " +e.getMessage(), e);
+          continue;
+        }
       }
     }
     return true;
@@ -195,22 +308,53 @@ public class SettingsMigration implements StartableClusterAware {
   @ExoTransactional
   private Boolean migrateUserSettingsOfSpecificScope(String user, String scope) {
     ScopeEntity scopeEntity = getScopeOfUser(user, scope);
-    for (String instance : scopeEntity.getInstances().keySet()) {
-      for (String key : scopeEntity.getInstance(instance).getProperties().keySet()) {
-        jpaSettingService.set(Context.USER.id(user), getScope(scope, instance), key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+    if (scopeEntity != null) {
+      for (String instance : scopeEntity.getInstances().keySet()) {
+        Scope specificScope = getScope(scope, instance);
+        for (String key : scopeEntity.getInstance(instance).getProperties().keySet()) {
+          try {
+            jpaSettingService.set(Context.USER.id(user), specificScope, key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+          } catch (Exception e) {
+            errorUserSettings.add(user);
+            LOG.error("Cannot migrate User Settings data of user: " + user + " and scope: " + scope + " - cause: " + e.getMessage(), e);
+            continue;
+          }
+        }
       }
     }
     return true;
   }
 
-  private Boolean hasDataToMigrate() {
+  private Boolean hasGlobalSettingsToMigrate() {
     return new SynchronizationTask<Boolean>() {
       @Override
       protected Boolean execute(SessionContext ctx) {
         SimpleContextEntity settings = ctx.getSession().findByPath(SimpleContextEntity.class, "settings/global");
-        SubContextEntity userSettings = ctx.getSession().findByPath(SubContextEntity.class, "settings/user");
-        return ((userSettings==null && settings==null)
-            ||((userSettings.getContexts().size() > 0) && (settings.getScopes().size() > 0)));
+        return (settings!=null && settings.getScopes().size() > 0);
+      }
+    }.executeWith(chromatticLifeCycle);
+  }
+
+  private Boolean hasUserSettingsToMigrate() {
+    try {
+      SettingValue<?> setting = jpaSettingService.get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY);
+      if (setting != null) {
+        return setting.getValue().equals("true");
+      } else {
+        return true;
+      }
+    } catch (Exception e) {
+      LOG.error("Error when defining if there is user settings to migrate in jcr - cause: " + e.getMessage(), e);
+      return false;
+    }
+  }
+
+  private Set<String> getJCRUserSettingsToRemove() {
+    return new SynchronizationTask<Set<String>>() {
+      @Override
+      protected Set<String> execute(SessionContext ctx) {
+        SubContextEntity settings = ctx.getSession().findByPath(SubContextEntity.class, "settings/user");
+        return (settings!=null ? settings.getContexts().keySet() : null);
       }
     }.executeWith(chromatticLifeCycle);
   }
@@ -226,7 +370,11 @@ public class SettingsMigration implements StartableClusterAware {
       @Override
       protected Set<String> execute(SessionContext ctx) {
         SimpleContextEntity globalSettings = ctx.getSession().findByPath(SimpleContextEntity.class, "settings/global");
-        return globalSettings.getScopes().keySet();
+        if (globalSettings != null) {
+          return globalSettings.getScopes().keySet();
+        } else {
+          return new HashSet<String>();
+        }
       }
     }.executeWith(chromatticLifeCycle);
   }
@@ -244,8 +392,15 @@ public class SettingsMigration implements StartableClusterAware {
   @ExoTransactional
   public Boolean migrateGlobalSettingsOfGlobalScopes(String scope) {
     ScopeEntity scopeEntity = getGlobalScope(scope);
+    Scope globalScope = getScope(scope, null);
     for (String key : scopeEntity.getProperties().keySet()) {
-      jpaSettingService.set(Context.GLOBAL, getScope(scope, null), key, new SettingValue<>(scopeEntity.getValue(key)));
+      try {
+        jpaSettingService.set(Context.GLOBAL, globalScope, key, new SettingValue<>(scopeEntity.getValue(key)));
+      } catch (Exception e) {
+        errorGlobalSettings.add(scope);
+        LOG.error("Cannot migrate Global Settings data of scope: "+scope+" - cause: " +e.getMessage(), e);
+        continue;
+      }
     }
     return true;
   }
@@ -263,8 +418,17 @@ public class SettingsMigration implements StartableClusterAware {
   @ExoTransactional
   public Boolean migrateUserSettingsOfGlobalScope(String user, String scope) {
     ScopeEntity scopeEntity = getGlobalScopeOfUser(user, scope);
-    for (String key : scopeEntity.getProperties().keySet()) {
-      jpaSettingService.set(Context.USER.id(user), getScope(scope, null), key, new SettingValue<>(scopeEntity.getValue(key)));
+    Scope globalScope = getScope(scope, null);
+    if (scopeEntity != null) {
+      for (String key : scopeEntity.getProperties().keySet()) {
+        try {
+          jpaSettingService.set(Context.USER.id(user), globalScope, key, new SettingValue<>(scopeEntity.getValue(key)));
+        } catch (Exception e) {
+          errorUserSettings.add(user);
+          LOG.error("Cannot migrate User Settings data of user: " + user + " and scope: " + scope + " - cause: " + e.getMessage(), e);
+          continue;
+        }
+      }
     }
     return true;
   }
@@ -287,15 +451,5 @@ public class SettingsMigration implements StartableClusterAware {
         return Scope.GLOBAL.id(id);
     }
     return null;
-  }
-
-  public Set<String> getUserSettings() {
-    return new SynchronizationTask<Set<String>>() {
-      @Override
-      protected Set<String> execute(SessionContext ctx) {
-        SubContextEntity userSettings = ctx.getSession().findByPath(SubContextEntity.class, "settings/user");
-        return userSettings.getContexts().keySet();
-      }
-    }.executeWith(chromatticLifeCycle);
   }
 }

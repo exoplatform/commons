@@ -11,14 +11,14 @@ import java.util.Set;
  *          exo@exoplatform.com
  * Mar 07, 2017
  */
-@Entity(name = "ContextEntity")
+@Entity(name = "SettingsContextEntity")
 @ExoEntity
 @Table(name = "STG_CONTEXTS")
 @NamedQueries({
-    @NamedQuery(name = "commons.getContext", query = "SELECT c FROM ContextEntity c " +
+    @NamedQuery(name = "commons.getContext", query = "SELECT c FROM SettingsContextEntity c " +
         "WHERE c.name = :name " +
         "AND c.type= :contextType "),
-    @NamedQuery(name = "commons.getContextofType", query = "SELECT c FROM ContextEntity c " +
+    @NamedQuery(name = "commons.getContextofType", query = "SELECT c FROM SettingsContextEntity c " +
         "WHERE c.type= :contextType ")
 })
 public class ContextEntity {

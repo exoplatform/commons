@@ -13,38 +13,38 @@ import java.util.Set;
  *          exo@exoplatform.com
  * Mar 07, 2017
  */
-@Entity(name = "WebNotifEntity")
+@Entity(name = "NotificationsWebNotifEntity")
 @ExoEntity
 @Table(name = "NTF_WEB_NOTIFS")
 @NamedQueries({
-    @NamedQuery(name = "commons.findWebNotifsByPluginFilter", query = "SELECT w FROM WebNotifEntity w " +
+    @NamedQuery(name = "commons.findWebNotifsByPluginFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.receiver  Receiver " +
         "WHERE w.type= :pluginId " +
         "AND Receiver.receiver = :userId " +
         "AND Receiver.showPopover= :isOnPopover " +
         "ORDER BY Receiver.updateDate DESC "),
-    @NamedQuery(name = "commons.findWebNotifsByUserFilter", query = "SELECT w FROM WebNotifEntity w " +
+    @NamedQuery(name = "commons.findWebNotifsByUserFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.receiver  Receiver " +
         "WHERE Receiver.receiver = :userId " +
         "ORDER BY Receiver.updateDate DESC "),
-    @NamedQuery(name = "commons.findWebNotifsByPopoverFilter", query = "SELECT w FROM WebNotifEntity w " +
+    @NamedQuery(name = "commons.findWebNotifsByPopoverFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.receiver  Receiver " +
         "WHERE Receiver.receiver = :userId " +
         "AND Receiver.showPopover= :isOnPopover " +
         "ORDER BY Receiver.updateDate DESC "),
-    @NamedQuery(name = "commons.findNewWebNotifsByUser", query = "SELECT w FROM WebNotifEntity w " +
+    @NamedQuery(name = "commons.findNewWebNotifsByUser", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.receiver  Receiver " +
         "WHERE Receiver.receiver = :userId " +
         "AND Receiver.read = :isRead " +
         "ORDER BY Receiver.updateDate DESC "),
-    @NamedQuery(name = "commons.findWebNotifsByLastUpdatedDate", query = "SELECT w FROM WebNotifEntity w " +
+    @NamedQuery(name = "commons.findWebNotifsByLastUpdatedDate", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.receiver  Receiver " +
         "WHERE Receiver.updateDate < :delayTime "),
-    @NamedQuery(name = "commons.findWebNotifsOfUserByLastUpdatedDate", query = "SELECT w FROM WebNotifEntity w " +
+    @NamedQuery(name = "commons.findWebNotifsOfUserByLastUpdatedDate", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.receiver  Receiver " +
         "WHERE Receiver.receiver = :userId " +
         "AND Receiver.updateDate < :calendar "),
-    @NamedQuery(name = "commons.findUnreadNotification", query = "SELECT w FROM WebNotifEntity w " +
+    @NamedQuery(name = "commons.findUnreadNotification", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.parameters  Parameters " +
         "JOIN w.receiver  Receiver " +
         "WHERE w.type= :pluginId " +
@@ -53,12 +53,12 @@ import java.util.Set;
         "AND Receiver.receiver = :owner " +
         "AND Receiver.read = false " +
         "AND Receiver.updateDate > :calendar "),
-    @NamedQuery(name = "commons.findWebNotifsOfUserByParam", query = "SELECT w FROM WebNotifEntity w " +
+    @NamedQuery(name = "commons.findWebNotifsOfUserByParam", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.parameters  Parameters " +
         "JOIN w.receiver  Receiver " +
         "WHERE w.type= :pluginId " +
         "AND Parameters.name = :paramName " +
-        "AND Parameters.value = :paramValue " +
+        "AND Parameters.value LIKE :paramValue " +
         "AND Receiver.receiver = :owner ")
 })
 public class WebNotifEntity {
@@ -75,7 +75,7 @@ public class WebNotifEntity {
   private String type;
 
   @Column(name = "CREATION_DATE")
-  private Calendar creationDate;
+  private Date creationDate;
 
   @Column(name = "OWNER")
   private String owner;
@@ -111,11 +111,11 @@ public class WebNotifEntity {
     return this;
   }
 
-  public Calendar getCreationDate() {
+  public Date getCreationDate() {
     return creationDate;
   }
 
-  public WebNotifEntity setCreationDate(Calendar creationDate) {
+  public WebNotifEntity setCreationDate(Date creationDate) {
     this.creationDate = creationDate;
     return this;
   }

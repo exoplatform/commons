@@ -143,7 +143,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       //
     } else {
       model = UserSetting.getDefaultInstance().setUserId(userId);
-      addMixin(userId);
+      initDefaultSettings(userId);
     }
     SettingValue<?> value = getSettingValue(userId, EXO_LAST_READ_DATE);
     if (value != null) {
@@ -184,12 +184,12 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   }
 
   @Override
-  public void addMixin(String userId) {
-    addMixin(new User[] { new UserImpl(userId) });
+  public void initDefaultSettings(String userId) {
+    initDefaultSettings(new User[] { new UserImpl(userId) });
   }
 
   @Override
-  public void addMixin(User[] users) {
+  public void initDefaultSettings(User[] users) {
     boolean created = NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider = NotificationSessionManager.getSessionProvider();
     try {

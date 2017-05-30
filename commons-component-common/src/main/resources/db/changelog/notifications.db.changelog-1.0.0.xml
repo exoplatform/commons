@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+
+    <!-- Managing both DB that use sequences and db that use auto increment -->
+    <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,hsqldb"/>
+    <property name="autoIncrement" value="false" dbms="oracle,postgresql"/>
+
+    <!-- Managing auto generation of timestamp by Database -->
+    <property name="now" value="now()" dbms="mysql,hsqldb,postgresql,h2"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="CURRENT_TIMESTAMP" dbms="mssql"/>
+
+    <!-- NOTIFICATIONS -->
+    <!-- email notifications -->
+    <changeSet author="notifications" id="1.0.0-1">
+        <createTable tableName="NTF_EMAIL_NOTIFS">
+            <column name="EMAIL_NOTIF_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_ID"/>
+            </column>
+            <column name="SENDER" type="NVARCHAR(200)">
+            </column>
+            <column name="TYPE" type="NVARCHAR(550)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATION_DATE" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SENDING_ORDER" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <modifySql dbms="mysql">
+            <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-2">
+        <createTable tableName="NTF_EMAIL_NOTIFS_PARAMS">
+            <column name="EMAIL_NOTIF_PARAMS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_PARAMS_ID"/>
+            </column>
+            <column name="EMAIL_NOTIF_ID" type="BIGINT">
+                <!--<constraints nullable="false"/>-->
+            </column>
+            <column name="PARAM_NAME" type="NVARCHAR(550)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PARAM_VALUE" type="CLOB"/>
+        </createTable>
+        <modifySql dbms="mysql">
+            <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-3">
+        <createTable tableName="NTF_EMAIL_NOTIFS_DIGEST">
+            <column name="EMAIL_NOTIF_DIGEST_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_DIGEST_ID"/>
+            </column>
+            <column name="EMAIL_NOTIF_ID" type="BIGINT">
+                <!--<constraints nullable="false"/>-->
+            </column>
+            <column name="DIGEST_TYPE" type="NVARCHAR(550)"/>
+            <column name="DIGEST_TO_USER" type="NVARCHAR(200)"/>
+        </createTable>
+        <modifySql dbms="mysql">
+            <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-4" dbms="oracle,postgresql">
+        <createSequence sequenceName="SEQ_NTF_EMAIL_NOTIF" startValue="1"/>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-5" dbms="oracle,postgresql">
+        <createSequence sequenceName="SEQ_NTF_EMAIL_PARAMS" startValue="1"/>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-6" dbms="oracle,postgresql">
+        <createSequence sequenceName="SEQ_NTF_EMAIL_DIGEST" startValue="1"/>
+    </changeSet>
+
+
+    <changeSet author="notifications" id="1.0.0-7">
+        <addForeignKeyConstraint baseColumnNames="EMAIL_NOTIF_ID" baseTableName="NTF_EMAIL_NOTIFS_PARAMS"
+                                 constraintName="FK_NTF_EMAIL_NOTIFS_PARAMS_01" deferrable="false" initiallyDeferred="false"
+                                 onDelete="SET NULL" onUpdate="NO ACTION"
+                                 referencedColumnNames="EMAIL_NOTIF_ID" referencedTableName="NTF_EMAIL_NOTIFS"/>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-8">
+        <addForeignKeyConstraint baseColumnNames="EMAIL_NOTIF_ID" baseTableName="NTF_EMAIL_NOTIFS_DIGEST"
+                                 constraintName="FK_NTF_EMAIL_NOTIFS_DIGEST_01" deferrable="false" initiallyDeferred="false"
+                                 onDelete="SET NULL" onUpdate="NO ACTION"
+                                 referencedColumnNames="EMAIL_NOTIF_ID" referencedTableName="NTF_EMAIL_NOTIFS"/>
+    </changeSet>
+
+    <!-- web notifications -->
+    <changeSet author="notifications" id="1.0.0-9">
+        <createTable tableName="NTF_WEB_NOTIFS">
+            <column name="WEB_NOTIF_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIF_ID"/>
+            </column>
+            <column name="SENDER" type="NVARCHAR(200)">
+            </column>
+            <column name="TYPE" type="NVARCHAR(550)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATION_DATE" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="OWNER" type="NVARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TEXT" type="CLOB">
+            </column>
+        </createTable>
+        <modifySql dbms="mysql">
+            <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-10">
+        <createTable tableName="NTF_WEB_NOTIFS_PARAMS">
+            <column name="WEB_NOTIF_PARAMS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIF_PARAMS_ID"/>
+            </column>
+            <column name="WEB_NOTIF_ID" type="BIGINT">
+                <!--<constraints nullable="false"/>-->
+            </column>
+            <column name="PARAM_NAME" type="NVARCHAR(550)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PARAM_VALUE" type="CLOB"/>
+        </createTable>
+        <modifySql dbms="mysql">
+            <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-11">
+        <createTable tableName="NTF_WEB_NOTIFS_USERS">
+            <column name="WEB_NOTIFS_USERS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIFS_USERS_ID"/>
+            </column>
+            <column name="WEB_NOTIF_ID" type="BIGINT">
+                <!--<constraints nullable="false"/>-->
+            </column>
+            <column name="RECEIVER" type="NVARCHAR(200)"/>
+            <column name="UPDATE_DATE" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IS_READ" type="BOOLEAN"/>
+            <column name="SHOW_POPOVER" type="BOOLEAN"/>
+        </createTable>
+        <modifySql dbms="mysql">
+            <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-12" dbms="oracle,postgresql">
+        <createSequence sequenceName="SEQ_NTF_WEB_NOTIFS" startValue="1"/>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-13" dbms="oracle,postgresql">
+        <createSequence sequenceName="SEQ_NTF_WEB_PARAMS" startValue="1"/>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-14" dbms="oracle,postgresql">
+        <createSequence sequenceName="SEQ_NTF_WEB_USERS" startValue="1"/>
+    </changeSet>
+
+
+    <changeSet author="notifications" id="1.0.0-15">
+        <addForeignKeyConstraint baseColumnNames="WEB_NOTIF_ID" baseTableName="NTF_WEB_NOTIFS_PARAMS"
+                                 constraintName="FK_NTF_WEB_NOTIFS_PARAMS_01" deferrable="false" initiallyDeferred="false"
+                                 onDelete="SET NULL" onUpdate="NO ACTION"
+                                 referencedColumnNames="WEB_NOTIF_ID" referencedTableName="NTF_WEB_NOTIFS"/>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-16">
+        <addForeignKeyConstraint baseColumnNames="WEB_NOTIF_ID" baseTableName="NTF_WEB_NOTIFS_USERS"
+                                 constraintName="FK_NTF_WEB_NOTIFS_USERS_01" deferrable="false" initiallyDeferred="false"
+                                 onDelete="SET NULL" onUpdate="NO ACTION"
+                                 referencedColumnNames="WEB_NOTIF_ID" referencedTableName="NTF_WEB_NOTIFS"/>
+    </changeSet>
+
+    <!-- email queue -->
+    <changeSet author="notifications" id="1.0.0-17">
+        <createTable tableName="EMAIL_QUEUE">
+            <column name="EMAIL_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_EMAIL_ID"/>
+            </column>
+            <column name="CREATION_DATE" type="TIMESTAMP"/>
+            <column name="TYPE" type="NVARCHAR(550)"/>
+            <column name="SENDER" type="NVARCHAR(200)"/>
+            <column name="RECEIVER" type="NVARCHAR(200)"/>
+            <column name="SUBJECT" type="NVARCHAR(550)"/>
+            <column name="BODY" type="CLOB"/>
+            <column name="FOOTER" type="NVARCHAR(550)"/>
+        </createTable>
+        <modifySql dbms="mysql">
+            <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-18" dbms="oracle,postgresql">
+        <createSequence sequenceName="SEQ_NTF_EMAIL_QUEUE" startValue="1"/>
+    </changeSet>
+
+</databaseChangeLog>

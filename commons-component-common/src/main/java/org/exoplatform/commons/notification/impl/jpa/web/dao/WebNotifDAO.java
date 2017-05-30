@@ -4,8 +4,7 @@ import org.exoplatform.commons.notification.impl.jpa.web.entity.WebNotifEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 
 import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,26 +54,26 @@ public class WebNotifDAO extends GenericDAOJPAImpl<WebNotifEntity, Long> {
         .setParameter("isRead", isRead)
         .getResultList();
   }
-  public List<WebNotifEntity> findWebNotifsByLastUpdatedDate(Calendar delayTime) {
+  public List<WebNotifEntity> findWebNotifsByLastUpdatedDate(Date delayTime) {
     return getEntityManager().createNamedQuery("commons.findWebNotifsByLastUpdatedDate")
         .setParameter("delayTime", delayTime)
         .getResultList();
   }
 
-  public List<WebNotifEntity> findWebNotifsOfUserByLastUpdatedDate(String userId, Calendar calendar) {
+  public List<WebNotifEntity> findWebNotifsOfUserByLastUpdatedDate(String userId, Date calendar) {
     return getEntityManager().createNamedQuery("commons.findWebNotifsOfUserByLastUpdatedDate")
         .setParameter("userId", userId)
         .setParameter("calendar", calendar)
         .getResultList();
   }
 
-  public List<WebNotifEntity> findUnreadNotification(String pluginId, String owner, String activityId, Calendar calendar) {
+  public List<WebNotifEntity> findUnreadNotification(String pluginId, String owner, String activityId, Date date) {
     return getEntityManager().createNamedQuery("commons.findUnreadNotification")
         .setParameter("pluginId", pluginId)
         .setParameter("owner", owner)
         .setParameter("activityId", activityId)
         .setParameter("activityIdParamName", "activityId")
-        .setParameter("calendar", calendar)
+        .setParameter("calendar", date)
         .setFirstResult(0)
         .setMaxResults(1)
         .getResultList();

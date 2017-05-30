@@ -13,17 +13,17 @@ import java.util.Set;
  *          exo@exoplatform.com
  * Mar 07, 2017
  */
-@Entity(name = "MailNotifEntity")
+@Entity(name = "NotificationsMailNotifEntity")
 @ExoEntity
 @Table(name = "NTF_EMAIL_NOTIFS")
 @NamedQueries({
-    @NamedQuery(name = "commons.getNotifsByPluginAndDay", query = "SELECT m FROM MailNotifEntity m " +
+    @NamedQuery(name = "commons.getNotifsByPluginAndDay", query = "SELECT m FROM NotificationsMailNotifEntity m " +
         "WHERE DAY(m.creationDate)= :day " +
         "AND MONTH(m.creationDate)= :month " +
         "AND YEAR(m.creationDate)= :year " +
         "AND m.type= :pluginId " +
         "ORDER BY m.order ASC, m.creationDate DESC"),
-    @NamedQuery(name = "commons.getNotifsByPluginAndWeek", query = "SELECT m FROM MailNotifEntity m " +
+    @NamedQuery(name = "commons.getNotifsByPluginAndWeek", query = "SELECT m FROM NotificationsMailNotifEntity m " +
         "WHERE m.creationDate> :date " +
         "AND m.type= :pluginId " +
         "ORDER BY m.order ASC, m.creationDate DESC")
@@ -62,7 +62,11 @@ public class MailNotifEntity {
   }
 
   public MailNotifEntity setSender(String sender) {
-    this.sender = sender;
+    if (sender == null || sender.isEmpty()) {
+      this.sender = null;
+    } else {
+      this.sender = sender;
+    }
     return this;
   }
 

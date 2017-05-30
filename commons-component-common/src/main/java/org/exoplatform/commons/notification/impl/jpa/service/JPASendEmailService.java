@@ -14,10 +14,10 @@ import org.exoplatform.management.jmx.annotations.Property;
  * Created by exo on 3/27/17.
  */
   @Managed
-  @ManagedDescription("Mock jpa mail service")
+  @ManagedDescription("Mail Service")
   @NameTemplate({
       @Property(key = "service", value = "notification"),
-      @Property(key = "view", value = "mockmail")
+      @Property(key = "view", value = "mail")
   })
   public class JPASendEmailService implements ManagementAware {
     private boolean     isOn           = false;

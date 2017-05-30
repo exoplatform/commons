@@ -16,11 +16,11 @@
  */
 package org.exoplatform.commons.api.notification.service.setting;
 
-import java.util.List;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.services.organization.User;
+
+import java.util.List;
 
 public interface UserSettingService {
 
@@ -87,14 +87,14 @@ public interface UserSettingService {
    * 
    * @param userId The user's remote Id.
    */
-  void addMixin(String userId);
+  void initDefaultSettings(String userId);
   
   /**
    * Adds the default settings to a list of users.
    * 
    * @param users The list of users.
    */
-  void addMixin(User[] users);
+  void initDefaultSettings(User[] users);
 
   /**
    * Stores the read time point when user clicks mark all read his/her messages.

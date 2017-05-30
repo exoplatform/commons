@@ -70,31 +70,35 @@ public class JPASettingServiceImpl implements SettingService {
   @Override
   @ExoTransactional
   public void set(Context context, Scope scope, String key, SettingValue<?> value) {
-    ContextEntity c = convertContextToContextEntity(context);
-    ContextEntity contextEntity = settingContextDAO.getContext(c);
-    if (contextEntity == null) {
-      if (c == null) {
-        LOG.info("=== contextEntity not found, because null ===");
-      } else {
-        LOG.info("=== contextEntity not found, with contextType = " + c.getType() + "  and contextName = " + c.getName());
+    try {
+      if (context == null) {
+        LOG.warn("Context is null, can't save setting key={}, value={}", key, value.getValue());
+        return;
       }
-      contextEntity = settingContextDAO.create(convertContextToContextEntity(context));
+      ContextEntity c = convertContextToContextEntity(context);
+      LOG.info("=== setting save, contextType={} and contextName={} and key={} and value={}", c.getType(), c.getName(), key, value.getValue());
+      ContextEntity contextEntity = settingContextDAO.getContext(c);
+      if (contextEntity == null) {
+        contextEntity = settingContextDAO.create(c);
+      }
+      ScopeEntity scopeEntity = settingScopeDAO.getScope(convertScopeToScopeEntity(scope));
+      if (scopeEntity == null) {
+        scopeEntity = settingScopeDAO.create(convertScopeToScopeEntity(scope));
+      }
+      SettingsEntity settingsEntity = settingsDAO.getSetting(contextEntity, scopeEntity, key);
+      if (settingsEntity != null) {
+        settingsEntity.setName(key);
+        settingsEntity.setContext(contextEntity);
+        settingsEntity.setScope(scopeEntity);
+        settingsEntity.setValue(value.getValue().toString());
+      } else {
+        settingsDAO.create(new SettingsEntity().setScope(scopeEntity).setContext(contextEntity).setName(key).setValue(value.getValue().toString()));
+      }
+      SettingData data = new SettingData(EventType.SETTING_SET, new SettingKey(context, scope, key), value);
+      eventManager.broadcastEvent(new Event<JPASettingServiceImpl, SettingData>(data.getEventType().toString(), this, data));
+    } catch (Exception e) {
+      LOG.error(e, e.getCause());
     }
-    ScopeEntity scopeEntity = settingScopeDAO.getScope(convertScopeToScopeEntity(scope));
-    if (scopeEntity == null) {
-      scopeEntity = settingScopeDAO.create(convertScopeToScopeEntity(scope));
-    }
-    SettingsEntity settingsEntity = settingsDAO.getSetting(contextEntity, scopeEntity, key);
-    if (settingsEntity != null) {
-      settingsEntity.setName(key);
-      settingsEntity.setContext(contextEntity);
-      settingsEntity.setScope(scopeEntity);
-      settingsEntity.setValue(value.getValue().toString());
-    } else {
-      settingsDAO.create(new SettingsEntity().setScope(scopeEntity).setContext(contextEntity).setName(key).setValue(value.getValue().toString()));
-    }
-    SettingData data = new SettingData (EventType.SETTING_SET,new SettingKey(context, scope, key),value);
-    eventManager.broadcastEvent(new Event<JPASettingServiceImpl,SettingData>(data.getEventType().toString(),this,data));
   }
 
   @Override

@@ -91,7 +91,7 @@ public class SettingsEntity {
   }
 
   public String getValue() {
-    return value;
+    return (value == null) ? "" : value;
   }
 
   public SettingsEntity setValue(String value) {

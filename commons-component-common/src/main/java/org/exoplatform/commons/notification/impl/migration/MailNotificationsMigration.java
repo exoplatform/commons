@@ -6,26 +6,26 @@ import org.exoplatform.commons.notification.impl.jpa.email.JPANotificationDataSt
 import org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl;
 import org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.RDBMSMigrationUtils;
 import org.exoplatform.commons.utils.StringCommonUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.scheduler.JobSchedulerService;
-import org.jgroups.util.DefaultThreadFactory;
 import org.json.JSONObject;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.servlet.ServletContext;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by exo on 4/21/17.
@@ -41,8 +41,6 @@ public class MailNotificationsMigration implements StartableClusterAware {
   //JCR storage
   private NotificationDataStorageImpl jcrNotificationDataStorage;
 
-  private ExecutorService executorServiceMail;
-  private ExecutorService executorServiceQueue;
   private Session session;
   private NodeHierarchyCreator nodeHierarchyCreator;
   private JobSchedulerService schedulerService;
@@ -56,25 +54,6 @@ public class MailNotificationsMigration implements StartableClusterAware {
     this.jcrNotificationDataStorage = jcrNotificationDataStorage;
 
     schedulerService = CommonsUtils.getService(JobSchedulerService.class);
-
-    this.executorServiceMail = Executors.newSingleThreadExecutor(new DefaultThreadFactory("MAIL-NOTIFICATIONS-MIGRATION-RDBMS", false, false));
-    this.executorServiceQueue = Executors.newSingleThreadExecutor(new DefaultThreadFactory("QUEUE-MESSAGES-MIGRATION-RDBMS", false, false));
-  }
-
-  public ExecutorService getExecutorServiceMail() {
-    return executorServiceMail;
-  }
-
-  public void setExecutorServiceMail(ExecutorService executorServiceMail) {
-    this.executorServiceMail = executorServiceMail;
-  }
-
-  public ExecutorService getExecutorServiceQueue() {
-    return executorServiceQueue;
-  }
-
-  public void setExecutorServiceQueue(ExecutorService executorServiceQueue) {
-    this.executorServiceQueue = executorServiceQueue;
   }
 
   @Override
@@ -93,38 +72,43 @@ public class MailNotificationsMigration implements StartableClusterAware {
       return;
     }
     //migration of mail notifications data from JCR to RDBMS is done as a background task
-    getExecutorServiceMail().submit(new Callable<Void>() {
+    PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
       @Override
-      public Void call() throws Exception {
-        try {
-          // pause job of sending digest mails
-          schedulerService.pauseJob("NotificationDailyJob", "Notification");
-          schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
-          ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-          LOG.info("=== Start migration of Mail Notifications data from JCR");
-          long startTime = System.currentTimeMillis();
-          migrateMailNotifData();
-          isMailNotifsMigrated = true;
-          long endTime = System.currentTimeMillis();
-          LOG.info("=== Migration of Mail Notification data done in " + (endTime - startTime) + " ms");
-          schedulerService.resumeJob("NotificationDailyJob", "Notification");
-          schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
-        } catch (Exception e) {
-          LOG.error("Error while migrating Mail Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
-          isMailNotifsMigrated = false;
-        }
-        try {
-          if (isMailNotifsMigrated) {
-            LOG.info("=== Start cleaning Mail notifications data from JCR");
-            long startTime = System.currentTimeMillis();
-            deleteJcrMailNotifications();
-            long endTime = System.currentTimeMillis();
-            LOG.info("=== Mail notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+      public void execute(ServletContext context, PortalContainer portalContainer) {
+        RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+          @Override
+          public Void call() throws Exception {
+            try {
+              // pause job of sending digest mails
+              schedulerService.pauseJob("NotificationDailyJob", "Notification");
+              schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
+              ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+              LOG.info("=== Start migration of Mail Notifications data from JCR");
+              long startTime = System.currentTimeMillis();
+              migrateMailNotifData();
+              isMailNotifsMigrated = true;
+              long endTime = System.currentTimeMillis();
+              LOG.info("=== Migration of Mail Notification data done in " + (endTime - startTime) + " ms");
+              schedulerService.resumeJob("NotificationDailyJob", "Notification");
+              schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
+            } catch (Exception e) {
+              LOG.error("Error while migrating Mail Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+              isMailNotifsMigrated = false;
+            }
+            try {
+              if (isMailNotifsMigrated) {
+                LOG.info("=== Start cleaning Mail notifications data from JCR");
+                long startTime = System.currentTimeMillis();
+                deleteJcrMailNotifications();
+                long endTime = System.currentTimeMillis();
+                LOG.info("=== Mail notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+              }
+            } catch (Exception e) {
+              LOG.error("Error while cleaning Mail notifications JCR data to RDBMS - Cause : " + e.getMessage(), e);
+            }
+            return null;
           }
-        } catch (Exception e) {
-          LOG.error("Error while cleaning Mail notifications JCR data to RDBMS - Cause : " + e.getMessage(), e);
-        }
-        return null;
+        });
       }
     });
 
@@ -133,30 +117,35 @@ public class MailNotificationsMigration implements StartableClusterAware {
       return;
     }
     //migration of queue messages data from JCR to RDBMS is done as a background task
-    getExecutorServiceQueue().submit(new Callable<Void>() {
+    PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
       @Override
-      public Void call() throws Exception {
-        try {
-          ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-          LOG.info("=== Start migration of Mail messages stored in the queue from JCR");
-          long startTime = System.currentTimeMillis();
-          migrateQueueMessages();
-          long endTime = System.currentTimeMillis();
-          LOG.info("=== Migration of Mail messages data done in " + (endTime - startTime) + " ms");
-        } catch (Exception e) {
-          LOG.error("Error while migrating Mail messages data from JCR to RDBMS - Cause : " + e.getMessage(), e);
-        }
-        try {
-          LOG.info("=== Start cleaning Mail messages data from JCR");
-          long startTime = System.currentTimeMillis();
-          deleteJcrMailMessages();
-          long endTime = System.currentTimeMillis();
-          LOG.info("=== Mail messages JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+      public void execute(ServletContext context, PortalContainer portalContainer) {
+        RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+          @Override
+          public Void call() throws Exception {
+            try {
+              ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+              LOG.info("=== Start migration of Mail messages stored in the queue from JCR");
+              long startTime = System.currentTimeMillis();
+              migrateQueueMessages();
+              long endTime = System.currentTimeMillis();
+              LOG.info("=== Migration of Mail messages data done in " + (endTime - startTime) + " ms");
+            } catch (Exception e) {
+              LOG.error("Error while migrating Mail messages data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+            }
+            try {
+              LOG.info("=== Start cleaning Mail messages data from JCR");
+              long startTime = System.currentTimeMillis();
+              deleteJcrMailMessages();
+              long endTime = System.currentTimeMillis();
+              LOG.info("=== Mail messages JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
 
-        } catch (Exception e) {
-          LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
-        }
-        return null;
+            } catch (Exception e) {
+              LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
+            }
+            return null;
+          }
+        });
       }
     });
   }
@@ -167,6 +156,30 @@ public class MailNotificationsMigration implements StartableClusterAware {
   }
 
   private void deleteJcrMailNotifications() throws RepositoryException {
+    NodeIterator pluginNodesIterator = getMailNotificationNodes();
+    while (pluginNodesIterator.hasNext()) {
+      Node pluginNode = pluginNodesIterator.nextNode();
+      NodeIterator dayNodesIterator = pluginNode.getNodes();
+      while (dayNodesIterator.hasNext()) {
+        Node dayNode = dayNodesIterator.nextNode();
+        NodeIterator notifNodes = dayNode.getNodes();
+        LOG.info("    Removing JCR mail notifications for plugin: " + pluginNode.getName() + " - day: " + dayNode.getName());
+        int i = 0;
+        while (notifNodes.hasNext()) {
+          i++;
+          notifNodes.nextNode().remove();
+          if(i%100 == 0){
+            session.save();
+          }
+        }
+        if (i > 0) {
+          session.save();
+          LOG.info("=== done removed " + i + " mail notifications from JCR for plugin: " + pluginNode.getName());
+        }
+      }
+      pluginNode.remove();
+      session.save();
+    }
     ((Node)session.getItem(nodeHierarchyCreator.getJcrPath("eXoNotification"))).getNode("messageHome").remove();
     session.save();
   }
@@ -233,6 +246,7 @@ public class MailNotificationsMigration implements StartableClusterAware {
       while (dayNodesIterator.hasNext()) {
         Node dayNode = dayNodesIterator.nextNode();
         NodeIterator notifNodes = dayNode.getNodes();
+        LOG.info("    Progression mail notifications migration for plugin: " + pluginNode.getName() + " - day: " + dayNode.getName());
         while (notifNodes.hasNext()) {
           migrateMailNotifNodeToRDBMS(notifNodes.nextNode());
         }

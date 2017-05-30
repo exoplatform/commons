@@ -119,7 +119,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
       //
     } else {
       model = UserSetting.getDefaultInstance().setUserId(userId);
-      addMixin(userId);
+      initDefaultSettings(userId);
     }
     SettingValue<?> value = getSettingValue(userId, EXO_LAST_READ_DATE);
     if (value != null) {
@@ -160,13 +160,13 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
   }
 
   @Override
-  public void addMixin(String userId) {
-    addMixin(new User[] { new UserImpl(userId) });
+  public void initDefaultSettings(String userId) {
+    initDefaultSettings(new User[] { new UserImpl(userId) });
   }
 
   @Override
   @ExoTransactional
-  public void addMixin(User[] users) {
+  public void initDefaultSettings(User[] users) {
     try {
       fillDefaultSettingsOfUser(users);
     } catch (Exception e) {
@@ -188,7 +188,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
 
       }
     } catch (Exception e) {
-      LOG.warn("Can not get the user setting with deactivated");
+      LOG.error("Can not get the user setting with deactivated", e);
     }
     return models;
   }
@@ -318,20 +318,6 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
    * @throws Exception
    */
   private UserSetting fillModel(String username, List<SettingsEntity> settings) throws Exception {
-//    if(!parentNode.hasProperty(EXO_LAST_MODIFIED_DATE)) {
-//      if(parentNode.isNodeType(EXO_MODIFY)) {
-//        parentNode.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
-//        parentNode.save();
-//      }
-//      else if(parentNode.canAddMixin(EXO_MODIFY)) {
-//        parentNode.addMixin(EXO_MODIFY);
-//        parentNode.setProperty(EXO_LAST_MODIFIED_DATE, Calendar.getInstance());
-//        parentNode.save();
-//      }
-//      else {
-//        LOG.warn("Cannot add mixin to node '{}'.", parentNode.getPath());
-//      }
-//    }
     UserSetting model = UserSetting.getInstance();
     model.setUserId(username);
     model.setDailyPlugins(getValues(settings, EXO_DAILY));
@@ -343,13 +329,6 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
     for (AbstractChannel channel : channels) {
       model.setChannelPlugins(channel.getId(), getValues(settings, getChannelProperty(channel.getId())));
     }
-    //
-//    if(parentNode.hasProperty(EXO_LAST_MODIFIED_DATE) ){
-//      model.setLastUpdateTime(parentNode.getProperty(EXO_LAST_MODIFIED_DATE).getDate());
-//    } else {
-//      model.setLastUpdateTime(Calendar.getInstance());
-//    }
-    //
     model.setLastUpdateTime(Calendar.getInstance());
     for (SettingsEntity settingsEntity : settings) {
       if (settingsEntity.getName().equals(EXO_IS_ENABLED)) {

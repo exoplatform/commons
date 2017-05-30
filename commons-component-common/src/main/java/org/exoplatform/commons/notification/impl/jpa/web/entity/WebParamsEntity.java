@@ -26,7 +26,7 @@ import javax.persistence.*;
  *          exo@exoplatform.com
  * Mar 07, 2017
  */
-@Entity(name = "WebParamsEntity")
+@Entity(name = "NotificationsWebParamsEntity")
 @ExoEntity
 @Table(name = "NTF_WEB_NOTIFS_PARAMS")
 public class WebParamsEntity {

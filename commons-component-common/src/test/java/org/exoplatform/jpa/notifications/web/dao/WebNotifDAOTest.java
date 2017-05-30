@@ -104,7 +104,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
   public void testFindWebNotifsByLastUpdatedDate() {
     //today
     WebUsersEntity webUsersEntity1 = new WebUsersEntity();
-    webUsersEntity1.setUpdateDate(Calendar.getInstance());
+    webUsersEntity1.setUpdateDate(Calendar.getInstance().getTime());
     webUsersEntity1.setReceiver("user1");
     WebNotifEntity webNotifEntity1 = new WebNotifEntity();
     webNotifEntity1.setReceiver(webUsersEntity1);
@@ -114,7 +114,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     Calendar yesterday = Calendar.getInstance();
     yesterday.set(Calendar.DAY_OF_MONTH, yesterday.get(Calendar.DAY_OF_MONTH)-1);
     WebUsersEntity webUsersEntity2 = new WebUsersEntity();
-    webUsersEntity2.setUpdateDate(yesterday);
+    webUsersEntity2.setUpdateDate(yesterday.getTime());
     webUsersEntity2.setReceiver("user1");
     WebNotifEntity webNotifEntity2 = new WebNotifEntity();
     webNotifEntity2.setReceiver(webUsersEntity2);
@@ -124,7 +124,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     Calendar fourDaysAgo = Calendar.getInstance();
     fourDaysAgo.set(Calendar.DAY_OF_MONTH, fourDaysAgo.get(Calendar.DAY_OF_MONTH)-4);
     WebUsersEntity webUsersEntity3 = new WebUsersEntity();
-    webUsersEntity3.setUpdateDate(fourDaysAgo);
+    webUsersEntity3.setUpdateDate(fourDaysAgo.getTime());
     webUsersEntity3.setReceiver("user1");
     WebNotifEntity webNotifEntity3 = new WebNotifEntity();
     webNotifEntity3.setReceiver(webUsersEntity3);
@@ -140,14 +140,14 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     fiveDaysAgo.set(Calendar.DAY_OF_MONTH, fiveDaysAgo.get(Calendar.DAY_OF_MONTH)-5);
 
     //Then
-    assertEquals(webNotifDAO.findWebNotifsByLastUpdatedDate(Calendar.getInstance()).size(), 3);
-    assertEquals(webNotifDAO.findWebNotifsByLastUpdatedDate(yesterday).size(), 1);
-    assertEquals(webNotifDAO.findWebNotifsByLastUpdatedDate(fiveDaysAgo).size(), 0);
-    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user1", Calendar.getInstance()).size(), 3);
-    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user2", Calendar.getInstance()).size(), 0);
-    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user1", yesterday).size(), 1);
-    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user2", yesterday).size(), 0);
-    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user1", fiveDaysAgo).size(), 0);
+    assertEquals(webNotifDAO.findWebNotifsByLastUpdatedDate(Calendar.getInstance().getTime()).size(), 3);
+    assertEquals(webNotifDAO.findWebNotifsByLastUpdatedDate(yesterday.getTime()).size(), 1);
+    assertEquals(webNotifDAO.findWebNotifsByLastUpdatedDate(fiveDaysAgo.getTime()).size(), 0);
+    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user1", Calendar.getInstance().getTime()).size(), 3);
+    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user2", Calendar.getInstance().getTime()).size(), 0);
+    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user1", yesterday.getTime()).size(), 1);
+    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user2", yesterday.getTime()).size(), 0);
+    assertEquals(webNotifDAO.findWebNotifsOfUserByLastUpdatedDate("user1", fiveDaysAgo.getTime()).size(), 0);
   }
 
   @Test
@@ -160,7 +160,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     WebUsersEntity webUsersEntity1 = new WebUsersEntity();
     webUsersEntity1.setRead(false);
     webUsersEntity1.setReceiver("user1");
-    webUsersEntity1.setUpdateDate(Calendar.getInstance());
+    webUsersEntity1.setUpdateDate(Calendar.getInstance().getTime());
     WebNotifEntity webNotifEntity1 = new WebNotifEntity();
     webNotifEntity1.setReceiver(webUsersEntity1);
     webNotifEntity1.setParameters(params1);
@@ -177,7 +177,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     WebUsersEntity webUsersEntity2 = new WebUsersEntity();
     webUsersEntity2.setRead(true);
     webUsersEntity2.setReceiver("user1");
-    webUsersEntity2.setUpdateDate(Calendar.getInstance());
+    webUsersEntity2.setUpdateDate(Calendar.getInstance().getTime());
     WebNotifEntity webNotifEntity2 = new WebNotifEntity();
     webNotifEntity2.setReceiver(webUsersEntity2);
     webNotifEntity2.setType("plugin1");
@@ -193,7 +193,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     WebUsersEntity webUsersEntity3 = new WebUsersEntity();
     webUsersEntity3.setRead(false);
     webUsersEntity3.setReceiver("user2");
-    webUsersEntity3.setUpdateDate(Calendar.getInstance());
+    webUsersEntity3.setUpdateDate(Calendar.getInstance().getTime());
     WebNotifEntity webNotifEntity3 = new WebNotifEntity();
     webNotifEntity3.setReceiver(webUsersEntity3);
     webNotifEntity3.setType("plugin1");
@@ -209,7 +209,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     WebUsersEntity webUsersEntity4 = new WebUsersEntity();
     webUsersEntity4.setRead(false);
     webUsersEntity4.setReceiver("user1");
-    webUsersEntity4.setUpdateDate(Calendar.getInstance());
+    webUsersEntity4.setUpdateDate(Calendar.getInstance().getTime());
     WebNotifEntity webNotifEntity4 = new WebNotifEntity();
     webNotifEntity4.setReceiver(webUsersEntity4);
     webNotifEntity4.setType("plugin2");
@@ -227,10 +227,10 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     Calendar yesterday = Calendar.getInstance();
     yesterday.set(Calendar.DAY_OF_MONTH, yesterday.get(Calendar.DAY_OF_MONTH)-1);
     //Then
-    assertEquals(webNotifDAO.findUnreadNotification("plugin1", "user1", "1", Calendar.getInstance()).size(), 0);
-    assertEquals(webNotifDAO.findUnreadNotification("plugin2", "user1", "1", yesterday).size(), 1);
-    assertEquals(webNotifDAO.findUnreadNotification("plugin1", "user2", "1", yesterday).size(), 1);
-    assertEquals(webNotifDAO.findUnreadNotification("plugin1", "user2", "2", yesterday).size(), 0);
+    assertEquals(webNotifDAO.findUnreadNotification("plugin1", "user1", "1", Calendar.getInstance().getTime()).size(), 0);
+    assertEquals(webNotifDAO.findUnreadNotification("plugin2", "user1", "1", yesterday.getTime()).size(), 1);
+    assertEquals(webNotifDAO.findUnreadNotification("plugin1", "user2", "1", yesterday.getTime()).size(), 1);
+    assertEquals(webNotifDAO.findUnreadNotification("plugin1", "user2", "2", yesterday.getTime()).size(), 0);
   }
 
   @Test

@@ -98,7 +98,7 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
     return notificationData;
   }
 
-  private static void putMap(Map<PluginKey, List<NotificationInfo>> notificationData, PluginKey key, List<NotificationInfo> values) {
+  private void putMap(Map<PluginKey, List<NotificationInfo>> notificationData, PluginKey key, List<NotificationInfo> values) {
     if (notificationData.containsKey(key)) {
       List<NotificationInfo> messages = notificationData.get(key);
       for (NotificationInfo notificationMessage : values) {

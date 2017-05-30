@@ -39,9 +39,9 @@ import static org.exoplatform.commons.notification.impl.jpa.EntityConverter.conv
 public class JPAQueueMessageImpl implements QueueMessage, Startable {
   private static final Log LOG                   = ExoLogger.getExoLogger(JPAQueueMessageImpl.class);
 
-  private static final String            MAX_TO_SEND_SYS_KEY   = "conf.notification.service.QueueMessage.numberOfMailPerBatch";
+  private static final String            MAX_TO_SEND_SYS_KEY   = "exo.notification.service.QueueMessage.numberOfMailPerBatch";
   private static final String            MAX_TO_SEND_KEY       = "numberOfMailPerBatch";
-  private static final String            DELAY_TIME_SYS_KEY    = "conf.notification.service.QueueMessage.period";
+  private static final String            DELAY_TIME_SYS_KEY    = "exo.notification.service.QueueMessage.period";
   private static final String            DELAY_TIME_KEY        = "period";
   private static final String            CACHE_REPO_NAME       = "repositoryName";
   private static int                     LIMIT                 = 20;
@@ -102,7 +102,7 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
       mailQueueEntity.setSubject(message.getSubject());
       mailQueueEntity.setBody(message.getBody());
       mailQueueEntity.setFooter(message.getFooter());
-      mailQueueEntity.setCreationDate(message.getCreatedTime());
+      mailQueueEntity.setCreationDate(new Date());
 
       mailQueueDAO.create(mailQueueEntity);
 
@@ -157,7 +157,7 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
 
   @Override
   public boolean sendMessage(Message message) {
-    if (sendEmailService.isOn() == false) {
+    if (!sendEmailService.isOn()) {
       try {
         //ensure the message is valid
         if (message.getFrom() == null) {

@@ -3,7 +3,7 @@ package org.exoplatform.commons.notification.impl.jpa.web.entity;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by The eXo Platform SAS
@@ -11,7 +11,7 @@ import java.util.Calendar;
  *          exo@exoplatform.com
  * Mar 07, 2017
  */
-@Entity(name = "WebUsersEntity")
+@Entity(name = "NotificationsWebUsersEntity")
 @ExoEntity
 @Table(name = "NTF_WEB_NOTIFS_USERS")
 public class WebUsersEntity {
@@ -29,9 +29,9 @@ public class WebUsersEntity {
   private String receiver;
 
   @Column(name = "UPDATE_DATE")
-  private Calendar updateDate;
+  private Date updateDate;
 
-  @Column(name = "READ")
+  @Column(name = "IS_READ")
   private boolean read;
 
   @Column(name = "SHOW_POPOVER")
@@ -58,11 +58,11 @@ public class WebUsersEntity {
     return this;
   }
 
-  public Calendar getUpdateDate() {
+  public Date getUpdateDate() {
     return updateDate;
   }
 
-  public WebUsersEntity setUpdateDate(Calendar updateDate) {
+  public WebUsersEntity setUpdateDate(Date updateDate) {
     this.updateDate = updateDate;
     return this;
   }

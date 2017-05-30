@@ -65,7 +65,7 @@ public class JPAUserSettingServiceTest extends BaseTest {
     for (int i = 0; i < 10; i++) {
       User user = new UserImpl("user_" + i);
       organizationService.getUserHandler().createUser(user, false);
-      userSettingService.addMixin(user.getUserName());
+      userSettingService.initDefaultSettings(user.getUserName());
     }
     List<UserSetting> list = userSettingService.getDigestDefaultSettingForAllUser(0, 0);
 

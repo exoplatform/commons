@@ -219,7 +219,7 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
             //
             User[] users = list.load(0, list.getSize());
             for (int i = 0; i < users.length; i++) {
-              userSettingService.addMixin(users[i].getUserName());
+              userSettingService.initDefaultSettings(users[i].getUserName());
             }
           } catch (Exception e) {
             assertFalse(true);

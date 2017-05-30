@@ -11,6 +11,7 @@ import org.exoplatform.commons.notification.impl.jpa.web.entity.WebUsersEntity;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -39,15 +40,17 @@ public class EntityConverter {
     messageInfo.subject(mailQueueEntity.getSubject());
     messageInfo.body(mailQueueEntity.getBody());
     messageInfo.footer(mailQueueEntity.getFooter());
-    messageInfo.setCreatedTime(mailQueueEntity.getCreationDate());
+    messageInfo.setCreatedTime(mailQueueEntity.getCreationDate().getTime());
     return messageInfo;
   }
 
   public static NotificationInfo convertWebNotifEntityToNotificationInfo(WebNotifEntity webNotifEntity) {
     NotificationInfo notificationInfo = new NotificationInfo();
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(webNotifEntity.getCreationDate());
 
     WebUsersEntity webUsersEntity = webNotifEntity.getReceiver();
-    notificationInfo.setLastModifiedDate(webUsersEntity.getUpdateDate());
+    notificationInfo.setLastModifiedDate(webUsersEntity.getUpdateDate().getTime());
 
     Map<String, String> ownerParameters = new HashMap<String, String>();
     for (WebParamsEntity parameter : webNotifEntity.getParameters()) {
@@ -59,7 +62,7 @@ public class EntityConverter {
     notificationInfo.setTitle(webNotifEntity.getText());
     notificationInfo.setFrom(webNotifEntity.getSender());
     notificationInfo.to(webNotifEntity.getOwner());
-    notificationInfo.setDateCreated(webNotifEntity.getCreationDate());
+    notificationInfo.setDateCreated(cal);
 
     notificationInfo.setId(String.valueOf(webNotifEntity.getId()));
     return notificationInfo;
