@@ -49,7 +49,7 @@ import java.util.Set;
         "JOIN w.receiver  Receiver " +
         "WHERE w.type= :pluginId " +
         "AND Parameters.name = :activityIdParamName " +
-        "AND Parameters.value = :activityId " +
+        "AND Parameters.value LIKE :activityId " +
         "AND Receiver.receiver = :owner " +
         "AND Receiver.read = false " +
         "AND Receiver.updateDate > :calendar "),
