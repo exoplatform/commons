@@ -44,12 +44,12 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
   private static final String            DELAY_TIME_SYS_KEY    = "exo.notification.service.QueueMessage.period";
   private static final String            DELAY_TIME_KEY        = "period";
   private static final String            CACHE_REPO_NAME       = "repositoryName";
-  private static int                     LIMIT                 = 20;
+  private static int                     limit                 = 20;
 
-  private int                            MAX_TO_SEND;
-  private long                           DELAY_TIME;
+  private int                            max_to_send;
+  private long                           delay_time;
 
-  private JPASendEmailService sendEmailService;
+  private JPASendEmailService sendEmailMockService;
   private MailService mailService;
 
   /** using the set to keep the messages. */
@@ -70,8 +70,8 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
     this.settingsDAO = PortalContainer.getInstance().getComponentInstanceOfType(SettingsDAO.class);
     this.mailNotifDAO = PortalContainer.getInstance().getComponentInstanceOfType(MailNotifDAO.class);
 
-    MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 20);
-    DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120) * 1000;
+    max_to_send = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 20);
+    delay_time = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120) * 1000;
   }
 
   @Override
@@ -88,7 +88,7 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
 
     saveMessageInfo(message);
     //
-    sendEmailService.addCurrentCapacity();
+    sendEmailMockService.addCurrentCapacity();
     return true;
   }
 
@@ -114,7 +114,7 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
   @Override
   @ExoTransactional
   public void send() {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean statsEnabled = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     try {
       //
       load();
@@ -127,27 +127,31 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
       }
 
       for (MessageInfo messageInfo : messages) {
-        if (messageInfo != null && !idsRemovingLocal.get().contains(messageInfo.getId())
-            && sendMessage(messageInfo.makeEmailNotification())) {
+        boolean isSent = false;
+        try {
+          isSent = sendMessage(messageInfo.makeEmailNotification());
+        } catch (Exception e) {
+          //error in sending message
+        }
+        if (messageInfo != null && !idsRemovingLocal.get().contains(messageInfo.getId()) && isSent) {
 
-          LOG.debug("Message sent to user: " + messageInfo.getTo());
+          LOG.debug("Message sent to user: {}", messageInfo.getTo());
           //
           idsRemovingLocal.get().add(messageInfo.getId());
-          if (stats) {
+          if (statsEnabled) {
             NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
           }
         }
       }
     } catch (Exception e) {
-      LOG.warn("Failed to send message.");
-      LOG.debug(e.getMessage(), e);
+      LOG.warn("Failed to send mail messages", e);
     }
     removeMessageInfo();
   }
 
   private void load() {
     try {
-      for (MailQueueEntity mailQueueEntity : mailQueueDAO.findAll(0, LIMIT)) {
+      for (MailQueueEntity mailQueueEntity : mailQueueDAO.findAll(0, limit)) {
         messages.add(convertQueueEntityToMessageInfo(mailQueueEntity));
       }
     } catch (Exception e) {
@@ -156,8 +160,12 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
   }
 
   @Override
-  public boolean sendMessage(Message message) {
-    if (!sendEmailService.isOn()) {
+  public boolean sendMessage(Message message) throws Exception {
+    if (sendEmailMockService.isOn()) {
+      //the sendEmailMockService is a managed service for monitoring and test purposes
+      //if it is on, no effective mails will be sent until it is turned off
+      sendEmailMockService.counter();
+    } else {
       try {
         //ensure the message is valid
         if (message.getFrom() == null) {
@@ -167,10 +175,8 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
         return true;
       } catch (Exception e) {
         LOG.error("Error while sending a message - Cause : " + e.getMessage(), e);
-        return false;
+        throw e;
       }
-    } else {
-      sendEmailService.counter();
     }
     // if service is off, removed message.
     return true;
@@ -183,12 +189,11 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
       for (String messageId : ids) {
         mailQueueDAO.delete(mailQueueDAO.find(Long.valueOf(messageId)));
         //
-        sendEmailService.removeCurrentCapacity();
         LOG.debug("Removing messageId: " + messageId);
+        sendEmailMockService.removeCurrentCapacity();
       }
     } catch (Exception e) {
-      LOG.warn("Failed to remove message.");
-      LOG.debug(e.getMessage(), e);
+      LOG.warn("Failed to remove message: " + e.getMessage(), e);
     } finally {
       messages.clear();
       idsRemovingLocal.get().removeAll(ids);
@@ -199,16 +204,16 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
   public void start() {
     resetDefaultConfigJob();
     //
-    sendEmailService.registerManager(this);
+    sendEmailMockService.registerManager(this);
   }
 
   public void resetDefaultConfigJob() {
-    makeJob(MAX_TO_SEND, DELAY_TIME);
+    makeJob(max_to_send, delay_time);
   }
 
   public void makeJob(int limit, long interval) {
     if (interval > 0) {
-      LIMIT = limit;
+      this.limit = limit;
       //
       JobSchedulerService schedulerService = CommonsUtils.getService(JobSchedulerService.class);
       Calendar cal = new GregorianCalendar();
@@ -224,7 +229,7 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
         jdatamap.put(CACHE_REPO_NAME, CommonsUtils.getRepository().getConfiguration().getName());
         //
         schedulerService.addPeriodJob(info, periodInfo, jdatamap);
-        LOG.debug("Job executes interval: " + interval);
+        LOG.debug("Send email notification job execution repeat interval: " + interval);
       } catch (Exception e) {
         LOG.warn("Failed at makeJob().");
         LOG.debug(e.getMessage(), e);
@@ -233,7 +238,7 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
   }
 
   public void setManagementView(JPASendEmailService managementView) {
-    this.sendEmailService = managementView;
+    this.sendEmailMockService = managementView;
   }
 
   public String removeAll() {

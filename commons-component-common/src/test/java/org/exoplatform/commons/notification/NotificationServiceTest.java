@@ -1,15 +1,5 @@
 package org.exoplatform.commons.notification;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
@@ -20,6 +10,15 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.notification.plugin.PluginTest;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NotificationServiceTest extends BaseNotificationTestCase {
   
@@ -105,7 +104,7 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     assertEquals(1, list.size());
     
     
-    notificationDataStorage.removeMessageAfterSent();
+    notificationDataStorage.removeMessageAfterSent(context);
     
     notification2 = getNotificationInfoByKeyIdAndParam(PluginTest.ID, "objectId=idofobject");
     assertNull(notification2);
@@ -141,7 +140,7 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
 
     assertEquals(NotificationInfo.FOR_ALL_USER, notification2.getSendToDaily()[0]);
     // remove value on property sendToDaily
-    notificationDataStorage.removeMessageAfterSent();
+    notificationDataStorage.removeMessageAfterSent(context);
 
     //after sent daily, the message's sendToDaily property must be empty
     notification2 = getNotificationInfoByKeyIdAndParam(PluginTest.ID, "objectId=idofobject");
@@ -156,7 +155,7 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
     
-    notificationDataStorage.removeMessageAfterSent();
+    notificationDataStorage.removeMessageAfterSent(context);
     
     notification2 = getNotificationInfoByKeyIdAndParam(PluginTest.ID, "objectId=idofobject");
     assertNull(notification2);

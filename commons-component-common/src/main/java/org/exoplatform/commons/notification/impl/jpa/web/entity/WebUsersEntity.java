@@ -14,6 +14,18 @@ import java.util.Date;
 @Entity(name = "NotificationsWebUsersEntity")
 @ExoEntity
 @Table(name = "NTF_WEB_NOTIFS_USERS")
+@NamedQueries({
+    @NamedQuery(name = "commons.findWebNotifsByUser", query = "SELECT u FROM NotificationsWebUsersEntity u " +
+        "WHERE u.receiver = :userId "),
+    @NamedQuery(name = "commons.findWebNotifsByUserAndRead", query = "SELECT u FROM NotificationsWebUsersEntity u " +
+        "JOIN u.webNotification WebNotif " +
+        "WHERE u.receiver = :userId " +
+        "AND u.read = :isRead " +
+        "ORDER BY WebNotif.creationDate DESC "),
+    @NamedQuery(name = "commons.getNumberOnBadge", query = "SELECT COUNT(u) FROM NotificationsWebUsersEntity u " +
+        "WHERE u.receiver = :userId " +
+        "AND u.resetNumberOnBadge = FALSE ")
+})
 public class WebUsersEntity {
   @Id
   @Column(name = "WEB_NOTIFS_USERS_ID")
@@ -23,7 +35,7 @@ public class WebUsersEntity {
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "WEB_NOTIF_ID")
-  private WebNotifEntity webNotifications;
+  private WebNotifEntity webNotification;
 
   @Column(name = "RECEIVER")
   private String receiver;
@@ -37,16 +49,20 @@ public class WebUsersEntity {
   @Column(name = "SHOW_POPOVER")
   private boolean showPopover;
 
+  @Column(name = "RESET_NUMBER_BADGE")
+  private boolean resetNumberOnBadge;
+
   public long getId() {
     return id;
   }
 
   public WebNotifEntity getNotification() {
-    return webNotifications;
+    return webNotification;
   }
 
   public WebUsersEntity setNotification(WebNotifEntity webNotification) {
-    this.webNotifications = webNotification;
+    this.webNotification = webNotification;
+    webNotification.addReceiver(this);
     return this;
   }
   public String getReceiver() {
@@ -83,5 +99,13 @@ public class WebUsersEntity {
   public WebUsersEntity setShowPopover(boolean showPopover) {
     this.showPopover = showPopover;
     return this;
+  }
+
+  public boolean isResetNumberOnBadge() {
+    return resetNumberOnBadge;
+  }
+
+  public void setResetNumberOnBadge(boolean resetNumberOnBadge) {
+    this.resetNumberOnBadge = resetNumberOnBadge;
   }
 }

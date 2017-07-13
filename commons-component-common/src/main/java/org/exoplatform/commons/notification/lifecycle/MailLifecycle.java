@@ -120,7 +120,12 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
       MessageInfo msg = builder.buildMessage(ctx);
       if (msg != null) {
         if (NotificationUtils.isValidEmailAddresses(msg.getTo()) == true) {
-          CommonsUtils.getService(QueueMessage.class).sendMessage(msg.makeEmailNotification());
+          try {
+            CommonsUtils.getService(QueueMessage.class).sendMessage(msg.makeEmailNotification());
+          } catch (Exception e) {
+            //error in sending message
+            LOG.error("error in sending message", e);
+          }
         } else {
           LOG.warn(String.format("The email %s is not valid for sending notification", msg.getTo()));
         }

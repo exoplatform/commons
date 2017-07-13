@@ -26,7 +26,7 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
   }
 
   @ExoTransactional
-  public List<ContextEntity> getContextsofType(String contextType) {
+  public List<ContextEntity> getContextsOfType(String contextType) {
     TypedQuery<ContextEntity> query = getEntityManager().createNamedQuery("commons.getContextofType", ContextEntity.class)
         .setParameter("contextType", contextType);
     try {
@@ -37,7 +37,7 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
   }
 
   @ExoTransactional
-  public List<ContextEntity> getContextsofType(String contextType, int offset, int limit) {
+  public List<ContextEntity> getContextsOfType(String contextType, int offset, int limit) {
     TypedQuery<ContextEntity> query = getEntityManager().createNamedQuery("commons.getContextofType", ContextEntity.class)
         .setFirstResult(offset)
         .setMaxResults(limit)

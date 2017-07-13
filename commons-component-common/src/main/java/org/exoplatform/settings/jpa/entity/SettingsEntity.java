@@ -35,7 +35,6 @@ import javax.persistence.*;
     @NamedQuery(name = "commons.getSettingsByScope", query = "SELECT s FROM SettingsEntity s " +
         "WHERE s.scope.name= :scopeName " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "commons.getAllSettingsIds", query = "SELECT s.id FROM SettingsEntity s ORDER BY s.id"),
     @NamedQuery(name = "commons.getSettingsByContextAndScope", query = "SELECT s FROM SettingsEntity s " +
         "WHERE s.context.type= :contextType " +
         "AND s.context.name= :contextName " +
@@ -47,13 +46,17 @@ import javax.persistence.*;
         "AND s.context.name= :contextName " +
         "AND s.scope.name= :scopeName " +
         "AND s.scope.type= :scopeType "),
+    @NamedQuery(name = "commons.getSettingsNumber", query = "SELECT count(s) FROM SettingsEntity s " +
+        "WHERE s.name = :name " +
+        "AND s.value LIKE :valueParam " +
+        "AND s.scope.name= :scopeName " +
+        "AND s.scope.type= :scopeType "),
     @NamedQuery(name = "commons.getSettingsByContext", query = "SELECT s FROM SettingsEntity s " +
         "WHERE s.context.type= :contextType " +
         "AND s.context.name= :contextName "),
     @NamedQuery(name = "commons.getUserSettingsWithDeactivate", query = "SELECT s FROM SettingsEntity s " +
         "WHERE (s.context.name= :user) " +
-        "AND (s.name= :isActive AND s.value='') " +
-        "OR (s.name= :isEnabled AND s.value IS NOT NULL AND s.value='false') ")
+        "AND ((s.name= :isActive AND s.value='') OR (s.name= :isEnabled AND s.value='false')) ")
 })
 public class SettingsEntity {
   @Id

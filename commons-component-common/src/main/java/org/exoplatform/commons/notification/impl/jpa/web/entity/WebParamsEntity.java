@@ -74,6 +74,7 @@ public class WebParamsEntity {
 
   public WebParamsEntity setNotification(WebNotifEntity webNotification) {
     this.webNotification = webNotification;
+    webNotification.addParameter(this);
     return this;
   }
 }

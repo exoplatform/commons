@@ -89,8 +89,6 @@ public class MailNotificationsMigration implements StartableClusterAware {
               isMailNotifsMigrated = true;
               long endTime = System.currentTimeMillis();
               LOG.info("=== Migration of Mail Notification data done in " + (endTime - startTime) + " ms");
-              schedulerService.resumeJob("NotificationDailyJob", "Notification");
-              schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
             } catch (Exception e) {
               LOG.error("Error while migrating Mail Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
               isMailNotifsMigrated = false;
@@ -105,6 +103,9 @@ public class MailNotificationsMigration implements StartableClusterAware {
               }
             } catch (Exception e) {
               LOG.error("Error while cleaning Mail notifications JCR data to RDBMS - Cause : " + e.getMessage(), e);
+            } finally {
+              schedulerService.resumeJob("NotificationDailyJob", "Notification");
+              schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
             }
             return null;
           }

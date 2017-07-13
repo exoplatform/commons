@@ -38,5 +38,5 @@ public interface QueueMessage {
    * @param message the message to be sent
    * @return true if the message is sent or mail service is off
    */
-  boolean sendMessage(Message message);
+  boolean sendMessage(Message message) throws Exception;
 }

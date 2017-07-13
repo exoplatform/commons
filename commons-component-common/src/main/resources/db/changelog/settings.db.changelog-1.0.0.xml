@@ -102,5 +102,20 @@
     <addUniqueConstraint columnNames="TYPE, NAME" tableName="STG_SCOPES"
                          constraintName="UK_STG_SCOPE_01"/>
   </changeSet>
+  <changeSet author="settings" id="1.0.0-11">
+    <addUniqueConstraint columnNames="NAME, SCOPE_ID, CONTEXT_ID" tableName="STG_SETTINGS"
+                         constraintName="UK_STG_SETTING_01"/>
+  </changeSet>
+  <changeSet author="settings" id="1.0.0-12">
+    <createIndex tableName="STG_SETTINGS" indexName="IDX_STG_SETTINGS_01">
+      <column name="NAME"/>
+    </createIndex>
+    <createIndex tableName="STG_SETTINGS" indexName="IDX_STG_SETTINGS_02">
+      <column name="SCOPE_ID"/>
+    </createIndex>
+    <createIndex tableName="STG_SETTINGS" indexName="IDX_STG_SETTINGS_03">
+      <column name="CONTEXT_ID"/>
+    </createIndex>
+  </changeSet>
 
 </databaseChangeLog>

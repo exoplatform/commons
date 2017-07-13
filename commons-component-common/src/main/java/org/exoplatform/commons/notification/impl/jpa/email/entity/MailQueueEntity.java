@@ -12,7 +12,8 @@ import java.util.Date;
 @ExoEntity
 @Table(name = "EMAIL_QUEUE")
 @NamedQueries({
-    @NamedQuery(name = "commons.getMessagesInQueue", query = "SELECT m FROM NotificationsMailQueueEntity m")
+    @NamedQuery(name = "commons.getMessagesInQueue", query = "SELECT m FROM NotificationsMailQueueEntity m " +
+        "ORDER BY m.creationDate ASC "),
 })
 public class MailQueueEntity {
   @Id

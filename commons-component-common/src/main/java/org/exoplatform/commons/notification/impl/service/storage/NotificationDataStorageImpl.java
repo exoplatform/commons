@@ -326,7 +326,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   }
 
   @Override
-  public void removeMessageAfterSent() throws Exception {
+  public void removeMessageAfterSent(NotificationContext ctx) throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     boolean created =  NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();

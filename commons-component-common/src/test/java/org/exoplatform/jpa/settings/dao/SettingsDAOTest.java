@@ -2,18 +2,15 @@ package org.exoplatform.jpa.settings.dao;
 
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.jpa.CommonsDAOJPAImplTest;
 import org.exoplatform.settings.jpa.entity.ContextEntity;
 import org.exoplatform.settings.jpa.entity.ScopeEntity;
 import org.exoplatform.settings.jpa.entity.SettingsEntity;
-import org.exoplatform.jpa.CommonsDAOJPAImplTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Created by exo on 3/8/17.
@@ -31,19 +28,6 @@ public class SettingsDAOTest extends CommonsDAOJPAImplTest {
   }
 
   @Test
-  public void testFindAllIds() {
-    //Given
-    settingsDAO.create(new SettingsEntity().setName("My setting #1").setValue("My value #1"));
-    settingsDAO.create(new SettingsEntity().setName("My setting #2").setValue("My value #2"));
-
-    //When
-    List<Long> ids = settingsDAO.findAllIds(0, 10);
-
-    //Then
-    assertThat(ids.size(), is(2));
-  }
-
-  @Test
   public void testGetSetting() {
     //Given
     ScopeEntity scopeEntity = new ScopeEntity();
@@ -57,9 +41,9 @@ public class SettingsDAOTest extends CommonsDAOJPAImplTest {
     settingsDAO.create(new SettingsEntity().setName("My setting #3").setValue("My value #3").setScope(scopeEntity).setContext(contextEntity));
 
     //When
-    SettingsEntity setting1 = settingsDAO.getSetting(contextEntity, scopeEntity, "My setting #1");
-    SettingsEntity setting2 = settingsDAO.getSetting(contextEntity, scopeEntity, "My setting #2");
-    SettingsEntity setting3 = settingsDAO.getSetting(contextEntity, scopeEntity, "My setting #3");
+    SettingsEntity setting1 = settingsDAO.getSettingByContextAndScopeAndKey(contextEntity, scopeEntity, "My setting #1");
+    SettingsEntity setting2 = settingsDAO.getSettingByContextAndScopeAndKey(contextEntity, scopeEntity, "My setting #2");
+    SettingsEntity setting3 = settingsDAO.getSettingByContextAndScopeAndKey(contextEntity, scopeEntity, "My setting #3");
 
     //Then
     assertNotNull(setting1);

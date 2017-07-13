@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import static java.lang.Math.max;
 import static org.exoplatform.commons.utils.CommonsUtils.getService;
 
 /**
@@ -47,6 +48,8 @@ public class SettingsMigration implements StartableClusterAware {
   private static List<String> allUsers = new LinkedList<String>();
   private static List<String> errorUserSettings = new LinkedList<String>();
   private static List<String> errorGlobalSettings = new LinkedList<String>();
+  private static List<String> nonRemovedGlobalSettings = new LinkedList<String>();
+  private static List<String> nonRemovedUserSettings = new LinkedList<String>();
   //scope of user settings migration
   public static final String SETTINGS_MIGRATION_USER_KEY = "SETTINGS_MIGRATION_USER";
   //status of jcr user settings data (true if jcr user settings data is migrated)
@@ -100,10 +103,19 @@ public class SettingsMigration implements StartableClusterAware {
           if (chromatticLifeCycle.getManager().getSynchronization() != null) {
             chromatticLifeCycle.getManager().endRequest(true);
           }
+          reportSettingsMigration();
           return null;
         }
       });
     }
+  }
+
+  private void reportSettingsMigration() {
+    int notMigrated = jpaSettingService.getNumber(Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, "false");
+    int error = errorUserSettings.size();
+    LOG.info(" === User Settings Migration from JCR to RDBBMS report: \n"
+        + "           - " + max(notMigrated, error) + " User Settings nodes are not migrated to RDBMS \n"
+        + "           - " + nonRemovedUserSettings.size() + " User Settings nodes are migrated but not removed from JCR");
   }
 
   private Boolean deleteJcrGlobalSettings() {
@@ -116,6 +128,9 @@ public class SettingsMigration implements StartableClusterAware {
               deleteGlobalSettings(scope);
             }
           }
+          LOG.info(" === Global Settings Migration from JCR to RDBBMS report: \n"
+                 + "           - " + errorGlobalSettings.size() + " Global Settings nodes are not migrated to RDBMS \n"
+                 + "           - " + nonRemovedGlobalSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
           return true;
         } catch (Exception e) {
           return false;
@@ -273,6 +288,7 @@ public class SettingsMigration implements StartableClusterAware {
           return true;
         } catch (Exception e) {
           LOG.error("Cannot remove JCR settings of scope: " + scope + " - cause: " + e.getCause(), e);
+          nonRemovedGlobalSettings.add(scope);
           return false;
         }
       }
@@ -289,6 +305,7 @@ public class SettingsMigration implements StartableClusterAware {
           return true;
         } catch (Exception e) {
           LOG.error("Cannot remove JCR settings of user: " + user + " - cause: " + e.getCause(), e);
+          nonRemovedUserSettings.add(user);
           return false;
         }
       }

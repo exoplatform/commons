@@ -73,7 +73,7 @@ public class JPANotificationServiceTest extends BaseTest {
     userSetting.setChannelActive(UserSetting.EMAIL_CHANNEL);
     Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
     List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
-    assertEquals(1, list.size());
+    assertEquals(2, list.size());
 
     assertTrue(list.get(0).getTo().equals("root"));
   }
@@ -92,7 +92,7 @@ public class JPANotificationServiceTest extends BaseTest {
     Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
 
     List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
-    assertEquals(1, list.size());
+    assertEquals(2, list.size());
 
     assertTrue(list.get(0).getKey().equals(notification.getKey()));
     assertTrue(list.get(0).getOwnerParameter().equals(notification.getOwnerParameter()));
@@ -104,13 +104,14 @@ public class JPANotificationServiceTest extends BaseTest {
     userSetting.setUserId("demo").addPlugin(PluginTest.ID, UserSetting.FREQUENCY.WEEKLY);
     map = notificationDataStorage.getByUser(context, userSetting);
     list = map.get(new PluginKey(PluginTest.ID));
-    assertEquals(1, list.size());
+    assertEquals(2, list.size());
 
 
-    notificationDataStorage.removeMessageAfterSent();
+    notificationDataStorage.removeMessageAfterSent(context);
     map = notificationDataStorage.getByUser(context, userSetting);
     list = map.get(new PluginKey(PluginTest.ID));
     assertNull(list);
+
   }
 
   public void testSpecialGetByUserAndRemoveMessagesSent() throws Exception {
@@ -134,12 +135,12 @@ public class JPANotificationServiceTest extends BaseTest {
     Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
 
     List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
-    assertEquals(1, list.size());
+    assertEquals(2, list.size());
 
     assertTrue(list.get(0).getKey().equals(notification.getKey()));
     assertTrue(list.get(0).getOwnerParameter().equals(notification.getOwnerParameter()));
 
-    notificationDataStorage.removeMessageAfterSent();
+    notificationDataStorage.removeMessageAfterSent(context);
 
     // Test send to weekly
     context = NotificationContextImpl.cloneInstance();
@@ -150,7 +151,8 @@ public class JPANotificationServiceTest extends BaseTest {
     list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
 
-    notificationDataStorage.removeMessageAfterSent();
+    context.append(NotificationJob.JOB_DAILY, true);
+    notificationDataStorage.removeMessageAfterSent(context);
 
     map = notificationDataStorage.getByUser(context, userSetting);
 

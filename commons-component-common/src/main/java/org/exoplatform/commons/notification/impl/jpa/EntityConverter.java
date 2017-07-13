@@ -11,10 +11,7 @@ import org.exoplatform.commons.notification.impl.jpa.web.entity.WebUsersEntity;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This is an utility class used for entity conversion from JPA entities to equivalent JCR ones
@@ -44,24 +41,33 @@ public class EntityConverter {
     return messageInfo;
   }
 
-  public static NotificationInfo convertWebNotifEntityToNotificationInfo(WebNotifEntity webNotifEntity) {
+  public static NotificationInfo convertWebNotifEntityToNotificationInfo(WebNotifEntity webNotifEntity, String userId) {
     NotificationInfo notificationInfo = new NotificationInfo();
     Calendar cal = Calendar.getInstance();
     cal.setTime(webNotifEntity.getCreationDate());
 
-    WebUsersEntity webUsersEntity = webNotifEntity.getReceiver();
+    WebUsersEntity webUsersEntity = new WebUsersEntity();
+    Iterator it = webNotifEntity.getReceivers().iterator();
+    while (it.hasNext()) {
+      webUsersEntity = (WebUsersEntity) it.next();
+      if (webUsersEntity.getReceiver().equals(userId)) {
+        break;
+      }
+    }
+
     notificationInfo.setLastModifiedDate(webUsersEntity.getUpdateDate().getTime());
 
     Map<String, String> ownerParameters = new HashMap<String, String>();
     for (WebParamsEntity parameter : webNotifEntity.getParameters()) {
       ownerParameters.put(parameter.getName(), parameter.getValue());
     }
+    ownerParameters.put("read", String.valueOf(webUsersEntity.isRead()));
     notificationInfo.setOwnerParameter(ownerParameters);
 
     notificationInfo.key(new PluginKey(webNotifEntity.getType()));
     notificationInfo.setTitle(webNotifEntity.getText());
     notificationInfo.setFrom(webNotifEntity.getSender());
-    notificationInfo.to(webNotifEntity.getOwner());
+    notificationInfo.to(userId);
     notificationInfo.setDateCreated(cal);
 
     notificationInfo.setId(String.valueOf(webNotifEntity.getId()));

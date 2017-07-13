@@ -65,7 +65,6 @@
                 <!--<constraints nullable="false"/>-->
             </column>
             <column name="DIGEST_TYPE" type="NVARCHAR(550)"/>
-            <column name="DIGEST_TO_USER" type="NVARCHAR(200)"/>
         </createTable>
         <modifySql dbms="mysql">
             <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
@@ -113,9 +112,6 @@
             <column name="CREATION_DATE" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="OWNER" type="NVARCHAR(200)">
-                <constraints nullable="false"/>
-            </column>
             <column name="TEXT" type="CLOB">
             </column>
         </createTable>
@@ -156,6 +152,7 @@
             </column>
             <column name="IS_READ" type="BOOLEAN"/>
             <column name="SHOW_POPOVER" type="BOOLEAN"/>
+            <column name="RESET_NUMBER_BADGE" type="BOOLEAN"/>
         </createTable>
         <modifySql dbms="mysql">
             <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>

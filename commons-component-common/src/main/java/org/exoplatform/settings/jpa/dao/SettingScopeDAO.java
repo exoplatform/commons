@@ -24,14 +24,4 @@ public class SettingScopeDAO extends GenericDAOJPAImpl<ScopeEntity, Long> {
       return null;
     }
   }
-
-  public ScopeEntity getScopeOfType(String scopeType) {
-    TypedQuery<ScopeEntity> query = getEntityManager().createNamedQuery("commons.getScopeOfType", ScopeEntity.class)
-        .setParameter("scopeType", scopeType);
-    try {
-      return query.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    }
-  }
 }

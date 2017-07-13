@@ -16,13 +16,13 @@
  */
 package org.exoplatform.commons.api.notification.service.storage;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+
 import java.util.List;
 import java.util.Map;
-
-import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.UserSetting;
 
 
 public interface NotificationDataStorage {
@@ -45,9 +45,10 @@ public interface NotificationDataStorage {
 
   /**
    * Removes all messages after they have been sent.
-   * 
+   *
+   * @param context The notification context to determine the type of digest.
    * @throws Exception
    */
-  void removeMessageAfterSent() throws Exception;
+  void removeMessageAfterSent(NotificationContext context) throws Exception;
   
 }

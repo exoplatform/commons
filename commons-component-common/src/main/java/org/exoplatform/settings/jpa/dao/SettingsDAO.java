@@ -19,11 +19,6 @@ import java.util.List;
 public class SettingsDAO extends GenericDAOJPAImpl<SettingsEntity, Long> {
 
   @ExoTransactional
-  public List<Long> findAllIds(int offset, int limit) {
-    return getEntityManager().createNamedQuery("commons.getAllSettingsIds").setFirstResult(offset).setMaxResults(limit).getResultList();
-  }
-
-  @ExoTransactional
   public List<SettingsEntity> getSettingsByUser(String user) {
     TypedQuery<SettingsEntity> query = getEntityManager().createNamedQuery("commons.getSettingsByUser", SettingsEntity.class)
         .setParameter("user", user);
@@ -32,33 +27,37 @@ public class SettingsDAO extends GenericDAOJPAImpl<SettingsEntity, Long> {
 
   @ExoTransactional
   public List<SettingsEntity> getSettingsByContext(Context context) {
+    ContextEntity contextEntity = EntityConverter.convertContextToContextEntity(context);
     TypedQuery<SettingsEntity> query = getEntityManager().createNamedQuery("commons.getSettingsByContext", SettingsEntity.class)
-        .setParameter("contextType", EntityConverter.convertContextToContextEntity(context).getType())
-        .setParameter("contextName", EntityConverter.convertContextToContextEntity(context).getName());
+        .setParameter("contextType", contextEntity.getType())
+        .setParameter("contextName", contextEntity.getName());
     return query.getResultList();
   }
 
   @ExoTransactional
   public List<SettingsEntity> getSettingsByScope(Scope scope) {
+    ScopeEntity scopeEntity = EntityConverter.convertScopeToScopeEntity(scope);
     TypedQuery<SettingsEntity> query = getEntityManager().createNamedQuery("commons.getSettingsByScope", SettingsEntity.class)
-        .setParameter("scopeType", EntityConverter.convertScopeToScopeEntity(scope).getType())
-        .setParameter("scopeName", EntityConverter.convertScopeToScopeEntity(scope).getName());
+        .setParameter("scopeType", scopeEntity.getType())
+        .setParameter("scopeName", scopeEntity.getName());
     return query.getResultList();
   }
 
   @ExoTransactional
   public List<SettingsEntity> getSettingsByContextAndScope(Context context, Scope scope) {
+    ContextEntity contextEntity = EntityConverter.convertContextToContextEntity(context);
+    ScopeEntity scopeEntity = EntityConverter.convertScopeToScopeEntity(scope);
     TypedQuery<SettingsEntity> query;
       query = getEntityManager().createNamedQuery("commons.getSettingsByContextAndScope", SettingsEntity.class)
-          .setParameter("contextType", EntityConverter.convertContextToContextEntity(context).getType())
-          .setParameter("contextName", EntityConverter.convertContextToContextEntity(context).getName())
-          .setParameter("scopeType", EntityConverter.convertScopeToScopeEntity(scope).getType())
-          .setParameter("scopeName", EntityConverter.convertScopeToScopeEntity(scope).getName());
+          .setParameter("contextType", contextEntity.getType())
+          .setParameter("contextName", contextEntity.getName())
+          .setParameter("scopeType", scopeEntity.getType())
+          .setParameter("scopeName", scopeEntity.getName());
     return query.getResultList();
   }
 
   @ExoTransactional
-  public SettingsEntity getSetting(ContextEntity contextEntity, ScopeEntity scopeEntity, String key) {
+  public SettingsEntity getSettingByContextAndScopeAndKey(ContextEntity contextEntity, ScopeEntity scopeEntity, String key) {
     TypedQuery<SettingsEntity> query;
       query =  getEntityManager().createNamedQuery("commons.getSetting", SettingsEntity.class)
           .setParameter("name", key)
@@ -80,5 +79,19 @@ public class SettingsDAO extends GenericDAOJPAImpl<SettingsEntity, Long> {
         .setParameter("isActive", isActive)
         .setParameter("isEnabled", isEnabled);
     return query.getResultList();
+  }
+
+  public int getNumber(ScopeEntity scopeEntity, String key, String value) {
+    TypedQuery<Long> query;
+    query =  getEntityManager().createNamedQuery("commons.getSettingsNumber", Long.class)
+        .setParameter("name", key)
+        .setParameter("valueParam", value)
+        .setParameter("scopeType", scopeEntity.getType())
+        .setParameter("scopeName", scopeEntity.getName());
+    try {
+      return query.getSingleResult().intValue();
+    } catch (NoResultException e) {
+      return 0;
+    }
   }
 }

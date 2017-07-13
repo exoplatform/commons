@@ -12,6 +12,8 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.jpa.BaseTest;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -90,6 +92,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     for(NotificationInfo notif : list) {
       assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY.getKey())));
     }
+    ConversationState.setCurrent(new ConversationState(new Identity(userId)));
     //
     webNotificationStorage.markAllRead(userId);
     //
@@ -97,10 +100,10 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     assertEquals(10, list.size());
     //
     for(NotificationInfo notif : list) {
-      assertTrue(Boolean.valueOf(notif.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
+      assertFalse(Boolean.valueOf(notif.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
     }
   }
-  
+
   public void testUpdateNotification() throws Exception {
     String userId = "john";
     NotificationInfo info = makeWebNotificationInfo(userId);
@@ -109,7 +112,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     NotificationInfo got = webNotificationStorage.get(info.getId());
     assertEquals("The title", got.getTitle());
     long lastUpdatedTime = got.getLastModifiedDate();
-    
+
     //update and move top, the lastUpdatedTime will be modified
     got = makeWebNotificationInfo(userId);
     got.setId(notifId);
@@ -119,7 +122,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     got = webNotificationStorage.get(got.getId());
     assertEquals("new title", got.getTitle());
     assertFalse(lastUpdatedTime == got.getLastModifiedDate());
-    
+
     //update but don't move top, the lastUpdatedTime will not be modified
     lastUpdatedTime = got.getLastModifiedDate();
     got.setTitle("new new title");
@@ -128,9 +131,9 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     assertEquals("new new title", got.getTitle());
     assertTrue(lastUpdatedTime == got.getLastModifiedDate());
   }
-  
+
   public void testRemoveByJob() throws Exception {
-    // Create data for old notifications 
+    // Create data for old notifications
     /* Example:
      *  PastTime is 1/12/2014
      *  Today is 15/12/2014
@@ -163,6 +166,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
         webNotificationStorage.save(info);
       }
     }
+    webNotifDAO.findAll();
     // check data
     //getWebUserDateNode
 //    SessionProvider sProvider = SessionProvider.createSystemProvider();
@@ -184,7 +188,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
 //    storage.remove(userId, 3 * daySeconds);
 //    assertEquals(0, parentNode.getNodes().getSize());
   }
-  
+
   public void testGetNewMessage() throws Exception  {
     assertEquals(8, NotificationMessageUtils.getMaxItemsInPopover());
     //
@@ -208,7 +212,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     //
     assertEquals(0, webNotificationStorage.getNumberOnBadge(userId));
   }
-  
+
   public void testSpecialUserNameToGetMessage() throws Exception {
     //Test with methods: getUnreadNotification, getNewMessage and remove
     String userId = "don't_blink_polarity";
@@ -225,7 +229,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
   }
 
   public void testRemoveByLiveTime() throws Exception {
-    // Create data for old notifications 
+    // Create data for old notifications
     /* Example:
      *  PastTime is 1/12/2014
      *  Today is 15/12/2014
@@ -258,6 +262,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
         webNotificationStorage.save(info);
       }
     }
+    webNotifDAO.findAll();
 //    // check data
 //    SessionProvider sProvider = SessionProvider.createSystemProvider();
 //    Node parentNode = getOrCreateChannelNode(sProvider, userId);

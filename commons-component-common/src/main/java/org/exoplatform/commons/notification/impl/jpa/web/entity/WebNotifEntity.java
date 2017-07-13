@@ -5,6 +5,7 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -17,49 +18,54 @@ import java.util.Set;
 @ExoEntity
 @Table(name = "NTF_WEB_NOTIFS")
 @NamedQueries({
+    @NamedQuery(name = "commons.findWebNotif", query = "SELECT w FROM NotificationsWebNotifEntity w " +
+        "WHERE w.sender= :sender " +
+        "AND w.type= :notifType " +
+        "AND w.creationDate= :creationDate "),
     @NamedQuery(name = "commons.findWebNotifsByPluginFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receiver  Receiver " +
+        "JOIN w.receivers  Receivers " +
         "WHERE w.type= :pluginId " +
-        "AND Receiver.receiver = :userId " +
-        "AND Receiver.showPopover= :isOnPopover " +
-        "ORDER BY Receiver.updateDate DESC "),
+        "AND Receivers.receiver = :userId " +
+        "AND Receivers.showPopover= :isOnPopover " +
+        "ORDER BY w.creationDate DESC "),
     @NamedQuery(name = "commons.findWebNotifsByUserFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receiver  Receiver " +
-        "WHERE Receiver.receiver = :userId " +
-        "ORDER BY Receiver.updateDate DESC "),
+        "JOIN w.receivers  Receivers " +
+        "WHERE Receivers.receiver = :userId " +
+        "ORDER BY w.creationDate DESC "),
     @NamedQuery(name = "commons.findWebNotifsByPopoverFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receiver  Receiver " +
-        "WHERE Receiver.receiver = :userId " +
-        "AND Receiver.showPopover= :isOnPopover " +
-        "ORDER BY Receiver.updateDate DESC "),
+        "JOIN w.receivers  Receivers " +
+        "WHERE Receivers.receiver = :userId " +
+        "AND Receivers.showPopover= :isOnPopover " +
+        "ORDER BY w.creationDate DESC "),
     @NamedQuery(name = "commons.findNewWebNotifsByUser", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receiver  Receiver " +
-        "WHERE Receiver.receiver = :userId " +
-        "AND Receiver.read = :isRead " +
-        "ORDER BY Receiver.updateDate DESC "),
+        "JOIN w.receivers  Receivers " +
+        "WHERE Receivers.receiver = :userId " +
+        "AND Receivers.read = :isRead " +
+        "ORDER BY w.creationDate DESC "),
     @NamedQuery(name = "commons.findWebNotifsByLastUpdatedDate", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receiver  Receiver " +
-        "WHERE Receiver.updateDate < :delayTime "),
+        "JOIN w.receivers  Receivers " +
+        "WHERE Receivers.updateDate < :delayTime "),
     @NamedQuery(name = "commons.findWebNotifsOfUserByLastUpdatedDate", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receiver  Receiver " +
-        "WHERE Receiver.receiver = :userId " +
-        "AND Receiver.updateDate < :calendar "),
+        "JOIN w.receivers  Receivers " +
+        "WHERE Receivers.receiver = :userId " +
+        "AND Receivers.updateDate < :calendar "),
     @NamedQuery(name = "commons.findUnreadNotification", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.parameters  Parameters " +
-        "JOIN w.receiver  Receiver " +
+        "JOIN w.receivers  Receivers " +
         "WHERE w.type= :pluginId " +
         "AND Parameters.name = :activityIdParamName " +
         "AND Parameters.value LIKE :activityId " +
-        "AND Receiver.receiver = :owner " +
-        "AND Receiver.read = false " +
-        "AND Receiver.updateDate > :calendar "),
+        "AND Receivers.receiver = :owner " +
+        "AND Receivers.read = false " +
+        "AND Receivers.updateDate > :calendar " +
+        "ORDER BY w.creationDate DESC "),
     @NamedQuery(name = "commons.findWebNotifsOfUserByParam", query = "SELECT w FROM NotificationsWebNotifEntity w " +
         "JOIN w.parameters  Parameters " +
-        "JOIN w.receiver  Receiver " +
+        "JOIN w.receivers  Receivers " +
         "WHERE w.type= :pluginId " +
         "AND Parameters.name = :paramName " +
         "AND Parameters.value LIKE :paramValue " +
-        "AND Receiver.receiver = :owner ")
+        "AND Receivers.receiver = :owner ")
 })
 public class WebNotifEntity {
   @Id
@@ -77,17 +83,14 @@ public class WebNotifEntity {
   @Column(name = "CREATION_DATE")
   private Date creationDate;
 
-  @Column(name = "OWNER")
-  private String owner;
-
   @Column(name = "TEXT")
   private String text;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "webNotification")
-  private Set<WebParamsEntity> parameters;
+  private Set<WebParamsEntity> parameters = new HashSet<>();
 
-  @OneToOne(cascade = CascadeType.ALL, mappedBy = "webNotifications")
-  private WebUsersEntity receiver;
+  @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "webNotification")
+  private Set<WebUsersEntity> receivers = new HashSet<>();
 
   public long getId() {
     return id;
@@ -120,15 +123,6 @@ public class WebNotifEntity {
     return this;
   }
 
-  public String getOwner() {
-    return owner;
-  }
-
-  public WebNotifEntity setOwner(String owner) {
-    this.owner = owner;
-    return this;
-  }
-
   public String getText() {
     return text;
   }
@@ -150,12 +144,16 @@ public class WebNotifEntity {
     this.parameters.add(parameter);
   }
 
-  public WebUsersEntity getReceiver() {
-    return receiver;
+  public void addReceiver(WebUsersEntity receiver) {
+    this.receivers.add(receiver);
   }
 
-  public void setReceiver(WebUsersEntity receiver) {
-    this.receiver = receiver;
+  public Set<WebUsersEntity> getReceivers() {
+    return receivers;
+  }
+
+  public void setReceivers(Set<WebUsersEntity> receivers) {
+    this.receivers = receivers;
   }
 }
 

@@ -82,7 +82,6 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
     if (model.getLastReadDate() > 0) {
       saveLastReadDate(userId, model.getLastReadDate());
     }
-    removeMixin(userId);
   }
 
   private String getChannelProperty(String channelId) {
@@ -174,15 +173,12 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
     }
   }
 
-
-  private void removeMixin(String userId) {}
-
   @Override
   @ExoTransactional
   public List<UserSetting> getUserSettingWithDeactivate() {
     List<UserSetting> models = new ArrayList<UserSetting>();
     try {
-      for (ContextEntity contextEntity : settingContextDAO.getContextsofType(USER.toString())) {
+      for (ContextEntity contextEntity : settingContextDAO.getContextsOfType(USER.toString())) {
         models.add(fillModel(contextEntity.getName(), settingsDAO.getUserSettingsWithDeactivate(contextEntity.getName(),
             EXO_IS_ACTIVE, EXO_IS_ENABLED)));
 
@@ -204,7 +200,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
     List<String> userIds = new ArrayList<String>();
     try {
       String isActive="", plugins="", daily="", weekly="", endabled="";
-      for (ContextEntity contextEntity : settingContextDAO.getContextsofType(USER.toString())) {
+      for (ContextEntity contextEntity : settingContextDAO.getContextsOfType(USER.toString())) {
         for (SettingsEntity settingsEntity : settingsDAO.getSettingsByUser(contextEntity.getName())) {
           if (settingsEntity.getName().equals(EXO_IS_ACTIVE)) {
             isActive = settingsEntity.getValue();
@@ -252,7 +248,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
       frequency = EXO_WEEKLY;
     }
     boolean isEnabled, isActive, isFrequency;
-    for (ContextEntity contextEntity : settingContextDAO.getContextsofType(USER.toString(), offset, limit)) {
+    for (ContextEntity contextEntity : settingContextDAO.getContextsOfType(USER.toString(), offset, limit)) {
       String username = contextEntity.getName();
       isActive=false; isEnabled=false; isFrequency=false;
       for (SettingsEntity settingsEntity : settingsDAO.getSettingsByUser(username)) {
@@ -354,7 +350,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
   @ExoTransactional
   private List<String> getDefaultDailyIterator(int offset, int limit) throws Exception {
     List<String> list = new ArrayList<String>();
-    for (ContextEntity contextEntity : settingContextDAO.getContextsofType(USER.toString(), offset, limit)) {
+    for (ContextEntity contextEntity : settingContextDAO.getContextsOfType(USER.toString(), offset, limit)) {
       if (!(settingsDAO.getSettingsByUser(contextEntity.getName()).size() > 1)) {
         list.add(contextEntity.getName());
       }

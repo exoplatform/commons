@@ -15,6 +15,8 @@ import javax.persistence.*;
 @Table(name = "NTF_EMAIL_NOTIFS_DIGEST")
 @NamedQueries({
     @NamedQuery(name = "commons.findDigestByNotifAndType", query = "SELECT m FROM NotificationsMailDigestEntity m " +
+        "WHERE m.notification= :notifId AND m.type= :digestType"),
+    @NamedQuery(name = "commons.countDigestByNotifAndType", query = "SELECT COUNT(m) FROM NotificationsMailDigestEntity m " +
         "WHERE m.notification= :notifId AND m.type= :digestType")
 })
 public class MailDigestEntity {
@@ -24,15 +26,12 @@ public class MailDigestEntity {
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_NTF_EMAIL_DIGEST")
   private long id;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "EMAIL_NOTIF_ID")
   private MailNotifEntity notification;
 
   @Column(name = "DIGEST_TYPE")
   private String type;
-
-  @Column(name = "DIGEST_TO_USER")
-  private String user;
 
   public long getId() {
     return id;
@@ -53,15 +52,6 @@ public class MailDigestEntity {
 
   public MailDigestEntity setType(String type) {
     this.type = type;
-    return this;
-  }
-
-  public String getUser() {
-    return user;
-  }
-
-  public MailDigestEntity setUser(String user) {
-    this.user = user;
     return this;
   }
 }

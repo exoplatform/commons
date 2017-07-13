@@ -34,7 +34,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity1.setRead(false);
     webUsersEntity1.setReceiver("user1");
     WebNotifEntity webNotifEntity1 = new WebNotifEntity();
-    webNotifEntity1.setReceiver(webUsersEntity1);
+    webNotifEntity1.addReceiver(webUsersEntity1);
     webNotifEntity1.setType("plugin1");
     webUsersEntity1.setNotification(webNotifEntity1);
 
@@ -43,7 +43,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity2.setRead(true);
     webUsersEntity2.setReceiver("user1");
     WebNotifEntity webNotifEntity2 = new WebNotifEntity();
-    webNotifEntity2.setReceiver(webUsersEntity2);
+    webNotifEntity2.addReceiver(webUsersEntity2);
     webNotifEntity2.setType("plugin2");
     webUsersEntity2.setNotification(webNotifEntity2);
 
@@ -65,49 +65,13 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
   }
 
   @Test
-  public void testFindWebNotifsByUser() {
-    WebUsersEntity webUsersEntity1 = new WebUsersEntity();
-    webUsersEntity1.setRead(true);
-    webUsersEntity1.setReceiver("user1");
-    WebNotifEntity webNotifEntity1 = new WebNotifEntity();
-    webNotifEntity1.setReceiver(webUsersEntity1);
-    webUsersEntity1.setNotification(webNotifEntity1);
-
-    WebUsersEntity webUsersEntity2 = new WebUsersEntity();
-    webUsersEntity2.setRead(true);
-    webUsersEntity2.setReceiver("user1");
-    WebNotifEntity webNotifEntity2 = new WebNotifEntity();
-    webNotifEntity2.setReceiver(webUsersEntity2);
-    webUsersEntity2.setNotification(webNotifEntity2);
-
-    WebUsersEntity webUsersEntity3 = new WebUsersEntity();
-    webUsersEntity3.setRead(false);
-    webUsersEntity3.setReceiver("user1");
-    WebNotifEntity webNotifEntity3 = new WebNotifEntity();
-    webNotifEntity3.setReceiver(webUsersEntity3);
-    webUsersEntity3.setNotification(webNotifEntity3);
-
-    //Given
-    webNotifDAO.create(webNotifEntity1);
-    webNotifDAO.create(webNotifEntity2);
-
-    //Then
-    assertEquals(webNotifDAO.findWebNotifsByUser("user1", true).size(), 2);
-    assertEquals(webNotifDAO.findWebNotifsByUser("user1", true, 0, 1).size(), 1);
-    assertEquals(webNotifDAO.findWebNotifsByUser("user1", false).size(), 0);
-    webNotifDAO.create(webNotifEntity3);
-    assertEquals(webNotifDAO.findWebNotifsByUser("user1", false).size(), 1);
-    assertEquals(webNotifDAO.findWebNotifsByUser("user2", false).size(), 0);
-  }
-
-  @Test
   public void testFindWebNotifsByLastUpdatedDate() {
     //today
     WebUsersEntity webUsersEntity1 = new WebUsersEntity();
     webUsersEntity1.setUpdateDate(Calendar.getInstance().getTime());
     webUsersEntity1.setReceiver("user1");
     WebNotifEntity webNotifEntity1 = new WebNotifEntity();
-    webNotifEntity1.setReceiver(webUsersEntity1);
+    webNotifEntity1.addReceiver(webUsersEntity1);
     webUsersEntity1.setNotification(webNotifEntity1);
 
     //yesterday
@@ -117,7 +81,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity2.setUpdateDate(yesterday.getTime());
     webUsersEntity2.setReceiver("user1");
     WebNotifEntity webNotifEntity2 = new WebNotifEntity();
-    webNotifEntity2.setReceiver(webUsersEntity2);
+    webNotifEntity2.addReceiver(webUsersEntity2);
     webUsersEntity2.setNotification(webNotifEntity2);
 
     //4 days ago
@@ -127,7 +91,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity3.setUpdateDate(fourDaysAgo.getTime());
     webUsersEntity3.setReceiver("user1");
     WebNotifEntity webNotifEntity3 = new WebNotifEntity();
-    webNotifEntity3.setReceiver(webUsersEntity3);
+    webNotifEntity3.addReceiver(webUsersEntity3);
     webUsersEntity3.setNotification(webNotifEntity3);
 
     //Given
@@ -162,7 +126,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity1.setReceiver("user1");
     webUsersEntity1.setUpdateDate(Calendar.getInstance().getTime());
     WebNotifEntity webNotifEntity1 = new WebNotifEntity();
-    webNotifEntity1.setReceiver(webUsersEntity1);
+    webNotifEntity1.addReceiver(webUsersEntity1);
     webNotifEntity1.setParameters(params1);
     webNotifEntity1.setType("plugin1");
     webUsersEntity1.setNotification(webNotifEntity1);
@@ -179,7 +143,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity2.setReceiver("user1");
     webUsersEntity2.setUpdateDate(Calendar.getInstance().getTime());
     WebNotifEntity webNotifEntity2 = new WebNotifEntity();
-    webNotifEntity2.setReceiver(webUsersEntity2);
+    webNotifEntity2.addReceiver(webUsersEntity2);
     webNotifEntity2.setType("plugin1");
     webNotifEntity2.setParameters(params2);
     webUsersEntity2.setNotification(webNotifEntity2);
@@ -195,7 +159,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity3.setReceiver("user2");
     webUsersEntity3.setUpdateDate(Calendar.getInstance().getTime());
     WebNotifEntity webNotifEntity3 = new WebNotifEntity();
-    webNotifEntity3.setReceiver(webUsersEntity3);
+    webNotifEntity3.addReceiver(webUsersEntity3);
     webNotifEntity3.setType("plugin1");
     webNotifEntity3.setParameters(params3);
     webUsersEntity3.setNotification(webNotifEntity3);
@@ -211,7 +175,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity4.setReceiver("user1");
     webUsersEntity4.setUpdateDate(Calendar.getInstance().getTime());
     WebNotifEntity webNotifEntity4 = new WebNotifEntity();
-    webNotifEntity4.setReceiver(webUsersEntity4);
+    webNotifEntity4.addReceiver(webUsersEntity4);
     webNotifEntity4.setType("plugin2");
     webNotifEntity4.setParameters(params4);
     webUsersEntity4.setNotification(webNotifEntity4);
@@ -243,7 +207,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     WebUsersEntity webUsersEntity1 = new WebUsersEntity();
     webUsersEntity1.setReceiver("user1");
     WebNotifEntity webNotifEntity1 = new WebNotifEntity();
-    webNotifEntity1.setReceiver(webUsersEntity1);
+    webNotifEntity1.addReceiver(webUsersEntity1);
     webNotifEntity1.setParameters(params1);
     webNotifEntity1.setType("plugin1");
     webUsersEntity1.setNotification(webNotifEntity1);
@@ -258,7 +222,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     WebUsersEntity webUsersEntity2 = new WebUsersEntity();
     webUsersEntity2.setReceiver("user1");
     WebNotifEntity webNotifEntity2 = new WebNotifEntity();
-    webNotifEntity2.setReceiver(webUsersEntity2);
+    webNotifEntity2.addReceiver(webUsersEntity2);
     webNotifEntity2.setType("plugin1");
     webNotifEntity2.setParameters(params2);
     webUsersEntity2.setNotification(webNotifEntity2);
@@ -272,7 +236,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     WebUsersEntity webUsersEntity3 = new WebUsersEntity();
     webUsersEntity3.setReceiver("user1");
     WebNotifEntity webNotifEntity3 = new WebNotifEntity();
-    webNotifEntity3.setReceiver(webUsersEntity3);
+    webNotifEntity3.addReceiver(webUsersEntity3);
     webNotifEntity3.setType("plugin1");
     webNotifEntity3.setParameters(params3);
     webUsersEntity3.setNotification(webNotifEntity3);
@@ -286,7 +250,7 @@ public class WebNotifDAOTest extends CommonsDAOJPAImplTest {
     WebUsersEntity webUsersEntity4 = new WebUsersEntity();
     webUsersEntity4.setReceiver("user1");
     WebNotifEntity webNotifEntity4 = new WebNotifEntity();
-    webNotifEntity4.setReceiver(webUsersEntity4);
+    webNotifEntity4.addReceiver(webUsersEntity4);
     webNotifEntity4.setType("plugin2");
     webNotifEntity4.setParameters(params4);
     webUsersEntity4.setNotification(webNotifEntity4);

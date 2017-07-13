@@ -95,8 +95,7 @@ public class UserSetting {
    * @return
    */
   public List<String> getChannelActives() {
-
-    return channelActives == null ? new ArrayList<String>() : channelActives;
+    return channelActives == null ? channelActives = new ArrayList<String>() : channelActives;
   }
   
   /**
@@ -132,9 +131,6 @@ public class UserSetting {
    * @param channelActives
    */
   public void setChannelActives(List<String> channelActives) {
-    if (this.channelActives == null) {
-      this.channelActives = new ArrayList<String>();
-    }
     this.channelActives = channelActives;
   }
 

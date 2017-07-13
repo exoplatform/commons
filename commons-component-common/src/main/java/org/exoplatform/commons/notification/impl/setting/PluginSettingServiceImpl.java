@@ -16,16 +16,6 @@
  */
 package org.exoplatform.commons.notification.impl.setting;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.jcr.Node;
-
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.model.GroupProvider;
@@ -48,10 +38,15 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
+import javax.jcr.Node;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 public class PluginSettingServiceImpl extends AbstractService implements PluginSettingService {
   private static final Log LOG = ExoLogger.getLogger(PluginSettingServiceImpl.class);
 
-  private List<PluginConfig> pluginConfigs = new ArrayList<PluginConfig>();
+  private List<PluginConfig> pluginConfigs = new CopyOnWriteArrayList<PluginConfig>();
 
   private Map<String, GroupProvider> groupPluginMap = new ConcurrentHashMap<String, GroupProvider>();
 

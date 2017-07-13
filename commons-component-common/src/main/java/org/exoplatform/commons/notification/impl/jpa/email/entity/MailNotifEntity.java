@@ -48,10 +48,10 @@ public class MailNotifEntity {
   private int order;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "mailNotification")
-  private Set<MailParamsEntity> ownerParameter;
+  private Set<MailParamsEntity> ownerParameters = new HashSet<>();
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "notification")
-  private Set<MailDigestEntity> digestSent;
+  private Set<MailDigestEntity> digestToSend;
 
   public long getId() {
     return id;
@@ -97,23 +97,23 @@ public class MailNotifEntity {
     return this;
   }
 
-  public Set<MailParamsEntity> getArrayOwnerParameter() {
-    return ownerParameter;
+  public Set<MailParamsEntity> getParameters() {
+    return ownerParameters;
   }
 
-  public void setArrayOwnerParameter(Set<MailParamsEntity> ownerParameter) {
-    this.ownerParameter = ownerParameter;
+  public void addParameter(MailParamsEntity ownerParameter) {
+    ownerParameters.add(ownerParameter);
   }
 
-  public Set<MailDigestEntity> getMailDigestSent() {
-    return digestSent;
+  public Set<MailDigestEntity> getMailDigestToSend() {
+    return digestToSend;
   }
 
-  public void addMailDigestSent(MailDigestEntity digestSent) {
-    if (this.digestSent == null) {
-      this.digestSent = new HashSet<MailDigestEntity>();
+  public void addMailDigestToSend(MailDigestEntity digestToSend) {
+    if (this.digestToSend == null) {
+      this.digestToSend = new HashSet<MailDigestEntity>();
     }
-    this.digestSent.add(digestSent);
+    this.digestToSend.add(digestToSend);
   }
 
 }

@@ -52,20 +52,24 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
       notifEntity.setOrder(message.getOrder());
       notifEntity.setType(message.getKey().getId());
       notifEntity.setCreationDate(message.getDateCreated());
+      notifEntity = mailNotifDAO.create(notifEntity);
 
       Map<String, String> ownerParameter = message.getOwnerParameter();
-      Set<MailParamsEntity> set = new HashSet<MailParamsEntity>();
       if (ownerParameter != null && !ownerParameter.isEmpty()) {
         for (String key : ownerParameter.keySet()) {
           MailParamsEntity paramsEntity = new MailParamsEntity();
           paramsEntity.setName(key);
           paramsEntity.setValue(ownerParameter.get(key));
           paramsEntity.setNotification(notifEntity);
-          set.add(paramsEntity);
           mailParamsDAO.create(paramsEntity);
         }
       }
-      notifEntity.setArrayOwnerParameter(set);
+      MailDigestEntity digestEntityDaily = new MailDigestEntity();
+      MailDigestEntity digestEntityWeekly = new MailDigestEntity();
+      digestEntityDaily.setNotification(notifEntity).setType(DIGEST_DAILY);
+      digestEntityWeekly.setNotification(notifEntity).setType(DIGEST_WEEKLY);
+      mailDigestDAO.create(digestEntityDaily);
+      mailDigestDAO.create(digestEntityWeekly);
 
     } catch (Exception e) {
       LOG.error("Failed to save the NotificationMessage", e);
@@ -119,22 +123,22 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
     List<NotificationInfo> messages = new ArrayList<NotificationInfo>();
     List<MailNotifEntity> notifEntities = getNotifsByDate(context, pluginId, userId);// for this user
     for (MailNotifEntity mailNotifEntity : notifEntities) {
-      if (!isDigestDailySent(mailNotifEntity, userId)) {
-        NotificationInfo model = fillModel(mailNotifEntity);
-        messages.add(model.setTo(userId));
-        setDailySent(mailNotifEntity, userId);
+      if (!mailDigestDAO.isDigestDailySent(mailNotifEntity)) {
+        NotificationInfo model = fillModel(mailNotifEntity, userId);
+        messages.add(model);
       }
     }
     return messages;
   }
 
-  private NotificationInfo fillModel(MailNotifEntity notifEntity) throws Exception {
+  private NotificationInfo fillModel(MailNotifEntity notifEntity, String userId) throws Exception {
     if(notifEntity == null) return null;
     NotificationInfo message = NotificationInfo.instance()
         .setFrom(notifEntity.getSender())
+        .setTo(userId)
         .setOrder(notifEntity.getOrder())
         .key(notifEntity.getType())
-        .setOwnerParameter(convertParamsEntityToParams(notifEntity.getArrayOwnerParameter()))
+        .setOwnerParameter(convertParamsEntityToParams(notifEntity.getParameters()))
         .setLastModifiedDate(notifEntity.getCreationDate())
         .setId(String.valueOf(notifEntity.getId()));
 
@@ -150,43 +154,13 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
     List<NotificationInfo> messages = new ArrayList<NotificationInfo>();
     List<MailNotifEntity> notifEntities = getNotifsByWeek(pluginId, userId);
     for (MailNotifEntity mailNotifEntity : notifEntities) {
-      if (!isDigestWeeklySent(mailNotifEntity, userId)) {
-        NotificationInfo model = fillModel(mailNotifEntity);
-        messages.add(model.setTo(userId));
-        setWeeklySent(mailNotifEntity, userId);
+      if (!mailDigestDAO.isDigestWeeklySent(mailNotifEntity)) {
+        NotificationInfo model = fillModel(mailNotifEntity, userId);
+        messages.add(model);
       }
     }
     return messages;
   }
-
-  private boolean isDigestWeeklySent(MailNotifEntity mailNotifEntity, String userId) {
-    boolean found = false;
-    if (mailNotifEntity.getMailDigestSent() != null) {
-      for (MailDigestEntity mailDigestEntity : mailNotifEntity.getMailDigestSent()) {
-        found = mailDigestEntity.getNotification().equals(mailNotifEntity) && mailDigestEntity.getType().equals("weekly")
-            && mailDigestEntity.getUser().equals(userId);
-        if (found) {
-          break;
-        }
-      }
-    }
-    return found;
-  }
-
-  private boolean isDigestDailySent(MailNotifEntity mailNotifEntity, String userId) {
-    boolean found = false;
-    if (mailNotifEntity.getMailDigestSent() != null) {
-      for (MailDigestEntity mailDigestEntity : mailNotifEntity.getMailDigestSent()) {
-        found = mailDigestEntity.getNotification().equals(mailNotifEntity) && mailDigestEntity.getType().equals("daily")
-            && mailDigestEntity.getUser().equals(userId);
-        if (found) {
-          break;
-        }
-      }
-    }
-    return found;
-  }
-
 
   private List<MailNotifEntity> getNotifsByWeek(String pluginId, String userId) {
     Calendar calendar = Calendar.getInstance();
@@ -195,22 +169,37 @@ public class JPANotificationDataStorage implements NotificationDataStorage {
     return mailNotifDAO.getNotifsByPluginAndWeek(pluginId, oneWeekAgo);
   }
 
-
   @Override
   @ExoTransactional
-  public void removeMessageAfterSent() throws Exception {
-    for (MailNotifEntity mailNotifEntity : mailNotifDAO.findAll()) {
-      if (mailDigestDAO.isDigestSent(mailNotifEntity)) {
-        mailNotifDAO.delete(mailNotifEntity);
+  public void removeMessageAfterSent(NotificationContext context) throws Exception {
+    boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
+    if (isWeekly) {
+      for (MailNotifEntity mailNotifEntity : mailNotifDAO.findAll()) {
+        MailDigestEntity digestEntityWeekly = getDigest(mailNotifEntity, DIGEST_WEEKLY);
+        if (digestEntityWeekly != null) {
+          mailDigestDAO.delete(digestEntityWeekly);
+        }
+        if (mailDigestDAO.isDigestDailySent(mailNotifEntity)) {
+          mailNotifDAO.delete(mailNotifEntity);
+        }
+      }
+    }
+    //
+    boolean isDaily = context.value(NotificationJob.JOB_DAILY);
+    if (isDaily) {
+      for (MailNotifEntity mailNotifEntity : mailNotifDAO.findAll()) {
+        MailDigestEntity digestEntityDaily = getDigest(mailNotifEntity, DIGEST_DAILY);
+        if (digestEntityDaily != null) {
+          mailDigestDAO.delete(digestEntityDaily);
+        }
+        if (mailDigestDAO.isDigestWeeklySent(mailNotifEntity)) {
+          mailNotifDAO.delete(mailNotifEntity);
+        }
       }
     }
   }
 
-  public void setDailySent(MailNotifEntity notifEntity, String userId) {
-    notifEntity.addMailDigestSent(new MailDigestEntity().setNotification(notifEntity).setType(DIGEST_DAILY).setUser(userId));
-  }
-
-  public void setWeeklySent(MailNotifEntity notifEntity, String userId) {
-    notifEntity.addMailDigestSent(new MailDigestEntity().setNotification(notifEntity).setType(DIGEST_WEEKLY).setUser(userId));
+  private MailDigestEntity getDigest(MailNotifEntity mailNotifEntity, String type) {
+    return mailDigestDAO.getDigest(mailNotifEntity, type);
   }
 }

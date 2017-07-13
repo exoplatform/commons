@@ -76,20 +76,18 @@ public class JPASettingServiceImpl implements SettingService {
         return;
       }
       ContextEntity c = convertContextToContextEntity(context);
-      LOG.info("=== setting save, contextType={} and contextName={} and key={} and value={}", c.getType(), c.getName(), key, value.getValue());
+      LOG.debug("=== setting save, contextType={} and contextName={} and key={} and value={}", c.getType(), c.getName(), key, value.getValue());
       ContextEntity contextEntity = settingContextDAO.getContext(c);
       if (contextEntity == null) {
         contextEntity = settingContextDAO.create(c);
       }
-      ScopeEntity scopeEntity = settingScopeDAO.getScope(convertScopeToScopeEntity(scope));
+      ScopeEntity scopeEntityTmp = convertScopeToScopeEntity(scope);
+      ScopeEntity scopeEntity = settingScopeDAO.getScope(scopeEntityTmp);
       if (scopeEntity == null) {
-        scopeEntity = settingScopeDAO.create(convertScopeToScopeEntity(scope));
+        scopeEntity = settingScopeDAO.create(scopeEntityTmp);
       }
-      SettingsEntity settingsEntity = settingsDAO.getSetting(contextEntity, scopeEntity, key);
+      SettingsEntity settingsEntity = settingsDAO.getSettingByContextAndScopeAndKey(contextEntity, scopeEntity, key);
       if (settingsEntity != null) {
-        settingsEntity.setName(key);
-        settingsEntity.setContext(contextEntity);
-        settingsEntity.setScope(scopeEntity);
         settingsEntity.setValue(value.getValue().toString());
       } else {
         settingsDAO.create(new SettingsEntity().setScope(scopeEntity).setContext(contextEntity).setName(key).setValue(value.getValue().toString()));
@@ -104,7 +102,7 @@ public class JPASettingServiceImpl implements SettingService {
   @Override
   @ExoTransactional
   public void remove(Context context, Scope scope, String key) {
-    SettingsEntity setting = settingsDAO.getSetting(convertContextToContextEntity(context),
+    SettingsEntity setting = settingsDAO.getSettingByContextAndScopeAndKey(convertContextToContextEntity(context),
         convertScopeToScopeEntity(scope), key);
     if (setting != null) {
       settingsDAO.delete(setting);
@@ -134,12 +132,17 @@ public class JPASettingServiceImpl implements SettingService {
   @Override
   @ExoTransactional
   public SettingValue<?> get(Context context, Scope scope, String key) {
-    SettingsEntity setting = settingsDAO.getSetting(convertContextToContextEntity(context),
+    SettingsEntity setting = settingsDAO.getSettingByContextAndScopeAndKey(convertContextToContextEntity(context),
         convertScopeToScopeEntity(scope), key);
     if (setting == null) {
       return null; // Property doesn't exist
     } else {
       return SettingValue.create((String) setting.getValue());
     }
+  }
+
+  @ExoTransactional
+  public int getNumber(Scope scope, String key, String value) {
+    return settingsDAO.getNumber(convertScopeToScopeEntity(scope), key, value);
   }
 }

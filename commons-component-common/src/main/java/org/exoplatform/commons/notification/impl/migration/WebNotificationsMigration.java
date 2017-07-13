@@ -49,6 +49,8 @@ public class WebNotificationsMigration implements StartableClusterAware {
   private OrganizationService organizationService;
   private SettingService settingService;
   private static List<String> allUsers = new LinkedList<String>();
+  private static List<String> nonRemovedWebNotifs = new LinkedList<String>();
+  private static List<String> nonMigratedWebNotifs = new LinkedList<String>();
   //scope of user web notification migration
   public static final String WEB_NOTIFICATION_MIGRATION_USER_KEY = "WEB_NOTIFICATION_MIGRATION_USER";
   //scope of web notification migration status
@@ -182,10 +184,16 @@ public class WebNotificationsMigration implements StartableClusterAware {
           node.getSession().save();
           settingService.remove(Context.USER.id(userId), Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_USER_KEY));
         } catch (Exception e) {
+          nonRemovedWebNotifs.add(userId);
           LOG.error("Error while cleaning Web notifications JCR data to RDBMS of user: " + userId + " - Cause : " + e.getMessage(), e);
         }
+      } else {
+        nonMigratedWebNotifs.add(userId);
       }
     }
+    LOG.info(" === Web Notifications Migration from JCR to RDBBMS report: \n"
+           + "           - " + nonMigratedWebNotifs.size() + " Web Notifications nodes are not migrated to RDBMS \n"
+           + "           - " + nonRemovedWebNotifs.size() + " Web Notifications nodes are migrated but not removed from JCR");
     long endTime = System.currentTimeMillis();
     LOG.info("=== Web notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
     settingService.set(Context.GLOBAL, Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_DONE_KEY), WEB_NOTIFICATION_RDBMS_CLEANUP_DONE, SettingValue.create("true"));

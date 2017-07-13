@@ -75,6 +75,7 @@ public class MailParamsEntity {
 
   public MailParamsEntity setNotification(MailNotifEntity mailNotification) {
     this.mailNotification = mailNotification;
+    mailNotification.addParameter(this);
     return this;
   }
 }

@@ -17,10 +17,7 @@ import java.util.Set;
 @NamedQueries({
     @NamedQuery(name = "commons.getScope", query = "SELECT s FROM SettingsScopeEntity s " +
         "WHERE s.name = :name " +
-        "AND s.type= :scopeType "),
-    @NamedQuery(name = "commons.getScopeOfType", query = "SELECT s FROM SettingsScopeEntity s " +
-        "WHERE s.type= :scopeType " +
-        "AND s.name IS NULL ")
+        "AND s.type= :scopeType ")
 })
 public class ScopeEntity {
   @Id

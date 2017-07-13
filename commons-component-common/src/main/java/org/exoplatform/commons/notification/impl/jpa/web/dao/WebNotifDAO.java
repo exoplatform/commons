@@ -38,22 +38,6 @@ public class WebNotifDAO extends GenericDAOJPAImpl<WebNotifEntity, Long> {
         .setMaxResults(limit)
         .getResultList();
   }
-
-  public List<WebNotifEntity> findWebNotifsByUser(String userId, Boolean isRead, int offset, int limit) {
-    return getEntityManager().createNamedQuery("commons.findNewWebNotifsByUser")
-        .setParameter("userId", userId)
-        .setParameter("isRead", isRead)
-        .setFirstResult(offset)
-        .setMaxResults(limit)
-        .getResultList();
-  }
-
-  public List<WebNotifEntity> findWebNotifsByUser(String userId, Boolean isRead) {
-    return getEntityManager().createNamedQuery("commons.findNewWebNotifsByUser")
-        .setParameter("userId", userId)
-        .setParameter("isRead", isRead)
-        .getResultList();
-  }
   public List<WebNotifEntity> findWebNotifsByLastUpdatedDate(Date delayTime) {
     return getEntityManager().createNamedQuery("commons.findWebNotifsByLastUpdatedDate")
         .setParameter("delayTime", delayTime)
@@ -86,6 +70,18 @@ public class WebNotifDAO extends GenericDAOJPAImpl<WebNotifEntity, Long> {
           .setParameter("pluginId", type)
           .setParameter("paramName", paramName)
           .setParameter("paramValue", paramValue)
+          .getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    }
+  }
+
+  public WebNotifEntity findWebNotif(String sender, String notifType, Date creationDate) {
+    try {
+      return (WebNotifEntity) getEntityManager().createNamedQuery("commons.findWebNotif")
+          .setParameter("sender", sender)
+          .setParameter("notifType", notifType)
+          .setParameter("creationDate", creationDate)
           .getSingleResult();
     } catch (NoResultException e) {
       return null;
