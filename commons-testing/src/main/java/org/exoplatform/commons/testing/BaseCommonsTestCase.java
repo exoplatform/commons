@@ -16,20 +16,25 @@
  */
 package org.exoplatform.commons.testing;
 
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Session;
-
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.test.BasicTestCase;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Session;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform hailt@exoplatform.com
  * May 22, 2012
  */
-public abstract class BaseCommonsTestCase extends BasicTestCase {
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
+public abstract class BaseCommonsTestCase extends BaseExoTestCase {
   protected final String         REPO_NAME      = "repository";
 
   protected final String         WORKSPACE_NAME = "portal-test";
@@ -45,6 +50,8 @@ public abstract class BaseCommonsTestCase extends BasicTestCase {
   protected Node                 root;
 
   public void setUp() throws Exception {
+    super.setUp();
+    begin();
     container = PortalContainer.getInstance();
     repositoryService = getService(RepositoryService.class);
     configurationManager = getService(ConfigurationManager.class);
@@ -55,14 +62,14 @@ public abstract class BaseCommonsTestCase extends BasicTestCase {
   }
 
   protected void tearDown() throws Exception {
-    super.tearDown();
     NodeIterator iter = root.getNodes();
     while (iter.hasNext()) {
       Node node = iter.nextNode();
       node.remove();
     }
     session.save();
-    session.logout();
+    end();
+    super.tearDown();
   }
 
   protected <T> T getService(Class<T> clazz) {

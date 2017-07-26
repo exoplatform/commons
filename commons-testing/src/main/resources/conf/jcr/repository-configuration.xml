@@ -10,7 +10,7 @@
         <workspace name="system">
           <container class="org.exoplatform.services.jcr.impl.storage.jdbc.optimisation.CQJDBCWorkspaceDataContainer">
             <properties>
-              <property name="source-name" value="jdbcexo"/>
+              <property name="source-name" value="jdbcjcr"/>
               <property name="dialect" value="hsqldb"/>
               <property name="multi-db" value="false"/>
               <property name="update-storage" value="true"/>
@@ -39,7 +39,7 @@
               <properties>
 	            <property name="time-out" value="15m" /><!-- 15min -->
                 <property name="path" value="target/temp/lock/portal-test"/>
-                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcexo" />
+                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcjcr" />
                 <property name="infinispan-configuration" value="conf/jcr/jcr-infinispan-lock-config.xml" />
               </properties>
           </lock-manager>
@@ -49,7 +49,7 @@
         <workspace name="portal-test">
           <container class="org.exoplatform.services.jcr.impl.storage.jdbc.JDBCWorkspaceDataContainer">
             <properties>
-              <property name="source-name" value="jdbcexo"/>
+              <property name="source-name" value="jdbcjcr"/>
               <property name="dialect" value="hsqldb"/>
               <property name="multi-db" value="false"/>
               <property name="update-storage" value="true"/>
@@ -78,18 +78,18 @@
               <properties>
                 <property name="time-out" value="15m" /><!-- 15min -->
                 <property name="path" value="target/temp/lock/portal-test"/>
-                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcexo" />
+                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcjcr" />
                 <property name="infinispan-configuration" value="conf/jcr/jcr-infinispan-lock-config.xml" />
               </properties>
           </lock-manager>
-          
+
         </workspace>
 
         <!-- Collaboration workspace data -->
         <workspace name="collaboration">
           <container class="org.exoplatform.services.jcr.impl.storage.jdbc.JDBCWorkspaceDataContainer">
             <properties>
-              <property name="source-name" value="jdbcexo"/>
+              <property name="source-name" value="jdbcjcr"/>
               <property name="dialect" value="hsqldb"/>
               <property name="multi-db" value="false"/>
               <property name="update-storage" value="true"/>
@@ -118,7 +118,7 @@
               <properties>
               <property name="time-out" value="15m" /><!-- 15min -->
                 <property name="path" value="target/temp/lock/collaboration"/>
-                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcexo" />
+                <property name="infinispan-cl-cache.jdbc.datasource" value="jdbcjcr" />
                 <property name="infinispan-configuration" value="conf/jcr/jcr-infinispan-lock-config.xml" />
               </properties>
           </lock-manager>

@@ -42,7 +42,7 @@
       <properties-param>
 				<name>working-conf</name>
 				<description>working-conf</description>
-				<property name="source-name" value="jdbcexo"/>
+				<property name="source-name" value="jdbcjcr"/>
 				<property name="dialect" value="hsqldb"/>
 				<property name="persister-class-name" value="org.exoplatform.services.jcr.impl.config.JDBCConfigurationPersister"/>
 			</properties-param>
@@ -78,7 +78,7 @@
 			<init-params>
 				<value-param>
 					<name>bind-name</name>
-					<value>jdbcexo</value>
+					<value>jdbcjcr</value>
 				</value-param>
 				<value-param>
 					<name>class-name</name>

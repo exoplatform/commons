@@ -16,21 +16,15 @@
  */
 package org.exoplatform.commons.upgrade;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-
 import org.apache.commons.lang.StringUtils;
-
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.info.MissingProductInformationException;
 import org.exoplatform.commons.info.ProductInformations;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
@@ -38,10 +32,19 @@ import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com May
  * 31, 2012
  */
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test-configuration.xml") })
+
 public class UpgradeProductTest extends BaseCommonsTestCase {
 
   private UpgradeProductService service;
@@ -235,7 +238,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     }
 
   }
-  
+
   public static class UpgradePluginFromVersionONE extends UpgradeProductPlugin {
 
     public UpgradePluginFromVersionONE(InitParams initParams) {
@@ -304,7 +307,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   }
 
   public static class UpgradePluginStatus extends UpgradeProductPlugin {
-    
+
     private static final String MIGRATION_STATUS_COMPLETED = "COMPLETED";
     private static final String MIGRATION_STATUS = "Migration_STATUS";
     boolean updateStatusAfterUpgrade = false;
@@ -339,5 +342,5 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     }
 
   }
-  
+
 }

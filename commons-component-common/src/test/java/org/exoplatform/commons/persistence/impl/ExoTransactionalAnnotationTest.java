@@ -1,6 +1,10 @@
 package org.exoplatform.commons.persistence.impl;
 
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.jpa.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,9 +14,22 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
-public class ExoTransactionalAnnotationTest {
+
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml") })
+public class ExoTransactionalAnnotationTest extends BaseTest {
+  @Override
+  public void setUp() {
+    getContainer();
+  }
+
+  @Override
+  public void tearDown() {
+    // don't call tearDown on super to not clean DB
+    // super.tearDown();
+  }
 
   @Test
   public void testCreateDaoMethodIsTransactional() {
@@ -45,16 +62,19 @@ public class ExoTransactionalAnnotationTest {
     assertNull(service.find(task.getId()));
   }
 
-  @Test(expected = TransactionRequiredException.class)
+  @Test
   public void testNonTransactionalMethodDoesNotCommit() {
     // Given
     TaskService service = new TaskService();
     TaskDao dao = new TaskDao();
     service.create(new Task());
     // When
-    dao.nonTransactionalDeleteAll();
-    // Then
-    fail("deleteAll must throw an exception");
+    try {
+      dao.nonTransactionalDeleteAll();
+      fail("deleteAll must throw an exception");
+    } catch (TransactionRequiredException e) {
+      // Then
+    }
   }
 
   @Test
@@ -87,7 +107,7 @@ public class ExoTransactionalAnnotationTest {
     task.setId((long) 1); // Invalid set to cause commit failed.
     try {
       dao.create(task);
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
       // Expected.
     }
 
@@ -102,6 +122,7 @@ public class ExoTransactionalAnnotationTest {
 
     // Given
     TaskDao dao = new TaskDao();
+    int initialSize = dao.findAll().size();
     // When
     try {
       // create first task
@@ -129,7 +150,7 @@ public class ExoTransactionalAnnotationTest {
     }
 
     // Then
-    assertThat(dao.findAll().size(), is(2));
+    assertThat(dao.findAll().size(), is(initialSize + 2));
 
     entityManagerService.endRequest(container);
   }
@@ -174,16 +195,19 @@ public class ExoTransactionalAnnotationTest {
     EntityManagerService service = container.getComponentInstanceOfType(EntityManagerService.class);
     service.startRequest(container);
     TaskDao dao = new TaskDao();
+    int initialSize = dao.findAll().size();
     dao.create(new Task());
     // When
     service.endRequest(container);
     // Then
-    assertThat(dao.findAll().size(), is(1));
+    assertThat(dao.findAll().size(), is(initialSize + 1));
   }
 
   @Before
   public void deleteAllTask() {
+    begin();
     new TaskDao().deleteAll();
+    end();
   }
 
   @Test
@@ -203,11 +227,12 @@ public class ExoTransactionalAnnotationTest {
     EntityManagerService service = container.getComponentInstanceOfType(EntityManagerService.class);
     service.startRequest(container);
     TaskDao dao = new TaskDao();
+    int initialSize = dao.findAll().size();
     dao.createWithSetRollbackOnly(new Task());
     // When
     dao.create(new Task());
     // Then
     service.endRequest(container);
-    assertThat(dao.findAll().size(), is(1));
+    assertThat(dao.findAll().size(), is(initialSize + 1));
   }
 }

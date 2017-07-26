@@ -1,7 +1,13 @@
 package org.exoplatform.commons.cluster;
 
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
-
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-cluster-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
 public class StartableClusterAwareTest extends BaseCommonsTestCase {
     public static int nbRunningA = 0;
     public static int nbRunningB = 0;

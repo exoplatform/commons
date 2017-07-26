@@ -1,25 +1,19 @@
 package org.exoplatform.commons.persistence.impl;
 
-import javax.persistence.EntityManager;
-
-import junit.framework.TestCase;
-
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.jpa.CommonsDAOJPAImplTest;
 
-public class TestEntityManagerService extends TestCase {
+import javax.persistence.EntityManager;
+
+public class TestEntityManagerService extends CommonsDAOJPAImplTest {
 
   private EntityManagerService service;
 
   @Override
-  protected void setUp() throws Exception {
+  public void setUp() throws Exception {
+    super.setUp();
     service = PortalContainer.getInstance().getComponentInstanceOfType(EntityManagerService.class);
-    RequestLifeCycle.begin(service);
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    RequestLifeCycle.end();
   }
 
   public void testServiceInitialize() {
