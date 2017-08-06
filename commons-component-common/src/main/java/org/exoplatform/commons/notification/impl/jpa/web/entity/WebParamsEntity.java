@@ -42,7 +42,7 @@ public class WebParamsEntity {
   @Column(name = "PARAM_VALUE")
   private String value;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "WEB_NOTIF_ID")
   private WebNotifEntity webNotification;
 

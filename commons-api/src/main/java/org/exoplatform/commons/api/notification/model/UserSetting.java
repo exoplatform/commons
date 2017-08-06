@@ -16,13 +16,21 @@
  */
 package org.exoplatform.commons.api.notification.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
 import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-
-import java.util.*;
-import java.util.Map.Entry;
+import org.exoplatform.container.RootContainer;
 
 /**
  * User setting notification
@@ -102,7 +110,6 @@ public class UserSetting {
    * @return
    */
   public boolean isChannelActive(String channelId) {
-
     return channelActives != null && channelActives.contains(channelId);
   }
 
@@ -110,11 +117,13 @@ public class UserSetting {
    * @param channelId
    */
   public void setChannelActive(String channelId) {
-    if(!isChannelActive(channelId)) {
+    if (!isChannelActive(channelId)) {
       if (channelActives == null) {
         channelActives = new ArrayList<String>();
+        channelActives.add(channelId);
+      } else if (!channelActives.contains(channelId)) {
+        channelActives.add(channelId);
       }
-      channelActives.add(channelId);
     }
   }
 
@@ -353,9 +362,13 @@ public class UserSetting {
   
   public static final UserSetting getDefaultInstance() {
     if (defaultSetting == null) {
-      PluginSettingService settingService = (PluginSettingService) PortalContainer.getInstance().
+      ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+      if (currentContainer instanceof RootContainer) {
+        currentContainer = PortalContainer.getInstance();
+      }
+      PluginSettingService settingService = (PluginSettingService) currentContainer.
                                               getComponentInstanceOfType(PluginSettingService.class);
-      ChannelManager channelManager = (ChannelManager) PortalContainer.getInstance().
+      ChannelManager channelManager = (ChannelManager) currentContainer.
                                               getComponentInstanceOfType(ChannelManager.class);
       defaultSetting = getInstance();
       List<String> activeChannels = getDefaultSettingActiveChannels();

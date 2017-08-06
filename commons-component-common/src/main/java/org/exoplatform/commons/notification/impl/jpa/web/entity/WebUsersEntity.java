@@ -3,7 +3,7 @@ package org.exoplatform.commons.notification.impl.jpa.web.entity;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.util.Calendar;
 
 /**
  * Created by The eXo Platform SAS
@@ -15,16 +15,46 @@ import java.util.Date;
 @ExoEntity
 @Table(name = "NTF_WEB_NOTIFS_USERS")
 @NamedQueries({
-    @NamedQuery(name = "commons.findWebNotifsByUser", query = "SELECT u FROM NotificationsWebUsersEntity u " +
-        "WHERE u.receiver = :userId "),
-    @NamedQuery(name = "commons.findWebNotifsByUserAndRead", query = "SELECT u FROM NotificationsWebUsersEntity u " +
-        "JOIN u.webNotification WebNotif " +
+    @NamedQuery(name = "NotificationsWebUsersEntity.getNumberOnBadge", query = "SELECT COUNT(u) FROM NotificationsWebUsersEntity u " +
         "WHERE u.receiver = :userId " +
-        "AND u.read = :isRead " +
-        "ORDER BY WebNotif.creationDate DESC "),
-    @NamedQuery(name = "commons.getNumberOnBadge", query = "SELECT COUNT(u) FROM NotificationsWebUsersEntity u " +
+        "AND u.resetNumberOnBadge = FALSE "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.findNotifsWithBadge", query = "SELECT u FROM NotificationsWebUsersEntity u " +
         "WHERE u.receiver = :userId " +
-        "AND u.resetNumberOnBadge = FALSE ")
+        "AND u.resetNumberOnBadge = FALSE "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.markWebNotifsAsReadByUser", query = "UPDATE NotificationsWebUsersEntity u " +
+        "SET u.read = TRUE " +
+        "WHERE u.receiver = :userId " +
+        "AND u.read = FALSE "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.findWebNotifsByPluginFilter", query = "SELECT u FROM NotificationsWebUsersEntity u " +
+        "JOIN FETCH u.webNotification w " +
+        "WHERE u.webNotification.type= :pluginId " +
+        "AND u.receiver = :userId " +
+        "AND u.showPopover= :isOnPopover " +
+        "ORDER BY u.updateDate DESC "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.findWebNotifsByUserFilter", query = "SELECT u FROM NotificationsWebUsersEntity u " +
+        "JOIN FETCH u.webNotification w " +
+        "WHERE u.receiver = :userId " +
+        "ORDER BY u.updateDate DESC "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.findWebNotifsByPopoverFilter", query = "SELECT u FROM NotificationsWebUsersEntity u " +
+        "JOIN FETCH u.webNotification w " +
+        "WHERE u.receiver = :userId " +
+        "AND u.showPopover= :isOnPopover " +
+        "ORDER BY u.updateDate DESC "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.findUnreadNotification", query = "SELECT u FROM NotificationsWebUsersEntity u " +
+        "JOIN FETCH u.webNotification w " +
+        "JOIN u.webNotification.parameters  p " +
+        "WHERE w.type= :pluginId " +
+        "AND p.name = :paramName " +
+        "AND p.value = :paramValue " +
+        "AND u.receiver = :userId " +
+        "AND u.read = FALSE " +
+        "ORDER BY u.updateDate DESC "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.findWebNotifsOfUserByLastUpdatedDate", query = "SELECT u FROM NotificationsWebUsersEntity u " +
+        "WHERE u.receiver = :userId " +
+        "AND u.updateDate < :calendar "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.findWebNotifsByLastUpdatedDate", query = "SELECT u FROM NotificationsWebUsersEntity u " +
+        "JOIN FETCH u.webNotification w " +
+        "WHERE u.updateDate < :calendar ")
 })
 public class WebUsersEntity {
   @Id
@@ -33,7 +63,7 @@ public class WebUsersEntity {
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_NTF_WEB_USERS")
   private long id;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(fetch=FetchType.LAZY)
   @JoinColumn(name = "WEB_NOTIF_ID")
   private WebNotifEntity webNotification;
 
@@ -41,7 +71,7 @@ public class WebUsersEntity {
   private String receiver;
 
   @Column(name = "UPDATE_DATE")
-  private Date updateDate;
+  private Calendar updateDate;
 
   @Column(name = "IS_READ")
   private boolean read;
@@ -74,11 +104,11 @@ public class WebUsersEntity {
     return this;
   }
 
-  public Date getUpdateDate() {
+  public Calendar getUpdateDate() {
     return updateDate;
   }
 
-  public WebUsersEntity setUpdateDate(Date updateDate) {
+  public WebUsersEntity setUpdateDate(Calendar updateDate) {
     this.updateDate = updateDate;
     return this;
   }

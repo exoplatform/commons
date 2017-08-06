@@ -171,8 +171,5 @@ public class NotificationUtilsTest extends TestCase {
     assertFalse(CollectionUtils.isEqualCollection(info.getOwnerParameter().values(), clone.getOwnerParameter().values()));
     //
     assertFalse(info.getValueOwnerParameter("test").equals(clone.getValueOwnerParameter("test")));
-    //
-    clone = info.clone(true);
-    assertFalse(info.getId().equals(clone.getId()));
   }
 }

@@ -39,8 +39,8 @@
   </component>
   
   <component profiles="all">
-    <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
-    <type>org.exoplatform.commons.notification.impl.jpa.email.JPANotificationDataStorage</type>
+    <key>org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage</key>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.JPAMailNotificationStorage</type>
   </component>
 
   <component profiles="all">
@@ -50,7 +50,6 @@
 
   <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
-    <!--<type>org.exoplatform.commons.notification.impl.jpa.cache.RDBMSCachedWebNotificationStorage</type>-->
     <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
   </component>
   
@@ -76,7 +75,7 @@
 
   <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</key>
-    <type>org.exoplatform.commons.notification.impl.setting.PluginSettingServiceImpl</type>
+    <type>org.exoplatform.settings.jpa.JPAPluginSettingServiceImpl</type>
   </component>
 
   <component profiles="all">
@@ -120,10 +119,6 @@
 			<value-param>
 				<name>numberOfMailPerBatch</name> <!-- Max number of mails to send in the configured period of time -->
 				<value>${exo.notification.service.QueueMessage.numberOfMailPerBatch:30}</value>
-			</value-param>
-			<value-param>
-				<name>period</name><!-- The interval in seconds between two executions of the send mail job -->
-				<value>${exo.notification.service.QueueMessage.period:60}</value>
 			</value-param>
 		</init-params>
 	</component>
@@ -225,11 +220,7 @@
         </properties-param>
       </init-params>
     </component-plugin>
-  </external-component-plugins>
-
-  <external-component-plugins>
-     <target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>    
-     <component-plugin profiles="all">
+    <component-plugin profiles="all">
      <name>AddCronJob</name>
      <set-method>addCronJob</set-method>
      <type>org.exoplatform.services.scheduler.CronJob</type>
@@ -245,33 +236,45 @@
         </properties-param>
       </init-params>
     </component-plugin>
+    <component-plugin profiles="all">
+     <name>AddCronJob</name>
+     <set-method>addCronJob</set-method>
+     <type>org.exoplatform.services.scheduler.CronJob</type>
+      <description>Add a mail queue messages processing job to the JobSchedulerService</description>
+      <init-params>
+        <properties-param>
+          <name>cronjob.info</name>
+          <description>Configuration for queue messages processing</description>
+          <property name="jobName" value="SendEmailNotificationJob"/>
+          <property name="groupName" value="Notification"/>
+          <property name="job" value="org.exoplatform.commons.notification.job.SendEmailNotificationJob"/>
+          <property name="expression" value="${exo.notification.SendEmailNotificationJob.expression:0 0/1 * * * ?}"/><!-- Run every minute -->
+        </properties-param>
+      </init-params>
+    </component-plugin>
+	<component-plugin profiles="all">
+		<name>AddCronJob</name>
+		<set-method>addCronJob</set-method>
+		<type>org.exoplatform.commons.notification.job.WebCronJob</type>
+		<description>Add clean old web notifications job to the JobSchedulerService</description>
+		<init-params>
+			<properties-param>
+				<name>cronjob.info</name>
+				<description>Configuration for cleaning old web notifications</description>
+				<property name="jobName" value="WebNotificationJob" />
+				<property name="groupName" value="Notification" />
+				<property name="job" value="org.exoplatform.commons.notification.job.WebNotificationJob" />
+				<property name="expression" value="${exo.notification.WebNotificationCleanJob.expression:0 0 23 ? * *}" /><!-- Run at 11:00pm every day -->
+			</properties-param>
+			<properties-param>
+				<name>web.info</name>
+				<description></description>
+				<property name="liveDays" value="${exo.notification.viewall:30}" /><!-- 30 days -->
+			</properties-param>
+		</init-params>
+	</component-plugin>
   </external-component-plugins>
 
-  <external-component-plugins>
-		<target-component>org.exoplatform.services.scheduler.JobSchedulerService</target-component>
-		<component-plugin profiles="all">
-			<name>AddCronJob</name>
-			<set-method>addCronJob</set-method>
-			<type>org.exoplatform.commons.notification.job.WebCronJob</type>
-			<description>Add clean old web notifications job to the JobSchedulerService</description>
-			<init-params>
-				<properties-param>
-					<name>cronjob.info</name>
-					<description>Configuration for cleaning old web notifications</description>
-					<property name="jobName" value="WebNotificationJob" />
-					<property name="groupName" value="Notification" />
-					<property name="job" value="org.exoplatform.commons.notification.job.WebNotificationJob" />
-					<property name="expression" value="${exo.notification.WebNotificationCleanJob.expression:0 0 23 ? * *}" /><!-- Run at 11:00pm every day -->
-				</properties-param>
-				<properties-param>
-					<name>web.info</name>
-					<description></description>
-					<property name="liveDays" value="${exo.notification.viewall:30}" /><!-- 30 days -->
-				</properties-param>
-			</init-params>
-		</component-plugin>
-	</external-component-plugins>
-  
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</target-component>
     <component-plugin profiles="all">

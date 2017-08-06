@@ -277,94 +277,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     queryBuffer.append(" AND (").append(EXO_IS_ENABLED).append(" IS NULL OR ").append(EXO_IS_ENABLED).append(" = 'true')");
     return queryBuffer;
   }
-  
-  @Override
-  public List<UserSetting> getUserSettingWithDeactivate() {
-    boolean created = NotificationSessionManager.createSystemProvider();
-    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();;
-    List<UserSetting> models = new ArrayList<UserSetting>();
-    try {
-      Session session = getSession(sProvider, workspace);
-      if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
-        return models;
-      }
-      
-      StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
-      strQuery.append(" WHERE (").append(EXO_IS_ACTIVE).append("='')")
-              .append(" OR (")
-              .append(EXO_IS_ENABLED).append(" IS NOT NULL AND ").append(EXO_IS_ENABLED).append(" = 'false')");;
-      
-      QueryManager qm = session.getWorkspace().getQueryManager();
-      QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
-      
-      NodeIterator iter = query.execute().getNodes();
-      while (iter != null && iter.hasNext()) {
-        Node node = iter.nextNode();
-        models.add(fillModel(node));
-      }
-      
-    } catch (Exception e) {
-      LOG.warn("Can not get the user setting with deactivated");
-    } finally {
-      NotificationSessionManager.closeSessionProvider(created);
-    }
 
-    return models;
-  }
-  
-  @Override
-  public List<String> getUserSettingByPlugin(String pluginId) {// only use for email channel
-    return getUserHasSettingPlugin(UserSetting.EMAIL_CHANNEL, pluginId);
-  }
-  
-  @Override
-  public List<String> getUserHasSettingPlugin(String channelId, String pluginId) {
-    boolean created = NotificationSessionManager.createSystemProvider();
-    SessionProvider sProvider = NotificationSessionManager.getSessionProvider();;
-    List<String> userIds = new ArrayList<String>();
-    try {
-      NodeIterator iter = getUserHasSettingPlugin(sProvider, channelId, pluginId);
-      while (iter != null && iter.hasNext()) {
-        Node node = iter.nextNode();
-        userIds.add(node.getParent().getName());
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to get all users have the " + pluginId + " in settings", e);
-    } finally {
-      NotificationSessionManager.closeSessionProvider(created);
-    }
-
-    return userIds;
-  }
-
-  private NodeIterator getUserHasSettingPlugin(SessionProvider sProvider, String channelId, String pluginId) throws Exception {
-    Session session = getSession(sProvider, workspace);
-    if(session.getRootNode().hasNode(SETTING_USER_PATH) == false) {
-      return null;
-    }
-    String property = getChannelProperty(channelId);
-    StringBuilder strQuery = new StringBuilder("SELECT * FROM ").append(STG_SCOPE);
-    String plugin = getValue(pluginId);
-    strQuery.append(" WHERE")
-            .append(buildSQLLikeProperty(EXO_IS_ACTIVE, channelId))
-            .append(" AND (");
-    //
-    if(UserSetting.EMAIL_CHANNEL.equals(channelId)) {
-      strQuery.append(buildSQLLikeProperty(property, plugin)).append(" OR")
-              .append(buildSQLLikeProperty(EXO_DAILY, plugin)).append(" OR")
-              .append(buildSQLLikeProperty(EXO_WEEKLY, plugin));
-    } else {
-      strQuery.append(buildSQLLikeProperty(property, plugin));
-    }
-    //
-    strQuery.append(" ) AND (")
-            .append(EXO_IS_ENABLED).append(" IS NULL OR ").append(EXO_IS_ENABLED).append(" = 'true'");
-    strQuery.append(" )");
-    QueryManager qm = session.getWorkspace().getQueryManager();
-    QueryImpl query = (QueryImpl) qm.createQuery(strQuery.toString(), Query.SQL);
-    return query.execute().getNodes();
-  }
-  
   /**
    * Gets these plugins what configured the daily
    * 
@@ -416,6 +329,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
    * Gets plugin's ID by propertyName
    * 
    * @param node
+   * @param propertyName
    * @return
    * @throws Exception
    */
@@ -540,5 +454,10 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   @Override
   public void saveLastReadDate(String userId, Long time) {
     settingService.set(Context.USER.id(userId), NOTIFICATION_SCOPE, EXO_LAST_READ_DATE, SettingValue.create(time));
+  }
+
+  @Override
+  public void setUserEnabled(String username, boolean enabled) {
+    saveUserSetting(username, EXO_IS_ENABLED, "" + enabled);
   }
 }

@@ -15,8 +15,8 @@ public class OrderComparatorASC implements Comparator<Object> {
       return order1.compareTo(order2);
     }
     if (o1 instanceof PluginConfig && o2 instanceof PluginConfig) {
-      Integer order1 = Integer.valueOf(((PluginConfig) o1).getOrder());
-      Integer order2 = Integer.valueOf(((PluginConfig) o2).getOrder());
+      Integer order1 = Integer.parseInt(((PluginConfig) o1).getOrder());
+      Integer order2 = Integer.parseInt(((PluginConfig) o2).getOrder());
       return order1.compareTo(order2);
     }
     if (o1 instanceof PluginInfo && o2 instanceof PluginInfo) {

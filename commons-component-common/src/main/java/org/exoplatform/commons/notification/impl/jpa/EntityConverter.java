@@ -1,28 +1,29 @@
 package org.exoplatform.commons.notification.impl.jpa;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.notification.impl.jpa.email.entity.MailParamsEntity;
+import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.notification.impl.jpa.email.entity.MailParamEntity;
 import org.exoplatform.commons.notification.impl.jpa.email.entity.MailQueueEntity;
 import org.exoplatform.commons.notification.impl.jpa.web.entity.WebNotifEntity;
 import org.exoplatform.commons.notification.impl.jpa.web.entity.WebParamsEntity;
 import org.exoplatform.commons.notification.impl.jpa.web.entity.WebUsersEntity;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
-
-import java.util.*;
 
 /**
  * This is an utility class used for entity conversion from JPA entities to equivalent JCR ones
  */
 public class EntityConverter {
-  private static final Log LOG = ExoLogger.getLogger(EntityConverter.class);
-
-
-  public static Map<String, String> convertParamsEntityToParams(Set<MailParamsEntity> paramsEntityList) {
+  public static Map<String, String> convertParamsEntityToParams(Collection<MailParamEntity> paramsEntityList) {
     Map<String, String> params = new HashMap<String, String>();
-    for (MailParamsEntity paramsEntity : paramsEntityList) {
+    for (MailParamEntity paramsEntity : paramsEntityList) {
       params.put(paramsEntity.getName(), paramsEntity.getValue());
     }
     return params;
@@ -37,40 +38,40 @@ public class EntityConverter {
     messageInfo.subject(mailQueueEntity.getSubject());
     messageInfo.body(mailQueueEntity.getBody());
     messageInfo.footer(mailQueueEntity.getFooter());
-    messageInfo.setCreatedTime(mailQueueEntity.getCreationDate().getTime());
+    messageInfo.setCreatedTime(mailQueueEntity.getCreationDate().getTimeInMillis());
     return messageInfo;
   }
 
-  public static NotificationInfo convertWebNotifEntityToNotificationInfo(WebNotifEntity webNotifEntity, String userId) {
+  /**
+   * Convert user web notification entity to notification DTO
+   * NOTE: The annotation {@link ExoTransactional} is used to
+   * allow fetching parameters lazily
+   * 
+   * @param webUsersEntity user web notification
+   * @return notification DTO
+   */
+  public static NotificationInfo convertWebNotifEntityToNotificationInfo(WebUsersEntity webUsersEntity) {
     NotificationInfo notificationInfo = new NotificationInfo();
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(webNotifEntity.getCreationDate());
+    WebNotifEntity notification = webUsersEntity.getNotification();
 
-    WebUsersEntity webUsersEntity = new WebUsersEntity();
-    Iterator it = webNotifEntity.getReceivers().iterator();
-    while (it.hasNext()) {
-      webUsersEntity = (WebUsersEntity) it.next();
-      if (webUsersEntity.getReceiver().equals(userId)) {
-        break;
-      }
-    }
+    notificationInfo.setLastModifiedDate(webUsersEntity.getUpdateDate());
 
-    notificationInfo.setLastModifiedDate(webUsersEntity.getUpdateDate().getTime());
-
-    Map<String, String> ownerParameters = new HashMap<String, String>();
-    for (WebParamsEntity parameter : webNotifEntity.getParameters()) {
-      ownerParameters.put(parameter.getName(), parameter.getValue());
-    }
-    ownerParameters.put("read", String.valueOf(webUsersEntity.isRead()));
+    Set<WebParamsEntity> parameters = notification.getParameters();
+    Map<String, String> ownerParameters =
+                                        parameters.stream()
+                                                  .collect(Collectors.toMap(WebParamsEntity::getName, WebParamsEntity::getValue));
+    ownerParameters.put(NotificationMessageUtils.READ_PORPERTY.getKey(), String.valueOf(webUsersEntity.isRead()));
     notificationInfo.setOwnerParameter(ownerParameters);
 
-    notificationInfo.key(new PluginKey(webNotifEntity.getType()));
-    notificationInfo.setTitle(webNotifEntity.getText());
-    notificationInfo.setFrom(webNotifEntity.getSender());
-    notificationInfo.to(userId);
-    notificationInfo.setDateCreated(cal);
-
-    notificationInfo.setId(String.valueOf(webNotifEntity.getId()));
+    notificationInfo.key(new PluginKey(notification.getType()));
+    notificationInfo.setTitle(notification.getText());
+    notificationInfo.setFrom(notification.getSender());
+    notificationInfo.to(webUsersEntity.getReceiver());
+    notificationInfo.setRead(webUsersEntity.isRead());
+    notificationInfo.setOnPopOver(webUsersEntity.isShowPopover());
+    notificationInfo.setResetOnBadge(webUsersEntity.isResetNumberOnBadge());
+    notificationInfo.setDateCreated(notification.getCreationDate());
+    notificationInfo.setId(String.valueOf(webUsersEntity.getId()));
     return notificationInfo;
   }
 }

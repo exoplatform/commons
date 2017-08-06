@@ -11,8 +11,8 @@
   </component>
   
   <component>
-    <key>org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage</key>
-    <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
+    <key>org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage</key>
+    <type>org.exoplatform.commons.notification.impl.service.storage.MailNotificationStorageImpl</type>
   </component>
 
   <component>
@@ -31,7 +31,7 @@
 
   <component>
     <key>org.exoplatform.services.mail.MailService</key>
-    <type>org.exoplatform.commons.notification.mock.MockMailService</type>
+    <type>org.exoplatform.commons.testing.mock.MockMailService</type>
   </component>
 
   <component>

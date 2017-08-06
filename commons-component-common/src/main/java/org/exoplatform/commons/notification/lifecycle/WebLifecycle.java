@@ -49,20 +49,21 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
     
     for (String userId : userIds) {
       UserSetting userSetting = userService.get(userId);
-      //check channel active for user
-      if (!userSetting.isChannelActive(WebChannel.ID)) {
+      //check channel active for user & user enabled
+      if (!userSetting.isEnabled() || !userSetting.isChannelActive(WebChannel.ID)) {
         continue;
       }
       if (userSetting.isActive(WebChannel.ID, pluginId)) {
-        ctx.setWritingProcess(true);
         NotificationInfo notif = notification.clone(true).setTo(userId).setLastModifiedDate(Calendar.getInstance());
         ctx.setNotificationInfo(notif);
+        //store before building message to get notification id (for actions in messages using notif ID)
+        store(ctx.getNotificationInfo());
         //build message
         MessageInfo msg = buildMessageInfo(ctx);
+
+        String notificationId = ctx.getNotificationInfo().getId();
         ctx.append(WebChannel.MESSAGE_INFO, msg);
-        //store
-        store(ctx.getNotificationInfo());
-        ctx.value(WebChannel.MESSAGE_INFO).setId(ctx.getNotificationInfo().getId());
+        ctx.value(WebChannel.MESSAGE_INFO).setId(notificationId);
         //send
         getChannel().dispatch(ctx, userId);
       }
@@ -79,6 +80,10 @@ public class WebLifecycle extends AbstractNotificationLifecycle {
     LOG.info("WEB:: Store the notification to db by Web channel.");
     notifInfo.with(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), "true")
              .with(NotificationMessageUtils.READ_PORPERTY.getKey(), "false");
+
+    // Get notification to update
+    AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(notifInfo.getKey());
+    notifInfo = builder.getNotificationToStore(notifInfo);
     CommonsUtils.getService(WebNotificationStorage.class).save(notifInfo);
   }
   

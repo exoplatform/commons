@@ -14,7 +14,6 @@ import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
 import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.commons.chromattic.SessionContext;
 import org.exoplatform.commons.event.impl.EventManagerImpl;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.settings.chromattic.ContextEntity;
 import org.exoplatform.settings.chromattic.ScopeEntity;
@@ -58,7 +57,7 @@ public class SettingServiceImpl implements SettingService {
           scopeEntity = createScope(context, scope);
         }
         scopeEntity.setValue(key, value.getValue());
-//        ctx.getSession().save();
+        ctx.getSession().save();
         return null;
       }
     }.executeWith(chromatticLifeCycle);
@@ -107,30 +106,26 @@ public class SettingServiceImpl implements SettingService {
         }
         // Context
         SimpleContextEntity contextEntity = null;
-        switch(c) {
-          case GLOBAL:
-            contextEntity = (SimpleContextEntity) settings.getContext(c.name().toLowerCase());
+        if(Context.GLOBAL.getName().equals(c.getName())) {
+            contextEntity = (SimpleContextEntity) settings.getContext(c.getName().toLowerCase());
             if (contextEntity == null) {
-              contextEntity = ctx.getSession().insert(settings, SimpleContextEntity.class, c.name().toLowerCase());
+              contextEntity = ctx.getSession().insert(settings, SimpleContextEntity.class, c.getName().toLowerCase());
             }
-            break;
-
-          case USER:
-            SubContextEntity userContextEntity = (SubContextEntity) settings.getContext(c.name().toLowerCase());
+        } else if(Context.USER.getName().equals(c.getName())) {
+            SubContextEntity userContextEntity = (SubContextEntity) settings.getContext(c.getName().toLowerCase());
             if (userContextEntity == null) {
-              userContextEntity = ctx.getSession().insert(settings, SubContextEntity.class, c.name().toLowerCase());
+              userContextEntity = ctx.getSession().insert(settings, SubContextEntity.class, c.getName().toLowerCase());
             }
             contextEntity = userContextEntity.getContext(c.getId());
             if (contextEntity == null) {
               contextEntity = ctx.getSession().insert(userContextEntity, SimpleContextEntity.class, c.getId());
             }
-            break;
         }
 
         // Scope
-        ScopeEntity scopeEntity = contextEntity.getScope(s.name().toLowerCase());
+        ScopeEntity scopeEntity = contextEntity.getScope(s.getName().toLowerCase());
         if (scopeEntity == null) {
-          scopeEntity = ctx.getSession().insert(contextEntity, ScopeEntity.class, s.name().toLowerCase());
+          scopeEntity = ctx.getSession().insert(contextEntity, ScopeEntity.class, s.getName().toLowerCase());
         }
 
         if (s.getId() == null) {

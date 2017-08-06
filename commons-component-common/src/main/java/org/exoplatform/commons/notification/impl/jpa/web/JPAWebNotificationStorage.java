@@ -1,56 +1,51 @@
 package org.exoplatform.commons.notification.impl.jpa.web;
 
+import static org.exoplatform.commons.notification.impl.jpa.EntityConverter.convertWebNotifEntityToNotificationInfo;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
-import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.notification.impl.jpa.EntityConverter;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebParamsDAO;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO;
 import org.exoplatform.commons.notification.impl.jpa.web.entity.WebNotifEntity;
 import org.exoplatform.commons.notification.impl.jpa.web.entity.WebParamsEntity;
 import org.exoplatform.commons.notification.impl.jpa.web.entity.WebUsersEntity;
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.security.ConversationState;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.exoplatform.commons.notification.impl.jpa.EntityConverter.convertWebNotifEntityToNotificationInfo;
-
-/**
- * Created by exo on 3/31/17.
- */
 public class JPAWebNotificationStorage implements WebNotificationStorage {
 
-  private static final Log LOG = ExoLogger.getLogger(JPAWebNotificationStorage.class);
+  private static final Log         LOG                   = ExoLogger.getLogger(JPAWebNotificationStorage.class);
 
   private final UserSettingService userSettingService;
-  private final DataDistributionManager distributionManager;
-  private WebNotificationStorage webNotificationStorage;
 
-  private WebNotifDAO webNotifDAO;
-  private WebParamsDAO webParamsDAO;
-  private WebUsersDAO webUsersDAO;
+  private WebNotifDAO              webNotifDAO;
 
-  private static final String NTF_NAME_SPACE           = "ntf:";
-  private static final String DATE_FRIENDLY_PATTERN = "yyyy-MM-dd";
-  private static final String RELATIONSHIP_RECEIVED_PLUGIN = "RelationshipReceivedRequestPlugin";
-  private static final String SPACE_INVITATION_PLUGIN = "SpaceInvitationPlugin";
-  private static final String REQUEST_JOIN_SPACE_PLUGIN = "RequestJoinSpacePlugin";
-  private static final String ACTIVITY_COMMENT_PLUGIN = "ActivityCommentPlugin";
-  private static final String LIKE_PLUGIN = "LikePlugin";
-  private static final String STATUS_PARAMETER = "status";
+  private WebParamsDAO             webParamsDAO;
 
-  public JPAWebNotificationStorage(WebNotifDAO webNotifDAO, WebParamsDAO webParamsDAO, WebUsersDAO webUsersDAO,
-                                   DataInitializer dataInitializer, DataDistributionManager distributionManager,
+  private WebUsersDAO              webUsersDAO;
+
+  private static final String      NTF_NAME_SPACE        = "ntf:";
+
+  private static final String      DATE_FRIENDLY_PATTERN = "yyyy-MM-dd";
+
+  public JPAWebNotificationStorage(WebNotifDAO webNotifDAO,
+                                   WebParamsDAO webParamsDAO,
+                                   WebUsersDAO webUsersDAO,
                                    UserSettingService userSettingService) {
-    this.distributionManager = distributionManager;
     this.userSettingService = userSettingService;
     this.webNotifDAO = webNotifDAO;
     this.webParamsDAO = webParamsDAO;
@@ -58,105 +53,30 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   }
 
   @Override
-  public void save(NotificationInfo notification) {
-    save(notification, true);
-  }
-
-  /**
-   * Creates the notification message to the specified user.
-   *
-   * @param notification The notification to save
-   * @param isCountOnPopover The status to update count on Popover or not
-   */
   @ExoTransactional
-  private void save(NotificationInfo notification, boolean isCountOnPopover) {
-    try {
-      WebNotifEntity webNotifEntity = null;
-      // if the notification is an invitation accepted for a space, relationship received or request join space notification:
-      // - remove the correspondant old notification
-      // - store the new notification with isCountOnPopover set to true
-      if ((notification.getKey().getId().equals(RELATIONSHIP_RECEIVED_PLUGIN)
-          || notification.getKey().getId().equals(SPACE_INVITATION_PLUGIN)
-          || notification.getKey().getId().equals(REQUEST_JOIN_SPACE_PLUGIN))
-          && notification.getOwnerParameter().containsKey(STATUS_PARAMETER)) {
-        if (!notification.getTitle().isEmpty()) {
-          String notifId = notification.getTitle().split("data-id=\"")[1].split("\"")[0];
-          try {
-            webNotifEntity = webNotifDAO.find(Long.parseLong(notifId));
-          } catch (NumberFormatException e) {
-          }
-        }
-      } else if (notification.getKey().getId().equals(ACTIVITY_COMMENT_PLUGIN)) {
-        webNotifEntity = webNotifDAO.findWebNotifsOfUserByParam(notification.getTo(),
-            ACTIVITY_COMMENT_PLUGIN, notification.getOwnerParameter().get("activityId"), "activityId");
-      } else if (notification.getKey().getId().equals(LIKE_PLUGIN)) {
-        webNotifEntity = webNotifDAO.findWebNotifsOfUserByParam(notification.getTo(),
-            LIKE_PLUGIN, notification.getOwnerParameter().get("activityId"), "activityId");
-      }
-      if (webNotifEntity != null) {
-        webNotifDAO.delete(webNotifEntity);
-        save(notification, true);
-      } else {
-        webNotifEntity = webNotifDAO.findWebNotif(notification.getFrom(), notification.getKey().getId(), notification.getDateCreated().getTime());
-        if (webNotifEntity == null) {
-          webNotifEntity = new WebNotifEntity();
-        }
-        //fill WebNotifEntity with data from notification
-        webNotifEntity.setType(notification.getKey().getId());
-        webNotifEntity.setText(notification.getTitle());
-        webNotifEntity.setSender(notification.getFrom());
-        webNotifEntity.setCreationDate(notification.getDateCreated().getTime());
-        Map<String, String> ownerParameter = notification.getOwnerParameter();
-        if (ownerParameter != null && !ownerParameter.isEmpty()) {
-          for (String key : ownerParameter.keySet()) {
-            String propertyName = key.replace(NTF_NAME_SPACE, "");
-            //fill WebParamsEntity with data from notification
-            WebParamsEntity webParamsEntity = new WebParamsEntity();
-            webParamsEntity.setName(propertyName);
-            webParamsEntity.setValue(ownerParameter.get(key));
-            webParamsEntity.setNotification(webNotifEntity);
-            webParamsDAO.create(webParamsEntity);
-          }
-        }
-        WebUsersEntity webUsersEntity = new WebUsersEntity();
-        //fill WebUsersEntity with data from notification
-        webUsersEntity.setReceiver(notification.getTo());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(notification.getLastModifiedDate());
-        webUsersEntity.setUpdateDate(calendar.getTime());
-        webUsersEntity.setResetNumberOnBadge(false);
-        webUsersEntity.setShowPopover(isCountOnPopover);
-        webUsersEntity.setRead(false);
-        webUsersEntity.setNotification(webNotifEntity);
-        webUsersDAO.create(webUsersEntity);
-
-        notification.setId(String.valueOf(webUsersEntity.getId()));
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to save the notificaton.", e);
-    }
+  public void save(NotificationInfo notification) {
+    save(notification, false);
   }
 
   @Override
   @ExoTransactional
   public List<NotificationInfo> get(WebNotificationFilter filter, int offset, int limit) {
     List<NotificationInfo> result = new ArrayList<NotificationInfo>();
-    String pluginId = filter.getPluginKey() !=null ? filter.getPluginKey().getId() : null;
+    String pluginId = filter.getPluginKey() != null ? filter.getPluginKey().getId() : null;
     String userId = filter.getUserId();
-    Boolean isOnPopover = filter.isOnPopover();
     try {
-      List<WebNotifEntity> webNotifEntities;
+      List<WebUsersEntity> webUsersEntities;
       if (pluginId != null) {
-        //web notifs entities order by lastUpdated DESC
-        webNotifEntities = webNotifDAO.findWebNotifsByFilter(pluginId, userId, isOnPopover, offset, limit);
-      } else if (isOnPopover){
-        webNotifEntities = webNotifDAO.findWebNotifsByFilter(userId, isOnPopover, offset, limit);
+        // web notifs entities order by lastUpdated DESC
+        webUsersEntities = webUsersDAO.findWebNotifsByFilter(pluginId, userId, filter.isOnPopover(), offset, limit);
+      } else if (filter.isOnPopover()) {
+        webUsersEntities = webUsersDAO.findWebNotifsByFilter(userId, filter.isOnPopover(), offset, limit);
       } else {
-        webNotifEntities = webNotifDAO.findWebNotifsByFilter(userId, offset, limit);
+        webUsersEntities = webUsersDAO.findWebNotifsByFilter(userId, offset, limit);
       }
       //
-      for(WebNotifEntity webNotifEntity : webNotifEntities) {
-        result.add(convertWebNotifEntityToNotificationInfo(webNotifEntity, userId));
+      for (WebUsersEntity webUserNotifEntity : webUsersEntities) {
+        result.add(convertWebNotifEntityToNotificationInfo(webUserNotifEntity));
       }
     } catch (Exception e) {
       LOG.error("Notifications not found by filter: " + filter.toString(), e);
@@ -165,23 +85,29 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   }
 
   @Override
+  @ExoTransactional
   public NotificationInfo get(String id) {
-    try {
-      WebUsersEntity webUsersEntity = getWebNotification(Long.parseLong(id));
-      return convertWebNotifEntityToNotificationInfo(webUsersEntity.getNotification(), webUsersEntity.getReceiver());
-    } catch (Exception e) {
-      LOG.error("Notification not found by id: " + id, e);
+    if (StringUtils.isBlank(id) || id.startsWith(NotificationInfo.PREFIX_ID)) {
       return null;
     }
+    try {
+      WebUsersEntity webUsersEntity = getWebNotification(parseNotificationId(id));
+      if (webUsersEntity != null) {
+        return convertWebNotifEntityToNotificationInfo(webUsersEntity);
+      }
+    } catch (Exception e) {
+      LOG.error("Notification not found by id: " + id, e);
+    }
+    return null;
   }
 
   @Override
   @ExoTransactional
   public boolean remove(String notificationId) {
     try {
-      WebNotifEntity webNotifEntity = getWebNotification(Long.parseLong(notificationId)).getNotification();
-      if (webNotifEntity != null) {
-        webNotifDAO.delete(webNotifEntity);
+      WebUsersEntity webUsersEntity = getWebNotification(parseNotificationId(notificationId));
+      if (webUsersEntity != null) {
+        webUsersDAO.delete(webUsersEntity);
         return true;
       }
     } catch (Exception e) {
@@ -198,10 +124,20 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
     long delayTime = System.currentTimeMillis() - (seconds * 1000);
     cal.setTimeInMillis(delayTime);
     try {
-      for (WebNotifEntity webNotifEntity : webNotifDAO.findWebNotifsByLastUpdatedDate(cal.getTime())) {
-        webNotifDAO.delete(webNotifEntity);
-        removed = true;
+      List<WebNotifEntity> notifEntities = new ArrayList<>();
+      List<WebUsersEntity> webUserNotifs = webUsersDAO.findWebNotifsByLastUpdatedDate(cal);
+      for (WebUsersEntity webUsersEntity : webUserNotifs) {
+        WebNotifEntity notification = webUsersEntity.getNotification();
+        if (!notifEntities.contains(notification)) {
+          notifEntities.add(notification);
+        }
+        webUsersDAO.delete(webUsersEntity);
       }
+      removed = notifEntities.size() > 0;
+      for (WebNotifEntity webNotifEntity : notifEntities) {
+        webParamsDAO.deleteAll(new ArrayList<>(webNotifEntity.getParameters()));
+      }
+      webNotifDAO.deleteAll(notifEntities);
     } catch (Exception e) {
       LOG.error("Failed to remove all notifications and delay date: " + converDateToFriendlyName(cal), e);
       return false;
@@ -209,48 +145,34 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
     return removed;
   }
 
-  private String converDateToFriendlyName(Calendar cal) {
-    return new SimpleDateFormat(DATE_FRIENDLY_PATTERN).format(cal.getTime());
-  }
-
   @Override
   @ExoTransactional
   public boolean remove(String userId, long seconds) {
-    long delayTime = System.currentTimeMillis() - (seconds * 1000);
+    Calendar calendar = Calendar.getInstance();
+    long timeInMilliseconds = calendar.getTimeInMillis() - seconds * 1000;
+    calendar.setTimeInMillis(timeInMilliseconds);
 
+    boolean removed = false;
     try {
-      for (WebNotifEntity webNotifEntity : webNotifDAO.findWebNotifsOfUserByLastUpdatedDate(userId, new Date(delayTime))) {
-        webNotifDAO.delete(webNotifEntity);
+      for (WebUsersEntity webUsersEntity : webUsersDAO.findWebNotifsOfUserByLastUpdatedDate(userId, calendar)) {
+        webUsersDAO.delete(webUsersEntity);
+        removed = true;
       }
     } catch (Exception e) {
       LOG.error("Failed to remove all notifications for the user id: " + userId, e);
       return false;
     }
-    return true;
+    return removed;
   }
 
   @Override
   @ExoTransactional
   public void markRead(String notificationId) {
-    WebNotifEntity webNotifEntity = webNotifDAO.find(Long.valueOf(notificationId));
-    if (webNotifEntity == null) {
-      //it is a relationship or request join accepted notification
-      webNotifEntity = webNotifDAO.find(Long.valueOf(notificationId)+1);
-    }
-    String userId = ConversationState.getCurrent().getIdentity().getUserId();
-    WebUsersEntity webUsersEntity = new WebUsersEntity();
-    Iterator it = webNotifEntity.getReceivers().iterator();
-    while (it.hasNext()) {
-      webUsersEntity = (WebUsersEntity) it.next();
-      if (webUsersEntity.getReceiver().equals(userId)) {
-        break;
-      }
-    }
-    try {
+    long notifIdLong = parseNotificationId(notificationId);
+    WebUsersEntity webUsersEntity = webUsersDAO.find(notifIdLong);
+    if (webUsersEntity != null) {
       webUsersEntity.setRead(true);
       webUsersDAO.update(webUsersEntity);
-    } catch (Exception e) {
-      LOG.error("Failed to update the read notification Id: " + notificationId, e);
     }
   }
 
@@ -258,84 +180,37 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @ExoTransactional
   public void hidePopover(String notificationId) {
     try {
-      String userId = ConversationState.getCurrent().getIdentity().getUserId();
-      WebNotifEntity webNotifEntity = webNotifDAO.find(Long.valueOf(notificationId));
-      if (webNotifEntity == null) {
-        WebUsersEntity webUsersEntity = webUsersDAO.find(Long.valueOf(notificationId));
-        if (webUsersEntity != null) {
-          webUsersEntity.setShowPopover(false);
-          webUsersDAO.update(webUsersEntity);
-        }
-      } else {
-        for (WebUsersEntity webUsersEntity : webNotifEntity.getReceivers()) {
-          if (webUsersEntity.getReceiver().equals(userId)) {
-            webUsersEntity.setShowPopover(false);
-            webUsersDAO.update(webUsersEntity);
-            break;
-          }
-        }
+      WebUsersEntity webUsersEntity = webUsersDAO.find(parseNotificationId(notificationId));
+      if (webUsersEntity != null) {
+        webUsersEntity.setShowPopover(false);
+        webUsersDAO.update(webUsersEntity);
       }
-    } catch (NumberFormatException e) {
-      //nothing to log
     } catch (Exception e) {
       LOG.error("Failed to update the read notification Id: " + notificationId, e);
     }
   }
 
   @Override
+  @ExoTransactional
   public void markAllRead(String userId) {
     try {
       //
+      webUsersDAO.markAllRead(userId);
       userSettingService.saveLastReadDate(userId, System.currentTimeMillis());
-      //
-      for (WebUsersEntity webUsersEntity : getNewMessage(userId, 0)) {
-        markRead(String.valueOf(webUsersEntity.getId()));
-      }
     } catch (Exception e) {
       LOG.error("Failed to update the all read for userId:" + userId, e);
     }
   }
 
-  @ExoTransactional
-  private WebUsersEntity getWebNotification(Long notificationId) {
-    try {
-      WebUsersEntity webUsersEntity = webUsersDAO.find(notificationId);
-      WebNotifEntity webNotifEntity = webNotifDAO.find(notificationId);
-      if (webUsersEntity == null && webNotifEntity != null) {
-        return webNotifEntity.getReceivers().iterator().next();
-      }
-      else {
-        return webUsersEntity;
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to get web notification node: " + notificationId, e);
-    }
-    return null;
-  }
-
-  /**
-   * Gets {@link WebNotificationStorage}
-   * @return
-   */
-  private WebNotificationStorage getWebNotificationStorage() {
-    if (webNotificationStorage == null) {
-      webNotificationStorage = CommonsUtils.getService(WebNotificationStorage.class);
-    }
-    return webNotificationStorage;
-  }
-
   @Override
   @ExoTransactional
-  public NotificationInfo getUnreadNotification(String pluginId, String activityId, String owner) {
+  public NotificationInfo getUnreadNotification(String pluginId, String activityId, String userId) {
     try {
-      long lastReadDate = getLastReadDateOfUser(owner);
-      Calendar calendar = Calendar.getInstance();
-      calendar.setTimeInMillis(lastReadDate);
-
-      List<WebNotifEntity> list = webNotifDAO.findUnreadNotification(pluginId, owner, activityId, calendar.getTime());
+      List<WebUsersEntity> list = webUsersDAO.findUnreadNotification(pluginId, userId, "activityId", activityId);
 
       if (list.size() > 0) {
-        return getWebNotificationStorage().get(String.valueOf(list.get(0).getId()));
+        WebUsersEntity webUsersNotification = list.get(0);
+        return EntityConverter.convertWebNotifEntityToNotificationInfo(webUsersNotification);
       }
     } catch (Exception e) {
       LOG.error("Failed to getUnreadNotification ", e);
@@ -346,11 +221,6 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @Override
   @ExoTransactional
   public void update(NotificationInfo notification, boolean moveTop) {
-    //only remove the old notification and create a new one in case of update and move top
-    //else just update it
-    if (moveTop) {
-      remove(notification.getId());
-    }
     // if moveTop == true, the number on badge will increase
     // else the number on badge will not increase
     save(notification, moveTop);
@@ -372,29 +242,138 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @ExoTransactional
   public void resetNumberOnBadge(String userId) {
     try {
-      for (WebUsersEntity webUsersEntity : webUsersDAO.findWebNotifsByUser(userId)) {
-        webUsersEntity.setResetNumberOnBadge(true);
-        webUsersDAO.update(webUsersEntity);
+      List<WebUsersEntity> notifsWithBadge = webUsersDAO.findNotifsWithBadge(userId);
+      if (notifsWithBadge != null && notifsWithBadge.size() > 0) {
+        for (WebUsersEntity webUsersEntity : notifsWithBadge) {
+          webUsersEntity.setResetNumberOnBadge(true);
+        }
+        webUsersDAO.updateAll(notifsWithBadge);
       }
     } catch (Exception e) {
       LOG.error("Failed to resetNumberOnBadge() ", e);
     }
   }
 
-  @ExoTransactional
-  private List<WebUsersEntity> getNewMessage(String userId, int limit) throws Exception {
-    if (limit > 0) {
-      return webUsersDAO.findWebNotifsByUserAndRead(userId, false, 0, limit);
-    } else {
-      return webUsersDAO.findWebNotifsByUserAndRead(userId, false);
+  /**
+   * Creates the notification message to the specified user.
+   *
+   * @param notification The notification to save
+   * @param moveTop The status to update count on Popover or not
+   */
+  private void save(NotificationInfo notification, boolean moveTop) {
+    try {
+      WebUsersEntity webUsersEntity = null;
+      if (notification.getId() != null && !notification.getId().startsWith(NotificationInfo.PREFIX_ID)) {
+        try {
+          webUsersEntity = webUsersDAO.find(Long.parseLong(notification.getId()));
+        } catch (Exception e) {
+          LOG.warn("Error getting notification with id = " + notification.getId(), e);
+        }
+      }
+      boolean isNew = webUsersEntity == null;
+      WebNotifEntity webNotifEntity = null;
+      if (isNew) {
+        webNotifEntity = new WebNotifEntity();
+        webUsersEntity = new WebUsersEntity();
+      } else {
+        webNotifEntity = webUsersEntity.getNotification();
+      }
+      // fill WebNotifEntity with data from notification
+      webNotifEntity.setType(notification.getKey().getId());
+      webNotifEntity.setText(notification.getTitle());
+      webNotifEntity.setSender(notification.getFrom());
+      if (notification.getDateCreated() == null) {
+        webNotifEntity.setCreationDate(Calendar.getInstance());
+      } else {
+        webNotifEntity.setCreationDate(notification.getDateCreated());
+      }
+      if (isNew) {
+        webNotifEntity = webNotifDAO.create(webNotifEntity);
+      } else {
+        webNotifEntity = webNotifDAO.update(webNotifEntity);
+      }
+
+      Map<String, String> ownerParameter = notification.getOwnerParameter();
+      Set<WebParamsEntity> parameters = webNotifEntity.getParameters();
+      if (ownerParameter != null && !ownerParameter.isEmpty()) {
+        for (String key : ownerParameter.keySet()) {
+          String propertyName = key.replace(NTF_NAME_SPACE, "");
+          // fill WebParamsEntity with data from notification
+          WebParamsEntity webParamsEntity = null;
+          boolean isParamNew = true;
+          if (isNew) {
+            webParamsEntity = new WebParamsEntity();
+          } else {
+            for (WebParamsEntity webParamsEntityTmp : parameters) {
+              if (webParamsEntityTmp.getName().equals(propertyName)) {
+                webParamsEntity = webParamsEntityTmp;
+                isParamNew = false;
+                break;
+              }
+            }
+          }
+          if (webParamsEntity == null) {
+            webParamsEntity = new WebParamsEntity();
+          }
+          webParamsEntity.setName(propertyName);
+          webParamsEntity.setValue(ownerParameter.get(key));
+          webParamsEntity.setNotification(webNotifEntity);
+          if (isParamNew) {
+            webParamsDAO.create(webParamsEntity);
+          } else {
+            webParamsDAO.update(webParamsEntity);
+          }
+        }
+      }
+
+      // fill WebUsersEntity with data from notification
+      webUsersEntity.setReceiver(notification.getTo());
+      Calendar calendar = Calendar.getInstance();
+      if (moveTop) {
+        webUsersEntity.setUpdateDate(calendar);
+      } else if (notification.getLastModifiedDate() > 0) {
+        calendar.setTimeInMillis(notification.getLastModifiedDate());
+        webUsersEntity.setUpdateDate(calendar);
+      } else {
+        webUsersEntity.setUpdateDate(webNotifEntity.getCreationDate());
+      }
+      webUsersEntity.setShowPopover(notification.isOnPopOver());
+
+      webUsersEntity.setResetNumberOnBadge(notification.isResetOnBadge());
+      webUsersEntity.setRead(notification.isRead());
+
+      webUsersEntity.setNotification(webNotifEntity);
+      if (isNew) {
+        webUsersEntity = webUsersDAO.create(webUsersEntity);
+        notification.setId(String.valueOf(webUsersEntity.getId()));
+      } else {
+        webUsersDAO.update(webUsersEntity);
+      }
+    } catch (Exception e) {
+      LOG.error("Failed to save the notificaton.", e);
     }
   }
 
-  /**
-   * @param userId
-   * @return
-   */
-  private long getLastReadDateOfUser(String userId) {
-    return userSettingService.get(userId).getLastReadDate();
+  private long parseNotificationId(String notificationId) {
+    try {
+      return Long.parseLong(notificationId);
+    } catch (NumberFormatException e) {
+      LOG.debug("Can't parse notification id '{}'", notificationId);
+      return 0;
+    }
+  }
+
+  private String converDateToFriendlyName(Calendar cal) {
+    return new SimpleDateFormat(DATE_FRIENDLY_PATTERN).format(cal);
+  }
+
+  @ExoTransactional
+  private WebUsersEntity getWebNotification(Long notificationId) {
+    try {
+      return webUsersDAO.find(notificationId);
+    } catch (Exception e) {
+      LOG.error("Failed to get web notification node: " + notificationId, e);
+    }
+    return null;
   }
 }

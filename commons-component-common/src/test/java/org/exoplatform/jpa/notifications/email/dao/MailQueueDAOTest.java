@@ -11,9 +11,6 @@ import java.util.List;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-/**
- * Created by exo on 3/27/17.
- */
 public class MailQueueDAOTest extends CommonsDAOJPAImplTest {
   @Before
   public void setUp() throws Exception {

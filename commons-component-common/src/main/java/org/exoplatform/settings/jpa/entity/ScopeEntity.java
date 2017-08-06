@@ -15,9 +15,12 @@ import java.util.Set;
 @ExoEntity
 @Table(name = "STG_SCOPES")
 @NamedQueries({
-    @NamedQuery(name = "commons.getScope", query = "SELECT s FROM SettingsScopeEntity s " +
-        "WHERE s.name = :name " +
-        "AND s.type= :scopeType ")
+    @NamedQuery(name = "SettingsScopeEntity.getScope", query = "SELECT s FROM SettingsScopeEntity s " +
+        "WHERE s.name = :scopeName " +
+        "AND s.type = :scopeType "),
+    @NamedQuery(name = "SettingsScopeEntity.getScopeWithNullName", query = "SELECT s FROM SettingsScopeEntity s " +
+        "WHERE s.name IS NULL " +
+        "AND s.type = :scopeType ")
 })
 public class ScopeEntity {
   @Id
@@ -32,7 +35,7 @@ public class ScopeEntity {
   @Column(name = "TYPE")
   private String type;
 
-  @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "scope")
+  @OneToMany(fetch=FetchType.LAZY, mappedBy = "scope")
   private Set<SettingsEntity> settings;
 
   public long getId() {

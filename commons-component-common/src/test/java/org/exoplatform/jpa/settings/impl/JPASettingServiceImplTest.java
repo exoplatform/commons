@@ -16,7 +16,6 @@
  */
 package org.exoplatform.jpa.settings.impl;
 
-import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
@@ -26,6 +25,10 @@ import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.jpa.BaseTest;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.settings.jpa.JPASettingServiceImpl;
+import org.exoplatform.settings.jpa.dao.SettingContextDAO;
+import org.exoplatform.settings.jpa.dao.SettingScopeDAO;
+import org.exoplatform.settings.jpa.dao.SettingsDAO;
 
 /**
  * Test just for the implementation service Created by The eXo Platform SAS
@@ -36,20 +39,38 @@ import org.exoplatform.services.security.Identity;
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml") })
 public class JPASettingServiceImplTest extends BaseTest {
 
-  protected static SettingService settingService;
+  protected JPASettingServiceImpl settingService;
+  protected SettingContextDAO contextDAO;
+  protected SettingScopeDAO scopeDAO;
+  protected SettingsDAO settingsDAO;
 
   @Override
   public void setUp() {
     super.setUp();
-    settingService = getService(SettingService.class);
+    settingService = getService(JPASettingServiceImpl.class);
+    contextDAO = getService(SettingContextDAO.class);
+    scopeDAO = getService(SettingScopeDAO.class);
+    settingsDAO = getService(SettingsDAO.class);
+
+    settingsDAO.deleteAll();
+    contextDAO.deleteAll();
+    scopeDAO.deleteAll();
+
     ConversationState c = new ConversationState(new Identity("root"));
     ConversationState.setCurrent(c);
+  }
+
+  @Override
+  protected void tearDown() {
+    settingsDAO.deleteAll();
+    contextDAO.deleteAll();
+    scopeDAO.deleteAll();
   }
 
   public void testUserSimple() {
 
     // String
-    settingService.set(Context.USER, Scope.SPACE, "a", SettingValue.create("b"));
+    settingService.set(Context.USER.id("foo"), Scope.SPACE, "a", SettingValue.create("b"));
     assertEquals("b", settingService.get(Context.USER.id("foo"), Scope.SPACE, "a").getValue());
 
     // Long type
@@ -65,7 +86,7 @@ public class JPASettingServiceImplTest extends BaseTest {
                        Scope.SPACE.id("name"),
                        "a",
                        SettingValue.create(new Double(4.5)));
-    value = Double.parseDouble(settingService.get(Context.USER, Scope.SPACE.id("name"), "a").getValue().toString());
+    value = Double.parseDouble(settingService.get(Context.USER.id("foo"), Scope.SPACE.id("name"), "a").getValue().toString());
     assertEquals(value, new Double(4.5));
 
     // Boolean
@@ -73,9 +94,8 @@ public class JPASettingServiceImplTest extends BaseTest {
                        Scope.SPACE.id("name"),
                        "a",
                        SettingValue.create(true));
-    value = Boolean.parseBoolean(settingService.get(Context.USER, Scope.SPACE.id("name"), "a").getValue().toString());
+    value = Boolean.parseBoolean(settingService.get(Context.USER.id("foo"), Scope.SPACE.id("name"), "a").getValue().toString());
     assertEquals(value, true);
-
   }
 
   public void testGlobalSimple() {
@@ -101,7 +121,7 @@ public class JPASettingServiceImplTest extends BaseTest {
     settingService.set(Context.USER.id("foo"), Scope.SPACE, "a", SettingValue.create("b"));
     assertEquals("b", settingService.get(Context.USER.id("foo"), Scope.SPACE, "a").getValue());
 
-    settingService.remove(Context.USER, Scope.SPACE, "a");
+    settingService.remove(Context.USER.id("foo"), Scope.SPACE, "a");
     assertNull(settingService.get(Context.USER.id("foo"), Scope.SPACE, "a"));
 
     // remove simple
@@ -147,6 +167,68 @@ public class JPASettingServiceImplTest extends BaseTest {
     assertNull(settingService.get(Context.USER, Scope.PAGE.id("name3"), "x3"));
     assertNull(settingService.get(Context.USER, Scope.PAGE.id("name4"), "x4"));
 
+  }
+
+  public void testCountSettingsByNameAndValueAndScope() {
+    settingService.set(Context.USER.id("user1"), Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
+    settingService.set(Context.USER.id("user1"), Scope.PAGE.id("name1"), "x1", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user2"), Scope.PAGE.id("name2"), "x1", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user2"), Scope.PAGE.id("name2"), "x2", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user3"), Scope.PORTAL.id("name1"), "x1", SettingValue.create("y1"));
+    settingService.set(Context.GLOBAL, Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
+
+    // verify
+    assertEquals(1, settingService.countSettingsByNameAndValueAndScope(Scope.PAGE.id("name2"), "x1", "y1"), 1);
+    assertEquals(1, settingService.countSettingsByNameAndValueAndScope(Scope.PAGE.id("name1"), "x1", "y2"), 1);
+    assertEquals(1, settingService.countSettingsByNameAndValueAndScope(Scope.PAGE.id("name2"), "x1", "y3"), 1);
+    assertEquals(1, settingService.countSettingsByNameAndValueAndScope(Scope.PAGE.id("name2"), "x2", "x2"), 1);
+  }
+
+  public void testGetContextsByTypeAndScopeAndSettingName() {
+    settingService.set(Context.USER.id("user1"), Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
+    settingService.set(Context.USER.id("user1"), Scope.PAGE.id("name1"), "x1", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user2"), Scope.PAGE.id("name2"), "x1", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user2"), Scope.PAGE.id("name2"), "x2", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user3"), Scope.PORTAL.id("name1"), "x1", SettingValue.create("y1"));
+    settingService.set(Context.GLOBAL, Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
+
+    // verify
+    assertEquals(1, settingService.getContextsByTypeAndScopeAndSettingName(Context.USER.getName(), Scope.PAGE.getName(), "name2", "x1", 0 , 10).size());
+    assertEquals(1, settingService.getContextsByTypeAndScopeAndSettingName(Context.USER.getName(), Scope.PAGE.getName(), "name1", "x1", 0 , 10).size());
+    assertEquals(1, settingService.getContextsByTypeAndScopeAndSettingName(Context.USER.getName(), Scope.PAGE.getName(), "name2", "x2", 0 , 10).size());
+  }
+
+  public void testGetSettingsByContext() {
+    settingService.set(Context.USER.id("user1"), Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
+    settingService.set(Context.USER.id("user1"), Scope.PAGE.id("name1"), "x2", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user2"), Scope.PAGE.id("name2"), "x1", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user2"), Scope.PAGE.id("name2"), "x2", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user3"), Scope.PORTAL.id("name1"), "x1", SettingValue.create("y1"));
+    settingService.set(Context.GLOBAL, Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
+
+    // verify
+    assertEquals(1, settingService.getSettingsByContext(Context.USER.id("user1")).size());
+    assertEquals(2, settingService.getSettingsByContext(Context.USER.id("user1")).get(Scope.PAGE.id("name1")).size());
+    assertEquals(1, settingService.getSettingsByContext(Context.USER.id("user2")).size());
+    assertEquals(2, settingService.getSettingsByContext(Context.USER.id("user2")).get(Scope.PAGE.id("name2")).size());
+    assertEquals(1, settingService.getSettingsByContext(Context.USER.id("user3")).size());
+    assertEquals(1, settingService.getSettingsByContext(Context.GLOBAL).size());
+    assertEquals(0, settingService.getSettingsByContext(Context.GLOBAL.id("user1")).size());
+  }
+
+  public void testGetEmptyContextsByScopeAndContextType() {
+    settingService.set(Context.USER.id("user1"), Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
+    settingService.set(Context.USER.id("user1"), Scope.PAGE.id("name1"), "x2", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user2"), Scope.PAGE.id("name1"), "x1", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user2"), Scope.PAGE.id("name2"), "x2", SettingValue.create("y2"));
+    settingService.set(Context.USER.id("user3"), Scope.PORTAL.id("name1"), "x1", SettingValue.create("y1"));
+    settingService.set(Context.GLOBAL, Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
+
+    // verify
+    assertEquals(3, settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(), Scope.PORTAL.getName(), null, 0, 10).size());
+    assertEquals(2, settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(), Scope.PORTAL.getName(), "name1", 0, 10).size());
+    assertEquals(1, settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(), Scope.PAGE.getName(), "name1", 0, 10).size());
+    assertEquals(2, settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(), Scope.PAGE.getName(), "name2", 0, 10).size());
   }
 
 }

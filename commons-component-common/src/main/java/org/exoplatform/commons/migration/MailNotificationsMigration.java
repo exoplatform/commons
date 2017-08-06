@@ -1,68 +1,76 @@
-package org.exoplatform.commons.notification.impl.migration;
+package org.exoplatform.commons.migration;
 
-import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.cluster.StartableClusterAware;
-import org.exoplatform.commons.notification.impl.jpa.email.JPANotificationDataStorage;
-import org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl;
-import org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl;
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.RDBMSMigrationUtils;
-import org.exoplatform.commons.utils.StringCommonUtils;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
-import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.scheduler.JobSchedulerService;
-import org.json.JSONObject;
+import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.servlet.ServletContext;
-import java.io.InputStream;
-import java.util.concurrent.Callable;
 
-/**
- * Created by exo on 4/21/17.
- */
-public class MailNotificationsMigration implements StartableClusterAware {
+import org.json.JSONObject;
+
+import org.exoplatform.commons.api.notification.model.MessageInfo;
+import org.exoplatform.commons.api.notification.service.QueueMessage;
+import org.exoplatform.commons.notification.NotificationConfiguration;
+import org.exoplatform.commons.notification.impl.jpa.email.JPAMailNotificationStorage;
+import org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl;
+import org.exoplatform.commons.notification.impl.service.storage.MailNotificationStorageImpl;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.RDBMSMigrationUtils;
+import org.exoplatform.commons.utils.StringCommonUtils;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
+import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.scheduler.JobSchedulerService;
+
+public class MailNotificationsMigration {
 
   private static final Log LOG = ExoLogger.getLogger(MailNotificationsMigration.class);
 
   //JPA Storage
-  private JPANotificationDataStorage jpaNotificationDataStorage;
+  private JPAMailNotificationStorage jpaMailNotificationStorage;
   private JPAQueueMessageImpl jpaQueueMessage;
 
   //JCR storage
-  private NotificationDataStorageImpl jcrNotificationDataStorage;
+  private MailNotificationStorageImpl jcrNotificationDataStorage;
+
+  private String jcrWorkspace;
 
   private Session session;
   private NodeHierarchyCreator nodeHierarchyCreator;
   private JobSchedulerService schedulerService;
+  private RepositoryService repositoryService;
 
   private static Boolean isMailNotifsMigrated = false;
 
-  public MailNotificationsMigration( NotificationDataStorageImpl jcrNotificationDataStorage, JPANotificationDataStorage jpaNotificationDataStorage,
-                                     JPAQueueMessageImpl jpaQueueMessage) {
-    this.jpaNotificationDataStorage = jpaNotificationDataStorage;
-    this.jpaQueueMessage = jpaQueueMessage;
+  public MailNotificationsMigration(MailNotificationStorageImpl jcrNotificationDataStorage,
+                                    JPAMailNotificationStorage jpaMailNotificationStorage,
+                                    JobSchedulerService schedulerService,
+                                    NotificationConfiguration notificationConfiguration,
+                                    RepositoryService repositoryService,
+                                    NodeHierarchyCreator nodeHierarchyCreator,
+                                    QueueMessage queueMessage) {
+    this.jpaMailNotificationStorage = jpaMailNotificationStorage;
     this.jcrNotificationDataStorage = jcrNotificationDataStorage;
+    this.nodeHierarchyCreator = nodeHierarchyCreator;
+    this.schedulerService = schedulerService;
+    this.repositoryService = repositoryService;
+    this.jcrWorkspace = notificationConfiguration.getWorkspace();
 
-    schedulerService = CommonsUtils.getService(JobSchedulerService.class);
+    this.jpaQueueMessage = CommonsUtils.getService(JPAQueueMessageImpl.class);
   }
 
-  @Override
-  public void start() {
-    PortalContainer container = PortalContainer.getInstance();
-    nodeHierarchyCreator = (NodeHierarchyCreator) container.getComponentInstanceOfType(NodeHierarchyCreator.class);
-    RepositoryService repositoryService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
+  public void migrate() {
     try {
-      session = repositoryService.getRepository("repository").getSystemSession("portal-system");
+      session = repositoryService.getRepository("repository").getSystemSession(jcrWorkspace);
     } catch (Exception e) {
       LOG.error("Error while getting Notification nodes for Notifications migration - Cause : " + e.getMessage(), e);
       return;
@@ -92,17 +100,6 @@ public class MailNotificationsMigration implements StartableClusterAware {
             } catch (Exception e) {
               LOG.error("Error while migrating Mail Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
               isMailNotifsMigrated = false;
-            }
-            try {
-              if (isMailNotifsMigrated) {
-                LOG.info("=== Start cleaning Mail notifications data from JCR");
-                long startTime = System.currentTimeMillis();
-                deleteJcrMailNotifications();
-                long endTime = System.currentTimeMillis();
-                LOG.info("=== Mail notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-              }
-            } catch (Exception e) {
-              LOG.error("Error while cleaning Mail notifications JCR data to RDBMS - Cause : " + e.getMessage(), e);
             } finally {
               schedulerService.resumeJob("NotificationDailyJob", "Notification");
               schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
@@ -133,6 +130,44 @@ public class MailNotificationsMigration implements StartableClusterAware {
               LOG.info("=== Migration of Mail messages data done in " + (endTime - startTime) + " ms");
             } catch (Exception e) {
               LOG.error("Error while migrating Mail messages data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+            }
+            return null;
+          }
+        });
+      }
+    });
+  }
+
+  public void cleanup() {
+    //migration of mail notifications data from JCR to RDBMS is done as a background task
+    PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
+      @Override
+      public void execute(ServletContext context, PortalContainer portalContainer) {
+        RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+          @Override
+          public Void call() throws Exception {
+            // pause job of sending digest mails
+            schedulerService.pauseJob("NotificationDailyJob", "Notification");
+            schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
+            PortalContainer currentContainer = PortalContainer.getInstance();
+            ExoContainerContext.setCurrentContainer(currentContainer);
+            RequestLifeCycle.begin(currentContainer);
+            try {
+              if (isMailNotifsMigrated) {
+                ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+
+                LOG.info("=== Start cleaning Mail notifications data from JCR");
+                long startTime = System.currentTimeMillis();
+                deleteJcrMailNotifications();
+                long endTime = System.currentTimeMillis();
+                LOG.info("=== Mail notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+              }
+            } catch (Exception e) {
+              LOG.error("Error while cleaning Mail notifications JCR data", e);
+            } finally {
+              schedulerService.resumeJob("NotificationDailyJob", "Notification");
+              schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
+              RequestLifeCycle.end();
             }
             try {
               LOG.info("=== Start cleaning Mail messages data from JCR");
@@ -185,7 +220,7 @@ public class MailNotificationsMigration implements StartableClusterAware {
     session.save();
   }
 
-  private void migrateQueueMessages() throws RepositoryException, RepositoryConfigurationException {
+  private void migrateQueueMessages() throws Exception {
     NodeIterator iterator = getMessageInfoNodes();
     while (iterator.hasNext()) {
       Node node = iterator.nextNode();
@@ -257,7 +292,7 @@ public class MailNotificationsMigration implements StartableClusterAware {
 
   private void migrateMailNotifNodeToRDBMS(Node node) {
     try {
-      jpaNotificationDataStorage.save(jcrNotificationDataStorage.fillModel(node));
+      jpaMailNotificationStorage.save(jcrNotificationDataStorage.fillModel(node));
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
     }
@@ -269,10 +304,5 @@ public class MailNotificationsMigration implements StartableClusterAware {
 
   private boolean hasQueueMessagesDataToMigrate() {
     return (getMessageInfoNodes() != null && getMessageInfoNodes().hasNext());
-  }
-
-  @Override
-  public boolean isDone() {
-    return false;
   }
 }

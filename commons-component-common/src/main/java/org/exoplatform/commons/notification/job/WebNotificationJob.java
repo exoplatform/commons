@@ -2,6 +2,7 @@ package org.exoplatform.commons.notification.job;
 
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
@@ -10,6 +11,14 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 
 public class WebNotificationJob extends NotificationJob {
+
+  public WebNotificationJob() {
+    this(PortalContainer.getInstance());
+  }
+
+  public WebNotificationJob(ExoContainer exoContainer) {
+    super(exoContainer);
+  }
 
   protected static final Log LOG = ExoLogger.getLogger(NotificationJob.class);
   @Override

@@ -1,8 +1,18 @@
 package org.exoplatform.commons.notification.impl.jpa.email.entity;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
-import javax.persistence.*;
+import org.exoplatform.commons.api.persistence.ExoEntity;
 
 /**
  * Created by The eXo Platform SAS
@@ -14,10 +24,11 @@ import javax.persistence.*;
 @ExoEntity
 @Table(name = "NTF_EMAIL_NOTIFS_DIGEST")
 @NamedQueries({
-    @NamedQuery(name = "commons.findDigestByNotifAndType", query = "SELECT m FROM NotificationsMailDigestEntity m " +
-        "WHERE m.notification= :notifId AND m.type= :digestType"),
-    @NamedQuery(name = "commons.countDigestByNotifAndType", query = "SELECT COUNT(m) FROM NotificationsMailDigestEntity m " +
-        "WHERE m.notification= :notifId AND m.type= :digestType")
+  @NamedQuery(name = "NotificationsMailDigestEntity.deleteAllDigestsOfType", query = "DELETE FROM NotificationsMailDigestEntity m " +
+      "WHERE m.type= :digestType"),
+  @NamedQuery(name = "NotificationsMailDigestEntity.deleteDigestsOfTypeByNotificationsIds", query = "DELETE FROM NotificationsMailDigestEntity m " +
+      "WHERE m.type= :digestType " +
+      "AND m.notification.id IN (:notificationIds) ")
 })
 public class MailDigestEntity {
   @Id
@@ -26,7 +37,7 @@ public class MailDigestEntity {
   @GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_NTF_EMAIL_DIGEST")
   private long id;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "EMAIL_NOTIF_ID")
   private MailNotifEntity notification;
 
@@ -55,4 +66,3 @@ public class MailDigestEntity {
     return this;
   }
 }
-

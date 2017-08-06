@@ -66,21 +66,21 @@ public class NotificationCompletionService implements Startable {
 
     //
     try {
-      configThreadNumber = Integer.valueOf(threadNumberValue.getValue());
+      configThreadNumber = Integer.parseInt(threadNumberValue.getValue());
     } catch (Exception e) {
       configThreadNumber = DEFAULT_THREAD_NUMBER;
     }
 
     //
     try {
-      keepAliveTime = Integer.valueOf(aliveTime.getValue());
+      keepAliveTime = Integer.parseInt(aliveTime.getValue());
     } catch (Exception e) {
       keepAliveTime = 10;
     }
 
     //
     try {
-      configAsyncExecution = Boolean.valueOf(asyncExecution.getValue());
+      configAsyncExecution = Boolean.parseBoolean(asyncExecution.getValue());
     } catch (Exception e) {
       configAsyncExecution = DEFAULT_ASYNC_EXECUTION;
     }

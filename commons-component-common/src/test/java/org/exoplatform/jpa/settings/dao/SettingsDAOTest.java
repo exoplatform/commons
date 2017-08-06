@@ -12,38 +12,43 @@ import org.junit.Test;
 
 import java.util.List;
 
-/**
- * Created by exo on 3/8/17.
- */
 public class SettingsDAOTest extends CommonsDAOJPAImplTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    settingsDAO.deleteAll();
   }
 
   @After
   public void tearDown()  {
     settingsDAO.deleteAll();
+    settingScopeDAO.deleteAll();
+    settingContextDAO.deleteAll();
   }
 
   @Test
   public void testGetSetting() {
+    String scopeGlobalName = Scope.GLOBAL.getName();
+    String contextGlobalName = Context.GLOBAL.getName();
+
     //Given
     ScopeEntity scopeEntity = new ScopeEntity();
-    scopeEntity.setType(Scope.GLOBAL.toString());
-    scopeEntity.setName(Scope.GLOBAL.toString());
+    scopeEntity.setType(scopeGlobalName);
+    scopeEntity.setName(scopeGlobalName);
+    scopeEntity = settingScopeDAO.create(scopeEntity);
+
     ContextEntity contextEntity = new ContextEntity();
-    contextEntity.setType(Context.GLOBAL.toString());
-    contextEntity.setName(Context.GLOBAL.toString());
+    contextEntity.setType(contextGlobalName);
+    contextEntity.setName(contextGlobalName);
+    contextEntity = settingContextDAO.create(contextEntity);
+
     settingsDAO.create(new SettingsEntity().setName("My setting #1").setValue("My value #1").setScope(scopeEntity).setContext(contextEntity));
     settingsDAO.create(new SettingsEntity().setName("My setting #2").setValue("My value #2").setScope(scopeEntity).setContext(contextEntity));
     settingsDAO.create(new SettingsEntity().setName("My setting #3").setValue("My value #3").setScope(scopeEntity).setContext(contextEntity));
 
     //When
-    SettingsEntity setting1 = settingsDAO.getSettingByContextAndScopeAndKey(contextEntity, scopeEntity, "My setting #1");
-    SettingsEntity setting2 = settingsDAO.getSettingByContextAndScopeAndKey(contextEntity, scopeEntity, "My setting #2");
-    SettingsEntity setting3 = settingsDAO.getSettingByContextAndScopeAndKey(contextEntity, scopeEntity, "My setting #3");
+    SettingsEntity setting1 = settingsDAO.getSettingByContextAndScopeAndKey(contextGlobalName, contextGlobalName, scopeGlobalName, scopeGlobalName, "My setting #1");
+    SettingsEntity setting2 = settingsDAO.getSettingByContextAndScopeAndKey(contextGlobalName, contextGlobalName, scopeGlobalName, scopeGlobalName, "My setting #2");
+    SettingsEntity setting3 = settingsDAO.getSettingByContextAndScopeAndKey(contextGlobalName, contextGlobalName, scopeGlobalName, scopeGlobalName, "My setting #3");
 
     //Then
     assertNotNull(setting1);
@@ -56,39 +61,25 @@ public class SettingsDAOTest extends CommonsDAOJPAImplTest {
 
   @Test
   public void testGetByUser() {
+    String scopeGlobalName = Scope.GLOBAL.getName();
+
     //Given
     ScopeEntity scopeEntity = new ScopeEntity();
-    scopeEntity.setType(Scope.GLOBAL.toString());
-    scopeEntity.setName(Scope.GLOBAL.toString());
+    scopeEntity.setType(scopeGlobalName);
+    scopeEntity.setName(scopeGlobalName);
+    scopeEntity = settingScopeDAO.create(scopeEntity);
+
     ContextEntity contextEntity = new ContextEntity();
-    contextEntity.setType(Context.USER.toString());
+    contextEntity.setType(Context.USER.getName());
     contextEntity.setName("foo");
+    contextEntity = settingContextDAO.create(contextEntity);
+
     settingsDAO.create(new SettingsEntity().setName("My setting #1").setValue("My value #1").setScope(scopeEntity).setContext(contextEntity));
     settingsDAO.create(new SettingsEntity().setName("My setting #2").setValue("My value #2").setScope(scopeEntity).setContext(contextEntity));
     settingsDAO.create(new SettingsEntity().setName("My setting #3").setValue("My value #3").setScope(scopeEntity).setContext(contextEntity));
 
     //When
-    List<SettingsEntity> settings = settingsDAO.getSettingsByUser("foo");
-
-    //Then
-    assertEquals(settings.size(), 3);
-  }
-
-  @Test
-  public void testGetByScope() {
-    //Given
-    ScopeEntity scopeEntity = new ScopeEntity();
-    scopeEntity.setType(Scope.APPLICATION.toString());
-    scopeEntity.setName("foo");
-    ContextEntity contextEntity = new ContextEntity();
-    contextEntity.setType(Context.GLOBAL.toString());
-    contextEntity.setName(Context.GLOBAL.toString());
-    settingsDAO.create(new SettingsEntity().setName("My setting #1").setValue("My value #1").setScope(scopeEntity).setContext(contextEntity));
-    settingsDAO.create(new SettingsEntity().setName("My setting #2").setValue("My value #2").setScope(scopeEntity).setContext(contextEntity));
-    settingsDAO.create(new SettingsEntity().setName("My setting #3").setValue("My value #3").setScope(scopeEntity).setContext(contextEntity));
-
-    //When
-    List<SettingsEntity> settings = settingsDAO.getSettingsByScope(Scope.APPLICATION.id("foo"));
+    List<SettingsEntity> settings = settingsDAO.getSettingsByContextTypeAndName(Context.USER.getName(), "foo");
 
     //Then
     assertEquals(settings.size(), 3);
@@ -96,19 +87,26 @@ public class SettingsDAOTest extends CommonsDAOJPAImplTest {
 
   @Test
   public void testGetByContext() {
+    String scopeGlobalName = Scope.GLOBAL.getName();
+    String contextGlobalName = Context.GLOBAL.getName();
+
     //Given
     ScopeEntity scopeEntity = new ScopeEntity();
-    scopeEntity.setType(Scope.GLOBAL.toString());
-    scopeEntity.setName(Scope.GLOBAL.toString());
+    scopeEntity.setType(scopeGlobalName);
+    scopeEntity.setName(scopeGlobalName);
+    scopeEntity = settingScopeDAO.create(scopeEntity);
+
     ContextEntity contextEntity = new ContextEntity();
-    contextEntity.setType(Context.GLOBAL.toString());
-    contextEntity.setName(Context.GLOBAL.toString());
+    contextEntity.setType(contextGlobalName);
+    contextEntity.setName(contextGlobalName);
+    contextEntity = settingContextDAO.create(contextEntity);
+
     settingsDAO.create(new SettingsEntity().setName("My setting #1").setValue("My value #1").setScope(scopeEntity).setContext(contextEntity));
     settingsDAO.create(new SettingsEntity().setName("My setting #2").setValue("My value #2").setScope(scopeEntity).setContext(contextEntity));
     settingsDAO.create(new SettingsEntity().setName("My setting #3").setValue("My value #3").setScope(scopeEntity).setContext(contextEntity));
 
     //When
-    List<SettingsEntity> settings = settingsDAO.getSettingsByContext(Context.GLOBAL.id(Context.GLOBAL.toString()));
+    List<SettingsEntity> settings = settingsDAO.getSettingsByContextTypeAndName(contextGlobalName, contextGlobalName);
 
     //Then
     assertEquals(settings.size(), 3);

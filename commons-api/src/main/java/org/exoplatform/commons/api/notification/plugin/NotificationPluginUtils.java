@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.api.notification.plugin;
 
+import java.util.Locale;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
@@ -24,14 +26,12 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
 import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.portal.localization.LocaleContextInfoUtils;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.portal.localization.LocaleContextInfoUtils;
 import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
-
-import java.util.Locale;
 
 public class NotificationPluginUtils {
   
@@ -143,7 +143,6 @@ public class NotificationPluginUtils {
    * @return
    */
   public static String getLanguage(String userId) {
-    ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
     LocaleContextInfo  localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(userId);
     LocalePolicy localePolicy = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(LocalePolicy.class);
     String lang = null;

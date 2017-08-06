@@ -70,7 +70,10 @@ public class NotificationExecutorImpl implements NotificationExecutor {
         public Boolean call() throws Exception {
           try {
             ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-            notificationService.process(create(ctx, command));
+            NotificationInfo notifiction = create(ctx, command);
+            if (notifiction != null) {
+              notificationService.process(notifiction);
+            }
           } catch (Exception e) {
             LOG.warn("Process NotificationInfo is failed: " + e.getMessage(), e);
             LOG.debug(e.getMessage(), e);

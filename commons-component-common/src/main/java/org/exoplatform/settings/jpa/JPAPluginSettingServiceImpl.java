@@ -14,17 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.impl.setting;
+package org.exoplatform.settings.jpa;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.jcr.Node;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
@@ -40,30 +39,20 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 
-public class PluginSettingServiceImpl extends AbstractService implements PluginSettingService {
-  private static final Log LOG = ExoLogger.getLogger(PluginSettingServiceImpl.class);
+public class JPAPluginSettingServiceImpl extends AbstractService implements PluginSettingService {
+  private static final String NAME_SPACES = "exo:";
 
   private List<PluginConfig> pluginConfigs = new ArrayList<PluginConfig>();
 
   private Map<String, GroupProvider> groupPluginMap = new ConcurrentHashMap<String, GroupProvider>();
 
-  private static final String NAME_SPACES = "exo:";
-
-  /** Defines the number of days in each month per plugin*/
-  private static final int DAYS_OF_MONTH = 31;
-
   private SettingService settingService;
   private ChannelManager channelManager;
 
-  public PluginSettingServiceImpl(SettingService settingService, ChannelManager channelManager) { 
+  public JPAPluginSettingServiceImpl(SettingService settingService, ChannelManager channelManager) { 
     this.settingService = settingService;
     this.channelManager = channelManager;
   }
@@ -71,6 +60,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   @Override
   public void registerPluginConfig(PluginConfig pluginConfig) {
     pluginConfigs.add(pluginConfig);
+    Collections.sort(pluginConfigs, new OrderComparatorASC());
     if (pluginConfig.isChildPlugin() == false) {
       PluginInfo pluginInfo = new PluginInfo();
       pluginInfo.setType(pluginConfig.getPluginId())
@@ -102,7 +92,6 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
         }
         groupPluginMap.put(groupId, groupProvider);
       }
-      createParentNodeOfPlugin(pluginConfig.getPluginId());
     }
   }
 
@@ -207,9 +196,10 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
   @Override
   public List<String> getActivePluginIds(String channelId) {
     Set<String> activePluginIds = new HashSet<String>();
-    Collections.sort(pluginConfigs, new OrderComparatorASC());
-    for (PluginConfig pluginConfig : pluginConfigs) {
-      if (pluginConfig.isChildPlugin() == false && isActive(channelId, pluginConfig.getPluginId())) {
+    Iterator<PluginConfig> pluginsIterator = pluginConfigs.iterator();
+    while (pluginsIterator.hasNext()) {
+      PluginConfig pluginConfig = pluginsIterator.next();
+      if (!pluginConfig.isChildPlugin() && isActive(channelId, pluginConfig.getPluginId())) {
         activePluginIds.add(pluginConfig.getPluginId());
       }
     }
@@ -238,22 +228,6 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       }
     }
     return Collections.unmodifiableList(new ArrayList<PluginInfo>(activePlugins));
-  }
-
-  private void createParentNodeOfPlugin(String pluginId) {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
-    try {
-      NotificationConfiguration configuration = CommonsUtils.getService(NotificationConfiguration.class);
-      Node node = getMessageNodeByPluginId(sProvider, configuration.getWorkspace(), pluginId);
-      for(int i = 1 ; i <= DAYS_OF_MONTH; i++) {
-        getOrCreateMessageNode(node, DAY + i);
-      }
-
-    } catch (Exception e) {
-      LOG.error("Failed to create parent Node for plugin " + pluginId);
-    } finally {
-      sProvider.close();
-    }
   }
 
   @Override

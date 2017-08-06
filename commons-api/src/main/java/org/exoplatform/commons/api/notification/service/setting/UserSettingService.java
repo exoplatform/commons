@@ -57,31 +57,7 @@ public interface UserSettingService {
    * @return The list of user settings.
    */
   List<UserSetting> getDigestDefaultSettingForAllUser(int offset, int limit);
-  
-  /**
-   * Gets all settings of users who deactivated is FALSE
-   * 
-   * @return
-   */
-  List<UserSetting> getUserSettingWithDeactivate();
-  
-  /**
-   * Gets all Ids of users registering for email notifications by a given plugin.
-   * 
-   * @param pluginId Id of the plugin.
-   * @return The remote Ids of users.
-   * @deprecated - Replace by {@link #getUserHasSettingPlugin(String, String)}
-   */
-  List<String> getUserSettingByPlugin(String pluginId);
-  
-  /**
-   * Gets all Ids of users registering for notifications by a given plugin.
-   * 
-   * @param pluginId Id of the plugin.
-   * @return The remote Ids of users.
-   */
-  List<String> getUserHasSettingPlugin(String channelId, String pluginId);
-  
+
   /**
    * Adds the default settings to a user's node.
    * 
@@ -107,4 +83,13 @@ public interface UserSettingService {
    * @since PLF 4.2
    */
   void saveLastReadDate(String userId, Long time);
+
+  /**
+   * Enables user settings
+   * 
+   * @param username user id
+   * @param enabled true/false
+   */
+  void setUserEnabled(String username, boolean enabled);
+
 }

@@ -17,7 +17,6 @@
 package org.exoplatform.commons.utils;
 
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
-import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.services.jcr.RepositoryService;
 
 public class CommonsUtilsTest extends BaseCommonsTestCase {

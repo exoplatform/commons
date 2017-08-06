@@ -24,7 +24,7 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
-import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
+import org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.channel.MailChannel;
@@ -53,8 +53,8 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
     List<String> userIdPendings = new ArrayList<String>();
     for (String userId : userIds) {
       UserSetting userSetting = userService.get(userId);
-      //check channel active for user
-      if (!userSetting.isChannelActive(MailChannel.ID)) {
+      //check channel active for user & user enabled
+      if (!userSetting.isEnabled() || !userSetting.isChannelActive(MailChannel.ID)) {
         continue;
       }
       // check plugin active for user
@@ -102,11 +102,11 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
   
   @Override
   public void store(NotificationInfo notifInfo) {
-    NotificationDataStorage storage = CommonsUtils.getService(NotificationDataStorage.class);
+    MailNotificationStorage storage = CommonsUtils.getService(MailNotificationStorage.class);
     try {
       storage.save(notifInfo);
     } catch (Exception e) {
-      LOG.error(e.getMessage(), e);
+      LOG.error("Error storing notification", e);
     }
   }
   
@@ -121,10 +121,10 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
       if (msg != null) {
         if (NotificationUtils.isValidEmailAddresses(msg.getTo()) == true) {
           try {
-            CommonsUtils.getService(QueueMessage.class).sendMessage(msg.makeEmailNotification());
+            CommonsUtils.getService(QueueMessage.class).sendMessage(msg);
           } catch (Exception e) {
             //error in sending message
-            LOG.error("error in sending message", e);
+            LOG.error("error in sending message with id = " + msg.getId(), e);
           }
         } else {
           LOG.warn(String.format("The email %s is not valid for sending notification", msg.getTo()));

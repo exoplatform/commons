@@ -4,6 +4,10 @@
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
+    <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.commons.api.settings.SettingService</key>
     <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
   </component>
@@ -19,7 +23,7 @@
   </component>
 
   <component>
-    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailParamsDAO</type>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailParamDAO</type>
   </component>
   <component>
     <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailDigestDAO</type>
@@ -41,27 +45,31 @@
     <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO</type>
   </component>
 
-  <component profiles="all">
-    <type>org.exoplatform.settings.migration.SettingsMigration</type>
-  </component>
-
-  <component profiles="all">
-    <type>org.exoplatform.commons.notification.impl.migration.MailNotificationsMigration</type>
-  </component>
-
-  <component profiles="all">
-    <type>org.exoplatform.commons.notification.impl.migration.WebNotificationsMigration</type>
+  <component>
+    <type>org.exoplatform.commons.migration.SettingsMigration</type>
   </component>
 
   <component>
-    <type>org.exoplatform.commons.notification.impl.service.storage.NotificationDataStorageImpl</type>
+    <type>org.exoplatform.commons.migration.JPAAsynMigrationService</type>
   </component>
 
   <component>
-    <type>org.exoplatform.commons.notification.impl.jpa.email.JPANotificationDataStorage</type>
+    <type>org.exoplatform.commons.migration.MailNotificationsMigration</type>
   </component>
 
-  <component profiles="all">
+  <component>
+    <type>org.exoplatform.commons.migration.WebNotificationsMigration</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.service.storage.MailNotificationStorageImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.JPAMailNotificationStorage</type>
+  </component>
+
+  <component>
     <type>org.exoplatform.commons.notification.NotificationConfiguration</type>
     <init-params>
       <value-param>
@@ -71,17 +79,13 @@
     </init-params>
   </component>
 
-  <component profiles="all">
+  <component>
     <key>org.exoplatform.commons.api.notification.service.QueueMessage</key>
     <type>org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl</type>
     <init-params>
       <value-param>
         <name>numberOfMailPerBatch</name> <!-- Max number of mails to send in the configured period of time -->
         <value>${exo.notification.service.QueueMessage.numberOfMailPerBatch:30}</value>
-      </value-param>
-      <value-param>
-        <name>period</name><!-- The interval in seconds between two executions of the send mail job -->
-        <value>${exo.notification.service.QueueMessage.period:60}</value>
       </value-param>
     </init-params>
   </component>
@@ -90,12 +94,12 @@
     <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
   </component>
 
-  <component profiles="all">
+  <component>
     <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
     <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
   </component>
 
-  <component profiles="all">
+  <component>
     <key>org.exoplatform.commons.api.notification.channel.ChannelManager</key>
     <type>org.exoplatform.commons.notification.channel.ChannelManagerImpl</type>
   </component>

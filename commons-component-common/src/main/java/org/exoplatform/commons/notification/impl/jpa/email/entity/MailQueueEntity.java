@@ -3,16 +3,13 @@ package org.exoplatform.commons.notification.impl.jpa.email.entity;
 import org.exoplatform.commons.api.persistence.ExoEntity;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.util.Calendar;
 
-/**
- * Created by exo on 3/27/17.
- */
 @Entity(name = "NotificationsMailQueueEntity")
 @ExoEntity
 @Table(name = "EMAIL_QUEUE")
 @NamedQueries({
-    @NamedQuery(name = "commons.getMessagesInQueue", query = "SELECT m FROM NotificationsMailQueueEntity m " +
+    @NamedQuery(name = "NotificationsMailQueueEntity.getMessagesInQueue", query = "SELECT m FROM NotificationsMailQueueEntity m " +
         "ORDER BY m.creationDate ASC "),
 })
 public class MailQueueEntity {
@@ -23,7 +20,7 @@ public class MailQueueEntity {
   private long id;
 
   @Column(name = "CREATION_DATE")
-  private Date creationDate;
+  private Calendar creationDate;
 
   @Column(name = "TYPE")
   private String type;
@@ -47,11 +44,11 @@ public class MailQueueEntity {
     return id;
   }
 
-  public Date getCreationDate() {
+  public Calendar getCreationDate() {
     return creationDate;
   }
 
-  public MailQueueEntity setCreationDate(Date creationDate) {
+  public MailQueueEntity setCreationDate(Calendar creationDate) {
     this.creationDate = creationDate;
     return this;
   }

@@ -1,23 +1,26 @@
 package org.exoplatform.settings.jpa.dao;
 
-import org.exoplatform.commons.api.persistence.ExoTransactional;
-import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.settings.jpa.entity.ScopeEntity;
-import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
-/**
- * Created by exo on 3/8/17.
- */
+import org.apache.commons.lang3.StringUtils;
+
+import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import org.exoplatform.settings.jpa.entity.ScopeEntity;
+
 public class SettingScopeDAO extends GenericDAOJPAImpl<ScopeEntity, Long> {
   @ExoTransactional
-  public ScopeEntity getScope(ScopeEntity scopeEntity) {
+  public ScopeEntity getScopeByTypeAndName(String scopeType, String scopeName) {
     TypedQuery<ScopeEntity> query;
-      query = getEntityManager().createNamedQuery("commons.getScope", ScopeEntity.class)
-          .setParameter("name", scopeEntity.getName())
-          .setParameter("scopeType", scopeEntity.getType());
+    if (StringUtils.isBlank(scopeName)) {
+      query = getEntityManager().createNamedQuery("SettingsScopeEntity.getScopeWithNullName", ScopeEntity.class)
+                                .setParameter("scopeType", scopeType);
+    } else {
+      query = getEntityManager().createNamedQuery("SettingsScopeEntity.getScope", ScopeEntity.class)
+                                .setParameter("scopeName", scopeName)
+                                .setParameter("scopeType", scopeType);
+    }
     try {
       return query.getSingleResult();
     } catch (NoResultException e) {

@@ -32,7 +32,7 @@ public class Tools {
   public static String buildScopePath(Context context, Scope scope) {
 
     StringBuilder path = new StringBuilder().append(buildContextPath(context));
-    path.append("/").append(scope.name().toLowerCase());
+    path.append("/").append(scope.getName().toLowerCase());
     if (scope.getId() != null) {
       path.append("/").append(scope.getId());
     }
@@ -45,9 +45,9 @@ public class Tools {
    * @LevelAPI Experimental
    */
   public static String buildContextPath(Context context) {
-    StringBuilder path = new StringBuilder().append("settings/").append(context.name()
+    StringBuilder path = new StringBuilder().append("settings/").append(context.getName()
                                                                                .toLowerCase());
-    if (context.getId() != null && context.equals(Context.USER)) {
+    if (context.getId() != null && Context.USER.getName().equals(context.getName())) {
       path.append("/").append(context.getId());
     }
     return path.toString();

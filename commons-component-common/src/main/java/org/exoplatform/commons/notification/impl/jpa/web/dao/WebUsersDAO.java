@@ -1,37 +1,82 @@
 package org.exoplatform.commons.notification.impl.jpa.web.dao;
 
-import org.exoplatform.commons.notification.impl.jpa.web.entity.WebNotifEntity;
-import org.exoplatform.commons.notification.impl.jpa.web.entity.WebUsersEntity;
-import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import java.util.List;
 
-/**
- * Created by exo on 3/8/17.
- */
+import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.notification.impl.jpa.web.entity.WebUsersEntity;
+import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+
 public class WebUsersDAO extends GenericDAOJPAImpl<WebUsersEntity, Long> {
 
-  public List<WebUsersEntity> findWebNotifsByUserAndRead(String userId, Boolean isRead, int offset, int limit) {
-    return getEntityManager().createNamedQuery("commons.findWebNotifsByUserAndRead")
-        .setParameter("userId", userId)
-        .setParameter("isRead", isRead)
-        .setFirstResult(offset)
-        .setMaxResults(limit)
-        .getResultList();
+  @ExoTransactional
+  public List<WebUsersEntity> findWebNotifsByFilter(String pluginId, String userId, Boolean isOnPopover, int offset, int limit) {
+    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByPluginFilter", WebUsersEntity.class)
+                             .setParameter("pluginId", pluginId)
+                             .setParameter("userId", userId)
+                             .setParameter("isOnPopover", isOnPopover)
+                             .setFirstResult(offset)
+                             .setMaxResults(limit)
+                             .getResultList();
   }
 
-  public List<WebUsersEntity> findWebNotifsByUserAndRead(String userId, Boolean isRead) {
-    return getEntityManager().createNamedQuery("commons.findWebNotifsByUserAndRead")
-        .setParameter("userId", userId)
-        .setParameter("isRead", isRead)
-        .getResultList();
+  @ExoTransactional
+  public List<WebUsersEntity> findWebNotifsByFilter(String userId, int offset, int limit) {
+    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByUserFilter", WebUsersEntity.class)
+                             .setParameter("userId", userId)
+                             .setFirstResult(offset)
+                             .setMaxResults(limit)
+                             .getResultList();
   }
 
+  @ExoTransactional
+  public List<WebUsersEntity> findWebNotifsByFilter(String userId, boolean isOnPopover, int offset, int limit) {
+    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByPopoverFilter", WebUsersEntity.class)
+                             .setParameter("userId", userId)
+                             .setParameter("isOnPopover", isOnPopover)
+                             .setFirstResult(offset)
+                             .setMaxResults(limit)
+                             .getResultList();
+  }
+
+  @ExoTransactional
+  public List<WebUsersEntity> findWebNotifsOfUserByLastUpdatedDate(String userId, Calendar calendar) {
+    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsOfUserByLastUpdatedDate", WebUsersEntity.class)
+                             .setParameter("userId", userId)
+                             .setParameter("calendar", calendar)
+                             .getResultList();
+  }
+
+  @ExoTransactional
+  public List<WebUsersEntity> findUnreadNotification(String pluginId, String userId, String paramName, String paramValue) {
+    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findUnreadNotification", WebUsersEntity.class)
+                             .setParameter("pluginId", pluginId)
+                             .setParameter("userId", userId)
+                             .setParameter("paramName", paramName)
+                             .setParameter("paramValue", paramValue)
+                             .getResultList();
+  }
+
+  @ExoTransactional
+  public void markAllRead(String userId) {
+      getEntityManager().createNamedQuery("NotificationsWebUsersEntity.markWebNotifsAsReadByUser")
+      .setParameter("userId", userId)
+      .executeUpdate();
+  }
+
+  @ExoTransactional
+  public List<WebUsersEntity> findWebNotifsByLastUpdatedDate(Calendar fiveDaysAgo) {
+    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByLastUpdatedDate", WebUsersEntity.class)
+                             .setParameter("calendar", fiveDaysAgo)
+                             .getResultList();
+  }
+
+  @ExoTransactional
   public int getNumberOnBadge(String userId) {
-    TypedQuery<Long> query;
-    query =  getEntityManager().createNamedQuery("commons.getNumberOnBadge", Long.class)
+    TypedQuery<Long> query =  getEntityManager().createNamedQuery("NotificationsWebUsersEntity.getNumberOnBadge", Long.class)
         .setParameter("userId", userId);
     try {
       return query.getSingleResult().intValue();
@@ -40,8 +85,9 @@ public class WebUsersDAO extends GenericDAOJPAImpl<WebUsersEntity, Long> {
     }
   }
 
-  public List<WebUsersEntity> findWebNotifsByUser(String userId) {
-    return getEntityManager().createNamedQuery("commons.findWebNotifsByUser")
+  @ExoTransactional
+  public List<WebUsersEntity> findNotifsWithBadge(String userId) {
+    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findNotifsWithBadge", WebUsersEntity.class)
         .setParameter("userId", userId)
         .getResultList();
   }

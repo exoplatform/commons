@@ -22,6 +22,10 @@ import java.lang.reflect.Constructor;
 import java.util.Date;
 
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
+
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -37,7 +41,10 @@ import org.quartz.spi.TriggerFiredBundle;
  *          canhpv@exoplatform.com
  * Oct 19, 2012  
  */
-public class MultiTenancyTaskTest extends BaseCommonsTestCase{
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
+public class MultiTenancyTaskTest extends BaseCommonsTestCase {
   
   private MultiTenancyJobImpl impl; 
   private TriggerFiredBundle firedBundle; 

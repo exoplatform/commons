@@ -42,7 +42,7 @@ public class CacheSettingTest extends BaseCommonsTestCase {
     super.setUp();
     settingCache = getService(CacheService.class).getCacheInstance(SettingService.class.getSimpleName());
     settingService = getService(CacheSettingServiceImpl.class);
-    ConversationState c = new ConversationState(new Identity(session.getUserID()));
+    ConversationState c = new ConversationState(new Identity("test"));
     ConversationState.setCurrent(c);  
     settingCache.clearCache();
   }

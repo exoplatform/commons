@@ -1,9 +1,20 @@
 package org.exoplatform.settings.jpa.entity;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-import javax.persistence.*;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import org.exoplatform.commons.api.persistence.ExoEntity;
 
 /**
  * Created by The eXo Platform SAS
@@ -15,11 +26,46 @@ import java.util.Set;
 @ExoEntity
 @Table(name = "STG_CONTEXTS")
 @NamedQueries({
-    @NamedQuery(name = "commons.getContext", query = "SELECT c FROM SettingsContextEntity c " +
-        "WHERE c.name = :name " +
+    @NamedQuery(name = "SettingsContextEntity.getContextByTypeAndName", query = "SELECT c FROM SettingsContextEntity c " +
+        "WHERE c.name = :contextName " +
         "AND c.type= :contextType "),
-    @NamedQuery(name = "commons.getContextofType", query = "SELECT c FROM SettingsContextEntity c " +
-        "WHERE c.type= :contextType ")
+    @NamedQuery(name = "SettingsContextEntity.getContextByTypeWithNullName", query = "SELECT c FROM SettingsContextEntity c " +
+        "WHERE c.name IS NULL " +
+        "AND c.type= :contextType "),
+    @NamedQuery(name = "SettingsContextEntity.getEmptyContextsByScopeAndContextType", query = "SELECT distinct(c) FROM SettingsContextEntity c " +
+        "WHERE  c.type = :contextType " +
+        "AND NOT EXISTS( " +
+        " SELECT s FROM SettingsEntity s " +
+        " JOIN s.context c2 " +
+        " JOIN s.scope sc " +
+        " WHERE c2.id = c.id " +
+        " AND sc.type = :scopeType " +
+        " AND sc.name = :scopeName " +
+        ")"),
+    @NamedQuery(name = "SettingsContextEntity.getEmptyContextsByScopeWithNullNameAndContextType", query = "SELECT distinct(c) FROM SettingsContextEntity c " +
+        "WHERE c.type = :contextType " +
+        "AND NOT EXISTS( " +
+        " SELECT s FROM SettingsEntity s " +
+        " JOIN s.context c2 " +
+        " JOIN s.scope sc " +
+        " WHERE c2.id = c.id " +
+        " AND sc.type = :scopeType " +
+        " AND sc.name IS NULL " +
+        ")"),
+    @NamedQuery(name = "SettingsContextEntity.getContextsByTypeAndScopeAndSettingName", query = "SELECT distinct(s.context) FROM SettingsEntity s " +
+        "JOIN s.context c " +
+        "JOIN s.scope sc " +
+        "WHERE sc.name = :scopeName " +
+        "AND sc.type = :scopeType " +
+        "AND c.type = :contextType " +
+        "AND s.name = :settingName "),
+    @NamedQuery(name = "SettingsContextEntity.getContextsByTypeAndScopeWithNullNameAndSettingName", query = "SELECT distinct(s.context) FROM SettingsEntity s " +
+        "JOIN s.context c " +
+        "JOIN s.scope sc " +
+        "WHERE sc.name = :scopeName " +
+        "AND sc.type = :scopeType " +
+        "AND c.type = :contextType " +
+        "AND s.name = :settingName ")
 })
 public class ContextEntity {
   @Id
@@ -34,7 +80,7 @@ public class ContextEntity {
   @Column(name = "TYPE")
   private String type;
 
-  @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "context")
+  @OneToMany(fetch=FetchType.LAZY, mappedBy = "context")
   private Set<SettingsEntity> settings;
 
   public long getId() {

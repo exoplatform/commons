@@ -16,9 +16,19 @@
  */
 package org.exoplatform.commons.notification.impl.jpa.email.entity;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
-import javax.persistence.*;
+import org.exoplatform.commons.api.persistence.ExoEntity;
 
 /**
  * Created by The eXo Platform SAS
@@ -29,7 +39,11 @@ import javax.persistence.*;
 @Entity(name = "NotificationsMailParamsEntity")
 @ExoEntity
 @Table(name = "NTF_EMAIL_NOTIFS_PARAMS")
-public class MailParamsEntity {
+@NamedQueries({
+  @NamedQuery(name = "NotificationsMailParamsEntity.deleteParamsOfNotifications", query = "DELETE FROM NotificationsMailParamsEntity m " +
+      "WHERE m.notification.id IN ( :notifications ) ")
+})
+public class MailParamEntity {
   @Id
   @Column(name = "EMAIL_NOTIF_PARAMS_ID")
   @SequenceGenerator(name="SEQ_NTF_EMAIL_PARAMS", sequenceName="SEQ_NTF_EMAIL_PARAMS")
@@ -42,10 +56,9 @@ public class MailParamsEntity {
   @Column(name = "PARAM_VALUE")
   private String value;
 
-
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "EMAIL_NOTIF_ID")
-  private MailNotifEntity mailNotification;
+  private MailNotifEntity notification;
 
   public long getId() {
     return id;
@@ -55,7 +68,7 @@ public class MailParamsEntity {
     return name;
   }
 
-  public MailParamsEntity setName(String name) {
+  public MailParamEntity setName(String name) {
     this.name = name;
     return this;
   }
@@ -64,18 +77,17 @@ public class MailParamsEntity {
     return value;
   }
 
-  public MailParamsEntity setValue(String value) {
+  public MailParamEntity setValue(String value) {
     this.value = value;
     return this;
   }
 
   public MailNotifEntity getNotification() {
-    return mailNotification;
+    return notification;
   }
 
-  public MailParamsEntity setNotification(MailNotifEntity mailNotification) {
-    this.mailNotification = mailNotification;
-    mailNotification.addParameter(this);
+  public MailParamEntity setNotification(MailNotifEntity notification) {
+    this.notification = notification;
     return this;
   }
 }

@@ -30,7 +30,6 @@ import org.exoplatform.commons.api.notification.service.WebNotificationService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoCacheKey;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -76,7 +75,7 @@ public class WebNotificationServiceImpl implements WebNotificationService {
       // if have any exception when template transformation
       // ignore to display the notification
       if (ctx.isFailed()) {
-        LOG.debug(ctx.getException().getMessage(), ctx.getException());
+        LOG.warn(ctx.getException().getMessage(), ctx.getException());
       }
     }
     return result;

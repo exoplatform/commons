@@ -17,26 +17,51 @@
 package org.exoplatform.commons.api.notification.service;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.services.mail.Message;
 
 public interface QueueMessage {
+  public static final String MESSAGE_ADDED_IN_QUEUE     = "MESSAGE_ADDED_IN_QUEUE";
+
+  public static final String MESSAGE_DELETED_FROM_QUEUE = "MESSAGE_DELETED_FROM_QUEUE";
+
+  public static final String MESSAGE_SENT_FROM_QUEUE    = "MESSAGE_SENT_FROM_QUEUE";
 
   /**
    * Puts the message into the queue
+   * 
    * @param message
    * @return
+   * @throws Exception
    */
-  boolean put(MessageInfo message);
-  
-  /**
-   * Peek the message from queue and send
-   */
-  void send() ;
+  boolean put(MessageInfo message) throws Exception;
 
   /**
-   * Sends the message using mail service
+   * Peek the message from queue and send
+   * @throws Exception
+   */
+  void send() throws Exception;
+
+  /**
+   * Sends mail instantly without passing by queue (use directly the mail
+   * service). If sending mail is suspended (by Mail Counter MBean), the message
+   * will not be sent, thus it will be suspended.
+   * 
    * @param message the message to be sent
    * @return true if the message is sent or mail service is off
+   * @throws Exception
    */
-  boolean sendMessage(Message message) throws Exception;
+  boolean sendMessage(MessageInfo message) throws Exception;
+
+  /**
+   * Removes all queue elements
+   *
+   * @throws Exception
+   */
+  void removeAll() throws Exception;
+
+  /**
+   * Enable/Disable sending mail message
+   * 
+   * @param enabled true to enable and false to disable
+   */
+  void enable(boolean enabled);
 }

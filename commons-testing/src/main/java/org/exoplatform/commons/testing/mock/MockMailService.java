@@ -14,21 +14,17 @@
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.commons.notification.mock;
+package org.exoplatform.commons.testing.mock;
 
 import java.util.concurrent.Future;
 
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.exoplatform.commons.notification.NotificationUtils;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 import org.exoplatform.services.mail.Message;
 
 public class MockMailService implements MailService {
-  private static final Log LOG = ExoLogger.getExoLogger(MockMailService.class);
 
   @Override
   public Session getMailSession() {
@@ -47,12 +43,7 @@ public class MockMailService implements MailService {
 
   @Override
   public void sendMessage(Message message) throws Exception {
-    String sendTo = message.getTo();
-    if (NotificationUtils.isValidEmailAddresses(sendTo)) {
-      LOG.info("Sent mail notification to email: " + sendTo);
-    } else {
-      LOG.error("Failed to sending mail notification to email: " + sendTo);
-    }
+
   }
 
   @Override

@@ -38,10 +38,10 @@ import org.exoplatform.settings.impl.SettingServiceImpl;
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
  * Nov 15, 2012
- * CacheSettingServiceImpl is implemented for application which uses cache. CacheSettingServiceImpl contains also settingService for database.
- * In case of saving and removing setting properties, CacheSettingService will effect the change in cache and database.
+ * CacheSettingServiceImpl is implemented for application which uses cache. CacheSettingServiceImpl contains also settingService for database. 
+ * In case of saving and removing setting properties, CacheSettingService will effect the change in cache and database. 
  * Otherwise, it will search setting properties in cache at first and then in database, that allows to improve performance.
- * @LevelAPI Experimental
+ * @LevelAPI Experimental    
  */
 public class CacheSettingServiceImpl implements SettingService {
   /** Logger */

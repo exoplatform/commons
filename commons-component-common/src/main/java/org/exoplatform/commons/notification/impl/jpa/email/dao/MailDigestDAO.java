@@ -1,47 +1,25 @@
 package org.exoplatform.commons.notification.impl.jpa.email.dao;
 
+import java.util.Set;
+
+import javax.persistence.Query;
+
+import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.notification.impl.jpa.email.entity.MailDigestEntity;
-import org.exoplatform.commons.notification.impl.jpa.email.entity.MailNotifEntity;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 
-import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
-
-/**
- * Created by exo on 3/8/17.
- */
 public class MailDigestDAO extends GenericDAOJPAImpl<MailDigestEntity, Long> {
-
-  public boolean isDigestDailySent(MailNotifEntity mailNotif) {
-    try {
-      TypedQuery<Long> queryDaily = getEntityManager().createNamedQuery("commons.countDigestByNotifAndType", Long.class)
-          .setParameter("digestType", "daily")
-          .setParameter("notifId", mailNotif);
-      return (queryDaily.getSingleResult().intValue() == 0);
-    } catch (NoResultException e) {
-      return true;
-    }
+  @ExoTransactional
+  public void deleteAllDigestsOfType(String type) {
+    Query query = getEntityManager().createNamedQuery("NotificationsMailDigestEntity.deleteAllDigestsOfType").setParameter("digestType", type);
+    query.executeUpdate();
   }
 
-  public boolean isDigestWeeklySent(MailNotifEntity mailNotif) {
-    try {
-      TypedQuery<Long> queryWeekly = getEntityManager().createNamedQuery("commons.countDigestByNotifAndType", Long.class)
-          .setParameter("digestType", "weekly")
-          .setParameter("notifId", mailNotif);
-      return (queryWeekly.getSingleResult().intValue() == 0);
-    } catch (NoResultException e) {
-      return true;
-    }
-  }
-
-  public MailDigestEntity getDigest(MailNotifEntity mailNotif, String type) {
-    try {
-      TypedQuery<MailDigestEntity> query = getEntityManager().createNamedQuery("commons.findDigestByNotifAndType", MailDigestEntity.class)
-          .setParameter("digestType", type)
-          .setParameter("notifId", mailNotif);
-      return query.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
-    }
+  @ExoTransactional
+  public void deleteDigestsOfTypeByNotificationsIds(Set<Long> mailNotifsIds, String type) {
+    Query query = getEntityManager().createNamedQuery("NotificationsMailDigestEntity.deleteDigestsOfTypeByNotificationsIds")
+        .setParameter("digestType", type)
+        .setParameter("notificationIds", mailNotifsIds);
+    query.executeUpdate();
   }
 }

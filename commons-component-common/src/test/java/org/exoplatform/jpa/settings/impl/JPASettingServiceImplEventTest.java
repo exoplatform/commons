@@ -20,30 +20,38 @@ import org.exoplatform.commons.api.event.EventManager;
 import org.exoplatform.commons.api.settings.SettingListener;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
-import org.exoplatform.commons.api.settings.data.*;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.EventType;
+import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.api.settings.data.SettingContext;
+import org.exoplatform.commons.api.settings.data.SettingData;
+import org.exoplatform.commons.api.settings.data.SettingKey;
+import org.exoplatform.commons.api.settings.data.SettingScope;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.jpa.BaseTest;
-import org.exoplatform.settings.jpa.JPASettingServiceImpl;
+import org.exoplatform.jpa.CommonsDAOJPAImplTest;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.settings.jpa.JPASettingServiceImpl;
 
-/** test the events
- * Created by The eXo Platform SAS Author : Nguyen Viet Bang
+/**
+ * test the events Created by The eXo Platform SAS Author : Nguyen Viet Bang
  * bangnv@exoplatform.com Nov 28, 2012
  */
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml") })
-public class JPASettingServiceImplEventTest extends BaseTest {
+public class JPASettingServiceImplEventTest extends CommonsDAOJPAImplTest {
 
-  protected static SettingService                   settingService;
+  protected static JPASettingServiceImpl            settingService;
 
   private EventManager<SettingService, SettingData> eventManager;
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setUp() {
+  public void setUp() throws Exception {
     super.setUp();
     settingService = getService(JPASettingServiceImpl.class);
     ConversationState c = new ConversationState(new Identity("root"));
@@ -55,9 +63,11 @@ public class JPASettingServiceImplEventTest extends BaseTest {
     ListenerImpl listener = new ListenerImpl();
     listener.setName(EventType.SETTING_SET.toString());
     eventManager.addEventListener(listener);
-    settingService.set(Context.USER, Scope.SPACE, "xyz", SettingValue.create("b"));
+    Scope spaceScope = Scope.SPACE.id("space");
+
+    settingService.set(Context.USER, spaceScope, "xyz", SettingValue.create("b"));
     // verify the key
-    assertEquals(listener.settingContext, new SettingKey(Context.USER, Scope.SPACE, "xyz"));
+    assertEquals(listener.settingContext, new SettingKey(Context.USER, spaceScope, "xyz"));
 
     // verify the value
     assertEquals(listener.settingValue.getValue(), "b");
@@ -70,12 +80,13 @@ public class JPASettingServiceImplEventTest extends BaseTest {
     ListenerImpl listener = new ListenerImpl();
     listener.setName(EventType.SETTING_REMOVE_KEY.toString());
     eventManager.addEventListener(listener);
-    settingService.set(Context.USER, Scope.SPACE, "xyz", SettingValue.create("b"));
+    Scope spaceScope = Scope.SPACE.id("space");
+    settingService.set(Context.USER, spaceScope, "xyz", SettingValue.create("b"));
 
-    settingService.remove(Context.USER, Scope.SPACE, "xyz");
+    settingService.remove(Context.USER, spaceScope, "xyz");
 
-    assertEquals(listener.settingContext, new SettingKey(Context.USER, Scope.SPACE, "xyz"));
-    assertEquals(listener.eventype, EventType.SETTING_REMOVE_KEY);
+    assertEquals(new SettingKey(Context.USER, spaceScope, "xyz"), listener.settingContext);
+    assertEquals(EventType.SETTING_REMOVE_KEY, listener.eventype);
   }
 
   public void testEventForScopeRemove() {

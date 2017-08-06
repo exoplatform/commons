@@ -7,7 +7,10 @@ import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO;
+import org.exoplatform.commons.notification.impl.jpa.web.dao.WebParamsDAO;
+import org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO;
 import org.exoplatform.commons.notification.plugin.PluginTest;
+import org.exoplatform.commons.persistence.impl.EntityManagerHolder;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
@@ -26,6 +29,8 @@ public class JPAWebNotificationStorageTest extends BaseTest {
 
   private JPAWebNotificationStorage webNotificationStorage;
   private WebNotifDAO webNotifDAO;
+  private WebUsersDAO webUsersDAO;
+  private WebParamsDAO webParamsDAO;
   protected List<String> userIds;
 
   @Override
@@ -33,12 +38,16 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     super.setUp();
     webNotificationStorage = getService(JPAWebNotificationStorage.class);
     webNotifDAO = getService(WebNotifDAO.class);
+    webUsersDAO = getService(WebUsersDAO.class);
+    webParamsDAO = getService(WebParamsDAO.class);
     userIds = new ArrayList<String>();
   }
 
   @Override
   public void tearDown()  {
-    webNotifDAO.deleteAll(webNotifDAO.findAll());
+    webParamsDAO.deleteAll();
+    webUsersDAO.deleteAll();
+    webNotifDAO.deleteAll();
     super.tearDown();
   }
 
@@ -60,7 +69,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
       info.with(AbstractService.NTF_SHOW_POPOVER, "true")
           .with(AbstractService.NTF_READ, "false")
           .with("activityId", "TheActivityId")
-          .with("accessLink", "http://fsdfsdf.com/fsdfsf");
+          .with("accessLink", "http://example.com/");
       return info;
   }
 
@@ -96,11 +105,12 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     //
     webNotificationStorage.markAllRead(userId);
     //
+    EntityManagerHolder.get().clear();
     list = webNotificationStorage.get(new WebNotificationFilter(userId), 0, 10);
     assertEquals(10, list.size());
     //
     for(NotificationInfo notif : list) {
-      assertFalse(Boolean.valueOf(notif.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
+      assertTrue(Boolean.valueOf(notif.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
     }
   }
 
@@ -153,7 +163,6 @@ public class JPAWebNotificationStorageTest extends BaseTest {
      *   + 12/12/2014
      *  Expected: remaining is 0 notification
     */
-    long daySeconds = 86400;
     String userId = "demo";
     Calendar cal = Calendar.getInstance();
     long t = 86400000l;
@@ -220,10 +229,15 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     Calendar cal = Calendar.getInstance();
     cal.setTimeInMillis(cal.getTimeInMillis() - 3 * 86400000l);
     //
-    webNotificationStorage.save(makeWebNotificationInfo(userId).setDateCreated(cal));
-    assertEquals(PluginTest.ID, webNotificationStorage.getUnreadNotification(PluginTest.ID, "TheActivityId", userId).getKey().getId());
+    webNotificationStorage.save(makeWebNotificationInfo(userId).setDateCreated(cal).setLastModifiedDate(cal));
+
+    EntityManagerHolder.get().clear();
+
+    NotificationInfo unreadNotification = webNotificationStorage.getUnreadNotification(PluginTest.ID, "TheActivityId", userId);
+    assertNotNull(unreadNotification);
+    assertEquals(PluginTest.ID, unreadNotification.getKey().getId());
     assertEquals(1, webNotificationStorage.getNumberOnBadge(userId));
-    assertTrue(webNotificationStorage.remove(userId, Calendar.getInstance().getTimeInMillis()));
+    assertTrue(webNotificationStorage.remove(userId, 86400));
     //
     assertEquals(0, webNotificationStorage.getNumberOnBadge(userId));
   }
@@ -249,7 +263,6 @@ public class JPAWebNotificationStorageTest extends BaseTest {
      *   + 12/12/2014
      *  Expected: remaining is 0 notification
     */
-    long daySeconds = 86400;
     String userId = "demo";
     Calendar cal = Calendar.getInstance();
     long t = 86400000l;

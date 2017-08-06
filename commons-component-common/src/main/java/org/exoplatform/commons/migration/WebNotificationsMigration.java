@@ -1,10 +1,18 @@
-package org.exoplatform.commons.notification.impl.migration;
+package org.exoplatform.commons.migration;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.PathNotFoundException;
+import javax.servlet.ServletContext;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.cluster.StartableClusterAware;
 import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage;
 import org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl;
 import org.exoplatform.commons.utils.ListAccess;
@@ -21,20 +29,7 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.PathNotFoundException;
-import javax.servlet.ServletContext;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import static org.exoplatform.commons.utils.CommonsUtils.getService;
-
-/**
- * Created by exo on 5/4/17.
- */
-public class WebNotificationsMigration implements StartableClusterAware {
+public class WebNotificationsMigration {
 
   private static final Log LOG = ExoLogger.getLogger(WebNotificationsMigration.class);
 
@@ -61,18 +56,19 @@ public class WebNotificationsMigration implements StartableClusterAware {
   public static final String WEB_NOTIFICATION_RDBMS_CLEANUP_DONE = "WEB_NOTIFICATION_RDBMS_CLEANUP_DONE";
 
 
-  public WebNotificationsMigration(JPAWebNotificationStorage jpaWebNotificationStorage, WebNotificationStorageImpl jcrWebNotificationStorage) {
+  public WebNotificationsMigration(JPAWebNotificationStorage jpaWebNotificationStorage,
+                                   NodeHierarchyCreator nodeHierarchyCreator,
+                                   OrganizationService organizationService,
+                                   SettingService settingService,
+                                   WebNotificationStorageImpl jcrWebNotificationStorage) {
     this.jpaWebNotificationStorage = jpaWebNotificationStorage;
     this.jcrWebNotificationStorage = jcrWebNotificationStorage;
-
-    this.organizationService = getService(OrganizationService.class);
-    this.settingService = getService(SettingService.class);
+    this.organizationService = organizationService;
+    this.settingService = settingService;
+    this.nodeHierarchyCreator = nodeHierarchyCreator;
   }
 
-  @Override
-  public void start() {
-    PortalContainer container = PortalContainer.getInstance();
-    nodeHierarchyCreator = (NodeHierarchyCreator) container.getComponentInstanceOfType(NodeHierarchyCreator.class);
+  public void migrate() {
     try {
       sProvider = SessionProvider.createSystemProvider();
     } catch (Exception e) {
@@ -105,16 +101,20 @@ public class WebNotificationsMigration implements StartableClusterAware {
                     pageSize = totalUsers - current;
                   }
                   users = allUsersListAccess.load(current, pageSize);
+                  int migratedUsersCount = current + 1;
                   for (User user : users) {
                     RequestLifeCycle.end();
                     RequestLifeCycle.begin(currentContainer);
                     String userName = user.getUserName();
                     if (!hasWebNotifDataToMigrate(userName) || isWebNotifMigrated(userName)) {
-                      LOG.info("No Web notification data to migrate from JCR to RDBMS for user: " + userName);
+                      int progression = (int)((migratedUsersCount++ * 100) / totalUsers);
+                      LOG.info("Web notification migration - progression = ({}%), username={}, migrated Web Notifications Count = {}", progression, userName, 0);
                       continue;
                     }
                     try {
-                      migrateWebNotifDataOfUser(nodeHierarchyCreator.getUserApplicationNode(sProvider, userName));
+                      long notificationsCount = migrateWebNotifDataOfUser(nodeHierarchyCreator.getUserApplicationNode(sProvider, userName));
+                      int progression = (int)((migratedUsersCount++ * 100) / totalUsers);
+                      LOG.info("Web notification migration - progression = ({}%), username={}, migrated Web Notifications Count = {}", progression, userName, notificationsCount);
                       allUsers.add(userName);
                       settingService.set(Context.USER.id(userName), Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_USER_KEY), WEB_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
                     } catch (Exception e) {
@@ -134,8 +134,32 @@ public class WebNotificationsMigration implements StartableClusterAware {
             } else {
               LOG.info("No web notifications data to migrate from JCR to RDBMS");
             }
-            if (!isWebNotifCleanupDone()) {
-              deleteJcrWebNotifications();
+            return null;
+          }
+        });
+      }
+    });
+  }
+
+  public void cleanup() {
+    // Proceed to delete JCR data after migration is finished
+    PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
+      @Override
+      public void execute(ServletContext context, PortalContainer portalContainer) {
+        RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+          @Override
+          public Void call() {
+            PortalContainer currentContainer = PortalContainer.getInstance();
+            ExoContainerContext.setCurrentContainer(currentContainer);
+            RequestLifeCycle.begin(currentContainer);
+            try {
+              if (isWebNotifMigrationDone() && !isWebNotifCleanupDone()) {
+                deleteJcrWebNotifications();
+              }
+            } catch (Exception e) {
+              LOG.error("Error while cleaning Web Notifications data from JCR", e);
+            } finally {
+              RequestLifeCycle.end();
             }
             return null;
           }
@@ -159,14 +183,16 @@ public class WebNotificationsMigration implements StartableClusterAware {
     return (setting != null && setting.getValue().equals("true"));
   }
 
-  private void migrateWebNotifDataOfUser(Node userAppNode) throws Exception {
+  private long migrateWebNotifDataOfUser(Node userAppNode) throws Exception {
     NodeIterator dateIterator = userAppNode.getNode("notifications").getNode("web").getNodes();
+    long notificationsCount = dateIterator.getSize();
     while (dateIterator.hasNext()) {
       NodeIterator notifIterator = dateIterator.nextNode().getNodes();
       while (notifIterator.hasNext()) {
         migrateWebNotifNodeToRDBMS(notifIterator.nextNode());
       }
     }
+    return notificationsCount;
   }
 
   private void migrateWebNotifNodeToRDBMS(Node node) throws Exception {
@@ -191,9 +217,9 @@ public class WebNotificationsMigration implements StartableClusterAware {
         nonMigratedWebNotifs.add(userId);
       }
     }
-    LOG.info(" === Web Notifications Migration from JCR to RDBBMS report: \n"
-           + "           - " + nonMigratedWebNotifs.size() + " Web Notifications nodes are not migrated to RDBMS \n"
-           + "           - " + nonRemovedWebNotifs.size() + " Web Notifications nodes are migrated but not removed from JCR");
+    LOG.info(" === Web Notifications Migration from JCR to RDBBMS report:");
+    LOG.info("           - " + nonMigratedWebNotifs.size() + " Web Notifications nodes are not migrated to RDBMS");
+    LOG.info("           - " + nonRemovedWebNotifs.size() + " Web Notifications nodes are migrated but not removed from JCR");
     long endTime = System.currentTimeMillis();
     LOG.info("=== Web notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
     settingService.set(Context.GLOBAL, Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_DONE_KEY), WEB_NOTIFICATION_RDBMS_CLEANUP_DONE, SettingValue.create("true"));
@@ -213,10 +239,4 @@ public class WebNotificationsMigration implements StartableClusterAware {
     }
     return false;
   }
-
-  @Override
-  public boolean isDone() {
-    return false;
-  }
-
 }

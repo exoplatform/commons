@@ -17,47 +17,94 @@
 package org.exoplatform.commons.api.settings.data;
 
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.IdentityConstants;
 
 /**
  * Saves some settings linked to a Context.
+ * 
  * @LevelAPI Experimental
  */
 
-public enum Context {
-
+public class Context implements Cloneable {
   /**
-   * GLOBAL: Settings should impact all users in the underlying scope. 
+   * GLOBAL: Settings should impact all users in the underlying scope.
+   * 
    * @LevelAPI Experimental
    */
-  GLOBAL, 
+  public static final Context GLOBAL = new Context("GLOBAL", "GLOBAL");
+
   /**
-   * USER: Each user should be able to save his own settings. 
+   * USER: Each user should be able to save his own settings.
+   * 
    * @LevelAPI Experimental
    */
-  USER;
+  public static final Context USER   = new Context("USER", null);
 
-  private String id;
+  private String              id;
+
+  private String              name;
+
+  public Context(String name, String id) {
+    this.id = id;
+    this.name = name;
+  }
 
   /**
    * Creates a context with a specified Id.
+   * 
    * @param id The Id that is displayed as username.
    * @LevelAPI Experimental
    */
   public Context id(String id) {
-    this.id = id;
-    return this;
+    Context result = null;
+    try {
+      result = (Context) this.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
+    result.id = id;
+    return result;
   }
 
   /**
    * Gets a context Id.
-   * @return Returns "null" if the context is GLOBAL or user Id if the context is USER.
+   * 
+   * @return Returns "null" if the context is GLOBAL or user Id if the context
+   *         is USER.
    * @LevelAPI Experimental
    */
   public String getId() {
-    if (id != null)
-      return id;
-    ConversationState state = ConversationState.getCurrent();
-    return (state != null) ? state.getIdentity().getUserId() : null;
+    if (id == null && USER.getName().equals(getName())) {
+      ConversationState state = ConversationState.getCurrent();
+      String currentId = (state == null) ? null : state.getIdentity().getUserId();
+      if (currentId != null
+          && (IdentityConstants.SYSTEM.contentEquals(currentId) || IdentityConstants.ANONIM.contentEquals(currentId))) {
+        currentId = null;
+      }
+      return currentId;
+    }
+    return id;
   }
 
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+
+    Context that = (Context) o;
+    return that.hashCode() == this.hashCode();
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    return result;
+  }
 }

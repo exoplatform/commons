@@ -49,7 +49,7 @@ public class NotificationMessageUtils {
     if (maxItemsInPopover == 0) {
       String maxItemsProperty = System.getProperty("exo.notification.maxitems", "8");
       try {
-        maxItemsInPopover = Integer.valueOf(maxItemsProperty);
+        maxItemsInPopover = Integer.parseInt(maxItemsProperty);
         if (maxItemsInPopover <= 0) {
           LOG.warn("The value of the property exo.notification.maxitems cannot be 0 or negative. Using the default value instead: 8.");
           maxItemsInPopover = 8;

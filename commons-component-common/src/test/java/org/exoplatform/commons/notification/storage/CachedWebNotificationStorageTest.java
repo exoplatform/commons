@@ -292,7 +292,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
      *   + 12/12/2014
      *  Expected: remaining is 0 notification
     */
-    long daySeconds = 86400;
+    int daySeconds = 86400;
     String userId = "demo";
     Calendar cal = Calendar.getInstance();
     long t = 86400000l;

@@ -44,7 +44,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_PARAMS_ID"/>
             </column>
             <column name="EMAIL_NOTIF_ID" type="BIGINT">
-                <!--<constraints nullable="false"/>-->
+                <constraints nullable="false"/>
             </column>
             <column name="PARAM_NAME" type="NVARCHAR(550)">
                 <constraints nullable="false"/>
@@ -62,7 +62,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_EMAIL_NOTIF_DIGEST_ID"/>
             </column>
             <column name="EMAIL_NOTIF_ID" type="BIGINT">
-                <!--<constraints nullable="false"/>-->
+                <constraints nullable="false"/>
             </column>
             <column name="DIGEST_TYPE" type="NVARCHAR(550)"/>
         </createTable>
@@ -87,14 +87,14 @@
     <changeSet author="notifications" id="1.0.0-7">
         <addForeignKeyConstraint baseColumnNames="EMAIL_NOTIF_ID" baseTableName="NTF_EMAIL_NOTIFS_PARAMS"
                                  constraintName="FK_NTF_EMAIL_NOTIFS_PARAMS_01" deferrable="false" initiallyDeferred="false"
-                                 onDelete="SET NULL" onUpdate="NO ACTION"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION"
                                  referencedColumnNames="EMAIL_NOTIF_ID" referencedTableName="NTF_EMAIL_NOTIFS"/>
     </changeSet>
 
     <changeSet author="notifications" id="1.0.0-8">
         <addForeignKeyConstraint baseColumnNames="EMAIL_NOTIF_ID" baseTableName="NTF_EMAIL_NOTIFS_DIGEST"
                                  constraintName="FK_NTF_EMAIL_NOTIFS_DIGEST_01" deferrable="false" initiallyDeferred="false"
-                                 onDelete="SET NULL" onUpdate="NO ACTION"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION"
                                  referencedColumnNames="EMAIL_NOTIF_ID" referencedTableName="NTF_EMAIL_NOTIFS"/>
     </changeSet>
 
@@ -126,7 +126,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIF_PARAMS_ID"/>
             </column>
             <column name="WEB_NOTIF_ID" type="BIGINT">
-                <!--<constraints nullable="false"/>-->
+                <constraints nullable="false"/>
             </column>
             <column name="PARAM_NAME" type="NVARCHAR(550)">
                 <constraints nullable="false"/>
@@ -144,7 +144,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="PK_NTF_WEB_NOTIFS_USERS_ID"/>
             </column>
             <column name="WEB_NOTIF_ID" type="BIGINT">
-                <!--<constraints nullable="false"/>-->
+                <constraints nullable="false"/>
             </column>
             <column name="RECEIVER" type="NVARCHAR(200)"/>
             <column name="UPDATE_DATE" type="TIMESTAMP">
@@ -175,14 +175,12 @@
     <changeSet author="notifications" id="1.0.0-15">
         <addForeignKeyConstraint baseColumnNames="WEB_NOTIF_ID" baseTableName="NTF_WEB_NOTIFS_PARAMS"
                                  constraintName="FK_NTF_WEB_NOTIFS_PARAMS_01" deferrable="false" initiallyDeferred="false"
-                                 onDelete="SET NULL" onUpdate="NO ACTION"
                                  referencedColumnNames="WEB_NOTIF_ID" referencedTableName="NTF_WEB_NOTIFS"/>
     </changeSet>
 
     <changeSet author="notifications" id="1.0.0-16">
         <addForeignKeyConstraint baseColumnNames="WEB_NOTIF_ID" baseTableName="NTF_WEB_NOTIFS_USERS"
                                  constraintName="FK_NTF_WEB_NOTIFS_USERS_01" deferrable="false" initiallyDeferred="false"
-                                 onDelete="SET NULL" onUpdate="NO ACTION"
                                  referencedColumnNames="WEB_NOTIF_ID" referencedTableName="NTF_WEB_NOTIFS"/>
     </changeSet>
 

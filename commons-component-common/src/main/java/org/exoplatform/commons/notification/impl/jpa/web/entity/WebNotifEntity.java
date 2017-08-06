@@ -1,12 +1,20 @@
 package org.exoplatform.commons.notification.impl.jpa.web.entity;
 
-import org.exoplatform.commons.api.persistence.ExoEntity;
-
-import javax.persistence.*;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import org.exoplatform.commons.api.persistence.ExoEntity;
 
 /**
  * Created by The eXo Platform SAS
@@ -17,56 +25,6 @@ import java.util.Set;
 @Entity(name = "NotificationsWebNotifEntity")
 @ExoEntity
 @Table(name = "NTF_WEB_NOTIFS")
-@NamedQueries({
-    @NamedQuery(name = "commons.findWebNotif", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "WHERE w.sender= :sender " +
-        "AND w.type= :notifType " +
-        "AND w.creationDate= :creationDate "),
-    @NamedQuery(name = "commons.findWebNotifsByPluginFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receivers  Receivers " +
-        "WHERE w.type= :pluginId " +
-        "AND Receivers.receiver = :userId " +
-        "AND Receivers.showPopover= :isOnPopover " +
-        "ORDER BY w.creationDate DESC "),
-    @NamedQuery(name = "commons.findWebNotifsByUserFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receivers  Receivers " +
-        "WHERE Receivers.receiver = :userId " +
-        "ORDER BY w.creationDate DESC "),
-    @NamedQuery(name = "commons.findWebNotifsByPopoverFilter", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receivers  Receivers " +
-        "WHERE Receivers.receiver = :userId " +
-        "AND Receivers.showPopover= :isOnPopover " +
-        "ORDER BY w.creationDate DESC "),
-    @NamedQuery(name = "commons.findNewWebNotifsByUser", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receivers  Receivers " +
-        "WHERE Receivers.receiver = :userId " +
-        "AND Receivers.read = :isRead " +
-        "ORDER BY w.creationDate DESC "),
-    @NamedQuery(name = "commons.findWebNotifsByLastUpdatedDate", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receivers  Receivers " +
-        "WHERE Receivers.updateDate < :delayTime "),
-    @NamedQuery(name = "commons.findWebNotifsOfUserByLastUpdatedDate", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.receivers  Receivers " +
-        "WHERE Receivers.receiver = :userId " +
-        "AND Receivers.updateDate < :calendar "),
-    @NamedQuery(name = "commons.findUnreadNotification", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.parameters  Parameters " +
-        "JOIN w.receivers  Receivers " +
-        "WHERE w.type= :pluginId " +
-        "AND Parameters.name = :activityIdParamName " +
-        "AND Parameters.value LIKE :activityId " +
-        "AND Receivers.receiver = :owner " +
-        "AND Receivers.read = false " +
-        "AND Receivers.updateDate > :calendar " +
-        "ORDER BY w.creationDate DESC "),
-    @NamedQuery(name = "commons.findWebNotifsOfUserByParam", query = "SELECT w FROM NotificationsWebNotifEntity w " +
-        "JOIN w.parameters  Parameters " +
-        "JOIN w.receivers  Receivers " +
-        "WHERE w.type= :pluginId " +
-        "AND Parameters.name = :paramName " +
-        "AND Parameters.value LIKE :paramValue " +
-        "AND Receivers.receiver = :owner ")
-})
 public class WebNotifEntity {
   @Id
   @Column(name = "WEB_NOTIF_ID")
@@ -81,15 +39,15 @@ public class WebNotifEntity {
   private String type;
 
   @Column(name = "CREATION_DATE")
-  private Date creationDate;
+  private Calendar creationDate;
 
   @Column(name = "TEXT")
   private String text;
 
-  @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "webNotification")
+  @OneToMany(fetch=FetchType.EAGER, mappedBy = "webNotification")
   private Set<WebParamsEntity> parameters = new HashSet<>();
 
-  @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "webNotification")
+  @OneToMany(fetch=FetchType.LAZY, mappedBy = "webNotification")
   private Set<WebUsersEntity> receivers = new HashSet<>();
 
   public long getId() {
@@ -114,11 +72,11 @@ public class WebNotifEntity {
     return this;
   }
 
-  public Date getCreationDate() {
+  public Calendar getCreationDate() {
     return creationDate;
   }
 
-  public WebNotifEntity setCreationDate(Date creationDate) {
+  public WebNotifEntity setCreationDate(Calendar creationDate) {
     this.creationDate = creationDate;
     return this;
   }

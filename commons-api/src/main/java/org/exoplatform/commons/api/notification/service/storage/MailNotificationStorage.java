@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public interface NotificationDataStorage {
+public interface MailNotificationStorage {
 
   /**
    * Saves information of a notification.

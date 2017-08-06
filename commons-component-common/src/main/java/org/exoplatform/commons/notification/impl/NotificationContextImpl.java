@@ -97,7 +97,7 @@ public final class NotificationContextImpl implements NotificationContext {
 
   @Override
   public <T> NotificationContext remove(ArgumentLiteral<T> argument) {
-    arguments.remove(argument);
+    arguments.remove(argument.getKey());
     return this;
   }
 

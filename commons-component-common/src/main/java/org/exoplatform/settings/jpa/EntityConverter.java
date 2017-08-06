@@ -1,50 +1,41 @@
+/*
+ *
+ *  * Copyright (C) 2003-2017 eXo Platform SAS.
+ *  *
+ *  * This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Affero General Public License
+ *  as published by the Free Software Foundation; either version 3
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, see<http://www.gnu.org/licenses/>.
+ *
+ */
 package org.exoplatform.settings.jpa;
 
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.settings.jpa.entity.ContextEntity;
 import org.exoplatform.settings.jpa.entity.ScopeEntity;
 
-import static org.exoplatform.commons.api.settings.data.Context.GLOBAL;
-import static org.exoplatform.commons.api.settings.data.Context.USER;
-
-/**
- * Created by exo on 3/8/17.
- */
 public class EntityConverter {
-  private static final Log LOG = ExoLogger.getLogger(EntityConverter.class);
 
   public static ContextEntity convertContextToContextEntity(Context context) {
-    ContextEntity contextEntity = null;
     if (context != null) {
-      contextEntity = new ContextEntity();
-      contextEntity.setName(context.getId());
-      switch (context) {
-        case GLOBAL:
-          contextEntity.setType(GLOBAL.toString());
-          contextEntity.setName(GLOBAL.toString());
-          break;
-        case USER:
-          contextEntity.setType(USER.toString());
-          break;
-      }
+      return new ContextEntity().setType(context.getName()).setName(context.getId());
     }
-    return contextEntity;
+    return null;
   }
 
   public static ScopeEntity convertScopeToScopeEntity(Scope scope) {
-    ScopeEntity scopeEntity = null;
     if (scope != null) {
-      scopeEntity = new ScopeEntity();
-      scopeEntity.setType(scope.toString());
-      if (scope.getId() != null) {
-        scopeEntity.setName(scope.getId());
-      } else {
-        scopeEntity.setName(scopeEntity.getType());
-      }
+      return new ScopeEntity().setType(scope.getName()).setName(scope.getId());
     }
-    return scopeEntity;
+    return null;
   }
 }

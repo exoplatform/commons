@@ -1,6 +1,15 @@
-package org.exoplatform.settings.migration;
+package org.exoplatform.commons.migration;
+
+import static java.lang.Math.max;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
@@ -8,6 +17,8 @@ import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
 import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.commons.chromattic.SessionContext;
 import org.exoplatform.commons.cluster.StartableClusterAware;
+import org.exoplatform.commons.notification.impl.AbstractService;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.RDBMSMigrationUtils;
 import org.exoplatform.container.ExoContainer;
@@ -23,19 +34,8 @@ import org.exoplatform.settings.chromattic.SimpleContextEntity;
 import org.exoplatform.settings.chromattic.SubContextEntity;
 import org.exoplatform.settings.chromattic.SynchronizationTask;
 import org.exoplatform.settings.jpa.JPASettingServiceImpl;
+import org.exoplatform.settings.jpa.JPAUserSettingServiceImpl;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-
-import static java.lang.Math.max;
-import static org.exoplatform.commons.utils.CommonsUtils.getService;
-
-/**
- * Created by exo on 4/18/17.
- */
 public class SettingsMigration implements StartableClusterAware {
 
   private static final Log LOG = ExoLogger.getLogger(SettingsMigration.class);
@@ -58,52 +58,61 @@ public class SettingsMigration implements StartableClusterAware {
   public static final String SETTINGS_RDBMS_MIGRATION_DONE = "SETTINGS_RDBMS_MIGRATION_DONE";
 
 
-  public SettingsMigration(JPASettingServiceImpl jpaSettingService) {
-    this.jpaSettingService = jpaSettingService;
-    ChromatticManager chromatticManager = PortalContainer.getInstance().getComponentInstanceOfType(ChromatticManager.class);
-    chromatticLifeCycle = (ChromatticLifeCycle) chromatticManager.getLifeCycle("setting");
-    this.organizationService = getService(OrganizationService.class);
+  public SettingsMigration(ChromatticManager chromatticManager,
+                           OrganizationService organizationService) {
+    this.chromatticLifeCycle = (ChromatticLifeCycle) chromatticManager.getLifeCycle("setting");
+    this.organizationService = organizationService;
   }
 
   @Override
   public void start() {
+    this.jpaSettingService = CommonsUtils.getService(JPASettingServiceImpl.class);
+    if(this.jpaSettingService == null) {
+      throw new IllegalStateException("Cannot find JPASettingServiceImpl service instance");
+    }
 
     //First check to see if the JCR still contains settings data. If not, migration is skipped
     if (!hasGlobalSettingsToMigrate()) {
       LOG.info("No global settings data to migrate from JCR to RDBMS");
     } else {
       migrateGlobalSettings();
-      //Deletion of settings data in JCR is done as a background task
-      RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
-        @Override
-        public Void call() throws Exception {
-          LOG.info("=== Start cleaning Global Settings data from JCR");
-          long startTime = System.currentTimeMillis();
-          deleteJcrGlobalSettings();
-          long endTime = System.currentTimeMillis();
-          LOG.info("=== Global Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-          return null;
-        }
-      });
     }
     if (!hasUserSettingsToMigrate()) {
       LOG.info("No user settings data to migrate from JCR to RDBMS");
     } else {
       migrateUserSettings();
     }
-    if (getJCRUserSettingsToRemove() != null) {
+  }
+
+  public void cleanup() {
+    if (!hasGlobalSettingsToMigrate() && getJCRUserSettingsToRemove() != null) {
+      //Deletion of settings data in JCR is done as a background task
       RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
         @Override
         public Void call() throws Exception {
-          LOG.info("=== Start cleaning User Settings data from JCR");
-          long startTime = System.currentTimeMillis();
-          deleteJcrUserSettings();
-          long endTime = System.currentTimeMillis();
-          LOG.info("=== User Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-          if (chromatticLifeCycle.getManager().getSynchronization() != null) {
-            chromatticLifeCycle.getManager().endRequest(true);
+          PortalContainer currentContainer = PortalContainer.getInstance();
+          ExoContainerContext.setCurrentContainer(currentContainer);
+          RequestLifeCycle.begin(currentContainer);
+          try {
+            LOG.info("=== Start cleaning Global Settings data from JCR");
+            long startTime = System.currentTimeMillis();
+            deleteJcrGlobalSettings();
+            long endTime = System.currentTimeMillis();
+            LOG.info("=== Global Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+            LOG.info("=== Start cleaning User Settings data from JCR");
+            startTime = System.currentTimeMillis();
+            deleteJcrUserSettings();
+            endTime = System.currentTimeMillis();
+            LOG.info("=== User Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+            if (chromatticLifeCycle.getManager().getSynchronization() != null) {
+              chromatticLifeCycle.getManager().endRequest(true);
+            }
+            reportSettingsMigration();
+          } catch (Exception e) {
+            LOG.error("Error while cleaning Settings data from JCR", e);
+          } finally {
+            RequestLifeCycle.end();
           }
-          reportSettingsMigration();
           return null;
         }
       });
@@ -111,7 +120,7 @@ public class SettingsMigration implements StartableClusterAware {
   }
 
   private void reportSettingsMigration() {
-    int notMigrated = jpaSettingService.getNumber(Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, "false");
+    long notMigrated = jpaSettingService.countSettingsByNameAndValueAndScope(Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, "false");
     int error = errorUserSettings.size();
     LOG.info(" === User Settings Migration from JCR to RDBBMS report: \n"
         + "           - " + max(notMigrated, error) + " User Settings nodes are not migrated to RDBMS \n"
@@ -192,7 +201,7 @@ public class SettingsMigration implements StartableClusterAware {
       RequestLifeCycle.begin(currentContainer);
       long startTime = System.currentTimeMillis();
       do {
-        LOG.info("    Progression of users settings migration : " + current + "/" + totalUsers);
+        LOG.info("    Progression of users settings migration : {}/{} users", current, totalUsers);
         if (current + pageSize > totalUsers) {
           pageSize = totalUsers - current;
         }
@@ -330,7 +339,11 @@ public class SettingsMigration implements StartableClusterAware {
         Scope specificScope = getScope(scope, instance);
         for (String key : scopeEntity.getInstance(instance).getProperties().keySet()) {
           try {
-            jpaSettingService.set(Context.USER.id(user), specificScope, key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+            Scope settingScope = specificScope;
+            if (key.equals(AbstractService.EXO_IS_ENABLED)) {
+              settingScope = Scope.GLOBAL.id(null);
+            }
+            jpaSettingService.set(Context.USER.id(user), settingScope, key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
           } catch (Exception e) {
             errorUserSettings.add(user);
             LOG.error("Cannot migrate User Settings data of user: " + user + " and scope: " + scope + " - cause: " + e.getMessage(), e);
@@ -439,10 +452,17 @@ public class SettingsMigration implements StartableClusterAware {
     if (scopeEntity != null) {
       for (String key : scopeEntity.getProperties().keySet()) {
         try {
-          jpaSettingService.set(Context.USER.id(user), globalScope, key, new SettingValue<>(scopeEntity.getValue(key)));
+          Scope settingScope = globalScope;
+          if (key.equals(AbstractService.EXO_LAST_READ_DATE) || key.equals(AbstractService.EXO_DAILY)
+              || key.equals(AbstractService.EXO_WEEKLY) || key.equals(AbstractService.EXO_IS_ACTIVE)
+              || (key.startsWith("exo:") && key.endsWith("Channel"))) {
+            settingScope = JPAUserSettingServiceImpl.NOTIFICATION_SCOPE;
+          }
+          jpaSettingService.set(Context.USER.id(user), settingScope, key, new SettingValue<>(scopeEntity.getValue(key)));
         } catch (Exception e) {
           errorUserSettings.add(user);
-          LOG.error("Cannot migrate User Settings data of user: " + user + " and scope: " + scope + " - cause: " + e.getMessage(), e);
+          LOG.error("Cannot migrate User Settings data of user: " + user + " and scope: " + scope + " - cause: " + e.getMessage(),
+                    e);
           continue;
         }
       }

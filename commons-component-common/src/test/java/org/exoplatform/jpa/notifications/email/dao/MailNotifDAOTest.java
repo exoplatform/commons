@@ -1,8 +1,12 @@
 package org.exoplatform.jpa.notifications.email.dao;
 
 
+import org.exoplatform.commons.notification.impl.jpa.email.JPAMailNotificationStorage;
+import org.exoplatform.commons.notification.impl.jpa.email.entity.MailDigestEntity;
 import org.exoplatform.commons.notification.impl.jpa.email.entity.MailNotifEntity;
 import org.exoplatform.jpa.CommonsDAOJPAImplTest;
+
+import org.apache.commons.lang.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,18 +18,19 @@ import java.util.List;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-/**
- * Created by exo on 3/8/17.
- */
 public class MailNotifDAOTest extends CommonsDAOJPAImplTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
+    mailParamsDAO.deleteAll();
+    mailDigestDAO.deleteAll();
     mailNotifDAO.deleteAll();
   }
 
   @After
   public void tearDown()  {
+    mailParamsDAO.deleteAll();
+    mailDigestDAO.deleteAll();
     mailNotifDAO.deleteAll();
   }
 
@@ -41,10 +46,10 @@ public class MailNotifDAOTest extends CommonsDAOJPAImplTest {
     calendar3.set(Calendar.DAY_OF_MONTH, calendar3.get(Calendar.DAY_OF_MONTH)+1);
 
     //Given
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(calendar).setType("plugin1"));
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(calendar2).setType("plugin1"));
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(calendar2).setType("plugin2"));
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(calendar3).setType("plugin1"));
+    createNotification(calendar, "plugin1", JPAMailNotificationStorage.DIGEST_DAILY);
+    createNotification(calendar2, "plugin1", JPAMailNotificationStorage.DIGEST_DAILY);
+    createNotification(calendar2, "plugin2", JPAMailNotificationStorage.DIGEST_DAILY);
+    createNotification(calendar3, "plugin1", JPAMailNotificationStorage.DIGEST_DAILY);
 
     //When
     List<MailNotifEntity> mailNotifEntities1 = mailNotifDAO.getNotifsByPluginAndDay("plugin1", String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
@@ -70,20 +75,29 @@ public class MailNotifDAOTest extends CommonsDAOJPAImplTest {
     eightDaysAgo.set(Calendar.DAY_OF_MONTH, eightDaysAgo.get(Calendar.DAY_OF_MONTH)-8);
 
     //Given
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(today).setType("plugin1"));
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(yesterday).setType("plugin1"));
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(fourDaysAgo).setType("plugin1"));
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(fourDaysAgo).setType("plugin2"));
-    mailNotifDAO.create(new MailNotifEntity().setCreationDate(eightDaysAgo).setType("plugin1"));
+
+    createNotification(today, "plugin1", JPAMailNotificationStorage.DIGEST_WEEKLY);
+    createNotification(yesterday, "plugin1", JPAMailNotificationStorage.DIGEST_WEEKLY);
+    createNotification(fourDaysAgo, "plugin1", JPAMailNotificationStorage.DIGEST_WEEKLY);
+    createNotification(eightDaysAgo, "plugin1", JPAMailNotificationStorage.DIGEST_WEEKLY);
+
+    createNotification(fourDaysAgo, "plugin2", JPAMailNotificationStorage.DIGEST_WEEKLY);
 
     //When
     Calendar calendar = Calendar.getInstance();
-    calendar.set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR) - 1);
+    calendar.add(Calendar.DATE, -7);
     List<MailNotifEntity> mailNotifEntities1 = mailNotifDAO.getNotifsByPluginAndWeek("plugin1", calendar);
     List<MailNotifEntity> mailNotifEntities2 = mailNotifDAO.getNotifsByPluginAndWeek("plugin2", calendar);
 
     //Then
     assertThat(mailNotifEntities1.size(), is(3));
     assertThat(mailNotifEntities2.size(), is(1));
+  }
+
+  private void createNotification(Calendar today, String pluginName1, String digestType) {
+    MailNotifEntity notif = new MailNotifEntity().setCreationDate(today).setType(pluginName1);
+    mailNotifDAO.create(notif);
+    MailDigestEntity digest = new MailDigestEntity().setType(digestType).setNotification(notif);
+    mailDigestDAO.create(digest);
   }
 }

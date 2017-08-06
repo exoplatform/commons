@@ -1,9 +1,19 @@
 package org.exoplatform.settings.impl;
 
+import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import javax.jcr.Node;
+
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
-import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
@@ -14,16 +24,6 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.idm.UserImpl;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
-
-import javax.jcr.Node;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserSettingServiceTest extends BaseNotificationTestCase {
@@ -106,29 +106,6 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
 
   }
 
-  public void test_2_GetUsersSetting() throws Exception {
-    runUpgrade();
-    //
-    userSettingService.save(createUserSetting("root", Arrays.asList("1","2"), Arrays.asList("3","4"), Arrays.asList("5","6")));
-    userSettingService.save(createUserSetting("john", Arrays.asList("4","5"), Arrays.asList("2","8"), Arrays.asList("6","7")));
-    userSettingService.save(createUserSetting("mary", Arrays.asList("32","5"), Arrays.asList("4","6"), Arrays.asList("1","9")));
-    userSettingService.save(createUserSetting("demo", Arrays.asList("2"), Arrays.asList("3","9"), Arrays.asList("2","7")));
-    getService(ChromatticManager.class).endRequest(true);
-
-    //
-    getService(ChromatticManager.class).beginRequest();
-    List<String> list = userSettingService.getUserSettingByPlugin("2");
-    assertEquals(3, list.size());// root, john, demo
-
-    //disable user "root"
-    CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("root", false, true);
-    getService(ChromatticManager.class).endRequest(true);
-
-    getService(ChromatticManager.class).beginRequest();
-    list = userSettingService.getUserSettingByPlugin("2");
-    assertEquals(2, list.size());//john, demo
-  }
-
   private void runUpgrade() throws Exception {
     // run upgrade by run daily
     NotificationContext context = NotificationContextImpl.cloneInstance();
@@ -205,7 +182,7 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     }
   }
 
-  public void test_3_AddMixingMultiThreads() throws Exception {
+  public void test_3_initDefaultSettingsMultiThreads() throws Exception {
     for (int i = 0; i < 10; i++) {
       User user = new UserImpl("user_" + i);
       organizationService.getUserHandler().createUser(user, false);

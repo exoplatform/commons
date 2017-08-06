@@ -30,33 +30,41 @@ import javax.persistence.*;
 @ExoEntity
 @Table(name = "STG_SETTINGS")
 @NamedQueries({
-    @NamedQuery(name = "commons.getSettingsByUser", query = "SELECT s FROM SettingsEntity s " +
-        "WHERE s.context.name= :user "),
-    @NamedQuery(name = "commons.getSettingsByScope", query = "SELECT s FROM SettingsEntity s " +
-        "WHERE s.scope.name= :scopeName " +
-        "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "commons.getSettingsByContextAndScope", query = "SELECT s FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.getSettingsByContextAndScope", query = "SELECT distinct(s) FROM SettingsEntity s " +
         "WHERE s.context.type= :contextType " +
         "AND s.context.name= :contextName " +
         "AND s.scope.name= :scopeName " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "commons.getSetting", query = "SELECT s FROM SettingsEntity s " +
-        "WHERE s.name = :name " +
+    @NamedQuery(name = "SettingsEntity.getSettingsByContextAndScopeWithNullName", query = "SELECT distinct(s) FROM SettingsEntity s " +
+        "WHERE s.context.type= :contextType " +
+        "AND s.context.name= :contextName " +
+        "AND s.scope.name IS NULL " +
+        "AND s.scope.type= :scopeType "),
+    @NamedQuery(name = "SettingsEntity.getSettingByContextAndScopeAndKey", query = "SELECT distinct(s) FROM SettingsEntity s " +
+        "WHERE s.name = :settingName " +
         "AND s.context.type= :contextType " +
         "AND s.context.name= :contextName " +
         "AND s.scope.name= :scopeName " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "commons.getSettingsNumber", query = "SELECT count(s) FROM SettingsEntity s " +
-        "WHERE s.name = :name " +
-        "AND s.value LIKE :valueParam " +
+    @NamedQuery(name = "SettingsEntity.getSettingByContextAndScopeWithNullNameAndKey", query = "SELECT distinct(s) FROM SettingsEntity s " +
+        "WHERE s.name = :settingName " +
+        "AND s.context.type= :contextType " +
+        "AND s.context.name= :contextName " +
+        "AND s.scope.name IS NULL " +
+        "AND s.scope.type= :scopeType "),
+    @NamedQuery(name = "SettingsEntity.countSettingsByNameAndValueAndScope", query = "SELECT count(s) FROM SettingsEntity s " +
+        "WHERE s.name = :settingName " +
+        "AND s.value = :settingValue " +
         "AND s.scope.name= :scopeName " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "commons.getSettingsByContext", query = "SELECT s FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.countSettingsByNameAndValueAndScopeWithNullName", query = "SELECT count(s) FROM SettingsEntity s " +
+        "WHERE s.name = :settingName " +
+        "AND s.value = :settingValue " +
+        "AND s.scope.name IS NULL " +
+        "AND s.scope.type= :scopeType "),
+    @NamedQuery(name = "SettingsEntity.getSettingsByContextByTypeAndName", query = "SELECT distinct(s) FROM SettingsEntity s " +
         "WHERE s.context.type= :contextType " +
-        "AND s.context.name= :contextName "),
-    @NamedQuery(name = "commons.getUserSettingsWithDeactivate", query = "SELECT s FROM SettingsEntity s " +
-        "WHERE (s.context.name= :user) " +
-        "AND ((s.name= :isActive AND s.value='') OR (s.name= :isEnabled AND s.value='false')) ")
+        "AND s.context.name= :contextName ")
 })
 public class SettingsEntity {
   @Id
@@ -71,11 +79,11 @@ public class SettingsEntity {
   @Column(name = "VALUE")
   private String value;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "CONTEXT_ID")
   private ContextEntity context;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "SCOPE_ID")
   private ScopeEntity scope;
 

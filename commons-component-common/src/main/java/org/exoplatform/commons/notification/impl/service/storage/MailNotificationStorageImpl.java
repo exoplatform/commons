@@ -20,7 +20,7 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
-import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
+import org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
@@ -41,8 +41,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class NotificationDataStorageImpl extends AbstractService implements NotificationDataStorage {
-  private static final Log         LOG              = ExoLogger.getLogger(NotificationDataStorageImpl.class);
+public class MailNotificationStorageImpl extends AbstractService implements MailNotificationStorage {
+  private static final Log         LOG              = ExoLogger.getLogger(MailNotificationStorageImpl.class);
 
   private static final String       REMOVE_ALL       = "removeAll";
   
@@ -54,7 +54,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   private Map<String, Set<String>>  removeByCallBack = new ConcurrentHashMap<String, Set<String>>();
 
-  public NotificationDataStorageImpl(NotificationConfiguration configuration) {
+  public MailNotificationStorageImpl(NotificationConfiguration configuration) {
     this.workspace = configuration.getWorkspace();
   }
 

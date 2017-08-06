@@ -41,7 +41,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="NAME" type="NVARCHAR(200)">
-        <constraints nullable="false"/>
+        <constraints />
       </column>
     </createTable>
     <modifySql dbms="mysql">
@@ -85,13 +85,13 @@
   <changeSet author="settings" id="1.0.0-7">
     <addForeignKeyConstraint baseColumnNames="CONTEXT_ID" baseTableName="STG_SETTINGS"
                              constraintName="FK_STG_SETTINGS_CONTEXT_01" deferrable="false" initiallyDeferred="false"
-                             onDelete="CASCADE" onUpdate="NO ACTION"
+                             onDelete="NO ACTION" onUpdate="NO ACTION"
                              referencedColumnNames="CONTEXT_ID" referencedTableName="STG_CONTEXTS"/>
   </changeSet>
   <changeSet author="settings" id="1.0.0-8">
     <addForeignKeyConstraint baseColumnNames="SCOPE_ID" baseTableName="STG_SETTINGS"
                              constraintName="FK_STG_SETTINGS_SCOPE_01" deferrable="false" initiallyDeferred="false"
-                             onDelete="CASCADE" onUpdate="NO ACTION"
+                             onDelete="NO ACTION" onUpdate="NO ACTION"
                              referencedColumnNames="SCOPE_ID" referencedTableName="STG_SCOPES"/>
   </changeSet>
   <changeSet author="settings" id="1.0.0-9">

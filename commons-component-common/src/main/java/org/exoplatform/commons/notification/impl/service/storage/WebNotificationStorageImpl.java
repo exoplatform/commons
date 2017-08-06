@@ -327,6 +327,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       .key(node.getProperty(NTF_PLUGIN_ID).getString())//pluginId
       .setTitle(node.getProperty(NTF_TEXT).getString())
       .setOnPopOver(node.getProperty(NTF_SHOW_POPOVER).getBoolean())
+      .setResetOnBadge(!node.isNodeType(MIX_NEW_NODE))
       //
       .setLastModifiedDate(node.getProperty(NTF_LAST_MODIFIED_DATE).getLong())
       .setId(node.getName())
