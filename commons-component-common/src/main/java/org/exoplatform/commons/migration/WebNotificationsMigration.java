@@ -202,7 +202,10 @@ public class WebNotificationsMigration {
   private void deleteJcrWebNotifications() {
     LOG.info("=== Start Cleaning Web Notifications data from JCR");
     long startTime = System.currentTimeMillis();
+    int i = 0;
+    int totalSize = allUsers.size();
     for (String userId : allUsers) {
+      i++;
       if (isWebNotifMigrated(userId)) {
         try {
           Node node = nodeHierarchyCreator.getUserApplicationNode(sProvider, userId).getNode("notifications").getNode("web");
@@ -215,6 +218,9 @@ public class WebNotificationsMigration {
         }
       } else {
         nonMigratedWebNotifs.add(userId);
+      }
+      if (i % 100 == 0) {
+        LOG.info("Web Notifications JCR cleanup - progression = {}/{}", i, totalSize);
       }
     }
     LOG.info(" === Web Notifications Migration from JCR to RDBBMS report:");

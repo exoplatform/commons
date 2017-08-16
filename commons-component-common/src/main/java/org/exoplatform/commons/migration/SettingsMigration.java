@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javax.servlet.ServletContext;
+
 import org.exoplatform.commons.api.persistence.ExoTransactional;
-import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
@@ -24,6 +25,7 @@ import org.exoplatform.commons.utils.RDBMSMigrationUtils;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -85,35 +87,40 @@ public class SettingsMigration implements StartableClusterAware {
   }
 
   public void cleanup() {
-    if (!hasGlobalSettingsToMigrate() && getJCRUserSettingsToRemove() != null) {
-      //Deletion of settings data in JCR is done as a background task
-      RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+    if (hasGlobalSettingsToMigrate() || getJCRUserSettingsToRemove() != null) {
+      PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
         @Override
-        public Void call() throws Exception {
-          PortalContainer currentContainer = PortalContainer.getInstance();
-          ExoContainerContext.setCurrentContainer(currentContainer);
-          RequestLifeCycle.begin(currentContainer);
-          try {
-            LOG.info("=== Start cleaning Global Settings data from JCR");
-            long startTime = System.currentTimeMillis();
-            deleteJcrGlobalSettings();
-            long endTime = System.currentTimeMillis();
-            LOG.info("=== Global Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-            LOG.info("=== Start cleaning User Settings data from JCR");
-            startTime = System.currentTimeMillis();
-            deleteJcrUserSettings();
-            endTime = System.currentTimeMillis();
-            LOG.info("=== User Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-            if (chromatticLifeCycle.getManager().getSynchronization() != null) {
-              chromatticLifeCycle.getManager().endRequest(true);
+        public void execute(ServletContext context, PortalContainer portalContainer) {
+          //Deletion of settings data in JCR is done as a background task
+          RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+              PortalContainer currentContainer = PortalContainer.getInstance();
+              ExoContainerContext.setCurrentContainer(currentContainer);
+              RequestLifeCycle.begin(currentContainer);
+              try {
+                LOG.info("=== Start cleaning Global Settings data from JCR");
+                long startTime = System.currentTimeMillis();
+                deleteJcrGlobalSettings();
+                long endTime = System.currentTimeMillis();
+                LOG.info("=== Global Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+                LOG.info("=== Start cleaning User Settings data from JCR");
+                startTime = System.currentTimeMillis();
+                deleteJcrUserSettings();
+                endTime = System.currentTimeMillis();
+                LOG.info("=== User Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+                if (chromatticLifeCycle.getManager().getSynchronization() != null) {
+                  chromatticLifeCycle.getManager().endRequest(true);
+                }
+                reportSettingsMigration();
+              } catch (Exception e) {
+                LOG.error("Error while cleaning Settings data from JCR", e);
+              } finally {
+                RequestLifeCycle.end();
+              }
+              return null;
             }
-            reportSettingsMigration();
-          } catch (Exception e) {
-            LOG.error("Error while cleaning Settings data from JCR", e);
-          } finally {
-            RequestLifeCycle.end();
-          }
-          return null;
+          });
         }
       });
     }
@@ -153,15 +160,22 @@ public class SettingsMigration implements StartableClusterAware {
       @Override
       protected Boolean execute(SessionContext ctx) {
         try {
-          for (String user : getJCRUserSettingsToRemove()) {
+          Set<String> jcrSettingsToRemove = getJCRUserSettingsToRemove();
+          int i = 0, totalSize = jcrSettingsToRemove.size();
+          for (String user : jcrSettingsToRemove) {
+            i++;
             if (!errorUserSettings.contains(user) && isSettingsMigrated(user)) {
-              LOG.info(" removing JCR settings of user: " + user);
               if (deleteUserSettings(user)) {
                 jpaSettingService.remove(Context.USER.id(user), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
-                LOG.info(" done removing JCR settings of user: " + user);
               }
             }
+            if (i % 100 == 0) {
+              LOG.info("User settings JCR cleanup - progression = {}/{}", i, totalSize);
+            }
           }
+          LOG.info(" === User settings Migration from JCR to RDBBMS report: \n"
+              + "           - " + errorUserSettings.size() + " User settings nodes are not migrated to RDBMS \n"
+              + "           - " + nonRemovedUserSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
           return true;
         } catch (Exception e) {
           return false;
