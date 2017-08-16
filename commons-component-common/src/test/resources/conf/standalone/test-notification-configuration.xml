@@ -53,7 +53,7 @@
 
   <component>
     <key>org.exoplatform.services.scheduler.JobSchedulerService</key>
-    <type>org.exoplatform.commons.notification.mock.MockJobSchedulerService</type>
+    <type>org.exoplatform.commons.testing.mock.MockJobSchedulerService</type>
   </component>
 
   <component>

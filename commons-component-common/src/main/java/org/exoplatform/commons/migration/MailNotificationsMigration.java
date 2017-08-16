@@ -9,6 +9,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
@@ -267,11 +268,17 @@ public class MailNotificationsMigration {
 
   private NodeIterator getMailNotificationNodes() {
     try {
-      return ((Node)session.getItem(nodeHierarchyCreator.getJcrPath("eXoNotification"))).getNode("messageHome").getNodes();
+      String jcrPath = nodeHierarchyCreator.getJcrPath("eXoNotification");
+      if(StringUtils.isNotBlank(jcrPath) && session.itemExists(jcrPath)) {
+        Node notificationsParentNode = (Node)session.getItem(jcrPath);
+        if(notificationsParentNode.hasNode("messageHome")) {
+          return notificationsParentNode.getNode("messageHome").getNodes();
+        }
+      }
     } catch (Exception e) {
       LOG.error("Error while getting Mail notification nodes - Cause : " + e.getMessage(), e);
-      return null;
     }
+    return null;
   }
 
   private void migrateMailNotifData() throws RepositoryException, RepositoryConfigurationException {

@@ -2,6 +2,9 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+  <component>
+      <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+  </component>
 
   <component>
     <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
@@ -46,22 +49,6 @@
   </component>
 
   <component>
-    <type>org.exoplatform.commons.migration.SettingsMigration</type>
-  </component>
-
-  <component>
-    <type>org.exoplatform.commons.migration.JPAAsynMigrationService</type>
-  </component>
-
-  <component>
-    <type>org.exoplatform.commons.migration.MailNotificationsMigration</type>
-  </component>
-
-  <component>
-    <type>org.exoplatform.commons.migration.WebNotificationsMigration</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.commons.notification.impl.service.storage.MailNotificationStorageImpl</type>
   </component>
 
@@ -75,17 +62,6 @@
       <value-param>
         <name>workspace</name>
         <value>portal-system</value>
-      </value-param>
-    </init-params>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.notification.service.QueueMessage</key>
-    <type>org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl</type>
-    <init-params>
-      <value-param>
-        <name>numberOfMailPerBatch</name> <!-- Max number of mails to send in the configured period of time -->
-        <value>${exo.notification.service.QueueMessage.numberOfMailPerBatch:30}</value>
       </value-param>
     </init-params>
   </component>
