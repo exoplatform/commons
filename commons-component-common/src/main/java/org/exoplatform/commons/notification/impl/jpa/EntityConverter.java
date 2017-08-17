@@ -10,7 +10,6 @@ import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.commons.notification.impl.jpa.email.entity.MailParamEntity;
 import org.exoplatform.commons.notification.impl.jpa.email.entity.MailQueueEntity;
 import org.exoplatform.commons.notification.impl.jpa.web.entity.WebNotifEntity;
@@ -44,8 +43,6 @@ public class EntityConverter {
 
   /**
    * Convert user web notification entity to notification DTO
-   * NOTE: The annotation {@link ExoTransactional} is used to
-   * allow fetching parameters lazily
    * 
    * @param webUsersEntity user web notification
    * @return notification DTO

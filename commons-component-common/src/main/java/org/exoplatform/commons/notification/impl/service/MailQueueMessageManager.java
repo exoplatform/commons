@@ -47,16 +47,16 @@ import org.exoplatform.services.scheduler.JobSchedulerService;
 import org.exoplatform.services.scheduler.PeriodInfo;
 
 @Managed
-@ManagedDescription("Mock mail service")
-@NameTemplate({ @Property(key = "service", value = "notification"), @Property(key = "view", value = "mockmail") })
-public class SendEmailService implements ManagementAware, Startable {
+@ManagedDescription("Mail Queue Massage service manager")
+@NameTemplate({ @Property(key = "service", value = "notification"), @Property(key = "view", value = "mailqueue") })
+public class MailQueueMessageManager implements ManagementAware, Startable {
   private static final String SEND_EMAIL_NOTIFICATION_JOB_GROUP = "Notification";
 
   private static final String SEND_EMAIL_NOTIFICATION_JOB       = "SendEmailNotificationJob";
 
   private static final String CACHE_REPO_NAME                   = "repositoryName";
 
-  private static final Log    LOG                               = ExoLogger.getExoLogger(SendEmailService.class);
+  private static final Log    LOG                               = ExoLogger.getExoLogger(MailQueueMessageManager.class);
 
   private boolean             isOn                              = false;
 
@@ -78,11 +78,7 @@ public class SendEmailService implements ManagementAware, Startable {
 
   private JobSchedulerService schedulerService;
 
-  public SendEmailService(QueueMessageImpl queueMessage) {
-    this.queueMessage = queueMessage;
-  }
-
-  public SendEmailService(JPAQueueMessageImpl queueMessage) {
+  public MailQueueMessageManager(JPAQueueMessageImpl queueMessage) {
     this.queueMessage = queueMessage;
   }
 
@@ -115,6 +111,7 @@ public class SendEmailService implements ManagementAware, Startable {
   @ManagedDescription("Turn on the mail service.")
   @Impact(ImpactType.READ)
   public void on() {
+    queueMessage.enable(true);
     resetCounter();
     isOn = true;
     makeJob(interval);
@@ -131,6 +128,7 @@ public class SendEmailService implements ManagementAware, Startable {
   @ManagedDescription("Turn off the mail service.")
   @Impact(ImpactType.READ)
   public String off() {
+    queueMessage.enable(false);
     resetCounter();
     isOn = false;
     return resetDefaultConfigJob();
@@ -205,7 +203,8 @@ public class SendEmailService implements ManagementAware, Startable {
 
   @Override
   public void start() {
-    // Get services that couldn't be loaded from constructor (No dependency injection)
+    // Get services that couldn't be loaded from constructor (No dependency
+    // injection)
     settingService = CommonsUtils.getService(SettingService.class);
     schedulerService = CommonsUtils.getService(JobSchedulerService.class);
     listenerService = CommonsUtils.getService(ListenerService.class);
@@ -238,11 +237,12 @@ public class SendEmailService implements ManagementAware, Startable {
           //
           schedulerService.addPeriodJob(info, periodInfo, jdatamap);
           LOG.debug("Job executes interval: " + interval);
+          return "done";
         } catch (Exception e) {
-          LOG.warn("Failed at makeJob().");
-          LOG.debug(e.getMessage(), e);
+          LOG.error("Error while building new Email Queue processing Job information", e);
+          resetDefaultConfigJob();
+          return "An error occurred while building new Email Queue processing Job information";
         }
-        return "done";
       } else {
         return "";
       }

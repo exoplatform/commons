@@ -67,36 +67,32 @@ public class JPAMailNotificationStorage implements MailNotificationStorage {
   @Override
   @ExoTransactional
   public void save(NotificationInfo message) throws Exception {
-    try {
-      MailNotifEntity notifEntity = new MailNotifEntity();
+    MailNotifEntity notifEntity = new MailNotifEntity();
 
-      notifEntity.setSender(message.getFrom());
-      notifEntity.setOrder(message.getOrder());
-      notifEntity.setType(message.getKey().getId());
-      notifEntity.setCreationDate(message.getDateCreated());
-      notifEntity = mailNotifDAO.create(notifEntity);
-      message.setId(String.valueOf(notifEntity.getId()));
+    notifEntity.setSender(message.getFrom());
+    notifEntity.setOrder(message.getOrder());
+    notifEntity.setType(message.getKey().getId());
+    notifEntity.setCreationDate(message.getDateCreated());
+    notifEntity = mailNotifDAO.create(notifEntity);
+    message.setId(String.valueOf(notifEntity.getId()));
 
-      MailDigestEntity digestEntityDaily = new MailDigestEntity();
-      digestEntityDaily.setNotification(notifEntity).setType(DIGEST_DAILY);
-      mailDigestDAO.create(digestEntityDaily);
+    MailDigestEntity digestEntityDaily = new MailDigestEntity();
+    digestEntityDaily.setNotification(notifEntity).setType(DIGEST_DAILY);
+    mailDigestDAO.create(digestEntityDaily);
 
-      MailDigestEntity digestEntityWeekly = new MailDigestEntity();
-      digestEntityWeekly.setNotification(notifEntity).setType(DIGEST_WEEKLY);
-      mailDigestDAO.create(digestEntityWeekly);
+    MailDigestEntity digestEntityWeekly = new MailDigestEntity();
+    digestEntityWeekly.setNotification(notifEntity).setType(DIGEST_WEEKLY);
+    mailDigestDAO.create(digestEntityWeekly);
 
-      Map<String, String> parameters = message.getOwnerParameter();
-      if (parameters != null && !parameters.isEmpty()) {
-        for (String key : parameters.keySet()) {
-          MailParamEntity paramEntity = new MailParamEntity();
-          paramEntity.setName(key);
-          paramEntity.setValue(parameters.get(key));
-          paramEntity.setNotification(notifEntity);
-          mailParamDAO.create(paramEntity);
-        }
+    Map<String, String> parameters = message.getOwnerParameter();
+    if (parameters != null && !parameters.isEmpty()) {
+      for (String key : parameters.keySet()) {
+        MailParamEntity paramEntity = new MailParamEntity();
+        paramEntity.setName(key);
+        paramEntity.setValue(parameters.get(key));
+        paramEntity.setNotification(notifEntity);
+        mailParamDAO.create(paramEntity);
       }
-    } catch (Exception e) {
-      LOG.error("Failed to save the Mail NotificationMessage", e);
     }
   }
 
@@ -107,22 +103,18 @@ public class JPAMailNotificationStorage implements MailNotificationStorage {
   @ExoTransactional
   public Map<PluginKey, List<NotificationInfo>> getByUser(NotificationContext context, UserSetting setting) {
     Map<PluginKey, List<NotificationInfo>> notificationData = new LinkedHashMap<PluginKey, List<NotificationInfo>>();
-    try {
-      boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
-      if (isWeekly) {
-        for (String pluginId : setting.getWeeklyPlugins()) {
-          putMap(notificationData, PluginKey.key(pluginId), getWeeklyNotifs(context, pluginId, setting.getUserId()));
-        }
+    boolean isWeekly = context.value(NotificationJob.JOB_WEEKLY);
+    if (isWeekly) {
+      for (String pluginId : setting.getWeeklyPlugins()) {
+        putMap(notificationData, PluginKey.key(pluginId), getWeeklyNotifs(context, pluginId, setting.getUserId()));
       }
-      //
-      boolean isDaily = context.value(NotificationJob.JOB_DAILY);
-      if (isDaily) {
-        for (String pluginId : setting.getDailyPlugins()) {
-          putMap(notificationData, PluginKey.key(pluginId), getDailyNotifs(context, pluginId, setting.getUserId()));
-        }
+    }
+    //
+    boolean isDaily = context.value(NotificationJob.JOB_DAILY);
+    if (isDaily) {
+      for (String pluginId : setting.getDailyPlugins()) {
+        putMap(notificationData, PluginKey.key(pluginId), getDailyNotifs(context, pluginId, setting.getUserId()));
       }
-    } catch (Exception e) {
-      LOG.error("Failed to get the NotificationMessage by user: " + setting.getUserId(), e);
     }
     return notificationData;
   }
@@ -174,18 +166,18 @@ public class JPAMailNotificationStorage implements MailNotificationStorage {
     } while (allNotificationsWithoutDigests.size() == QUERY_LIMIT);
   }
 
-  private List<NotificationInfo> getWeeklyNotifs(NotificationContext context, String pluginId, String userId) throws Exception {
+  private List<NotificationInfo> getWeeklyNotifs(NotificationContext context, String pluginId, String userId) {
     return getNotificationsByDigestAndPluginId(context, WEEKLY_NOTIFS, pluginId, userId);
   }
 
-  private List<NotificationInfo> getDailyNotifs(NotificationContext context, String pluginId, String userId) throws Exception {
+  private List<NotificationInfo> getDailyNotifs(NotificationContext context, String pluginId, String userId) {
     return getNotificationsByDigestAndPluginId(context, DAILY_NOTIFS, pluginId, userId);
   }
 
   private List<NotificationInfo> getNotificationsByDigestAndPluginId(NotificationContext context,
                                                                      @SuppressWarnings("rawtypes") ArgumentLiteral<Map> notifsDigestArgument,
                                                                      String pluginId,
-                                                                     String userId) throws Exception {
+                                                                     String userId) {
     // Get notifications by plugin id from context
     @SuppressWarnings("unchecked")
     Map<String, List<NotificationInfo>> notificationsByPluginId = context.value(notifsDigestArgument);
@@ -237,7 +229,7 @@ public class JPAMailNotificationStorage implements MailNotificationStorage {
     }
   }
 
-  private NotificationInfo fillModel(MailNotifEntity notifEntity, String userId) throws Exception {
+  private NotificationInfo fillModel(MailNotifEntity notifEntity, String userId) {
     if (notifEntity == null)
       return null;
     NotificationInfo message = NotificationInfo.instance()

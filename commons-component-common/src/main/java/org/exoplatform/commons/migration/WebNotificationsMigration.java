@@ -7,7 +7,6 @@ import java.util.concurrent.Callable;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
-import javax.servlet.ServletContext;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -17,10 +16,8 @@ import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStora
 import org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.RDBMSMigrationUtils;
-import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
@@ -55,7 +52,6 @@ public class WebNotificationsMigration {
   //status of web notifications cleanup from JCR (true if cleanup is completed successfully)
   public static final String WEB_NOTIFICATION_RDBMS_CLEANUP_DONE = "WEB_NOTIFICATION_RDBMS_CLEANUP_DONE";
 
-
   public WebNotificationsMigration(JPAWebNotificationStorage jpaWebNotificationStorage,
                                    NodeHierarchyCreator nodeHierarchyCreator,
                                    OrganizationService organizationService,
@@ -69,101 +65,90 @@ public class WebNotificationsMigration {
   }
 
   public void migrate() {
-    try {
-      sProvider = SessionProvider.createSystemProvider();
-    } catch (Exception e) {
-      LOG.error("Error while getting Notification nodes for Notifications migration - Cause : " + e.getMessage(), e);
-      return;
-    }
     //migration of web notifications data from JCR to RDBMS is done as a background task
-    PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
+    RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
       @Override
-      public void execute(ServletContext context, PortalContainer portalContainer) {
-        RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
-          @Override
-          public Void call() {
-            if (!isWebNotifMigrationDone()) {
-              int pageSize = 20;
-              int current = 0;
-              try {
-                ListAccess<User> allUsersListAccess = organizationService.getUserHandler().findAllUsers();
-                ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-                int totalUsers = allUsersListAccess.getSize();
-                LOG.info("    Number of users = " + totalUsers);
-                User[] users;
-                LOG.info("=== Start migration of Web Notifications data from JCR");
-                ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
-                RequestLifeCycle.begin(currentContainer);
-                long startTime = System.currentTimeMillis();
-                do {
-                  LOG.info("    Progression of users web notifications migration : " + current + "/" + totalUsers);
-                  if (current + pageSize > totalUsers) {
-                    pageSize = totalUsers - current;
-                  }
-                  users = allUsersListAccess.load(current, pageSize);
-                  int migratedUsersCount = current + 1;
-                  for (User user : users) {
-                    RequestLifeCycle.end();
-                    RequestLifeCycle.begin(currentContainer);
-                    String userName = user.getUserName();
-                    if (!hasWebNotifDataToMigrate(userName) || isWebNotifMigrated(userName)) {
-                      int progression = (int)((migratedUsersCount++ * 100) / totalUsers);
-                      LOG.info("Web notification migration - progression = ({}%), username={}, migrated Web Notifications Count = {}", progression, userName, 0);
-                      continue;
-                    }
-                    try {
-                      long notificationsCount = migrateWebNotifDataOfUser(nodeHierarchyCreator.getUserApplicationNode(sProvider, userName));
-                      int progression = (int)((migratedUsersCount++ * 100) / totalUsers);
-                      LOG.info("Web notification migration - progression = ({}%), username={}, migrated Web Notifications Count = {}", progression, userName, notificationsCount);
-                      allUsers.add(userName);
-                      settingService.set(Context.USER.id(userName), Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_USER_KEY), WEB_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
-                    } catch (Exception e) {
-                      settingService.set(Context.USER.id(userName), Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_USER_KEY), WEB_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("false"));
-                    }
-                  }
-                  current += users.length;
-                } while (users != null && users.length > 0);
-                long endTime = System.currentTimeMillis();
-                LOG.info("=== Migration of Web Notification data done in " + (endTime - startTime) + " ms");
-              } catch (Exception e) {
-                LOG.error("Error while migrating Web Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
-              } finally {
-                RequestLifeCycle.end();
-              }
-              settingService.set(Context.GLOBAL, Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_DONE_KEY), WEB_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
-            } else {
-              LOG.info("No web notifications data to migrate from JCR to RDBMS");
+      public Void call() {
+        ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+        if (!isWebNotifMigrationDone()) {
+          int pageSize = 20;
+          int current = 0;
+          RequestLifeCycle.begin(PortalContainer.getInstance());
+          try {
+            ListAccess<User> allUsersListAccess = organizationService.getUserHandler().findAllUsers();
+            int totalUsers = allUsersListAccess.getSize();
+            LOG.info("    Number of users = " + totalUsers);
+            User[] users;
+            LOG.info("=== Start migration of Web Notifications data from JCR");
+            try {
+              sProvider = SessionProvider.createSystemProvider();
+            } catch (Exception e) {
+              LOG.error("Error while getting Notification nodes for Notifications migration - Cause : " + e.getMessage(), e);
             }
-            return null;
+
+            long startTime = System.currentTimeMillis();
+            do {
+              LOG.info("    Progression of users web notifications migration : " + current + "/" + totalUsers);
+              if (current + pageSize > totalUsers) {
+                pageSize = totalUsers - current;
+              }
+              users = allUsersListAccess.load(current, pageSize);
+              int migratedUsersCount = current + 1;
+              for (User user : users) {
+                RequestLifeCycle.end();
+                RequestLifeCycle.begin(PortalContainer.getInstance());
+                String userName = user.getUserName();
+                if (!hasWebNotifDataToMigrate(userName) || isWebNotifMigrated(userName)) {
+                  int progression = (int)((migratedUsersCount++ * 100) / totalUsers);
+                  LOG.info("Web notification migration - progression = ({}%), username={}, migrated Web Notifications Count = {}", progression, userName, 0);
+                  continue;
+                }
+                try {
+                  long notificationsCount = migrateWebNotifDataOfUser(nodeHierarchyCreator.getUserApplicationNode(sProvider, userName));
+                  int progression = (int)((migratedUsersCount++ * 100) / totalUsers);
+                  LOG.info("Web notification migration - progression = ({}%), username={}, migrated Web Notifications Count = {}", progression, userName, notificationsCount);
+                  allUsers.add(userName);
+                  settingService.set(Context.USER.id(userName), Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_USER_KEY), WEB_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
+                } catch (Exception e) {
+                  settingService.set(Context.USER.id(userName), Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_USER_KEY), WEB_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("false"));
+                }
+              }
+              current += users.length;
+            } while (users != null && users.length > 0);
+            long endTime = System.currentTimeMillis();
+            LOG.info("=== Migration of Web Notification data done in " + (endTime - startTime) + " ms");
+          } catch (Exception e) {
+            LOG.error("Error while migrating Web Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+          } finally {
+            RequestLifeCycle.end();
           }
-        });
+          settingService.set(Context.GLOBAL, Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_DONE_KEY), WEB_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
+        } else {
+          LOG.info("No web notifications data to migrate from JCR to RDBMS");
+        }
+        cleanup();
+        return null;
       }
     });
   }
 
   public void cleanup() {
-    // Proceed to delete JCR data after migration is finished
-    PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
+    RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
       @Override
-      public void execute(ServletContext context, PortalContainer portalContainer) {
-        RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
-          @Override
-          public Void call() {
-            PortalContainer currentContainer = PortalContainer.getInstance();
-            ExoContainerContext.setCurrentContainer(currentContainer);
-            RequestLifeCycle.begin(currentContainer);
-            try {
-              if (isWebNotifMigrationDone() && !isWebNotifCleanupDone()) {
-                deleteJcrWebNotifications();
-              }
-            } catch (Exception e) {
-              LOG.error("Error while cleaning Web Notifications data from JCR", e);
-            } finally {
-              RequestLifeCycle.end();
-            }
-            return null;
+      public Void call() {
+        PortalContainer currentContainer = PortalContainer.getInstance();
+        ExoContainerContext.setCurrentContainer(currentContainer);
+        RequestLifeCycle.begin(currentContainer);
+        try {
+          if (isWebNotifMigrationDone() && !isWebNotifCleanupDone()) {
+            deleteJcrWebNotifications();
           }
-        });
+        } catch (Exception e) {
+          LOG.error("Error while cleaning Web Notifications data from JCR", e);
+        } finally {
+          RequestLifeCycle.end();
+        }
+        return null;
       }
     });
   }

@@ -16,7 +16,7 @@ import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.jpa.email.dao.MailQueueDAO;
 import org.exoplatform.commons.notification.impl.jpa.email.entity.MailQueueEntity;
-import org.exoplatform.commons.notification.impl.service.SendEmailService;
+import org.exoplatform.commons.notification.impl.service.MailQueueMessageManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.management.annotations.ManagedBy;
 import org.exoplatform.services.listener.Event;
@@ -25,7 +25,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 
-@ManagedBy(SendEmailService.class)
+@ManagedBy(MailQueueMessageManager.class)
 public class JPAQueueMessageImpl implements QueueMessage, Startable {
   private static final Log    LOG                 = ExoLogger.getExoLogger(JPAQueueMessageImpl.class);
 
@@ -151,18 +151,13 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
     if (message == null) {
       throw new IllegalArgumentException("Message is null");
     }
+    if (message.getFrom() == null) {
+      throw new IllegalStateException("Message with id '" + message.getId() + "' has an empty 'from' field");
+    }
     if (this.enabled) {
-      try {
-        // ensure the message is valid
-        if (message.getFrom() == null) {
-          return false;
-        }
-        mailService.sendMessage(message.makeEmailNotification());
-        return true;
-      } catch (Exception e) {
-        LOG.error("Error while sending a message - Cause : " + e.getMessage(), e);
-        return false;
-      }
+      // ensure the message is valid
+      mailService.sendMessage(message.makeEmailNotification());
+      return true;
     }
     //
     listenerService.broadcast(new Event<QueueMessage, String>(MESSAGE_SENT_FROM_QUEUE, this, message.getId()));
@@ -181,21 +176,16 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
   }
 
   private void saveMessageInfo(MessageInfo message) {
-    try {
-      MailQueueEntity mailQueueEntity = new MailQueueEntity();
-      mailQueueEntity.setType(message.getPluginId());
-      mailQueueEntity.setFrom(message.getFrom());
-      mailQueueEntity.setTo(message.getTo());
-      mailQueueEntity.setSubject(message.getSubject());
-      mailQueueEntity.setBody(message.getBody());
-      mailQueueEntity.setFooter(message.getFooter());
-      mailQueueEntity.setCreationDate(Calendar.getInstance());
+    MailQueueEntity mailQueueEntity = new MailQueueEntity();
+    mailQueueEntity.setType(message.getPluginId());
+    mailQueueEntity.setFrom(message.getFrom());
+    mailQueueEntity.setTo(message.getTo());
+    mailQueueEntity.setSubject(message.getSubject());
+    mailQueueEntity.setBody(message.getBody());
+    mailQueueEntity.setFooter(message.getFooter());
+    mailQueueEntity.setCreationDate(Calendar.getInstance());
 
-      mailQueueDAO.create(mailQueueEntity);
-
-    } catch (Exception e) {
-      LOG.error("Failed to save message.", e.getMessage() + message.toJSON(), e);
-    }
+    mailQueueDAO.create(mailQueueEntity);
   }
 
   private Set<MessageInfo> load() {
@@ -210,15 +200,11 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
     return messages;
   }
 
-  private void removeMessageInfo(String id) {
-    try {
-      LOG.debug("Removing messageId: " + id);
-      mailQueueDAO.delete(mailQueueDAO.find(Long.parseLong(id)));
-      //
-      listenerService.broadcast(new Event<QueueMessage, String>(MESSAGE_DELETED_FROM_QUEUE, this, id));
-    } catch (Exception e) {
-      LOG.warn("Failed to remove message: " + e.getMessage(), e);
-    }
+  private void removeMessageInfo(String id) throws Exception {
+    LOG.debug("Removing messageId: " + id);
+    mailQueueDAO.delete(mailQueueDAO.find(Long.parseLong(id)));
+    //
+    listenerService.broadcast(new Event<QueueMessage, String>(MESSAGE_DELETED_FROM_QUEUE, this, id));
   }
 
 }

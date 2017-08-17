@@ -54,10 +54,14 @@ public class SettingsMigration implements StartableClusterAware {
   private static List<String> nonRemovedUserSettings = new LinkedList<String>();
   //scope of user settings migration
   public static final String SETTINGS_MIGRATION_USER_KEY = "SETTINGS_MIGRATION_USER";
+  //scope of global settings migration
+  public static final String SETTINGS_MIGRATION_GLOBAL_KEY = "SETTINGS_MIGRATION_USER";
   //status of jcr user settings data (true if jcr user settings data is migrated)
   public static final String SETTINGS_JCR_DATA_USER_MIGRATED_KEY = "SETTINGS_JCR_DATA_USER_MIGRATED";
   //status of settings migration (true if migration completed successfully)
   public static final String SETTINGS_RDBMS_MIGRATION_DONE = "SETTINGS_RDBMS_MIGRATION_DONE";
+  //status of settings cleanup from JCR (true if cleanup is completed successfully)
+  public static final String SETTINGS_RDBMS_CLEANUP_DONE = "SETTINGS_RDBMS_CLEANUP_DONE";
 
 
   public SettingsMigration(ChromatticManager chromatticManager,
@@ -74,64 +78,72 @@ public class SettingsMigration implements StartableClusterAware {
     }
 
     //First check to see if the JCR still contains settings data. If not, migration is skipped
-    if (!hasGlobalSettingsToMigrate()) {
-      LOG.info("No global settings data to migrate from JCR to RDBMS");
-    } else {
+    if (hasGlobalSettingsToMigrate()) {
       migrateGlobalSettings();
-    }
-    if (!hasUserSettingsToMigrate()) {
-      LOG.info("No user settings data to migrate from JCR to RDBMS");
     } else {
+      LOG.info("No global settings data to migrate from JCR to RDBMS");
+    }
+    if (hasUserSettingsToMigrate()) {
       migrateUserSettings();
+    } else {
+      LOG.info("No user settings data to migrate from JCR to RDBMS");
     }
   }
 
   public void cleanup() {
-    if (hasGlobalSettingsToMigrate() || getJCRUserSettingsToRemove() != null) {
-      PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
-        @Override
-        public void execute(ServletContext context, PortalContainer portalContainer) {
-          //Deletion of settings data in JCR is done as a background task
-          RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-              PortalContainer currentContainer = PortalContainer.getInstance();
-              ExoContainerContext.setCurrentContainer(currentContainer);
-              RequestLifeCycle.begin(currentContainer);
-              try {
+    PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
+      @Override
+      public void execute(ServletContext context, PortalContainer portalContainer) {
+        //Deletion of settings data in JCR is done as a background task
+        RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+          @Override
+          public Void call() throws Exception {
+            PortalContainer currentContainer = PortalContainer.getInstance();
+            ExoContainerContext.setCurrentContainer(currentContainer);
+            RequestLifeCycle.begin(currentContainer);
+            try {
+              boolean globalSettingsCleaned = isGlobalSettingsCleanupDone();
+              if (!globalSettingsCleaned) {
                 LOG.info("=== Start cleaning Global Settings data from JCR");
                 long startTime = System.currentTimeMillis();
                 deleteJcrGlobalSettings();
+                setGlobalSettingsCleanupDone();
                 long endTime = System.currentTimeMillis();
                 LOG.info("=== Global Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+              }
+              boolean userSettingsCleaned = isUserSettingsCleanupDone();
+              if(!userSettingsCleaned) {
                 LOG.info("=== Start cleaning User Settings data from JCR");
-                startTime = System.currentTimeMillis();
+                long startTime = System.currentTimeMillis();
                 deleteJcrUserSettings();
-                endTime = System.currentTimeMillis();
+                setUserSettingsCleanupDone();
+                long endTime = System.currentTimeMillis();
                 LOG.info("=== User Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
                 if (chromatticLifeCycle.getManager().getSynchronization() != null) {
                   chromatticLifeCycle.getManager().endRequest(true);
                 }
-                reportSettingsMigration();
-              } catch (Exception e) {
-                LOG.error("Error while cleaning Settings data from JCR", e);
-              } finally {
-                RequestLifeCycle.end();
               }
-              return null;
+              if (!globalSettingsCleaned || !userSettingsCleaned) {
+                reportSettingsMigration();
+              }
+            } catch (Exception e) {
+              LOG.error("Error while cleaning Settings data from JCR", e);
+            } finally {
+              RequestLifeCycle.end();
             }
-          });
-        }
-      });
-    }
+            return null;
+          }
+        });
+      }
+    });
   }
 
   private void reportSettingsMigration() {
     long notMigrated = jpaSettingService.countSettingsByNameAndValueAndScope(Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, "false");
     int error = errorUserSettings.size();
-    LOG.info(" === User Settings Migration from JCR to RDBBMS report: \n"
-        + "           - " + max(notMigrated, error) + " User Settings nodes are not migrated to RDBMS \n"
-        + "           - " + nonRemovedUserSettings.size() + " User Settings nodes are migrated but not removed from JCR");
+    LOG.info(" === User Settings Migration from JCR to RDBBMS report: ");
+    LOG.info("           - " + max(notMigrated, error) + " User Settings nodes are not migrated to RDBMS ");
+    LOG.info("           - " + nonRemovedUserSettings.size() + " User Settings nodes are migrated but not removed from JCR");
   }
 
   private Boolean deleteJcrGlobalSettings() {
@@ -144,9 +156,9 @@ public class SettingsMigration implements StartableClusterAware {
               deleteGlobalSettings(scope);
             }
           }
-          LOG.info(" === Global Settings Migration from JCR to RDBBMS report: \n"
-                 + "           - " + errorGlobalSettings.size() + " Global Settings nodes are not migrated to RDBMS \n"
-                 + "           - " + nonRemovedGlobalSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
+          LOG.info(" === Global Settings Migration from JCR to RDBBMS report: ");
+          LOG.info("           - " + errorGlobalSettings.size() + " Global Settings nodes are not migrated to RDBMS ");
+          LOG.info("           - " + nonRemovedGlobalSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
           return true;
         } catch (Exception e) {
           return false;
@@ -173,9 +185,9 @@ public class SettingsMigration implements StartableClusterAware {
               LOG.info("User settings JCR cleanup - progression = {}/{}", i, totalSize);
             }
           }
-          LOG.info(" === User settings Migration from JCR to RDBBMS report: \n"
-              + "           - " + errorUserSettings.size() + " User settings nodes are not migrated to RDBMS \n"
-              + "           - " + nonRemovedUserSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
+          LOG.info(" === User settings Migration from JCR to RDBBMS report: ");
+          LOG.info("           - " + errorUserSettings.size() + " User settings nodes are not migrated to RDBMS ");
+          LOG.info("           - " + nonRemovedUserSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
           return true;
         } catch (Exception e) {
           return false;
@@ -401,6 +413,24 @@ public class SettingsMigration implements StartableClusterAware {
         return (settings!=null ? settings.getContexts().keySet() : null);
       }
     }.executeWith(chromatticLifeCycle);
+  }
+
+  private void setUserSettingsCleanupDone() {
+    jpaSettingService.set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_CLEANUP_DONE, SettingValue.create("true"));
+  }
+
+  private void setGlobalSettingsCleanupDone() {
+    jpaSettingService.set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_GLOBAL_KEY), SETTINGS_RDBMS_CLEANUP_DONE, SettingValue.create("true"));
+  }
+
+  private boolean isUserSettingsCleanupDone() {
+    SettingValue<?> setting = jpaSettingService.get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_CLEANUP_DONE);
+    return (setting != null && setting.getValue().equals("true"));
+  }
+
+  private boolean isGlobalSettingsCleanupDone() {
+    SettingValue<?> setting = jpaSettingService.get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_GLOBAL_KEY), SETTINGS_RDBMS_CLEANUP_DONE);
+    return (setting != null && setting.getValue().equals("true"));
   }
 
   @Override

@@ -46,7 +46,6 @@ import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.StringCommonUtils;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.management.annotations.ManagedBy;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.listener.Event;
@@ -55,7 +54,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
 
-@ManagedBy(SendEmailService.class)
 public class QueueMessageImpl extends AbstractService implements QueueMessage, Startable {
   private static final Log          LOG                 = ExoLogger.getExoLogger(QueueMessageImpl.class);
 

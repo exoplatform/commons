@@ -2,7 +2,6 @@ package org.exoplatform.commons.notification.impl.jpa.web;
 
 import static org.exoplatform.commons.notification.impl.jpa.EntityConverter.convertWebNotifEntityToNotificationInfo;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -40,8 +39,6 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
 
   private static final String      NTF_NAME_SPACE        = "ntf:";
 
-  private static final String      DATE_FRIENDLY_PATTERN = "yyyy-MM-dd";
-
   public JPAWebNotificationStorage(WebNotifDAO webNotifDAO,
                                    WebParamsDAO webParamsDAO,
                                    WebUsersDAO webUsersDAO,
@@ -64,22 +61,18 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
     List<NotificationInfo> result = new ArrayList<NotificationInfo>();
     String pluginId = filter.getPluginKey() != null ? filter.getPluginKey().getId() : null;
     String userId = filter.getUserId();
-    try {
-      List<WebUsersEntity> webUsersEntities;
-      if (pluginId != null) {
-        // web notifs entities order by lastUpdated DESC
-        webUsersEntities = webUsersDAO.findWebNotifsByFilter(pluginId, userId, filter.isOnPopover(), offset, limit);
-      } else if (filter.isOnPopover()) {
-        webUsersEntities = webUsersDAO.findWebNotifsByFilter(userId, filter.isOnPopover(), offset, limit);
-      } else {
-        webUsersEntities = webUsersDAO.findWebNotifsByFilter(userId, offset, limit);
-      }
-      //
-      for (WebUsersEntity webUserNotifEntity : webUsersEntities) {
-        result.add(convertWebNotifEntityToNotificationInfo(webUserNotifEntity));
-      }
-    } catch (Exception e) {
-      LOG.error("Notifications not found by filter: " + filter.toString(), e);
+    List<WebUsersEntity> webUsersEntities;
+    if (pluginId != null) {
+      // web notifs entities order by lastUpdated DESC
+      webUsersEntities = webUsersDAO.findWebNotifsByFilter(pluginId, userId, filter.isOnPopover(), offset, limit);
+    } else if (filter.isOnPopover()) {
+      webUsersEntities = webUsersDAO.findWebNotifsByFilter(userId, filter.isOnPopover(), offset, limit);
+    } else {
+      webUsersEntities = webUsersDAO.findWebNotifsByFilter(userId, offset, limit);
+    }
+    //
+    for (WebUsersEntity webUserNotifEntity : webUsersEntities) {
+      result.add(convertWebNotifEntityToNotificationInfo(webUserNotifEntity));
     }
     return result;
   }
@@ -90,13 +83,9 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
     if (StringUtils.isBlank(id) || id.startsWith(NotificationInfo.PREFIX_ID)) {
       return null;
     }
-    try {
-      WebUsersEntity webUsersEntity = getWebNotification(parseNotificationId(id));
-      if (webUsersEntity != null) {
-        return convertWebNotifEntityToNotificationInfo(webUsersEntity);
-      }
-    } catch (Exception e) {
-      LOG.error("Notification not found by id: " + id, e);
+    WebUsersEntity webUsersEntity = getWebNotification(parseNotificationId(id));
+    if (webUsersEntity != null) {
+      return convertWebNotifEntityToNotificationInfo(webUsersEntity);
     }
     return null;
   }
@@ -104,14 +93,10 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @Override
   @ExoTransactional
   public boolean remove(String notificationId) {
-    try {
-      WebUsersEntity webUsersEntity = getWebNotification(parseNotificationId(notificationId));
-      if (webUsersEntity != null) {
-        webUsersDAO.delete(webUsersEntity);
-        return true;
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to remove the notification id: " + notificationId, e);
+    WebUsersEntity webUsersEntity = getWebNotification(parseNotificationId(notificationId));
+    if (webUsersEntity != null) {
+      webUsersDAO.delete(webUsersEntity);
+      return true;
     }
     return false;
   }
@@ -123,24 +108,21 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
     Calendar cal = Calendar.getInstance();
     long delayTime = System.currentTimeMillis() - (seconds * 1000);
     cal.setTimeInMillis(delayTime);
-    try {
-      List<WebNotifEntity> notifEntities = new ArrayList<>();
-      List<WebUsersEntity> webUserNotifs = webUsersDAO.findWebNotifsByLastUpdatedDate(cal);
-      for (WebUsersEntity webUsersEntity : webUserNotifs) {
-        WebNotifEntity notification = webUsersEntity.getNotification();
-        if (!notifEntities.contains(notification)) {
-          notifEntities.add(notification);
-        }
-        webUsersDAO.delete(webUsersEntity);
+    List<WebNotifEntity> notifEntities = new ArrayList<>();
+    List<WebUsersEntity> webUserNotifs = webUsersDAO.findWebNotifsByLastUpdatedDate(cal);
+    for (WebUsersEntity webUsersEntity : webUserNotifs) {
+      WebNotifEntity notification = webUsersEntity.getNotification();
+      if (!notifEntities.contains(notification)) {
+        notifEntities.add(notification);
       }
-      removed = notifEntities.size() > 0;
+      webUsersDAO.delete(webUsersEntity);
+    }
+    removed = notifEntities.size() > 0;
+    if(removed) {
       for (WebNotifEntity webNotifEntity : notifEntities) {
         webParamsDAO.deleteAll(new ArrayList<>(webNotifEntity.getParameters()));
       }
       webNotifDAO.deleteAll(notifEntities);
-    } catch (Exception e) {
-      LOG.error("Failed to remove all notifications and delay date: " + converDateToFriendlyName(cal), e);
-      return false;
     }
     return removed;
   }
@@ -153,14 +135,14 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
     calendar.setTimeInMillis(timeInMilliseconds);
 
     boolean removed = false;
-    try {
-      for (WebUsersEntity webUsersEntity : webUsersDAO.findWebNotifsOfUserByLastUpdatedDate(userId, calendar)) {
+    for (WebUsersEntity webUsersEntity : webUsersDAO.findWebNotifsOfUserByLastUpdatedDate(userId, calendar)) {
+      try {
         webUsersDAO.delete(webUsersEntity);
         removed = true;
+      } catch (Exception e) {
+        LOG.error("Failed to remove notification with id '" + webUsersEntity.getId() + "' for the user id: " + userId, e);
+        return false;
       }
-    } catch (Exception e) {
-      LOG.error("Failed to remove all notifications for the user id: " + userId, e);
-      return false;
     }
     return removed;
   }
@@ -179,41 +161,29 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @Override
   @ExoTransactional
   public void hidePopover(String notificationId) {
-    try {
-      WebUsersEntity webUsersEntity = webUsersDAO.find(parseNotificationId(notificationId));
-      if (webUsersEntity != null) {
-        webUsersEntity.setShowPopover(false);
-        webUsersDAO.update(webUsersEntity);
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to update the read notification Id: " + notificationId, e);
+    WebUsersEntity webUsersEntity = webUsersDAO.find(parseNotificationId(notificationId));
+    if (webUsersEntity != null) {
+      webUsersEntity.setShowPopover(false);
+      webUsersDAO.update(webUsersEntity);
     }
   }
 
   @Override
   @ExoTransactional
   public void markAllRead(String userId) {
-    try {
-      //
-      webUsersDAO.markAllRead(userId);
-      userSettingService.saveLastReadDate(userId, System.currentTimeMillis());
-    } catch (Exception e) {
-      LOG.error("Failed to update the all read for userId:" + userId, e);
-    }
+    //
+    webUsersDAO.markAllRead(userId);
+    userSettingService.saveLastReadDate(userId, System.currentTimeMillis());
   }
 
   @Override
   @ExoTransactional
   public NotificationInfo getUnreadNotification(String pluginId, String activityId, String userId) {
-    try {
-      List<WebUsersEntity> list = webUsersDAO.findUnreadNotification(pluginId, userId, "activityId", activityId);
+    List<WebUsersEntity> list = webUsersDAO.findUnreadNotification(pluginId, userId, "activityId", activityId);
 
-      if (list.size() > 0) {
-        WebUsersEntity webUsersNotification = list.get(0);
-        return EntityConverter.convertWebNotifEntityToNotificationInfo(webUsersNotification);
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to getUnreadNotification ", e);
+    if (list.size() > 0) {
+      WebUsersEntity webUsersNotification = list.get(0);
+      return EntityConverter.convertWebNotifEntityToNotificationInfo(webUsersNotification);
     }
     return null;
   }
@@ -229,28 +199,18 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @Override
   @ExoTransactional
   public int getNumberOnBadge(String userId) {
-    try {
-      int number = webUsersDAO.getNumberOnBadge(userId);
-      return number;
-    } catch (Exception e) {
-      LOG.error("Failed to getNumberOnBadge() ", e);
-    }
-    return 0;
+    return webUsersDAO.getNumberOnBadge(userId);
   }
 
   @Override
   @ExoTransactional
   public void resetNumberOnBadge(String userId) {
-    try {
-      List<WebUsersEntity> notifsWithBadge = webUsersDAO.findNotifsWithBadge(userId);
-      if (notifsWithBadge != null && notifsWithBadge.size() > 0) {
-        for (WebUsersEntity webUsersEntity : notifsWithBadge) {
-          webUsersEntity.setResetNumberOnBadge(true);
-        }
-        webUsersDAO.updateAll(notifsWithBadge);
+    List<WebUsersEntity> notifsWithBadge = webUsersDAO.findNotifsWithBadge(userId);
+    if (notifsWithBadge != null && notifsWithBadge.size() > 0) {
+      for (WebUsersEntity webUsersEntity : notifsWithBadge) {
+        webUsersEntity.setResetNumberOnBadge(true);
       }
-    } catch (Exception e) {
-      LOG.error("Failed to resetNumberOnBadge() ", e);
+      webUsersDAO.updateAll(notifsWithBadge);
     }
   }
 
@@ -261,119 +221,97 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
    * @param moveTop The status to update count on Popover or not
    */
   private void save(NotificationInfo notification, boolean moveTop) {
-    try {
-      WebUsersEntity webUsersEntity = null;
-      if (notification.getId() != null && !notification.getId().startsWith(NotificationInfo.PREFIX_ID)) {
-        try {
-          webUsersEntity = webUsersDAO.find(Long.parseLong(notification.getId()));
-        } catch (Exception e) {
-          LOG.warn("Error getting notification with id = " + notification.getId(), e);
-        }
-      }
-      boolean isNew = webUsersEntity == null;
-      WebNotifEntity webNotifEntity = null;
-      if (isNew) {
-        webNotifEntity = new WebNotifEntity();
-        webUsersEntity = new WebUsersEntity();
-      } else {
-        webNotifEntity = webUsersEntity.getNotification();
-      }
-      // fill WebNotifEntity with data from notification
-      webNotifEntity.setType(notification.getKey().getId());
-      webNotifEntity.setText(notification.getTitle());
-      webNotifEntity.setSender(notification.getFrom());
-      if (notification.getDateCreated() == null) {
-        webNotifEntity.setCreationDate(Calendar.getInstance());
-      } else {
-        webNotifEntity.setCreationDate(notification.getDateCreated());
-      }
-      if (isNew) {
-        webNotifEntity = webNotifDAO.create(webNotifEntity);
-      } else {
-        webNotifEntity = webNotifDAO.update(webNotifEntity);
-      }
+    WebUsersEntity webUsersEntity = null;
+    if (notification.getId() != null && !notification.getId().startsWith(NotificationInfo.PREFIX_ID)) {
+      webUsersEntity = webUsersDAO.find(Long.parseLong(notification.getId()));
+    }
+    boolean isNew = webUsersEntity == null;
+    WebNotifEntity webNotifEntity = null;
+    if (isNew) {
+      webNotifEntity = new WebNotifEntity();
+      webUsersEntity = new WebUsersEntity();
+    } else {
+      webNotifEntity = webUsersEntity.getNotification();
+    }
+    // fill WebNotifEntity with data from notification
+    webNotifEntity.setType(notification.getKey().getId());
+    webNotifEntity.setText(notification.getTitle());
+    webNotifEntity.setSender(notification.getFrom());
+    if (notification.getDateCreated() == null) {
+      webNotifEntity.setCreationDate(Calendar.getInstance());
+    } else {
+      webNotifEntity.setCreationDate(notification.getDateCreated());
+    }
+    if (isNew) {
+      webNotifEntity = webNotifDAO.create(webNotifEntity);
+    } else {
+      webNotifEntity = webNotifDAO.update(webNotifEntity);
+    }
 
-      Map<String, String> ownerParameter = notification.getOwnerParameter();
-      Set<WebParamsEntity> parameters = webNotifEntity.getParameters();
-      if (ownerParameter != null && !ownerParameter.isEmpty()) {
-        for (String key : ownerParameter.keySet()) {
-          String propertyName = key.replace(NTF_NAME_SPACE, "");
-          // fill WebParamsEntity with data from notification
-          WebParamsEntity webParamsEntity = null;
-          boolean isParamNew = true;
-          if (isNew) {
-            webParamsEntity = new WebParamsEntity();
-          } else {
-            for (WebParamsEntity webParamsEntityTmp : parameters) {
-              if (webParamsEntityTmp.getName().equals(propertyName)) {
-                webParamsEntity = webParamsEntityTmp;
-                isParamNew = false;
-                break;
-              }
+    Map<String, String> ownerParameter = notification.getOwnerParameter();
+    Set<WebParamsEntity> parameters = webNotifEntity.getParameters();
+    if (ownerParameter != null && !ownerParameter.isEmpty()) {
+      for (String key : ownerParameter.keySet()) {
+        String propertyName = key.replace(NTF_NAME_SPACE, "");
+        // fill WebParamsEntity with data from notification
+        WebParamsEntity webParamsEntity = null;
+        boolean isParamNew = true;
+        if (isNew) {
+          webParamsEntity = new WebParamsEntity();
+        } else {
+          for (WebParamsEntity webParamsEntityTmp : parameters) {
+            if (webParamsEntityTmp.getName().equals(propertyName)) {
+              webParamsEntity = webParamsEntityTmp;
+              isParamNew = false;
+              break;
             }
           }
-          if (webParamsEntity == null) {
-            webParamsEntity = new WebParamsEntity();
-          }
-          webParamsEntity.setName(propertyName);
-          webParamsEntity.setValue(ownerParameter.get(key));
-          webParamsEntity.setNotification(webNotifEntity);
-          if (isParamNew) {
-            webParamsDAO.create(webParamsEntity);
-          } else {
-            webParamsDAO.update(webParamsEntity);
-          }
+        }
+        if (webParamsEntity == null) {
+          webParamsEntity = new WebParamsEntity();
+        }
+        webParamsEntity.setName(propertyName);
+        webParamsEntity.setValue(ownerParameter.get(key));
+        webParamsEntity.setNotification(webNotifEntity);
+        if (isParamNew) {
+          webParamsDAO.create(webParamsEntity);
+        } else {
+          webParamsDAO.update(webParamsEntity);
         }
       }
+    }
 
-      // fill WebUsersEntity with data from notification
-      webUsersEntity.setReceiver(notification.getTo());
-      Calendar calendar = Calendar.getInstance();
-      if (moveTop) {
-        webUsersEntity.setUpdateDate(calendar);
-      } else if (notification.getLastModifiedDate() > 0) {
-        calendar.setTimeInMillis(notification.getLastModifiedDate());
-        webUsersEntity.setUpdateDate(calendar);
-      } else {
-        webUsersEntity.setUpdateDate(webNotifEntity.getCreationDate());
-      }
-      webUsersEntity.setShowPopover(notification.isOnPopOver());
+    // fill WebUsersEntity with data from notification
+    webUsersEntity.setReceiver(notification.getTo());
+    Calendar calendar = Calendar.getInstance();
+    if (moveTop) {
+      webUsersEntity.setUpdateDate(calendar);
+    } else if (notification.getLastModifiedDate() > 0) {
+      calendar.setTimeInMillis(notification.getLastModifiedDate());
+      webUsersEntity.setUpdateDate(calendar);
+    } else {
+      webUsersEntity.setUpdateDate(webNotifEntity.getCreationDate());
+    }
+    webUsersEntity.setShowPopover(notification.isOnPopOver());
 
-      webUsersEntity.setResetNumberOnBadge(notification.isResetOnBadge());
-      webUsersEntity.setRead(notification.isRead());
+    webUsersEntity.setResetNumberOnBadge(notification.isResetOnBadge());
+    webUsersEntity.setRead(notification.isRead());
 
-      webUsersEntity.setNotification(webNotifEntity);
-      if (isNew) {
-        webUsersEntity = webUsersDAO.create(webUsersEntity);
-        notification.setId(String.valueOf(webUsersEntity.getId()));
-      } else {
-        webUsersDAO.update(webUsersEntity);
-      }
-    } catch (Exception e) {
-      LOG.error("Failed to save the notificaton.", e);
+    webUsersEntity.setNotification(webNotifEntity);
+    if (isNew) {
+      webUsersEntity = webUsersDAO.create(webUsersEntity);
+      notification.setId(String.valueOf(webUsersEntity.getId()));
+    } else {
+      webUsersDAO.update(webUsersEntity);
     }
   }
 
   private long parseNotificationId(String notificationId) {
-    try {
-      return Long.parseLong(notificationId);
-    } catch (NumberFormatException e) {
-      LOG.debug("Can't parse notification id '{}'", notificationId);
-      return 0;
-    }
-  }
-
-  private String converDateToFriendlyName(Calendar cal) {
-    return new SimpleDateFormat(DATE_FRIENDLY_PATTERN).format(cal);
+    return Long.parseLong(notificationId);
   }
 
   @ExoTransactional
   private WebUsersEntity getWebNotification(Long notificationId) {
-    try {
-      return webUsersDAO.find(notificationId);
-    } catch (Exception e) {
-      LOG.error("Failed to get web notification node: " + notificationId, e);
-    }
-    return null;
+    return webUsersDAO.find(notificationId);
   }
 }

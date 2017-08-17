@@ -13,7 +13,10 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 
 import org.exoplatform.commons.api.notification.model.MessageInfo;
-import org.exoplatform.commons.api.notification.service.QueueMessage;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.impl.jpa.email.JPAMailNotificationStorage;
 import org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl;
@@ -33,6 +36,12 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.scheduler.JobSchedulerService;
 
 public class MailNotificationsMigration {
+  //scope of mail notification migration status
+  public static final String MAIL_NOTIFICATION_MIGRATION_DONE_KEY = "MAIL_NOTIFICATION_MIGRATION_DONE";
+  //status of mail notifications migration (true if migration completed successfully)
+  public static final String MAIL_NOTIFICATION_RDBMS_MIGRATION_DONE = "MAIL_NOTIFICATION_RDBMS_MIGRATION_DONE";
+  //status of mail notifications cleanup from JCR (true if cleanup is completed successfully)
+  public static final String MAIL_NOTIFICATION_RDBMS_CLEANUP_DONE = "MAIL_NOTIFICATION_RDBMS_CLEANUP_DONE";
 
   private static final Log LOG = ExoLogger.getLogger(MailNotificationsMigration.class);
 
@@ -49,21 +58,21 @@ public class MailNotificationsMigration {
   private NodeHierarchyCreator nodeHierarchyCreator;
   private JobSchedulerService schedulerService;
   private RepositoryService repositoryService;
-
-  private static Boolean isMailNotifsMigrated = false;
+  private SettingService settingService;
 
   public MailNotificationsMigration(MailNotificationStorageImpl jcrNotificationDataStorage,
                                     JPAMailNotificationStorage jpaMailNotificationStorage,
                                     JobSchedulerService schedulerService,
+                                    SettingService settingService,
                                     NotificationConfiguration notificationConfiguration,
                                     RepositoryService repositoryService,
-                                    NodeHierarchyCreator nodeHierarchyCreator,
-                                    QueueMessage queueMessage) {
+                                    NodeHierarchyCreator nodeHierarchyCreator) {
     this.jpaMailNotificationStorage = jpaMailNotificationStorage;
     this.jcrNotificationDataStorage = jcrNotificationDataStorage;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
     this.schedulerService = schedulerService;
     this.repositoryService = repositoryService;
+    this.settingService = settingService;
     this.jcrWorkspace = notificationConfiguration.getWorkspace();
 
     this.jpaQueueMessage = CommonsUtils.getService(JPAQueueMessageImpl.class);
@@ -76,10 +85,6 @@ public class MailNotificationsMigration {
       LOG.error("Error while getting Notification nodes for Notifications migration - Cause : " + e.getMessage(), e);
       return;
     }
-    if (!hasMailNotifDataToMigrate()) {
-      LOG.info("No mail notification data to migrate from JCR to RDBMS");
-      return;
-    }
     //migration of mail notifications data from JCR to RDBMS is done as a background task
     PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
       @Override
@@ -87,34 +92,34 @@ public class MailNotificationsMigration {
         RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
           @Override
           public Void call() throws Exception {
-            try {
-              // pause job of sending digest mails
-              schedulerService.pauseJob("NotificationDailyJob", "Notification");
-              schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
-              ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-              LOG.info("=== Start migration of Mail Notifications data from JCR");
-              long startTime = System.currentTimeMillis();
-              migrateMailNotifData();
-              isMailNotifsMigrated = true;
-              long endTime = System.currentTimeMillis();
-              LOG.info("=== Migration of Mail Notification data done in " + (endTime - startTime) + " ms");
-            } catch (Exception e) {
-              LOG.error("Error while migrating Mail Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
-              isMailNotifsMigrated = false;
-            } finally {
-              schedulerService.resumeJob("NotificationDailyJob", "Notification");
-              schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
+            if (hasMailNotifDataToMigrate()) {
+              try {
+                // pause job of sending digest mails
+                schedulerService.pauseJob("NotificationDailyJob", "Notification");
+                schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
+                ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+                LOG.info("=== Start migration of Mail Notifications data from JCR");
+                long startTime = System.currentTimeMillis();
+                migrateMailNotifData();
+                setMailNotifMigrationDone();
+                long endTime = System.currentTimeMillis();
+                LOG.info("=== Migration of Mail Notification data done in " + (endTime - startTime) + " ms");
+              } catch (Exception e) {
+                LOG.error("Error while migrating Mail Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+              } finally {
+                schedulerService.resumeJob("NotificationDailyJob", "Notification");
+                schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
+              }
+            } else {
+              LOG.info("No mail notification data to migrate from JCR to RDBMS");
             }
+            cleanupMailNotifications();
             return null;
           }
         });
       }
     });
 
-    if (!hasQueueMessagesDataToMigrate()) {
-      LOG.info("No queue messages data to migrate from JCR to RDBMS");
-      return;
-    }
     //migration of queue messages data from JCR to RDBMS is done as a background task
     PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
       @Override
@@ -122,16 +127,21 @@ public class MailNotificationsMigration {
         RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
           @Override
           public Void call() throws Exception {
-            try {
-              ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-              LOG.info("=== Start migration of Mail messages stored in the queue from JCR");
-              long startTime = System.currentTimeMillis();
-              migrateQueueMessages();
-              long endTime = System.currentTimeMillis();
-              LOG.info("=== Migration of Mail messages data done in " + (endTime - startTime) + " ms");
-            } catch (Exception e) {
-              LOG.error("Error while migrating Mail messages data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+            ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+            if (hasQueueMessagesDataToMigrate()) {
+              try {
+                LOG.info("=== Start migration of Mail messages stored in the queue from JCR");
+                long startTime = System.currentTimeMillis();
+                migrateQueueMessages();
+                long endTime = System.currentTimeMillis();
+                LOG.info("=== Migration of Mail messages data done in " + (endTime - startTime) + " ms");
+              } catch (Exception e) {
+                LOG.error("Error while migrating Mail messages data from JCR to RDBMS - Cause : " + e.getMessage(), e);
+              }
+            } else {
+              LOG.info("No queue messages data to migrate from JCR to RDBMS");
             }
+            cleanupQueue();
             return null;
           }
         });
@@ -139,52 +149,86 @@ public class MailNotificationsMigration {
     });
   }
 
-  public void cleanup() {
+  public void cleanupMailNotifications() {
     //migration of mail notifications data from JCR to RDBMS is done as a background task
-    PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
+    RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
       @Override
-      public void execute(ServletContext context, PortalContainer portalContainer) {
-        RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
-          @Override
-          public Void call() throws Exception {
-            // pause job of sending digest mails
-            schedulerService.pauseJob("NotificationDailyJob", "Notification");
-            schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
-            PortalContainer currentContainer = PortalContainer.getInstance();
-            ExoContainerContext.setCurrentContainer(currentContainer);
-            RequestLifeCycle.begin(currentContainer);
-            try {
-              if (isMailNotifsMigrated) {
-                ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-
-                LOG.info("=== Start cleaning Mail notifications data from JCR");
-                long startTime = System.currentTimeMillis();
-                deleteJcrMailNotifications();
-                long endTime = System.currentTimeMillis();
-                LOG.info("=== Mail notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-              }
-            } catch (Exception e) {
-              LOG.error("Error while cleaning Mail notifications JCR data", e);
-            } finally {
-              schedulerService.resumeJob("NotificationDailyJob", "Notification");
-              schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
-              RequestLifeCycle.end();
-            }
-            try {
-              LOG.info("=== Start cleaning Mail messages data from JCR");
+      public Void call() throws Exception {
+        RequestLifeCycle.begin(PortalContainer.getInstance());
+        if (isMailNotifMigrationDone() && !isMailNotifCleanupDone()) {
+          // pause job of sending digest mails
+          schedulerService.pauseJob("NotificationDailyJob", "Notification");
+          schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
+          try {
+              LOG.info("=== Start cleaning Mail notifications data from JCR");
               long startTime = System.currentTimeMillis();
-              deleteJcrMailMessages();
+              deleteJcrMailNotifications();
+              setMailNotifCleanupDone();
               long endTime = System.currentTimeMillis();
-              LOG.info("=== Mail messages JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-
-            } catch (Exception e) {
-              LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
-            }
-            return null;
+              LOG.info("=== Mail notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+          } catch (Exception e) {
+            LOG.error("Error while cleaning Mail notifications JCR data", e);
+          } finally {
+            RequestLifeCycle.end();
           }
-        });
+          try {
+            LOG.info("=== Start cleaning Mail messages data from JCR");
+            long startTime = System.currentTimeMillis();
+            deleteJcrMailMessages();
+            long endTime = System.currentTimeMillis();
+            LOG.info("=== Mail messages JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+
+          } catch (Exception e) {
+            LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
+          }
+        }
+        return null;
       }
     });
+  }
+
+  public void cleanupQueue() {
+    //migration of mail notifications data from JCR to RDBMS is done as a background task
+    RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
+      @Override
+      public Void call() throws Exception {
+        RequestLifeCycle.begin(PortalContainer.getInstance());
+        if (isMailNotifMigrationDone() && !isMailNotifCleanupDone()) {
+          // pause job of sending digest mails
+          schedulerService.pauseJob("NotificationDailyJob", "Notification");
+          schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
+          try {
+            LOG.info("=== Start cleaning Mail messages data from JCR");
+            long startTime = System.currentTimeMillis();
+            deleteJcrMailMessages();
+            long endTime = System.currentTimeMillis();
+            LOG.info("=== Mail messages JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+
+          } catch (Exception e) {
+            LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
+          }
+        }
+        return null;
+      }
+    });
+  }
+
+  private void setMailNotifMigrationDone() {
+    settingService.set(Context.GLOBAL, Scope.APPLICATION.id(MAIL_NOTIFICATION_MIGRATION_DONE_KEY), MAIL_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
+  }
+
+  private void setMailNotifCleanupDone() {
+    settingService.set(Context.GLOBAL, Scope.APPLICATION.id(MAIL_NOTIFICATION_MIGRATION_DONE_KEY), MAIL_NOTIFICATION_RDBMS_CLEANUP_DONE, SettingValue.create("true"));
+  }
+
+  private boolean isMailNotifMigrationDone() {
+    SettingValue<?> setting = settingService.get(Context.GLOBAL, Scope.APPLICATION.id(MAIL_NOTIFICATION_MIGRATION_DONE_KEY), MAIL_NOTIFICATION_RDBMS_MIGRATION_DONE);
+    return (setting != null && setting.getValue().equals("true"));
+  }
+
+  private boolean isMailNotifCleanupDone() {
+    SettingValue<?> setting = settingService.get(Context.GLOBAL, Scope.APPLICATION.id(MAIL_NOTIFICATION_MIGRATION_DONE_KEY), MAIL_NOTIFICATION_RDBMS_CLEANUP_DONE);
+    return (setting != null && setting.getValue().equals("true"));
   }
 
   private void deleteJcrMailMessages() throws RepositoryException {
@@ -230,7 +274,10 @@ public class MailNotificationsMigration {
   }
 
   private MessageInfo getMessageInfo(Node node) {
+    String path = null;
     try {
+      path = node.getPath();
+
       String messageJson = getDataJson(node);
       JSONObject object = new JSONObject(messageJson);
       MessageInfo info = new MessageInfo();
@@ -244,8 +291,7 @@ public class MailNotificationsMigration {
       //
       return info;
     } catch (Exception e) {
-      LOG.warn("Failed to map message between node and model.");
-      LOG.debug(e.getMessage(), e);
+      LOG.warn("Failed to map message from node " + path + "", e);
     }
     return null;
   }

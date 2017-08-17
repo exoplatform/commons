@@ -78,11 +78,7 @@ public class WebUsersDAO extends GenericDAOJPAImpl<WebUsersEntity, Long> {
   public int getNumberOnBadge(String userId) {
     TypedQuery<Long> query =  getEntityManager().createNamedQuery("NotificationsWebUsersEntity.getNumberOnBadge", Long.class)
         .setParameter("userId", userId);
-    try {
-      return query.getSingleResult().intValue();
-    } catch (NoResultException e) {
-      return 0;
-    }
+    return query.getSingleResult().intValue();
   }
 
   @ExoTransactional
