@@ -55,7 +55,7 @@ public class SettingsMigration implements StartableClusterAware {
   //scope of user settings migration
   public static final String SETTINGS_MIGRATION_USER_KEY = "SETTINGS_MIGRATION_USER";
   //scope of global settings migration
-  public static final String SETTINGS_MIGRATION_GLOBAL_KEY = "SETTINGS_MIGRATION_USER";
+  public static final String SETTINGS_MIGRATION_GLOBAL_KEY = "SETTINGS_MIGRATION_GLOBAL";
   //status of jcr user settings data (true if jcr user settings data is migrated)
   public static final String SETTINGS_JCR_DATA_USER_MIGRATED_KEY = "SETTINGS_JCR_DATA_USER_MIGRATED";
   //status of settings migration (true if migration completed successfully)
@@ -151,12 +151,14 @@ public class SettingsMigration implements StartableClusterAware {
       @Override
       protected Boolean execute(SessionContext ctx) {
         try {
-          for (String scope : getGlobalSettings()) {
+          Set<String> globalSettings = getGlobalSettings();
+          for (String scope : globalSettings) {
             if (!errorGlobalSettings.contains(scope)) {
               deleteGlobalSettings(scope);
             }
           }
           LOG.info(" === Global Settings Migration from JCR to RDBBMS report: ");
+          LOG.info("           - " + globalSettings.size() + " Global Settings nodes are cleaned from JCR ");
           LOG.info("           - " + errorGlobalSettings.size() + " Global Settings nodes are not migrated to RDBMS ");
           LOG.info("           - " + nonRemovedGlobalSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
           return true;
@@ -176,11 +178,13 @@ public class SettingsMigration implements StartableClusterAware {
           ExoContainerContext.setCurrentContainer(currentContainer);
 
           Set<String> jcrSettingsToRemove = getJCRUserSettingsToRemove();
+          int deletedCounter = 0;
           int i = 0, totalSize = jcrSettingsToRemove.size();
           for (String user : jcrSettingsToRemove) {
             i++;
             if (!errorUserSettings.contains(user) && isSettingsMigrated(user)) {
               if (deleteUserSettings(user)) {
+                deletedCounter ++;
                 jpaSettingService.remove(Context.USER.id(user), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
               }
             }
@@ -190,7 +194,8 @@ public class SettingsMigration implements StartableClusterAware {
               RequestLifeCycle.begin(currentContainer);
             }
           }
-          LOG.info(" === User settings Migration from JCR to RDBBMS report: ");
+          LOG.info(" === User settings Migration & Cleanup from JCR to RDBBMS report: ");
+          LOG.info("           - " + deletedCounter + " Users with settings are cleaned from JCR ");
           LOG.info("           - " + errorUserSettings.size() + " User settings nodes are not migrated to RDBMS ");
           LOG.info("           - " + nonRemovedUserSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
           return true;

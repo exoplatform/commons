@@ -215,7 +215,8 @@ public class WebNotificationsMigration {
       }
     }
 
-    LOG.info(" === Web Notifications Migration from JCR to RDBBMS report:");
+    LOG.info(" === Web Notifications Migration & cleanup from JCR to RDBBMS report:");
+    LOG.info("           - " + i + " Web Notifications nodes are cleaned from JCR");
     LOG.info("           - " + nonMigratedWebNotifs.size() + " Web Notifications nodes are not migrated to RDBMS");
     LOG.info("           - " + nonRemovedWebNotifs.size() + " Web Notifications nodes are migrated but not removed from JCR");
     long endTime = System.currentTimeMillis();
