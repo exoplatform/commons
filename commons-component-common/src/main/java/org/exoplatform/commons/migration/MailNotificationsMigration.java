@@ -24,6 +24,7 @@ import org.exoplatform.commons.notification.impl.service.storage.MailNotificatio
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.RDBMSMigrationUtils;
 import org.exoplatform.commons.utils.StringCommonUtils;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
@@ -237,6 +238,8 @@ public class MailNotificationsMigration {
   }
 
   private void deleteJcrMailNotifications() throws RepositoryException {
+    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+
     NodeIterator pluginNodesIterator = getMailNotificationNodes();
     while (pluginNodesIterator.hasNext()) {
       Node pluginNode = pluginNodesIterator.nextNode();
@@ -251,6 +254,8 @@ public class MailNotificationsMigration {
           notifNodes.nextNode().remove();
           if(i%100 == 0){
             session.save();
+            RequestLifeCycle.end();
+            RequestLifeCycle.begin(currentContainer);
           }
         }
         if (i > 0) {

@@ -16,6 +16,7 @@ import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStora
 import org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.RDBMSMigrationUtils;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -189,6 +190,8 @@ public class WebNotificationsMigration {
     long startTime = System.currentTimeMillis();
     int i = 0;
     int totalSize = allUsers.size();
+    ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+
     for (String userId : allUsers) {
       i++;
       if (isWebNotifMigrated(userId)) {
@@ -199,15 +202,19 @@ public class WebNotificationsMigration {
           settingService.remove(Context.USER.id(userId), Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_USER_KEY));
         } catch (Exception e) {
           nonRemovedWebNotifs.add(userId);
-          LOG.error("Error while cleaning Web notifications JCR data to RDBMS of user: " + userId + " - Cause : " + e.getMessage(), e);
+          LOG.error("Error while cleaning Web notifications JCR data to RDBMS of user: " + userId + " - Cause : "
+              + e.getMessage(), e);
         }
       } else {
         nonMigratedWebNotifs.add(userId);
       }
       if (i % 100 == 0) {
         LOG.info("Web Notifications JCR cleanup - progression = {}/{}", i, totalSize);
+        RequestLifeCycle.end();
+        RequestLifeCycle.begin(currentContainer);
       }
     }
+
     LOG.info(" === Web Notifications Migration from JCR to RDBBMS report:");
     LOG.info("           - " + nonMigratedWebNotifs.size() + " Web Notifications nodes are not migrated to RDBMS");
     LOG.info("           - " + nonRemovedWebNotifs.size() + " Web Notifications nodes are migrated but not removed from JCR");

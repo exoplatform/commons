@@ -172,6 +172,9 @@ public class SettingsMigration implements StartableClusterAware {
       @Override
       protected Boolean execute(SessionContext ctx) {
         try {
+          PortalContainer currentContainer = PortalContainer.getInstance();
+          ExoContainerContext.setCurrentContainer(currentContainer);
+
           Set<String> jcrSettingsToRemove = getJCRUserSettingsToRemove();
           int i = 0, totalSize = jcrSettingsToRemove.size();
           for (String user : jcrSettingsToRemove) {
@@ -183,6 +186,8 @@ public class SettingsMigration implements StartableClusterAware {
             }
             if (i % 100 == 0) {
               LOG.info("User settings JCR cleanup - progression = {}/{}", i, totalSize);
+              RequestLifeCycle.end();
+              RequestLifeCycle.begin(currentContainer);
             }
           }
           LOG.info(" === User settings Migration from JCR to RDBBMS report: ");
