@@ -243,40 +243,45 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     JSONArray jsonHits = (JSONArray) jsonResult.get("hits");
 
     for(Object jsonHit : jsonHits) {
-      JSONObject hitSource = (JSONObject) ((JSONObject) jsonHit).get("_source");
-      String title = getTitleFromJsonResult(hitSource);
-      String url = getUrlFromJsonResult(hitSource, context);
-      Long lastUpdatedDate = (Long) hitSource.get("lastUpdatedDate");
-      if (lastUpdatedDate == null) lastUpdatedDate = new Date().getTime();
-      Double score = (Double) ((JSONObject) jsonHit).get("_score");
-      //Get the excerpt
-      JSONObject hitHighlight = (JSONObject) ((JSONObject) jsonHit).get("highlight");
+      results.add(buildHit((JSONObject) jsonHit, context));
+    }
+
+    return results;
+
+  }
+
+  protected SearchResult buildHit(JSONObject jsonHit, SearchContext searchContext) {
+    JSONObject hitSource = (JSONObject) jsonHit.get("_source");
+    String title = getTitleFromJsonResult(hitSource);
+    String url = getUrlFromJsonResult(hitSource, searchContext);
+    Long lastUpdatedDate = (Long) hitSource.get("lastUpdatedDate");
+    if (lastUpdatedDate == null) lastUpdatedDate = new Date().getTime();
+    Double score = (Double) jsonHit.get("_score");
+    //Get the excerpt
+    JSONObject hitHighlight = (JSONObject) jsonHit.get("highlight");
+    StringBuilder excerpt = new StringBuilder();
+    if(hitHighlight != null) {
       Iterator<?> keys = hitHighlight.keySet().iterator();
-      StringBuilder excerpt = new StringBuilder();
-      while( keys.hasNext() ) {
-        String key = (String)keys.next();
+      while (keys.hasNext()) {
+        String key = (String) keys.next();
         JSONArray highlights = (JSONArray) hitHighlight.get(key);
         for (Object highlight : highlights) {
           excerpt.append("... ").append(highlight);
         }
       }
-
-      LOG.debug("Excerpt extract from ES response : "+excerpt.toString());
-
-      results.add(new SearchResult(
-          url,
-          title,
-          excerpt.toString(),
-          null,
-          img,
-          lastUpdatedDate,
-          //score must not be null as "track_scores" is part of the query
-          score.longValue()
-      ));
     }
 
-    return results;
+    LOG.debug("Excerpt extract from ES response : " + excerpt.toString());
 
+    return new SearchResult(
+            url,
+            title,
+            excerpt.toString(),
+            null,
+            img,
+            lastUpdatedDate,
+            //score must not be null as "track_scores" is part of the query
+            score.longValue());
   }
 
   protected String getUrlFromJsonResult(JSONObject hitSource, SearchContext context) {
