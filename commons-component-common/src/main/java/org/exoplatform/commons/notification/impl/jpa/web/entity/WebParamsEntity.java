@@ -40,6 +40,7 @@ public class WebParamsEntity {
   private String name;
 
   @Column(name = "PARAM_VALUE")
+  @Lob
   private String value;
 
   @ManyToOne

@@ -45,7 +45,7 @@ import java.util.Calendar;
         "JOIN u.webNotification.parameters  p " +
         "WHERE w.type= :pluginId " +
         "AND p.name = :paramName " +
-        "AND p.value = :paramValue " +
+        "AND p.value LIKE :paramValue " +
         "AND u.receiver = :userId " +
         "AND u.read = FALSE " +
         "ORDER BY u.updateDate DESC "),
