@@ -30,39 +30,39 @@ import javax.persistence.*;
 @ExoEntity
 @Table(name = "STG_SETTINGS")
 @NamedQueries({
-    @NamedQuery(name = "SettingsEntity.getSettingsByContextAndScope", query = "SELECT distinct(s) FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.getSettingsByContextAndScope", query = "SELECT s FROM SettingsEntity s " +
         "WHERE s.context.type= :contextType " +
         "AND s.context.name= :contextName " +
         "AND s.scope.name= :scopeName " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "SettingsEntity.getSettingsByContextAndScopeWithNullName", query = "SELECT distinct(s) FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.getSettingsByContextAndScopeWithNullName", query = "SELECT s FROM SettingsEntity s " +
         "WHERE s.context.type= :contextType " +
         "AND s.context.name= :contextName " +
         "AND s.scope.name IS NULL " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "SettingsEntity.getSettingByContextAndScopeAndKey", query = "SELECT distinct(s) FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.getSettingByContextAndScopeAndKey", query = "SELECT s FROM SettingsEntity s " +
         "WHERE s.name = :settingName " +
         "AND s.context.type= :contextType " +
         "AND s.context.name= :contextName " +
         "AND s.scope.name= :scopeName " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "SettingsEntity.getSettingByContextAndScopeWithNullNameAndKey", query = "SELECT distinct(s) FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.getSettingByContextAndScopeWithNullNameAndKey", query = "SELECT s FROM SettingsEntity s " +
         "WHERE s.name = :settingName " +
         "AND s.context.type= :contextType " +
         "AND s.context.name= :contextName " +
         "AND s.scope.name IS NULL " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "SettingsEntity.countSettingsByNameAndValueAndScope", query = "SELECT count(s) FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.countSettingsByNameAndValueAndScope", query = "SELECT count(s.id) FROM SettingsEntity s " +
         "WHERE s.name = :settingName " +
-        "AND s.value = :settingValue " +
+        "AND s.value LIKE :settingValue " +
         "AND s.scope.name= :scopeName " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "SettingsEntity.countSettingsByNameAndValueAndScopeWithNullName", query = "SELECT count(s) FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.countSettingsByNameAndValueAndScopeWithNullName", query = "SELECT count(s.id) FROM SettingsEntity s " +
         "WHERE s.name = :settingName " +
-        "AND s.value = :settingValue " +
+        "AND s.value LIKE :settingValue " +
         "AND s.scope.name IS NULL " +
         "AND s.scope.type= :scopeType "),
-    @NamedQuery(name = "SettingsEntity.getSettingsByContextByTypeAndName", query = "SELECT distinct(s) FROM SettingsEntity s " +
+    @NamedQuery(name = "SettingsEntity.getSettingsByContextByTypeAndName", query = "SELECT s FROM SettingsEntity s " +
         "WHERE s.context.type= :contextType " +
         "AND s.context.name= :contextName ")
 })
@@ -76,7 +76,8 @@ public class SettingsEntity {
   @Column(name = "NAME")
   private String name;
 
-  @Column(name = "VALUE")
+  @Column(name = "VALUE", columnDefinition = "CLOB NOT NULL")
+  @Lob
   private String value;
 
   @ManyToOne
