@@ -275,6 +275,24 @@ public class JPASettingServiceImpl implements SettingService {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long countContextsByType(String contextType) {
+    validateArgumentNullability(contextType, "context type is null");
+    return settingContextDAO.countContextsByType(contextType);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<String> getContextNamesByType(String contextType, int offset, int limit) {
+    validateArgumentNullability(contextType, "context type is null");
+    return settingContextDAO.getContextNamesByType(contextType, offset, limit);
+  }
+
+  /**
    * Gets a list of names of contexts of a chosen type that doesn't have
    * settings associated to a dedicated scope
    * 

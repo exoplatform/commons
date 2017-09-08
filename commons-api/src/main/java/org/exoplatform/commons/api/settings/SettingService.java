@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.api.settings;
 
+import java.util.List;
+
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 
@@ -79,5 +81,24 @@ public interface SettingService {
    * @LevelAPI Experimental
    */
   public SettingValue<?> get(Context context, Scope scope, String key);
+
+  /**
+   * Returns the total count of contexts by type
+   * 
+   * @param contextType context type name ('USER' OR 'GLOBAL')
+   * @return count of contexts by type
+   */
+  long countContextsByType(String contextType);
+
+  /**
+   * Returns context names by type
+   * 
+   * @param contextType context type name ('USER' OR 'GLOBAL')
+   * @param offset query offset
+   * @param limit query max results
+   * 
+   * @return the list of context names
+   */
+  List<String> getContextNamesByType(String contextType, int offset, int limit);
 
 }

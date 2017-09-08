@@ -33,7 +33,7 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
     } catch (NoResultException e) {
       return null;
     } catch (NonUniqueResultException e1) {
-      LOG.error("Non unique result for settings context of type {} and name {}. First result will be returned",
+      LOG.warn("Non unique result for settings context of type {} and name {}. First result will be returned",
                 contextType,
                 contextName);
       return query.getResultList().get(0);
@@ -90,6 +90,22 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
                                 .setParameter("scopeName", scopeName)
                                 .setParameter("settingName", settingName);
     }
+    return query.getResultList();
+  }
+
+  @ExoTransactional
+  public long countContextsByType(String contextType) {
+    TypedQuery<Long> query = getEntityManager().createNamedQuery("SettingsContextEntity.countContextsByType", Long.class)
+                                               .setParameter("contextType", contextType);
+    return query.getSingleResult().longValue();
+  }
+
+  @ExoTransactional
+  public List<String> getContextNamesByType(String contextType, int offset, int limit) {
+    TypedQuery<String> query = getEntityManager().createNamedQuery("SettingsContextEntity.getContextNamesByType", String.class)
+                                                        .setParameter("contextType", contextType)
+                                                        .setFirstResult(offset)
+                                                        .setMaxResults(limit);
     return query.getResultList();
   }
 }

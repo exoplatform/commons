@@ -65,7 +65,11 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
         "WHERE sc.name = :scopeName " +
         "AND sc.type = :scopeType " +
         "AND c.type = :contextType " +
-        "AND s.name = :settingName ")
+        "AND s.name = :settingName "),
+    @NamedQuery(name = "SettingsContextEntity.countContextsByType", query = "SELECT count(c) FROM SettingsContextEntity c " +
+        "WHERE c.type = :contextType "),
+    @NamedQuery(name = "SettingsContextEntity.getContextNamesByType", query = "SELECT c.name FROM SettingsContextEntity c " +
+        "WHERE c.type = :contextType ")
 })
 public class ContextEntity {
   @Id

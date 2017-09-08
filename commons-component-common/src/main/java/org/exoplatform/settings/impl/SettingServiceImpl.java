@@ -1,5 +1,7 @@
 package org.exoplatform.settings.impl;
 
+import java.util.List;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
@@ -244,6 +246,16 @@ public class SettingServiceImpl implements SettingService {
     if (requestClose) {
       chromatticLifeCycle.getManager().endRequest(true);
     }
+  }
+
+  @Override
+  public long countContextsByType(String contextType) {
+    throw new UnsupportedOperationException("This operation isn't supported in JCR Impl");
+  }
+
+  @Override
+  public List<String> getContextNamesByType(String contextType, int offset, int limit) {
+    throw new UnsupportedOperationException("This operation isn't supported in JCR Impl");
   }
 
 }

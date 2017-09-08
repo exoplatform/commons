@@ -37,6 +37,8 @@ import org.exoplatform.commons.api.notification.service.setting.UserSettingServi
 import org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.channel.MailChannel;
@@ -99,16 +101,26 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
         continue;
       }
 
-      if (notification.getSendToUserIds() == null || notification.getSendToUserIds().isEmpty()) {
-        LOG.debug("Notification with id '{}' and parameters = '{}' not sent because receivers are empty",
-                  notification.getId(),
-                  notification.getOwnerParameter());
-        userIds = Collections.emptyList();
-      } else {
-        userIds = notification.getSendToUserIds();
-      }
       AbstractNotificationLifecycle lifecycle = channelManager.getLifecycle(ChannelKey.key(channel.getId()));
-      lifecycle.process(ctx, userIds.toArray(new String[userIds.size()]));
+      if (notification.isSendAll()) {
+        SettingService settingService = CommonsUtils.getService(SettingService.class);
+        long usersCount = settingService.countContextsByType(Context.USER.getName());
+        int maxResults = 100;
+        for (int i = 0; i < usersCount; i += maxResults) {
+          List<String> users = settingService.getContextNamesByType(Context.USER.getName(), i, maxResults);
+          lifecycle.process(ctx, users.toArray(new String[users.size()]));
+        }
+      } else {
+        if (notification.getSendToUserIds() == null || notification.getSendToUserIds().isEmpty()) {
+          LOG.debug("Notification with id '{}' and parameters = '{}' not sent because receivers are empty",
+                    notification.getId(),
+                    notification.getOwnerParameter());
+          userIds = Collections.emptyList();
+        } else {
+          userIds = notification.getSendToUserIds();
+        }
+        lifecycle.process(ctx, userIds.toArray(new String[userIds.size()]));
+      }
     }
   }
 

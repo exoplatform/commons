@@ -16,6 +16,8 @@
  */
 package org.exoplatform.settings.cache;
 
+import java.util.List;
+
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -154,6 +156,16 @@ public class CacheSettingServiceImpl implements SettingService {
       LOG.error("cannot get setting context",e);
     }
     service.remove(context);
+  }
+
+  @Override
+  public long countContextsByType(String contextType) {
+    return service.countContextsByType(contextType);
+  }
+
+  @Override
+  public List<String> getContextNamesByType(String contextType, int offset, int limit) {
+    return service.getContextNamesByType(contextType, offset, limit);
   }
 
 }
