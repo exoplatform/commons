@@ -36,6 +36,7 @@ import org.exoplatform.services.log.Log;
 public class WebNotificationServiceImpl implements WebNotificationService {
   /** logger */
   private static final Log LOG = ExoLogger.getLogger(WebNotificationServiceImpl.class);
+
   /** storage */
   private final WebNotificationStorage storage;
   
@@ -63,6 +64,7 @@ public class WebNotificationServiceImpl implements WebNotificationService {
     List<String> result = new ArrayList<String>();
     List<NotificationInfo> gotList = storage.get(filter, offset, limit);
     NotificationContext ctx = NotificationContextImpl.cloneInstance();
+    ctx.append(POPUP_OVER, filter.isOnPopover());
     AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(WebChannel.ID));
     //
     for (NotificationInfo notification : gotList) {

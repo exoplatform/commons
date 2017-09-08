@@ -18,10 +18,15 @@ package org.exoplatform.commons.api.notification.service;
 
 import java.util.List;
 
+import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 
 public interface WebNotificationService {
+
+  /** Define the argument parameter for popup over context */  
+  public final static ArgumentLiteral<Boolean> POPUP_OVER = new ArgumentLiteral<Boolean>(Boolean.class, "popupOver");
+
   /**
    * Creates the new notification message to the specified user.
    * The userId gets from the notification#getTo().
