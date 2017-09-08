@@ -56,7 +56,7 @@ public class EntityConverter {
     Set<WebParamsEntity> parameters = notification.getParameters();
     Map<String, String> ownerParameters =
                                         parameters.stream()
-                                                  .collect(Collectors.toMap(WebParamsEntity::getName, WebParamsEntity::getValue));
+                                                  .collect(Collectors.toMap(WebParamsEntity::getName, value -> value.getValue() == null ? "" : value.getValue()));
     ownerParameters.put(NotificationMessageUtils.READ_PORPERTY.getKey(), String.valueOf(webUsersEntity.isRead()));
     notificationInfo.setOwnerParameter(ownerParameters);
 
