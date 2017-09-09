@@ -88,7 +88,9 @@ public interface SettingService {
    * @param contextType context type name ('USER' OR 'GLOBAL')
    * @return count of contexts by type
    */
-  long countContextsByType(String contextType);
+  default long countContextsByType(String contextType) {
+    return 0;
+  }
 
   /**
    * Returns context names by type
@@ -99,6 +101,8 @@ public interface SettingService {
    * 
    * @return the list of context names
    */
-  List<String> getContextNamesByType(String contextType, int offset, int limit);
+  default List<String> getContextNamesByType(String contextType, int offset, int limit) {
+    return null;
+  }
 
 }
