@@ -320,9 +320,11 @@
       var source = settings.source;
       if (!(source && source.length) && settings.sourceProviders && settings.sourceProviders.length) {
         settings.source = function(query, callback) {
-          if (($(window).width() > 767 || $(window).width() < $(window).height()) && (app.$input[0].className.indexOf('cke_editable') !== -1)) {
-            loadFromProvider.call(app, query, callback);
+          // disable suggester for phone landscape CKEditor
+          if (($(window).width() < 768 && $(window).width() > $(window).height()) && (app.$input[0].className.indexOf('cke_editable') !== -1)) {
+            return;
           }
+          loadFromProvider.call(app, query, callback);
         };
       } else if ($.isArray(settings.source)){
         settings.data = source;
