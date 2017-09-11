@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,7 +44,6 @@ public class WebNotifEntity {
   private Calendar creationDate;
 
   @Column(name = "TEXT")
-  @Lob
   private String text;
 
   @OneToMany(fetch=FetchType.EAGER, mappedBy = "webNotification")

@@ -76,8 +76,7 @@ public class SettingsEntity {
   @Column(name = "NAME")
   private String name;
 
-  @Column(name = "VALUE", columnDefinition = "CLOB NOT NULL")
-  @Lob
+  @Column(name = "VALUE")
   private String value;
 
   @ManyToOne

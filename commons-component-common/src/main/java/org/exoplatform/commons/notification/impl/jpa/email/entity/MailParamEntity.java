@@ -55,7 +55,6 @@ public class MailParamEntity {
   private String name;
 
   @Column(name = "PARAM_VALUE")
-  @Lob
   private String value;
 
   @ManyToOne
