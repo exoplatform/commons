@@ -1,6 +1,8 @@
 package org.exoplatform.settings.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -229,9 +231,6 @@ public class SettingServiceImpl implements SettingService {
     }.executeWith(chromatticLifeCycle);
       SettingData data = new SettingData(EventType.SETTING_REMOVE_CONTEXT,  new SettingContext(context));
       eventManager.broadcastEvent(new Event<SettingServiceImpl,SettingData>(data.getEventType().toString(),this,data));
-        // TODO Auto-generated catch block
-    
-    
   }
 
   public boolean startSynchronization() {
@@ -256,6 +255,31 @@ public class SettingServiceImpl implements SettingService {
   @Override
   public List<String> getContextNamesByType(String contextType, int offset, int limit) {
     throw new UnsupportedOperationException("This operation isn't supported in JCR Impl");
+  }
+
+  @Override
+  public Map<Scope, Map<String, SettingValue<String>>> getSettingsByContext(Context context) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<Context> getContextsByTypeAndScopeAndSettingName(String contextType,
+                                                               String scopeType,
+                                                               String scopeName,
+                                                               String settingName,
+                                                               int offset,
+                                                               int limit) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Set<String> getEmptyContextsByScopeAndContextType(String name, String name2, String id, int offset, int limit) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void save(Context id) {
+    throw new UnsupportedOperationException();
   }
 
 }

@@ -230,11 +230,10 @@ public class JPASettingServiceImpl implements SettingService {
   }
 
   /**
-   * Saves a {@link Context} on database
-   * 
-   * @param context context to save
+   * {@inheritDoc}
    */
   @ExoTransactional
+  @Override
   public void save(Context context) {
     validateContextArgument(context);
 
@@ -248,13 +247,10 @@ public class JPASettingServiceImpl implements SettingService {
   }
 
   /**
-   * Get settings related to a scope and a context
-   * 
-   * @param context {@link Context} used to search settings
-   * @return {@link Map} of settings with key = setting name and as value =
-   *         corresponding {@link SettingValue}
+   * {@inheritDoc}
    */
   @ExoTransactional
+  @Override
   public Map<Scope, Map<String, SettingValue<String>>> getSettingsByContext(Context context) {
     validateContextArgument(context);
 
@@ -293,17 +289,10 @@ public class JPASettingServiceImpl implements SettingService {
   }
 
   /**
-   * Gets a list of names of contexts of a chosen type that doesn't have
-   * settings associated to a dedicated scope
-   * 
-   * @param contextType type of context used in filter
-   * @param scopeType type of scope used in filter
-   * @param scopeName name of scope used in filter
-   * @param offset search query offset
-   * @param limit search query limit
-   * @return a {@link Set} of {@link String} for filtered context names
+   * {@inheritDoc}
    */
   @ExoTransactional
+  @Override
   public Set<String> getEmptyContextsByScopeAndContextType(String contextType,
                                                            String scopeType,
                                                            String scopeName,
@@ -321,18 +310,10 @@ public class JPASettingServiceImpl implements SettingService {
   }
 
   /**
-   * Gets a list of names of contexts of a chosen type that have a setting
-   * associated to a dedicated scope
-   * 
-   * @param contextType type of context used in filter
-   * @param scopeType type of scope used in filter
-   * @param scopeName name of scope used in filter
-   * @param settingName name of setting used in filter
-   * @param offset search query offset
-   * @param limit search query limit
-   * @return a {@link List} of {@link String} for filtered context names
+   * {@inheritDoc}
    */
   @ExoTransactional
+  @Override
   public List<Context> getContextsByTypeAndScopeAndSettingName(String contextType,
                                                                String scopeType,
                                                                String scopeName,

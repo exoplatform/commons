@@ -58,7 +58,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
 
   public static final String    NAME_PATTERN       = "exo:{CHANNELID}Channel";
 
-  private JPASettingServiceImpl settingService;
+  private SettingService settingService;
 
   private ChannelManager        channelManager;
 
@@ -70,7 +70,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
                                    NotificationConfiguration configuration,
                                    ChannelManager channelManager,
                                    DataInitializer dataInitializer) {
-    this.settingService = (JPASettingServiceImpl) settingService;
+    this.settingService = settingService;
     this.channelManager = channelManager;
   }
 

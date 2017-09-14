@@ -62,7 +62,6 @@ public class MultiTenancyTaskTest extends BaseCommonsTestCase {
    }
 
    public void testRun(){
-     
      try {      
        Constructor constructor = impl.getTask().getConstructor(MultiTenancyJobImpl.class, JobExecutionContext.class, String.class);
        Runnable temp = (Runnable) constructor.newInstance(impl, context, repoName);
@@ -78,7 +77,6 @@ public class MultiTenancyTaskTest extends BaseCommonsTestCase {
    protected void tearDown() throws Exception {
      super.tearDown();
    }
-   
    
    private JobExecutionContext createContext(JobDetail jobDetail) {
      firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTriggerImpl(), null, false, new Date(), new Date(), new Date(), new Date());

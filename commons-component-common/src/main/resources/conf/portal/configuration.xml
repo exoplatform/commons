@@ -12,7 +12,7 @@
 
   <component>
     <key>org.exoplatform.commons.api.settings.SettingService</key>
-    <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
+    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
   </component>
 
   <component>
@@ -94,6 +94,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.commons.api.settings.SettingService</key>
+    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.commons.diff.DiffService</key>
     <type>org.exoplatform.commons.diff.DiffService</type>
   </component>
@@ -137,7 +142,7 @@
     </init-params>
   </component>
 
-  <component>
+    <component>
     <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
     <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
     <init-params>

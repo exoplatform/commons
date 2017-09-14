@@ -41,7 +41,9 @@ public class CacheSettingTest extends BaseCommonsTestCase {
   public void setUp() throws Exception {
     super.setUp();
     settingCache = getService(CacheService.class).getCacheInstance(SettingService.class.getSimpleName());
-    settingService = getService(CacheSettingServiceImpl.class);
+    settingService = getService(SettingService.class);
+    assertNotNull("Cannot find Setting Service", settingService);
+    assertTrue("settingService should be of type CacheSettingServiceImpl instead of " + settingService.getClass().getName(), settingService instanceof CacheSettingServiceImpl);
     ConversationState c = new ConversationState(new Identity("test"));
     ConversationState.setCurrent(c);  
     settingCache.clearCache();

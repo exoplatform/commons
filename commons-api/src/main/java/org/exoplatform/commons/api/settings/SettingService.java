@@ -17,6 +17,8 @@
 package org.exoplatform.commons.api.settings;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
@@ -104,5 +106,54 @@ public interface SettingService {
   default List<String> getContextNamesByType(String contextType, int offset, int limit) {
     return null;
   }
+
+  /**
+   * Get settings related to a scope and a context
+   * 
+   * @param context {@link Context} used to search settings
+   * @return {@link Map} of settings with key = setting name and as value =
+   *         corresponding {@link SettingValue}
+   */
+  Map<Scope, Map<String, SettingValue<String>>> getSettingsByContext(Context context);
+
+
+  /**
+   * Gets a list of names of contexts of a chosen type that have a setting
+   * associated to a dedicated scope
+   * 
+   * @param contextType type of context used in filter
+   * @param scopeType type of scope used in filter
+   * @param scopeName name of scope used in filter
+   * @param settingName name of setting used in filter
+   * @param offset search query offset
+   * @param limit search query limit
+   * @return a {@link List} of {@link String} for filtered context names
+   */
+  List<Context> getContextsByTypeAndScopeAndSettingName(String contextType,
+                                                        String scopeType,
+                                                        String scopeName,
+                                                        String settingName,
+                                                        int offset,
+                                                        int limit);
+
+  /**
+   * Gets a list of names of contexts of a chosen type that doesn't have
+   * settings associated to a dedicated scope
+   * 
+   * @param contextType type of context used in filter
+   * @param scopeType type of scope used in filter
+   * @param scopeName name of scope used in filter
+   * @param offset search query offset
+   * @param limit search query limit
+   * @return a {@link Set} of {@link String} for filtered context names
+   */
+  public Set<String> getEmptyContextsByScopeAndContextType(String contextType, String scopeType, String scopeName, int offset, int limit);
+
+  /**
+   * Saves a {@link Context} on database
+   * 
+   * @param context context to save
+   */
+  public void save(Context context);
 
 }

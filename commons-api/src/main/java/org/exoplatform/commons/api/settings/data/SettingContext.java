@@ -128,7 +128,11 @@ public class SettingContext implements Serializable {
         return repositoryService.getCurrentRepository().getConfiguration().getName();
       }
     } catch (Exception e) {
-      LOG.warn("An error occurred when getting current repository name, null will be returned", e);
+      if(LOG.isDebugEnabled()) {
+        LOG.warn("An error occurred when getting current repository name, null will be returned", e);
+      } else {
+        LOG.warn("An error occurred when getting current repository name, null will be returned");
+      }
       return null;
     }
   }

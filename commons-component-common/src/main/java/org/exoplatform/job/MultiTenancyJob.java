@@ -60,7 +60,7 @@ public abstract class MultiTenancyJob implements Job {
         LOG.error("Exception when looking for multi-tenancy task", e);
       }
     }
-    executor.shutdown();
+    executor.shutdownNow();
   }
 
   public class MultiTenancyTask implements Runnable {

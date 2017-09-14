@@ -17,6 +17,8 @@
 package org.exoplatform.settings.cache;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -35,7 +37,7 @@ import org.exoplatform.services.cache.future.Loader;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.settings.cache.selector.SettingCacheSelector;
-import org.exoplatform.settings.impl.SettingServiceImpl;
+import org.exoplatform.settings.jpa.JPASettingServiceImpl;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
@@ -51,24 +53,24 @@ public class CacheSettingServiceImpl implements SettingService {
 
   protected ExoCache<SettingKey, SettingValue>                           settingCache;
 
-  protected FutureExoCache<SettingKey, SettingValue, SettingServiceImpl> futureExoCache;
+  protected FutureExoCache<SettingKey, SettingValue, SettingService> futureExoCache;
 
   private static final Logger                                            log = LoggerFactory.getLogger(CacheSettingServiceImpl.class);
 
-  private final SettingServiceImpl                                       service;
+  private final SettingService                                            service;
 /**
  * Create cache setting service object with service for database and service for cache
  * @param service Setting service for database
  * @param cacheService Cache service
  * @LevelAPI Experimental
  */
-  public CacheSettingServiceImpl(SettingServiceImpl service, CacheService cacheService) {
+  public CacheSettingServiceImpl(JPASettingServiceImpl service, CacheService cacheService) {
 
     settingCache = cacheService.getCacheInstance(SettingService.class.getSimpleName());
 
-    Loader<SettingKey, SettingValue, SettingServiceImpl> loader = new Loader<SettingKey, SettingValue, SettingServiceImpl>() {
+    Loader<SettingKey, SettingValue, SettingService> loader = new Loader<SettingKey, SettingValue, SettingService>() {
       @Override
-      public SettingValue retrieve(SettingServiceImpl service, SettingKey key) throws Exception {
+      public SettingValue retrieve(SettingService service, SettingKey key) throws Exception {
         SettingValue<?> settingValue = service.get(key.getContext(), key.getScope(), key.getKey());
         if(settingValue == null) {
           settingValue = NullSettingValue.getInstance();
@@ -76,7 +78,7 @@ public class CacheSettingServiceImpl implements SettingService {
         return settingValue;
       }
     };
-    futureExoCache = new FutureExoCache<SettingKey, SettingValue, SettingServiceImpl>(loader,
+    futureExoCache = new FutureExoCache<SettingKey, SettingValue, SettingService>(loader,
                                                                                       settingCache);
     this.service = service;
 
@@ -166,6 +168,31 @@ public class CacheSettingServiceImpl implements SettingService {
   @Override
   public List<String> getContextNamesByType(String contextType, int offset, int limit) {
     return service.getContextNamesByType(contextType, offset, limit);
+  }
+
+  @Override
+  public Map<Scope, Map<String, SettingValue<String>>> getSettingsByContext(Context context) {
+    return service.getSettingsByContext(context);
+  }
+
+  @Override
+  public List<Context> getContextsByTypeAndScopeAndSettingName(String contextType,
+                                                               String scopeType,
+                                                               String scopeName,
+                                                               String settingName,
+                                                               int offset,
+                                                               int limit) {
+    return service.getContextsByTypeAndScopeAndSettingName(contextType, scopeType, scopeName, settingName, offset, limit);
+  }
+
+  @Override
+  public Set<String> getEmptyContextsByScopeAndContextType(String name, String name2, String id, int offset, int limit) {
+    return service.getEmptyContextsByScopeAndContextType(name, name2, id, offset, limit);
+  }
+
+  @Override
+  public void save(Context context) {
+    service.save(context);
   }
 
 }

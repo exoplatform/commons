@@ -58,7 +58,7 @@
 	</component>
 	<component>
 		<key>org.exoplatform.commons.api.settings.SettingService</key>
-		<type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
+    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
 	</component>
 	<component>
 		<type>org.exoplatform.jpa.mock.DummyDependantComponent</type>
