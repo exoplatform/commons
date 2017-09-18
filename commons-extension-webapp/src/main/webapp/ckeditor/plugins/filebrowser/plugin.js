@@ -1,5 +1,5 @@
-/**
- * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+﻿/**
+ * @license Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -167,7 +167,7 @@
 			params.langCode = editor.langCode;
 
 		var url = addQueryString( this.filebrowser.url, params );
-		// TODO: V4: Remove backward compatibility (#8163).
+		// TODO: V4: Remove backward compatibility (http://dev.ckeditor.com/ticket/8163).
 		editor.popup( url, width, height, editor.config.filebrowserWindowFeatures || editor.config.fileBrowserWindowFeatures );
 	}
 

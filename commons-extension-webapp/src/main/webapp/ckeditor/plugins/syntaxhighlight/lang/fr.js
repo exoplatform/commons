@@ -1,4 +1,4 @@
-CKEDITOR.plugins.setLang('syntaxhighlight', 'fr', {
+﻿CKEDITOR.plugins.setLang('syntaxhighlight', 'fr', {
 	title:'Ajouter ou modifier un morceau de code source',
 	contextTitle:'&Eacute;diter le code source',
 	sourceTab:'Code source',

@@ -1,4 +1,4 @@
-CKEDITOR.plugins.add( 'syntaxhighlight', {
+﻿CKEDITOR.plugins.add( 'syntaxhighlight', {
 	requires : 'dialog',
 	lang : 'en,de,fr,zh-cn', // %REMOVE_LINE_CORE%
 	icons : 'syntaxhighlight', // %REMOVE_LINE_CORE%

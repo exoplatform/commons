@@ -1,5 +1,5 @@
 /**
- * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -88,7 +88,7 @@
 	// Register a plugin named "stylesheetparser".
 	CKEDITOR.plugins.add( 'stylesheetparser', {
 		init: function( editor ) {
-			// Stylesheet parser is incompatible with filter (#10136).
+			// Stylesheet parser is incompatible with filter (http://dev.ckeditor.com/ticket/10136).
 			editor.filter.disable();
 
 			var cachedDefinitions;
