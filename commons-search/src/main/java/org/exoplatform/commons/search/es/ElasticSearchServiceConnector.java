@@ -238,12 +238,15 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
       throw new ElasticSearchException("Unable to parse JSON response", e);
     }
 
-    //TODO check if response is successful
     JSONObject jsonResult = (JSONObject) json.get("hits");
-    JSONArray jsonHits = (JSONArray) jsonResult.get("hits");
+    if(jsonResult != null) {
+      JSONArray jsonHits = (JSONArray) jsonResult.get("hits");
 
-    for(Object jsonHit : jsonHits) {
-      results.add(buildHit((JSONObject) jsonHit, context));
+      if(jsonHits != null) {
+        for (Object jsonHit : jsonHits) {
+          results.add(buildHit((JSONObject) jsonHit, context));
+        }
+      }
     }
 
     return results;
