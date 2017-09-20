@@ -25,7 +25,8 @@ package org.exoplatform.commons.search.es;
 public enum  ElasticSearchFilterType {
   FILTER_BY_TERM("term"),
   FILTER_EXIST("exist"),
-  FILTER_NOT_EXIST("notExist");
+  FILTER_NOT_EXIST("notExist"),
+  FILTER_CUSTOM("custom");
 
   private final String filterType;
 

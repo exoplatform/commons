@@ -323,6 +323,8 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
         return getExistFilter(filter.getField());
       case FILTER_NOT_EXIST:
         return getNotExistFilter(filter.getField());
+      case FILTER_CUSTOM:
+        return getCustomFilter(filter.getValue());
     }
     return "";
   }
@@ -369,6 +371,16 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
       fields.add("\"" + searchField + "\"");
     }
     return StringUtils.join(fields, ",");
+  }
+
+  /**
+   * Apply the given value directly as the filter
+   *
+   * @param value
+   * @return a Custom Filter
+   */
+  private String getCustomFilter(String value) {
+    return value;
   }
 
   protected String getPermissionFilter() {
