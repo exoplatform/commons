@@ -36,7 +36,7 @@ public class SettingServiceImplTest extends BaseCommonsTestCase {
   public void setUp() throws Exception {
     super.setUp();
     settingService = getService(SettingServiceImpl.class);
-    ConversationState c = new ConversationState(new Identity(session.getUserID()));
+    ConversationState c = new ConversationState(new Identity("foo"));
     ConversationState.setCurrent(c);
   }
 

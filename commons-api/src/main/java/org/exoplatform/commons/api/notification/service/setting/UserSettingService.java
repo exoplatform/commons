@@ -16,11 +16,11 @@
  */
 package org.exoplatform.commons.api.notification.service.setting;
 
-import java.util.List;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.services.organization.User;
+
+import java.util.List;
 
 public interface UserSettingService {
 
@@ -57,44 +57,20 @@ public interface UserSettingService {
    * @return The list of user settings.
    */
   List<UserSetting> getDigestDefaultSettingForAllUser(int offset, int limit);
-  
-  /**
-   * Gets all settings of users who deactivated is FALSE
-   * 
-   * @return
-   */
-  List<UserSetting> getUserSettingWithDeactivate();
-  
-  /**
-   * Gets all Ids of users registering for email notifications by a given plugin.
-   * 
-   * @param pluginId Id of the plugin.
-   * @return The remote Ids of users.
-   * @deprecated - Replace by {@link #getUserHasSettingPlugin(String, String)}
-   */
-  List<String> getUserSettingByPlugin(String pluginId);
-  
-  /**
-   * Gets all Ids of users registering for notifications by a given plugin.
-   * 
-   * @param pluginId Id of the plugin.
-   * @return The remote Ids of users.
-   */
-  List<String> getUserHasSettingPlugin(String channelId, String pluginId);
-  
+
   /**
    * Adds the default settings to a user's node.
    * 
    * @param userId The user's remote Id.
    */
-  void addMixin(String userId);
+  void initDefaultSettings(String userId);
   
   /**
    * Adds the default settings to a list of users.
    * 
    * @param users The list of users.
    */
-  void addMixin(User[] users);
+  void initDefaultSettings(User[] users);
 
   /**
    * Stores the read time point when user clicks mark all read his/her messages.
@@ -107,4 +83,13 @@ public interface UserSettingService {
    * @since PLF 4.2
    */
   void saveLastReadDate(String userId, Long time);
+
+  /**
+   * Enables user settings
+   * 
+   * @param username user id
+   * @param enabled true/false
+   */
+  void setUserEnabled(String username, boolean enabled);
+
 }

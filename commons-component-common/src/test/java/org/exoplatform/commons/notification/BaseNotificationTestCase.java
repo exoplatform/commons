@@ -17,10 +17,16 @@ import org.exoplatform.commons.notification.impl.service.storage.WebNotification
 import org.exoplatform.commons.notification.mock.AddNodeEventListener;
 import org.exoplatform.commons.notification.plugin.PluginTest;
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/commons-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
 public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
 
   protected static final String NOTIFICATIONS = "notifications";

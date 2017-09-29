@@ -60,9 +60,13 @@ public class NotificationInfo {
   
   private Calendar            dateCreated;
   
-  private boolean             isOnPopOver;
+  private boolean             isOnPopOver    = true;
 
-  private boolean             isUpdate = false;
+  private boolean             read           = false;
+
+  private boolean             resetOnBadge   = false;
+
+  private boolean             isUpdate       = false;
 
   public NotificationInfo() {
     this.id = PREFIX_ID + IdGenerator.generate();
@@ -386,7 +390,24 @@ public class NotificationInfo {
     return this;
   }
 
-  
+  public boolean isResetOnBadge() {
+    return resetOnBadge;
+  }
+
+  public NotificationInfo setResetOnBadge(boolean resetOnBadge) {
+    this.resetOnBadge = resetOnBadge;
+    return this;
+  }
+
+  public boolean isRead() {
+    return read;
+  }
+
+  public NotificationInfo setRead(boolean read) {
+    this.read = read;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
 
@@ -394,6 +415,9 @@ public class NotificationInfo {
       NotificationInfo m = (NotificationInfo) o;
       if (super.equals(o)) {
         return true;
+      }
+      if(m.getId() == null || this.id == null) {
+        return false;
       }
       if (m.getId().equals(this.id)) {
         return true;
@@ -453,13 +477,17 @@ public class NotificationInfo {
     message.setFrom(from)
            .key(key)
            .setTitle(title)
+           .setUpdate(!isNew)
            .setOrder(order)
            .setOwnerParameter(new HashMap<String, String>(ownerParameter))
            .setSendToDaily(arrayCopy(sendToDaily))
            .setSendToWeekly(arrayCopy(sendToWeekly))
-           .setTo(to);
+           .setTo(to)
+           .setId(isNew ? null : id);
     if(!isNew) {
-      message.setId(id);
+      message.setOnPopOver(isOnPopOver)
+             .setResetOnBadge(resetOnBadge)
+             .setRead(read);
     }
     return message;
   }

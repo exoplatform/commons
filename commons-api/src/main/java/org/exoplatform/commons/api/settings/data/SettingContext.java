@@ -18,10 +18,10 @@ package org.exoplatform.commons.api.settings.data;
 
 import java.io.Serializable;
 
-import javax.jcr.RepositoryException;
-
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 /**
  * Associates setting properties with a specified context (GLOBAL/USER).
@@ -29,6 +29,7 @@ import org.exoplatform.services.jcr.RepositoryService;
  * @LevelAPI Experimental
  */
 public class SettingContext implements Serializable {
+  private static final Log  LOG              = ExoLogger.getLogger(SettingContext.class);
 
   private static final long serialVersionUID = 437625857263645213L;
   /**
@@ -69,20 +70,26 @@ public class SettingContext implements Serializable {
 
     if (obj instanceof SettingContext) {
       SettingContext dest = (SettingContext) obj;
-      return this.repositoryName.equals(dest.getRepositoryName())
-          && this.getContextPath().equals(dest.getContextPath());
+      if (this.repositoryName == null) {
+        return this.getContextPath().equals(dest.getContextPath());
+      } else {
+        return this.repositoryName.equals(dest.getRepositoryName())
+            && this.getContextPath().equals(dest.getContextPath());
+      }
     }
     return false;
   }
+
   /**
    * Returns the hash code value for the SettingContext object.
    */
   @Override
   public int hashCode() {
-    int result = repositoryName.hashCode();
+    int result = repositoryName == null ? 0 : repositoryName.hashCode();
     result = 31 * result + ContextPath.hashCode();
     return result;
   }
+
   /**
    * Gets path of the SettingContext object.
    * @return The setting context path.
@@ -114,9 +121,19 @@ public class SettingContext implements Serializable {
     RepositoryService repositoryService = (RepositoryService) PortalContainer.getInstance()
                                                                              .getComponentInstanceOfType(RepositoryService.class);
     try {
-      return repositoryService.getCurrentRepository().getConfiguration().getName();
-    } catch (RepositoryException e) {
-      throw new RuntimeException(e);
+      if (repositoryService == null || repositoryService.getCurrentRepository() == null
+          || repositoryService.getCurrentRepository().getConfiguration() == null) {
+        return null;
+      } else {
+        return repositoryService.getCurrentRepository().getConfiguration().getName();
+      }
+    } catch (Exception e) {
+      if(LOG.isDebugEnabled()) {
+        LOG.warn("An error occurred when getting current repository name, null will be returned", e);
+      } else {
+        LOG.warn("An error occurred when getting current repository name, null will be returned");
+      }
+      return null;
     }
   }
 }

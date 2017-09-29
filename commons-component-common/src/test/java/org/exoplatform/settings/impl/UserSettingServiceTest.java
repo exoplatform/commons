@@ -1,6 +1,5 @@
 package org.exoplatform.settings.impl;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -8,6 +7,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import javax.jcr.Node;
+
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.UserSetting;
@@ -22,15 +24,13 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.idm.UserImpl;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserSettingServiceTest extends BaseNotificationTestCase {
   private UserSettingServiceImpl userSettingService;
   private OrganizationService organizationService;
   private ExecutorService executor;
-  
+
   public UserSettingServiceTest() {
   }
 
@@ -52,7 +52,7 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
 
     executor = Executors.newFixedThreadPool(20, threadFactory);
   }
-  
+
   @Override
   protected void tearDown() throws Exception {
     for (int i = 0; i < 10; i++) {
@@ -75,7 +75,7 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     list = userSettingService.getDigestDefaultSettingForAllUser(0, 0);
     assertTrue(list.size() > size);
   }
-  
+
   public void testDisabledUser() throws Exception {
     User u = CommonsUtils.getService(OrganizationService.class).getUserHandler().createUserInstance("binh");
     u.setEmail("email@test");
@@ -83,18 +83,18 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     u.setLastName("last");
     u.setPassword("pwdADDSomeSaltToBeCompliantWithSomeIS00");
     CommonsUtils.getService(OrganizationService.class).getUserHandler().createUser(u, true);
-    
+
     userSettingService.save(createUserSetting("binh", null, null, null));
     UserSetting userSetting = userSettingService.get("binh");
     assertTrue(userSetting.isChannelActive(MailChannel.ID));
     assertTrue(userSetting.isEnabled());
-    
+
     //disable user "root"
     CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", false, true);
     userSetting = userSettingService.get("binh");
     assertTrue(userSetting.isChannelActive(MailChannel.ID));
     assertFalse(userSetting.isEnabled());
-    
+
     //enable user "root" but not change the active channel status
     CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("binh", true, true);
     userSetting = userSettingService.get("binh");
@@ -106,35 +106,18 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
 
   }
 
-  public void test_2_GetUsersSetting() throws Exception {
-    runUpgrade();
-    //
-    userSettingService.save(createUserSetting("root", Arrays.asList("1","2"), Arrays.asList("3","4"), Arrays.asList("5","6")));
-    userSettingService.save(createUserSetting("john", Arrays.asList("4","5"), Arrays.asList("2","8"), Arrays.asList("6","7")));
-    userSettingService.save(createUserSetting("mary", Arrays.asList("32","5"), Arrays.asList("4","6"), Arrays.asList("1","9")));
-    userSettingService.save(createUserSetting("demo", Arrays.asList("2"), Arrays.asList("3","9"), Arrays.asList("2","7")));
-    //
-    List<String> list = userSettingService.getUserSettingByPlugin("2");
-    assertEquals(3, list.size());// root, john, demo
-    
-    //disable user "root"
-    CommonsUtils.getService(OrganizationService.class).getUserHandler().setEnabled("root", false, true);
-    list = userSettingService.getUserSettingByPlugin("2");
-    assertEquals(2, list.size());//john, demo
-  }
-
   private void runUpgrade() throws Exception {
     // run upgrade by run daily
     NotificationContext context = NotificationContextImpl.cloneInstance();
     context.append(NotificationJob.JOB_DAILY, true);
     context.append(NotificationJob.JOB_WEEKLY, false);
-    
+
     getService(NotificationService.class).digest(context);
     //
     initModifiedDate();
     Thread.sleep(100);
   }
-  
+
   private UserSetting createUserSetting(String userId, List<String> instantly, List<String> daily, List<String> weekly) {
     UserSetting model = new UserSetting();
     model.setUserId(userId);
@@ -144,16 +127,21 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
     model.setWeeklyPlugins(weekly);
     return model;
   }
-  
+
   private void initSettingHome() throws Exception {
     Node rootNode = session.getRootNode();
-    if (rootNode.hasNode("settings") == false) {
-      Node settingNode = rootNode.addNode("settings", "stg:settings");
+    Node settingNode = null;
+    if (!rootNode.hasNode("settings")) {
+      settingNode = rootNode.addNode("settings", "stg:settings");
+      session.save();
+    }
+    settingNode = rootNode.getNode("settings");
+    if (!settingNode.hasNode("user")) {
       settingNode.addNode("user", "stg:subcontext");
       session.save();
     }
   }
-  
+
   private void addLastUpdateTime(String userId) throws Exception {
     Node rootNode = session.getRootNode().getNode("settings").getNode("user");
     Node userNode = null;
@@ -171,7 +159,7 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
       session.save();
     }
   }
-  
+
   private void initModifiedDate() throws Exception {
     ListAccess<User> list = organizationService.getUserHandler().findAllUsers();
     //
@@ -193,8 +181,8 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
       }
     }
   }
-  
-  public void test_3_AddMixingMultiThreads() throws Exception {
+
+  public void test_3_initDefaultSettingsMultiThreads() throws Exception {
     for (int i = 0; i < 10; i++) {
       User user = new UserImpl("user_" + i);
       organizationService.getUserHandler().createUser(user, false);
@@ -208,7 +196,7 @@ public class UserSettingServiceTest extends BaseNotificationTestCase {
             //
             User[] users = list.load(0, list.getSize());
             for (int i = 0; i < users.length; i++) {
-              userSettingService.addMixin(users[i].getUserName());
+              userSettingService.initDefaultSettings(users[i].getUserName());
             }
           } catch (Exception e) {
             assertFalse(true);

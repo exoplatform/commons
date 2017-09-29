@@ -41,7 +41,7 @@ public abstract class AbstractTemplateBuilder {
    * @return
    */
   protected abstract MessageInfo makeMessage(NotificationContext ctx);
-  
+
   /**
    * Makes the Digest message from given NotificationMessage what keep inside NotificationContext
    * @param ctx
@@ -59,6 +59,9 @@ public abstract class AbstractTemplateBuilder {
     NotificationInfo notif = ctx.getNotificationInfo();
     try {
       MessageInfo messageInfo = makeMessage(ctx);
+      if (messageInfo == null) {
+        return null;
+      }
       return messageInfo.setId(notif.getId()).pluginId(notif.getKey().getId()).from(NotificationPluginUtils.getFrom(notif.getFrom()))
           .to(NotificationPluginUtils.getTo(notif.getTo())).end();
     } catch (Exception e) {
@@ -106,4 +109,8 @@ public abstract class AbstractTemplateBuilder {
     this.engine = engine;
   }
 
+  public NotificationInfo getNotificationToStore(NotificationInfo notificationInfo) {
+    return notificationInfo;
+  }
+  
 }

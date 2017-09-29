@@ -16,19 +16,11 @@
  */
 package org.exoplatform.commons.notification.impl.service.storage;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.jcr.*;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
-import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
+import org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
@@ -39,8 +31,18 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public class NotificationDataStorageImpl extends AbstractService implements NotificationDataStorage {
-  private static final Log         LOG              = ExoLogger.getLogger(NotificationDataStorageImpl.class);
+import javax.jcr.Item;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Session;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class MailNotificationStorageImpl extends AbstractService implements MailNotificationStorage {
+  private static final Log         LOG              = ExoLogger.getLogger(MailNotificationStorageImpl.class);
 
   private static final String       REMOVE_ALL       = "removeAll";
   
@@ -52,7 +54,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
 
   private Map<String, Set<String>>  removeByCallBack = new ConcurrentHashMap<String, Set<String>>();
 
-  public NotificationDataStorageImpl(NotificationConfiguration configuration) {
+  public MailNotificationStorageImpl(NotificationConfiguration configuration) {
     this.workspace = configuration.getWorkspace();
   }
 
@@ -235,7 +237,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
     return it;
   }
 
-  private NotificationInfo fillModel(Node node) throws Exception {
+  public NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
     if(!node.hasProperty(EXO_LAST_MODIFIED_DATE)) {
       if(node.isNodeType(EXO_MODIFY)) {
@@ -324,7 +326,7 @@ public class NotificationDataStorageImpl extends AbstractService implements Noti
   }
 
   @Override
-  public void removeMessageAfterSent() throws Exception {
+  public void removeMessageAfterSent(NotificationContext ctx) throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     boolean created =  NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();

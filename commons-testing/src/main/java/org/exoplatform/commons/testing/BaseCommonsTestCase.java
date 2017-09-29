@@ -16,20 +16,33 @@
  */
 package org.exoplatform.commons.testing;
 
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Session;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
+import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.test.BasicTestCase;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Session;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform hailt@exoplatform.com
  * May 22, 2012
  */
-public abstract class BaseCommonsTestCase extends BasicTestCase {
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
+public abstract class BaseCommonsTestCase extends AbstractKernelTest {
+  private static final Log       LOG            = ExoLogger.getLogger(BaseCommonsTestCase.class);
+
   protected final String         REPO_NAME      = "repository";
 
   protected final String         WORKSPACE_NAME = "portal-test";
@@ -45,6 +58,10 @@ public abstract class BaseCommonsTestCase extends BasicTestCase {
   protected Node                 root;
 
   public void setUp() throws Exception {
+    // Set random folder name for JCR index, swap & lock
+    System.setProperty("exo.test.random.name", "" + Math.random());
+    super.setUp();
+    begin();
     container = PortalContainer.getInstance();
     repositoryService = getService(RepositoryService.class);
     configurationManager = getService(ConfigurationManager.class);
@@ -55,14 +72,23 @@ public abstract class BaseCommonsTestCase extends BasicTestCase {
   }
 
   protected void tearDown() throws Exception {
-    super.tearDown();
     NodeIterator iter = root.getNodes();
     while (iter.hasNext()) {
       Node node = iter.nextNode();
       node.remove();
     }
     session.save();
-    session.logout();
+    end();
+    super.tearDown();
+  }
+
+  @BeforeClass
+  @Override
+  protected void beforeRunBare() {
+    if(System.getProperty("gatein.test.output.path") == null) {
+      System.setProperty("gatein.test.output.path", System.getProperty("java.io.tmpdir"));
+    }
+    super.beforeRunBare();
   }
 
   protected <T> T getService(Class<T> clazz) {

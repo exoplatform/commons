@@ -10,6 +10,7 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
+import org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.IntegerData;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsData;
 import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsKey;
@@ -40,6 +41,8 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     exoWebNotificationCache = cacheService.getCacheInstance(WEB_NOTIFICATION_CACHING_NAME);
     exoWebNotificationsCache = cacheService.getCacheInstance(LIST_WEB_NOTIFICATION_CACHING_NAME);
     exoWebNotificationCountCache = cacheService.getCacheInstance(WEB_NOTIFICATION_COUNT_CACHING_NAME);
+
+    assertTrue(cachedStorage instanceof CachedWebNotificationStorage);
   }
   
   @Override
@@ -292,7 +295,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
      *   + 12/12/2014
      *  Expected: remaining is 0 notification
     */
-    long daySeconds = 86400;
+    int daySeconds = 86400;
     String userId = "demo";
     Calendar cal = Calendar.getInstance();
     long t = 86400000l;

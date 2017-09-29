@@ -18,16 +18,20 @@ package org.exoplatform.commons.notification.job;
 
 import java.util.concurrent.Callable;
 
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 public abstract class NotificationJob implements Job {
   /** Defines the Logger instance*/
@@ -41,8 +45,16 @@ public abstract class NotificationJob implements Job {
   
   /** Define the argument parameter for WEEKLY job with Boolean type */
   public final static ArgumentLiteral<Boolean> JOB_WEEKLY = new ArgumentLiteral<Boolean>(Boolean.class, "jobWeekly");
-  
-  public NotificationJob() {}
+
+  private ExoContainer container;
+
+  public NotificationJob() {
+    this(PortalContainer.getInstance());
+  }
+
+  public NotificationJob(ExoContainer exoContainer) {
+    this.container = exoContainer;
+  }
 
   @Override
   public void execute(final JobExecutionContext context) throws JobExecutionException {
@@ -52,6 +64,8 @@ public abstract class NotificationJob implements Job {
     Callable<Boolean> task = new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
+        ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
+        ExoContainerContext.setCurrentContainer(container);
         boolean created = NotificationSessionManager.createSystemProvider();
         try {
           processSendNotification(context);
@@ -60,6 +74,7 @@ public abstract class NotificationJob implements Job {
           return false;
         } finally {
           NotificationSessionManager.closeSessionProvider(created);
+          ExoContainerContext.setCurrentContainer(currentContainer);
         }
         return true;
       }

@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,114 +32,72 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 
+import org.json.JSONObject;
+import org.picocontainer.Startable;
+
 import org.exoplatform.commons.api.notification.model.MessageInfo;
 import org.exoplatform.commons.api.notification.service.QueueMessage;
+import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationContextFactory;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationSessionManager;
-import org.exoplatform.commons.notification.job.SendEmailNotificationJob;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.StringCommonUtils;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.management.annotations.ManagedBy;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
+import org.exoplatform.services.listener.Event;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.mail.MailService;
-import org.exoplatform.services.mail.Message;
-import org.exoplatform.services.scheduler.JobInfo;
-import org.exoplatform.services.scheduler.JobSchedulerService;
-import org.exoplatform.services.scheduler.PeriodInfo;
-import org.json.JSONObject;
-import org.picocontainer.Startable;
-import org.quartz.JobDataMap;
 
-@ManagedBy(SendEmailService.class)
 public class QueueMessageImpl extends AbstractService implements QueueMessage, Startable {
-  private static final Log               LOG                   = ExoLogger.getExoLogger(QueueMessageImpl.class);
+  private static final Log          LOG                 = ExoLogger.getExoLogger(QueueMessageImpl.class);
 
-  private static final String            MAX_TO_SEND_SYS_KEY   = "conf.notification.service.QueueMessage.numberOfMailPerBatch";
-  private static final String            MAX_TO_SEND_KEY       = "numberOfMailPerBatch";
-  private static final String            DELAY_TIME_SYS_KEY    = "conf.notification.service.QueueMessage.period";
-  private static final String            DELAY_TIME_KEY        = "period";
-  private static final String            CACHE_REPO_NAME       = "repositoryName";
-  private static int                     LIMIT                 = 20;
+  private static final String       MAX_TO_SEND_SYS_KEY = "conf.notification.service.QueueMessage.numberOfMailPerBatch";
 
-  private int                            MAX_TO_SEND;
-  private long                           DELAY_TIME;
+  private static final String       MAX_TO_SEND_KEY     = "numberOfMailPerBatch";
+
+  private static final int          MAX_TO_SEND_DEFAULT  = 20;
+
+  private boolean                   enabled             = true;
+
+  private int                       maxToSend;
+
   /** .. */
-  private SendEmailService               sendEmailService;
+  private MailService               mailService;
+
+  private ListenerService           listenerService;
+
   /** .. */
-  private MailService                    mailService;
-  /** .. */
-  private NotificationConfiguration      configuration;
+  private NotificationConfiguration notificationConfiguration;
+
   /** The lock protecting all mutators */
-  transient final ReentrantLock lock = new ReentrantLock();
+  transient final ReentrantLock     lock                = new ReentrantLock();
+
   /** using the set to keep the messages. */
-  private Set<MessageInfo> messages = Collections.synchronizedSet(new HashSet<MessageInfo>());
+  private Set<MessageInfo>          messages            = Collections.synchronizedSet(new HashSet<MessageInfo>());
+
   /** .. */
-  private ThreadLocal<Set<String>> idsRemovingLocal = new ThreadLocal<Set<String>>();
-  
-  public QueueMessageImpl(InitParams params) {
-    this.configuration = CommonsUtils.getService(NotificationConfiguration.class);
-    this.mailService = CommonsUtils.getService(MailService.class);
+  private ThreadLocal<Set<String>>  idsRemovingLocal    = new ThreadLocal<Set<String>>();
 
-    MAX_TO_SEND = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, 20);
-    DELAY_TIME = NotificationUtils.getSystemValue(params, DELAY_TIME_SYS_KEY, DELAY_TIME_KEY, 120) * 1000;
-  }
-  
-  public void setManagementView(SendEmailService managementView) {
-    this.sendEmailService = managementView;
-  }
+  public QueueMessageImpl(NotificationConfiguration notificationConfiguration,
+                          MailService mailService,
+                          ListenerService listenerService,
+                          SettingService settingService,
+                          InitParams params) {
+    this.notificationConfiguration = notificationConfiguration;
+    this.listenerService = listenerService;
+    this.mailService = mailService;
 
-  public void makeJob(int limit, long interval) {
-    if (interval > 0) {
-      LIMIT = limit;
-      //
-      JobSchedulerService schedulerService = CommonsUtils.getService(JobSchedulerService.class);
-      Calendar cal = new GregorianCalendar();
-      //
-      try {
-        PeriodInfo periodInfo = new PeriodInfo(cal.getTime(), null, -1, interval);
-        JobInfo info = new JobInfo("SendEmailNotificationJob", "Notification", SendEmailNotificationJob.class);
-        info.setDescription("Send email notification job.");
-        //
-        schedulerService.removeJob(info);
-
-        JobDataMap jdatamap = new JobDataMap();
-        jdatamap.put(CACHE_REPO_NAME, CommonsUtils.getRepository().getConfiguration().getName());
-        //
-        schedulerService.addPeriodJob(info, periodInfo, jdatamap);
-        LOG.debug("Job executes interval: " + interval);
-      } catch (Exception e) {
-        LOG.warn("Failed at makeJob().");
-        LOG.debug(e.getMessage(), e);
-      }
-    }
-  }
-
-  public void resetDefaultConfigJob() {
-    makeJob(MAX_TO_SEND, DELAY_TIME);
+    maxToSend = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, MAX_TO_SEND_DEFAULT);
   }
 
   @Override
-  public void start() {
-    
-    //
-    resetDefaultConfigJob();
-    //
-    sendEmailService.registerManager(this);
-  }
-
-  @Override
-  public void stop() {
-  }
-
-  @Override
-  public boolean put(MessageInfo message) {
+  public boolean put(MessageInfo message) throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     //
     if (message == null || message.getTo() == null || message.getTo().length() == 0) {
@@ -158,12 +115,12 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     }
     saveMessageInfo(message);
     //
-    sendEmailService.addCurrentCapacity();
+    listenerService.broadcast(new Event<QueueMessage, String>(MESSAGE_ADDED_IN_QUEUE, this, message.getId()));
     return true;
   }
 
   @Override
-  public void send() {
+  public void send() throws Exception {
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
@@ -179,7 +136,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       
       for (MessageInfo messageInfo : messages) {
         if (messageInfo != null && !idsRemovingLocal.get().contains(messageInfo.getId())
-            && sendMessage(messageInfo.makeEmailNotification())) {
+            && sendMessage(messageInfo)) {
           
           LOG.debug("Message sent to user: " + messageInfo.getTo());
           //
@@ -227,7 +184,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();
     try {
       message.setCreatedTime(System.currentTimeMillis());
-      Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
+      Node messageInfoHome = getMessageInfoHomeNode(sProvider, notificationConfiguration.getWorkspace());
       Node messageInfoNode = messageInfoHome.addNode(String.valueOf(message.getCreatedTime()), NTF_MESSAGE_INFO);
       if (messageInfoNode.canAddMixin("mix:referenceable")) {
         messageInfoNode.addMixin("mix:referenceable");
@@ -252,11 +209,11 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     List<String> ids = new ArrayList<String>(idsRemovingLocal.get()) ;
     try {
       lock.lock();
-      Session session = getSession(sProvider, configuration.getWorkspace());
+      Session session = getSession(sProvider, notificationConfiguration.getWorkspace());
       for (String messageId : ids) {
         session.getNodeByUUID(messageId).remove();
         //
-        sendEmailService.removeCurrentCapacity();
+        listenerService.broadcast(new Event<QueueMessage, String>(MESSAGE_DELETED_FROM_QUEUE, this, messageId));
         LOG.debug("Removing messageId: " + messageId);
       }
       session.save();
@@ -273,7 +230,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
   private NodeIterator getMessageInfoNodes(SessionProvider sProvider) {
     try {
-      Node messageInfoHome = getMessageInfoHomeNode(sProvider, configuration.getWorkspace());
+      Node messageInfoHome = getMessageInfoHomeNode(sProvider, notificationConfiguration.getWorkspace());
       QueryManager qm = messageInfoHome.getSession().getWorkspace().getQueryManager();
       StringBuilder sqlQuery = new StringBuilder();
       sqlQuery.append("SELECT * FROM ").append(NTF_MESSAGE_INFO)
@@ -282,7 +239,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
               .append(" ORDER BY exo:name");
       QueryImpl query = (QueryImpl) qm.createQuery(sqlQuery.toString(), Query.SQL);
       query.setOffset(0);
-      query.setLimit(LIMIT);
+      query.setLimit(maxToSend);
       QueryResult result = query.execute();
       return result.getNodes();
     } catch (Exception e) {
@@ -292,7 +249,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     return null;
   }
 
-  private MessageInfo getMessageInfo(Node messageInfoNode) {
+  public MessageInfo getMessageInfo(Node messageInfoNode) {
     try {
       String messageJson = getDataJson(messageInfoNode);
       JSONObject object = new JSONObject(messageJson);
@@ -313,24 +270,43 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
     return null;
   }
 
-  public boolean sendMessage(Message message) {
-    if (sendEmailService.isOn() == false) {
+  @Override
+  public boolean sendMessage(MessageInfo message) throws Exception {
+    if (message == null) {
+      throw new IllegalArgumentException("Message is null");
+    }
+    if (this.enabled) {
       try {
         //ensure the message is valid
         if (message.getFrom() == null) {
           return false;
         }
-        mailService.sendMessage(message);
+        mailService.sendMessage(message.makeEmailNotification());
         return true;
       } catch (Exception e) {
         LOG.error("Error while sending a message - Cause : " + e.getMessage(), e);
         return false;
       }
-    } else {
-      sendEmailService.counter();
     }
-    // if service is off, removed message.
+    //
+    listenerService.broadcast(new Event<QueueMessage, String>(MESSAGE_SENT_FROM_QUEUE, this, message.getId()));
     return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void enable(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  @Override
+  public void start() {
+  }
+
+  @Override
+  public void stop() {
   }
 
   private void saveData(Node node, InputStream is) throws Exception {
@@ -351,23 +327,23 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
 
 
-  public String removeAll() {
+  public void removeAll() {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     int t = 0, j = 0;
     String pli="";
     try {
-      Session session = getSession(sProvider, configuration.getWorkspace());
+      Session session = getSession(sProvider, notificationConfiguration.getWorkspace());
       Node root = session.getRootNode();
       //
-      LOG.trace("Removing messages: ");
+      LOG.debug("Removing messages: ");
       if (root.hasNode("eXoNotification/messageInfoHome")) {
         NodeIterator it = root.getNode("eXoNotification/messageInfoHome").getNodes();
         //
         removeNodes(session, it);
       }
-      LOG.trace("Done to removed messages! ");
+      LOG.debug("Done to removed messages! ");
       //
-      LOG.trace("Removing notification info... ");
+      LOG.debug("Removing notification info... ");
       NodeIterator it = root.getNode("eXoNotification/messageHome").getNodes();
       List<String> pluginPaths = new ArrayList<String>();
       while (it.hasNext()) {
@@ -376,33 +352,31 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       session.logout();
       for (String string : pluginPaths) {
         pli = string;
-        LOG.trace("Remove notification info on plugin: " + pli);
+        LOG.debug("Remove notification info on plugin: " + pli);
         //
-        session = getSession(sProvider, configuration.getWorkspace());
+        session = getSession(sProvider, notificationConfiguration.getWorkspace());
         it = ((Node) session.getItem(string)).getNodes();
         while (it.hasNext()) {
           NodeIterator hIter = it.nextNode().getNodes();
           j = removeNodes(session, hIter);
           t += j;
         }
-        LOG.trace("Removed " + j + " nodes info on plugin: " + pli);
+        LOG.debug("Removed " + j + " nodes info on plugin: " + pli);
         session.logout();
       }
 
-      return "Done to removed " + t + " nodes!";
     } catch (Exception e) {
-      LOG.trace("Removed " + j + " nodes info on plugin: " + pli);
-      LOG.trace("Removed all " + t + " nodes.");
+      LOG.debug("Removed " + j + " nodes info on plugin: " + pli);
+      LOG.debug("Removed all " + t + " nodes.");
       LOG.debug("Failed to remove all data of feature notification." + e.getMessage());
     } finally {
       sProvider.close();
     }
-    return "Failed to remove all. Please, try again !";
   }
   
   private int removeNodes(Session session, NodeIterator it) throws Exception {
     int i = 0, size = Integer.valueOf(System.getProperty("sizePersiter", "200"));
-    LOG.trace("Starting to remove nodes...");
+    LOG.debug("Starting to remove nodes...");
     while (it.hasNext()) {
       it.nextNode().remove();
       ++i;
@@ -411,29 +385,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
       }
     }
     session.save();
-    LOG.trace(String.format("Done to removed %s nodes", i));
+    LOG.debug(String.format("Done to removed %s nodes", i));
     return i;
-  }
-  
-  public String removeUsersSetting() {
-    SessionProvider sProvider = SessionProvider.createSystemProvider();
-    int t = 0;
-    try {
-      Session session = getSession(sProvider, configuration.getWorkspace());
-      Node root = session.getRootNode();
-      LOG.trace("Removing all user settings: ");
-      if (root.hasNode("settings/user")) {
-        NodeIterator it = root.getNode("settings/user").getNodes();
-        //
-        t = removeNodes(session, it);
-      }
-      return "Done to removed " + t + " users!";
-    } catch (Exception e) {
-      LOG.trace("Removed all " + t + " nodes.");
-      LOG.debug("Failed to remove all data of feature notification." + e.getMessage());
-    } finally {
-      sProvider.close();
-    }
-    return "Failed to remove all. Please, try again !";
   }
 }

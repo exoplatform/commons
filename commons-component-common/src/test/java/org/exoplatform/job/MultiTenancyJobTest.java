@@ -16,70 +16,66 @@
  */
 package org.exoplatform.job;
 
-import static org.mockito.Mockito.mock;
-
-import java.util.Date;
-
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
-import org.quartz.Job;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.Scheduler;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
+import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.JobExecutionContextImpl;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.quartz.spi.TriggerFiredBundle;
+
+import java.util.Date;
+
+import static org.mockito.Mockito.mock;
 /**
  * Created by The eXo Platform SAS
  * Author : Canh Pham Van
  *          canhpv@exoplatform.com
- * Oct 18, 2012  
+ * Oct 18, 2012
  */
-public class MultiTenancyJobTest extends BaseCommonsTestCase{
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
+public class MultiTenancyJobTest extends BaseCommonsTestCase {
 
- private MultiTenancyJobImpl impl; 
- private TriggerFiredBundle firedBundle; 
- private JobExecutionContext context;
-  
+  private MultiTenancyJobImpl impl;
+  private TriggerFiredBundle firedBundle;
+  private JobExecutionContext context;
+
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    impl = new MultiTenancyJobImpl();    
-    
+    impl = new MultiTenancyJobImpl();
+
     JobDetail jobDetail = new JobDetailImpl();
     context = createContext(jobDetail);
   }
-  
+
   public void testExecute(){
-    
-      try {
-        impl.execute(context);
-      } catch (JobExecutionException e) {        
-        fail("testExecute");
-      }    
-      
+
+    try {
+      impl.execute(context);
+    } catch (JobExecutionException e) {
+      fail("testExecute");
+    }
+
   }
-  
+
 /*  public void testRun(){
-    
-    try {      
+
+    try {
       Constructor constructor = impl.getTask().getConstructor(MultiTenancyJobImpl.class, JobExecutionContext.class, String.class);
       Runnable temp = (Runnable) constructor.newInstance(impl, context, repoName);
       temp.run();
-      
+
     } catch (Exception e) {
       fail("testRun");
     }
-    
+
   }*/
-  
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-  }
-  
-  
+
   private JobExecutionContext createContext(JobDetail jobDetail) {
     firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTriggerImpl(), null, false, new Date(), new Date(), new Date(), new Date());
     return new StubJobExecutionContext();

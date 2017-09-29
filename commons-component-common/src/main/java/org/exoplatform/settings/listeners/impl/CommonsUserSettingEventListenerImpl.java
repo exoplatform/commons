@@ -1,7 +1,8 @@
 package org.exoplatform.settings.listeners.impl;
 
-import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -21,11 +22,19 @@ public class CommonsUserSettingEventListenerImpl extends UserEventListener {
   public void postSetEnabled(User user) throws Exception {
     UserSettingService userSettingService = CommonsUtils.getService(UserSettingService.class);
     try {
-      UserSetting userSetting = userSettingService.get(user.getUserName());
-      userSetting.setEnabled(user.isEnabled());
-      userSettingService.save(userSetting);
+      userSettingService.setUserEnabled(user.getUserName(), user.isEnabled());
     } catch (Exception e) {
-      LOG.warn("Failed to update user's setting : ", e);
+      LOG.warn("Failed to update user's 'enable' setting : ", e);
+    }
+  }
+
+  @Override
+  public void postDelete(User user) throws Exception {
+    SettingService settingService = CommonsUtils.getService(SettingService.class);
+    try {
+      settingService.remove(Context.USER.id(user.getUserName()));
+    } catch (Exception e) {
+      LOG.warn("Failed to delete settings of user : " + user.getUserName(), e);
     }
   }
 }

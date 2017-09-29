@@ -1,11 +1,11 @@
 package org.exoplatform.settings.chromattic;
 
-import java.util.Map;
-
 import org.chromattic.api.annotations.Destroy;
 import org.chromattic.api.annotations.OneToMany;
 import org.chromattic.api.annotations.PrimaryType;
 import org.chromattic.api.annotations.Properties;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
@@ -14,10 +14,10 @@ import org.chromattic.api.annotations.Properties;
 public abstract class ScopeEntity {
 
   @OneToMany
-  protected abstract Map<String, ScopeEntity> getInstances();
+  public abstract Map<String, ScopeEntity> getInstances();
 
   @Properties
-  protected abstract Map<String, Object> getProperties();
+  public abstract Map<String, Object> getProperties();
   
   @Destroy
   public abstract void remove();

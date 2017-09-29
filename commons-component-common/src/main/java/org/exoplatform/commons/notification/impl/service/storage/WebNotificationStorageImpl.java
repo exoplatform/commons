@@ -1,23 +1,5 @@
 package org.exoplatform.commons.notification.impl.service.storage;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
@@ -34,9 +16,15 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
-import org.exoplatform.services.jcr.impl.util.ISO9075;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
+import javax.jcr.*;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class WebNotificationStorageImpl extends AbstractService implements WebNotificationStorage {
   private static final Log LOG = ExoLogger.getLogger(WebNotificationStorageImpl.class);
@@ -331,7 +319,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    * @return
    * @throws Exception
    */
-  private NotificationInfo fillModel(Node node) throws Exception {
+  public NotificationInfo fillModel(Node node) throws Exception {
     if(node == null) return null;
     NotificationInfo notifiInfo = NotificationInfo.instance()
       .setTo(node.getProperty(NTF_OWNER).getString()) // owner of notification NTF_OWNER
@@ -339,6 +327,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       .key(node.getProperty(NTF_PLUGIN_ID).getString())//pluginId
       .setTitle(node.getProperty(NTF_TEXT).getString())
       .setOnPopOver(node.getProperty(NTF_SHOW_POPOVER).getBoolean())
+      .setResetOnBadge(!node.isNodeType(MIX_NEW_NODE))
       //
       .setLastModifiedDate(node.getProperty(NTF_LAST_MODIFIED_DATE).getLong())
       .setId(node.getName())

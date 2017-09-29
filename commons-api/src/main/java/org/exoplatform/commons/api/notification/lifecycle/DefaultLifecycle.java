@@ -43,8 +43,8 @@ public final class DefaultLifecycle extends AbstractNotificationLifecycle {
     
     for (String userId : userIds) {
       UserSetting userSetting = userService.get(userId);
-      //check channel active for user
-      if (!userSetting.isChannelActive(getChannel().getId())) {
+      //check channel active for user & user enabled
+      if (!userSetting.isEnabled() || !userSetting.isChannelActive(getChannel().getId())) {
         continue;
       }
       

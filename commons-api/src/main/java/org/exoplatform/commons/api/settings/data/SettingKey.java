@@ -83,7 +83,7 @@ public class SettingKey extends SettingScope {
    */
   @Override
   public int hashCode() {
-    int result = super.repositoryName.hashCode();
+    int result = this.repositoryName == null ? 0 : this.repositoryName.hashCode();
     result = 31 * result + scopePath.hashCode();
     result = 31 * result + key.hashCode();
     return result;

@@ -1,36 +1,35 @@
 package org.exoplatform.commons.notification;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
-import org.exoplatform.commons.api.notification.service.storage.NotificationDataStorage;
+import org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.notification.plugin.PluginTest;
 
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class NotificationServiceTest extends BaseNotificationTestCase {
   
   private NotificationService       notificationService;
-  private NotificationDataStorage   notificationDataStorage;
+  private MailNotificationStorage   mailNotificationStorage;
   
   @Override
   public void setUp() throws Exception {
     super.setUp();
     notificationService = getService(NotificationService.class);
-    notificationDataStorage = getService(NotificationDataStorage.class);
+    mailNotificationStorage = getService(MailNotificationStorage.class);
   }
   
   @Override
@@ -51,14 +50,14 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     params.put("objectId", "idofobject");
     notification.key(PluginTest.ID).setSendToDaily(userDaily)
                 .setSendToWeekly(userWeekly).setOwnerParameter(params).setOrder(1);
-    notificationDataStorage.save(notification);
+    mailNotificationStorage.save(notification);
     addMixin(notification.getId());
     return notification;
   }
   
   public void testServiceNotNull() throws Exception {
     assertNotNull(notificationService);
-    assertNotNull(notificationDataStorage);
+    assertNotNull(mailNotificationStorage);
     saveNotification("root", "demo");
   }
 
@@ -83,7 +82,7 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     context.append(NotificationJob.DAY_OF_JOB, dayName);
     //
     context.append(NotificationJob.JOB_WEEKLY, false);
-    Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
+    Map<PluginKey, List<NotificationInfo>> map = mailNotificationStorage.getByUser(context, userSetting);
     
     List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
@@ -100,12 +99,12 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     context.append(NotificationJob.JOB_WEEKLY, true);
     
     userSetting.setUserId("demo").addPlugin(PluginTest.ID, FREQUENCY.WEEKLY);
-    map = notificationDataStorage.getByUser(context, userSetting);
+    map = mailNotificationStorage.getByUser(context, userSetting);
     list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
     
     
-    notificationDataStorage.removeMessageAfterSent();
+    mailNotificationStorage.removeMessageAfterSent(context);
     
     notification2 = getNotificationInfoByKeyIdAndParam(PluginTest.ID, "objectId=idofobject");
     assertNull(notification2);
@@ -116,7 +115,7 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     Map<String, String> params = new HashMap<String, String>();
     params.put("objectId", "idofobject");
     notification.key(PluginTest.ID).setSendAll(true).setOwnerParameter(params).setOrder(1);
-    notificationDataStorage.save(notification);
+    mailNotificationStorage.save(notification);
     
     UserSetting userSetting = UserSetting.getInstance();
     userSetting.setUserId("root").addPlugin(PluginTest.ID, FREQUENCY.DAILY);
@@ -129,7 +128,7 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     //
     context.append(NotificationJob.JOB_WEEKLY, false);
     
-    Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
+    Map<PluginKey, List<NotificationInfo>> map = mailNotificationStorage.getByUser(context, userSetting);
     
     List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
@@ -141,7 +140,7 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
 
     assertEquals(NotificationInfo.FOR_ALL_USER, notification2.getSendToDaily()[0]);
     // remove value on property sendToDaily
-    notificationDataStorage.removeMessageAfterSent();
+    mailNotificationStorage.removeMessageAfterSent(context);
 
     //after sent daily, the message's sendToDaily property must be empty
     notification2 = getNotificationInfoByKeyIdAndParam(PluginTest.ID, "objectId=idofobject");
@@ -152,11 +151,11 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     context.append(NotificationJob.JOB_DAILY, false);
     context.append(NotificationJob.JOB_WEEKLY, true);
     userSetting.setUserId("demo").addPlugin(PluginTest.ID, FREQUENCY.WEEKLY);
-    map = notificationDataStorage.getByUser(context, userSetting);
+    map = mailNotificationStorage.getByUser(context, userSetting);
     list = map.get(new PluginKey(PluginTest.ID));
     assertEquals(1, list.size());
     
-    notificationDataStorage.removeMessageAfterSent();
+    mailNotificationStorage.removeMessageAfterSent(context);
     
     notification2 = getNotificationInfoByKeyIdAndParam(PluginTest.ID, "objectId=idofobject");
     assertNull(notification2);
@@ -177,7 +176,7 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     userSetting.setUserId(userNameSpecial).addPlugin(PluginTest.ID, FREQUENCY.DAILY);
     userSetting.setChannelActive(UserSetting.EMAIL_CHANNEL);
     //
-    Map<PluginKey, List<NotificationInfo>> map = notificationDataStorage.getByUser(context, userSetting);
+    Map<PluginKey, List<NotificationInfo>> map = mailNotificationStorage.getByUser(context, userSetting);
     List<NotificationInfo> list = map.get(new PluginKey(PluginTest.ID));
     //
     assertEquals(1, list.size());

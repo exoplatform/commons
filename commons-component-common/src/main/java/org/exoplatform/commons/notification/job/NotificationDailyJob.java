@@ -23,9 +23,19 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.job.mbeans.DailyService;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.PortalContainer;
 
 public class NotificationDailyJob extends NotificationJob {
-  
+
+  public NotificationDailyJob() {
+    this(PortalContainer.getInstance());
+  }
+
+  public NotificationDailyJob(ExoContainer exoContainer) {
+    super(exoContainer);
+  }
+
   @Override
   protected void processSendNotification() throws Exception {
     if (DailyService.isStarted() == false) {

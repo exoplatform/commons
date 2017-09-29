@@ -22,6 +22,10 @@ import java.lang.reflect.Constructor;
 import java.util.Date;
 
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
+
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -37,7 +41,10 @@ import org.quartz.spi.TriggerFiredBundle;
  *          canhpv@exoplatform.com
  * Oct 19, 2012  
  */
-public class MultiTenancyTaskTest extends BaseCommonsTestCase{
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
+public class MultiTenancyTaskTest extends BaseCommonsTestCase {
   
   private MultiTenancyJobImpl impl; 
   private TriggerFiredBundle firedBundle; 
@@ -55,7 +62,6 @@ public class MultiTenancyTaskTest extends BaseCommonsTestCase{
    }
 
    public void testRun(){
-     
      try {      
        Constructor constructor = impl.getTask().getConstructor(MultiTenancyJobImpl.class, JobExecutionContext.class, String.class);
        Runnable temp = (Runnable) constructor.newInstance(impl, context, repoName);
@@ -71,7 +77,6 @@ public class MultiTenancyTaskTest extends BaseCommonsTestCase{
    protected void tearDown() throws Exception {
      super.tearDown();
    }
-   
    
    private JobExecutionContext createContext(JobDetail jobDetail) {
      firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTriggerImpl(), null, false, new Date(), new Date(), new Date(), new Date());

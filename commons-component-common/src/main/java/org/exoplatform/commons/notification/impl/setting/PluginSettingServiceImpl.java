@@ -248,7 +248,7 @@ public class PluginSettingServiceImpl extends AbstractService implements PluginS
       for(int i = 1 ; i <= DAYS_OF_MONTH; i++) {
         getOrCreateMessageNode(node, DAY + i);
       }
-      
+
     } catch (Exception e) {
       LOG.error("Failed to create parent Node for plugin " + pluginId);
     } finally {

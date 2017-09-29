@@ -1,5 +1,9 @@
 package org.exoplatform.settings.impl;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
@@ -14,7 +18,6 @@ import org.exoplatform.commons.chromattic.ChromatticLifeCycle;
 import org.exoplatform.commons.chromattic.ChromatticManager;
 import org.exoplatform.commons.chromattic.SessionContext;
 import org.exoplatform.commons.event.impl.EventManagerImpl;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.settings.chromattic.ContextEntity;
 import org.exoplatform.settings.chromattic.ScopeEntity;
@@ -58,7 +61,7 @@ public class SettingServiceImpl implements SettingService {
           scopeEntity = createScope(context, scope);
         }
         scopeEntity.setValue(key, value.getValue());
-//        ctx.getSession().save();
+        ctx.getSession().save();
         return null;
       }
     }.executeWith(chromatticLifeCycle);
@@ -107,30 +110,26 @@ public class SettingServiceImpl implements SettingService {
         }
         // Context
         SimpleContextEntity contextEntity = null;
-        switch(c) {
-          case GLOBAL:
-            contextEntity = (SimpleContextEntity) settings.getContext(c.name().toLowerCase());
+        if(Context.GLOBAL.getName().equals(c.getName())) {
+            contextEntity = (SimpleContextEntity) settings.getContext(c.getName().toLowerCase());
             if (contextEntity == null) {
-              contextEntity = ctx.getSession().insert(settings, SimpleContextEntity.class, c.name().toLowerCase());
+              contextEntity = ctx.getSession().insert(settings, SimpleContextEntity.class, c.getName().toLowerCase());
             }
-            break;
-
-          case USER:
-            SubContextEntity userContextEntity = (SubContextEntity) settings.getContext(c.name().toLowerCase());
+        } else if(Context.USER.getName().equals(c.getName())) {
+            SubContextEntity userContextEntity = (SubContextEntity) settings.getContext(c.getName().toLowerCase());
             if (userContextEntity == null) {
-              userContextEntity = ctx.getSession().insert(settings, SubContextEntity.class, c.name().toLowerCase());
+              userContextEntity = ctx.getSession().insert(settings, SubContextEntity.class, c.getName().toLowerCase());
             }
             contextEntity = userContextEntity.getContext(c.getId());
             if (contextEntity == null) {
               contextEntity = ctx.getSession().insert(userContextEntity, SimpleContextEntity.class, c.getId());
             }
-            break;
         }
 
         // Scope
-        ScopeEntity scopeEntity = contextEntity.getScope(s.name().toLowerCase());
+        ScopeEntity scopeEntity = contextEntity.getScope(s.getName().toLowerCase());
         if (scopeEntity == null) {
-          scopeEntity = ctx.getSession().insert(contextEntity, ScopeEntity.class, s.name().toLowerCase());
+          scopeEntity = ctx.getSession().insert(contextEntity, ScopeEntity.class, s.getName().toLowerCase());
         }
 
         if (s.getId() == null) {
@@ -232,9 +231,6 @@ public class SettingServiceImpl implements SettingService {
     }.executeWith(chromatticLifeCycle);
       SettingData data = new SettingData(EventType.SETTING_REMOVE_CONTEXT,  new SettingContext(context));
       eventManager.broadcastEvent(new Event<SettingServiceImpl,SettingData>(data.getEventType().toString(),this,data));
-        // TODO Auto-generated catch block
-    
-    
   }
 
   public boolean startSynchronization() {
@@ -249,6 +245,41 @@ public class SettingServiceImpl implements SettingService {
     if (requestClose) {
       chromatticLifeCycle.getManager().endRequest(true);
     }
+  }
+
+  @Override
+  public long countContextsByType(String contextType) {
+    throw new UnsupportedOperationException("This operation isn't supported in JCR Impl");
+  }
+
+  @Override
+  public List<String> getContextNamesByType(String contextType, int offset, int limit) {
+    throw new UnsupportedOperationException("This operation isn't supported in JCR Impl");
+  }
+
+  @Override
+  public Map<Scope, Map<String, SettingValue<String>>> getSettingsByContext(Context context) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<Context> getContextsByTypeAndScopeAndSettingName(String contextType,
+                                                               String scopeType,
+                                                               String scopeName,
+                                                               String settingName,
+                                                               int offset,
+                                                               int limit) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Set<String> getEmptyContextsByScopeAndContextType(String name, String name2, String id, int offset, int limit) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void save(Context id) {
+    throw new UnsupportedOperationException();
   }
 
 }

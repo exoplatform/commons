@@ -30,13 +30,13 @@ import org.exoplatform.commons.api.notification.service.WebNotificationService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoCacheKey;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public class WebNotificationServiceImpl implements WebNotificationService {
   /** logger */
   private static final Log LOG = ExoLogger.getLogger(WebNotificationServiceImpl.class);
+
   /** storage */
   private final WebNotificationStorage storage;
   
@@ -64,19 +64,24 @@ public class WebNotificationServiceImpl implements WebNotificationService {
     List<String> result = new ArrayList<String>();
     List<NotificationInfo> gotList = storage.get(filter, offset, limit);
     NotificationContext ctx = NotificationContextImpl.cloneInstance();
+    ctx.append(POPUP_OVER, filter.isOnPopover());
     AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(WebChannel.ID));
     //
     for (NotificationInfo notification : gotList) {
-      notification.setOnPopOver(filter.isOnPopover());
       AbstractTemplateBuilder builder = channel.getTemplateBuilder(notification.getKey());
-      MessageInfo msg = builder.buildMessage(ctx.setNotificationInfo(notification));
+      MessageInfo msg = null;
+      try {
+        msg = builder.buildMessage(ctx.setNotificationInfo(notification));
+      } catch (Exception e) {
+        LOG.error("Error while building message for notification with id = " + notification.getId(), e);
+      }
       if (msg != null && msg.getBody() != null && !msg.getBody().isEmpty()) {
         result.add(msg.getBody());
       }
       // if have any exception when template transformation
       // ignore to display the notification
       if (ctx.isFailed()) {
-        LOG.debug(ctx.getException().getMessage(), ctx.getException());
+        LOG.warn(ctx.getException().getMessage(), ctx.getException());
       }
     }
     return result;
