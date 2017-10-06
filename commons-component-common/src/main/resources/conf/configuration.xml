@@ -3,10 +3,6 @@
                xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
                xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
-    <component>
-        <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
-    </component>
-
     <!--Declare DataInitializer at RootContainer Level to ensure initData before instantiation of declared service
         at portalContainer level (for example QuartzSheduler see PLF-6640)-->
     <component>
