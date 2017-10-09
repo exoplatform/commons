@@ -83,17 +83,8 @@ UISpaceSwitcher.prototype.initAfterLoaded = function(uicomponentId, baseRestUrl,
       var wikiSpaceSwitcher = document.getElementById(id);
       if (wikiSpaceSwitcher) {
         var container = jQuery(wikiSpaceSwitcher);
-        if (jQuery.browser.msie) {
-          for (var i = 0; i < container.length; i++) {
-            if (container[i] == e.target) {
-              isNeedToClosePopup = false;
-              break;
-            }
-          }
-        } else {
-          if (container.is(e.target) || container.has(e.target).length != 0) {
-            isNeedToClosePopup = false;
-          }
+        if (container.is(e.target) || container.has(e.target).length != 0) {
+          isNeedToClosePopup = false;
         }
       }
     }
