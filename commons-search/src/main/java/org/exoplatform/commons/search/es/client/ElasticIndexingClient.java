@@ -235,15 +235,13 @@ public class ElasticIndexingClient extends ElasticClient {
    */
   public boolean sendIsTypeExistsRequest(String index, String type) {
     String url = urlClient + "/" + index + "/_mapping/" + type;
-    ElasticResponse responseExists = sendHttpGetRequest(url);
+    ElasticResponse responseExists = sendHttpHeadRequest(url);
     if (responseExists.getStatusCode() == HttpStatus.SC_OK) {
-      if (EMPTY_JSON.equals(responseExists.getMessage())) {
-        return false;
-      } else {
-        return true;
-      }
+      return true;
+    } else if(responseExists.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+      return false;
     } else {
-      LOG.error("Error while creating Mapping: Unsupported HttpStatusCode {}. url={}", responseExists.getStatusCode(), url);
+      LOG.error("Error while checking Type existence: Unsupported HttpStatusCode {}. url={}", responseExists.getStatusCode(), url);
       throw new ElasticClientException("Can't request ES to get index/type " + index + "/" + type + " existence status");
     }
   }

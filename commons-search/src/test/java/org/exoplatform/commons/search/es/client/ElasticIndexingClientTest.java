@@ -30,9 +30,6 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
 
-import org.exoplatform.commons.search.es.client.ElasticClientAuthenticationException;
-import org.exoplatform.commons.search.es.client.ElasticIndexingAuditTrail;
-import org.exoplatform.commons.search.es.client.ElasticIndexingClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,7 +84,7 @@ public class ElasticIndexingClientTest {
   @Test
   public void sendCreateTypeRequest_IfCreateNewType_requestShouldBeSentToElastic() throws IOException {
     //Given
-    initClientMock(200, ElasticIndexingClient.EMPTY_JSON, 200, "Success");
+    initClientMock(404, "", 200, "Success");
     //When
     elasticIndexingClient.sendCreateTypeRequest("index", "type", "fakeMappings");
     //Then
@@ -163,7 +160,7 @@ public class ElasticIndexingClientTest {
   public void createType_callAuditTrail() throws IOException {
     //Given
     String response = "{\"error\":\"IndexMissingException[[profile] missing]\",\"status\":404}";
-    initClientMock(200, ElasticIndexingClient.EMPTY_JSON,404, response);
+    initClientMock(404, "", 404, response);
     //When
     elasticIndexingClient.sendCreateTypeRequest("profile", "profile", "mySettings");
     //Then
@@ -235,15 +232,15 @@ public class ElasticIndexingClientTest {
     verifyNoMoreInteractions(httpClient);
   }
 
-  private void initClientMock(Integer getStatus, String getContent, Integer postStatus, String postContent) throws IOException {
+  private void initClientMock(Integer getOrHeadStatus, String getOrHeadContent, Integer postStatus, String postContent) throws IOException {
     // Get request
-    final HttpResponse getResponse = mock(HttpResponse.class);
-    StatusLine getStatusLine = mock(StatusLine.class);
-    HttpEntity getHttpEntity = mock(HttpEntity.class);
-    when(getResponse.getStatusLine()).thenReturn(getStatusLine);
-    when(getStatusLine.getStatusCode()).thenReturn(getStatus);
-    when(getResponse.getEntity()).thenReturn(getHttpEntity);
-    when(getHttpEntity.getContent()).thenReturn(IOUtils.toInputStream(getContent, "UTF-8"));
+    final HttpResponse getOrHeadResponse = mock(HttpResponse.class);
+    StatusLine getOrHeadStatusLine = mock(StatusLine.class);
+    HttpEntity getOrHeadHttpEntity = mock(HttpEntity.class);
+    when(getOrHeadResponse.getStatusLine()).thenReturn(getOrHeadStatusLine);
+    when(getOrHeadStatusLine.getStatusCode()).thenReturn(getOrHeadStatus);
+    when(getOrHeadResponse.getEntity()).thenReturn(getOrHeadHttpEntity);
+    when(getOrHeadHttpEntity.getContent()).thenReturn(IOUtils.toInputStream(getOrHeadContent, "UTF-8"));
     // Post request
     final HttpResponse postResponse = mock(HttpResponse.class);
     StatusLine postStatusLine = mock(StatusLine.class);
@@ -253,12 +250,12 @@ public class ElasticIndexingClientTest {
     when(postResponse.getEntity()).thenReturn(postHttpEntity);
     when(postHttpEntity.getContent()).thenReturn(IOUtils.toInputStream(postContent, "UTF-8"));
     // Mock setting
-    when(httpClient.execute(any(HttpGet.class))).thenAnswer(new Answer<HttpResponse>() {
+    when(httpClient.execute(any(HttpRequestBase.class))).thenAnswer(new Answer<HttpResponse>() {
       @Override
       public HttpResponse answer(InvocationOnMock invocation) throws Throwable {
         Object[] args = invocation.getArguments();
-        if (args[0] instanceof HttpGet) {
-          return getResponse;
+        if (args[0] instanceof HttpGet || args[0] instanceof HttpHead) {
+          return getOrHeadResponse;
         }
         return postResponse;
       }
