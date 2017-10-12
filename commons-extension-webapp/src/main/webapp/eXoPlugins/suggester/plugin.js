@@ -37,7 +37,7 @@ require(['SHARED/jquery', 'SHARED/suggester'],function($) {
       val = $(editor.container.$).find(".cke_source").suggester("replaceMentions", textData);
     }
     val = val.replace( fillingCharSequence, '');
-    val = val.replace(/&nbsp;/ig, ' ');
+    val = val.replace(/ &nbsp;/ig, ' ');
 
     return val;
   }
