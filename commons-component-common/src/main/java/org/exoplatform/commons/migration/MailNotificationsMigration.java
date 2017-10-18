@@ -93,7 +93,7 @@ public class MailNotificationsMigration {
         RDBMSMigrationUtils.getExecutorService().submit(new Callable<Void>() {
           @Override
           public Void call() throws Exception {
-            if (hasMailNotifDataToMigrate()) {
+            if (!isMailNotifMigrationDone()) {
               try {
                 // pause job of sending digest mails
                 schedulerService.pauseJob("NotificationDailyJob", "Notification");
@@ -233,8 +233,11 @@ public class MailNotificationsMigration {
   }
 
   private void deleteJcrMailMessages() throws RepositoryException {
-    ((Node)session.getItem(nodeHierarchyCreator.getJcrPath("eXoNotification"))).getNode("messageInfoHome").remove();
-    session.save();
+    Node parentMsgHome = getNode("eXoNotification", "messageInfoHome");
+    if (parentMsgHome != null) {
+      parentMsgHome.remove();
+      session.save();
+    }
   }
 
   private void deleteJcrMailNotifications() throws RepositoryException {
@@ -266,8 +269,11 @@ public class MailNotificationsMigration {
       pluginNode.remove();
       session.save();
     }
-    ((Node)session.getItem(nodeHierarchyCreator.getJcrPath("eXoNotification"))).getNode("messageHome").remove();
-    session.save();
+    Node parentMsgHome = getNode("eXoNotification", "messageHome");
+    if (parentMsgHome != null) {
+      parentMsgHome.remove();
+      session.save();
+    }
   }
 
   private void migrateQueueMessages() throws Exception {
@@ -309,27 +315,39 @@ public class MailNotificationsMigration {
   }
 
   private NodeIterator getMessageInfoNodes() {
-    try {
-      return ((Node) session.getItem(nodeHierarchyCreator.getJcrPath("eXoNotification"))).getNode("messageInfoHome").getNodes();
-    } catch (Exception e) {
-      LOG.error("Error while getting MessageInfo nodes - Cause : " + e.getMessage(), e);
-      return null;
-    }
+    return getSubNodes("eXoNotification", "messageInfoHome");
   }
 
   private NodeIterator getMailNotificationNodes() {
+    return getSubNodes("eXoNotification", "messageHome");
+  }
+
+  private NodeIterator getSubNodes(String jcrPathAlias, String relPath) {
+    Node parentNode = getNode(jcrPathAlias, relPath);
+    if (parentNode != null) {
+      try {
+        return parentNode.getNodes();
+      } catch (RepositoryException e) {
+        LOG.error("Error while getting sub nodes with path '" + relPath + "' from node with alias'" + jcrPathAlias + "'", e);
+      }
+    }
+    return null;
+  }
+
+  private Node getNode(String jcrPathAlias, String relPath) {
+    Node parentNode = null;
     try {
-      String jcrPath = nodeHierarchyCreator.getJcrPath("eXoNotification");
-      if(StringUtils.isNotBlank(jcrPath) && session.itemExists(jcrPath)) {
-        Node notificationsParentNode = (Node)session.getItem(jcrPath);
-        if(notificationsParentNode.hasNode("messageHome")) {
-          return notificationsParentNode.getNode("messageHome").getNodes();
+      String eXoNotificationJCRPath = nodeHierarchyCreator.getJcrPath(jcrPathAlias);
+      if (StringUtils.isNotBlank(eXoNotificationJCRPath) && session.itemExists(eXoNotificationJCRPath)) {
+        Node msgInfoHome = (Node) session.getItem(eXoNotificationJCRPath);
+        if (msgInfoHome.hasNode(relPath)) {
+          parentNode = msgInfoHome.getNode(relPath);
         }
       }
     } catch (Exception e) {
-      LOG.error("Error while getting Mail notification nodes - Cause : " + e.getMessage(), e);
+      LOG.error("Error while getting Path '" + relPath + "' from node with alias'" + jcrPathAlias + "'", e);
     }
-    return null;
+    return parentNode;
   }
 
   private void migrateMailNotifData() throws RepositoryException, RepositoryConfigurationException {
@@ -340,9 +358,12 @@ public class MailNotificationsMigration {
       while (dayNodesIterator.hasNext()) {
         Node dayNode = dayNodesIterator.nextNode();
         NodeIterator notifNodes = dayNode.getNodes();
-        LOG.info("    Progression mail notifications migration for plugin: " + pluginNode.getName() + " - day: " + dayNode.getName());
-        while (notifNodes.hasNext()) {
-          migrateMailNotifNodeToRDBMS(notifNodes.nextNode());
+        if (notifNodes.getSize() > 0) {
+          LOG.info("    Progression mail notifications migration for plugin: " + pluginNode.getName() + " - day: "
+              + dayNode.getName());
+          while (notifNodes.hasNext()) {
+            migrateMailNotifNodeToRDBMS(notifNodes.nextNode());
+          }
         }
       }
     }
@@ -354,10 +375,6 @@ public class MailNotificationsMigration {
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
     }
-  }
-
-  private boolean hasMailNotifDataToMigrate() {
-    return (getMailNotificationNodes() != null && getMailNotificationNodes().hasNext());
   }
 
   private boolean hasQueueMessagesDataToMigrate() {
