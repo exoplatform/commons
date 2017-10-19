@@ -11,6 +11,11 @@ import org.exoplatform.container.RootContainer;
  * asynchronously
  */
 public class JPAAsynMigrationService implements StartableClusterAware {
+  /** The Constant ONE_DAY_IN_SECONDS. */
+  protected static final int         ONE_DAY_IN_SECONDS = 86400;
+
+  /** The Constant ONE_DAY_IN_MS. */
+  protected static final long        ONE_DAY_IN_MS      = 86400000L;
 
   private SettingsMigration          settingsMigration;
 

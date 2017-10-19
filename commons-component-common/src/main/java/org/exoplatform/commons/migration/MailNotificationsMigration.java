@@ -32,9 +32,11 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
+import org.exoplatform.services.jcr.impl.core.SessionImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.scheduler.JobSchedulerService;
+import org.exoplatform.services.transaction.TransactionService;
 
 public class MailNotificationsMigration {
   //scope of mail notification migration status
@@ -60,6 +62,7 @@ public class MailNotificationsMigration {
   private JobSchedulerService schedulerService;
   private RepositoryService repositoryService;
   private SettingService settingService;
+  private TransactionService transactionService;
 
   public MailNotificationsMigration(MailNotificationStorageImpl jcrNotificationDataStorage,
                                     JPAMailNotificationStorage jpaMailNotificationStorage,
@@ -67,6 +70,7 @@ public class MailNotificationsMigration {
                                     SettingService settingService,
                                     NotificationConfiguration notificationConfiguration,
                                     RepositoryService repositoryService,
+                                    TransactionService transactionService,
                                     NodeHierarchyCreator nodeHierarchyCreator) {
     this.jpaMailNotificationStorage = jpaMailNotificationStorage;
     this.jcrNotificationDataStorage = jcrNotificationDataStorage;
@@ -74,18 +78,28 @@ public class MailNotificationsMigration {
     this.schedulerService = schedulerService;
     this.repositoryService = repositoryService;
     this.settingService = settingService;
+    this.transactionService = transactionService;
     this.jcrWorkspace = notificationConfiguration.getWorkspace();
 
     this.jpaQueueMessage = CommonsUtils.getService(JPAQueueMessageImpl.class);
   }
 
-  public void migrate() {
+  private Session getJCRSession() {
+    Session jcrSession = null;
     try {
-      session = repositoryService.getRepository("repository").getSystemSession(jcrWorkspace);
+      jcrSession = repositoryService.getRepository("repository").getSystemSession(jcrWorkspace);
+      if (jcrSession instanceof SessionImpl) {
+        ((SessionImpl) jcrSession).setTimeout(JPAAsynMigrationService.ONE_DAY_IN_MS);
+      }
+      transactionService.setTransactionTimeout(JPAAsynMigrationService.ONE_DAY_IN_SECONDS);
     } catch (Exception e) {
       LOG.error("Error while getting Notification nodes for Notifications migration - Cause : " + e.getMessage(), e);
-      return;
     }
+    return jcrSession;
+  }
+
+  public void migrate() {
+    session = getJCRSession();
     //migration of mail notifications data from JCR to RDBMS is done as a background task
     PortalContainer.addInitTask(PortalContainer.getInstance().getPortalContext(), new RootContainer.PortalContainerPostInitTask() {
       @Override
