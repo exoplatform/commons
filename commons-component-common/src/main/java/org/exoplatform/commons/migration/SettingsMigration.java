@@ -72,8 +72,7 @@ public class SettingsMigration implements StartableClusterAware {
 
   @Override
   public void start() {
-    this.jpaSettingService = CommonsUtils.getService(JPASettingServiceImpl.class);
-    if(this.jpaSettingService == null) {
+    if(getJpaSettingService() == null) {
       throw new IllegalStateException("Cannot find JPASettingServiceImpl service instance");
     }
 
@@ -139,7 +138,7 @@ public class SettingsMigration implements StartableClusterAware {
   }
 
   private void reportSettingsMigration() {
-    long notMigrated = jpaSettingService.countSettingsByNameAndValueAndScope(Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, "false");
+    long notMigrated = getJpaSettingService().countSettingsByNameAndValueAndScope(Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, "false");
     int error = errorUserSettings.size();
     LOG.info(" === User Settings Migration from JCR to RDBBMS report: ");
     LOG.info("           - " + max(notMigrated, error) + " User Settings nodes are not migrated to RDBMS ");
@@ -185,7 +184,7 @@ public class SettingsMigration implements StartableClusterAware {
             if (!errorUserSettings.contains(user) && isSettingsMigrated(user)) {
               if (deleteUserSettings(user)) {
                 deletedCounter ++;
-                jpaSettingService.remove(Context.USER.id(user), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
+                getJpaSettingService().remove(Context.USER.id(user), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
               }
             }
             if (i % 100 == 0) {
@@ -253,9 +252,9 @@ public class SettingsMigration implements StartableClusterAware {
             }
             allUsers.add(userName);
             if (errorUserSettings.contains(userName)) {
-              jpaSettingService.set(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, SettingValue.create("false"));
+              getJpaSettingService().set(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, SettingValue.create("false"));
             } else {
-              jpaSettingService.set(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
+              getJpaSettingService().set(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
             }
           }
         }
@@ -264,9 +263,9 @@ public class SettingsMigration implements StartableClusterAware {
       long endTime = System.currentTimeMillis();
       LOG.info("User Settings data migrated in " + (endTime - startTime) + " ms");
       if (!errorUserSettings.isEmpty()) {
-        jpaSettingService.set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY, SettingValue.create("true"));
+        getJpaSettingService().set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY, SettingValue.create("true"));
       } else {
-        jpaSettingService.set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY, SettingValue.create("false"));
+        getJpaSettingService().set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY, SettingValue.create("false"));
       }
       return true;
     } catch (Exception e) {
@@ -281,7 +280,7 @@ public class SettingsMigration implements StartableClusterAware {
   }
 
   private boolean isSettingsMigrated(String userName) {
-    SettingValue<?> setting = jpaSettingService.get(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
+    SettingValue<?> setting = getJpaSettingService().get(Context.USER.id(userName), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
     return (setting != null && setting.getValue().equals("true"));
   }
 
@@ -312,7 +311,7 @@ public class SettingsMigration implements StartableClusterAware {
       Scope specificScope = getScope(scope, instance);
       for (String key : scopeEntity.getInstance(instance).getProperties().keySet()) {
         try {
-          jpaSettingService.set(Context.GLOBAL, specificScope, key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+          getJpaSettingService().set(Context.GLOBAL, specificScope, key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
         } catch (Exception e) {
           errorGlobalSettings.add(scope);
           LOG.error("Cannot migrate Global Settings data of specific scope: "+scope+" - cause: " +e.getMessage(), e);
@@ -379,7 +378,7 @@ public class SettingsMigration implements StartableClusterAware {
             if (key.equals(AbstractService.EXO_IS_ENABLED)) {
               settingScope = Scope.GLOBAL.id(null);
             }
-            jpaSettingService.set(Context.USER.id(user), settingScope, key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
+            getJpaSettingService().set(Context.USER.id(user), settingScope, key, new SettingValue<>(scopeEntity.getInstance(instance).getValue(key)));
           } catch (Exception e) {
             errorUserSettings.add(user);
             LOG.error("Cannot migrate User Settings data of user: " + user + " and scope: " + scope + " - cause: " + e.getMessage(), e);
@@ -403,7 +402,7 @@ public class SettingsMigration implements StartableClusterAware {
 
   private Boolean hasUserSettingsToMigrate() {
     try {
-      SettingValue<?> setting = jpaSettingService.get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY);
+      SettingValue<?> setting = getJpaSettingService().get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_JCR_DATA_USER_MIGRATED_KEY);
       if (setting != null) {
         return setting.getValue().equals("true");
       } else {
@@ -426,20 +425,20 @@ public class SettingsMigration implements StartableClusterAware {
   }
 
   private void setUserSettingsCleanupDone() {
-    jpaSettingService.set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_CLEANUP_DONE, SettingValue.create("true"));
+    getJpaSettingService().set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_CLEANUP_DONE, SettingValue.create("true"));
   }
 
   private void setGlobalSettingsCleanupDone() {
-    jpaSettingService.set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_GLOBAL_KEY), SETTINGS_RDBMS_CLEANUP_DONE, SettingValue.create("true"));
+    getJpaSettingService().set(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_GLOBAL_KEY), SETTINGS_RDBMS_CLEANUP_DONE, SettingValue.create("true"));
   }
 
   private boolean isUserSettingsCleanupDone() {
-    SettingValue<?> setting = jpaSettingService.get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_CLEANUP_DONE);
+    SettingValue<?> setting = getJpaSettingService().get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_CLEANUP_DONE);
     return (setting != null && setting.getValue().equals("true"));
   }
 
   private boolean isGlobalSettingsCleanupDone() {
-    SettingValue<?> setting = jpaSettingService.get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_GLOBAL_KEY), SETTINGS_RDBMS_CLEANUP_DONE);
+    SettingValue<?> setting = getJpaSettingService().get(Context.GLOBAL, Scope.APPLICATION.id(SETTINGS_MIGRATION_GLOBAL_KEY), SETTINGS_RDBMS_CLEANUP_DONE);
     return (setting != null && setting.getValue().equals("true"));
   }
 
@@ -479,7 +478,7 @@ public class SettingsMigration implements StartableClusterAware {
     Scope globalScope = getScope(scope, null);
     for (String key : scopeEntity.getProperties().keySet()) {
       try {
-        jpaSettingService.set(Context.GLOBAL, globalScope, key, new SettingValue<>(scopeEntity.getValue(key)));
+        getJpaSettingService().set(Context.GLOBAL, globalScope, key, new SettingValue<>(scopeEntity.getValue(key)));
       } catch (Exception e) {
         errorGlobalSettings.add(scope);
         LOG.error("Cannot migrate Global Settings data of scope: "+scope+" - cause: " +e.getMessage(), e);
@@ -512,7 +511,7 @@ public class SettingsMigration implements StartableClusterAware {
               || (key.startsWith("exo:") && key.endsWith("Channel"))) {
             settingScope = JPAUserSettingServiceImpl.NOTIFICATION_SCOPE;
           }
-          jpaSettingService.set(Context.USER.id(user), settingScope, key, new SettingValue<>(scopeEntity.getValue(key)));
+          getJpaSettingService().set(Context.USER.id(user), settingScope, key, new SettingValue<>(scopeEntity.getValue(key)));
         } catch (Exception e) {
           errorUserSettings.add(user);
           LOG.error("Cannot migrate User Settings data of user: " + user + " and scope: " + scope + " - cause: " + e.getMessage(),
@@ -522,6 +521,13 @@ public class SettingsMigration implements StartableClusterAware {
       }
     }
     return true;
+  }
+
+  public JPASettingServiceImpl getJpaSettingService() {
+    if (jpaSettingService == null) {
+      jpaSettingService = CommonsUtils.getService(JPASettingServiceImpl.class);
+    }
+    return jpaSettingService;
   }
 
   private Scope getScope(String scope, String id) {
