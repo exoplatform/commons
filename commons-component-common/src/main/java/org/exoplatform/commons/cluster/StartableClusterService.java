@@ -4,12 +4,11 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.chromattic.ChromatticManager;
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.commons.utils.SecurityHelper;
 import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.spi.ComponentAdapter;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.log.ExoLogger;
@@ -208,13 +207,11 @@ public class StartableClusterService implements Startable {
      */
     private void updateServiceSettings(String key, String value) {
         try {
+            RequestLifeCycle.begin(ExoContainerContext.getCurrentContainer());
             settingService.set(Context.GLOBAL, Scope.GLOBAL.id(CLUSTER_SERVICE_SETTING_GLOBAL_KEY), key, SettingValue.create(value));
-            try {
-                CommonsUtils.getService(ChromatticManager.class).getLifeCycle(SETTING_LIFECYCLE).getContext().getSession().save();
-            } catch (Exception e) {
-                LOG.error("Exception during save global setting {} : " + CLUSTER_SERVICE_SETTING_GLOBAL_KEY, e);
-            }
+
         } finally {
+            RequestLifeCycle.end();
             Scope.GLOBAL.id(null);
         }
     }
