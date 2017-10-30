@@ -19,13 +19,15 @@ package org.exoplatform.commons.api.settings.data;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityConstants;
 
+import java.io.Serializable;
+
 /**
  * Saves some settings linked to a Context.
  * 
  * @LevelAPI Experimental
  */
 
-public class Context implements Cloneable {
+public class Context implements Cloneable, Serializable {
   /**
    * GLOBAL: Settings should impact all users in the underlying scope.
    * 

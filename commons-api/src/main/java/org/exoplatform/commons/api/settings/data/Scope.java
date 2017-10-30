@@ -16,12 +16,14 @@
  */
 package org.exoplatform.commons.api.settings.data;
 
+import java.io.Serializable;
+
 /**
  * Saves some settings linked to a scope.
  * 
  * @LevelAPI Experimental
  */
-public class Scope implements Cloneable {
+public class Scope implements Cloneable, Serializable {
 
   /**
    * Settings of portlets or gadgets.
