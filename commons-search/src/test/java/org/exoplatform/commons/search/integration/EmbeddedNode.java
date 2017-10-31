@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 public class EmbeddedNode extends Node {
 
-  public static final String ES_VERSION = "5.3.2";
+  public static final String ES_VERSION = "5.6.3";
   private Collection<Class<? extends Plugin>> plugins;
 
   public EmbeddedNode(Environment environment, Version version, Collection<Class<? extends Plugin>> classpathPlugins) {
