@@ -188,7 +188,7 @@
       }
     },
     replaceMentions: function(content) {
-      if (this.settings.type === type.TAG) {
+      if ( !this.settings || this.settings.type === type.TAG ) {
         return content;
       } else {
         var at = this.settings.at;
