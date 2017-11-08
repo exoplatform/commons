@@ -17,12 +17,15 @@ CKEDITOR.editorConfig = function( config ) {
 
     // %REMOVE_START%
     // The configuration options below are needed when running CKEditor from source files.
-    config.plugins = 'dialogui,dialog,about,a11yhelp,basicstyles,blockquote,clipboard,panel,floatpanel,menu,contextmenu,button,toolbar,enterkey,entities,popup,filebrowser,floatingspace,listblock,richcombo,format,horizontalrule,htmlwriter,wysiwygarea,image,indent,indentlist,fakeobjects,link,list,maximize,pastetext,pastefromword,removeformat,showborders,sourcearea,specialchar,menubutton,scayt,stylescombo,tab,table,tabletools,undo,wsc,panelbutton,colorbutton,colordialog,autogrow,confighelper';
+    config.plugins = 'dialogui,dialog,about,a11yhelp,basicstyles,blockquote,clipboard,panel,floatpanel,menu,contextmenu,button,toolbar,enterkey,entities,popup,filebrowser,floatingspace,listblock,richcombo,format,horizontalrule,htmlwriter,wysiwygarea,image,indent,indentlist,fakeobjects,link,list,maximize,pastetext,pastefromword,removeformat,showborders,sourcearea,specialchar,menubutton,scayt,stylescombo,tab,table,tabletools,notification,notificationaggregator,filetools,undo,wsc,panelbutton,colorbutton,colordialog,autogrow,confighelper,uploadwidget,imageresize';
     CKEDITOR.plugins.addExternal('simpleLink','/commons-extension/eXoPlugins/simpleLink/','plugin.js');
     CKEDITOR.plugins.addExternal('simpleImage','/commons-extension/eXoPlugins/simpleImage/','plugin.js');
     CKEDITOR.plugins.addExternal('suggester','/commons-extension/eXoPlugins/suggester/','plugin.js');
     CKEDITOR.plugins.addExternal('hideBottomToolbar','/commons-extension/eXoPlugins/hideBottomToolbar/','plugin.js');
-    config.extraPlugins = 'simpleLink,simpleImage,suggester,hideBottomToolbar';
+    CKEDITOR.plugins.addExternal('selectImage','/commons-extension/eXoPlugins/selectImage/','plugin.js');
+    CKEDITOR.plugins.addExternal('uploadimage','/commons-extension/eXoPlugins/uploadimage/','plugin.js');
+
+    config.extraPlugins = 'simpleLink,selectImage,suggester,hideBottomToolbar';
     config.skin = 'moono-exo,/commons-extension/ckeditor/skins/moono-exo/';
     // %REMOVE_END%
 
@@ -39,6 +42,8 @@ CKEDITOR.editorConfig = function( config ) {
     // Remove some buttons provided by the standard plugins, which are
     // not needed in the Standard(s) toolbar.
     config.removeButtons = 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,Format,BGColor,About';
+
+    config.uploadUrl = eXo.env.server.context + '/upload?action=upload&uploadId=';
 
     // Set the most common block elements.
     config.format_tags = 'p;h1;h2;h3;pre';
@@ -60,7 +65,7 @@ CKEDITOR.editorConfig = function( config ) {
     config.toolbar = [
                       ['Bold','Italic','RemoveFormat',],
                       ['-','NumberedList','BulletedList','Blockquote'],
-                      ['-','simpleLink', 'simpleImage'],
+                      ['-','simpleLink', 'selectImage'],
                ] ;
 
     config.height = 110;

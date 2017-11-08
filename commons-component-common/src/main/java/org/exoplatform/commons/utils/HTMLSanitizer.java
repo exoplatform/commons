@@ -19,8 +19,11 @@
 package org.exoplatform.commons.utils;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.owasp.html.*;
 
 import com.google.common.base.Function;
@@ -57,10 +60,10 @@ abstract public class HTMLSanitizer {
 
   private static final Pattern                                                HTML_CLASS               = Pattern.compile("[a-zA-Z0-9\\s,\\-_]+");
 
-  private static final Pattern                                                ONSITE_URL               = Pattern.compile("(?:[\\p{L}\\p{N}\\\\\\.\\#@\\$%\\+&;\\-_~,\\?=/!]+|\\#(\\w)+)");
+  private static final Pattern                                                ONSITE_URL               = Pattern.compile("(?:[\\p{L}\\p{N} \\\\\\.\\#@\\$%\\+&;\\-_~,\\?=/!]+|\\#(\\w)+)");
 
   private static final Pattern                                                OFFSITE_URL              = Pattern.compile("\\s*(?:(?:ht|f)tps?://|mailto:)[\\p{L}\\p{N}]"
-                                                                                                           + "[\\p{L}\\p{N}\\p{Zs}\\.\\#@\\$%\\+&;:\\-_~,\\?=/!\\(\\)]*+\\s*");
+                                                                                                           + "[\\p{L}\\p{N} \\p{Zs}\\.\\#@\\$%\\+&;:\\-_~,\\?=/!\\(\\)]*+\\s*");
 
   private static final Pattern                                                NUMBER                   = Pattern.compile("[+-]?(?:(?:[0-9]+(?:\\.[0-9]*)?)|\\.[0-9]+)");
 
@@ -81,6 +84,11 @@ abstract public class HTMLSanitizer {
   private static final Pattern                                                ONE_CHAR                 = Pattern.compile(".?",
                                                                                                                          Pattern.DOTALL);
 
+  @SuppressWarnings("unchecked")
+  private static final Collection<String>                                     CUSTOM_ALLOWED_STYLES    =
+                                                                                                    (Collection<String>) CollectionUtils.union(CssSchema.DEFAULT.allowedProperties(),
+                                                                                                                                               Collections.singleton("float"));
+
   /** A policy definition that matches the minimal HTML that eXo allows. */
   public static final Function<HtmlStreamEventReceiver, HtmlSanitizer.Policy> POLICY_DEFINITION        = new HtmlPolicyBuilder()
                                                                                                        // Allow
@@ -98,7 +106,7 @@ abstract public class HTMLSanitizer {
                                                                                                                                 .allowAttributes("title")
                                                                                                                                 .matching(HTML_TITLE)
                                                                                                                                 .globally()
-                                                                                                                                .allowStyling()
+                                                                                                                                .allowStyling(CssSchema.withProperties(CUSTOM_ALLOWED_STYLES))
                                                                                                                                 .allowAttributes("align")
                                                                                                                                 .matching(ALIGN)
                                                                                                                                 .onElements("p")
@@ -134,6 +142,11 @@ abstract public class HTMLSanitizer {
                                                                                                                                 .allowAttributes("src")
                                                                                                                                 .matching(ONSITE_OR_OFFSITE_URL)
                                                                                                                                 .onElements("img")
+                                                                                                                                .allowAttributes("src")
+                                                                                                                                .matching(ONSITE_OR_OFFSITE_URL)
+                                                                                                                                .onElements("img")
+                                                                                                                                .allowAttributes("referrerpolicy")
+                                                                                                                                .onElements("img")
                                                                                                                                 .allowAttributes("name")
                                                                                                                                 .matching(NAME)
                                                                                                                                 .onElements("img")
@@ -144,6 +157,9 @@ abstract public class HTMLSanitizer {
                                                                                                                                         "hspace",
                                                                                                                                         "vspace")
                                                                                                                                 .matching(NUMBER)
+                                                                                                                                .onElements("img")
+                                                                                                                                .allowAttributes("width", "height")
+                                                                                                                                .matching(NUMBER_OR_PERCENT)
                                                                                                                                 .onElements("img")
                                                                                                                                 .allowAttributes("border",
                                                                                                                                         "cellpadding",

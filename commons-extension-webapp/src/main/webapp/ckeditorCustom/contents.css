@@ -186,3 +186,18 @@ a > img {
 ul li {
 	list-style-type: disc;
 }
+.cke_widget_selectImage {
+  max-width: 100%;
+  margin: 0 10px 10px 0;
+}
+.cke_widget_selectImage img {
+  max-width: 100%;
+  text-align: center;
+}
+.dragEntered {
+  background-color: rgba(1,1,1,0.03);
+}
+.dragEntered * {
+    display: none;
+    pointer-events: none;
+}
