@@ -207,6 +207,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     esQuery.append("       \"fields\" : {\n");
     for (int i=0; i<this.searchFields.size(); i++) {
       esQuery.append("         \""+searchFields.get(i)+"\" : {\n")
+              .append("          \"type\" : \"unified\",\n")
               .append("          \"fragment_size\" : " + this.highlightFragmentSize + ",\n")
               .append("          \"number_of_fragments\" : " + this.highlightFragmentNumber + "}");
       if (i<this.searchFields.size()-1) {
