@@ -274,7 +274,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
       }
     }
 
-    LOG.debug("Excerpt extract from ES response : " + excerpt.toString());
+    LOG.debug("Excerpt extract from ES response : {}", excerpt.toString());
 
     return new SearchResult(
             url,
