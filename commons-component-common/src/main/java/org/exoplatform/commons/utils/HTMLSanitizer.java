@@ -19,8 +19,11 @@
 package org.exoplatform.commons.utils;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.owasp.html.*;
 
 import com.google.common.base.Function;
@@ -81,6 +84,10 @@ abstract public class HTMLSanitizer {
   private static final Pattern                                                ONE_CHAR                 = Pattern.compile(".?",
                                                                                                                          Pattern.DOTALL);
 
+  @SuppressWarnings("unchecked")
+  private static final Collection<String>                                     CUSTOM_ALLOWED_STYLES    = (Collection<String>) CollectionUtils.union(CssSchema.DEFAULT.allowedProperties(),
+                                                                                                          Collections.singleton("float"));
+
   /** A policy definition that matches the minimal HTML that eXo allows. */
   public static final Function<HtmlStreamEventReceiver, HtmlSanitizer.Policy> POLICY_DEFINITION        = new HtmlPolicyBuilder()
                                                                                                        // Allow
@@ -98,7 +105,7 @@ abstract public class HTMLSanitizer {
                                                                                                                                 .allowAttributes("title")
                                                                                                                                 .matching(HTML_TITLE)
                                                                                                                                 .globally()
-                                                                                                                                .allowStyling()
+                                                                                                                                .allowStyling(CssSchema.withProperties(CUSTOM_ALLOWED_STYLES))
                                                                                                                                 .allowAttributes("align")
                                                                                                                                 .matching(ALIGN)
                                                                                                                                 .onElements("p")
@@ -347,3 +354,4 @@ abstract public class HTMLSanitizer {
   }
 
 }
+
