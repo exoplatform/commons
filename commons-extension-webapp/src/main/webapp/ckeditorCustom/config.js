@@ -74,6 +74,9 @@ CKEDITOR.editorConfig = function( config ) {
     config.autoGrow_minHeight = 110;
 
     config.language = eXo.env.portal.language || 'en';
+  
+    // image2 config of align classes
+    config.image2_alignClasses = [ 'pull-left', 'text-center', 'pull-right' ];
 
 
     // Here is configure for suggester
