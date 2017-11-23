@@ -8,6 +8,10 @@
     </component>
 
     <component>
+        <type>org.exoplatform.settings.rest.SettingResource</type>
+    </component>
+
+    <component>
         <key>org.exoplatform.services.scheduler.QueueTasks</key>
         <type>org.exoplatform.services.scheduler.QueueTasks</type>
     </component>
