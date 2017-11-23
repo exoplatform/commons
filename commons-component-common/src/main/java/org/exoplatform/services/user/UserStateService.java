@@ -47,6 +47,10 @@ public class UserStateService {
     delay = (delay > 0) ? delay : DEFAULT_OFFLINE_DELAY;
   }
 
+  public int getDelay() {
+    return delay;
+  }
+
   // Add or update a userState
   public void save(UserStateModel model) {
     userStateCache.put(model.getUserId(), model);
