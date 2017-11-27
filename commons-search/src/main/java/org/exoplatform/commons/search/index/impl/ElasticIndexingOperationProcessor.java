@@ -77,6 +77,8 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
 
   private String                             esVersion;
 
+  private boolean interrupted = false;
+
   public ElasticIndexingOperationProcessor(IndexingOperationDAO indexingOperationDAO,
                                            ElasticIndexingClient elasticIndexingClient,
                                            ElasticContentRequestBuilder elasticContentRequestBuilder,
@@ -143,6 +145,20 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
     } while (processedOperations >= batchNumber);
   }
 
+  @Override
+  public void interrupt() {
+    LOG.debug("Indexing queue processor has been interrupted");
+    this.interrupted = true;
+  }
+
+  private boolean isInterrupted() {
+    if(Thread.interrupted()) {
+      LOG.debug("Thread running indexing queue processor has been interrupted");
+      this.interrupted = true;
+    }
+    return this.interrupted;
+  }
+
   private boolean isUpgradeInProgress() {
     return !typesOrIndexUpgrading.isEmpty();
   }
@@ -178,11 +194,12 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
     processReindexAll(indexingQueueSorted);
     processCUD(indexingQueueSorted);
 
-    // Removes the processed IDs from the “indexing queue” table that have
-    // timestamp older than the timestamp of
-    // start of processing
-    indexingOperationDAO.deleteAllIndexingOperationsHavingIdLessThanOrEqual(maxIndexingOperationId);
-
+    if(!isInterrupted()) {
+      // Removes the processed IDs from the “indexing queue” table that have
+      // timestamp older than the timestamp of
+      // start of processing
+      indexingOperationDAO.deleteAllIndexingOperationsHavingIdLessThanOrEqual(maxIndexingOperationId);
+    }
     // clear entity manager content after each bulk
     entityManagerService.getEntityManager().clear();
 
@@ -233,6 +250,9 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
         }
         Iterator<IndexingOperation> deleteIndexingOperationsIterator = deleteIndexingOperationsList.iterator();
         while (deleteIndexingOperationsIterator.hasNext()) {
+          if(isInterrupted()) {
+            return;
+          }
           IndexingOperation deleteIndexQueue = deleteIndexingOperationsIterator.next();
           try {
             bulkRequest += elasticContentRequestBuilder.getDeleteDocumentRequestContent(connector,
@@ -271,6 +291,9 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
         }
         Iterator<IndexingOperation> createIndexingOperationsIterator = createIndexingOperationsList.iterator();
         while (createIndexingOperationsIterator.hasNext()) {
+          if(isInterrupted()) {
+            return;
+          }
           IndexingOperation createIndexQueue = createIndexingOperationsIterator.next();
           try {
             if(connector.isNeedIngestPipeline()) {
@@ -318,6 +341,9 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
         }
         Iterator<IndexingOperation> updateIndexingOperationsIterator = updateIndexingOperationsList.iterator();
         while (updateIndexingOperationsIterator.hasNext()) {
+          if(isInterrupted()) {
+            return;
+          }
           IndexingOperation updateIndexQueue = updateIndexingOperationsIterator.next();
           try {
             if(connector.isNeedIngestPipeline()) {
@@ -347,7 +373,7 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
       }
     }
 
-    if (StringUtils.isNotBlank(bulkRequest)) {
+    if (StringUtils.isNotBlank(bulkRequest) && !isInterrupted()) {
       elasticIndexingClient.sendCUDRequest(bulkRequest);
     }
   }
@@ -361,6 +387,9 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
   private void processInit(Map<OperationType, Map<String, List<IndexingOperation>>> indexingQueueSorted) {
     if (indexingQueueSorted.containsKey(OperationType.INIT)) {
       for (String entityType : indexingQueueSorted.get(OperationType.INIT).keySet()) {
+        if(isInterrupted()) {
+          return;
+        }
         sendInitRequests(getConnectors().get(entityType));
       }
       indexingQueueSorted.remove(OperationType.INIT);
@@ -376,6 +405,9 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
   private void processDeleteAll(Map<OperationType, Map<String, List<IndexingOperation>>> indexingQueueSorted) {
     if (indexingQueueSorted.containsKey(OperationType.DELETE_ALL)) {
       for (String entityType : indexingQueueSorted.get(OperationType.DELETE_ALL).keySet()) {
+        if(isInterrupted()) {
+          return;
+        }
         if (indexingQueueSorted.get(OperationType.DELETE_ALL).containsKey(entityType)) {
           for (IndexingOperation indexingOperation : indexingQueueSorted.get(OperationType.DELETE_ALL).get(entityType)) {
             processDeleteAll(indexingOperation, indexingQueueSorted);
@@ -415,6 +447,9 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
       for (String entityType : indexingQueueSorted.get(OperationType.REINDEX_ALL).keySet()) {
         if (indexingQueueSorted.get(OperationType.REINDEX_ALL).containsKey(entityType)) {
           for (IndexingOperation indexingOperation : indexingQueueSorted.get(OperationType.REINDEX_ALL).get(entityType)) {
+            if(isInterrupted()) {
+              return;
+            }
             reindexAllByEntityType(indexingOperation.getEntityType());
             // clear entity manager content
             entityManagerService.getEntityManager().clear();
