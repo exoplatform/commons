@@ -145,7 +145,7 @@ abstract public class HTMLSanitizer {
                                                                                                                                 .allowAttributes("src")
                                                                                                                                 .matching(ONSITE_OR_OFFSITE_URL)
                                                                                                                                 .onElements("img")
-                                                                                                                                .allowAttributes("referrerpolicy")
+                                                                                                                                .allowAttributes("referrerpolicy", "data-plugin-name")
                                                                                                                                 .onElements("img")
                                                                                                                                 .allowAttributes("name")
                                                                                                                                 .matching(NAME)

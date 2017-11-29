@@ -185,8 +185,11 @@
 
     return {
       allowedContent: getWidgetAllowedContent( editor ),
-
-      requiredContent: 'img[src,alt]',
+      /* 'data-plugin-name' attribute is used by CKEditor plugin
+          to specify that it was inserted in the DOM by it.
+         This will be used to add extra processing on this element
+          when notification is sent (Replace this image by 'Inline Image' message). */
+      requiredContent: 'img[src,data-plugin-name,alt]',
 
       features: getWidgetFeatures( editor ),
 
@@ -250,6 +253,8 @@
 
         this.parts.image.setAttributes( {
           src: this.data.src,
+
+          "data-plugin-name" : "selectImage",
 
           // This internal is required by the editor.
           'data-cke-saved-src': this.data.src,
@@ -1451,7 +1456,7 @@
           match: centerWrapperChecker( editor )
         },
         img: {
-          attributes: '!src,alt,width,height,referrerpolicy'
+          attributes: '!src,data-plugin-name,alt,width,height,referrerpolicy'
         },
         figure: {
           classes: '!' + editor.config.image2_captionedClass
