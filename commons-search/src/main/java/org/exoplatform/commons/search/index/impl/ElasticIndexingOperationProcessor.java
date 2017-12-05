@@ -150,6 +150,12 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
     } while (processedOperations >= batchNumber);
   }
 
+  /**
+   * Set the indexing process as interrupted in order to terminate it as soon
+   * as possible without finishing the whole process.
+   * Since the indexing process can take time (for a reindexAll operation for example), it
+   * allows to interrupt it gracefully (without killing the thread).
+   */
   @Override
   public void interrupt() {
     LOG.debug("Indexing queue processor has been interrupted");
