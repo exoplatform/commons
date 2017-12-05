@@ -21,7 +21,6 @@
 
 import org.exoplatform.commons.search.index.IndexingOperationProcessor;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.quartz.*;
@@ -50,8 +49,7 @@ public class BulkIndexingJob implements InterruptableJob {
 
   private IndexingOperationProcessor getIndexingOperationProcessor() {
     if(indexingOperationProcessor == null) {
-      indexingOperationProcessor = ExoContainerContext.getCurrentContainer()
-              .getComponentInstanceOfType(IndexingOperationProcessor.class);
+      indexingOperationProcessor = CommonsUtils.getService(IndexingOperationProcessor.class);
     }
     return indexingOperationProcessor;
   }
