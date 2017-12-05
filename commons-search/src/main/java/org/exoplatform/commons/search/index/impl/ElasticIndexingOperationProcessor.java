@@ -134,9 +134,14 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
    * means that we have 1 entity manager per job execution. Because of that, we
    * have to take care of cleaning the persistence context regularly to avoid
    * to have too big sessions and bad performances.
+   *
+   * This method is synchronized to make sure the queue is processed by only one
+   * thread at a time, since the indexing queue does not support multi-thread
+   * processing for the moment.
    */
   @Override
-  public void process() {
+  public synchronized void process() {
+    this.interrupted = false;
     // Loop until the number of data retrieved from indexing queue is less than
     // BATCH_NUMBER (default = 1000)
     int processedOperations;
@@ -476,6 +481,9 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
     int offset = 0;
     int numberIndexed;
     do {
+      if(isInterrupted()) {
+        return;
+      }
       List<String> ids = connector.getAllIds(offset, reindexBatchSize);
       if (ids == null) {
         numberIndexed = 0;

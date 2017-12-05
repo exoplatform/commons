@@ -50,6 +50,15 @@ public class IndexingOperationDAOImpl extends GenericDAOJPAImpl<IndexingOperatio
   }
 
   @Override
+  @ExoTransactional
+  public void deleteAllByEntityType(String entityType) {
+    getEntityManager()
+            .createNamedQuery("IndexingOperation.deleteAllByEntityType")
+            .setParameter("entityType", entityType)
+            .executeUpdate();
+  }
+
+  @Override
   public List<IndexingOperation> findAll(int offset, int limit) {
     return getEntityManager()
         .createNamedQuery("IndexingOperation.findAll", IndexingOperation.class)

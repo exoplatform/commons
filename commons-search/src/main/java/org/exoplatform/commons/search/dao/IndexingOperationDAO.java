@@ -30,7 +30,10 @@ import java.util.List;
 public interface IndexingOperationDAO extends GenericDAO<IndexingOperation, Long> {
 
   List<IndexingOperation> findAllFirst(Integer maxResults);
+
   void deleteAllIndexingOperationsHavingIdLessThanOrEqual(long id);
+
+  void deleteAllByEntityType(String entityType);
 
   List<IndexingOperation> findAll(int offset, int limit);
 }

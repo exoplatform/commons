@@ -34,6 +34,8 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "IndexingOperation.deleteAllIndexingOperationsHavingIdLessThanOrEqual",
         query = "DELETE FROM IndexingOperation q WHERE q.id <= :id"),
+    @NamedQuery(name = "IndexingOperation.deleteAllByEntityType",
+        query = "DELETE FROM IndexingOperation q WHERE q.entityType = :entityType"),
     @NamedQuery(name = "IndexingOperation.findAll",
         query = "SELECT q FROM IndexingOperation q ORDER BY q.id")
 })
