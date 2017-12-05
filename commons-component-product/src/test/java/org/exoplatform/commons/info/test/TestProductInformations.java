@@ -38,10 +38,6 @@ public class TestProductInformations extends BasicTestCase {
   private static final String OLD_VERSION = "1.0-old";
   private static final String NEW_VERSION = "1.0-new";
 
-  protected final String REPO_NAME = "repository";
-
-  protected final String COLLABORATION_WS = "collaboration";
-
   protected PortalContainer container;
 
   protected RepositoryService repositoryService;
@@ -62,7 +58,7 @@ public class TestProductInformations extends BasicTestCase {
       oldVersionsContentIS.read(binaries);
       String oldVersionsContent = new String(binaries);
 
-      session = repositoryService.getRepository(REPO_NAME).getSystemSession(COLLABORATION_WS);
+      session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
 
       Node plfVersionDeclarationNode = getProductVersionNode(session);
       Node plfVersionDeclarationContentNode = plfVersionDeclarationNode.getNode("jcr:content");
@@ -80,7 +76,7 @@ public class TestProductInformations extends BasicTestCase {
   }
 
   public void testUpgradeVersion() throws Exception {
-    Session session = repositoryService.getRepository(REPO_NAME).getSystemSession(COLLABORATION_WS);
+    Session session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
 
     assertEquals(productInformations.getVersion(), NEW_VERSION);
     assertEquals(productInformations.getRevision(), NEW_VERSION);

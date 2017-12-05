@@ -12,12 +12,15 @@ import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.info.ProductInformations;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.commons.version.util.VersionComparator;
 import org.exoplatform.container.component.BaseComponentPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
@@ -26,25 +29,53 @@ import org.exoplatform.services.log.Log;
 
 public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
 
-  public static final String  UPGRADE_COMPLETED_STATUS       = "Completed";
+  public static final String UPGRADE_COMPLETED_STATUS              = "Completed";
 
-  private static final Log LOG = ExoLogger.getLogger(UpgradeProductPlugin.class);
-  private static final String PRODUCT_GROUP_ID = "product.group.id";
-  private static final String OLD_PRODUCT_GROUP_ID = "old.product.group.id";
-  private static final String UPGRADE_PLUGIN_EXECUTION_ORDER = "plugin.execution.order";
-  private static final String UPGRADE_PLUGIN_ENABLE = "commons.upgrade.{$0}.enable";
+  public static final String PRODUCT_GROUP_ID                      = "product.group.id";
 
-  private SettingService      settingService;
+  public static final String OLD_PRODUCT_GROUP_ID                  = "old.product.group.id";
 
-  private int pluginExecutionOrder;
+  public static final String UPGRADE_PLUGIN_ASYNC                  = "plugin.upgrade.async.execution";
+
+  public static final String UPGRADE_PLUGIN_TARGET_PARAMETER       = "plugin.upgrade.target.version";
+
+  public static final String UPGRADE_PLUGIN_EXECUTE_ONCE_PARAMETER = "plugin.upgrade.execute.once";
+
+  public static final String UPGRADE_PLUGIN_EXECUTION_ORDER        = "plugin.execution.order";
+
+  public static final String UPGRADE_PLUGIN_ENABLE                 = "commons.upgrade.{$0}.enable";
+
+  private static final Log   LOG                                   = ExoLogger.getLogger(UpgradeProductPlugin.class);
+
+  private SettingService     settingService                        = null;
+
+  private int                pluginExecutionOrder                  = 0;
 
   /**
-   * The plugin's product maven group identifier, by example: org.exoplatform.portal for gatein.
+   * The plugin's product maven group identifier, by example:
+   * org.exoplatform.portal for gatein.
    */
-  protected String productGroupId;
-  
-  protected String oldProductGroupId;
+  protected String           productGroupId                        = null;
 
+  protected String           oldProductGroupId                     = null;
+
+  /**
+   * The target version of this upgrade Plugin.
+   */
+  protected String           targetVersion                         = null;
+
+  /**
+   * True if the upgrade execution should be processed asynchronously
+   * else, it will be executed synchronously
+   */
+  protected boolean          asyncUpgradeExecution                 = false;
+
+  /**
+   * Determines whether the plugin should be executed once or even version upgrade.
+   * If true, the method shouldProceedToUpgrade will not be called to test if the Upgrade Plugin
+   * should be executed or not.
+   */
+  protected boolean          executeOnlyOnce                       = false;
 
   public UpgradeProductPlugin(SettingService settingService, InitParams initParams) {
     this(initParams);
@@ -58,7 +89,7 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
       }
       return;
     }
-    
+
     //
     productGroupId = initParams.getValueParam(PRODUCT_GROUP_ID).getValue();
     
@@ -70,6 +101,15 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
       pluginExecutionOrder = 0;
     }else{
       pluginExecutionOrder = Integer.parseInt(initParams.getValueParam(UPGRADE_PLUGIN_EXECUTION_ORDER).getValue());
+    }
+    if (initParams.containsKey(UPGRADE_PLUGIN_TARGET_PARAMETER)) {
+      targetVersion = initParams.getValueParam(UPGRADE_PLUGIN_TARGET_PARAMETER).getValue();
+    }
+    if (initParams.containsKey(UPGRADE_PLUGIN_ASYNC)) {
+      asyncUpgradeExecution = Boolean.parseBoolean(initParams.getValueParam(UPGRADE_PLUGIN_ASYNC).getValue());
+    }
+    if (initParams.containsKey(UPGRADE_PLUGIN_EXECUTE_ONCE_PARAMETER)) {
+      executeOnlyOnce = Boolean.parseBoolean(initParams.getValueParam(UPGRADE_PLUGIN_EXECUTE_ONCE_PARAMETER).getValue());
     }
   }
 
@@ -87,6 +127,30 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
   }
 
   /**
+   * Execute some operations synchronously after the execution of processUpgrade
+   * method synchronously or asynchronously
+   */
+  public void beforeUpgrade() {}
+
+  /**
+   * Execute some operations synchronously after the execution of processUpgrade
+   * method synchronously or asynchronously
+   */
+  public void afterUpgrade() {}
+
+  public boolean isAsyncUpgradeExecution() {
+    return asyncUpgradeExecution;
+  }
+
+  public boolean isExecuteOnlyOnce() {
+    return executeOnlyOnce;
+  }
+
+  public String getTargetVersion() {
+    return targetVersion;
+  }
+
+  /**
    * Determines if the plugin is enabled, this method will be called when adding the plugin to the upgradePlugins list.
    * See {@link UpgradeProductService#addUpgradePlugin(UpgradeProductPlugin)}
    * 
@@ -98,7 +162,7 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
     String isEnabledProperty = PropertyManager.getProperty(UPGRADE_PLUGIN_ENABLE.replace("{$0}", getName()));
     if(isEnabledProperty == null || isEnabledProperty.equals("true")){
       return true;
-    }else {
+    } else {
       return false;
     }
   }
@@ -134,7 +198,7 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
     }
     if (nodeToAddVersion.isCheckedOut()) {
       Version version = nodeToAddVersion.checkin();
-      nodeToAddVersion.getVersionHistory().addVersionLabel(version.getName(), versionLabel, false);
+      nodeToAddVersion.getVersionHistory().addVersionLabel(version.getName(), versionLabel, true);
     }
     nodeToAddVersion.checkout();
   }
@@ -161,9 +225,60 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
    *          The previous version of plugin's product
    * @return
    *          true: if the plugin should be executed when switching product from previousVersion to newVersion
-   *          true: if the upgrade isn't necessary
+   *          false: if the upgrade isn't necessary
    */
-  public abstract boolean shouldProceedToUpgrade(String newVersion, String previousVersion);
+  public boolean shouldProceedToUpgrade(String newVersion, String previousVersion) {
+    return true;
+  }
+
+  /**
+   * This method is called when a new version has been detected to decide
+   * whether proceed to upgrade or not. It will test on previous version of
+   * artifact, previous version of group and newer version to decide whether to
+   * upgrade or not. This method will call
+   * shouldProceedToUpgrade(previousVersion, newVersion) to include optional
+   * specific check(s).
+   * 
+   * @param newVersion The current version of running server
+   * @param previousGroupVersion The previous version of plugin's product group (social, portal...)
+   *          This parameter will be equals to '0' if first time it runs.
+   * @param previousArtifactVersion The previous version of plugin's product (retrieved from last run)
+   *          This parameter will be null if first time it runs.
+   * @return
+   *          true: if the plugin should be executed when switching product from previousVersion to newVersion
+   *          false: if the upgrade isn't necessary
+   * @return
+   */
+  public boolean shouldProceedToUpgrade(String newVersion, String previousGroupVersion, String previousArtifactVersion) {
+    if (StringUtils.isBlank(previousGroupVersion) && StringUtils.isBlank(previousArtifactVersion)) {
+      throw new IllegalArgumentException("At least one previous version (artifact or group versions) shouldn't be null (equals to '0') for plugin "
+          + getClass().getName());
+    }
+    if (StringUtils.isBlank(newVersion)) {
+      throw new IllegalArgumentException("No declared version for Upgrade plugin " + getClass().getName());
+    }
+
+    // If the plugin has to be executed only once, don't upgrade
+    if (isExecuteOnlyOnce() && StringUtils.isNotBlank(previousArtifactVersion)) {
+      return false;
+    }
+
+    String previousVersion = StringUtils.isBlank(previousArtifactVersion) ? previousGroupVersion : previousArtifactVersion;
+
+    // If version didn't change or newVersion is greater to previous version,
+    // don't upgrade
+    if (VersionComparator.isBefore(newVersion, previousVersion)
+        || (StringUtils.isNotBlank(previousArtifactVersion) && (VersionComparator.isBefore(newVersion, previousArtifactVersion)
+            || VersionComparator.isSame(newVersion, previousArtifactVersion)))) {
+      return false;
+    }
+    // If the plugin has a target version that is before current version
+    if (StringUtils.isNotBlank(getTargetVersion()) && (VersionComparator.isBefore(getTargetVersion(), previousVersion)
+        || VersionComparator.isSame(getTargetVersion(), previousVersion))) {
+      return false;
+    }
+    return shouldProceedToUpgrade(newVersion, previousVersion);
+  }
 
   /**
    * {@inheritDoc}

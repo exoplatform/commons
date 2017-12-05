@@ -332,7 +332,8 @@ public class ProductInformations implements Startable {
       // This node's path is
       // "WS_NAME:/exo;services/ProductInformationsService/productVersionDeclarationNode"
       Node productVersionDeclarationNode = null;
-      if (applicationDataNode.hasNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME)) {// reads
+      if (applicationDataNode.hasNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME)
+          && applicationDataNode.getNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME).hasNode(PRODUCT_VERSION_DECLARATION_NODE_NAME)) {// reads
         // from
         // the
         // JCR
@@ -353,8 +354,14 @@ public class ProductInformations implements Startable {
           LOG.debug("Product server first run: setup product Version Declaration Node");
         }
         firstRun = true;
-        Node UpgradeProductServiceNode = applicationDataNode.addNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME, "nt:unstructured");
-        productVersionDeclarationNode = UpgradeProductServiceNode.addNode(PRODUCT_VERSION_DECLARATION_NODE_NAME, "nt:file");
+
+        Node upgradeProductServiceNode = null;
+        if (applicationDataNode.hasNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME)) {
+          upgradeProductServiceNode = applicationDataNode.getNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME);
+        } else {
+          upgradeProductServiceNode = applicationDataNode.addNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME, "nt:unstructured");
+        }
+        productVersionDeclarationNode = upgradeProductServiceNode.addNode(PRODUCT_VERSION_DECLARATION_NODE_NAME, "nt:file");
         Node productVersionDeclarationNodeContent = productVersionDeclarationNode.addNode("jcr:content", "nt:resource");
         productVersionDeclarationNodeContent.setProperty("jcr:encoding", "UTF-8");
         productVersionDeclarationNodeContent.setProperty("jcr:mimeType", "text/plain");
@@ -552,4 +559,15 @@ public class ProductInformations implements Startable {
     return dateFormat.format(Calendar.getInstance(TimeZone.getDefault()).getTime());
   }
 
+  public void setPreviousProductInformationProperties(Properties previousProductInformationProperties) {
+    this.previousProductInformationProperties = previousProductInformationProperties;
+  }
+
+  public void setProductInformationProperties(Properties productInformationProperties) {
+    this.productInformationProperties = productInformationProperties;
+  }
+
+  public void setFirstRun(boolean firstRun) {
+    this.firstRun = firstRun;
+  }
 }

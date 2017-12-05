@@ -60,9 +60,6 @@
 		<key>org.exoplatform.commons.api.settings.SettingService</key>
     <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
 	</component>
-	<component>
-		<type>org.exoplatform.jpa.mock.DummyDependantComponent</type>
-	</component>
 
 	<component>
 		<key>org.exoplatform.services.naming.InitialContextInitializer</key>

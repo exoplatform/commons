@@ -16,7 +16,20 @@
  */
 package org.exoplatform.commons.upgrade;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+
 import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.info.MissingProductInformationException;
 import org.exoplatform.commons.info.ProductInformations;
@@ -26,18 +39,12 @@ import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com May
@@ -47,14 +54,34 @@ import java.util.List;
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test-configuration.xml") })
 
 public class UpgradeProductTest extends BaseCommonsTestCase {
+  private static final String    OLD_PRODUCT_INFORMATIONS_FILE = "classpath:/conf/data/product_old.properties";
 
-  private UpgradeProductService service;
+  private static final String    NEW_PRODUCT_INFORMATIONS_FILE = "classpath:/conf/data/product_new.properties";
+
+  private static final String    NEWER_PRODUCT_INFORMATIONS_FILE = "classpath:/conf/data/product_newer.properties";
+
+  protected RepositoryService    repositoryService;
+
+  private ProductInformations    productInformations;
+
+  private SettingService         settingService;
+
+  private UpgradeProductService  upgradeService;
+
+  protected ConfigurationManager configurationManager;
+
+  public UpgradeProductTest() {
+    setForceContainerReload(true);
+  }
 
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    this.service = (UpgradeProductService) container.getComponentInstanceOfType(UpgradeProductService.class);
-
+    this.upgradeService = getContainer().getComponentInstanceOfType(UpgradeProductService.class);
+    this.productInformations = getService(ProductInformations.class);
+    this.settingService = getService(SettingService.class);
+    this.repositoryService = getService(RepositoryService.class);
+    this.configurationManager = getService(ConfigurationManager.class);
   }
 
   public void testPluginIsEnable() {
@@ -119,11 +146,11 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   }
 
   public void testProcessUpgrade() throws PathNotFoundException,
-      RepositoryException,
-      RepositoryConfigurationException,
-      MissingProductInformationException {
+                                   RepositoryException,
+                                   RepositoryConfigurationException,
+                                   MissingProductInformationException {
 
-    ProductInformations prodInfo = (ProductInformations) container.getComponentInstanceOfType(ProductInformations.class);
+    ProductInformations prodInfo = getContainer().getComponentInstanceOfType(ProductInformations.class);
 
     String portalVersion = prodInfo.getVersion("org.gatein.portal");
     String portalPrevVersion = prodInfo.getPreviousVersion("org.gatein.portal");
@@ -138,8 +165,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     List<String> versionLabels = Arrays.asList(upgradeNode.getVersionHistory().getVersionLabels());
 
     // Verify upgrade portal plugin: only upgrade from version 0
-    assertEquals(portalPrevVersion.equals("0"),
-        versionLabels.contains(portalVersion + "-ZERO-SNAPSHOT"));
+    assertEquals(portalPrevVersion.equals("0"), versionLabels.contains(portalVersion + "-ZERO-SNAPSHOT"));
     assertEquals(portalPrevVersion.equals("0"), versionLabels.contains(portalVersion + "-ZERO"));
     assertEquals(portalPrevVersion.equals("0"), upgradeNode.hasNode("upgradeFromZERO"));
 
@@ -147,6 +173,246 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     assertEquals(!ecmsPrevVersion.equals("0"), versionLabels.contains(ecmsVersion + "-X-SNAPSHOT"));
     assertEquals(!ecmsPrevVersion.equals("0"), versionLabels.contains(ecmsVersion + "-X"));
     assertEquals(!ecmsPrevVersion.equals("0"), upgradeNode.hasNode("upgradeFrom" + ecmsPrevVersion));
+  }
+
+  public void testUpgradeWithTargetVersion() {
+    productInformations.setFirstRun(false);
+
+    // Create upgrade plugin for ECMS
+    InitParams params = new InitParams();
+    ValueParam param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.social");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName("plugin.execution.order");
+    param.setValue("2");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName(UpgradeProductPlugin.UPGRADE_PLUGIN_TARGET_PARAMETER);
+    param.setValue("1.0-M3");
+    params.addParameter(param);
+
+    UpgradePluginWithTargetVersion upgradeProductPlugin = new UpgradePluginWithTargetVersion(params);
+    upgradeProductPlugin.setName("UpgradePluginWithTargetVersion");
+
+    assertEquals("1.0-M3", upgradeProductPlugin.getTargetVersion());
+
+    upgradeService.addUpgradePlugin(upgradeProductPlugin);
+
+    try {
+      resetPreviousProductInformation(OLD_PRODUCT_INFORMATIONS_FILE);
+    } catch (Exception e) {
+      fail(e);
+    }
+
+    // invoke productInformations() explicitly to store the new version in the
+    // JCR
+    productInformations.start();
+    upgradeService.start();
+
+    assertEquals(1, UpgradePluginWithTargetVersion.COUNT.get());
+    assertTrue(UpgradePluginWithTargetVersion.PROCESSED);
+
+    UpgradePluginWithTargetVersion.PROCESSED = false;
+
+    // invoke productInformations() explicitly to store the new version in the
+    // JCR
+    productInformations.start();
+    upgradeService.start();
+
+    assertFalse(UpgradePluginWithTargetVersion.PROCESSED);
+  }
+
+  public void testUpgradeAsynchronous() {
+    productInformations.setFirstRun(false);
+
+    // Create upgrade plugin for ECMS
+    InitParams params = new InitParams();
+    ValueParam param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.social");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName("plugin.execution.order");
+    param.setValue("2");
+    params.addParameter(param);
+
+    UpgradePluginAsynchronous upgradeProductPlugin = new UpgradePluginAsynchronous(params);
+
+    assertFalse(upgradeProductPlugin.isAsyncUpgradeExecution());
+
+    param = new ValueParam();
+    param.setName(UpgradeProductPlugin.UPGRADE_PLUGIN_ASYNC);
+    param.setValue("true");
+    params.addParameter(param);
+    upgradeProductPlugin = new UpgradePluginAsynchronous(params);
+
+    assertTrue(upgradeProductPlugin.isAsyncUpgradeExecution());
+
+    upgradeProductPlugin.setName("UpgradePluginAsynchronous");
+    upgradeService.addUpgradePlugin(upgradeProductPlugin);
+
+    try {
+      resetPreviousProductInformation(OLD_PRODUCT_INFORMATIONS_FILE);
+    } catch (Exception e) {
+      fail(e);
+    }
+
+    // Lock current thread twice to wait until Upgrade plugin has finished its
+    // execution
+    upgradeProductPlugin.executeParentThread.lock();
+
+    // Interrupt Upgrade plugin execution
+    upgradeProductPlugin.executePluginLock.lock();
+    try {
+      // invoke productInformations() explicitly to store the new version in the
+      // JCR
+      productInformations.start();
+      upgradeService.start();
+
+      assertFalse(UpgradePluginAsynchronous.PROCESSED);
+    } finally {
+      // Proceed Upgrade plugin execution
+      upgradeProductPlugin.executePluginLock.unlock();
+    }
+
+    // Force wait until the Upgrade Task finishes its execution
+    upgradeProductPlugin.executeParentThread.lock();
+    upgradeProductPlugin.executeParentThread.unlock();
+
+    assertEquals(1, UpgradePluginAsynchronous.COUNT.get());
+    assertTrue(UpgradePluginAsynchronous.PROCESSED);
+
+    // Start test for the second Upgrade Plugin execution
+
+    UpgradePluginAsynchronous.PROCESSED = false;
+    updateNewProductionInformations(NEWER_PRODUCT_INFORMATIONS_FILE);
+
+    // Lock current thread twice to wait until Upgrade plugin has finished its
+    // execution
+    upgradeProductPlugin.executeParentThread.lock();
+
+    // Interrupt Upgrade plugin execution
+    upgradeProductPlugin.executePluginLock.lock();
+
+    try {
+      // invoke productInformations() explicitly to store the new version in the
+      // JCR
+      productInformations.start();
+      upgradeService.start();
+    } finally {
+      // Proceed Upgrade plugin execution
+      upgradeProductPlugin.executePluginLock.unlock();
+    }
+
+    upgradeProductPlugin.executeParentThread.lock();
+    upgradeProductPlugin.executeParentThread.unlock();
+
+    assertEquals(2, UpgradePluginAsynchronous.COUNT.get());
+    assertTrue(UpgradePluginAsynchronous.PROCESSED);
+  }
+
+  public void testUpgradeExecutedOnce() {
+    productInformations.setFirstRun(false);
+
+    // Create upgrade plugin for ECMS
+    InitParams params = new InitParams();
+    ValueParam param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.social");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName("plugin.execution.order");
+    param.setValue("2");
+    params.addParameter(param);
+
+    UpgradePluginExecutedOnce upgradeProductPlugin = new UpgradePluginExecutedOnce(params);
+    assertFalse(upgradeProductPlugin.isExecuteOnlyOnce());
+
+    param = new ValueParam();
+    param.setName(UpgradeProductPlugin.UPGRADE_PLUGIN_EXECUTE_ONCE_PARAMETER);
+    param.setValue("true");
+    params.addParameter(param);
+    upgradeProductPlugin = new UpgradePluginExecutedOnce(params);
+
+    assertTrue(upgradeProductPlugin.isExecuteOnlyOnce());
+
+    upgradeProductPlugin.setName("UpgradePluginExecutedOnce");
+    upgradeService.addUpgradePlugin(upgradeProductPlugin);
+
+    try {
+      resetPreviousProductInformation(OLD_PRODUCT_INFORMATIONS_FILE);
+    } catch (Exception e) {
+      fail(e);
+    }
+
+    // invoke productInformations() explicitly to store the new version in the
+    // JCR
+    productInformations.start();
+    upgradeService.start();
+
+    assertTrue(UpgradePluginExecutedOnce.PROCESSED);
+
+    UpgradePluginExecutedOnce.PROCESSED = false;
+
+    // invoke productInformations() explicitly to store the new version in the
+    // JCR
+    productInformations.start();
+    upgradeService.start();
+
+    assertFalse(UpgradePluginExecutedOnce.PROCESSED);
+  }
+
+  public void testUpgradeErrorFirstCall() {
+    productInformations.setFirstRun(false);
+
+    // Create upgrade plugin for ECMS
+    InitParams params = new InitParams();
+    ValueParam param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.social");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName("plugin.execution.order");
+    param.setValue("2");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName(UpgradeProductPlugin.UPGRADE_PLUGIN_EXECUTE_ONCE_PARAMETER);
+    param.setValue("true");
+    params.addParameter(param);
+
+    UpgradePluginErrorFirstCall upgradeProductPlugin = new UpgradePluginErrorFirstCall(params);
+    upgradeProductPlugin.setName("UpgradePluginErrorFirstCall");
+    upgradeService.addUpgradePlugin(upgradeProductPlugin);
+
+    try {
+      resetPreviousProductInformation(OLD_PRODUCT_INFORMATIONS_FILE);
+    } catch (Exception e) {
+      fail(e);
+    }
+
+    // invoke productInformations() explicitly to store the new version in the
+    // JCR
+    productInformations.start();
+    upgradeService.start();
+
+    assertFalse(UpgradePluginErrorFirstCall.PROCESSED);
+    assertEquals(1, UpgradePluginErrorFirstCall.COUNT.get());
+
+    // invoke productInformations() explicitly to store the new version in the
+    // JCR
+    productInformations.start();
+    upgradeService.start();
+
+    assertEquals(2, UpgradePluginErrorFirstCall.COUNT.get());
+    assertTrue(UpgradePluginErrorFirstCall.PROCESSED);
   }
 
   public void testUpgradeStatus() {
@@ -183,28 +449,123 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
     assertTrue("Status should be != COMPLETED", upgradeStatus.shouldProceedToUpgrade("", ""));
     upgradeStatus.processUpgrade("", "");
-    assertTrue("Status should be != COMPLETED even after upgrade completion AND UpdateStatusAfterUpgrade = false", upgradeStatus.shouldProceedToUpgrade("", ""));
+    assertTrue("Status should be != COMPLETED even after upgrade completion AND UpdateStatusAfterUpgrade = false",
+               upgradeStatus.shouldProceedToUpgrade("", ""));
     upgradeStatus.setUpdateStatusAfterUpgrade(true);
     upgradeStatus.processUpgrade("", "");
-    assertFalse("Status should be == COMPLETED after upgrade completion AND UpdateStatusAfterUpgrade = true", upgradeStatus.shouldProceedToUpgrade("", ""));
+    assertFalse("Status should be == COMPLETED after upgrade completion AND UpdateStatusAfterUpgrade = true",
+                upgradeStatus.shouldProceedToUpgrade("", ""));
   }
 
   @Override
   public void tearDown() {
+    try {
+      Session session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
+      Node plfVersionDeclarationNode = getProductVersionNode(session);
+      plfVersionDeclarationNode.remove();
+      session.save();
+
+      Node upgradeProductTestNode = getUpgradeProductTestNode();
+      Session testSession = upgradeProductTestNode.getSession();
+      upgradeProductTestNode.remove();
+      testSession.save();
+
+      updateNewProductionInformations(NEW_PRODUCT_INFORMATIONS_FILE);
+      settingService.remove(UpgradeProductService.UPGRADE_PRODUCT_CONTEXT);
+    } catch (Exception e) {
+      fail(e);
+    }
   }
 
-  private static Node getUpgradeProductTestNode() throws RepositoryException,
-      RepositoryConfigurationException {
+  private static Node getUpgradeProductTestNode() throws RepositoryException, RepositoryConfigurationException {
 
     PortalContainer container = PortalContainer.getInstance();
 
-    NodeHierarchyCreator nodeHierarchyCreator = (NodeHierarchyCreator) container.getComponentInstanceOfType(NodeHierarchyCreator.class);
+    ProductInformations productInformations = container.getComponentInstanceOfType(ProductInformations.class);
+    NodeHierarchyCreator nodeHierarchyCreator =
+                                              (NodeHierarchyCreator) container.getComponentInstanceOfType(NodeHierarchyCreator.class);
     String upgradeNodePath = nodeHierarchyCreator.getJcrPath("upgradeProductTest");
 
     RepositoryService repositoryService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
-    Session session = repositoryService.getRepository("repository").getSystemSession("portal-test");
+    Session session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
     return (Node) session.getItem(upgradeNodePath);
+  }
 
+  public static class UpgradePluginAsynchronous extends UpgradeProductPlugin {
+
+    public static AtomicLong COUNT               = new AtomicLong(0);
+
+    public static boolean    PROCESSED;
+
+    public Lock              executeParentThread = new Lock();
+
+    public Lock              executePluginLock   = new Lock();
+
+    public UpgradePluginAsynchronous(InitParams initParams) {
+      super(initParams);
+    }
+
+    @Override
+    public void processUpgrade(String oldVersion, String newVersion) {
+      executePluginLock.lock();
+      try {
+        PROCESSED = true;
+        COUNT.incrementAndGet();
+      } finally {
+        executePluginLock.unlock();
+        executeParentThread.unlock();
+      }
+    }
+  }
+
+  public static class UpgradePluginWithTargetVersion extends UpgradeProductPlugin {
+
+    public static final AtomicLong COUNT = new AtomicLong(0);
+
+    public static boolean          PROCESSED;
+
+    public UpgradePluginWithTargetVersion(InitParams initParams) {
+      super(initParams);
+    }
+
+    @Override
+    public void processUpgrade(String oldVersion, String newVersion) {
+      PROCESSED = true;
+      COUNT.incrementAndGet();
+    }
+  }
+
+  public static class UpgradePluginExecutedOnce extends UpgradeProductPlugin {
+
+    public static boolean PROCESSED;
+
+    public UpgradePluginExecutedOnce(InitParams initParams) {
+      super(initParams);
+    }
+
+    @Override
+    public void processUpgrade(String oldVersion, String newVersion) {
+      PROCESSED = true;
+    }
+  }
+
+  public static class UpgradePluginErrorFirstCall extends UpgradeProductPlugin {
+
+    public static final AtomicLong COUNT = new AtomicLong(0);
+
+    public static boolean          PROCESSED;
+
+    public UpgradePluginErrorFirstCall(InitParams initParams) {
+      super(initParams);
+    }
+
+    @Override
+    public void processUpgrade(String oldVersion, String newVersion) {
+      if (COUNT.incrementAndGet() == 1) {
+        throw new RuntimeException("EXPECTED EXCEPTION");
+      }
+      PROCESSED = true;
+    }
   }
 
   public static class UpgradePluginFromVersionZERO extends UpgradeProductPlugin {
@@ -226,7 +587,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
         upgradeNode.save();
         upgradeNode.getSession().save();
       } catch (RepositoryException e) {
-        fail();
+        fail(e);
       } catch (RepositoryConfigurationException e) {
       }
     }
@@ -259,7 +620,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
         upgradeNode.save();
         upgradeNode.getSession().save();
       } catch (RepositoryException e) {
-        fail();
+        fail(e);
       } catch (RepositoryConfigurationException e) {
       }
     }
@@ -310,8 +671,10 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   public static class UpgradePluginStatus extends UpgradeProductPlugin {
 
     private static final String MIGRATION_STATUS_COMPLETED = "COMPLETED";
-    private static final String MIGRATION_STATUS = "Migration_STATUS";
-    boolean updateStatusAfterUpgrade = false;
+
+    private static final String MIGRATION_STATUS           = "Migration_STATUS";
+
+    boolean                     updateStatusAfterUpgrade   = false;
 
     public UpgradePluginStatus(SettingService settingService, InitParams initParams) {
       super(settingService, initParams);
@@ -320,11 +683,11 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     @Override
     public void processUpgrade(String oldVersion, String newVersion) {
       try {
-        if(updateStatusAfterUpgrade) {
+        if (updateStatusAfterUpgrade) {
           storeValueForPlugin(MIGRATION_STATUS, MIGRATION_STATUS_COMPLETED);
         }
       } catch (Exception e) {
-        fail();
+        fail(e);
       }
     }
 
@@ -341,7 +704,70 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     public boolean isUpdateStatusAfterUpgrade() {
       return updateStatusAfterUpgrade;
     }
-
   }
 
+  public static class Lock {
+    private boolean locked = false;
+
+    public synchronized void lock() {
+      try {
+        while (locked) {
+          wait();
+        }
+      } catch (InterruptedException e) {
+        throw new RuntimeException("Wait was interrupted unexpectly", e);
+      }
+      locked = true;
+    }
+
+    public synchronized void unlock() {
+      locked = false;
+      notify();
+    }
+
+    public boolean isLocked() {
+      return locked;
+    }
+  }
+
+  private void resetPreviousProductInformation(String filePath) throws Exception {
+    Session session = null;
+    try {
+      InputStream oldVersionsContentIS = configurationManager.getInputStream(filePath);
+      byte[] binaries = new byte[oldVersionsContentIS.available()];
+      oldVersionsContentIS.read(binaries);
+      String oldVersionsContent = new String(binaries);
+
+      session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
+
+      Node plfVersionDeclarationNode = getProductVersionNode(session);
+      Node plfVersionDeclarationContentNode = plfVersionDeclarationNode.getNode("jcr:content");
+      plfVersionDeclarationContentNode.setProperty("jcr:data", oldVersionsContent);
+
+      session.save();
+      session.refresh(true);
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+  }
+
+  private void updateNewProductionInformations(String filePath) {
+    try {
+      InputStream newVersionsContentIS = configurationManager.getInputStream(filePath);
+      byte[] binaries = new byte[newVersionsContentIS.available()];
+      newVersionsContentIS.read(binaries);
+      Properties properties = new Properties();
+      properties.load(new ByteArrayInputStream(binaries));
+      productInformations.setProductInformationProperties(properties);
+    } catch (Exception e) {
+      fail(e);
+    }
+  }
+
+  private Node getProductVersionNode(Session session) throws PathNotFoundException, RepositoryException {
+    Node plfVersionDeclarationNodeContent = ((Node) session.getItem(productInformations.getProductVersionDeclarationNodePath()));
+    return plfVersionDeclarationNodeContent;
+  }
 }
