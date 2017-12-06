@@ -12,11 +12,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.StringUtils;
+import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.cluster.StartableClusterAware;
 import org.exoplatform.commons.info.MissingProductInformationException;
 import org.exoplatform.commons.info.ProductInformations;
 import org.exoplatform.commons.utils.PropertyManager;
@@ -24,11 +26,11 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.picocontainer.Startable;
 
-public class UpgradeProductService implements Startable {
+public class UpgradeProductService implements StartableClusterAware {
 
   public static final Context              UPGRADE_PRODUCT_CONTEXT       = Context.GLOBAL.id("UPGRADE_PRODUCT_CONTEXT");
 
@@ -49,18 +51,24 @@ public class UpgradeProductService implements Startable {
   private List<UpgradeProductPlugin> upgradePlugins = new ArrayList<UpgradeProductPlugin>();
   private Set<UpgradeProductPlugin> allUpgradePlugins= new HashSet<UpgradeProductPlugin>();
   private ProductInformations productInformations = null;
-  private SettingService settingService;
+  private SettingService settingService = null;
+  private NodeHierarchyCreator nodeHierarchyCreator = null;
   private boolean proceedUpgradeFirstRun = false;
 
   private Comparator<UpgradeProductPlugin> pluginsComparator             = null;
 
   /**
-   * Constructor called by eXo Kernel
+   * Constructor with services and init params injected by Kernel
    * 
+   * @param portalContainer
+   * @param nodeHierarchyCreator
+   * @param settingService
    * @param productInformations
+   * @param initParams
    */
-  public UpgradeProductService(PortalContainer portalContainer, SettingService settingService, ProductInformations productInformations, InitParams initParams) {
+  public UpgradeProductService(PortalContainer portalContainer, NodeHierarchyCreator nodeHierarchyCreator, SettingService settingService, ProductInformations productInformations, InitParams initParams) {
     this.productInformations = productInformations;
+    this.nodeHierarchyCreator = nodeHierarchyCreator;
     this.settingService = settingService;
     this.portalContainer = portalContainer;
     if (!initParams.containsKey(PROCEED_UPGRADE_FIRST_RUN_KEY)) {
@@ -124,6 +132,12 @@ public class UpgradeProductService implements Startable {
    * ExoContainer
    */
   public void start() {
+    // Make sure that related services are started before starting this service
+    if (nodeHierarchyCreator instanceof Startable) {
+      ((Startable) nodeHierarchyCreator).start();
+    }
+    productInformations.start();
+
     if (productInformations.isFirstRun()) {
       LOG.info("Proceed upgrade on first run = {}", proceedUpgradeFirstRun);
 
@@ -220,7 +234,13 @@ public class UpgradeProductService implements Startable {
   public void stop() {
     executorService.shutdown();
   }
-  
+
+  @Override
+  public boolean isDone() {
+    // Avoid start this service in other cluster nodes
+    return false;
+  }
+
   /**
    * Re-import all upgrade-plugins for service
    */

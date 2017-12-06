@@ -3,6 +3,16 @@
 			   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
 			   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
+  <component>
+    <type>org.exoplatform.commons.cluster.StartableClusterService</type>
+    <init-params>
+      <value-param>
+        <name>exo.cluster.startable.check.period</name>
+        <value>${exo.cluster.startable.check.period:2000}</value>
+      </value-param>
+    </init-params>
+  </component>
+
 	<component>
 		<key>org.exoplatform.portal.config.UserACL</key>
 		<type>org.exoplatform.portal.config.UserACL</type>
@@ -38,6 +48,10 @@
 				<name>product.versions.declaration.file</name>
 				<value>classpath:/conf/data/product_new.properties</value>
 			</value-param>
+      <value-param>
+        <name>working.worspace.name</name>
+        <value>portal-test</value>
+      </value-param>
 		</init-params>
 	</component>
 

@@ -150,16 +150,19 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
                                    RepositoryConfigurationException,
                                    MissingProductInformationException {
 
-    ProductInformations prodInfo = getContainer().getComponentInstanceOfType(ProductInformations.class);
+    productInformations.start();
+    upgradeService.start();
 
-    String portalVersion = prodInfo.getVersion("org.gatein.portal");
-    String portalPrevVersion = prodInfo.getPreviousVersion("org.gatein.portal");
+    String portalVersion = productInformations.getVersion("org.gatein.portal");
+    String portalPrevVersion = productInformations.getPreviousVersion("org.gatein.portal");
 
-    String ecmsVersion = prodInfo.getVersion("org.exoplatform.ecms");
-    String ecmsPrevVersion = prodInfo.getPreviousVersion("org.exoplatform.ecms");
+    String ecmsVersion = productInformations.getVersion("org.exoplatform.ecms");
+    String ecmsPrevVersion = productInformations.getPreviousVersion("org.exoplatform.ecms");
 
     // Node has been changed by upgrade-plugins
     Node upgradeNode = getUpgradeProductTestNode();
+
+    assertTrue("Node is not versionnable", upgradeNode.isNodeType("mix:versionable"));
 
     // Get all version labels are set
     List<String> versionLabels = Arrays.asList(upgradeNode.getVersionHistory().getVersionLabels());
@@ -478,7 +481,6 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   }
 
   private static Node getUpgradeProductTestNode() throws RepositoryException, RepositoryConfigurationException {
-
     PortalContainer container = PortalContainer.getInstance();
 
     ProductInformations productInformations = container.getComponentInstanceOfType(ProductInformations.class);
