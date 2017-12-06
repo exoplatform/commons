@@ -17,10 +17,9 @@
 package org.exoplatform.commons.search.es;
 
 /**
- * Created by The eXo Platform SAS
- * Author : Thibault Clement
- * tclement@exoplatform.com
- * 11/27/15
+ * Filter type that can be added by search connectors in
+ * ES queries (seeElasticSearchServiceConnector#getAdditionalFilters(java.util.List)).
+ * Type FILTER_CUSTOM allows to define any type of filter by providing the full content of the filter.
  */
 public enum  ElasticSearchFilterType {
   FILTER_BY_TERM("term"),
