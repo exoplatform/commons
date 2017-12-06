@@ -148,6 +148,10 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
     do {
       processedOperations = processBulk();
     } while (processedOperations >= batchNumber);
+
+    if(this.interrupted) {
+      LOG.info("Indexing queue processing interruption done");
+    }
   }
 
   /**
@@ -158,13 +162,13 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
    */
   @Override
   public void interrupt() {
-    LOG.debug("Indexing queue processor has been interrupted");
+    LOG.info("Indexing queue processing has been interrupted. Please wait until the service exists cleanly...");
     this.interrupted = true;
   }
 
   private boolean isInterrupted() {
     if(Thread.interrupted()) {
-      LOG.debug("Thread running indexing queue processor has been interrupted");
+      LOG.info("Thread running indexing queue processing has been interrupted. Please wait until the service exists cleanly...");
       this.interrupted = true;
     }
     return this.interrupted;
