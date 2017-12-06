@@ -19,8 +19,8 @@
 package org.exoplatform.commons.utils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -87,7 +87,7 @@ abstract public class HTMLSanitizer {
   @SuppressWarnings("unchecked")
   private static final Collection<String>                                     CUSTOM_ALLOWED_STYLES    =
                                                                                                     (Collection<String>) CollectionUtils.union(CssSchema.DEFAULT.allowedProperties(),
-                                                                                                                                               Collections.singleton("float"));
+                                                                                                                                               Arrays.asList(new String[]{"float", "display", "clear"}));
 
   /** A policy definition that matches the minimal HTML that eXo allows. */
   public static final Function<HtmlStreamEventReceiver, HtmlSanitizer.Policy> POLICY_DEFINITION        = new HtmlPolicyBuilder()
@@ -311,7 +311,8 @@ abstract public class HTMLSanitizer {
                                                                                                                                         "tr",
                                                                                                                                         "colgroup",
                                                                                                                                         "fieldset",
-                                                                                                                                        "legend")
+                                                                                                                                        "legend",
+                                                                                                                                        "ins")
 
                                                                                                                                  //Allows the named elements for xwiki input
                                                                                                                                 .allowElements("wikiimage","wikilink","wikimacro")
