@@ -145,12 +145,10 @@ public class UpgradeProductService implements StartableClusterAware {
       if (!proceedUpgradeFirstRun) {
         LOG.info("Ignore all upgrade plugins");
         for (UpgradeProductPlugin upgradeProductPlugin : allUpgradePlugins) {
-          // Mark Plugin that should be executed only once as executed
-          // to avoid that the plugin is executed future version upgrade
-          if (upgradeProductPlugin.isExecuteOnlyOnce()) {
-            String currentProductPluginVersion = getCurrentVersion(upgradeProductPlugin);
-            storeUpgradePluginVersion(upgradeProductPlugin, currentProductPluginVersion);
-          }
+          // Mark Plugin as executed to avoid that the plugin is executed future version upgrade
+          String currentProductPluginVersion = getCurrentVersion(upgradeProductPlugin);
+          UpgradePluginExecutionContext currenUpgradePluginExecutionContext = new UpgradePluginExecutionContext(currentProductPluginVersion, 0);
+          storeUpgradePluginVersion(upgradeProductPlugin, currenUpgradePluginExecutionContext);
         }
         return;
       }
@@ -169,7 +167,8 @@ public class UpgradeProductService implements StartableClusterAware {
       // the upgradePlugins list, execute these remaining plugins.
       for (UpgradeProductPlugin upgradeProductPlugin : upgradePlugins) {
         // Get stored version for this specific Upgrade Plugin from SettingService
-        String previousUpgradePluginVersion = getPreviousUpgradePluginVersion(upgradeProductPlugin);
+        UpgradePluginExecutionContext previousUpgradePluginExecutionContext = getPreviousUpgradePluginVersion(upgradeProductPlugin);
+        String previousUpgradePluginVersion = previousUpgradePluginExecutionContext == null ? null : previousUpgradePluginExecutionContext.getVersion();
         // If the specific version is null, get it from GroupId an store it in SettingService
         // The retrieval from GroupId will not be done if checkGroupIdVersion == null
         String previousGroupVersion = getPreviousVersionByGroupId(upgradeProductPlugin);
@@ -181,13 +180,14 @@ public class UpgradeProductService implements StartableClusterAware {
 
         try {
           // The plugin will determine if it should proceed to upgrade
-          if (upgradeProductPlugin.shouldProceedToUpgrade(currentVersion, previousGroupVersion, previousUpgradePluginVersion)) {
+          if (upgradeProductPlugin.shouldProceedToUpgrade(currentVersion, previousGroupVersion, previousUpgradePluginExecutionContext)) {
             // Store previous version for this specific plugin. This version will be updated to currentVersion
             // only if proceedToUpgrade succeeds, else, the plugin will be executed again.
             // In case of isExecuteOnlyOnce==true, we shouldn't store any information for the specific plugin,
             // else it will not be executed if an error occurs 
-            if (StringUtils.isBlank(previousUpgradePluginVersion) && !upgradeProductPlugin.isExecuteOnlyOnce()) {
-              storeUpgradePluginVersion(upgradeProductPlugin, previousVersion);
+            if (StringUtils.isBlank(previousUpgradePluginVersion)) {
+              previousUpgradePluginExecutionContext = new UpgradePluginExecutionContext(previousGroupVersion, 0);
+              storeUpgradePluginVersion(upgradeProductPlugin, previousUpgradePluginExecutionContext);
             }
 
             // Proceed to upgrade upgrade plugin
@@ -197,18 +197,19 @@ public class UpgradeProductService implements StartableClusterAware {
                      previousVersion,
                      currentVersion);
             if (upgradeProductPlugin.isAsyncUpgradeExecution()) {
+              final UpgradePluginExecutionContext previousUpgradePluginExecutionContextFinal = previousUpgradePluginExecutionContext;
               Runnable task = () -> {
                 ExoContainerContext.setCurrentContainer(portalContainer);
                 RequestLifeCycle.begin(portalContainer);
                 try {
-                  proceedToUpgrade(upgradeProductPlugin, currentVersion, previousVersion);
+                  proceedToUpgrade(upgradeProductPlugin, currentVersion, previousVersion, previousUpgradePluginExecutionContextFinal);
                 } finally {
                   RequestLifeCycle.end();
                 }
               };
               executorService.execute(task);
             } else {
-              proceedToUpgrade(upgradeProductPlugin, currentVersion, previousVersion);
+              proceedToUpgrade(upgradeProductPlugin, currentVersion, previousVersion, previousUpgradePluginExecutionContext);
             }
           } else {
             LOG.info("Ignore upgrade plugin {} from version {} to {}",
@@ -259,12 +260,14 @@ public class UpgradeProductService implements StartableClusterAware {
     }
   }
 
-  private void proceedToUpgrade(UpgradeProductPlugin upgradeProductPlugin, String currentVersion, String previousVersion) {
+  private void proceedToUpgrade(UpgradeProductPlugin upgradeProductPlugin, String currentVersion, String previousVersion, UpgradePluginExecutionContext upgradePluginExecutionContext) {
     upgradeProductPlugin.beforeUpgrade();
     try {
       upgradeProductPlugin.processUpgrade(previousVersion, currentVersion);
 
-      storeUpgradePluginVersion(upgradeProductPlugin, currentVersion);
+      upgradePluginExecutionContext.setExecutionCount(upgradePluginExecutionContext.getExecutionCount() + 1);
+      upgradePluginExecutionContext.setVersion(currentVersion);
+      storeUpgradePluginVersion(upgradeProductPlugin, upgradePluginExecutionContext);
       LOG.info("Upgrade of plugin {} completed.", upgradeProductPlugin.getName());
     } catch (Exception e) {
       LOG.error("Error while upgrading plugin with name '" + upgradeProductPlugin.getName()
@@ -305,18 +308,22 @@ public class UpgradeProductService implements StartableClusterAware {
     return previousUpgradePluginVersion;
   }
 
-  private void storeUpgradePluginVersion(UpgradeProductPlugin upgradeProductPlugin, String version) {
+  private void storeUpgradePluginVersion(UpgradeProductPlugin upgradeProductPlugin, UpgradePluginExecutionContext upgradePluginExecution) {
+    if (upgradePluginExecution == null) {
+      throw new IllegalArgumentException("UpgradePluginExecution is null");
+    }
     Scope upgradePluginScope = getUpgradePluginScope(upgradeProductPlugin);
-    settingService.set(UPGRADE_PRODUCT_CONTEXT, upgradePluginScope, UPGRADE_PLUGIN_VERSION_KEY, SettingValue.create(version));
+    settingService.set(UPGRADE_PRODUCT_CONTEXT, upgradePluginScope, UPGRADE_PLUGIN_VERSION_KEY, SettingValue.create(upgradePluginExecution.toString()));
   }
 
-  private String getPreviousUpgradePluginVersion(UpgradeProductPlugin upgradeProductPlugin) {
+  private UpgradePluginExecutionContext getPreviousUpgradePluginVersion(UpgradeProductPlugin upgradeProductPlugin) {
     Scope upgradePluginScope = getUpgradePluginScope(upgradeProductPlugin);
     SettingValue<?> upgradePluginVersion = settingService.get(UPGRADE_PRODUCT_CONTEXT, upgradePluginScope, UPGRADE_PLUGIN_VERSION_KEY);
-    return upgradePluginVersion == null ? null : upgradePluginVersion.getValue().toString();
+    return upgradePluginVersion == null ? null : new UpgradePluginExecutionContext(upgradePluginVersion.getValue().toString());
   }
 
   private Scope getUpgradePluginScope(UpgradeProductPlugin upgradeProductPlugin) {
     return Scope.APPLICATION.id(upgradeProductPlugin.getName());
   }
+
 }

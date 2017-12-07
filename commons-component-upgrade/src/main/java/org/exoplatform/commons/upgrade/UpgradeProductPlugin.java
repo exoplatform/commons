@@ -242,14 +242,17 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
    * @param newVersion The current version of running server
    * @param previousGroupVersion The previous version of plugin's product group (social, portal...)
    *          This parameter will be equals to '0' if first time it runs.
-   * @param previousArtifactVersion The previous version of plugin's product (retrieved from last run)
+   * @param previousUpgradePluginExecution The previous version and execution count of plugin (retrieved from last run)
    *          This parameter will be null if first time it runs.
    * @return
    *          true: if the plugin should be executed when switching product from previousVersion to newVersion
    *          false: if the upgrade isn't necessary
    * @return
    */
-  public boolean shouldProceedToUpgrade(String newVersion, String previousGroupVersion, String previousArtifactVersion) {
+  public boolean shouldProceedToUpgrade(String newVersion, String previousGroupVersion, UpgradePluginExecutionContext previousUpgradePluginExecution) {
+    String previousArtifactVersion = previousUpgradePluginExecution == null ? null : previousUpgradePluginExecution.getVersion();
+    int executionCount = previousUpgradePluginExecution == null ? 0 : previousUpgradePluginExecution.getExecutionCount();
+
     if (StringUtils.isBlank(previousGroupVersion) && StringUtils.isBlank(previousArtifactVersion)) {
       throw new IllegalArgumentException("At least one previous version (artifact or group versions) shouldn't be null (equals to '0') for plugin "
           + getClass().getName());
@@ -259,7 +262,7 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
     }
 
     // If the plugin has to be executed only once, don't upgrade
-    if (isExecuteOnlyOnce() && StringUtils.isNotBlank(previousArtifactVersion)) {
+    if (isExecuteOnlyOnce() && executionCount > 0) {
       return false;
     }
 

@@ -371,6 +371,61 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     assertFalse(UpgradePluginExecutedOnce.PROCESSED);
   }
 
+  public void testUpgradeErrorFirstCallWithTargetVersion() {
+    productInformations.setFirstRun(false);
+
+    // Create upgrade plugin for ECMS
+    InitParams params = new InitParams();
+    ValueParam param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.social");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName("plugin.execution.order");
+    param.setValue("2");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName(UpgradeProductPlugin.UPGRADE_PLUGIN_EXECUTE_ONCE_PARAMETER);
+    param.setValue("true");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName(UpgradeProductPlugin.UPGRADE_PLUGIN_TARGET_PARAMETER);
+    param.setValue("1.0-M5");
+    params.addParameter(param);
+
+    UpgradePluginErrorFirstCall.PROCESSED = false;
+    UpgradePluginErrorFirstCall.COUNT = new AtomicLong(0);
+
+    UpgradePluginErrorFirstCall upgradeProductPlugin = new UpgradePluginErrorFirstCall(params);
+    upgradeProductPlugin.setName("UpgradePluginErrorFirstCallWithTargetVersion");
+    upgradeService.addUpgradePlugin(upgradeProductPlugin);
+
+    try {
+      resetPreviousProductInformation(OLD_PRODUCT_INFORMATIONS_FILE);
+    } catch (Exception e) {
+      fail(e);
+    }
+
+    // invoke productInformations() explicitly to store the new version in the
+    // JCR
+    productInformations.start();
+    upgradeService.start();
+
+    assertFalse(UpgradePluginErrorFirstCall.PROCESSED);
+    assertEquals(1, UpgradePluginErrorFirstCall.COUNT.get());
+
+    // invoke productInformations() explicitly to store the new version in the
+    // JCR
+    productInformations.start();
+    upgradeService.start();
+
+    assertEquals(2, UpgradePluginErrorFirstCall.COUNT.get());
+    assertTrue(UpgradePluginErrorFirstCall.PROCESSED);
+  }
+
   public void testUpgradeErrorFirstCall() {
     productInformations.setFirstRun(false);
 
@@ -390,6 +445,9 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     param.setName(UpgradeProductPlugin.UPGRADE_PLUGIN_EXECUTE_ONCE_PARAMETER);
     param.setValue("true");
     params.addParameter(param);
+
+    UpgradePluginErrorFirstCall.PROCESSED = false;
+    UpgradePluginErrorFirstCall.COUNT = new AtomicLong(0);
 
     UpgradePluginErrorFirstCall upgradeProductPlugin = new UpgradePluginErrorFirstCall(params);
     upgradeProductPlugin.setName("UpgradePluginErrorFirstCall");
@@ -553,7 +611,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
   public static class UpgradePluginErrorFirstCall extends UpgradeProductPlugin {
 
-    public static final AtomicLong COUNT = new AtomicLong(0);
+    public static AtomicLong COUNT = new AtomicLong(0);
 
     public static boolean          PROCESSED;
 
