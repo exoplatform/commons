@@ -16,6 +16,8 @@
  */
 package org.exoplatform.services.user;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
 
 
@@ -62,5 +64,21 @@ public class UserStateModel implements Serializable {
   
   public UserStateModel clone() {
     return new UserStateModel(this.getUserId(), this.getLastActivity(), this.getStatus());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof UserStateModel)) return false;
+
+    UserStateModel that = (UserStateModel) o;
+
+    return StringUtils.equals(userId, that.userId);
+
+  }
+
+  @Override
+  public int hashCode() {
+    return userId != null ? userId.hashCode() : 0;
   }
 }

@@ -193,4 +193,23 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
   public boolean removeByValue(V value) {
     return this.list.remove(value);
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof AbstractWebNotifListData)) return false;
+
+    AbstractWebNotifListData<?, ?> that = (AbstractWebNotifListData<?, ?>) o;
+
+    if (isMax != that.isMax) return false;
+    return key != null ? key.equals(that.key) : that.key == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (isMax ? 1 : 0);
+    result = 31 * result + (key != null ? key.hashCode() : 0);
+    return result;
+  }
 }

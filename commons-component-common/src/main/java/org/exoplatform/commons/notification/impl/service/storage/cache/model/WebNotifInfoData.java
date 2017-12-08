@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
@@ -110,4 +111,25 @@ public class WebNotifInfoData implements Serializable {
     return sb.toString();
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof WebNotifInfoData)) return false;
+
+    WebNotifInfoData that = (WebNotifInfoData) o;
+
+    if (key != null ? !key.equals(that.key) : that.key != null) return false;
+    return StringUtils.equals(id, that.id) && StringUtils.equals(from, that.from) &&
+            StringUtils.equals(to, that.to) && StringUtils.equals(title, that.title);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (key != null ? key.hashCode() : 0);
+    result = 31 * result + (from != null ? from.hashCode() : 0);
+    result = 31 * result + (to != null ? to.hashCode() : 0);
+    result = 31 * result + (title != null ? title.hashCode() : 0);
+    return result;
+  }
 }

@@ -256,13 +256,12 @@
         </object-param>
         <object-param>
           <name>cache.config.WebNotificationsCache</name>
-          <description>The JBoss Cache configuration for the Web Notification List Cache</description>
-          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+          <description>The Exo Cache configuration for the Web Notification List Cache</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
             <field name="name"><string>WebNotificationsCache</string></field>
-            <field name="strategy"><string>LIRS</string></field>
-            <field name="lifespan"><long>${cache.exo.commons.WebNotificationsCache.ExpirationTimeout:86400000}</long></field>
-            <field name="maxEntries"><int>${cache.exo.commons.WebNotificationsCache.MaxNodes:5000}</int></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="maxSize"><int>${cache.exo.commons.WebNotificationsCache.Capacity:5000}</int></field>
+            <field name="liveTime"><long>${cache.exo.commons.WebNotificationsCache.TimeToLive:86400}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
           </object>
         </object-param>
         <!-- WebNotificationCountCache -->
@@ -279,13 +278,12 @@
         <!-- UserStateService -->
         <object-param>
           <name>UserStateService</name>
-          <description>The JBoss Cache configuration for the UserStateService</description>
-          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+          <description>The Exo Cache configuration for the UserStateService</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
             <field name="name"><string>UserStateService</string></field>
-            <field name="strategy"><string>LIRS</string></field>
-            <field name="maxEntries"><int>${cache.exo.commons.UserStateService.MaxNodes:5000}</int></field>
-            <field name="lifespan"><long>${cache.exo.commons.UserStateService.ExpirationTimeout:600000}</long></field>
-            <field name="replicated"><boolean>false</boolean></field>
+            <field name="maxSize"><int>${cache.exo.commons.UserStateService.Capacity:5000}</int></field>
+            <field name="liveTime"><long>${cache.exo.commons.UserStateService.TimeToLive:600}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
           </object>
         </object-param>
       </init-params>
@@ -306,7 +304,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${cache.exo.commons.SettingService.MaxNodes:5000}</int></field>
             <field name="lifespan"><long>86400000</long></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.commons.SettingService:replication}</string></field>
           </object>
         </object-param>
         <!-- WebNotificationCache -->
@@ -318,7 +316,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="lifespan"><long>${cache.exo.commons.WebNotificationCache.ExpirationTimeout:86400000}</long></field>
             <field name="maxEntries"><int>${cache.exo.commons.WebNotificationCache.MaxNodes:5000}</int></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.commons.WebNotificationCache.cacheMode:replication}</string></field>
           </object>
         </object-param>
         <object-param>
@@ -329,7 +327,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="lifespan"><long>${cache.exo.commons.WebNotificationsCache.ExpirationTimeout:86400000}</long></field>
             <field name="maxEntries"><int>${cache.exo.commons.WebNotificationsCache.MaxNodes:5000}</int></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.commons.WebNotificationsCache.cacheMode:replication}</string></field>
           </object>
         </object-param>
         <!-- WebNotificationCountCache -->
@@ -341,7 +339,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="lifespan"><long>${cache.exo.commons.WebNotificationCountCache.ExpirationTimeout:86400000}</long></field>
             <field name="maxEntries"><int>${cache.exo.commons.WebNotificationCountCache.MaxNodes:5000}</int></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.commons.WebNotificationCountCache.cacheMode:replication}</string></field>
           </object>
         </object-param>
         <!-- UserStateService -->
@@ -353,7 +351,7 @@
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${cache.exo.commons.UserStateService.MaxNodes:5000}</int></field>
             <field name="lifespan"><long>${cache.exo.commons.UserStateService.ExpirationTimeout:600000}</long></field>
-            <field name="replicated"><boolean>true</boolean></field>
+            <field name="cacheMode"><string>${exo.cache.commons.UserStateService.cacheMode:replication}</string></field>
           </object>
         </object-param>
       </init-params>

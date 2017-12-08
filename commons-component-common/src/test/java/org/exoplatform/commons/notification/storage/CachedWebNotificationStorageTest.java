@@ -30,7 +30,10 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
   private ExoCache<WebNotifInfoCacheKey, WebNotifInfoData> exoWebNotificationCache;
   private ExoCache<WebNotifInfoCacheKey, IntegerData> exoWebNotificationCountCache;
 
-  //
+  public CachedWebNotificationStorageTest() {
+    setForceContainerReload(true);
+  }
+
   @Override
   public void setUp() throws Exception {
     initCollaborationWorkspace();
