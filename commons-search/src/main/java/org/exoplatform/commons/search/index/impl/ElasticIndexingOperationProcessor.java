@@ -142,15 +142,17 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
   @Override
   public synchronized void process() {
     this.interrupted = false;
-    // Loop until the number of data retrieved from indexing queue is less than
-    // BATCH_NUMBER (default = 1000)
-    int processedOperations;
-    do {
-      processedOperations = processBulk();
-    } while (processedOperations >= batchNumber);
-
-    if(this.interrupted) {
-      LOG.info("Indexing queue processing interruption done");
+    try {
+      // Loop until the number of data retrieved from indexing queue is less than
+      // BATCH_NUMBER (default = 1000)
+      int processedOperations;
+      do {
+        processedOperations = processBulk();
+      } while (processedOperations >= batchNumber);
+    } finally {
+      if (this.interrupted) {
+        LOG.info("Indexing queue processing interruption done");
+      }
     }
   }
 
@@ -209,12 +211,15 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
     processReindexAll(indexingQueueSorted);
     processCUD(indexingQueueSorted);
 
-    if(!isInterrupted()) {
-      // Removes the processed IDs from the “indexing queue” table that have
-      // timestamp older than the timestamp of
-      // start of processing
-      indexingOperationDAO.deleteAllIndexingOperationsHavingIdLessThanOrEqual(maxIndexingOperationId);
+    if(isInterrupted()) {
+      throw new RuntimeException("Indexing queue processing interrupted");
     }
+
+    // Removes the processed IDs from the “indexing queue” table that have
+    // timestamp older than the timestamp of
+    // start of processing
+    indexingOperationDAO.deleteAllIndexingOperationsHavingIdLessThanOrEqual(maxIndexingOperationId);
+
     // clear entity manager content after each bulk
     entityManagerService.getEntityManager().clear();
 
