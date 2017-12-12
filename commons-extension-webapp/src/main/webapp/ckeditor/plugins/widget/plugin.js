@@ -80,6 +80,11 @@
 					'cursor:move !important' +
 				'}'
 			);
+
+			// To fix https://jira.exoplatform.org/browse/TA-587,
+			// by adding custom style handler only when loading widget plugin.
+			// This is actually a bug from widget plugin itself https://github.com/ckeditor/ckeditor-dev/pull/1286
+			addCustomStyleHandler();
 		},
 
 		beforeInit: function( editor ) {
@@ -3463,7 +3468,7 @@
 	// WIDGET STYLE HANDLER ---------------------------------------------------
 	//
 
-	( function() {
+	function addCustomStyleHandler() {
 		// Styles categorized by group. It is used to prevent applying styles for the same group being used together.
 		var styleGroups = {};
 
@@ -3718,7 +3723,7 @@
 			}
 		}
 
-	} )();
+	}
 
 	//
 	// EXPOSE PUBLIC API ------------------------------------------------------
