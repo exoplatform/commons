@@ -169,7 +169,7 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
   }
 
   private boolean isInterrupted() {
-    if(Thread.interrupted()) {
+    if(Thread.currentThread().isInterrupted()) {
       LOG.info("Thread running indexing queue processing has been interrupted. Please wait until the service exists cleanly...");
       this.interrupted = true;
     }
