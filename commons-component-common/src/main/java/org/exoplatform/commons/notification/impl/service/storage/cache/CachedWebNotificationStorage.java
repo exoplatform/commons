@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
@@ -320,23 +321,28 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
 
   @Override
   public int getNumberOnBadge(final String userId) {
-    WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(userId);
-    IntegerData numberOfMessageData = futureWebNotificationCountCache.get(
-        new ServiceContext<IntegerData>() {
-          public IntegerData execute() {
-           try {
-             Integer number = storage.getNumberOnBadge(userId);
-             if (number != null) {
-               return new IntegerData(number);
-             }
-             return new IntegerData(0);
-           } catch (Exception e) {
-             throw new RuntimeException(e);
-           }
-         }
-       }, key);
-    return numberOfMessageData.build().intValue();
+    if (StringUtils.isNotBlank(userId)) {
+      WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(userId);
+      IntegerData numberOfMessageData = futureWebNotificationCountCache.get(
+              new ServiceContext<IntegerData>() {
+                public IntegerData execute() {
+                  try {
+                    Integer number = storage.getNumberOnBadge(userId);
+                    if (number != null) {
+                      return new IntegerData(number);
+                    }
+                    return new IntegerData(0);
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                }
+              }, key);
+      return numberOfMessageData.build().intValue();
+    } else {
+      return 0;
+    }
   }
+
 
   @Override
   public void resetNumberOnBadge(String userId) {

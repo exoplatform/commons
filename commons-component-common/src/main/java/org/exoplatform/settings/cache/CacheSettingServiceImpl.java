@@ -104,11 +104,24 @@ public class CacheSettingServiceImpl implements SettingService {
    */
   @Override
   public SettingValue<?> get(Context context, Scope scope, String key) {
-    SettingValue<?> settingValue = futureExoCache.get(service, new SettingKey(context, scope, key));
-    if(settingValue == NullSettingValue.getInstance() || settingValue.getValue() == null) {
-      return null;
+    try {
+      SettingValue<?> settingValue = futureExoCache.get(service, new SettingKey(context, scope, key));
+      if(settingValue == NullSettingValue.getInstance() || settingValue.getValue() == null) {
+        return null;
+      }
+      return settingValue;
+    } catch (Exception e) {
+      if(LOG.isDebugEnabled()) {
+        LOG.error("Exception raising when getting setting value ", e);
+      } else {
+        if(context != null) {
+          LOG.warn("Exception raising when getting setting value associated to the key " + key + " and the context " + context.getName());
+        } else {
+          LOG.warn("Can't get setting value. The context is null");
+        }
+      }
     }
-    return settingValue;
+    return null;
   }
 
   /** 
