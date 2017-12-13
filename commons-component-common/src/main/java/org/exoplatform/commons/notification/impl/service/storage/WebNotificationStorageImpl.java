@@ -1,5 +1,6 @@
 package org.exoplatform.commons.notification.impl.service.storage;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
@@ -442,14 +443,23 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
 
   @Override
   public int getNumberOnBadge(String userId) {
-    try {
-      SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
-      NodeIterator iter = getNewMessage(sProvider, userId, 0);
-      return (int) iter.getSize();
-    } catch (Exception e) {
-      LOG.error("Failed to getNumberOnBadge() ", e);
+    if (StringUtils.isNotBlank(userId)) {
+      try {
+        SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+        NodeIterator iter = getNewMessage(sProvider, userId, 0);
+        return (int) iter.getSize();
+      } catch (Exception e) {
+        if (LOG.isDebugEnabled()) {
+          LOG.error("Failed to getNumberOnBadge() ", e);
+        } else {
+          LOG.warn("Exception raising when getNumberOnBadge() associated to the userId " + userId);
+        }
+      }
+      return 0;
+    } else {
+      LOG.warn("Can't getNumberOnBadge(). The userId is null");
+      return 0;
     }
-    return 0;
   }
 
   @Override

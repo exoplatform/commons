@@ -19,6 +19,7 @@ package org.exoplatform.commons.notification.impl.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
@@ -104,6 +105,20 @@ public class WebNotificationServiceImpl implements WebNotificationService {
 
   @Override
   public int getNumberOnBadge(String userId) {
-    return storage.getNumberOnBadge(userId);
+    if (StringUtils.isNotBlank(userId)) {
+      try {
+        return storage.getNumberOnBadge(userId);
+      } catch (Exception e) {
+        if (LOG.isDebugEnabled()) {
+          LOG.error("Exception raising when getNumberOnBadge() ", e);
+        } else {
+            LOG.warn("Exception raising when getNumberOnBadge() associated to the userId " + userId);
+        }
+      }
+      return 0;
+    } else {
+      LOG.warn("Can't getNumberOnBadge(). The userId is null");
+      return 0;
+    }
   }
 }
