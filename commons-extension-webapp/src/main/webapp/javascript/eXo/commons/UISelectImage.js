@@ -14,7 +14,7 @@
         $("<a class='btn hidden' />").insertBefore(this.cancelButton);
         this.cancelButton[0].className = "btn";
         $(".cke_dialog_background_cover").addClass("uiPopupWrapper");
-        $(".cke_dialog_background_cover").css("background-color", "");
+        $(".cke_dialog_background_cover").css({"background-color": "", "opacity": ""});
       } else {
         this.okButton = this.$parentDialog.find(".btn-primary");
         this.cancelButton = this.$parentDialog.find(".btn").last();

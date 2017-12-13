@@ -77,6 +77,10 @@ CKEDITOR.editorConfig = function( config ) {
   
     // image2 config of align classes
     config.image2_alignClasses = [ 'pull-left', 'text-center', 'pull-right' ];
+  
+    // remove the white mask on dialog
+    config.dialog_backgroundCoverColor = 'transparent';
+    config.dialog_backgroundCoverOpacity = 1;
 
 
     // Here is configure for suggester

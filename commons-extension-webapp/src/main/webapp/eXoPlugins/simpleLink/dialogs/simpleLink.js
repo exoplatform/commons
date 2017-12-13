@@ -19,6 +19,9 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
                         },
                         commit: function(element) {
                             element.setText(this.getValue());
+                        },
+                        onLoad : function () {
+                            this.getInputElement().$.className = ''; 
                         }
                     },
                     {
@@ -35,6 +38,9 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
                                 url = "http://" + url;
                             }
                             element.setAttribute("href", url);
+                        },
+                        onLoad : function () {
+                            this.getInputElement().$.className = ''; 
                         }
                     }
                 ]
@@ -68,6 +74,21 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
 
             if ( this.insertMode )
                 editor.insertElement(a);
+        },
+
+        onLoad : function () {
+            var dialog = this.getElement();
+            var dialogCover = document.getElementsByClassName('cke_dialog_background_cover')[0];
+
+            dialog.removeClass('cke_reset_all').$.className += ' uiPopup simpleLinkDialog';
+            dialog.findOne('.cke_dialog_ui_button_ok').$.className = 'btn btn-primary';
+            dialog.findOne('.cke_dialog_ui_button_cancel').$.className = 'btn';
+            dialog.findOne('.cke_dialog_footer').$.className = 'uiActionBorder';
+            dialog.findOne('.cke_dialog_title').$.className = 'popupHeader';
+            dialog.findOne('.cke_dialog_close_button').$.className = 'uiIconClose cke_dialog_close_button';
+            dialogCover.className = 'uiPopupWrapper';
+            dialogCover.style.backgroundColor = '';
+            dialogCover.style.opacity = '';
         }
     };
 });

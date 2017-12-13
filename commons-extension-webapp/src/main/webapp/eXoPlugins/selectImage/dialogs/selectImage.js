@@ -98,8 +98,10 @@ CKEDITOR.dialog.add( 'selectImage', function( editor ) {
     onLoad: function() {
       var parentElement = this.getElement();
 
-      parentElement.addClass("dropFileWindow");
+      parentElement.addClass("dropFileWindow").addClass("uiPopup");
       parentElement.removeClass('cke_reset_all');
+      parentElement.findOne('.cke_dialog_title').$.className += ' popupHeader';
+      parentElement.findOne('.cke_dialog_close_button').$.className = 'uiIconClose cke_dialog_close_button';
 
       // Create a "global" reference to the document for this dialog instance.
       doc = this._.element.getDocument();
