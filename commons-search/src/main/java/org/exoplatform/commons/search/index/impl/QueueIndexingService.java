@@ -26,10 +26,12 @@ public class QueueIndexingService implements IndexingService {
     this.indexingOperationDAO = indexingOperationDAO;
   }
 
+  @Override
   public void init(String connectorName) {
     addToIndexingQueue(connectorName, null, OperationType.INIT);
   }
 
+  @Override
   public void index(String connectorName, String id) {
     if (StringUtils.isBlank(id)) {
       throw new IllegalArgumentException("Id is null");
@@ -37,6 +39,7 @@ public class QueueIndexingService implements IndexingService {
     addToIndexingQueue(connectorName, id, OperationType.CREATE);
   }
 
+  @Override
   public void reindex(String connectorName, String id) {
     if (StringUtils.isBlank(id)) {
       throw new IllegalArgumentException("Id is null");
@@ -44,6 +47,7 @@ public class QueueIndexingService implements IndexingService {
     addToIndexingQueue(connectorName, id, OperationType.UPDATE);
   }
 
+  @Override
   public void unindex(String connectorName, String id) {
     if (StringUtils.isBlank(id)) {
       throw new IllegalArgumentException("Id is null");
@@ -51,12 +55,24 @@ public class QueueIndexingService implements IndexingService {
     addToIndexingQueue(connectorName, id, OperationType.DELETE);
   }
 
+  @Override
   public void reindexAll(String connectorName) {
     addToIndexingQueue(connectorName, null, OperationType.REINDEX_ALL);
   }
 
+  @Override
   public void unindexAll(String connectorName) {
     addToIndexingQueue(connectorName, null, OperationType.DELETE_ALL);
+  }
+
+  @Override
+  public void clearQueue() {
+    indexingOperationDAO.deleteAll();
+  }
+
+  @Override
+  public void clearQueue(String entityType) {
+    indexingOperationDAO.deleteAllByEntityType(entityType);
   }
 
   /**

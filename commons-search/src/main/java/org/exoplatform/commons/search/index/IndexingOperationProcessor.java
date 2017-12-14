@@ -68,4 +68,8 @@ public abstract class IndexingOperationProcessor {
    */
   public abstract void process();
 
+  /**
+   * Interrupt the indexing queue process
+   */
+  public abstract void interrupt();
 }

@@ -53,4 +53,16 @@ public interface IndexingService {
    */
   void unindexAll(String connectorName);
 
+  /**
+   * Delete all the operations of the indexing queue
+   * @LevelAPI Experimental
+   */
+  void clearQueue();
+
+  /**
+   * Delete all the operations of the indexing queue for a given entity type
+   * @param entityType Entity type
+   * @LevelAPI Experimental
+   */
+  void clearQueue(String entityType);
 }

@@ -23,22 +23,34 @@ import org.exoplatform.commons.search.index.IndexingOperationProcessor;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 
 /**
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
 @DisallowConcurrentExecution
-public class BulkIndexingJob implements Job {
+public class BulkIndexingJob implements InterruptableJob {
   private static final Log LOG = ExoLogger.getExoLogger(BulkIndexingJob.class);
+
+  private IndexingOperationProcessor indexingOperationProcessor;
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     LOG.debug("Running job BulkIndexingJob");
-    IndexingOperationProcessor indexingOperationProcessor = CommonsUtils.getService(IndexingOperationProcessor.class);
-    indexingOperationProcessor.process();
+
+    getIndexingOperationProcessor().process();
+  }
+
+  @Override
+  public void interrupt() throws UnableToInterruptJobException {
+    LOG.debug("Interrupting job BulkIndexingJob");
+    getIndexingOperationProcessor().interrupt();
+  }
+
+  private IndexingOperationProcessor getIndexingOperationProcessor() {
+    if(indexingOperationProcessor == null) {
+      indexingOperationProcessor = CommonsUtils.getService(IndexingOperationProcessor.class);
+    }
+    return indexingOperationProcessor;
   }
 }

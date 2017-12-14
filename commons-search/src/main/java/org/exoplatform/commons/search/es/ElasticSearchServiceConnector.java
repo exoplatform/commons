@@ -238,45 +238,53 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
       throw new ElasticSearchException("Unable to parse JSON response", e);
     }
 
-    //TODO check if response is successful
     JSONObject jsonResult = (JSONObject) json.get("hits");
-    JSONArray jsonHits = (JSONArray) jsonResult.get("hits");
+    if(jsonResult != null) {
+      JSONArray jsonHits = (JSONArray) jsonResult.get("hits");
 
-    for(Object jsonHit : jsonHits) {
-      JSONObject hitSource = (JSONObject) ((JSONObject) jsonHit).get("_source");
-      String title = getTitleFromJsonResult(hitSource);
-      String url = getUrlFromJsonResult(hitSource, context);
-      Long lastUpdatedDate = (Long) hitSource.get("lastUpdatedDate");
-      if (lastUpdatedDate == null) lastUpdatedDate = new Date().getTime();
-      Double score = (Double) ((JSONObject) jsonHit).get("_score");
-      //Get the excerpt
-      JSONObject hitHighlight = (JSONObject) ((JSONObject) jsonHit).get("highlight");
+      if(jsonHits != null) {
+        for (Object jsonHit : jsonHits) {
+          results.add(buildHit((JSONObject) jsonHit, context));
+        }
+      }
+    }
+
+    return results;
+
+  }
+
+  protected SearchResult buildHit(JSONObject jsonHit, SearchContext searchContext) {
+    JSONObject hitSource = (JSONObject) jsonHit.get("_source");
+    String title = getTitleFromJsonResult(hitSource);
+    String url = getUrlFromJsonResult(hitSource, searchContext);
+    Long lastUpdatedDate = (Long) hitSource.get("lastUpdatedDate");
+    if (lastUpdatedDate == null) lastUpdatedDate = new Date().getTime();
+    Double score = (Double) jsonHit.get("_score");
+    //Get the excerpt
+    JSONObject hitHighlight = (JSONObject) jsonHit.get("highlight");
+    StringBuilder excerpt = new StringBuilder();
+    if(hitHighlight != null) {
       Iterator<?> keys = hitHighlight.keySet().iterator();
-      StringBuilder excerpt = new StringBuilder();
-      while( keys.hasNext() ) {
-        String key = (String)keys.next();
+      while (keys.hasNext()) {
+        String key = (String) keys.next();
         JSONArray highlights = (JSONArray) hitHighlight.get(key);
         for (Object highlight : highlights) {
           excerpt.append("... ").append(highlight);
         }
       }
-
-      LOG.debug("Excerpt extract from ES response : "+excerpt.toString());
-
-      results.add(new SearchResult(
-          url,
-          title,
-          excerpt.toString(),
-          null,
-          img,
-          lastUpdatedDate,
-          //score must not be null as "track_scores" is part of the query
-          score.longValue()
-      ));
     }
 
-    return results;
+    LOG.debug("Excerpt extract from ES response : {}", excerpt.toString());
 
+    return new SearchResult(
+            url,
+            title,
+            excerpt.toString(),
+            null,
+            img,
+            lastUpdatedDate,
+            //score must not be null as "track_scores" is part of the query
+            score.longValue());
   }
 
   protected String getUrlFromJsonResult(JSONObject hitSource, SearchContext context) {
@@ -318,6 +326,8 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
         return getExistFilter(filter.getField());
       case FILTER_NOT_EXIST:
         return getNotExistFilter(filter.getField());
+      case FILTER_CUSTOM:
+        return getCustomFilter(filter.getValue());
     }
     return "";
   }
@@ -364,6 +374,16 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
       fields.add("\"" + searchField + "\"");
     }
     return StringUtils.join(fields, ",");
+  }
+
+  /**
+   * Apply the given value directly as the filter
+   *
+   * @param value
+   * @return a Custom Filter
+   */
+  private String getCustomFilter(String value) {
+    return value;
   }
 
   protected String getPermissionFilter() {

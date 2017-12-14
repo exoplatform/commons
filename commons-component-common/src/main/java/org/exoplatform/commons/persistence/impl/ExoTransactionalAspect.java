@@ -21,6 +21,7 @@ package org.exoplatform.commons.persistence.impl;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.hibernate.TransactionException;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
@@ -30,6 +31,7 @@ import org.exoplatform.commons.api.persistence.ExoTransactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 
 /**
  * Process the Transactional annotation. The only propagation implemented yet is
@@ -67,7 +69,19 @@ public class ExoTransactionalAspect {
       LOG.debug("Using current transaction");
     } else {
       LOG.debug("Starting new transaction");
-      tx.begin();
+      try {
+        tx.begin();
+      } catch (TransactionException | PersistenceException e) {
+        LOG.warn("An error occured while starting JPA transaction. The transaction will be restarted.", e);
+        try {
+          service.closeEntityManager();
+        } catch (Exception e1) {
+          LOG.warn("An error occured while closing current JPA entity manager. The transaction will be recreated.", e);
+        }
+        entityManager = service.createEntityManager();
+        tx = entityManager.getTransaction();
+        tx.begin();
+      }
       begunTx = true;
     }
     try {
