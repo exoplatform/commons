@@ -115,7 +115,7 @@ public class CacheSettingServiceImpl implements SettingService {
         LOG.error("Exception raising when getting setting value ", e);
       } else {
         if(context != null) {
-          LOG.warn("Exception raising when getting setting value associated to the key " + key + " and the context " + context.getName());
+          LOG.warn("Exception raising when getting setting value associated to the key " + key + " and the context " + context.getId());
         } else {
           LOG.warn("Can't get setting value. The context is null");
         }
