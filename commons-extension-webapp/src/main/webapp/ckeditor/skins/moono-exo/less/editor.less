@@ -146,12 +146,7 @@
   overflow:hidden;
   .border-bottom-radius(5px);
 }
-.cke_bottom {
-  background-image:linear-gradient(to bottom,@color19,@color7);
-  background: @headingColor;
-  border-top: none;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+.cke_bottom, .cke_top {
   .box-shadow(0 1px 0 @white inset);
   filter:progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr='@color19',endColorstr='@color7');
   overflow:hidden;
@@ -159,11 +154,29 @@
   display: block;
   height: 0;
   padding: 0;
+  white-space:normal;
   .box-sizing(border-box);
+}
+.cke_bottom {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background-image:linear-gradient(to bottom,@color19,@color7);
+  background: @headingColor;
 
   &.cke_bottom_visible {
     padding: 5px 8px 3px;
     border-top:1px solid @color11;
+  }  
+}
+.cke_top {
+  border-radius: 5px;
+  > .cke_toolbox {
+    display: flex;
+    padding: 5px 8px 3px;
+    border-bottom:1px solid @color11;
+    margin-bottom: 2px;
+    background-image:linear-gradient(to bottom,@color19,@color7);
+    background: @headingColor;
   }
 }
 .cke_browser_ios {
@@ -378,6 +391,7 @@
 .cke_panel_listItem {
   margin:0;
   padding-bottom:1px;
+  list-style-type: none;
   a {
 	.border-radius(2px);
 	border:1px solid @white;
