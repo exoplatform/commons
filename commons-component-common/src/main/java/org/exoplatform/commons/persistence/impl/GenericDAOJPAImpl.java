@@ -25,8 +25,12 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.exoplatform.commons.api.persistence.GenericDAO;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.ejb.EntityManagerFactoryImpl;
+
 import org.exoplatform.commons.api.persistence.ExoTransactional;
+import org.exoplatform.commons.api.persistence.GenericDAO;
 
 /**
  * @author <a href="trongtt@gmail.com">Trong Tran</a>
@@ -151,6 +155,27 @@ public class GenericDAOJPAImpl<E, ID extends Serializable> implements GenericDAO
    */
   protected EntityManager getEntityManager() {
     return EntityManagerHolder.get();
+  }
+
+  protected Dialect getHibernateDialect() {
+    return getEntityManager() == null || getEntityManager().getEntityManagerFactory() == null
+        || !(getEntityManager().getEntityManagerFactory() instanceof EntityManagerFactoryImpl) ? null
+                                                                                               : getDialect(((EntityManagerFactoryImpl) getEntityManager().getEntityManagerFactory()));
+  }
+
+  protected Dialect getDialect(EntityManagerFactoryImpl factoryImpl) {
+    return factoryImpl.getSessionFactory().getDialect();
+  }
+
+  protected boolean isMSSQLDialect() {
+    Dialect hibernateDialect = getHibernateDialect();
+    return hibernateDialect != null && (StringUtils.contains(hibernateDialect.getClass().getName(), "MsSQL")
+        || StringUtils.contains(hibernateDialect.getClass().getName(), "SQLServer"));
+  }
+
+  protected boolean isOrcaleDialect() {
+    Dialect hibernateDialect = getHibernateDialect();
+    return hibernateDialect != null && StringUtils.contains(hibernateDialect.getClass().getName(), "Oracle");
   }
 }
 
