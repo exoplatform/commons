@@ -47,6 +47,8 @@ require(['SHARED/jquery', 'SHARED/suggester'],function($) {
       var config = editor.config.suggester;
       if (config == undefined) config = {};
       config = $.extend(true, {}, defaultOptions, config);
+      
+      editor.addContentsCss( $('#ckeditor-suggester').attr('href') );
 
       editor.on('mode', function(e) {
         initSuggester(this, config);
