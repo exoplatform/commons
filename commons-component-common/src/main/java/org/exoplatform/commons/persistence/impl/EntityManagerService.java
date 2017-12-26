@@ -134,6 +134,10 @@ public class EntityManagerService implements ComponentRequestLifecycle {
 
   @Override
   public void startRequest(ExoContainer container) {
+    if(instance.get() != null) {
+      endRequest(container);
+    }
+
     createEntityManager();
   }
 
@@ -141,6 +145,12 @@ public class EntityManagerService implements ComponentRequestLifecycle {
   public void endRequest(ExoContainer container) {
     closeEntityManager();
   }
+
+  @Override
+  public boolean isStarted(ExoContainer container) {
+    return instance.get() != null && instance.get().getTransaction() != null;
+  }
+
 
   void closeEntityManager() {
     EntityManager em = getEntityManager();
