@@ -64,6 +64,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   //SearchResult information
   private String img;
   private String titleElasticFieldName = "title";
+  private String updatedDateElasticFieldName = "lastUpdatedDate";
 
   private Map<String, String> sortMapping = new HashMap<>();
 
@@ -74,6 +75,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     this.index = param.getProperty("index");
     this.type = param.getProperty("type");
     if (StringUtils.isNotBlank(param.getProperty("titleField"))) this.titleElasticFieldName = param.getProperty("titleField");
+    if (StringUtils.isNotBlank(param.getProperty("updatedDateField"))) this.updatedDateElasticFieldName = param.getProperty("updatedDateField");
     this.searchFields = new ArrayList<>(Arrays.asList(param.getProperty("searchFields").split(",")));
 
     // highlight fragment size
@@ -257,9 +259,10 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     JSONObject hitSource = (JSONObject) jsonHit.get("_source");
     String title = getTitleFromJsonResult(hitSource);
     String url = getUrlFromJsonResult(hitSource, searchContext);
-    Long lastUpdatedDate = (Long) hitSource.get("lastUpdatedDate");
+    Long lastUpdatedDate = getUpdatedDateFromResult(hitSource);
     if (lastUpdatedDate == null) lastUpdatedDate = new Date().getTime();
     Double score = (Double) jsonHit.get("_score");
+    String detail = buildDetail(jsonHit, searchContext);
     //Get the excerpt
     JSONObject hitHighlight = (JSONObject) jsonHit.get("highlight");
     StringBuilder excerpt = new StringBuilder();
@@ -280,11 +283,29 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
             url,
             title,
             excerpt.toString(),
-            null,
+            detail,
             img,
             lastUpdatedDate,
             //score must not be null as "track_scores" is part of the query
             score.longValue());
+  }
+
+  protected String buildDetail(JSONObject jsonHit, SearchContext searchContext) {
+    return null;
+  }
+
+  protected Long getUpdatedDateFromResult(JSONObject hitSource) {
+    Object date = hitSource.get(updatedDateElasticFieldName);
+    if (date instanceof  Long) {
+      return (Long)date;
+    } else if (date != null) {
+      try {
+        return Long.parseLong(date.toString());
+      } catch (Exception ex) {
+        LOG.error("Can not parse updatedDate field as Long {}", date);
+      }
+    }
+    return null;
   }
 
   protected String getUrlFromJsonResult(JSONObject hitSource, SearchContext context) {
