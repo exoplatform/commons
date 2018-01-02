@@ -447,6 +447,11 @@ public class SettingsMigration implements StartableClusterAware {
     return false;
   }
 
+  @Override
+  public void stop() {
+    RDBMSMigrationUtils.getExecutorService().shutdown();
+  }
+
   public Set<String> getGlobalSettings() {
 
     return new SynchronizationTask<Set<String>>() {
