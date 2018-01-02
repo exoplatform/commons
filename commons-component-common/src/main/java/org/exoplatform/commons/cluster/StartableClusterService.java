@@ -149,6 +149,13 @@ public class StartableClusterService implements Startable {
     @Override
     public void stop() {
         resetSetting();
+        for (ComponentAdapter<?> componentAdapter : container.getComponentAdaptersOfType(StartableClusterAware.class)) {
+          if (componentAdapter != null) {
+              Object key = componentAdapter.getComponentKey();
+              StartableClusterAware service = (StartableClusterAware) container.getComponentInstance(key);
+              service.stop();
+          }
+      }
     }
 
     //***** Internal Methods *****//

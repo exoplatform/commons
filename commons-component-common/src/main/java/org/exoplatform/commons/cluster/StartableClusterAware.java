@@ -17,4 +17,9 @@ public interface StartableClusterAware {
      * @return
      */
     boolean isDone();
+
+    /**
+     * Stop service by the current node
+     */
+    default void stop() {}
 }
