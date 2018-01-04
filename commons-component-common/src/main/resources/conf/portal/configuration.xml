@@ -114,7 +114,7 @@
     <init-params>
       <value-param>
         <name>http(s)?://(www\.dailymotion\.com\/(embed\/)?video|dai\.ly)/.*</name>
-        <value>//www.dailymotion.com/services/oembed?format=json&amp;url=%s&amp;maxwidth=330&amp;maxheight=200</value>
+        <value>https://www.dailymotion.com/services/oembed?format=json&amp;url=%s&amp;maxwidth=330&amp;maxheight=200</value>
       </value-param>
       <value-param>
         <name>http(s)?://(player.)?vimeo\.com/.*</name>
