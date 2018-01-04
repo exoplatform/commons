@@ -128,7 +128,7 @@ abstract public class HTMLSanitizer {
                                                                                                                                 .allowStandardUrlProtocols()
                                                                                                                                 .allowAttributes("nohref")
                                                                                                                                 .onElements("a")
-                                                                                                                                .allowAttributes("name")
+                                                                                                                                .allowAttributes("name", "rel")
                                                                                                                                 .matching(NAME)
                                                                                                                                 .onElements("a")
                                                                                                                                 .allowAttributes("onfocus",
