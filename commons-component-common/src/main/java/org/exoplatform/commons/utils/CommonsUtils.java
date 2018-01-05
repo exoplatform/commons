@@ -60,12 +60,8 @@ public class CommonsUtils {
     if(IdentityConstants.ANONIM.equals(userId) || IdentityConstants.SYSTEM.equals(userId)) {
       return true;
     }
-    ConversationState conversationState = getConversationState(userId);
-    User user = conversationState == null ? null : (User) conversationState.getAttribute("UserProfile");
-    if(user != null) {
-      return user.isEnabled();
-    }
-    return getOrganizationService().getUserHandler().findUserByName(userId, UserStatus.ANY).isEnabled();
+    User user = getOrganizationService().getUserHandler().findUserByName(userId, UserStatus.ANY);
+    return user == null ? false : user.isEnabled();
   }
 
   /**
@@ -97,21 +93,7 @@ public class CommonsUtils {
    * @throws Exception thrown when an exception occurs while getting user from IDM store
    */
   public static User getUser(String userId) throws Exception {
-    User user = null;
-    ConversationRegistry conversationRegistry = getConversationRegistry();
-    if(conversationRegistry != null) {
-      List<StateKey> stateKeys = conversationRegistry.getStateKeys(userId);
-      if (stateKeys != null && !stateKeys.isEmpty()) {
-        // get last conversation state
-        StateKey stateKey = stateKeys.get(stateKeys.size() - 1);
-        ConversationState conversationState = conversationRegistry.getState(stateKey);
-        user = conversationState == null ? null : (User) conversationState.getAttribute("UserProfile");
-      }
-    }
-    if (user == null) {
-      user = getOrganizationService().getUserHandler().findUserByName(userId, UserStatus.ANY);
-    }
-    return user;
+    return getOrganizationService().getUserHandler().findUserByName(userId, UserStatus.ANY);
   }
 
   /**
