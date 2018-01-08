@@ -225,10 +225,10 @@ public class JPASettingServiceImplTest extends BaseTest {
     settingService.set(Context.GLOBAL, Scope.PAGE.id("name1"), "x1", SettingValue.create("y1"));
 
     // verify
-    assertEquals(3, settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(), Scope.PORTAL.getName(), null, 0, 10).size());
-    assertEquals(2, settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(), Scope.PORTAL.getName(), "name1", 0, 10).size());
-    assertEquals(1, settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(), Scope.PAGE.getName(), "name1", 0, 10).size());
-    assertEquals(2, settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(), Scope.PAGE.getName(), "name2", 0, 10).size());
+    assertEquals(3, settingService.getEmptyContextsByTypeAndScopeAndSettingName(Context.USER.getName(), Scope.PORTAL.getName(), null, "x1", 0, 10).size());
+    assertEquals(2, settingService.getEmptyContextsByTypeAndScopeAndSettingName(Context.USER.getName(), Scope.PORTAL.getName(), "name1", "x1", 0, 10).size());
+    assertEquals(1, settingService.getEmptyContextsByTypeAndScopeAndSettingName(Context.USER.getName(), Scope.PAGE.getName(), "name1", "x1", 0, 10).size());
+    assertEquals(2, settingService.getEmptyContextsByTypeAndScopeAndSettingName(Context.USER.getName(), Scope.PAGE.getName(), "name2", "x2", 0, 10).size());
   }
 
 }

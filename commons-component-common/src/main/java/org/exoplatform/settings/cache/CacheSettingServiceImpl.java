@@ -199,8 +199,8 @@ public class CacheSettingServiceImpl implements SettingService {
   }
 
   @Override
-  public Set<String> getEmptyContextsByScopeAndContextType(String name, String name2, String id, int offset, int limit) {
-    return service.getEmptyContextsByScopeAndContextType(name, name2, id, offset, limit);
+  public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType, String scopeType, String scopeName, String settingName, int offset, int limit) {
+    return service.getEmptyContextsByTypeAndScopeAndSettingName(contextType, scopeType, scopeName, settingName, offset, limit);
   }
 
   @Override
