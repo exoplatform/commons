@@ -143,11 +143,12 @@ public interface SettingService {
    * @param contextType type of context used in filter
    * @param scopeType type of scope used in filter
    * @param scopeName name of scope used in filter
+   * @param settingName 
    * @param offset search query offset
    * @param limit search query limit
    * @return a {@link Set} of {@link String} for filtered context names
    */
-  public Set<String> getEmptyContextsByScopeAndContextType(String contextType, String scopeType, String scopeName, int offset, int limit);
+  public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType, String scopeType, String scopeName, String settingName, int offset, int limit);
 
   /**
    * Saves a {@link Context} on database

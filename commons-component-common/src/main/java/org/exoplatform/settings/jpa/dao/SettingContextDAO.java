@@ -44,6 +44,7 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
   public List<ContextEntity> getEmptyContextsByScopeAndContextType(String contextType,
                                                                    String scopeType,
                                                                    String scopeName,
+                                                                   String settingName,
                                                                    int offset,
                                                                    int limit) {
     TypedQuery<ContextEntity> query;
@@ -51,12 +52,14 @@ public class SettingContextDAO extends GenericDAOJPAImpl<ContextEntity, Long> {
       query =
             getEntityManager().createNamedQuery("SettingsContextEntity.getEmptyContextsByScopeWithNullNameAndContextType", ContextEntity.class)
                               .setParameter("contextType", contextType)
-                              .setParameter("scopeType", scopeType);
+                              .setParameter("scopeType", scopeType)
+                              .setParameter("settingName", settingName);
     } else {
       query = getEntityManager().createNamedQuery("SettingsContextEntity.getEmptyContextsByScopeAndContextType", ContextEntity.class)
                                 .setParameter("contextType", contextType)
                                 .setParameter("scopeType", scopeType)
-                                .setParameter("scopeName", scopeName);
+                                .setParameter("scopeName", scopeName)
+                                .setParameter("settingName", settingName);
     }
     if (limit != 0) {
       query.setMaxResults(limit).setFirstResult(offset);

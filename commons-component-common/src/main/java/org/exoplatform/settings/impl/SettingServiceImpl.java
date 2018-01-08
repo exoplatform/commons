@@ -273,7 +273,12 @@ public class SettingServiceImpl implements SettingService {
   }
 
   @Override
-  public Set<String> getEmptyContextsByScopeAndContextType(String name, String name2, String id, int offset, int limit) {
+  public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType,
+                                                                  String scopeType,
+                                                                  String scopeName,
+                                                                  String settingName,
+                                                                  int offset,
+                                                                  int limit) {
     throw new UnsupportedOperationException();
   }
 

@@ -254,9 +254,13 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
   public List<UserSetting> getDigestDefaultSettingForAllUser(int offset, int limit) {
     List<UserSetting> users = new ArrayList<UserSetting>();
     try {
-      Set<String> userNames = settingService.getEmptyContextsByScopeAndContextType(Context.USER.getName(),
+      // Get all users not having EXO_DAILY setting stored in DB.
+      // Not having this setting assumes that users uses default settings
+      // and haven't changed their notification settings.
+      Set<String> userNames = settingService.getEmptyContextsByTypeAndScopeAndSettingName(Context.USER.getName(),
                                                                                    NOTIFICATION_SCOPE.getName(),
                                                                                    NOTIFICATION_SCOPE.getId(),
+                                                                                   EXO_DAILY,
                                                                                    offset,
                                                                                    limit);
       for (String userName : userNames) {

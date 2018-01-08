@@ -293,17 +293,20 @@ public class JPASettingServiceImpl implements SettingService {
    */
   @ExoTransactional
   @Override
-  public Set<String> getEmptyContextsByScopeAndContextType(String contextType,
+  public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType,
                                                            String scopeType,
                                                            String scopeName,
+                                                           String settingName,
                                                            int offset,
                                                            int limit) {
     validateArgumentNullability(contextType, "context type is null");
     validateArgumentNullability(scopeType, "scope type is null");
+    validateArgumentNullability(settingName, "setting name is null");
 
     List<ContextEntity> emptyContexts = settingContextDAO.getEmptyContextsByScopeAndContextType(contextType,
                                                                                                 scopeType,
                                                                                                 scopeName,
+                                                                                                settingName,
                                                                                                 offset,
                                                                                                 limit);
     return emptyContexts.stream().map(context -> context.getName()).collect(Collectors.toSet());

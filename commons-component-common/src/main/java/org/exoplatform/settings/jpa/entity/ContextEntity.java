@@ -39,6 +39,7 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
         " JOIN s.context c2 " +
         " JOIN s.scope sc " +
         " WHERE c2.id = c.id " +
+        " AND s.name = :settingName " +
         " AND sc.type = :scopeType " +
         " AND sc.name = :scopeName " +
         ")"),
@@ -49,6 +50,7 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
         " JOIN s.context c2 " +
         " JOIN s.scope sc " +
         " WHERE c2.id = c.id " +
+        " AND s.name = :settingName " +
         " AND sc.type = :scopeType " +
         " AND sc.name IS NULL " +
         ")"),
