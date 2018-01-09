@@ -71,8 +71,12 @@
   </component>
 
   <component>
-    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
     <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
+    <type>org.exoplatform.settings.jpa.CacheUserSettingServiceImpl</type>
   </component>
 
   <component>
@@ -275,6 +279,17 @@
             <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
           </object>
         </object-param>
+        <!-- UserSettingService -->
+        <object-param>
+          <name>UserSettingService</name>
+          <description>The Exo Cache configuration for the UserSettingService</description>
+          <object type="org.exoplatform.services.cache.ExoCacheConfig">
+            <field name="name"><string>commons.UserSettingService</string></field>
+            <field name="maxSize"><int>${cache.exo.commons.UserSettingService.Capacity:5000}</int></field>
+            <field name="liveTime"><long>${cache.exo.commons.UserSettingService.TimeToLive:86400}</long></field>
+            <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+          </object>
+        </object-param>
         <!-- UserStateService -->
         <object-param>
           <name>UserStateService</name>
@@ -303,7 +318,7 @@
             <field name="name"><string>SettingService</string></field>
             <field name="strategy"><string>LIRS</string></field>
             <field name="maxEntries"><int>${cache.exo.commons.SettingService.MaxNodes:5000}</int></field>
-            <field name="lifespan"><long>86400000</long></field>
+            <field name="lifespan"><long>${cache.exo.commons.SettingService.ExpirationTimeout:86400000}</long></field>
             <field name="cacheMode"><string>${exo.cache.commons.SettingService:replication}</string></field>
           </object>
         </object-param>
@@ -340,6 +355,18 @@
             <field name="lifespan"><long>${cache.exo.commons.WebNotificationCountCache.ExpirationTimeout:86400000}</long></field>
             <field name="maxEntries"><int>${cache.exo.commons.WebNotificationCountCache.MaxNodes:5000}</int></field>
             <field name="cacheMode"><string>${exo.cache.commons.WebNotificationCountCache.cacheMode:replication}</string></field>
+          </object>
+        </object-param>
+        <!-- UserSettingService -->
+        <object-param>
+          <name>UserSettingService</name>
+          <description>The JBoss Cache configuration for the UserSettingService</description>
+          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
+            <field name="name"><string>commons.UserSettingService</string></field>
+            <field name="strategy"><string>LIRS</string></field>
+            <field name="maxEntries"><int>${cache.exo.commons.UserSettingService.MaxNodes:5000}</int></field>
+            <field name="lifespan"><long>${cache.exo.commons.UserSettingService.ExpirationTimeout:86400000}</long></field>
+            <field name="cacheMode"><string>${exo.cache.commons.UserSettingService.cacheMode:asyncInvalidation}</string></field>
           </object>
         </object-param>
         <!-- UserStateService -->

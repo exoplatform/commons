@@ -137,7 +137,12 @@
     </component>
 
     <component>
-        <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
+      <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
+    </component>
+  
+    <component>
+      <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
+      <type>org.exoplatform.settings.jpa.CacheUserSettingServiceImpl</type>
     </component>
 
     <component>

@@ -69,8 +69,12 @@
   </component>
 
   <component profiles="all">
-    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
     <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
+  </component>
+
+  <component profiles="all">
+    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
+    <type>org.exoplatform.settings.jpa.CacheUserSettingServiceImpl</type>
   </component>
 
   <component profiles="all">
