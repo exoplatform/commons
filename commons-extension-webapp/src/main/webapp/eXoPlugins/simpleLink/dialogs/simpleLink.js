@@ -80,7 +80,7 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
             var dialog = this.getElement();
             var dialogCover = document.getElementsByClassName('cke_dialog_background_cover')[0];
 
-            dialog.removeClass('cke_reset_all').$.className += ' uiPopup simpleLinkDialog';
+            dialog.removeClass('cke_reset_all').$.className += ' uiPopup cke_dialog simpleLinkDialog';
             dialog.findOne('.cke_dialog_ui_button_ok').$.className = 'btn btn-primary';
             dialog.findOne('.cke_dialog_ui_button_cancel').$.className = 'btn';
             dialog.findOne('.cke_dialog_footer').$.className = 'uiActionBorder';
