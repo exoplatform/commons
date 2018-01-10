@@ -21,7 +21,7 @@ import org.exoplatform.services.cache.ExoCache;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
-  private WebNotificationStorage cachedStorage;
+  protected WebNotificationStorage cachedStorage;
   private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCache";
   private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationsCache";
   private final static String WEB_NOTIFICATION_COUNT_CACHING_NAME = "WebNotificationsCache";
@@ -76,56 +76,49 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     assertNotNull(notifInfo);
     assertEquals(1, cachedStorage.get(new WebNotificationFilter(userId, false), 0, 10).size());
   }
-  
-  private ListWebNotificationsData getWebNotificationsData(ListWebNotificationsKey key) {
-    ListWebNotificationsData data = exoWebNotificationsCache.get(key);
-    if (data == null) {
-      data = new ListWebNotificationsData(key);
-      exoWebNotificationsCache.put(key, data);
-    }
-    return data;
-  }
 
   public void testGetNotifications() {
     String userId = "demo";
     userIds.add(userId);
     //
-    ListWebNotificationsKey key = ListWebNotificationsKey.key(userId, true);
     List<NotificationInfo> onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
     assertEquals(0, onPopoverInfos.size());
     for (int i = 0; i < 2; i++) {
-      cachedStorage.save(makeWebNotificationInfo(userId));
+      try {
+        cachedStorage.save(makeWebNotificationInfo(userId));
+      } catch (Exception e) {
+        fail(e);
+      }
     }
-    ListWebNotificationsData data = getWebNotificationsData(key);
-    assertFalse(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
-    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
     //
     assertEquals(2, onPopoverInfos.size());
+
     for (int i = 0; i < 20; i++) {
-      cachedStorage.save(makeWebNotificationInfo(userId));
+      try {
+        cachedStorage.save(makeWebNotificationInfo(userId));
+      } catch (Exception e) {
+        fail(e);
+      }
     }
-    assertTrue(data.isMax());
+    end();
+    begin();
+
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 10);
-    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 10);
+    assertEquals(10, onPopoverInfos.size());
+
     //
-    assertEquals(6, onPopoverInfos.size());
-    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 15);
-    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 5 , 15);
+    assertEquals(15, onPopoverInfos.size());
+
     //
-    assertEquals(11, onPopoverInfos.size());
-    //
-    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 30);
-    assertTrue(data.isMax());
     onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 30);
     assertEquals(22, onPopoverInfos.size());
-    assertTrue(data.isMax());
   }
   
   public void testRemove() throws Exception {
@@ -210,32 +203,36 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     String userId = "demo";
     userIds.add(userId);
     NotificationInfo info = makeWebNotificationInfo(userId);
-    cachedStorage.save(info);
+    try {
+      cachedStorage.save(info);
+    } catch (Exception e) {
+      fail(e);
+    }
     //
     NotificationInfo notifInfo = cachedStorage.get(info.getId());
-    assertTrue(Boolean.valueOf(notifInfo.getValueOwnerParameter(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey())));
+    assertTrue(notifInfo.isOnPopOver());
     //
-    ListWebNotificationsKey key = ListWebNotificationsKey.key(userId, true);
     //checks caching
     List<NotificationInfo> infos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
+
+    ListWebNotificationsKey key = ListWebNotificationsKey.key(userId, true, 0, 10);
     ListWebNotificationsData listData = exoWebNotificationsCache.get(key);
     assertNotNull(listData);
     assertEquals(1,listData.size());
+
     //
     infos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
     assertEquals(infos.get(0), notifInfo);
-    assertTrue(Boolean.valueOf(infos.get(0).getValueOwnerParameter(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey())));
+    assertTrue(infos.get(0).isOnPopOver());
+
     //
     cachedStorage.hidePopover(notifInfo.getId());
-    //checks caching
-    listData = exoWebNotificationsCache.get(key);
-    assertNotNull(listData);
-    assertEquals(0,listData.size());
+
     //
-    WebNotifInfoCacheKey notifKey = WebNotifInfoCacheKey.key(info.getId());
+    WebNotifInfoCacheKey notifKey = WebNotifInfoCacheKey.key(notifInfo.getId());
     WebNotifInfoData notifData = exoWebNotificationCache.get(notifKey);
     notifInfo = notifData.build();
-    assertFalse(Boolean.valueOf(notifInfo.getValueOwnerParameter(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey())));
+    assertFalse(notifInfo.isOnPopOver());
   }
   
   public void testUpdate() throws Exception {
@@ -249,20 +246,26 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     for (int i = 0; i < 5; i++) {
       cachedStorage.save(makeWebNotificationInfo(userId));
     }
+    end();
+    begin();
+
     List<NotificationInfo> onPopoverInfos = cachedStorage.get(new WebNotificationFilter(userId, true), 0 , 10);
     assertEquals(6, onPopoverInfos.size());
     List<NotificationInfo> viewAllInfos = cachedStorage.get(new WebNotificationFilter(userId, false), 0 , 10);
     assertEquals(6, viewAllInfos.size());
     //
-    NotificationInfo lastOnPopoverInfo = onPopoverInfos.get(onPopoverInfos.size() - 5);
+    NotificationInfo lastOnPopoverInfo = onPopoverInfos.get(onPopoverInfos.size() - 1);
     assertEquals(createdFirstInfo.getId(), lastOnPopoverInfo.getId());
-    NotificationInfo lastViewAllInfos = viewAllInfos.get(viewAllInfos.size() - 5);
+    NotificationInfo lastViewAllInfos = viewAllInfos.get(viewAllInfos.size() - 1);
     assertEquals(createdFirstInfo.getId(), lastViewAllInfos.getId());
     //
     String newTitle = "The new title";
     createdFirstInfo.setTitle(newTitle);
     //
     cachedStorage.update(createdFirstInfo, true);
+    end();
+    begin();
+
     //
     createdFirstInfo = cachedStorage.get(info.getId());
     //
@@ -301,12 +304,14 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     int daySeconds = 86400;
     String userId = "demo";
     Calendar cal = Calendar.getInstance();
-    long t = 86400000l;
+    long t = daySeconds * 1000l;
     long current = cal.getTimeInMillis();
     for (int i = 12; i > 3; i = i - 2) {
       cal.setTimeInMillis(current - i * t);
       for (int j = 0; j < 10; j++) {
-        NotificationInfo info = makeWebNotificationInfo(userId).setDateCreated(cal);
+        NotificationInfo notifInfi = makeWebNotificationInfo(userId);
+        NotificationInfo info = notifInfi.setDateCreated(cal);
+        notifInfi.setLastModifiedDate(cal);
         //
         cachedStorage.save(info);
       }

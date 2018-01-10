@@ -10,6 +10,7 @@ import javax.jcr.Session;
 import javax.jcr.observation.Event;
 import javax.jcr.observation.ObservationManager;
 
+import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.impl.AbstractService;
@@ -144,8 +145,8 @@ public abstract class BaseNotificationTestCase extends BaseCommonsTestCase {
     info.setTitle("The title");
     info.setFrom("mary");
     info.setTo(userId);
-    info.with(AbstractService.NTF_SHOW_POPOVER, "true")
-        .with(AbstractService.NTF_READ, "false")
+    info.with(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), "true")
+        .with(NotificationMessageUtils.READ_PORPERTY.getKey(), "false")
         .with("activityId", "TheActivityId")
         .with("accessLink", "http://fsdfsdf.com/fsdfsf");
     return info;

@@ -28,10 +28,10 @@ import java.util.List;
  * Oct 30, 2014  
  */
 public abstract class AbstractWebNotifListData<K, V> implements Serializable {
+  private static final long serialVersionUID = -9014159315525998105L;
+
   /** defines the list keeps the data **/
   private final LinkedList<V> list = new LinkedList<V>();
-  /** */
-  private boolean isMax = false;
   /** */
   protected final K key;
   
@@ -55,14 +55,6 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
    */
   public List<V> getList() {
     return this.list;
-  }
-
-  public boolean isMax() {
-    return isMax;
-  }
-
-  public void setMax(boolean isMax) {
-    this.isMax = isMax;
   }
 
   /**
@@ -201,15 +193,17 @@ public abstract class AbstractWebNotifListData<K, V> implements Serializable {
 
     AbstractWebNotifListData<?, ?> that = (AbstractWebNotifListData<?, ?>) o;
 
-    if (isMax != that.isMax) return false;
+    if(!list.equals(that.list)) {
+      return false;
+    }
     return key != null ? key.equals(that.key) : that.key == null;
 
   }
 
   @Override
   public int hashCode() {
-    int result = (isMax ? 1 : 0);
-    result = 31 * result + (key != null ? key.hashCode() : 0);
+    int result = (key != null ? key.hashCode() : 0);
+    result = 31 * result + (list != null ? list.hashCode() : 0);
     return result;
   }
 }

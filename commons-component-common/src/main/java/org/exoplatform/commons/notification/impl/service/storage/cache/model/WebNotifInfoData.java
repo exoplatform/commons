@@ -74,8 +74,18 @@ public class WebNotifInfoData implements Serializable {
     notificationInfo.setLastModifiedDate(this.lastModifiedDate);
     notificationInfo.setTitle(this.title);
     notificationInfo.setChannelKey(this.channelKey);
-    
+    if (ownerParameter != null && ownerParameter.containsKey(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey())) {
+      notificationInfo.setOnPopOver(Boolean.valueOf(ownerParameter.get(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey())));
+    }
+    if (ownerParameter != null && ownerParameter.containsKey(NotificationMessageUtils.READ_PORPERTY.getKey())) {
+      notificationInfo.setRead(Boolean.valueOf(ownerParameter.get(NotificationMessageUtils.READ_PORPERTY.getKey())));
+    }
+
     return notificationInfo;
+  }
+
+  public String getTo() {
+    return to;
   }
 
   public WebNotifInfoData updateRead(boolean isRead) {

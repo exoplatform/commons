@@ -15,6 +15,10 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class WebNotificationStorageTest extends BaseNotificationTestCase {
 
+  public WebNotificationStorageTest() {
+    setForceContainerReload(true);
+  }
+
   @Override
   public void setUp() throws Exception {
     initCollaborationWorkspace();
@@ -61,7 +65,7 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     List<NotificationInfo> list = storage.get(new WebNotificationFilter(userId), 0, 10);
     assertEquals(10, list.size());
     for(NotificationInfo notif : list) {
-      assertFalse(Boolean.valueOf(notif.getOwnerParameter().get(NotificationMessageUtils.READ_PORPERTY.getKey())));
+      assertFalse(notif.isRead());
     }
     //
     storage.markAllRead(userId);
@@ -70,7 +74,7 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     assertEquals(10, list.size());
     //
     for(NotificationInfo notif : list) {
-      assertTrue(Boolean.valueOf(notif.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())));
+      assertTrue(notif.isRead());
     }
   }
   
@@ -130,7 +134,9 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     for (int i = 12; i > 3; i = i - 2) {
       cal.setTimeInMillis(current - i * t);
       for (int j = 0; j < 10; j++) {
-        NotificationInfo info = makeWebNotificationInfo(userId).setDateCreated(cal);
+        NotificationInfo info = makeWebNotificationInfo(userId)
+              .setDateCreated(cal)
+              .setLastModifiedDate(cal);
         //
         storage.save(info);
       }

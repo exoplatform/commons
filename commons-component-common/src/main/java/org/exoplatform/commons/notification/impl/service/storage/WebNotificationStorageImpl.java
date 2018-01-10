@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class WebNotificationStorageImpl extends AbstractService implements WebNotificationStorage {
+
   private static final Log LOG = ExoLogger.getLogger(WebNotificationStorageImpl.class);
   private static final String NOTIFICATIONS = "notifications";
   private static final String NT_UNSTRUCTURED = "nt:unstructured";
@@ -171,6 +172,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       for(Node node : nodes) {
         result.add(getWebNotificationStorage().get(node.getName()));
       }
+      Collections.sort(result, new NotificationInfoUpdateDateComparator());
     } catch (Exception e) {
       LOG.error("Notifications not found by filter: " + filter.toString(), e);
     }
@@ -432,6 +434,8 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       //else just update it
       if (moveTop) {
         remove(notification.getId());
+        Calendar calendar = Calendar.getInstance();
+        notification.setLastModifiedDate(calendar);
       }
       // if moveTop == true, the number on badge will increase
       // else the number on badge will not increase
@@ -498,5 +502,11 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
    */
   private long getLastReadDateOfUser(String userId) {
     return userSettingService.get(userId).getLastReadDate();
+  }
+
+  public static final class NotificationInfoUpdateDateComparator implements Comparator<NotificationInfo> {
+    public int compare(NotificationInfo n1, NotificationInfo n2) {
+      return (int) (n2.getLastModifiedDate() - n1.getLastModifiedDate());
+    }
   }
 }

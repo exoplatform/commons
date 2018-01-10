@@ -23,16 +23,24 @@ import org.exoplatform.commons.notification.impl.service.storage.cache.CacheKey;
 
 public class ListWebNotificationsKey implements CacheKey, Serializable {
   private static final long serialVersionUID = 1L;
-  private final boolean isOnPopover;
-  private final String userId;
 
-  private ListWebNotificationsKey(final String userId, final boolean isOnPopover) {
+  private final boolean     isOnPopover;
+
+  private final String      userId;
+
+  private final int         offset;
+
+  private final int         limit;
+
+  private ListWebNotificationsKey(final String userId, final boolean isOnPopover, int offset, int limit) {
     this.userId = userId;
     this.isOnPopover = isOnPopover;
+    this.offset = offset;
+    this.limit = limit;
   }
   
-  public static ListWebNotificationsKey key(String userId, boolean isOnPopover) {
-    return new ListWebNotificationsKey(userId, isOnPopover);
+  public static ListWebNotificationsKey key(String userId, boolean isOnPopover, int offset, int limit) {
+    return new ListWebNotificationsKey(userId, isOnPopover,offset, limit);
   }
   
   public boolean isOnPopover() {
@@ -41,6 +49,14 @@ public class ListWebNotificationsKey implements CacheKey, Serializable {
 
   public String getUserId() {
     return userId;
+  }
+
+  public int getOffset() {
+    return offset;
+  }
+
+  public int getLimit() {
+    return limit;
   }
 
   @Override
@@ -57,6 +73,14 @@ public class ListWebNotificationsKey implements CacheKey, Serializable {
     if (userId != null ? !userId.equals(that.userId) : that.userId != null)
       return false;
     
+    if (offset != that.offset) {
+      return false;
+    }
+    
+    if (limit != that.limit) {
+      return false;
+    }
+    
     if (isOnPopover != that.isOnPopover) {
       return false;
     }
@@ -68,6 +92,8 @@ public class ListWebNotificationsKey implements CacheKey, Serializable {
   public int hashCode() {
     int result = 31 * (userId != null ? userId.hashCode() : 0);
     result = 31 * result + (isOnPopover ? 1 : 0);
+    result = 31 * result + offset;
+    result = 31 * result + limit;
     return result;
   }
 

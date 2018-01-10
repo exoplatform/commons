@@ -53,7 +53,7 @@ public interface WebNotificationService {
    * @LevelAPI Platform
    * @since PLF 4.2
    */
-  void markAllRead(String userId);
+  void markAllRead(String userId) throws Exception;
 
   /**
    * Updates the notification's popover list status to be FALSE value
