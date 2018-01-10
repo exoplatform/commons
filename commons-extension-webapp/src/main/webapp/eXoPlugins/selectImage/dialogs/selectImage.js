@@ -98,7 +98,7 @@ CKEDITOR.dialog.add( 'selectImage', function( editor ) {
     onLoad: function() {
       var parentElement = this.getElement();
 
-      parentElement.addClass("dropFileWindow").addClass("uiPopup");
+      parentElement.addClass("dropFileWindow").addClass("uiPopup").addClass("cke_dialog");
       parentElement.removeClass('cke_reset_all');
       parentElement.findOne('.cke_dialog_title').$.className += ' popupHeader';
       parentElement.findOne('.cke_dialog_close_button').$.className = 'uiIconClose cke_dialog_close_button';
