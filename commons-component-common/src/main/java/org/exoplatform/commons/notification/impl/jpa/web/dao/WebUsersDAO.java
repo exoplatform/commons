@@ -3,7 +3,6 @@ package org.exoplatform.commons.notification.impl.jpa.web.dao;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;

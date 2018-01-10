@@ -56,7 +56,7 @@ public class WebNotificationServiceImpl implements WebNotificationService {
   }
 
   @Override
-  public void markAllRead(String userId) {
+  public void markAllRead(String userId) throws Exception {
     storage.markAllRead(userId);
   }
 

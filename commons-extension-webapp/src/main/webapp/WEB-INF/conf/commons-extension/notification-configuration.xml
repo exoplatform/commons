@@ -50,7 +50,7 @@
 
   <component profiles="all">
     <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
-    <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
+    <type>org.exoplatform.commons.notification.impl.jpa.cache.JPACachedWebNotificationStorage</type>
   </component>
   
   <component profiles="all">

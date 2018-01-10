@@ -1,10 +1,13 @@
 package org.exoplatform.jpa.notifications.web.impl;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
-import org.exoplatform.commons.notification.impl.AbstractService;
+import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebParamsDAO;
@@ -14,18 +17,14 @@ import org.exoplatform.commons.persistence.impl.EntityManagerHolder;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.jpa.BaseTest;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml") })
-
-public class JPAWebNotificationStorageTest extends BaseTest {
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/commons-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-cache-configuration.xml") })
+public class JPAWebNotificationStorageTest extends BaseNotificationTestCase {
 
   private JPAWebNotificationStorage webNotificationStorage;
   private WebNotifDAO webNotifDAO;
@@ -33,8 +32,12 @@ public class JPAWebNotificationStorageTest extends BaseTest {
   private WebParamsDAO webParamsDAO;
   protected List<String> userIds;
 
+  public JPAWebNotificationStorageTest() {
+    setForceContainerReload(true);
+  }
+
   @Override
-  public void setUp()  {
+  public void setUp() throws Exception  {
     super.setUp();
     webNotificationStorage = getService(JPAWebNotificationStorage.class);
     webNotifDAO = getService(WebNotifDAO.class);
@@ -44,7 +47,7 @@ public class JPAWebNotificationStorageTest extends BaseTest {
   }
 
   @Override
-  public void tearDown()  {
+  public void tearDown() throws Exception  {
     webParamsDAO.deleteAll();
     webUsersDAO.deleteAll();
     webNotifDAO.deleteAll();
@@ -58,19 +61,6 @@ public class JPAWebNotificationStorageTest extends BaseTest {
     webNotificationStorage.save(info);
     //
     assertEquals(1, webNotificationStorage.get(new WebNotificationFilter(userId), 0, 10).size());
-  }
-
-  private NotificationInfo makeWebNotificationInfo(String userId) {
-      NotificationInfo info = NotificationInfo.instance();
-      info.key(new PluginKey(PluginTest.ID));
-      info.setTitle("The title");
-      info.setFrom("mary");
-      info.setTo(userId);
-      info.with(AbstractService.NTF_SHOW_POPOVER, "true")
-          .with(AbstractService.NTF_READ, "false")
-          .with("activityId", "TheActivityId")
-          .with("accessLink", "http://example.com/");
-      return info;
   }
 
   public void testMarkRead() throws Exception {
