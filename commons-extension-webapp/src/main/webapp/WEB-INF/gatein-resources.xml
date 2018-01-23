@@ -59,6 +59,7 @@
     <supported-locale>nl</supported-locale>
     <supported-locale>sl</supported-locale>
     <supported-locale>sq</supported-locale>
+    <supported-locale>in</supported-locale>
     <script>
       <path>/javascript/eXo/commons/UISelectFromDrives.js</path>
       <resource-bundle>locale.portal.webui</resource-bundle>
@@ -108,6 +109,7 @@
     <supported-locale>nl</supported-locale>
     <supported-locale>sl</supported-locale>
     <supported-locale>sq</supported-locale>
+    <supported-locale>in</supported-locale>
     <script>
       <path>/javascript/eXo/commons/UISelectImage.js</path>
       <resource-bundle>locale.portal.webui</resource-bundle>
