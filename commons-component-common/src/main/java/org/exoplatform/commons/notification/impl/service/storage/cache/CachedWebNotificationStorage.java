@@ -118,9 +118,10 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     if (infoData != null) {
       infoData.updateShowPopover(false);
       exoWebNotificationCache.put(key, infoData);
+
+      clearWebNotificationCountCache(infoData.getTo());
+      clearUserWebNotificationList(infoData.getTo());
     }
-    clearWebNotificationCountCache(infoData.getTo());
-    clearUserWebNotificationList(infoData.getTo());
   }
 
   @Override
