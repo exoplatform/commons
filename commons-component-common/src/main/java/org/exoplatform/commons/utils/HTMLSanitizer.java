@@ -286,6 +286,7 @@ abstract public class HTMLSanitizer {
                                                                                                                                         "sub",
                                                                                                                                         "sup",
                                                                                                                                         "strike",
+                                                                                                                                        "del",
                                                                                                                                         "center",
                                                                                                                                         "blockquote",
                                                                                                                                         "hr",
