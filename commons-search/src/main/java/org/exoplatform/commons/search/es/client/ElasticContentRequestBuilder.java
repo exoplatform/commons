@@ -45,33 +45,27 @@ public class ElasticContentRequestBuilder {
    */
   public String getCreateIndexRequestContent(ElasticIndexingServiceConnector connector) {
 
-    Map<String, String> indexProperties = new HashMap<>();
-    indexProperties.put("number_of_shards", String.valueOf(connector.getShards()));
-    indexProperties.put("number_of_replicas", String.valueOf(connector.getReplicas()));
+    StringBuilder mapping = new StringBuilder()
+            .append("{")
+            .append("  \"settings\" : {\n")
+            .append("    \"number_of_shards\" : \"").append(connector.getShards()).append("\",\n")
+            .append("    \"number_of_replicas\" : \"").append(connector.getReplicas()).append("\",\n")
+            .append("    \"analysis\" : {")
+            .append("      \"analyzer\" : {")
+            .append("        \"default\" : {")
+            .append("          \"tokenizer\" : \"standard\",")
+            .append("          \"filter\" : [\"standard\", \"lowercase\", \"asciifolding\"]")
+            .append("        },")
+            .append("        \"whitespace_lowercase_asciifolding\" : {")
+            .append("          \"tokenizer\" : \"whitespace\",")
+            .append("          \"filter\" : [\"lowercase\", \"asciifolding\"]")
+            .append("        }")
+            .append("      }")
+            .append("    }\n")
+            .append("  }\n")
+            .append("}");
 
-    JSONObject indexSettings = new JSONObject();
-    for (String setting: indexProperties.keySet()) {
-      indexSettings.put(setting, indexProperties.get(setting));
-    }
-
-    // define default analyzer with lowercase and asciifolding filters
-    JSONArray filters = new JSONArray();
-    filters.add("standard");
-    filters.add("lowercase");
-    filters.add("asciifolding");
-    JSONObject defaultAnalyzer = new JSONObject();
-    defaultAnalyzer.put("filter", filters);
-    defaultAnalyzer.put("tokenizer", "standard");
-    JSONObject analyzer = new JSONObject();
-    analyzer.put("default", defaultAnalyzer);
-    JSONObject analysis = new JSONObject();
-    analysis.put("analyzer", analyzer);
-    indexSettings.put("analysis", analysis);
-
-    JSONObject indexJSON = new JSONObject();
-    indexJSON.put("settings", indexSettings);
-
-    String request =  indexJSON.toJSONString();
+    String request =  mapping.toString();
 
     LOG.debug("Create index request to ES: \n {}", request);
     return request;
