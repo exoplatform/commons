@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+	xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+
+  <component>
+    <key>org.exoplatform.services.organization.OrganizationService</key>
+    <type>org.exoplatform.commons.test.MockOrganizationService</type>
+  </component>
+  <component>
+    <key>org.exoplatform.services.resources.LocalePolicy</key>
+    <type>org.exoplatform.portal.application.localization.DefaultLocalePolicyService</type>
+  </component>
+  <component>
+    <key>org.exoplatform.services.resources.LocaleConfigService</key>
+    <type>org.exoplatform.commons.test.MockLocaleConfigService</type>
+  </component>
+</configuration>

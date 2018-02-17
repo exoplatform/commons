@@ -143,12 +143,12 @@ public class NotificationPluginUtils {
    * @return
    */
   public static String getLanguage(String userId) {
-    LocaleContextInfo  localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(userId);
+    LocaleContextInfo localeCtx = LocaleContextInfoUtils.buildLocaleContextInfo(userId);
     LocalePolicy localePolicy = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(LocalePolicy.class);
     String lang = null;
     if(localePolicy != null) {
       Locale locale = localePolicy.determineLocale(localeCtx);
-      lang = locale.getLanguage();
+      lang = locale.toString();
     }
     return lang;
   }
