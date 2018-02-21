@@ -130,8 +130,6 @@ public class SettingContext implements Serializable {
     } catch (Exception e) {
       if(LOG.isDebugEnabled()) {
         LOG.warn("An error occurred when getting current repository name, null will be returned", e);
-      } else {
-        LOG.warn("An error occurred when getting current repository name, null will be returned");
       }
       return null;
     }
