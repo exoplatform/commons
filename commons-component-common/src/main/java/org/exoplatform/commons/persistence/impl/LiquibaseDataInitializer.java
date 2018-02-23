@@ -40,8 +40,6 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
   public static final String LIQUIBASE_CONTEXTS_PARAM_NAME = "liquibase.contexts";
   public static final String LIQUIBASE_DEFAULT_CONTEXTS = "production";
 
-  private static final String PGSQL_SELECT_CURRENT_SCHEMA = "select current_schema";
-
   private String datasourceName;
 
   private String liquibaseContexts;
@@ -151,13 +149,6 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
     try {
       database = DatabaseFactory.getInstance()
               .findCorrectDatabaseImplementation(new JdbcConnection(datasource.getConnection()));
-      //PLF-7773 : workarround postgres EnterpriseDB
-      if(database instanceof PostgresDatabase){
-        String currentSchema = getCurrentSchema(datasource);
-        if(!StringUtils.isEmpty(currentSchema)){
-            database.setDefaultSchemaName(getCurrentSchema(datasource));
-        }
-      }
       Liquibase liquibase = new Liquibase(changelogsPath, new ClassLoaderResourceAccessor(), database);
       liquibase.update(liquibaseContexts);
     } catch (SQLException e) {
@@ -193,27 +184,4 @@ public class LiquibaseDataInitializer implements Startable, DataInitializer {
 
     return dataSource;
   }
-
-  /**
-   * Select current schema name for postgres EnterpriseDB
-   * @param dataSource
-   * @return current schema
-   * @throws SQLException
-   */
-  private String getCurrentSchema(DataSource dataSource) throws SQLException {
-      try (Connection jdbcConn =
-                   (Connection) SecurityHelper.doPrivilegedSQLExceptionAction(new PrivilegedExceptionAction<Connection>() {
-                       public Connection run() throws Exception {
-                           return dataSource.getConnection();
-                       }
-                   });
-           Statement statement = jdbcConn.createStatement();
-           ResultSet result = statement.executeQuery(PGSQL_SELECT_CURRENT_SCHEMA)) {
-          if (result.next()) {
-              return result.getString(1);
-          }
-      }
-      return null;
-  }
-
 }
