@@ -18,12 +18,12 @@
 package org.exoplatform.commons.notification.impl.service.storage.cache.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.google.common.base.Objects;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
@@ -103,7 +103,7 @@ public class WebNotifInfoData implements Serializable {
     ownerParameter.put(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey(), String.valueOf(isShow));
     return this;
   }
-  
+
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
@@ -119,27 +119,30 @@ public class WebNotifInfoData implements Serializable {
       .append(", showPopover: ")
       .append(ownerParameter.get(NotificationMessageUtils.SHOW_POPOVER_PROPERTY.getKey()));
     return sb.toString();
+
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof WebNotifInfoData)) return false;
-
+    if (o == null || getClass() != o.getClass()) return false;
     WebNotifInfoData that = (WebNotifInfoData) o;
-
-    if (key != null ? !key.equals(that.key) : that.key != null) return false;
-    return StringUtils.equals(id, that.id) && StringUtils.equals(from, that.from) &&
-            StringUtils.equals(to, that.to) && StringUtils.equals(title, that.title);
+    return order == that.order &&
+            lastModifiedDate == that.lastModifiedDate &&
+            Objects.equal(id, that.id) &&
+            Objects.equal(key, that.key) &&
+            Objects.equal(from, that.from) &&
+            Objects.equal(to, that.to) &&
+            Objects.equal(ownerParameter, that.ownerParameter) &&
+            Objects.equal(sendToUserIds, that.sendToUserIds) &&
+            Objects.equal(sendToDaily, that.sendToDaily) &&
+            Objects.equal(sendToWeekly, that.sendToWeekly) &&
+            Objects.equal(title, that.title) &&
+            Objects.equal(channelKey, that.channelKey);
   }
 
   @Override
   public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
-    result = 31 * result + (key != null ? key.hashCode() : 0);
-    result = 31 * result + (from != null ? from.hashCode() : 0);
-    result = 31 * result + (to != null ? to.hashCode() : 0);
-    result = 31 * result + (title != null ? title.hashCode() : 0);
-    return result;
+    return Objects.hashCode(id, key, from, to, order, ownerParameter, sendToUserIds, sendToDaily, sendToWeekly, lastModifiedDate, title, channelKey);
   }
 }
