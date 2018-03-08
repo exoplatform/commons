@@ -261,6 +261,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     //
     String newTitle = "The new title";
     createdFirstInfo.setTitle(newTitle);
+
     //
     cachedStorage.update(createdFirstInfo, true);
     end();
@@ -278,6 +279,19 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     assertEquals(newTitle, firstOnPopoverInfo.getTitle());
     NotificationInfo firstViewAllInfos = viewAllInfos.get(0);
     assertEquals(newTitle, firstViewAllInfos.getTitle());
+
+    cachedStorage.resetNumberOnBadge(userId);
+    //
+    int num = cachedStorage.getNumberOnBadge(userId);
+    assertEquals(0, num);
+    //moveTop = false, mean no need to increase notification badge number
+    cachedStorage.update(createdFirstInfo, false);
+    num = cachedStorage.getNumberOnBadge(userId);
+    assertEquals(0, num);
+
+    cachedStorage.update(createdFirstInfo, true);
+    num = cachedStorage.getNumberOnBadge(userId);
+    assertEquals(1, num);
   }
 
   public void testRemoveByJob() throws Exception {
