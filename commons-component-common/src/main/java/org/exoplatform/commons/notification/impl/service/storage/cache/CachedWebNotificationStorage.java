@@ -92,7 +92,14 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   @Override
   public void update(NotificationInfo notification, boolean moveTop) {
     notification.setUpdate(true);
-    save(notification);
+    notification.setResetOnBadge(!moveTop);
+
+    storage.update(notification, moveTop);
+    //
+    WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notification.getId());
+    exoWebNotificationCache.put(key, new WebNotifInfoData(notification));
+    clearWebNotificationCountCache(notification.getTo());
+    clearUserWebNotificationList(notification.getTo());
   }
 
   @Override
