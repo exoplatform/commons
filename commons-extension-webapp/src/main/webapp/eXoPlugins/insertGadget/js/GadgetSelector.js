@@ -188,9 +188,9 @@ GadgetSelector.insertGadget = function(oGadget) {
 	newTag.setAttribute('float', 'left');
 	var newScript = editor.document.createElement("script");
 	if(eXo.core.Browser.browserType == 'ie') {
-		newScript.$.text = "eXo.core.Browser.addOnLoadCallback('" + random + "', function() {eXo.gadget.UIGadget.createGadget('" + url + "','" + random + "', " + metadata + ", '{}', 'home', '/eXoGadgetServer/gadgets', 0, 0)}); document.getElementById('icon_"+random+"').style.display = 'none';";
+		newScript.$.text = "if(typeof require == 'function') { require([\"SHARED/gadget\"], function(){ eXo.gadget.UIGadget.createGadget('" + url + "','" + random + "', " + metadata + ", '{}', 'home', '/eXoGadgetServer/gadgets', 0, 0); document.getElementById('icon_"+random+"').style.display = 'none';})}";
 	} else {
-		newScript.setText("eXo.core.Browser.addOnLoadCallback('" + random + "', function() {eXo.gadget.UIGadget.createGadget('" + url + "','" + random + "', " + metadata + ", '{}', 'home', '/eXoGadgetServer/gadgets', 0, 0)}); document.getElementById('icon_"+random+"').style.display = 'none';");
+		newScript.setText("if(typeof require == 'function') { require([\"SHARED/gadget\"], function(){ eXo.gadget.UIGadget.createGadget('" + url + "','" + random + "', " + metadata + ", '{}', 'home', '/eXoGadgetServer/gadgets', 0, 0); document.getElementById('icon_"+random+"').style.display = 'none';})}");
 	}
 	editor.insertElement(newTag);
 	editor.insertElement(newScript);
