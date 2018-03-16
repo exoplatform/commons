@@ -43,17 +43,17 @@ public class FileFilterTest extends TestCase {
    * Case 01: when the mimetypes attribute of FileFilter is null
    * Expected result: return TRUE
    */
-  public void testAcceptWhenMimeTypeNull() {
+  public void testAcceptWhenAllMimeTypesAllowed() throws Exception {
+    // Given
     FileFilter filter = new FileFilterDummy();
     Map<String, Object> context = new HashMap<String, Object>();
     context.put("mimeType", "application/pdf");
 
-    try {
-      boolean isAccepted = filter.accept(context);
-      assertEquals(isAccepted, true);
-    } catch (Exception ex) {
-      Assert.fail("testAcceptWhenMimeTypeNull is FAILED because of an unhandled excaption");
-    }
+    // When
+    boolean isAccepted = filter.accept(context);
+
+    // Then
+    assertEquals(isAccepted, true);
   }
 
   /**
@@ -102,6 +102,25 @@ public class FileFilterTest extends TestCase {
     } catch (Exception ex) {
       Assert.fail("testAcceptWhenContain is FAILED because of an unhandled excaption");
     }
+  }
+
+  public void testAcceptWhenMimeTypeNullInContext() throws Exception {
+    // Given
+    FileFilter filter = new FileFilterDummy();
+    Map<String, Object> context = new HashMap<String, Object>();
+    context.put("mimeType", null);
+
+    List<String> mimetypes = new ArrayList<String>();
+    mimetypes.add("image/gif");
+    mimetypes.add("image/jpeg");
+    mimetypes.add("image/png");
+    ((FileFilterDummy) filter).setMimeTypes(mimetypes);
+
+    // When
+    boolean isAccepted = filter.accept(context);
+
+    // Then
+    assertEquals(isAccepted, false);
   }
   
   /**
