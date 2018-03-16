@@ -37,8 +37,10 @@ public class FileFilter implements UIExtensionFilter {
     if (mimeTypes == null || mimeTypes.isEmpty()) {
       return true;
     }
-    String mimeType = context.get("mimeType").toString();
-    if(mimeTypes.contains(mimeType)) return true;
+    if(context != null && context.containsKey("mimeType")) {
+      Object mimeType = context.get("mimeType");
+      return mimeType != null && mimeTypes.contains(mimeType.toString());
+    }
     return false;
   }
 
