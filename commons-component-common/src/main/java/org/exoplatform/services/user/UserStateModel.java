@@ -19,6 +19,7 @@ package org.exoplatform.services.user;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 
 public class UserStateModel implements Serializable {
@@ -69,16 +70,15 @@ public class UserStateModel implements Serializable {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof UserStateModel)) return false;
-
+    if (o == null || getClass() != o.getClass()) return false;
     UserStateModel that = (UserStateModel) o;
-
-    return StringUtils.equals(userId, that.userId);
-
+    return lastActivity == that.lastActivity &&
+            Objects.equals(userId, that.userId) &&
+            Objects.equals(status, that.status);
   }
 
   @Override
   public int hashCode() {
-    return userId != null ? userId.hashCode() : 0;
+    return Objects.hash(userId, lastActivity, status);
   }
 }
