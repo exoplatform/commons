@@ -16,12 +16,7 @@
  */
 package org.exoplatform.commons.api.notification.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
@@ -333,29 +328,6 @@ public class UserSetting {
   }
   
   @Override
-  public boolean equals(Object obj) {
-    if (super.equals(obj)) {
-      return true;
-    }
-    if (!(obj instanceof UserSetting)) {
-      return false;
-    }
-    UserSetting that = (UserSetting) obj;
-    if (userId != null && userId.equals(that.userId)) {
-      return true;
-    }
-    return false;
-  }
-  
-  @Override
-  public int hashCode() {
-    if (userId != null) {
-      return userId.hashCode();
-    }
-    return super.hashCode();
-  }
-  
-  @Override
   public String toString() {
     return "UserSetting : {userId : " + userId + "}";
   }
@@ -407,5 +379,25 @@ public class UserSetting {
 
   public void setEnabled(boolean isEnabled) {
     this.isEnabled = isEnabled;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    UserSetting that = (UserSetting) o;
+    return lastReadDate == that.lastReadDate &&
+            isEnabled == that.isEnabled &&
+            Objects.equals(channelActives, that.channelActives) &&
+            Objects.equals(lastUpdateTime, that.lastUpdateTime) &&
+            Objects.equals(userId, that.userId) &&
+            Objects.equals(channelPlugins, that.channelPlugins) &&
+            Objects.equals(dailyPlugins, that.dailyPlugins) &&
+            Objects.equals(weeklyPlugins, that.weeklyPlugins);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(channelActives, lastUpdateTime, userId, channelPlugins, dailyPlugins, weeklyPlugins, lastReadDate, isEnabled);
   }
 }
