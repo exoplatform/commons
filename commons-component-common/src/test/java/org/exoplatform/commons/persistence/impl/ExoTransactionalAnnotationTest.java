@@ -183,6 +183,9 @@ public class ExoTransactionalAnnotationTest {
 
   @Before
   public void deleteAllTask() {
+    // Make sure the PortalContainer has been created
+    PortalContainer.getInstance();
+
     new TaskDao().deleteAll();
   }
 
