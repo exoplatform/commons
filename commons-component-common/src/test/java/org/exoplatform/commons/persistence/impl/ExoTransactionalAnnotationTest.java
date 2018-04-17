@@ -1,5 +1,6 @@
 package org.exoplatform.commons.persistence.impl;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,8 +14,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 public class ExoTransactionalAnnotationTest {
+    public ExoTransactionalAnnotationTest() {
+        String config = PortalContainer.getInstance().getConfigurationXML();
+        System.out.println(config);
+    }
 
-  @Test
+    @Test
   public void testCreateDaoMethodIsTransactional() {
     // Given
     TaskDao dao = new TaskDao();
