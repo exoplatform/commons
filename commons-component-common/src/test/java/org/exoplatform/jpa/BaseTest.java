@@ -11,7 +11,7 @@ import org.exoplatform.component.test.ContainerScope;
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/components-configuration.xml") })
+@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/commons-configuration.xml") })
 public abstract class BaseTest extends BaseExoTestCase {
   protected void setUp() {
     begin();

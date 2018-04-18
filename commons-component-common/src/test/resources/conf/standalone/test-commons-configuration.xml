@@ -66,6 +66,11 @@
     </component>
 
     <component>
+      <key>org.exoplatform.services.mail.MailService</key>
+      <type>org.exoplatform.commons.testing.mock.MockMailService</type>
+    </component>
+
+    <component>
         <key>org.exoplatform.services.resources.ResourceBundleService</key>
         <type>org.exoplatform.services.resources.impl.SimpleResourceBundleService</type>
         <init-params>

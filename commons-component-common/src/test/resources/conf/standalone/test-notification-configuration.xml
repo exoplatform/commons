@@ -58,11 +58,6 @@
 	</component>
 
   <component>
-    <key>org.exoplatform.services.mail.MailService</key>
-    <type>org.exoplatform.commons.testing.mock.MockMailService</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.commons.notification.impl.PluginStatisticService</type>
   </component>
 

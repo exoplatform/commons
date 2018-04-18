@@ -24,6 +24,8 @@ import org.exoplatform.commons.api.notification.template.ElementVisitor;
 import org.exoplatform.commons.notification.template.DigestTemplate;
 import org.exoplatform.commons.notification.template.SimpleElement;
 import org.exoplatform.commons.notification.template.SimpleElementVistior;
+import org.exoplatform.component.test.*;
+import org.exoplatform.jpa.BaseTest;
 
 /**
  * Created by The eXo Platform SAS
@@ -31,18 +33,12 @@ import org.exoplatform.commons.notification.template.SimpleElementVistior;
  *          thanhvc@exoplatform.com
  * Aug 2, 2013  
  */
-public class TemplateTestCase extends TestCase {
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+public class TemplateTestCase extends BaseTest {
+
+  public TemplateTestCase() {
+    setForceContainerReload(true);
   }
-  
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-  }
-  
-  
+
   private Element makeSubject() {
     return new SimpleElement().template("$USER has joined $PORTAL_NAME");
   }
