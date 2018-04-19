@@ -55,29 +55,16 @@ public class ElasticContentRequestBuilder {
       indexSettings.put(setting, indexProperties.get(setting));
     }
 
+    // define default analyzer with lowercase and asciifolding filters
     JSONArray filters = new JSONArray();
     filters.add("standard");
     filters.add("lowercase");
     filters.add("asciifolding");
-
-    JSONArray wSFilters = new JSONArray();
-    wSFilters.add("lowercase");
-    wSFilters.add("asciifolding");
-
-    // define whitespace analyzer with lowercase and asciifolding filters
-    JSONObject WhiteSpaceAnalyzer = new JSONObject();
-    WhiteSpaceAnalyzer.put("filter", wSFilters);
-    WhiteSpaceAnalyzer.put("tokenizer", "whitespace");
-
-    // define default analyzer with lowercase and asciifolding filters
     JSONObject defaultAnalyzer = new JSONObject();
     defaultAnalyzer.put("filter", filters);
     defaultAnalyzer.put("tokenizer", "standard");
-
     JSONObject analyzer = new JSONObject();
     analyzer.put("default", defaultAnalyzer);
-    analyzer.put("whitespace_lowercase_asciifolding", WhiteSpaceAnalyzer);
-
     JSONObject analysis = new JSONObject();
     analysis.put("analyzer", analyzer);
     indexSettings.put("analysis", analysis);
