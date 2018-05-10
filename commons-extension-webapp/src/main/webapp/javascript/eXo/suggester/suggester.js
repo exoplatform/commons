@@ -305,7 +305,7 @@
       });
     }
 
-    if (settings.type !== type.TAG) {
+    if (settings.type !== type.TAG) {   // Using At.js
       if (settings.callbacks == undefined) {
         settings.callbacks = {};
       }
@@ -366,7 +366,7 @@
       }
 
       app.atWho = $editable.atwho(settings);
-    } else {
+    } else {    // Using Selectize.js
       if (!settings.valueField) {
         settings.valueField = 'uid';
       }
@@ -375,6 +375,9 @@
       }
       if (!settings.searchField) {
         settings.searchField = [settings.labelField];
+      }
+      if (!settings.optionIconField) {
+        settings.optionIconField = 'icon';
       }
 
       if (settings.selectedItems) {
@@ -400,10 +403,40 @@
         }
       }
 
+      var _onItemRemove = settings.onItemRemove;
+      settings.onItemRemove = function(value) {
+        if (this.options[value] && this.options[value].invalid) {
+          this.removeOption(value);
+        }
+        if (_onItemRemove) {
+          _onItemRemove.call(this, value);
+        }
+      }
+
       if (settings.renderMenuItem) {
         settings.render = {
           option: function(item, escape) {
             return '<div class="option">' + settings.renderMenuItem.call(app, item, escape) + '</div>';
+          }
+        };
+      } else {
+        settings.render = {
+          option: function(item, escape) {
+            var thumb = item[settings.optionIconField];
+
+            if (!thumb) {
+              if (settings.defaultOptionIcon) {
+                if ($.isFunction(settings.defaultOptionIcon)) {
+                  thumb = settings.defaultOptionIcon.call(this, item, escape);
+                } else {
+                  thumb = settings.defaultOptionIcon;
+                }
+              }
+            }
+
+            return '<div class="option">' +
+              (thumb ? '<img class="thumb" src="' + thumb + '"> ' : '') +
+              escape(item[settings.labelField]) + '</div>';
           }
         };
       }
