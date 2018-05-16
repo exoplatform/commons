@@ -11,6 +11,11 @@
   <name>eXo PLF:: Commons - API</name>
   <dependencies>
     <dependency>
+      <groupId>javax.portlet</groupId>
+      <artifactId>portlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>javax.websocket</groupId>
       <artifactId>javax.websocket-api</artifactId>
       <version>1.0</version>

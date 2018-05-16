@@ -39,3 +39,4 @@ pom.xml.versionsBackup
 transaction.log
 rebel-remote.xml
 rebel.xml
+.factorypath
