@@ -158,9 +158,9 @@ public abstract class UpgradeProductPlugin extends BaseComponentPlugin {
    *          true: if the plugin is enabled: should be added to the upgradePlugins list
    *          false: if the plugin is disabled: should not be added to the upgradePlugins list
    */
-  public boolean isEnabled(){
+  public boolean isEnabled() {
     String isEnabledProperty = PropertyManager.getProperty(UPGRADE_PLUGIN_ENABLE.replace("{$0}", getName()));
-    if(isEnabledProperty == null || isEnabledProperty.equals("true")){
+    if (StringUtils.isBlank(isEnabledProperty) || isEnabledProperty.equals("true")) {
       return true;
     } else {
       return false;
