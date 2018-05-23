@@ -39,9 +39,9 @@ import org.exoplatform.services.cache.ObjectCacheInfo;
 
 public class CachedWebNotificationStorage implements WebNotificationStorage {
   //
-  private final static String WEB_NOTIFICATION_CACHING_NAME = "WebNotificationCache";
-  private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "WebNotificationsCache";
-  private final static String WEB_NOTIFICATION_COUNT_CACHING_NAME = "WebNotificationCountCache";
+  private final static String WEB_NOTIFICATION_CACHING_NAME = "commons.WebNotificationCache";
+  private final static String LIST_WEB_NOTIFICATION_CACHING_NAME = "commons.WebNotificationsCache";
+  private final static String WEB_NOTIFICATION_COUNT_CACHING_NAME = "commons.WebNotificationCountCache";
   //
   private final ExoCache<WebNotifInfoCacheKey, WebNotifInfoData> exoWebNotificationCache;
   private final ExoCache<WebNotifInfoCacheKey, IntegerData> exoWebNotificationCountCache;

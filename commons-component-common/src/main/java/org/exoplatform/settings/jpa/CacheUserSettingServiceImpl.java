@@ -32,8 +32,7 @@ import org.exoplatform.services.organization.User;
 
 public class CacheUserSettingServiceImpl implements UserSettingService {
 
-  public static final String                                      CACHE_NAME = "commons."
-      + UserSettingService.class.getSimpleName();
+  public static final String                                      CACHE_NAME = "commons.UserSettingService";
 
   private UserSettingService                                      userSettingService;
 

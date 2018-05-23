@@ -50,7 +50,6 @@ public class StartableClusterService implements Startable {
 
     private static final String CLUSTER_NODE_NAME = "exo.cluster.node.name";
     private static final String CLUSTER_CHECK_PERIOD = "exo.cluster.startable.check.period";
-    private static final String SETTING_LIFECYCLE = "setting";
     private static final String CLUSTER_SERVICE_SETTING_GLOBAL_KEY = "CLUSTER_SERVICE_CLUSTER_STARTABLE_SERVICE";
 
     private static Map<Object,Boolean> services = new HashMap<>();

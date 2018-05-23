@@ -51,6 +51,8 @@ public class CacheSettingServiceImpl implements SettingService {
   /** Logger */
   private static final Log                                               LOG = ExoLogger.getLogger(CacheSettingServiceImpl.class);
 
+  private final static String SETTING_CACHING_NAME = "commons.SettingService";
+
   protected ExoCache<SettingKey, SettingValue>                           settingCache;
 
   protected FutureExoCache<SettingKey, SettingValue, SettingService> futureExoCache;
@@ -66,7 +68,7 @@ public class CacheSettingServiceImpl implements SettingService {
  */
   public CacheSettingServiceImpl(JPASettingServiceImpl service, CacheService cacheService) {
 
-    settingCache = cacheService.getCacheInstance(SettingService.class.getSimpleName());
+    settingCache = cacheService.getCacheInstance(SETTING_CACHING_NAME);
 
     Loader<SettingKey, SettingValue, SettingService> loader = new Loader<SettingKey, SettingValue, SettingService>() {
       @Override

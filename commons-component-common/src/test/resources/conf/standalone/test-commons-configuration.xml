@@ -110,9 +110,6 @@
                     <field name="liveTime">
                         <long>60000</long>
                     </field>
-                    <field name="distributed">
-                        <boolean>false</boolean>
-                    </field>
                     <field name="implementation">
                         <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
                     </field>

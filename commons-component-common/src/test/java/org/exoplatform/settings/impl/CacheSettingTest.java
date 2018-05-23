@@ -37,10 +37,13 @@ public class CacheSettingTest extends BaseCommonsTestCase {
 
   private ExoCache<SettingKey, SettingValue<?>> settingCache;
 
+  private final static String SETTING_CACHING_NAME = "commons.SettingService";
+
+
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    settingCache = getService(CacheService.class).getCacheInstance(SettingService.class.getSimpleName());
+    settingCache = getService(CacheService.class).getCacheInstance(SETTING_CACHING_NAME);
     settingService = getService(SettingService.class);
     assertNotNull("Cannot find Setting Service", settingService);
     assertTrue("settingService should be of type CacheSettingServiceImpl instead of " + settingService.getClass().getName(), settingService instanceof CacheSettingServiceImpl);

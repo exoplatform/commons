@@ -20,6 +20,14 @@
         </init-params>
     </component>
 
+    <component profiles="cluster">
+        <type>org.exoplatform.commons.cluster.ClusterNodeName</type>
+    </component>
+    <component>
+        <key>org.exoplatform.services.idgenerator.IDGeneratorService</key>
+        <type>org.exoplatform.services.idgenerator.impl.IDGeneratorServiceImpl</type>
+    </component>
+
     <!-- Data Initialization -->
     <external-component-plugins>
         <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>

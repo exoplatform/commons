@@ -35,13 +35,14 @@ import org.exoplatform.services.security.IdentityConstants;
 public class UserStateService {
   private static final Log LOG = ExoLogger.getLogger(UserStateService.class.getName());
   public static String DEFAULT_STATUS = "available";
+  private final static String USER_STATE_CACHING_NAME = "commons.UserStateService";
   private static final int DEFAULT_OFFLINE_DELAY = 60000;
   private int delay = 60*1000;
 
   ExoCache<String, UserStateModel> userStateCache = null;
 
   public UserStateService(CacheService cacheService) {
-    userStateCache = cacheService.getCacheInstance(UserStateService.class.getSimpleName());
+    userStateCache = cacheService.getCacheInstance(USER_STATE_CACHING_NAME);
     String strDelay = System.getProperty("user.status.offline.delay");
     delay = NumberUtils.toInt(strDelay, DEFAULT_OFFLINE_DELAY);
     delay = (delay > 0) ? delay : DEFAULT_OFFLINE_DELAY;
