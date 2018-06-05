@@ -25,12 +25,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -110,6 +105,7 @@ public class ElasticOperationProcessorTest {
     initParams.addParameter(param);
     elasticIndexingOperationProcessor = new ElasticIndexingOperationProcessor(indexingOperationDAO, elasticIndexingClient, elasticContentRequestBuilder, auditTrail, entityManagerService, null, initParams);
     initElasticServiceConnector();
+    initElasticContentRequestBuilder();
   }
 
   private void initElasticServiceConnector() {
@@ -119,15 +115,17 @@ public class ElasticOperationProcessorTest {
     when(elasticIndexingServiceConnector.getShards()).thenReturn(5);
   }
 
+  private void initElasticContentRequestBuilder() {
+    when(elasticContentRequestBuilder.getCreateDocumentRequestContent(eq(elasticIndexingServiceConnector), anyString())).thenReturn("{ \"workspace\": \"collaboration\", \"title\": \"doc1.pdf\", \"file\": \"xxxx\"}");
+    when(elasticContentRequestBuilder.getUpdateDocumentRequestContent(eq(elasticIndexingServiceConnector), anyString())).thenReturn("{ \"workspace\": \"collaboration\", \"title\": \"doc1.pdf\", \"file\": \"xxxx\"}");
+    when(elasticContentRequestBuilder.getDeleteDocumentRequestContent(eq(elasticIndexingServiceConnector), anyString())).thenReturn("{\"delete\":{\"_index\":\"file_alias\",\"_type\":\"file\",\"_id\":\"xxxx\"}}\n");
+  }
+
   @After
   public void clean() {
     elasticIndexingOperationProcessor.getConnectors().clear();
     entityManagerService.endRequest(null);
   }
-
-  /*
-  addConnector(ElasticIndexingServiceConnector elasticIndexingServiceConnector)
-   */
 
   @Test
   public void addConnector_ifNewConnector_connectorAdded() {
@@ -160,13 +158,6 @@ public class ElasticOperationProcessorTest {
     //Then
     verify(indexingOperationDAO, times(0)).create(indexingOperation);
   }
-
-  /*
-  process()
-   */
-
-  //test the order of the operation processing
-
 
   @Test
   public void process_ifAllOperationsInQueue_requestShouldBeSentInAnExpectedOrder() throws ParseException {
@@ -611,6 +602,41 @@ public class ElasticOperationProcessorTest {
     //Then
     verify(auditTrail).audit(eq("delete_all"), isNull(String.class), isNull(String.class), eq("post"), isNull(Integer.class), isNull(String.class), anyLong());
     verifyNoMoreInteractions(auditTrail);
+  }
+
+  @Test
+  public void process_ifAllOperationsInQueue_requestShouldNotBeSentIfDocumentsAreNull() throws ParseException {
+    //Given
+    elasticIndexingOperationProcessor.getConnectors().put("post", elasticIndexingServiceConnector);
+    IndexingOperation create = new IndexingOperation("1","post",OperationType.CREATE);
+    create.setId(4L);
+    IndexingOperation delete = new IndexingOperation("1","post",OperationType.DELETE);
+    delete.setId(5L);
+    IndexingOperation update = new IndexingOperation("1","post",OperationType.UPDATE);
+    update.setId(2L);
+    IndexingOperation init = new IndexingOperation(null,"post",OperationType.INIT);
+    init.setId(3L);
+    List<IndexingOperation> indexingOperations = new ArrayList<>();
+    indexingOperations.add(create);
+    indexingOperations.add(delete);
+    indexingOperations.add(update);
+    indexingOperations.add(init);
+    Document document = new Document("post", "1", new Date());
+    when(indexingOperationDAO.findAllFirst(anyInt())).thenReturn(indexingOperations);
+    when(elasticIndexingServiceConnector.create("1")).thenReturn(document);
+    when(elasticIndexingServiceConnector.update("1")).thenReturn(document);
+    when(elasticContentRequestBuilder.getCreateDocumentRequestContent(eq(elasticIndexingServiceConnector), anyString())).thenReturn(null);
+    when(elasticContentRequestBuilder.getUpdateDocumentRequestContent(eq(elasticIndexingServiceConnector), anyString())).thenReturn(null);
+    when(elasticContentRequestBuilder.getDeleteDocumentRequestContent(eq(elasticIndexingServiceConnector), anyString())).thenReturn(null);
+
+
+    //When
+    elasticIndexingOperationProcessor.process();
+
+    //Then
+
+    //Check Client invocation
+    verify(elasticIndexingClient, never()).sendCUDRequest(anyString());
   }
 
 }

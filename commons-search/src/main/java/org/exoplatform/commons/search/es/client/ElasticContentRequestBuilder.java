@@ -104,12 +104,16 @@ public class ElasticContentRequestBuilder {
 
     JSONObject cudHeaderRequest = createCUDHeaderRequestContent(connector, id);
 
-    JSONObject deleteRequest = new JSONObject();
-    deleteRequest.put("delete", cudHeaderRequest);
+    String request = null;
+    if (cudHeaderRequest != null) {
+      JSONObject deleteRequest = new JSONObject();
+      deleteRequest.put("delete", cudHeaderRequest);
 
-    String request =  deleteRequest.toJSONString()+"\n";
+      request =  deleteRequest.toJSONString()+"\n";
+    }
 
     LOG.debug("Delete request to ES: \n {}", request);
+
     return request;
   }
 
@@ -158,7 +162,10 @@ public class ElasticContentRequestBuilder {
   public String getCreatePipelineDocumentRequestContent(ElasticIndexingServiceConnector connector, String id) {
     Document document = connector.update(id);
 
-    String request = document.toJSON();
+    String request = null;
+    if (document != null) {
+      request = document.toJSON();
+    }
 
     LOG.debug("Create Pipeline document request to ES: \n {}", request);
 
@@ -182,10 +189,13 @@ public class ElasticContentRequestBuilder {
 
     Document document = connector.update(id);
 
-    JSONObject updateRequest = new JSONObject();
-    updateRequest.put("index", ElasticInformation);
+    String request = null;
+    if (document != null) {
+      JSONObject updateRequest = new JSONObject();
+      updateRequest.put("index", ElasticInformation);
 
-    String request = updateRequest.toJSONString() + "\n" + document.toJSON() + "\n";
+      request = updateRequest.toJSONString() + "\n" + document.toJSON() + "\n";
+    }
 
     LOG.debug("Update request to ES: \n {}", request);
 
