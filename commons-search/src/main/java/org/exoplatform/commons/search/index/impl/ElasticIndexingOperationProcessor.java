@@ -275,8 +275,11 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
           }
           IndexingOperation deleteIndexQueue = deleteIndexingOperationsIterator.next();
           try {
-            bulkRequest += elasticContentRequestBuilder.getDeleteDocumentRequestContent(connector,
-                                                                                        deleteIndexQueue.getEntityId());
+            String deleteDocumentRequestContent = elasticContentRequestBuilder.getDeleteDocumentRequestContent(connector,
+                    deleteIndexQueue.getEntityId());
+            if(deleteDocumentRequestContent != null) {
+              bulkRequest += deleteDocumentRequestContent;
+            }
             // Choose operation to delete from Queue one by one instead
           } catch(Exception e) {
             LOG.warn("Error while *deleting* index entry of entity, type = " + entityType + ", id =" + (deleteIndexQueue == null ? null : deleteIndexQueue.getEntityId()) + ", cause:", e);
@@ -318,17 +321,21 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
           try {
             if(connector.isNeedIngestPipeline()) {
               String singleRequestOperation = elasticContentRequestBuilder.getCreatePipelineDocumentRequestContent(connector, createIndexQueue.getEntityId());
-              elasticIndexingClient.sendCreateDocOnPipeline(connector.getIndex(),
-                                                            connector.getType(),
-                                                            createIndexQueue.getEntityId(),
-                                                            connector.getPipelineName(),
-                                                            singleRequestOperation);
+              if(singleRequestOperation != null) {
+                elasticIndexingClient.sendCreateDocOnPipeline(connector.getIndex(),
+                        connector.getType(),
+                        createIndexQueue.getEntityId(),
+                        connector.getPipelineName(),
+                        singleRequestOperation);
+              }
               // Delete this single operation since it's not indexed in bulk
               indexingQueueSorted.remove(OperationType.CREATE, createIndexQueue.getEntityId());
               indexingQueueSorted.remove(OperationType.UPDATE, createIndexQueue.getEntityId());
             } else {
               String singleRequestOperation = elasticContentRequestBuilder.getCreateDocumentRequestContent(connector, createIndexQueue.getEntityId());
-              bulkRequest += singleRequestOperation;
+              if(singleRequestOperation != null) {
+                bulkRequest += singleRequestOperation;
+              }
             }
           } catch(Exception e) {
             LOG.warn("Error while *creating* index entry of entity, type = " + entityType + ", id =" + (createIndexQueue == null ? null : createIndexQueue.getEntityId()) + ", cause:", e);
@@ -368,14 +375,18 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
           try {
             if(connector.isNeedIngestPipeline()) {
               String singleRequestOperation = elasticContentRequestBuilder.getCreatePipelineDocumentRequestContent(connector, updateIndexQueue.getEntityId());
-              elasticIndexingClient.sendCreateDocOnPipeline(connector.getIndex(),
-                                                            connector.getType(),
-                                                            updateIndexQueue.getEntityId(),
-                                                            connector.getPipelineName(),
-                                                            singleRequestOperation);
+              if(singleRequestOperation != null) {
+                elasticIndexingClient.sendCreateDocOnPipeline(connector.getIndex(),
+                        connector.getType(),
+                        updateIndexQueue.getEntityId(),
+                        connector.getPipelineName(),
+                        singleRequestOperation);
+              }
             } else {
               String singleRequestOperation = elasticContentRequestBuilder.getUpdateDocumentRequestContent(connector, updateIndexQueue.getEntityId());
-              bulkRequest += singleRequestOperation;
+              if(singleRequestOperation != null) {
+                bulkRequest += singleRequestOperation;
+              }
             }
           } catch(Exception e) {
             LOG.warn("Error while *updating* index entry of entity, type = " + entityType + ", id =" + (updateIndexQueue == null ? null : updateIndexQueue.getEntityId()) + ", cause:", e);
