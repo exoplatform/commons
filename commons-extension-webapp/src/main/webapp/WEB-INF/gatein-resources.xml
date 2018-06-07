@@ -273,5 +273,48 @@
 		  <path>/javascript/es6-promise.js</path>
 		</script>
 	</module>
+  <module>
+      <name>vue</name>
+      <script>
+          <minify>false</minify>
+          <path>/javascript/vue.min.js</path>
+      </script>
+  </module>
+  <module>
+      <name>filedrop</name>
+      <script>
+          <path>/javascript/jquery.filedrop.js</path>
+      </script>
+      <depends>
+          <module>jquery</module>
+      </depends>
+  </module>
+  <module>
+      <name>customEventPolyfill</name>
+      <script>
+          <path>/javascript/custom-event-polyfill.js</path>
+      </script>
+  </module>
+  <module>
+      <name>iePolyfills</name>
+      <script>
+          <path>/javascript/ie-polyfills.js</path>
+      </script>
+  </module>
+  <module>
+      <name>promisePolyfill</name>
+      <script>
+          <path>/javascript/promise.min.js</path>
+      </script>
+  </module>
+  <module>
+      <name>fetchPolyfill</name>
+      <script>
+          <path>/javascript/fetch.js</path>
+      </script>
+      <depends>
+          <module>promisePolyfill</module>
+      </depends>
+  </module>
 </gatein-resources>
 
