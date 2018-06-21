@@ -169,40 +169,44 @@ public class SettingsMigration implements StartableClusterAware {
   }
 
   private Boolean deleteJcrUserSettings() {
-    return new SynchronizationTask<Boolean>() {
-      @Override
-      protected Boolean execute(SessionContext ctx) {
-        try {
-          PortalContainer currentContainer = PortalContainer.getInstance();
-          ExoContainerContext.setCurrentContainer(currentContainer);
+    try {
+      PortalContainer currentContainer = PortalContainer.getInstance();
+      ExoContainerContext.setCurrentContainer(currentContainer);
 
-          Set<String> jcrSettingsToRemove = getJCRUserSettingsToRemove();
-          int deletedCounter = 0;
-          int i = 0, totalSize = jcrSettingsToRemove.size();
-          for (String user : jcrSettingsToRemove) {
-            i++;
-            if (!errorUserSettings.contains(user) && isSettingsMigrated(user)) {
-              if (deleteUserSettings(user)) {
-                deletedCounter ++;
-                getJpaSettingService().remove(Context.USER.id(user), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
-              }
-            }
-            if (i % 100 == 0) {
-              LOG.info("User settings JCR cleanup - progression = {}/{}", i, totalSize);
-              RequestLifeCycle.end();
-              RequestLifeCycle.begin(currentContainer);
+      RequestLifeCycle.begin(currentContainer);
+
+      Set<String> jcrSettingsToRemove = getJCRUserSettingsToRemove();
+      int deletedCounter = 0;
+      int i = 0, totalSize = jcrSettingsToRemove.size();
+      for (String user : jcrSettingsToRemove) {
+        i++;
+        try {
+          if (!errorUserSettings.contains(user) && isSettingsMigrated(user)) {
+            if (deleteUserSettings(user)) {
+              deletedCounter++;
+              getJpaSettingService().remove(Context.USER.id(user), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
             }
           }
-          LOG.info(" === User settings Migration & Cleanup from JCR to RDBBMS report: ");
-          LOG.info("           - " + deletedCounter + " Users with settings are cleaned from JCR ");
-          LOG.info("           - " + errorUserSettings.size() + " User settings nodes are not migrated to RDBMS ");
-          LOG.info("           - " + nonRemovedUserSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
-          return true;
+          if (i % 100 == 0) {
+            LOG.info("User settings JCR cleanup - progression = {}/{}", i, totalSize);
+            RequestLifeCycle.end();
+            RequestLifeCycle.begin(currentContainer);
+          }
         } catch (Exception e) {
-          return false;
+          LOG.error("Error while cleaning settings of user " + user + " : " + e.getMessage(), e);
         }
       }
-    }.executeWith(chromatticLifeCycle);
+      LOG.info(" === User settings Migration & Cleanup from JCR to RDBBMS report: ");
+      LOG.info("           - " + deletedCounter + " Users with settings are cleaned from JCR ");
+      LOG.info("           - " + errorUserSettings.size() + " User settings nodes are not migrated to RDBMS ");
+      LOG.info("           - " + nonRemovedUserSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
+      return true;
+    } catch (Exception e) {
+      LOG.error("Error while cleaning users settings : " + e.getMessage(), e);
+      return false;
+    } finally {
+      RequestLifeCycle.end();
+    }
   }
 
   private Boolean migrateGlobalSettings() {
