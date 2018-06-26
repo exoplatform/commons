@@ -631,6 +631,14 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return id;
     }
 
+    @Override
+    public void setParentId(String parentId) {
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
     public String getLabel() {
       return id;
     }

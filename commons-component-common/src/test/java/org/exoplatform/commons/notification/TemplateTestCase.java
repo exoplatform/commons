@@ -104,12 +104,19 @@ public class TemplateTestCase extends BaseTest {
   
   public void testDigestMore() throws Exception {
     Element instantly = makeDigestThree().addNewLine(true);
+    assertNotNull(instantly);
     ElementVisitor visitor = SimpleElementVistior.instance();
+    assertNotNull(visitor);
     TemplateContext context = new TemplateContext();
     
     context.put("$USER_LIST", "root,demo,mary");
     context.put("$PORTAL_NAME", "intranet");
-    String got = instantly.accept(visitor.with(context)).out();
+    visitor = visitor.with(context);
+    assertNotNull(visitor);
+    visitor = instantly.accept(visitor);
+    assertNotNull(visitor);
+    String got = visitor.out();
+    assertNotNull(got);
     
     assertEquals("root,demo,mary have joined intranet.<br/>", got);
   }

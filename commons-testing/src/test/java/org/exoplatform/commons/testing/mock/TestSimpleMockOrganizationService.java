@@ -45,6 +45,8 @@ public class TestSimpleMockOrganizationService extends TestCase {
 			public void setDescription(String desc) {}
 			public void setGroupName(String name) {}
 			public void setLabel(String name) {}
+			public void setId(String id) {}
+			public void setParentId(String id) {}
 		});
 		
 		
