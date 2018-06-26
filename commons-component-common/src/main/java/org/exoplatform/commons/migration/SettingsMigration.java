@@ -176,7 +176,7 @@ public class SettingsMigration implements StartableClusterAware {
 
       RequestLifeCycle.begin(currentContainer);
 
-      Set<String> jcrSettingsToRemove = getJCRUserSettingsToRemove();
+      Set<String> jcrSettingsToRemove = getJCRUserSettings();
       int deletedCounter = 0;
       int i = 0, totalSize = jcrSettingsToRemove.size();
       for (String user : jcrSettingsToRemove) {
@@ -211,7 +211,6 @@ public class SettingsMigration implements StartableClusterAware {
       RequestLifeCycle.end();
     }
   }
-
   private Boolean migrateGlobalSettings() {
     return new SynchronizationTask<Boolean>() {
       @Override
@@ -413,7 +412,8 @@ public class SettingsMigration implements StartableClusterAware {
       if (setting != null) {
         return setting.getValue().equals("true");
       } else {
-        return true;
+        Set userSettingsToRemove = getJCRUserSettings();
+        return userSettingsToRemove != null && userSettingsToRemove.size() > 0;
       }
     } catch (Exception e) {
       LOG.error("Error when defining if there is user settings to migrate in jcr - cause: " + e.getMessage(), e);
@@ -421,7 +421,7 @@ public class SettingsMigration implements StartableClusterAware {
     }
   }
 
-  private Set<String> getJCRUserSettingsToRemove() {
+  private Set<String> getJCRUserSettings() {
     return new SynchronizationTask<Set<String>>() {
       @Override
       protected Set<String> execute(SessionContext ctx) {
