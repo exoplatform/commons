@@ -31,6 +31,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserStatus;
 import org.exoplatform.settings.chromattic.ScopeEntity;
 import org.exoplatform.settings.chromattic.SimpleContextEntity;
 import org.exoplatform.settings.chromattic.SubContextEntity;
@@ -181,7 +182,9 @@ public class SettingsMigration implements StartableClusterAware {
       for (String user : jcrSettingsToRemove) {
         i++;
         try {
-          if (!errorUserSettings.contains(user) && isSettingsMigrated(user)) {
+          // delete settings of users which have been migrated successfully or of non-existing users (deleted)
+          if (!errorUserSettings.contains(user)
+                  && (isSettingsMigrated(user) || organizationService.getUserHandler().findUserByName(user, UserStatus.ANY) == null)) {
             if (deleteUserSettings(user)) {
               deletedCounter++;
               getJpaSettingService().remove(Context.USER.id(user), Scope.APPLICATION.id(SETTINGS_MIGRATION_USER_KEY), SETTINGS_RDBMS_MIGRATION_DONE);
@@ -230,7 +233,7 @@ public class SettingsMigration implements StartableClusterAware {
     int pageSize = 20;
     int current = 0;
     try {
-      ListAccess<User> allUsersListAccess = organizationService.getUserHandler().findAllUsers();
+      ListAccess<User> allUsersListAccess = organizationService.getUserHandler().findAllUsers(UserStatus.ANY);
       ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
       int totalUsers = allUsersListAccess.getSize();
       LOG.info("    Number of users = " + totalUsers);
