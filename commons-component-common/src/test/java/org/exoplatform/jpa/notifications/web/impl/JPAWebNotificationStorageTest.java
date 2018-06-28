@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage;
@@ -277,5 +278,34 @@ public class JPAWebNotificationStorageTest extends BaseNotificationTestCase {
 //    //
 //    webNotificationStorage.remove(userId, 3 * daySeconds);
 //    assertEquals(0, parentNode.getNodes().getSize());
+  }
+
+  public void testGetNotificationsByTypeAndParams() {
+    String userId = "toto";
+    userIds.add(userId);
+    NotificationInfo info = makeWebNotificationInfo(userId);
+    webNotificationStorage.save(info);
+    WebNotificationFilter referenceFilter = new WebNotificationFilter(userId);
+    referenceFilter.setParameter("activityId", "TheActivityId");
+    referenceFilter.setPluginKey(new PluginKey(PluginTest.ID));
+    List<NotificationInfo> gotList = webNotificationStorage.get(referenceFilter, 0, 10);
+    //
+    // Test fake parameter value
+    WebNotificationFilter fakeParameterFilter = new WebNotificationFilter(userId);
+    fakeParameterFilter.setParameter("activityId", "fake");
+    PluginKey pluginKey = new PluginKey(PluginTest.ID);
+    fakeParameterFilter.setPluginKey(pluginKey);
+    // Test fake plugin key
+    WebNotificationFilter fakePluginFilter = new WebNotificationFilter(userId);
+    fakePluginFilter.setParameter("activityId", "TheActivityId");
+    fakePluginFilter.setPluginKey(new PluginKey("FakePluginId"));
+
+    // not found because of fake plugin key
+    assertEquals(0, webNotificationStorage.get(fakePluginFilter, 0, 10).size());
+    // not removed because of fake parameter value
+    assertEquals(0, webNotificationStorage.get(fakeParameterFilter, 0, 10).size());
+    // success get
+    assertEquals(1, webNotificationStorage.get(referenceFilter, 0, 10).size());
+    assertEquals(info.getId(), gotList.get(0).getId());
   }
 }

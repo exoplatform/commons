@@ -76,6 +76,32 @@ public class WebUsersDAOTest extends CommonsDAOJPAImplTest {
   }
 
   @Test
+  public void testgetNotificationsByTypeAndParams() {
+    WebNotifEntity webNotifEntity1 = new WebNotifEntity();
+    webNotifEntity1.setType("plugin1");
+    webNotifEntity1 = webNotifDAO.create(webNotifEntity1);
+
+    WebUsersEntity webUsersEntity1 = new WebUsersEntity();
+    webUsersEntity1.setReceiver("user1");
+    webUsersEntity1.setNotification(webNotifEntity1);
+    webUsersDAO.create(webUsersEntity1);
+    WebParamsEntity webParamsEntity1 = new WebParamsEntity();
+    webParamsEntity1.setName("toto");
+    webParamsEntity1.setValue("titi");
+    webParamsEntity1.setNotification(webNotifEntity1);
+    webParamsDAO.create(webParamsEntity1);
+
+    EntityManagerHolder.get().clear();
+
+    //Then
+    assertEquals(1, webUsersDAO.findNotificationsByTypeAndParams("plugin1", "toto", "titi", "user1", 0, 10).size());
+    assertEquals(0, webUsersDAO.findNotificationsByTypeAndParams("plugin2", "toto", "titi", "user1", 0, 10).size());
+    assertEquals(0, webUsersDAO.findNotificationsByTypeAndParams("plugin1", "toto", "tata", "user1", 0, 10).size());
+    assertEquals(0, webUsersDAO.findNotificationsByTypeAndParams("plugin1", "tata", "titi", "user1", 0, 10).size());
+    assertEquals(0, webUsersDAO.findNotificationsByTypeAndParams("plugin1", "toto", "titi", "user2", 0, 10).size());
+  }
+
+  @Test
   public void testFindWebNotifsByLastUpdatedDate() {
     //yesterday
     Calendar today = Calendar.getInstance();

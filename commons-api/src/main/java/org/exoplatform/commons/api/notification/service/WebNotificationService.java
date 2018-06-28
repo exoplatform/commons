@@ -16,6 +16,7 @@
  */
 package org.exoplatform.commons.api.notification.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
@@ -76,11 +77,35 @@ public interface WebNotificationService {
    * @param filter the filter condition
    * @param offset
    * @param limit
-   * @return The notification list matched the given filter
+   * @return The notification bodies list matched the given filter
    * @LevelAPI Platform
    * @since PLF 4.2
    */
   List<String> get(WebNotificationFilter filter, int offset, int limit);
+
+  /**
+   * Gets the NotificationInfo list by the given filter.
+   * <p>
+   * The filter consist of these criteria:
+   * + UserId
+   * + isPopover TRUE/FALSE
+   * + Read TRUE/FALSE
+   * + parameter key,value
+   *
+   * @param filter the filter condition
+   * @param offset
+   * @param limit
+   * @return The notification list matched the given filter
+   * @LevelAPI Platform
+   * @since PLF 5.1
+   */
+  default List<NotificationInfo> getNotificationInfos(WebNotificationFilter filter, int offset, int limit) {
+    List<NotificationInfo> list = new ArrayList<>();
+    for (String notif : get(filter, offset, limit)) {
+      list.add(new NotificationInfo());
+    }
+    return list;
+  }
 
   /**
    * Removes the notification by the notificationId

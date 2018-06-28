@@ -54,7 +54,14 @@ import java.util.Calendar;
         "AND u.updateDate < :calendar "),
     @NamedQuery(name = "NotificationsWebUsersEntity.findWebNotifsByLastUpdatedDate", query = "SELECT u FROM NotificationsWebUsersEntity u " +
         "JOIN FETCH u.webNotification w " +
-        "WHERE u.updateDate < :calendar ")
+        "WHERE u.updateDate < :calendar "),
+    @NamedQuery(name = "NotificationsWebUsersEntity.findNotificationsByTypeAndParams", query = "SELECT distinct(u) FROM NotificationsWebUsersEntity u " +
+        "JOIN u.webNotification w " +
+        "JOIN u.webNotification.parameters p " +
+        "WHERE w.type= :pluginType " +
+        "AND p.name= :paramName " +
+        "AND p.value= :paramValue " +
+        "AND u.receiver= :receiver ")
 })
 public class WebUsersEntity {
   @Id
