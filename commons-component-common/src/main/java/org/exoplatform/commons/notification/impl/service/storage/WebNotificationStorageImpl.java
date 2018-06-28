@@ -3,6 +3,7 @@ package org.exoplatform.commons.notification.impl.service.storage;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
@@ -162,19 +163,21 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
   @Override
   public List<NotificationInfo> get(WebNotificationFilter filter, int offset, int limit) {
     List<NotificationInfo> result = new ArrayList<NotificationInfo>();
-    SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
-    try {
-      Node userWebNotificationNode = getOrCreateChannelNode(sProvider, filter.getUserId());
-      NotificationIterator notificationIterator = new NotificationIterator(filter, userWebNotificationNode, offset, limit);
-      //nodes order by lastUpdated DESC
-      List<Node> nodes = notificationIterator.nodes();
-      //
-      for(Node node : nodes) {
-        result.add(getWebNotificationStorage().get(node.getName()));
+    if (limit > 0) {
+      SessionProvider sProvider = CommonsUtils.getSystemSessionProvider();
+      try {
+        Node userWebNotificationNode = getOrCreateChannelNode(sProvider, filter.getUserId());
+        NotificationIterator notificationIterator = new NotificationIterator(filter, userWebNotificationNode, offset, limit);
+        //nodes order by lastUpdated DESC
+        List<Node> nodes = notificationIterator.nodes();
+        //
+        for (Node node : nodes) {
+          result.add(getWebNotificationStorage().get(node.getName()));
+        }
+        Collections.sort(result, new NotificationInfoUpdateDateComparator());
+      } catch (Exception e) {
+        LOG.error("Notifications not found by filter: " + filter.toString(), e);
       }
-      Collections.sort(result, new NotificationInfoUpdateDateComparator());
-    } catch (Exception e) {
-      LOG.error("Notifications not found by filter: " + filter.toString(), e);
     }
     return result;
   }
@@ -238,7 +241,7 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     }
     return removed;
   }
-  
+
   @Override
   public boolean remove(String userId, long seconds) {
     boolean created = NotificationSessionManager.createSystemProvider();

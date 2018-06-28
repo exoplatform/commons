@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
@@ -61,8 +62,17 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
     List<NotificationInfo> result = new ArrayList<NotificationInfo>();
     String pluginId = filter.getPluginKey() != null ? filter.getPluginKey().getId() : null;
     String userId = filter.getUserId();
+    Pair<String, String> parameter = filter.getParameter();
+    String paramName = null;
+    String paramValue = null;
+    if (parameter != null) {
+      paramName = parameter.getKey();
+      paramValue = parameter.getValue();
+    }
     List<WebUsersEntity> webUsersEntities;
-    if (pluginId != null) {
+    if (paramName != null && paramValue != null && pluginId != null) {
+      webUsersEntities = webUsersDAO.findNotificationsByTypeAndParams(pluginId, paramName, paramValue, userId, offset, limit);
+    } else if (pluginId != null) {
       // web notifs entities order by lastUpdated DESC
       webUsersEntities = webUsersDAO.findWebNotifsByFilter(pluginId, userId, filter.isOnPopover(), offset, limit);
     } else if (filter.isOnPopover()) {

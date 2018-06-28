@@ -13,32 +13,41 @@ public class WebUsersDAO extends GenericDAOJPAImpl<WebUsersEntity, Long> {
 
   @ExoTransactional
   public List<WebUsersEntity> findWebNotifsByFilter(String pluginId, String userId, Boolean isOnPopover, int offset, int limit) {
-    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByPluginFilter", WebUsersEntity.class)
-                             .setParameter("pluginId", pluginId)
-                             .setParameter("userId", userId)
-                             .setParameter("isOnPopover", isOnPopover)
-                             .setFirstResult(offset)
-                             .setMaxResults(limit)
-                             .getResultList();
+    TypedQuery<WebUsersEntity> query = getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByPluginFilter", WebUsersEntity.class)
+        .setParameter("pluginId", pluginId)
+        .setParameter("userId", userId)
+        .setParameter("isOnPopover", isOnPopover)
+        .setFirstResult(offset);
+    if (limit >= 0) {
+      return query.setMaxResults(limit).getResultList();
+    } else {
+      return query.getResultList();
+    }
   }
 
   @ExoTransactional
   public List<WebUsersEntity> findWebNotifsByFilter(String userId, int offset, int limit) {
-    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByUserFilter", WebUsersEntity.class)
-                             .setParameter("userId", userId)
-                             .setFirstResult(offset)
-                             .setMaxResults(limit)
-                             .getResultList();
+    TypedQuery<WebUsersEntity> query = getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByUserFilter", WebUsersEntity.class)
+        .setParameter("userId", userId)
+        .setFirstResult(offset);
+    if (limit >= 0) {
+      return query.setMaxResults(limit).getResultList();
+    } else {
+      return query.getResultList();
+    }
   }
 
   @ExoTransactional
   public List<WebUsersEntity> findWebNotifsByFilter(String userId, boolean isOnPopover, int offset, int limit) {
-    return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByPopoverFilter", WebUsersEntity.class)
-                             .setParameter("userId", userId)
-                             .setParameter("isOnPopover", isOnPopover)
-                             .setFirstResult(offset)
-                             .setMaxResults(limit)
-                             .getResultList();
+    TypedQuery<WebUsersEntity> query = getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findWebNotifsByPopoverFilter", WebUsersEntity.class)
+        .setParameter("userId", userId)
+        .setParameter("isOnPopover", isOnPopover)
+        .setFirstResult(offset);
+    if (limit >= 0) {
+      return query.setMaxResults(limit).getResultList();
+    } else {
+      return query.getResultList();
+    }
   }
 
   @ExoTransactional
@@ -85,5 +94,21 @@ public class WebUsersDAO extends GenericDAOJPAImpl<WebUsersEntity, Long> {
     return getEntityManager().createNamedQuery("NotificationsWebUsersEntity.findNotifsWithBadge", WebUsersEntity.class)
         .setParameter("userId", userId)
         .getResultList();
+  }
+
+  @ExoTransactional
+  public List<WebUsersEntity> findNotificationsByTypeAndParams(String pluginType, String paramName, String paramValue, String receiver, int offset, int limit) {
+    TypedQuery<WebUsersEntity> query = getEntityManager()
+        .createNamedQuery("NotificationsWebUsersEntity.findNotificationsByTypeAndParams", WebUsersEntity.class)
+        .setParameter("pluginType", pluginType)
+        .setParameter("paramName", paramName)
+        .setParameter("paramValue", paramValue)
+        .setParameter("receiver", receiver)
+        .setFirstResult(offset);
+    if (limit >= 0) {
+          return query.setMaxResults(limit).getResultList();
+    } else {
+      return query.getResultList();
+    }
   }
 }

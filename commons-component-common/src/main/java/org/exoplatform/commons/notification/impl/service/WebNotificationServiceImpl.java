@@ -63,7 +63,7 @@ public class WebNotificationServiceImpl implements WebNotificationService {
   @Override
   public List<String> get(WebNotificationFilter filter, int offset, int limit) {
     List<String> result = new ArrayList<String>();
-    List<NotificationInfo> gotList = storage.get(filter, offset, limit);
+    List<NotificationInfo> gotList = getNotificationInfos(filter, offset, limit);
     NotificationContext ctx = NotificationContextImpl.cloneInstance();
     ctx.append(POPUP_OVER, filter.isOnPopover());
     AbstractChannel channel = ctx.getChannelManager().getChannel(ChannelKey.key(WebChannel.ID));
@@ -86,6 +86,11 @@ public class WebNotificationServiceImpl implements WebNotificationService {
       }
     }
     return result;
+  }
+
+  @Override
+  public List<NotificationInfo> getNotificationInfos(WebNotificationFilter filter, int offset, int limit) {
+    return storage.get(filter, offset, limit);
   }
 
   @Override

@@ -1,5 +1,7 @@
 package org.exoplatform.commons.api.notification.model;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONObject;
 
 
@@ -11,6 +13,7 @@ public class WebNotificationFilter {
   private boolean onPopover = false;
   private Boolean isRead = null;
   private boolean isOrder = true;
+  private Pair<String, String> parameter;
 
   public WebNotificationFilter(String userId) {
     this.userId = userId;
@@ -66,6 +69,15 @@ public class WebNotificationFilter {
 
   public WebNotificationFilter setOrder(boolean isOrder) {
     this.isOrder = isOrder;
+    return this;
+  }
+
+  public Pair<String, String> getParameter() {
+    return parameter;
+  }
+
+  public WebNotificationFilter setParameter(String paramName, String paramValue) {
+    this.parameter = new ImmutablePair<>(paramName, paramValue);
     return this;
   }
   
