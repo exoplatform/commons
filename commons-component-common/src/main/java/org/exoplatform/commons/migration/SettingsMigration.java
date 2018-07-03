@@ -106,19 +106,27 @@ public class SettingsMigration implements StartableClusterAware {
               if (!globalSettingsCleaned) {
                 LOG.info("=== Start cleaning Global Settings data from JCR");
                 long startTime = System.currentTimeMillis();
-                deleteJcrGlobalSettings();
-                setGlobalSettingsCleanupDone();
+                boolean successfulCleaning = deleteJcrGlobalSettings();
                 long endTime = System.currentTimeMillis();
-                LOG.info("=== Global Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+                if(successfulCleaning) {
+                  setGlobalSettingsCleanupDone();
+                  LOG.info("=== Global Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+                } else {
+                  LOG.error("=== Global Settings JCR data cleaning due to RDBMS migration failed in " + (endTime - startTime) + " ms");
+                }
               }
               boolean userSettingsCleaned = isUserSettingsCleanupDone();
               if(!userSettingsCleaned) {
                 LOG.info("=== Start cleaning User Settings data from JCR");
                 long startTime = System.currentTimeMillis();
-                deleteJcrUserSettings();
-                setUserSettingsCleanupDone();
+                boolean successfulCleaning = deleteJcrUserSettings();
                 long endTime = System.currentTimeMillis();
-                LOG.info("=== User Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+                if(successfulCleaning) {
+                  setUserSettingsCleanupDone();
+                  LOG.info("=== User Settings JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+                } else {
+                  LOG.error("=== User Settings JCR data cleaning due to RDBMS migration failed in " + (endTime - startTime) + " ms");
+                }
                 if (chromatticLifeCycle.getManager().getSynchronization() != null) {
                   chromatticLifeCycle.getManager().endRequest(true);
                 }
@@ -163,6 +171,7 @@ public class SettingsMigration implements StartableClusterAware {
           LOG.info("           - " + nonRemovedGlobalSettings.size() + " Global Settings nodes are migrated but not removed from JCR");
           return true;
         } catch (Exception e) {
+          LOG.error("Error while cleaning JCR global settings : " + e.getMessage(), e);
           return false;
         }
       }
