@@ -421,8 +421,13 @@ public class SettingsMigration implements StartableClusterAware {
       if (setting != null) {
         return setting.getValue().equals("true");
       } else {
-        Set userSettingsToRemove = getJCRUserSettings();
-        return userSettingsToRemove != null && userSettingsToRemove.size() > 0;
+        return new SynchronizationTask<Boolean>() {
+          @Override
+          protected Boolean execute(SessionContext ctx) {
+            Set userSettingsToRemove = getJCRUserSettings();
+            return userSettingsToRemove != null && userSettingsToRemove.size() > 0;
+          }
+        }.executeWith(chromatticLifeCycle);
       }
     } catch (Exception e) {
       LOG.error("Error when defining if there is user settings to migrate in jcr - cause: " + e.getMessage(), e);
