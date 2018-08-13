@@ -258,30 +258,32 @@ public class MailNotificationsMigration {
     ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
 
     NodeIterator pluginNodesIterator = getMailNotificationNodes();
-    while (pluginNodesIterator.hasNext()) {
-      Node pluginNode = pluginNodesIterator.nextNode();
-      NodeIterator dayNodesIterator = pluginNode.getNodes();
-      while (dayNodesIterator.hasNext()) {
-        Node dayNode = dayNodesIterator.nextNode();
-        NodeIterator notifNodes = dayNode.getNodes();
-        LOG.info("    Removing JCR mail notifications for plugin: " + pluginNode.getName() + " - day: " + dayNode.getName());
-        int i = 0;
-        while (notifNodes.hasNext()) {
-          i++;
-          notifNodes.nextNode().remove();
-          if(i%100 == 0){
+    if(pluginNodesIterator != null) {
+      while (pluginNodesIterator.hasNext()) {
+        Node pluginNode = pluginNodesIterator.nextNode();
+        NodeIterator dayNodesIterator = pluginNode.getNodes();
+        while (dayNodesIterator.hasNext()) {
+          Node dayNode = dayNodesIterator.nextNode();
+          NodeIterator notifNodes = dayNode.getNodes();
+          LOG.info("    Removing JCR mail notifications for plugin: " + pluginNode.getName() + " - day: " + dayNode.getName());
+          int i = 0;
+          while (notifNodes.hasNext()) {
+            i++;
+            notifNodes.nextNode().remove();
+            if (i % 100 == 0) {
+              session.save();
+              RequestLifeCycle.end();
+              RequestLifeCycle.begin(currentContainer);
+            }
+          }
+          if (i > 0) {
             session.save();
-            RequestLifeCycle.end();
-            RequestLifeCycle.begin(currentContainer);
+            LOG.info("=== done removed " + i + " mail notifications from JCR for plugin: " + pluginNode.getName());
           }
         }
-        if (i > 0) {
-          session.save();
-          LOG.info("=== done removed " + i + " mail notifications from JCR for plugin: " + pluginNode.getName());
-        }
+        pluginNode.remove();
+        session.save();
       }
-      pluginNode.remove();
-      session.save();
     }
     Node parentMsgHome = getNode("eXoNotification", "messageHome");
     if (parentMsgHome != null) {
@@ -366,17 +368,19 @@ public class MailNotificationsMigration {
 
   private void migrateMailNotifData() throws RepositoryException, RepositoryConfigurationException {
     NodeIterator pluginNodesIterator = getMailNotificationNodes();
-    while (pluginNodesIterator.hasNext()) {
-      Node pluginNode = pluginNodesIterator.nextNode();
-      NodeIterator dayNodesIterator = pluginNode.getNodes();
-      while (dayNodesIterator.hasNext()) {
-        Node dayNode = dayNodesIterator.nextNode();
-        NodeIterator notifNodes = dayNode.getNodes();
-        if (notifNodes.getSize() > 0) {
-          LOG.info("    Progression mail notifications migration for plugin: " + pluginNode.getName() + " - day: "
-              + dayNode.getName());
-          while (notifNodes.hasNext()) {
-            migrateMailNotifNodeToRDBMS(notifNodes.nextNode());
+    if(pluginNodesIterator != null) {
+      while (pluginNodesIterator.hasNext()) {
+        Node pluginNode = pluginNodesIterator.nextNode();
+        NodeIterator dayNodesIterator = pluginNode.getNodes();
+        while (dayNodesIterator.hasNext()) {
+          Node dayNode = dayNodesIterator.nextNode();
+          NodeIterator notifNodes = dayNode.getNodes();
+          if (notifNodes.getSize() > 0) {
+            LOG.info("    Progression mail notifications migration for plugin: " + pluginNode.getName() + " - day: "
+                    + dayNode.getName());
+            while (notifNodes.hasNext()) {
+              migrateMailNotifNodeToRDBMS(notifNodes.nextNode());
+            }
           }
         }
       }
