@@ -37,7 +37,7 @@ public class NotificationInfo {
 
   private PluginKey           key;                                           //
 
-  private String              from           = "";
+  private String              from;
 
   private String              to;
 

@@ -207,4 +207,10 @@
         <createSequence sequenceName="SEQ_NTF_EMAIL_QUEUE" startValue="1"/>
     </changeSet>
 
+    <changeSet author="notifications" id="1.0.0-19">
+        <addNotNullConstraint tableName="NTF_WEB_NOTIFS_USERS"
+                              columnName="RECEIVER"
+                              columnDataType="NVARCHAR(200)"
+                              defaultNullValue=""/>
+    </changeSet>
 </databaseChangeLog>

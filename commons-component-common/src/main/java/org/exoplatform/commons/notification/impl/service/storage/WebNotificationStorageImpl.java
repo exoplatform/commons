@@ -329,7 +329,6 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
     if(node == null) return null;
     NotificationInfo notifiInfo = NotificationInfo.instance()
       .setTo(node.getProperty(NTF_OWNER).getString()) // owner of notification NTF_OWNER
-      .setFrom(node.getProperty(NTF_SENDER).getString()) // user make event of notification
       .key(node.getProperty(NTF_PLUGIN_ID).getString())//pluginId
       .setTitle(node.getProperty(NTF_TEXT).getString())
       .setOnPopOver(node.getProperty(NTF_SHOW_POPOVER).getBoolean())
@@ -338,6 +337,9 @@ public class WebNotificationStorageImpl extends AbstractService implements WebNo
       .setLastModifiedDate(node.getProperty(NTF_LAST_MODIFIED_DATE).getLong())
       .setId(node.getName())
       .end();
+    if (node.hasProperty(NTF_FROM)) {
+      notifiInfo.setFrom(node.getProperty(NTF_SENDER).getString()); // user make event of notification
+    }
     if (node.hasProperty(EXO_DATE_CREATED)) {
       notifiInfo.setDateCreated(node.getProperty(EXO_DATE_CREATED).getDate());
     }

@@ -198,7 +198,7 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
     strQuery.append(" jcr:path LIKE '").append(messageHomeNode.getPath()).append("/%'");
     strQuery.append(" AND (").append(NTF_SEND_TO_WEEKLY).append("='").append(userId).append("'");
     strQuery.append(" OR ").append(NTF_SEND_TO_WEEKLY).append("='").append(NotificationInfo.FOR_ALL_USER)
-            .append("') AND ").append(NTF_FROM).append("<>'").append(userId).append("'");
+            .append("') AND (").append(NTF_FROM).append("<>'").append(userId).append("' OR ").append(NTF_FROM).append(" IS NULL)");
     strQuery.append(" order by ").append(NTF_ORDER).append(ASCENDING).append(", exo:dateCreated").append(DESCENDING);
 
     QueryManager qm = messageHomeNode.getSession().getWorkspace().getQueryManager();
@@ -224,7 +224,7 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
               .append(" AND NOT jcr:path LIKE '").append(pluginDayNode.getPath()).append("/%/%')");
     strQuery.append(" AND (").append(NTF_SEND_TO_DAILY).append("='").append(userId).append("'");
     strQuery.append(" OR ").append(NTF_SEND_TO_DAILY).append("='").append(NotificationInfo.FOR_ALL_USER)
-              .append("') AND ").append(NTF_FROM).append("<>'").append(userId).append("'");
+              .append("') AND (").append(NTF_FROM).append("<>'").append(userId).append("' OR ").append(NTF_FROM).append(" IS NULL)");
     strQuery.append(" order by ").append(NTF_ORDER).append(ASCENDING).append(", exo:dateCreated").append(DESCENDING);
 
     QueryManager qm = pluginDayNode.getSession().getWorkspace().getQueryManager();
@@ -254,7 +254,6 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
       }
     }
     NotificationInfo message = NotificationInfo.instance()
-      .setFrom(node.getProperty(NTF_FROM).getString())
       .setOrder(Integer.valueOf(node.getProperty(NTF_ORDER).getString()))
       .key(node.getProperty(NTF_PROVIDER_TYPE).getString())
       .setOwnerParameter(node.getProperty(NTF_OWNER_PARAMETER).getValues())
@@ -262,6 +261,10 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
       .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(NTF_SEND_TO_WEEKLY).getValues()))
       .setLastModifiedDate(node.getProperty(EXO_LAST_MODIFIED_DATE).getDate())
       .setId(node.getName());
+
+    if (node.hasProperty(NTF_FROM)) {
+      message.setFrom(node.getProperty(NTF_FROM).getString());
+    }
 
     return message;
   }

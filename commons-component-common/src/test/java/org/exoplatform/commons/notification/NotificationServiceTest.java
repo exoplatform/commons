@@ -7,6 +7,7 @@ import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.UserSetting.FREQUENCY;
 import org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
+import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.job.NotificationJob;
 import org.exoplatform.commons.notification.plugin.PluginTest;
@@ -192,27 +193,30 @@ public class NotificationServiceTest extends BaseNotificationTestCase {
     }
   }
 
-  private NotificationInfo fillModel(Node node) throws Exception {
-    if(node == null) return null;
-    NotificationInfo message = NotificationInfo.instance()
-      .setFrom(node.getProperty("ntf:from").getString())
-      .setOrder(Integer.valueOf(node.getProperty("ntf:order").getString()))
-      .key(node.getProperty("ntf:providerType").getString())
-      .setOwnerParameter(node.getProperty("ntf:ownerParameter").getValues())
-      .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty("ntf:sendToDaily").getValues()))
-      .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty("ntf:sendToWeekly").getValues()))
-      .setId(node.getName());
-    
-    return message;
-  }
-  
   private Node getMessageNodeById(String msgId) throws Exception {
     return getMessageNode(new StringBuffer("exo:name = '").append(msgId).append("'").toString(), "");
   }
 
   private NotificationInfo getNotificationInfoByKeyIdAndParam(String key, String param) throws Exception {
     Node node = getMessageNode(new StringBuffer("ntf:ownerParameter LIKE '%").append(param).append("%'").toString(), key);
-    return fillModel(node);
+
+    if(node != null) {
+      NotificationInfo message = NotificationInfo.instance()
+          .setOrder(Integer.valueOf(node.getProperty(AbstractService.NTF_ORDER).getString()))
+          .key(node.getProperty(AbstractService.NTF_PROVIDER_TYPE).getString())
+          .setOwnerParameter(node.getProperty(AbstractService.NTF_OWNER_PARAMETER).getValues())
+          .setSendToDaily(NotificationUtils.valuesToArray(node.getProperty(AbstractService.NTF_SEND_TO_DAILY).getValues()))
+          .setSendToWeekly(NotificationUtils.valuesToArray(node.getProperty(AbstractService.NTF_SEND_TO_WEEKLY).getValues()))
+          .setId(node.getName());
+
+      if (node.hasProperty(AbstractService.NTF_FROM)) {
+        message.setFrom(node.getProperty(AbstractService.NTF_FROM).getString());
+      }
+
+      return message;
+    } else {
+      return null;
+    }
   }
   
   private Node getMessageNode(String strQuery, String key) throws Exception {
