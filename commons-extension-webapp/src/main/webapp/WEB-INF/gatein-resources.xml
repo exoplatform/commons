@@ -281,6 +281,30 @@
       </script>
   </module>
   <module>
+      <name>vueI18n</name>
+      <as>vuei18n</as>
+      <script>
+          <minify>false</minify>
+          <path>/javascript/vue-i18n.min.js</path>
+      </script>
+      <depends>
+          <module>vue</module>
+      </depends>
+  </module>
+  <module>
+      <name>eXoVueI18n</name>
+      <as>exoi18n</as>
+      <script>
+          <path>/javascript/exo-i18n.js</path>
+      </script>
+      <depends>
+          <module>vueI18n</module>
+      </depends>
+      <depends>
+          <module>fetchPolyfill</module>
+      </depends>
+  </module>
+  <module>
       <name>filedrop</name>
       <script>
           <path>/javascript/jquery.filedrop.js</path>
