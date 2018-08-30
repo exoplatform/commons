@@ -268,7 +268,7 @@
           <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
             <field name="name"><string>commons.WebNotificationsCache</string></field>
             <field name="strategy" profiles="cluster"><string>${exo.cache.commons.WebNotificationsCache.strategy:LIRS}</string></field>
-            <field name="liveTime"><long>${exo.cache.commons.WebNotificationsCache.ExpirationTimeout:86400}</long></field>
+            <field name="liveTime"><long>${exo.cache.commons.WebNotificationsCache.TimeToLive:86400}</long></field>
             <field name="maxSize"><int>${exo.cache.commons.WebNotificationsCache.MaxNodes:1000}</int></field>
             <field name="cacheMode" profiles="cluster"><string>${exo.cache.commons.WebNotificationsCache.cacheMode:replication}</string></field>
           </object>
