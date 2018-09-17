@@ -33,6 +33,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by The eXo Platform SAS
@@ -152,6 +154,8 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   }
 
   protected String buildFilteredQuery(String query, Collection<String> sites, List<ElasticSearchFilter> filters, int offset, int limit, String sort, String order) {
+    String escapedQuery = escapeReservedCharacters(query);
+
     StringBuilder esQuery = new StringBuilder();
     esQuery.append("{\n");
     esQuery.append("     \"from\" : " + offset + ",\n");
@@ -171,7 +175,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     esQuery.append("            \"must\" : {\n");
     esQuery.append("                \"query_string\" : {\n");
     esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
-    esQuery.append("                    \"query\" : \"" + query + "\"\n");
+    esQuery.append("                    \"query\" : \"" + escapedQuery + "\"\n");
     esQuery.append("                }\n");
     esQuery.append("            },\n");
     esQuery.append("            \"filter\" : {\n");
@@ -224,6 +228,20 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     LOG.debug("Search Query request to ES : {} ", esQuery);
 
     return esQuery.toString();
+  }
+
+  /**
+   * Escaped reserved characters by ES when using query_string.
+   * Only ~ is not escaped since it is used for fuzzy search parameter.
+   * The list of reserved characters is documented at
+   * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_reserved_characters
+   * @param query The unescaped query string
+   * @return The escaped query string
+   */
+  protected String escapeReservedCharacters(String query) {
+    String escapedQuery = query.replaceAll("[" + Pattern.quote("+-=&|><!(){}\\[\\]^\"*?:\\/") + "]",
+            Matcher.quoteReplacement("\\\\")+"$0");
+    return escapedQuery;
   }
 
   protected Collection<SearchResult> buildResult(String jsonResponse, SearchContext context) {
