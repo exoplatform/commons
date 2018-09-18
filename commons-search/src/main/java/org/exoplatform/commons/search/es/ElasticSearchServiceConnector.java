@@ -239,9 +239,12 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
    * @return The escaped query string
    */
   protected String escapeReservedCharacters(String query) {
-    String escapedQuery = query.replaceAll("[" + Pattern.quote("+-=&|><!(){}\\[\\]^\"*?:\\/") + "]",
-            Matcher.quoteReplacement("\\\\")+"$0");
-    return escapedQuery;
+    if(StringUtils.isNotEmpty(query)) {
+      return query.replaceAll("[" + Pattern.quote("+-=&|><!(){}\\[\\]^\"*?:\\/") + "]",
+              Matcher.quoteReplacement("\\\\") + "$0");
+    } else {
+      return query;
+    }
   }
 
   protected Collection<SearchResult> buildResult(String jsonResponse, SearchContext context) {
