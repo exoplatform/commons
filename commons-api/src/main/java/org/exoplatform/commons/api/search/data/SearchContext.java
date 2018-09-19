@@ -54,7 +54,7 @@ public class SearchContext {
   private String siteName;
   
   /** */
-  private Map<QualifiedName, String> qualifiedName = null;
+  private Map<QualifiedName, String> params = null;
   
   /**
    * Get router
@@ -74,6 +74,10 @@ public class SearchContext {
     this.router = router;
   }
 
+  public String getParamValue(QualifiedName name) {
+    return params.get(name);
+  }
+
   /**
    * Get site name, e.g. intranet, acme, ..
    * @return String
@@ -89,7 +93,7 @@ public class SearchContext {
    * @LevelAPI Experimental
    */
   public String getSiteType() {
-    return qualifiedName.get(RouterParams.SITE_TYPE.create());
+    return params.get(RouterParams.SITE_TYPE.create());
   }
 
   /**
@@ -101,7 +105,7 @@ public class SearchContext {
   public SearchContext(Router router, String siteName) {
     this.router = router;
     this.siteName = siteName;
-    qualifiedName = new HashedMap();
+    params = new HashedMap();
   }
   
   /**
@@ -111,7 +115,7 @@ public class SearchContext {
    * @LevelAPI Experimental  
    */
   public SearchContext handler(String value) {
-    qualifiedName.put(RouterParams.HANDLER.create(), value);
+    params.put(RouterParams.HANDLER.create(), value);
     return this;
   }
   
@@ -122,7 +126,7 @@ public class SearchContext {
    * @LevelAPI Experimental 
    */
   public SearchContext lang(String value) {
-    qualifiedName.put(RouterParams.LANG.create(), value);
+    params.put(RouterParams.LANG.create(), value);
     return this;
   }
   
@@ -133,7 +137,7 @@ public class SearchContext {
    * @LevelAPI Experimental
    */
   public SearchContext path(String value) {
-    qualifiedName.put(RouterParams.PATH.create(), value);
+    params.put(RouterParams.PATH.create(), value);
     return this;
   }
   
@@ -144,7 +148,7 @@ public class SearchContext {
    * @LevelAPI Experimental
    */
   public SearchContext siteType(String value) {
-    qualifiedName.put(RouterParams.SITE_TYPE.create(), value);
+    params.put(RouterParams.SITE_TYPE.create(), value);
     return this;
   }
   
@@ -155,7 +159,7 @@ public class SearchContext {
    * @LevelAPI Experimental
    */
   public SearchContext siteName(String value) {
-    qualifiedName.put(RouterParams.SITE_NAME.create(), value);
+    params.put(RouterParams.SITE_NAME.create(), value);
     return this;
   }
   
@@ -167,27 +171,27 @@ public class SearchContext {
    */
   public String renderLink() throws Exception {
     //
-    if (qualifiedName.containsKey(RouterParams.LANG.create()) == false) {
+    if (params.containsKey(RouterParams.LANG.create()) == false) {
       lang("");
     }
     
     //
-    if (qualifiedName.containsKey(RouterParams.HANDLER.create()) == false) {
+    if (params.containsKey(RouterParams.HANDLER.create()) == false) {
       LOG.warn("Handler of QualifiedName not found!");
     }
     
     //
-    if (qualifiedName.containsKey(RouterParams.SITE_NAME.create()) == false) {
+    if (params.containsKey(RouterParams.SITE_NAME.create()) == false) {
       LOG.warn("SiteName of QualifiedName not found!");
     }
     
     //
-    if (qualifiedName.containsKey(RouterParams.SITE_TYPE.create()) == false) {
+    if (params.containsKey(RouterParams.SITE_TYPE.create()) == false) {
       LOG.warn("SiteType of QualifiedName not found!");
     }
     
     //
-    return router.render(qualifiedName);
+    return router.render(params);
   }
   
 }

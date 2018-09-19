@@ -1,13 +1,18 @@
 package org.exoplatform.commons.notification.lifecycle;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.mockito.Mockito;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.PluginTemplateBuilderAdapter;
-import org.exoplatform.commons.api.notification.model.*;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.WebNotificationService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
-import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
-import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.commons.notification.channel.WebChannel;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO;
@@ -17,14 +22,6 @@ import org.exoplatform.commons.testing.BaseCommonsTestCase;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.jpa.CommonsDAOJPAImplTest;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.io.Writer;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
@@ -184,8 +181,11 @@ public class WebLifecycleTest extends BaseCommonsTestCase {
     webNotifDAO.deleteAll();
 
     // Reset notifications user settings
-    UserSetting userSetting = UserSetting.getDefaultInstance();
+    UserSetting userSetting = new UserSetting();
     userSetting.setUserId("john");
+    userSetting.setChannelActive(UserSetting.EMAIL_CHANNEL);
+    userSetting.setChannelActive(WebChannel.ID);
+    userSetting.setChannelPlugins(WebChannel.ID, Arrays.asList("TestPlugin"));
     userSettingService.save(userSetting);
     userSetting.setUserId("mary");
     userSettingService.save(userSetting);
