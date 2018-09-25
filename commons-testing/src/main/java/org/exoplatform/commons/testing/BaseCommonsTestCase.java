@@ -66,7 +66,7 @@ public abstract class BaseCommonsTestCase extends AbstractKernelTest {
     repositoryService = getService(RepositoryService.class);
     configurationManager = getService(ConfigurationManager.class);
 
-    session = repositoryService.getRepository(REPO_NAME).getSystemSession(WORKSPACE_NAME);
+    session = repositoryService.getCurrentRepository().getSystemSession(WORKSPACE_NAME);
     root = session.getRootNode();
     System.setProperty("gatein.email.domain.url", "http://localhost:8080");
   }

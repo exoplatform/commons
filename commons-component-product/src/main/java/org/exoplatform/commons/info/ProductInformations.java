@@ -23,7 +23,6 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.access.PermissionType;
-import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
 import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
@@ -300,14 +299,11 @@ public class ProductInformations implements Startable {
     }
     if (workspaceName == null || workspaceName.equals("")) {
       try {
-        workspaceName = repositoryService.getDefaultRepository().getConfiguration().getDefaultWorkspaceName();
+        workspaceName = repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
         if (LOG.isInfoEnabled()){
           LOG.info("Workspace wasn't specified, use '" + workspaceName + "' as default workspace of this repository.");
         }
       } catch (RepositoryException exception) {
-        LOG.error("Error occured while getting default workspace name.", exception);
-        return;
-      } catch (RepositoryConfigurationException exception) {
         LOG.error("Error occured while getting default workspace name.", exception);
         return;
       }

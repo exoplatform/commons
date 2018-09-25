@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.plugin.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class TemplateConfig {
   public static final String  DEFAULT_SRC_RESOURCE_BUNDLE_KEY = "locale.notification.template.Notification";
@@ -134,4 +135,8 @@ public class TemplateConfig {
     return false;
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(providerId);
+  }
 }

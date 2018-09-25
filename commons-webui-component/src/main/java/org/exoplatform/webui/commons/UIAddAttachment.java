@@ -174,12 +174,11 @@ public class UIAddAttachment extends UIContainer implements UIPopupComponent {
   
   
   public Session getCurrentSession() throws Exception {
-    RepositoryService repoService = (RepositoryService) PortalContainer.getInstance()
-                                                                       .getComponentInstanceOfType(RepositoryService.class);
+    RepositoryService repoService = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
     String defaultWorkspace = repoService.getCurrentRepository()
                                          .getConfiguration()
                                          .getDefaultWorkspaceName();
-    return repoService.getDefaultRepository().getSystemSession(defaultWorkspace);
+    return repoService.getCurrentRepository().getSystemSession(defaultWorkspace);
   }
   
   private String getPortalName() {

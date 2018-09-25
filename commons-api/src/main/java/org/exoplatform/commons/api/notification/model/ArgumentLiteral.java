@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.api.notification.model;
 
+import java.util.Objects;
+
 public final class ArgumentLiteral<T> implements Cloneable {
   
   private final Class<T> type;
@@ -51,8 +53,12 @@ public final class ArgumentLiteral<T> implements Cloneable {
     
     return this.type.equals(other.type);
   }
-  
-  
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(type);
+  }
+
   public ArgumentLiteral<T> clone() throws CloneNotSupportedException {
     Object obj = super.clone();
     return (obj instanceof  ArgumentLiteral<?>) ? (ArgumentLiteral<T>) obj : null;

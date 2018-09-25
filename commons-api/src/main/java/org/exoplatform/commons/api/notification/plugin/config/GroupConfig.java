@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.plugin.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GroupConfig {
 
@@ -103,4 +104,8 @@ public class GroupConfig {
     return super.equals(obj);
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

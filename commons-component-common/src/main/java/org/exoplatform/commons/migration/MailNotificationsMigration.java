@@ -87,7 +87,7 @@ public class MailNotificationsMigration {
   private Session getJCRSession() {
     Session jcrSession = null;
     try {
-      jcrSession = repositoryService.getRepository("repository").getSystemSession(jcrWorkspace);
+      jcrSession = repositoryService.getCurrentRepository().getSystemSession(jcrWorkspace);
       if (jcrSession instanceof SessionImpl) {
         ((SessionImpl) jcrSession).setTimeout(JPAAsynMigrationService.ONE_DAY_IN_MS);
       }

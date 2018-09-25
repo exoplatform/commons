@@ -16,12 +16,7 @@
  */
 package org.exoplatform.commons.api.notification.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.jcr.Value;
 
@@ -425,7 +420,12 @@ public class NotificationInfo {
     }
     return false;
   }
-  
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
+
   @Override
   public String toString() {
     StringBuffer buffer = new StringBuffer("{");

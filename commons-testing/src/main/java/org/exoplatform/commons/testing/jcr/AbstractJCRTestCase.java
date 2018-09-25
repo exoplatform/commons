@@ -70,8 +70,7 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
    */
   ManageableRepository getRepo() throws RepositoryException, RepositoryConfigurationException {
     RepositoryService repos = getComponent(RepositoryService.class);
-    ManageableRepository repo = repos.getDefaultRepository();
-    return repo;
+    return repos.getCurrentRepository();
   }
 
   /**

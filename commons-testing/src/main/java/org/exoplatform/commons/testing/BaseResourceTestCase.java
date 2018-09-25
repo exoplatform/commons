@@ -73,7 +73,8 @@ public class BaseResourceTestCase extends BaseExoTestCase {
     repositoryService = getService(RepositoryService.class);
     configurationManager = getService(ConfigurationManager.class);
 
-    session = repositoryService.getRepository(REPO_NAME).getSystemSession(WORKSPACE_NAME);
+    repositoryService.setCurrentRepositoryName(REPO_NAME);
+    session = repositoryService.getCurrentRepository().getSystemSession(WORKSPACE_NAME);
     root = session.getRootNode();
     
     resourceBinder = getService(ResourceBinder.class);

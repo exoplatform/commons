@@ -19,6 +19,7 @@ package org.exoplatform.webui.cssfile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class CssClassIconFile {
   public static final String      DEFAULT_TYPE       = "default";
@@ -148,6 +149,11 @@ public class CssClassIconFile {
                binCSSFile.getCssClass().equals(cssClass)) ? true : false;
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(type, cssClass);
   }
 
   @Override

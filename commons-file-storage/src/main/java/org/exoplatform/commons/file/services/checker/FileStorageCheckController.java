@@ -84,7 +84,7 @@ public class FileStorageCheckController implements Startable {
             while (hasNext) {
               List<FileInfo> list = dataStorage.getAllFilesInfo(offset, pageSize);
 
-              if (list == null && list.isEmpty()) {
+              if (list == null || list.isEmpty()) {
                 break;
               }
               if (list.size() < pageSize) {

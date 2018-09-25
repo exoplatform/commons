@@ -22,6 +22,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import javax.activation.UnsupportedDataTypeException;
 
@@ -286,5 +287,10 @@ public class UIExtension implements Comparable<UIExtension> {
    */
   public boolean equals(Object o) {
       return o instanceof UIExtension && compareTo((UIExtension) o) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, category, rank);
   }
 }

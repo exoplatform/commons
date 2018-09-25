@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * This class provide database implementation of the File RDBMS API.
@@ -116,6 +117,18 @@ public class RdbmsResourceProvider implements BinaryProvider {
   @Override
   public String getLocation() {
     return "rdbms";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    RdbmsResourceProvider that = (RdbmsResourceProvider) o;
+    return getLocation().equals(that.getLocation());
   }
 
   @Override
