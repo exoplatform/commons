@@ -9,6 +9,9 @@
   <artifactId>commons-testing</artifactId>
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Testing</name>
+  <properties>
+    <exo.test.coverage.ratio>0.40</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.jcr</groupId>

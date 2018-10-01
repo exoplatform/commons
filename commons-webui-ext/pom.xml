@@ -9,6 +9,9 @@
   <artifactId>commons-webui-ext</artifactId>
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - WebUI Extension</name>
+  <properties>
+    <exo.test.coverage.ratio>0.69</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.activation</groupId>

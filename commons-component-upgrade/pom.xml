@@ -8,6 +8,9 @@
   </parent>
   <artifactId>commons-component-upgrade</artifactId>
   <name>eXo PLF:: Commons - Transparent Upgrade Framework</name>
+  <properties>
+    <exo.test.coverage.ratio>0.71</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.jcr</groupId>

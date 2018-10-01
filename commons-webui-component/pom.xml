@@ -9,6 +9,9 @@
   <artifactId>commons-webui-component</artifactId>
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Commons WebUI</name>
+  <properties>
+    <exo.test.coverage.ratio>0.28</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>commons-lang</groupId>

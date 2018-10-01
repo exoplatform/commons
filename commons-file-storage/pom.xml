@@ -9,6 +9,9 @@
   <artifactId>commons-file-storage</artifactId>
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Common File Storage</name>
+  <properties>
+    <exo.test.coverage.ratio>0.52</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.commons</groupId>

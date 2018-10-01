@@ -9,6 +9,9 @@
   <artifactId>commons-component-common</artifactId>
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Common Services</name>
+  <properties>
+    <exo.test.coverage.ratio>0.40</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>commons-lang</groupId>

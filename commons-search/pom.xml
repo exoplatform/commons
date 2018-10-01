@@ -10,6 +10,7 @@
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Commons Search</name>
   <properties>
+    <exo.test.coverage.ratio>0.43</exo.test.coverage.ratio>
     <org.elasticsearch.test.guava.version>18.0</org.elasticsearch.test.guava.version>
     <org.elasticsearch.test.jodatime.version>2.8.2</org.elasticsearch.test.jodatime.version>
     <!-- Issue with the PLF pom parent that trigger lucene 3.6.2 needed by JCR (Only working with impl version < 0.20.6) -->
