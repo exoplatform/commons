@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - WebUI Extension</name>
   <properties>
-    <exo.test.coverage.ratio>0.69</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.68</exo.test.coverage.ratio>
   </properties>
   <dependencies>
     <dependency>
