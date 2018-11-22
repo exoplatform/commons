@@ -26,6 +26,7 @@ import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.services.security.MembershipEntry;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -439,6 +440,11 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
       .append("\" }\n")
       .append("},\n")
       .append("{\n")
+      .append("  \"term\" : { \"permissions\" : \"")
+      .append(IdentityConstants.ANY)
+      .append("\" }\n")
+      .append("},\n")
+      .append("{\n")
       .append("  \"regexp\" : { \"permissions\" : \"")
       .append(memberships)
       .append("\" }\n")
@@ -448,6 +454,11 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
       permissionSB.append("{\n")
       .append("  \"term\" : { \"permissions\" : \"")
       .append(getCurrentUser())
+      .append("\" }\n")
+      .append("},\n")
+      .append("{\n")
+      .append("  \"term\" : { \"permissions\" : \"")
+      .append(IdentityConstants.ANY)
       .append("\" }\n")
       .append("}");
     }

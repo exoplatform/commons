@@ -6,7 +6,6 @@ import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
-import org.json.simple.parser.ParseException;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -28,7 +27,7 @@ public class ElasticSearchServiceConnectorTest {
   private ElasticSearchingClient elasticSearchingClient;
   
   @Test
-  public void testMembership() throws ParseException {
+  public void testMembership() {
       //Given
       setCurrentIdentity();
       ElasticSearchServiceConnector connector = new ElasticSearchServiceConnector(getInitParams(), elasticSearchingClient);
@@ -36,6 +35,7 @@ public class ElasticSearchServiceConnectorTest {
       String query = connector.buildQuery("My Wiki", null, 0, 20, "name", "asc");
       //Then
       assertThat(query, containsString("\"term\" : { \"permissions\" : \"BCH\" }"));
+      assertThat(query, containsString("\"term\" : { \"permissions\" : \"any\" }"));
       assertThat(query, containsString("\"regexp\" : { \"permissions\" : \".*:Admin\" }"));
   }
 
