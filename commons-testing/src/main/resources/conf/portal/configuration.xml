@@ -206,4 +206,6 @@
     </external-component-plugins>
   <import>jar:/conf/jcr/jcr-configuration.xml</import>
   <import>jar:/conf/portal/test-commons-jpa-configuration.xml</import>
+  <import>jar:/conf/portal/test-notifications-configuration.xml</import>
+
 </configuration>
