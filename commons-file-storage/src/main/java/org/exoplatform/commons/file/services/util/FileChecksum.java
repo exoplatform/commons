@@ -32,19 +32,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public final class FileChecksum {
 
-  private static String       defaultAlgorithm = "MD5";
-
-  private static final String                ALGORITHM_FILE_CHECKSUM_PROPERTY_NAME          = "exo.file-rdbms.algorithm.checksum";
-
-  private static String digestAlgorithm;
-
-  static {
-    String algorithm= PropertyManager.getProperty(ALGORITHM_FILE_CHECKSUM_PROPERTY_NAME);
-    if (algorithm != null && !algorithm.isEmpty())
-      digestAlgorithm = algorithm;
-    else
-      digestAlgorithm =  defaultAlgorithm;
-  }
+  private static String digestAlgorithm = "MD5";
 
   /**
    * MD5-Checksum for a string.
