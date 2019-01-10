@@ -22,17 +22,19 @@ import java.util.Set;
 
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.api.settings.data.SettingKey;
 
 /**
  * Stores and removes a value associated with a key in JCR.
+ * 
  * @LevelAPI Experimental
  */
 public interface SettingService {
 
   /**
-   * Sets a value with the key that is composed by context, scope,
-   * key. The value will be saved in the database.
-   * 
+   * Sets a value with the key that is composed by context, scope, key. The value
+   * will be saved in the database.
+   *
    * @param context The context with which the specified value is associated.
    * @param scope The scope with which the specified value is associated.
    * @param key The key with which the specified value is associated.
@@ -43,7 +45,7 @@ public interface SettingService {
 
   /**
    * Removes a value associated with a specified composite key.
-   * 
+   *
    * @param context The context with which the specified value is associated.
    * @param scope The scope with which the specified value is associated.
    * @param key The key with which the specified value is associated.
@@ -52,11 +54,11 @@ public interface SettingService {
   public void remove(Context context, Scope scope, String key);
 
   /**
-   * Removes all values associated with a specified context and
-   * scope from the database.
-   * 
-   * @param context The context with which the specified value is associated.
-   *          The context type must be USER and context, and Id must not be "null".
+   * Removes all values associated with a specified context and scope from the
+   * database.
+   *
+   * @param context The context with which the specified value is associated. The
+   *          context type must be USER and context, and Id must not be "null".
    * @param scope The scope with which the specified value is associated. The
    *          scope.id must not be "null".
    * @LevelAPI Experimental
@@ -65,18 +67,19 @@ public interface SettingService {
 
   /**
    * Removes all values associated with a specified context from the database.
-   * @param context The context with which the specified value is associated.
-   * The context type must be USER and context, and Id must not be "null".
+   * 
+   * @param context The context with which the specified value is associated. The
+   *          context type must be USER and context, and Id must not be "null".
    * @LevelAPI Experimental
    */
   public void remove(Context context);
 
   /**
-   * Gets values associated with a specified composite key (context, scope, key) in
-   * the database.
-   * 
-  * @param context The context with which the specified value is associated.
-   *          The context type must be USER and context and Id must not be "null".
+   * Gets values associated with a specified composite key (context, scope, key)
+   * in the database.
+   *
+   * @param context The context with which the specified value is associated. The
+   *          context type must be USER and context and Id must not be "null".
    * @param scope The scope with which the specified value is associated. The
    *          scope.id must not be "null".
    * @param key The key with which the specified value is associated.
@@ -86,7 +89,7 @@ public interface SettingService {
 
   /**
    * Returns the total count of contexts by type
-   * 
+   *
    * @param contextType context type name ('USER' OR 'GLOBAL')
    * @return count of contexts by type
    */
@@ -96,11 +99,10 @@ public interface SettingService {
 
   /**
    * Returns context names by type
-   * 
+   *
    * @param contextType context type name ('USER' OR 'GLOBAL')
    * @param offset query offset
    * @param limit query max results
-   * 
    * @return the list of context names
    */
   default List<String> getContextNamesByType(String contextType, int offset, int limit) {
@@ -109,18 +111,17 @@ public interface SettingService {
 
   /**
    * Get settings related to a scope and a context
-   * 
+   *
    * @param context {@link Context} used to search settings
    * @return {@link Map} of settings with key = setting name and as value =
    *         corresponding {@link SettingValue}
    */
   Map<Scope, Map<String, SettingValue<String>>> getSettingsByContext(Context context);
 
-
   /**
    * Gets a list of names of contexts of a chosen type that have a setting
    * associated to a dedicated scope
-   * 
+   *
    * @param contextType type of context used in filter
    * @param scopeType type of scope used in filter
    * @param scopeName name of scope used in filter
@@ -137,24 +138,43 @@ public interface SettingService {
                                                         int limit);
 
   /**
-   * Gets a list of names of contexts of a chosen type that doesn't have
-   * settings associated to a dedicated scope
-   * 
+   * Gets a list of names of contexts of a chosen type that doesn't have settings
+   * associated to a dedicated scope
+   *
    * @param contextType type of context used in filter
    * @param scopeType type of scope used in filter
    * @param scopeName name of scope used in filter
-   * @param settingName 
+   * @param settingName
    * @param offset search query offset
    * @param limit search query limit
    * @return a {@link Set} of {@link String} for filtered context names
    */
-  public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType, String scopeType, String scopeName, String settingName, int offset, int limit);
+  public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType,
+                                                                  String scopeType,
+                                                                  String scopeName,
+                                                                  String settingName,
+                                                                  int offset,
+                                                                  int limit);
 
   /**
    * Saves a {@link Context} on database
-   * 
+   *
    * @param context context to save
    */
   public void save(Context context);
+
+  /**
+   * Get a list of settings that belongs to the context and scope
+   *
+   * @param contextType type of ontext
+   * @param contextName name of ontext
+   * @param scopeType type of scope
+   * @param scopeName name of scope
+   * @return Map of settings key and value
+   */
+  public Map<String, SettingValue> getSettingsByContextAndScope(String contextType,
+                                                                String contextName,
+                                                                String scopeType,
+                                                                String scopeName);
 
 }

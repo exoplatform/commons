@@ -18,34 +18,28 @@
  */
 package org.exoplatform.commons.info;
 
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.access.PermissionType;
-import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.security.IdentityConstants;
+import org.exoplatform.settings.jpa.entity.SettingsEntity;
 import org.picocontainer.Startable;
 
 import javax.jcr.*;
-import javax.jcr.version.Version;
-import javax.jcr.version.VersionHistory;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Calendar;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:anouar.chattouna@exoplatform.com">Anouar
@@ -53,76 +47,83 @@ import java.util.TimeZone;
  * @version $Revision$
  */
 public class ProductInformations implements Startable {
-  public static final String ENTERPRISE_EDITION = "ENTERPRISE";
 
-  public static final String EXPRESS_EDITION = "EXPRESS";
+  public static final String     product_Information                   = "ProductInformation";
 
-  public static final String EDITION = "edition";
+  public static final String     ENTERPRISE_EDITION                    = "ENTERPRISE";
 
-  public static final String KEY_GENERATION_DATE = "key generation date";
+  public static final String     EXPRESS_EDITION                       = "EXPRESS";
 
-  public static final String DELAY = "delay";
+  public static final String     EDITION                               = "edition";
 
-  public static final String PRODUCT_CODE = "productCode";
+  public static final String     KEY_GENERATION_DATE                   = "key generation date";
 
-  public static final String PRODUCT_KEY = "productKey";
+  public static final String     DELAY                                 = "delay";
 
-  public static final String NB_USERS = "number of users";
+  public static final String     PRODUCT_CODE                          = "productCode";
 
-  public static final String PRODUCT_GROUP_ID = "product.groupId";
+  public static final String     PRODUCT_KEY                           = "productKey";
 
-  public static final String PRODUCT_REVISION = "product.revision";
+  public static final String     NB_USERS                              = "number of users";
 
-  public static final String PRODUCT_BUILD_NUMBER = "product.buildNumber";
+  public static final String     PRODUCT_GROUP_ID                      = "product.groupId";
 
-  public static final String PRODUCT_VERSIONS_DECLARATION_FILE = "product.versions.declaration.file";
+  public static final String     PRODUCT_REVISION                      = "product.revision";
 
-  public static final String PROCEED_UPGRADE_FIRST_TIME_KEY = "proceedUpgradeFirstTime";
+  public static final String     PRODUCT_BUILD_NUMBER                  = "product.buildNumber";
 
-  public static final String WORKING_WORSPACE_NAME = "working.worspace.name";
+  public static final String     WORKING_WORSPACE_NAME                 = "working.worspace.name";
 
-  
-  /**
-   * Constant that will be used in nodeHierarchyCreator.getJcrPath: it
-   * represents the Application data root node Alias
-   */
-  public static final String EXO_APPLICATIONS_DATA_NODE_ALIAS = "exoApplicationDataNode";
+  public static final String     PRODUCT_VERSIONS_DECLARATION_FILE     = "product.versions.declaration.file";
 
   /**
-   * MixinType that will activate the versioning on a selected node
+   * Constant that will be used in nodeHierarchyCreator.getJcrPath: it represents
+   * the Application data root node Alias
    */
-  public static final String MIX_VERSIONABLE = "mix:versionable";
+  public static final String     EXO_APPLICATIONS_DATA_NODE_ALIAS      = "exoApplicationDataNode";
 
   /**
    * Service application data node name
    */
-  public static final String UPGRADE_PRODUCT_SERVICE_NODE_NAME = "ProductInformationsService";
+  public static final String     UPGRADE_PRODUCT_SERVICE_NODE_NAME     = "ProductInformationsService";
 
   /**
    * node name where the Product version declaration is
    */
-  public static final String PRODUCT_VERSION_DECLARATION_NODE_NAME = "productVersionDeclarationNode";
+  public static final String     PRODUCT_VERSION_DECLARATION_NODE_NAME = "productVersionDeclarationNode";
 
-  private static final Log LOG = ExoLogger.getLogger(ProductInformations.class);
+  private static final Log       LOG                                   = ExoLogger.getLogger(ProductInformations.class);
 
-  private Properties productInformationProperties = new Properties();
-  private Properties previousProductInformationProperties = new Properties();
+  public String                  applicationDataRootNodePath           = null;
 
-  private String workspaceName = null;
-  private String applicationDataRootNodePath = null;
-  private String productVersionDeclarationNodePath = null;
-  private boolean firstRun = false;
+  private String                 productVersionDeclarationNodePath     = null;
 
-  private RepositoryService repositoryService = null;
-  private SessionProviderService sessionProviderService = null;
-  private UserACL userAcl;
+  private String                 workspaceName                         = null;
 
-  public ProductInformations(RepositoryService repositoryService, SessionProviderService sessionProviderService,
-                             NodeHierarchyCreator nodeHierarchyCreator, ConfigurationManager cmanager, InitParams initParams,
-                             UserACL userAcl) {
+  private Properties             productInformationProperties          = new Properties();
+
+  private Map<String, String>    productInformation                    = new HashMap<>();
+
+  private boolean                firstRun                              = false;
+
+  private SettingService         settingService;
+
+  private NodeHierarchyCreator   nodeHierarchyCreator;
+
+  private RepositoryService      repositoryService                     = null;
+
+  private SessionProviderService sessionProviderService                = null;
+
+  public ProductInformations(ConfigurationManager cmanager,
+                             NodeHierarchyCreator nodeHierarchyCreator,
+                             InitParams initParams,
+                             SettingService settingService,
+                             SessionProviderService sessionProviderService,
+                             RepositoryService repositoryService) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
-    this.userAcl = userAcl;
+    this.settingService = settingService;
+    this.nodeHierarchyCreator = nodeHierarchyCreator;
     if (!initParams.containsKey(PRODUCT_VERSIONS_DECLARATION_FILE)) {
       if (LOG.isErrorEnabled()) {
         LOG.error("Couldn't find the init value param: " + PRODUCT_VERSIONS_DECLARATION_FILE);
@@ -142,58 +143,42 @@ public class ProductInformations implements Startable {
       }
       return;
     } catch (Exception exception) {
-      //ConfigurationManager.getInputStream() throws Exception().
-      //It's from another project and we cannot modify it. So we have to catch Exception
+      // ConfigurationManager.getInputStream() throws Exception().
+      // It's from another project and we cannot modify it. So we have to catch
+      // Exception
       if (LOG.isErrorEnabled()) {
         LOG.error("Error occured while reading the file " + filePath, exception);
       }
       return;
     }
-
-    // The workspace name where products informations are stored
     if (initParams.containsKey(WORKING_WORSPACE_NAME)) {
       workspaceName = initParams.getValueParam(WORKING_WORSPACE_NAME).getValue();
     }
-
-    applicationDataRootNodePath = nodeHierarchyCreator.getJcrPath(EXO_APPLICATIONS_DATA_NODE_ALIAS);
-    if (applicationDataRootNodePath == null) {
-      if (LOG.isErrorEnabled()) {
-        LOG.error(EXO_APPLICATIONS_DATA_NODE_ALIAS + " wasn't found as 'NodeHierarchyCreator' alias");
-      }
-      return;
-    }
-    if (applicationDataRootNodePath.indexOf("/") == 0) {
-      applicationDataRootNodePath = applicationDataRootNodePath.replaceFirst("/", "");
-    }
-    productVersionDeclarationNodePath = "/" + applicationDataRootNodePath + "/" + UPGRADE_PRODUCT_SERVICE_NODE_NAME + "/"
-            + PRODUCT_VERSION_DECLARATION_NODE_NAME;
   }
 
   public String getEdition() throws MissingProductInformationException {
-    return previousProductInformationProperties.getProperty(EDITION);
+    return productInformation.get(EDITION);
   }
 
   public String getNumberOfUsers() throws MissingProductInformationException {
-    return previousProductInformationProperties.getProperty(NB_USERS);
+    return productInformation.get(NB_USERS);
   }
 
   public String getDateOfLicence() throws MissingProductInformationException {
-    return previousProductInformationProperties.getProperty(KEY_GENERATION_DATE);
+    return productInformation.get(KEY_GENERATION_DATE);
   }
 
   public String getDuration() throws MissingProductInformationException {
-    return previousProductInformationProperties.getProperty(DELAY);
+    return productInformation.get(DELAY);
   }
 
   public String getProductCode() throws MissingProductInformationException {
-    return previousProductInformationProperties.getProperty(PRODUCT_CODE);
+    return productInformation.get(PRODUCT_CODE);
   }
 
   public String getProductKey() throws MissingProductInformationException {
-    return previousProductInformationProperties.getProperty(PRODUCT_KEY);
+    return productInformation.get(PRODUCT_KEY);
   }
-
-
 
   /**
    * @return This method returns the current product's version.
@@ -256,22 +241,22 @@ public class ProductInformations implements Startable {
    *         version.
    */
   public String getPreviousVersion(String productGroupId) throws MissingProductInformationException {
-    if (!previousProductInformationProperties.containsKey(productGroupId)) {
+    if (!productInformation.containsKey(productGroupId)) {
       throw new MissingProductInformationException(productGroupId);
     }
-    return previousProductInformationProperties.getProperty(productGroupId);
+    return productInformation.get(productGroupId);
   }
 
   /**
-   * @return an empty string if the properties file is not found, otherwise
-   *         the platform.buildNumber property. This method return the
-   *         build number of the platform.
+   * @return an empty string if the properties file is not found, otherwise the
+   *         platform.buildNumber property. This method return the build number of
+   *         the platform.
    */
   public String getPreviousBuildNumber() throws MissingProductInformationException {
-    if (!previousProductInformationProperties.containsKey(PRODUCT_BUILD_NUMBER)) {
+    if (!productInformation.containsKey(PRODUCT_BUILD_NUMBER)) {
       throw new MissingProductInformationException(PRODUCT_BUILD_NUMBER);
     }
-    return previousProductInformationProperties.getProperty(PRODUCT_BUILD_NUMBER);
+    return productInformation.get(PRODUCT_BUILD_NUMBER);
   }
 
   /**
@@ -279,10 +264,10 @@ public class ProductInformations implements Startable {
    *         current revison of the platform.
    */
   public String getPreviousRevision() throws MissingProductInformationException {
-    if (!previousProductInformationProperties.containsKey(PRODUCT_REVISION)) {
+    if (!productInformation.containsKey(PRODUCT_REVISION)) {
       throw new MissingProductInformationException(PRODUCT_REVISION);
     }
-    return previousProductInformationProperties.getProperty(PRODUCT_REVISION);
+    return productInformation.get(PRODUCT_REVISION);
   }
 
   public boolean isFirstRun() {
@@ -290,17 +275,66 @@ public class ProductInformations implements Startable {
   }
 
   /**
-   * This method loads from the JCR the stored products versions. If it's
+   * This method migrate from the JCR the stored products versions to JPA. If it's
    * the first server start up, then store the declared one.
    */
   public void start() {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("start method begin");
+    try {
+      migrateProductInformation();
+      // Load product information from DB
+      Map<String, SettingValue> productInformationSettings =
+                                                           settingService.getSettingsByContextAndScope(Context.GLOBAL.getName(),
+                                                                                                       Context.GLOBAL.getId(),
+                                                                                                       Scope.APPLICATION.getName(),
+                                                                                                       product_Information);
+      if (productInformationSettings != null && !productInformationSettings.isEmpty()) {
+        productInformationSettings.entrySet()
+                                  .stream()
+                                  .forEach(e -> productInformation.put(e.getKey(), e.getValue().getValue().toString()));
+
+      } else {// This is the first time that this Service starts up
+        LOG.info("Platform first run - init and store product Information");
+        firstRun = true;
+        // Store product information properties in DB
+        initProductInformation(productInformationProperties);
+        storeProductInformation(productInformation);
+      }
+    } catch (Exception e) {
+      LOG.error("Error while starting product information service - Cause : " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * This method is called by eXo Kernel when stopping the parent ExoContainer
+   */
+  public void stop() {
+  }
+
+  public void storeProductInformation(Map<String, String> map) {
+    try {
+      for (Map.Entry<String, String> entry : map.entrySet()) {
+        settingService.set(Context.GLOBAL,
+                           Scope.APPLICATION.id(product_Information),
+                           entry.getKey(),
+                           SettingValue.create(entry.getValue()));
+      }
+    } catch (Exception e) {
+      LOG.error("Error while storing product informations    - Cause : " + e.getMessage(), e);
+    }
+  }
+
+  public void initProductInformation(Properties properties) {
+    properties.entrySet().stream().forEach(entry -> productInformation.put((String) entry.getKey(), (String) entry.getValue()));
+  }
+
+  /**
+   * Migrate product information from JCR to RDBMS
+   */
+  public void migrateProductInformation() {
     if (workspaceName == null || workspaceName.equals("")) {
       try {
         workspaceName = repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
-        if (LOG.isInfoEnabled()){
+        if (LOG.isInfoEnabled()) {
           LOG.info("Workspace wasn't specified, use '" + workspaceName + "' as default workspace of this repository.");
         }
       } catch (RepositoryException exception) {
@@ -310,71 +344,23 @@ public class ProductInformations implements Startable {
     }
     Session session = null;
     try {
-      // Get a JCR Session
       session = getSession();
-
-      // get "Application Data" node
-      Node applicationDataNode = null;
-      if (session.getRootNode().hasNode(applicationDataRootNodePath)) {
-        applicationDataNode = session.getRootNode().getNode(applicationDataRootNodePath);
-      } else {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("'Application Data' doesn't exist, creating it ... ");
-        }
-        applicationDataNode = session.getRootNode().addNode(applicationDataRootNodePath, "nt:unstructured");
-        applicationDataNode.addMixin("exo:hiddenable");
-      }
-
-      // This node's path is
-      // "WS_NAME:/exo;services/ProductInformationsService/productVersionDeclarationNode"
-      Node productVersionDeclarationNode = null;
-      if (applicationDataNode.hasNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME)
-          && applicationDataNode.getNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME).hasNode(PRODUCT_VERSION_DECLARATION_NODE_NAME)) {// reads
-        // from
-        // the
-        // JCR
-        // the
-        // previous
-        // version
-        productVersionDeclarationNode = applicationDataNode.getNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME + "/"
-                + PRODUCT_VERSION_DECLARATION_NODE_NAME);
-        // get the previous product informations, stored in a JCR property,
-        // this will be by example:
-        // "WS_NAME:/exo:services/ProductInformationsService/productVersionDeclarationNode/jcr:content/jcr:data"
-        String previousVersionData = ((Property) session.getItem(productVersionDeclarationNode.getPath()
-                + "/jcr:content/jcr:data")).getString();
-        previousProductInformationProperties = new Properties();
-        previousProductInformationProperties.load(new ByteArrayInputStream(previousVersionData.getBytes()));
-      } else {// This is the first time that this Service starts up
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Product server first run: setup product Version Declaration Node");
-        }
-        firstRun = true;
-
-        Node upgradeProductServiceNode = null;
-        if (applicationDataNode.hasNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME)) {
-          upgradeProductServiceNode = applicationDataNode.getNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME);
-        } else {
-          upgradeProductServiceNode = applicationDataNode.addNode(UPGRADE_PRODUCT_SERVICE_NODE_NAME, "nt:unstructured");
-        }
-        productVersionDeclarationNode = upgradeProductServiceNode.addNode(PRODUCT_VERSION_DECLARATION_NODE_NAME, "nt:file");
-        Node productVersionDeclarationNodeContent = productVersionDeclarationNode.addNode("jcr:content", "nt:resource");
-        productVersionDeclarationNodeContent.setProperty("jcr:encoding", "UTF-8");
-        productVersionDeclarationNodeContent.setProperty("jcr:mimeType", "text/plain");
-        productVersionDeclarationNodeContent.setProperty("jcr:data", getCurrentProductInformationsAsString());
-        productVersionDeclarationNodeContent.setProperty("jcr:lastModified", new Date().getTime());
-        if (!productVersionDeclarationNode.isNodeType(MIX_VERSIONABLE)) {
-          productVersionDeclarationNode.addMixin(MIX_VERSIONABLE);
-        }
-        //set permission: only allow __system and admin to access this node
-        productVersionDeclarationNode.addMixin("exo:privilegeable");
-        Map<String, String[]> perms = new HashMap<String, String[]>();
-        perms.put(IdentityConstants.SYSTEM, PermissionType.ALL);
-        perms.put("*:" + userAcl.getAdminGroups(), PermissionType.ALL);
-        ((ExtendedNode)productVersionDeclarationNode).setPermissions(perms);
+      applicationDataRootNodePath = nodeHierarchyCreator.getJcrPath(EXO_APPLICATIONS_DATA_NODE_ALIAS);
+      productVersionDeclarationNodePath = applicationDataRootNodePath + "/" + UPGRADE_PRODUCT_SERVICE_NODE_NAME + "/"
+          + PRODUCT_VERSION_DECLARATION_NODE_NAME;
+      if (session.itemExists(productVersionDeclarationNodePath)) {
+        Node productVersionDeclarationNode = (Node) session.getItem(productVersionDeclarationNodePath);
+        Node productVersionDeclarationNodeContent = productVersionDeclarationNode.getNode("jcr:content");
+        String data = productVersionDeclarationNodeContent.getProperty("jcr:data").getString();
+        Properties jcrInformation = new Properties();
+        jcrInformation.load(new ByteArrayInputStream(data.getBytes()));
+        initProductInformation(jcrInformation);
+        storeProductInformation(productInformation);
+        productVersionDeclarationNode.getParent().remove();
+        LOG.info("productVersionDeclaration node removed!");
         session.save();
-        session.refresh(true);
-        previousProductInformationProperties = (Properties)productInformationProperties.clone();
+      } else {
+        LOG.info("No product information to migrate from JCR to RDBMS");
       }
     } catch (LoginException exception) {
       LOG.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
@@ -388,146 +374,52 @@ public class ProductInformations implements Startable {
     } catch (IOException exception) {
       LOG.error("Can't load product informations from the JCR: the data stored in the JCR couldn't be parsed.", exception);
       return;
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
     }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("start method end");
-    }
-  }
-
-  /**
-   * This method is called by eXo Kernel when stopping the parent
-   * ExoContainer
-   */
-  public void stop() {}
-
-  public void storeUnlockInformation(){
-    Session session = null;
-    try {
-      session = getSession();
-      Node productVersionDeclarationNode = (Node) session.getItem(productVersionDeclarationNodePath);
-      Node productVersionDeclarationNodeContent = productVersionDeclarationNode.getNode("jcr:content");
-      productVersionDeclarationNodeContent.setProperty("jcr:data", getPreviousProductInformationsAsString() );
-      productVersionDeclarationNodeContent.setProperty("jcr:lastModified", new Date().getTime());
-      productVersionDeclarationNode.save();
-    } catch (LoginException exception) {
-      LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
-    } catch (NoSuchWorkspaceException exception) {
-      LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
-    } catch (RepositoryException exception) {
-      LOG.error("Can't store informations in the JCR!", exception);
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
-    }
-  }
-
-  public void storeProductsInformationsInJCR() {
-    Session session = null;
-    try {
-      session = getSession();
-      Node productVersionDeclarationNode = (Node) session.getItem(productVersionDeclarationNodePath);
-
-      // Add a version of product informations node, with the previous
-      // informations
-          Version version = productVersionDeclarationNode.checkin();
-      productVersionDeclarationNode.getSession().save();
-      VersionHistory versionHistory = productVersionDeclarationNode.getVersionHistory();
-      String  versionLabel = null;
-      if(versionHistory.hasVersionLabel(getPreviousVersion())) {
-
-          versionLabel = getPreviousVersion()+"-"+currentFlag();
-
-      } else {
-
-          versionLabel = getPreviousVersion();
-      }
-      versionHistory.addVersionLabel(version.getName(), versionLabel , false);
-
-      productVersionDeclarationNode.checkout();
-
-      // Update the content of the product informations node, with the new
-      // content
-      Node productVersionDeclarationNodeContent = productVersionDeclarationNode.getNode("jcr:content");
-      productVersionDeclarationNodeContent.setProperty("jcr:data", getCurrentProductInformationsAsString());
-      productVersionDeclarationNodeContent.setProperty("jcr:lastModified", new Date().getTime());
-      productVersionDeclarationNode.getSession().save();
-    } catch (LoginException exception) {
-      LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
-    } catch (NoSuchWorkspaceException exception) {
-      LOG.error("Can't store informations in the JCR: Error when getting JCR session.", exception);
-    } catch (RepositoryException exception) {
-      LOG.error("Can't store informations in the JCR!", exception);
-    } catch (MissingProductInformationException exception) {
-      LOG.error("Can't read current product version!", exception);
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
-    }
-  }
-
-  private String getCurrentProductInformationsAsString() {
-    StringWriter stringWriter = new StringWriter();
-    String info = "";
-    try {
-      if(previousProductInformationProperties.containsKey(PRODUCT_KEY))
-        productInformationProperties.setProperty(PRODUCT_KEY,getProductKey());
-      if(previousProductInformationProperties.containsKey(PRODUCT_CODE))
-        productInformationProperties.setProperty(PRODUCT_CODE, getProductCode());
-      if(previousProductInformationProperties.containsKey(EDITION))
-        productInformationProperties.setProperty(EDITION, getEdition());
-      if(previousProductInformationProperties.containsKey(KEY_GENERATION_DATE))
-        productInformationProperties.setProperty(KEY_GENERATION_DATE, getDateOfLicence());
-      if(previousProductInformationProperties.containsKey(DELAY))
-        productInformationProperties.setProperty(DELAY, getDuration());
-      if(previousProductInformationProperties.containsKey(NB_USERS))
-        productInformationProperties.setProperty(NB_USERS, getNumberOfUsers());
-    } catch (MissingProductInformationException e) {
-      LOG.info("it's a locked instance!");
-    }
-      try {
-          productInformationProperties.store(stringWriter,"ProductInformation");
-          info = stringWriter.toString();
-
-      }   catch (IOException ex) {
-          LOG.error("cannot load properties");
-
-      }
-
-      return info;
-  }
-
-  private String getPreviousProductInformationsAsString() {
-    StringWriter stringWriter = new StringWriter();
-      String info = "";
-      if(previousProductInformationProperties.containsKey("--")) previousProductInformationProperties.remove("--");
-      try {
-          previousProductInformationProperties.store(stringWriter,"ProductInformation");
-          info = stringWriter.toString();
-
-      } catch (IOException ex) {
-          LOG.error("cannot load properties");
-      }
-
-      return info;
   }
 
   public void setUnlockInformation(Properties unlockInformation) {
-    previousProductInformationProperties.setProperty(EDITION, (String) unlockInformation.get(EDITION));
-    previousProductInformationProperties.setProperty(NB_USERS, (String) unlockInformation.get(NB_USERS));
-    previousProductInformationProperties.setProperty(PRODUCT_KEY, (String) unlockInformation.get(PRODUCT_KEY));
-    previousProductInformationProperties.setProperty(PRODUCT_CODE, (String) unlockInformation.get(PRODUCT_CODE));
-    previousProductInformationProperties.setProperty(DELAY, (String) unlockInformation.get(DELAY));
-    previousProductInformationProperties.setProperty(KEY_GENERATION_DATE, (String) unlockInformation.get(KEY_GENERATION_DATE));
+    productInformation.put(EDITION, (String) unlockInformation.get(EDITION));
+    productInformation.put(NB_USERS, (String) unlockInformation.get(NB_USERS));
+    productInformation.put(PRODUCT_KEY, (String) unlockInformation.get(PRODUCT_KEY));
+    productInformation.put(PRODUCT_CODE, (String) unlockInformation.get(PRODUCT_CODE));
+    productInformation.put(DELAY, (String) unlockInformation.get(DELAY));
+    productInformation.put(KEY_GENERATION_DATE, (String) unlockInformation.get(KEY_GENERATION_DATE));
+  }
+
+  public void setPreviousVersionsIfFirstRun(String defaultVersion) {
+    if (isFirstRun()) {
+      initProductInformation(productInformationProperties);
+      productInformation.forEach((key, value) -> productInformation.put(key, defaultVersion));
+    }
   }
 
   public String getWorkspaceName() {
     return workspaceName;
+  }
+
+  public String getProductVersionDeclarationNodePath() {
+    return this.productVersionDeclarationNodePath;
+  }
+
+  private static String currentFlag() {
+    DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    return dateFormat.format(Calendar.getInstance(TimeZone.getDefault()).getTime());
+  }
+
+  public void setProductInformationProperties(Properties productInformationProperties) {
+    this.productInformationProperties = productInformationProperties;
+  }
+
+  public Properties getProductInformationProperties() {
+    return productInformationProperties;
+  }
+
+  public Map<String, String> getProductInformation() {
+    return productInformation;
+  }
+
+  public void setFirstRun(boolean firstRun) {
+    this.firstRun = firstRun;
   }
 
   private Session getSession() throws RepositoryException, LoginException, NoSuchWorkspaceException {
@@ -536,34 +428,4 @@ public class ProductInformations implements Startable {
     return sessionProvider.getSession(workspaceName, repository);
   }
 
-  public String getProductVersionDeclarationNodePath() {
-    return this.productVersionDeclarationNodePath;
-  }
-
-  public void setPreviousVersionsIfFirstRun(String defaultVersion) {
-    if (isFirstRun()) {
-      previousProductInformationProperties = (Properties)productInformationProperties.clone();
-      Set<?> keys = previousProductInformationProperties.keySet();
-      for (Object key : keys) {
-        previousProductInformationProperties.setProperty((String) key, defaultVersion);
-      }
-    }
-  }
-
-  private static String currentFlag () {
-    DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    return dateFormat.format(Calendar.getInstance(TimeZone.getDefault()).getTime());
-  }
-
-  public void setPreviousProductInformationProperties(Properties previousProductInformationProperties) {
-    this.previousProductInformationProperties = previousProductInformationProperties;
-  }
-
-  public void setProductInformationProperties(Properties productInformationProperties) {
-    this.productInformationProperties = productInformationProperties;
-  }
-
-  public void setFirstRun(boolean firstRun) {
-    this.firstRun = firstRun;
-  }
 }

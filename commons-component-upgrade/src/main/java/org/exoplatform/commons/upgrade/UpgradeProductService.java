@@ -59,7 +59,7 @@ public class UpgradeProductService implements StartableClusterAware {
 
   /**
    * Constructor with services and init params injected by Kernel
-   * 
+   *
    * @param portalContainer
    * @param nodeHierarchyCreator
    * @param settingService
@@ -73,7 +73,7 @@ public class UpgradeProductService implements StartableClusterAware {
     this.portalContainer = portalContainer;
     if (!initParams.containsKey(PROCEED_UPGRADE_FIRST_RUN_KEY)) {
       LOG.warn("init param '" + PROCEED_UPGRADE_FIRST_RUN_KEY + "' isn't set, use default value (" + proceedUpgradeFirstRun
-          + "). Don't proceed upgrade when this service will run for the first time.");
+              + "). Don't proceed upgrade when this service will run for the first time.");
     } else {
       proceedUpgradeFirstRun = Boolean.parseBoolean(initParams.getValueParam(PROCEED_UPGRADE_FIRST_RUN_KEY).getValue());
     }
@@ -109,7 +109,7 @@ public class UpgradeProductService implements StartableClusterAware {
 
   /**
    * Method called by eXo Kernel to inject upgrade plugins
-   * 
+   *
    * @param upgradeProductPlugin
    */
   public void addUpgradePlugin(UpgradeProductPlugin upgradeProductPlugin) {
@@ -137,7 +137,6 @@ public class UpgradeProductService implements StartableClusterAware {
       ((Startable) nodeHierarchyCreator).start();
     }
     productInformations.start();
-
     if (productInformations.isFirstRun()) {
       LOG.info("Proceed upgrade on first run = {}", proceedUpgradeFirstRun);
 
@@ -192,10 +191,10 @@ public class UpgradeProductService implements StartableClusterAware {
 
             // Proceed to upgrade upgrade plugin
             LOG.info("Proceed upgrade the plugin (async = {}): name = {} from version {} to {}",
-                     upgradeProductPlugin.isAsyncUpgradeExecution(),
-                     upgradeProductPlugin.getName(),
-                     previousVersion,
-                     currentVersion);
+                    upgradeProductPlugin.isAsyncUpgradeExecution(),
+                    upgradeProductPlugin.getName(),
+                    previousVersion,
+                    currentVersion);
             if (upgradeProductPlugin.isAsyncUpgradeExecution()) {
               final UpgradePluginExecutionContext previousUpgradePluginExecutionContextFinal = previousUpgradePluginExecutionContext;
               Runnable task = () -> {
@@ -213,17 +212,17 @@ public class UpgradeProductService implements StartableClusterAware {
             }
           } else {
             LOG.info("Ignore upgrade plugin {} from version {} to {}",
-                     upgradeProductPlugin.getName(),
-                     previousVersion,
-                     currentVersion);
+                    upgradeProductPlugin.getName(),
+                    previousVersion,
+                    currentVersion);
           }
         } catch (Exception e) {
           LOG.error("Error while upgrading plugin with name '" + upgradeProductPlugin.getName()
-              + "'. The upgrade plugin will attempt again next startup.", e);
+                  + "'. The upgrade plugin will attempt again next startup.", e);
         }
       }
-
-      productInformations.storeProductsInformationsInJCR();
+      productInformations.initProductInformation(productInformations.getProductInformationProperties());
+      productInformations.storeProductInformation(productInformations.getProductInformation());
     } catch (Exception e) {
       LOG.error("Error while executing upgrade plugins", e);
     }
@@ -249,7 +248,7 @@ public class UpgradeProductService implements StartableClusterAware {
   {
     //Reset product information
     productInformations.start();
-    
+
     //Reload list Upgrade-Plugins
     upgradePlugins.clear();
     Iterator<UpgradeProductPlugin> iterator= allUpgradePlugins.iterator();
@@ -271,7 +270,7 @@ public class UpgradeProductService implements StartableClusterAware {
       LOG.info("Upgrade of plugin {} completed.", upgradeProductPlugin.getName());
     } catch (Exception e) {
       LOG.error("Error while upgrading plugin with name '" + upgradeProductPlugin.getName()
-          + "'. The upgrade plugin will attempt again next startup.", e);
+              + "'. The upgrade plugin will attempt again next startup.", e);
     } finally {
       upgradeProductPlugin.afterUpgrade();
     }

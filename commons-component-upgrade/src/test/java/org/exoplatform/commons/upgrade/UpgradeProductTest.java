@@ -18,15 +18,8 @@ package org.exoplatform.commons.upgrade;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -38,13 +31,9 @@ import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.component.test.ConfigurationUnit;
 import org.exoplatform.component.test.ConfiguredBy;
 import org.exoplatform.component.test.ContainerScope;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.config.RepositoryConfigurationException;
-import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com May
@@ -54,21 +43,21 @@ import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test-configuration.xml") })
 
 public class UpgradeProductTest extends BaseCommonsTestCase {
-  private static final String    OLD_PRODUCT_INFORMATIONS_FILE = "classpath:/conf/data/product_old.properties";
+  private static final String      OLD_PRODUCT_INFORMATIONS_FILE   = "classpath:/conf/data/product_old.properties";
 
-  private static final String    NEW_PRODUCT_INFORMATIONS_FILE = "classpath:/conf/data/product_new.properties";
+  private static final String      NEW_PRODUCT_INFORMATIONS_FILE   = "classpath:/conf/data/product_new.properties";
 
-  private static final String    NEWER_PRODUCT_INFORMATIONS_FILE = "classpath:/conf/data/product_newer.properties";
+  private static final String      NEWER_PRODUCT_INFORMATIONS_FILE = "classpath:/conf/data/product_newer.properties";
 
-  protected RepositoryService    repositoryService;
+  private ProductInformations      productInformations;
 
-  private ProductInformations    productInformations;
+  private SettingService           settingService;
 
-  private SettingService         settingService;
+  private UpgradeProductService    upgradeService;
 
-  private UpgradeProductService  upgradeService;
+  protected ConfigurationManager   configurationManager;
 
-  protected ConfigurationManager configurationManager;
+  private static ArrayList<String> versions;
 
   public UpgradeProductTest() {
     setForceContainerReload(true);
@@ -80,11 +69,11 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     this.upgradeService = getContainer().getComponentInstanceOfType(UpgradeProductService.class);
     this.productInformations = getService(ProductInformations.class);
     this.settingService = getService(SettingService.class);
-    this.repositoryService = getService(RepositoryService.class);
     this.configurationManager = getService(ConfigurationManager.class);
+    versions = new ArrayList<String>();
   }
 
-  public void testPluginIsEnable() {
+  public void testProcessUpgrade() throws MissingProductInformationException {
     PropertyManager.setProperty("commons.upgrade.portalPlugin.enable", "true");
     PropertyManager.setProperty("commons.upgrade.dummyPlugin.enable", "false");
 
@@ -143,39 +132,74 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     // Set property enable = false
     assertFalse(dummyPlugin.isEnabled());
 
-  }
-
-  public void testProcessUpgrade() throws PathNotFoundException,
-                                   RepositoryException,
-                                   RepositoryConfigurationException,
-                                   MissingProductInformationException {
-
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
     String portalVersion = productInformations.getVersion("org.gatein.portal");
     String portalPrevVersion = productInformations.getPreviousVersion("org.gatein.portal");
-
     String ecmsVersion = productInformations.getVersion("org.exoplatform.ecms");
     String ecmsPrevVersion = productInformations.getPreviousVersion("org.exoplatform.ecms");
 
-    // Node has been changed by upgrade-plugins
-    Node upgradeNode = getUpgradeProductTestNode();
-
-    assertTrue("Node is not versionnable", upgradeNode.isNodeType("mix:versionable"));
-
-    // Get all version labels are set
-    List<String> versionLabels = Arrays.asList(upgradeNode.getVersionHistory().getVersionLabels());
-
     // Verify upgrade portal plugin: only upgrade from version 0
-    assertEquals(portalPrevVersion.equals("0"), versionLabels.contains(portalVersion + "-ZERO-SNAPSHOT"));
-    assertEquals(portalPrevVersion.equals("0"), versionLabels.contains(portalVersion + "-ZERO"));
-    assertEquals(portalPrevVersion.equals("0"), upgradeNode.hasNode("upgradeFromZERO"));
+    assertEquals(portalPrevVersion.equals("0"), versions.contains(portalVersion + "-ZERO-Version"));
 
     // Verify upgrade ecms plugin: only upgrade from version != 0
-    assertEquals(!ecmsPrevVersion.equals("0"), versionLabels.contains(ecmsVersion + "-X-SNAPSHOT"));
-    assertEquals(!ecmsPrevVersion.equals("0"), versionLabels.contains(ecmsVersion + "-X"));
-    assertEquals(!ecmsPrevVersion.equals("0"), upgradeNode.hasNode("upgradeFrom" + ecmsPrevVersion));
+    assertEquals(ecmsPrevVersion.equals("0"), versions.contains(ecmsVersion + "-X-Version"));
+  }
+
+  public void testUpgradeWithDisabledPlugin() {
+    InitParams params;
+    ValueParam param;
+
+    // Create upgrade plugin for portal
+    params = new InitParams();
+    param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.portal");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName("plugin.execution.order");
+    param.setValue("1");
+    params.addParameter(param);
+
+    UpgradePluginFromVersionX upgradePortalPlugin = new UpgradePluginFromVersionX(params);
+    upgradePortalPlugin.setName("portalUpgrade");
+
+    params = new InitParams();
+    param = new ValueParam();
+    param.setName("product.group.id");
+    param.setValue("org.exoplatform.ecms");
+    params.addParameter(param);
+
+    param = new ValueParam();
+    param.setName("plugin.execution.order");
+    param.setValue("2");
+    params.addParameter(param);
+
+    // Creare a dummy plugin: is not enabled
+    UpgradeProductPlugin dummyPlugin = new UpgradeProductPlugin(params) {
+
+      @Override
+      public boolean shouldProceedToUpgrade(String previousVersion, String newVersion) {
+        return true;
+      }
+
+      @Override
+      public void processUpgrade(String oldVersion, String newVersion) {
+        // Do Nothing
+      }
+    };
+    dummyPlugin.setName("dummyPlugin");
+
+    upgradeService.addUpgradePlugin(upgradePortalPlugin);
+    upgradeService.addUpgradePlugin(dummyPlugin);
+    productInformations.start();
+    upgradeService.start();
+
+    assertFalse(dummyPlugin.isEnabled());
+    assertTrue(upgradePortalPlugin.isEnabled());
   }
 
   public void testUpgradeWithTargetVersion() {
@@ -211,8 +235,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
       fail(e);
     }
 
-    // invoke productInformations() explicitly to store the new version in the
-    // JCR
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
@@ -221,8 +244,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
     UpgradePluginWithTargetVersion.PROCESSED = false;
 
-    // invoke productInformations() explicitly to store the new version in the
-    // JCR
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
@@ -272,8 +294,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     // Interrupt Upgrade plugin execution
     upgradeProductPlugin.executePluginLock.lock();
     try {
-      // invoke productInformations() explicitly to store the new version in the
-      // JCR
+      // invoke productInformations() explicitly to store the new version in DB
       productInformations.start();
       upgradeService.start();
 
@@ -303,8 +324,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     upgradeProductPlugin.executePluginLock.lock();
 
     try {
-      // invoke productInformations() explicitly to store the new version in the
-      // JCR
+      // invoke productInformations() explicitly to store the new version in DB
       productInformations.start();
       upgradeService.start();
     } finally {
@@ -354,8 +374,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
       fail(e);
     }
 
-    // invoke productInformations() explicitly to store the new version in the
-    // JCR
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
@@ -363,8 +382,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
     UpgradePluginExecutedOnce.PROCESSED = false;
 
-    // invoke productInformations() explicitly to store the new version in the
-    // JCR
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
@@ -374,7 +392,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   public void testUpgradeErrorFirstCallWithTargetVersion() {
     productInformations.setFirstRun(false);
 
-    // Create upgrade plugin for ECMS
+    // Create upgrade plugin for social
     InitParams params = new InitParams();
     ValueParam param = new ValueParam();
     param.setName("product.group.id");
@@ -409,16 +427,14 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
       fail(e);
     }
 
-    // invoke productInformations() explicitly to store the new version in the
-    // JCR
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
     assertFalse(UpgradePluginErrorFirstCall.PROCESSED);
     assertEquals(1, UpgradePluginErrorFirstCall.COUNT.get());
 
-    // invoke productInformations() explicitly to store the new version in the
-    // JCR
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
@@ -459,16 +475,14 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
       fail(e);
     }
 
-    // invoke productInformations() explicitly to store the new version in the
-    // JCR
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
     assertFalse(UpgradePluginErrorFirstCall.PROCESSED);
     assertEquals(1, UpgradePluginErrorFirstCall.COUNT.get());
 
-    // invoke productInformations() explicitly to store the new version in the
-    // JCR
+    // invoke productInformations() explicitly to store the new version in DB
     productInformations.start();
     upgradeService.start();
 
@@ -521,34 +535,11 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   @Override
   public void tearDown() {
     try {
-      Session session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
-      Node plfVersionDeclarationNode = getProductVersionNode(session);
-      plfVersionDeclarationNode.remove();
-      session.save();
-
-      Node upgradeProductTestNode = getUpgradeProductTestNode();
-      Session testSession = upgradeProductTestNode.getSession();
-      upgradeProductTestNode.remove();
-      testSession.save();
-
       updateNewProductionInformations(NEW_PRODUCT_INFORMATIONS_FILE);
       settingService.remove(UpgradeProductService.UPGRADE_PRODUCT_CONTEXT);
     } catch (Exception e) {
       fail(e);
     }
-  }
-
-  private static Node getUpgradeProductTestNode() throws RepositoryException, RepositoryConfigurationException {
-    PortalContainer container = PortalContainer.getInstance();
-
-    ProductInformations productInformations = container.getComponentInstanceOfType(ProductInformations.class);
-    NodeHierarchyCreator nodeHierarchyCreator =
-                                              (NodeHierarchyCreator) container.getComponentInstanceOfType(NodeHierarchyCreator.class);
-    String upgradeNodePath = nodeHierarchyCreator.getJcrPath("upgradeProductTest");
-
-    RepositoryService repositoryService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
-    Session session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
-    return (Node) session.getItem(upgradeNodePath);
   }
 
   public static class UpgradePluginAsynchronous extends UpgradeProductPlugin {
@@ -613,7 +604,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
     public static AtomicLong COUNT = new AtomicLong(0);
 
-    public static boolean          PROCESSED;
+    public static boolean    PROCESSED;
 
     public UpgradePluginErrorFirstCall(InitParams initParams) {
       super(initParams);
@@ -629,60 +620,13 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   }
 
   public static class UpgradePluginFromVersionZERO extends UpgradeProductPlugin {
-
     public UpgradePluginFromVersionZERO(InitParams initParams) {
       super(initParams);
     }
 
     @Override
     public void processUpgrade(String oldVersion, String newVersion) {
-      try {
-        Node upgradeNode = getUpgradeProductTestNode();
-        addNodeVersion(upgradeNode, newVersion + "-ZERO-SNAPSHOT");
-        upgradeNode.save();
-
-        upgradeNode.addNode("upgradeFromZERO");
-        upgradeNode.save();
-        addNodeVersion(upgradeNode, newVersion + "-ZERO");
-        upgradeNode.save();
-        upgradeNode.getSession().save();
-      } catch (RepositoryException e) {
-        fail(e);
-      } catch (RepositoryConfigurationException e) {
-      }
-    }
-
-    @Override
-    public boolean shouldProceedToUpgrade(String newVersion, String previousVersion) {
-      if (previousVersion.equals("0"))
-        return true;
-      return false;
-    }
-
-  }
-
-  public static class UpgradePluginFromVersionONE extends UpgradeProductPlugin {
-
-    public UpgradePluginFromVersionONE(InitParams initParams) {
-      super(initParams);
-    }
-
-    @Override
-    public void processUpgrade(String oldVersion, String newVersion) {
-      try {
-        Node upgradeNode = getUpgradeProductTestNode();
-        addNodeVersion(upgradeNode, newVersion + "-ONE-SNAPSHOT");
-        upgradeNode.save();
-
-        upgradeNode.addNode("upgradeFromONE");
-        upgradeNode.save();
-        addNodeVersion(upgradeNode, newVersion + "-ONE");
-        upgradeNode.save();
-        upgradeNode.getSession().save();
-      } catch (RepositoryException e) {
-        fail(e);
-      } catch (RepositoryConfigurationException e) {
-      }
+      versions.add(newVersion + "-ZERO-Version");
     }
 
     @Override
@@ -702,22 +646,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
     @Override
     public void processUpgrade(String oldVersion, String newVersion) {
-      try {
-        Node upgradeNode = getUpgradeProductTestNode();
-        addNodeVersion(upgradeNode, newVersion + "-X-SNAPSHOT");
-        upgradeNode.save();
-
-        upgradeNode.addNode("upgradeFrom" + oldVersion);
-        upgradeNode.save();
-        addNodeVersion(upgradeNode, newVersion + "-X");
-        upgradeNode.save();
-        upgradeNode.getSession().save();
-
-      } catch (RepositoryException e) {
-        e.printStackTrace();
-      } catch (RepositoryConfigurationException e) {
-        e.printStackTrace();
-      }
+      versions.add(newVersion + "-X-Version");
     }
 
     @Override
@@ -791,26 +720,11 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   }
 
   private void resetPreviousProductInformation(String filePath) throws Exception {
-    Session session = null;
-    try {
-      InputStream oldVersionsContentIS = configurationManager.getInputStream(filePath);
-      byte[] binaries = new byte[oldVersionsContentIS.available()];
-      oldVersionsContentIS.read(binaries);
-      String oldVersionsContent = new String(binaries);
-
-      session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
-
-      Node plfVersionDeclarationNode = getProductVersionNode(session);
-      Node plfVersionDeclarationContentNode = plfVersionDeclarationNode.getNode("jcr:content");
-      plfVersionDeclarationContentNode.setProperty("jcr:data", oldVersionsContent);
-
-      session.save();
-      session.refresh(true);
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
-    }
+    InputStream oldVersionsContentIS = configurationManager.getInputStream(filePath);
+    Properties properties = new Properties();
+    properties.load(oldVersionsContentIS);
+    productInformations.initProductInformation(properties);
+    productInformations.storeProductInformation(productInformations.getProductInformation());
   }
 
   private void updateNewProductionInformations(String filePath) {
@@ -824,10 +738,5 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     } catch (Exception e) {
       fail(e);
     }
-  }
-
-  private Node getProductVersionNode(Session session) throws PathNotFoundException, RepositoryException {
-    Node plfVersionDeclarationNodeContent = ((Node) session.getItem(productInformations.getProductVersionDeclarationNodePath()));
-    return plfVersionDeclarationNodeContent;
   }
 }

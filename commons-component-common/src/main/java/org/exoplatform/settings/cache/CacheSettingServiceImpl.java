@@ -41,31 +41,39 @@ import org.exoplatform.settings.jpa.JPASettingServiceImpl;
 
 /**
  * Created by The eXo Platform SAS Author : eXoPlatform bangnv@exoplatform.com
- * Nov 15, 2012
- * CacheSettingServiceImpl is implemented for application which uses cache. CacheSettingServiceImpl contains also settingService for database. 
- * In case of saving and removing setting properties, CacheSettingService will effect the change in cache and database. 
- * Otherwise, it will search setting properties in cache at first and then in database, that allows to improve performance.
- * @LevelAPI Experimental    
+ * Nov 15, 2012 CacheSettingServiceImpl is implemented for application which
+ * uses cache. CacheSettingServiceImpl contains also settingService for
+ * database. In case of saving and removing setting properties,
+ * CacheSettingService will effect the change in cache and database. Otherwise,
+ * it will search setting properties in cache at first and then in database,
+ * that allows to improve performance.
+ * 
+ * @LevelAPI Experimental
  */
 public class CacheSettingServiceImpl implements SettingService {
   /** Logger */
-  private static final Log                                               LOG = ExoLogger.getLogger(CacheSettingServiceImpl.class);
+  private static final Log                                           LOG                  =
+                                                                         ExoLogger.getLogger(CacheSettingServiceImpl.class);
 
-  private final static String SETTING_CACHING_NAME = "commons.SettingService";
+  private final static String                                        SETTING_CACHING_NAME = "commons.SettingService";
 
-  protected ExoCache<SettingKey, SettingValue>                           settingCache;
+  protected ExoCache<SettingKey, SettingValue>                       settingCache;
 
   protected FutureExoCache<SettingKey, SettingValue, SettingService> futureExoCache;
 
-  private static final Logger                                            log = LoggerFactory.getLogger(CacheSettingServiceImpl.class);
+  private static final Logger                                        log                  =
+                                                                         LoggerFactory.getLogger(CacheSettingServiceImpl.class);
 
-  private final SettingService                                            service;
-/**
- * Create cache setting service object with service for database and service for cache
- * @param service Setting service for database
- * @param cacheService Cache service
- * @LevelAPI Experimental
- */
+  private final SettingService                                       service;
+
+  /**
+   * Create cache setting service object with service for database and service for
+   * cache
+   * 
+   * @param service Setting service for database
+   * @param cacheService Cache service
+   * @LevelAPI Experimental
+   */
   public CacheSettingServiceImpl(JPASettingServiceImpl service, CacheService cacheService) {
 
     settingCache = cacheService.getCacheInstance(SETTING_CACHING_NAME);
@@ -74,25 +82,25 @@ public class CacheSettingServiceImpl implements SettingService {
       @Override
       public SettingValue retrieve(SettingService service, SettingKey key) throws Exception {
         SettingValue<?> settingValue = service.get(key.getContext(), key.getScope(), key.getKey());
-        if(settingValue == null) {
+        if (settingValue == null) {
           settingValue = NullSettingValue.getInstance();
         }
         return settingValue;
       }
     };
-    futureExoCache = new FutureExoCache<SettingKey, SettingValue, SettingService>(loader,
-                                                                                      settingCache);
+    futureExoCache = new FutureExoCache<SettingKey, SettingValue, SettingService>(loader, settingCache);
     this.service = service;
 
   }
 
   /**
-   *  Set the specified value  with the key which is composed by context, scope, key. 
-   *  The value will be saved in the cache and the database 
+   * Set the specified value with the key which is composed by context, scope,
+   * key. The value will be saved in the cache and the database
+   * 
    * @param context context with which the specified value is to be associated
-   * @param scope   scope with which  the specified value is to be associated
-   * @param key     key with which the specified value is to be associated
-   * @param value   value to be associated with the specified key.
+   * @param scope scope with which the specified value is to be associated
+   * @param key key with which the specified value is to be associated
+   * @param value value to be associated with the specified key.
    * @LevelAPI Experimental
    */
   @Override
@@ -103,25 +111,28 @@ public class CacheSettingServiceImpl implements SettingService {
   }
 
   /**
-   * Get setting value associated with composite key(context, scope, key)
-   * This service will search in the cache first and then in the database.
-   * @return Setting value with type of setting property, and null if the cache and the database doesn't contain the value for the composite key
+   * Get setting value associated with composite key(context, scope, key) This
+   * service will search in the cache first and then in the database.
+   * 
+   * @return Setting value with type of setting property, and null if the cache
+   *         and the database doesn't contain the value for the composite key
    * @LevelAPI Experimental
    */
   @Override
   public SettingValue<?> get(Context context, Scope scope, String key) {
     try {
       SettingValue<?> settingValue = futureExoCache.get(service, new SettingKey(context, scope, key));
-      if(settingValue == NullSettingValue.getInstance() || settingValue.getValue() == null) {
+      if (settingValue == NullSettingValue.getInstance() || settingValue.getValue() == null) {
         return null;
       }
       return settingValue;
     } catch (Exception e) {
-      if(LOG.isDebugEnabled()) {
+      if (LOG.isDebugEnabled()) {
         LOG.error("Exception raising when getting setting value ", e);
       } else {
-        if(context != null) {
-          LOG.warn("Exception raising when getting setting value associated to the key " + key + " and the context " + context.getName());
+        if (context != null) {
+          LOG.warn("Exception raising when getting setting value associated to the key " + key + " and the context "
+              + context.getName());
         } else {
           LOG.warn("Can't get setting value. The context is null");
         }
@@ -130,11 +141,15 @@ public class CacheSettingServiceImpl implements SettingService {
     return null;
   }
 
-  /** 
-   * Remove all the value associated with the composite key(context,scope,key) in cache and also in database.
-   * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
-   * @param scope  	scope with which  the specified value is to be associated. The scope.id must be not null.
-   * @param key		key with which the specified value is to be associated
+  /**
+   * Remove all the value associated with the composite key(context,scope,key) in
+   * cache and also in database.
+   * 
+   * @param context context with which the specified value is to be associated.
+   *          The context type must be USER and context.id must be not null.
+   * @param scope scope with which the specified value is to be associated. The
+   *          scope.id must be not null.
+   * @param key key with which the specified value is to be associated
    * @LevelAPI Experimental
    */
   @Override
@@ -144,9 +159,14 @@ public class CacheSettingServiceImpl implements SettingService {
     service.remove(context, scope, key);
   }
 
-  /** remove all the value associated with the specified context and specified scope in cache and database also.
-   * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
-   * @param scope  scope with which  the specified value is to be associated. The scope.id must be not null.
+  /**
+   * remove all the value associated with the specified context and specified
+   * scope in cache and database also.
+   * 
+   * @param context context with which the specified value is to be associated.
+   *          The context type must be USER and context.id must be not null.
+   * @param scope scope with which the specified value is to be associated. The
+   *          scope.id must be not null.
    * @LevelAPI Experimental
    */
   @Override
@@ -155,13 +175,17 @@ public class CacheSettingServiceImpl implements SettingService {
     try {
       settingCache.select(new SettingCacheSelector(settingScope));
     } catch (Exception e) {
-      LOG.error("Cannot get setting cache",e);
+      LOG.error("Cannot get setting cache", e);
     }
     service.remove(context, scope);
   }
-  
-  /** remove all the value associated with the specified context in cache and database also.
-   * @param context context with which the specified value is to be associated. The context type must be USER and context.id must be not null.
+
+  /**
+   * remove all the value associated with the specified context in cache and
+   * database also.
+   * 
+   * @param context context with which the specified value is to be associated.
+   *          The context type must be USER and context.id must be not null.
    * @LevelAPI Experimental
    */
   @Override
@@ -170,7 +194,7 @@ public class CacheSettingServiceImpl implements SettingService {
     try {
       settingCache.select(new SettingCacheSelector(settingContext));
     } catch (Exception e) {
-      LOG.error("cannot get setting context",e);
+      LOG.error("cannot get setting context", e);
     }
     service.remove(context);
   }
@@ -201,13 +225,26 @@ public class CacheSettingServiceImpl implements SettingService {
   }
 
   @Override
-  public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType, String scopeType, String scopeName, String settingName, int offset, int limit) {
+  public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType,
+                                                                  String scopeType,
+                                                                  String scopeName,
+                                                                  String settingName,
+                                                                  int offset,
+                                                                  int limit) {
     return service.getEmptyContextsByTypeAndScopeAndSettingName(contextType, scopeType, scopeName, settingName, offset, limit);
   }
 
   @Override
   public void save(Context context) {
     service.save(context);
+  }
+
+  @Override
+  public Map<String, SettingValue> getSettingsByContextAndScope(String contextType,
+                                                                String contextName,
+                                                                String scopeType,
+                                                                String scopeName) {
+    return service.getSettingsByContextAndScope(contextType, contextName, scopeType, scopeName);
   }
 
 }

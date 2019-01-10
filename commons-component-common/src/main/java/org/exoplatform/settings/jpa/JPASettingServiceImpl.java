@@ -22,11 +22,7 @@ package org.exoplatform.settings.jpa;
 import static org.exoplatform.settings.jpa.EntityConverter.convertContextToContextEntity;
 import static org.exoplatform.settings.jpa.EntityConverter.convertScopeToScopeEntity;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -294,11 +290,11 @@ public class JPASettingServiceImpl implements SettingService {
   @ExoTransactional
   @Override
   public Set<String> getEmptyContextsByTypeAndScopeAndSettingName(String contextType,
-                                                           String scopeType,
-                                                           String scopeName,
-                                                           String settingName,
-                                                           int offset,
-                                                           int limit) {
+                                                                  String scopeType,
+                                                                  String scopeName,
+                                                                  String settingName,
+                                                                  int offset,
+                                                                  int limit) {
     validateArgumentNullability(contextType, "context type is null");
     validateArgumentNullability(scopeType, "scope type is null");
     validateArgumentNullability(settingName, "setting name is null");
@@ -327,13 +323,12 @@ public class JPASettingServiceImpl implements SettingService {
     validateArgumentNullability(scopeType, "scope type is null");
     validateArgumentNullability(settingName, "setting name is null");
 
-    List<ContextEntity> contexts =
-                                 settingContextDAO.getContextsByTypeAndSettingNameAndScope(contextType,
-                                                                                           scopeType,
-                                                                                           scopeName,
-                                                                                           settingName,
-                                                                                           offset,
-                                                                                           limit);
+    List<ContextEntity> contexts = settingContextDAO.getContextsByTypeAndSettingNameAndScope(contextType,
+                                                                                             scopeType,
+                                                                                             scopeName,
+                                                                                             settingName,
+                                                                                             offset,
+                                                                                             limit);
     return contexts.stream().map(context -> new Context(context.getType(), context.getName())).collect(Collectors.toList());
   }
 
@@ -346,14 +341,14 @@ public class JPASettingServiceImpl implements SettingService {
   }
 
   private void validateScopeArgument(Scope scope) {
-    if(scope == null) {
+    if (scope == null) {
       throw new IllegalArgumentException("scope is null");
     }
     validateArgumentNullability(scope.getName(), "scope name is null");
   }
 
   private void validateContextArgument(Context context) {
-    if(context == null) {
+    if (context == null) {
       throw new IllegalArgumentException("context is null");
     }
     validateArgumentNullability(context.getId(), "context id is null");
@@ -361,14 +356,27 @@ public class JPASettingServiceImpl implements SettingService {
   }
 
   private void validateArgumentNullability(String arg, String message) {
-    if(StringUtils.isBlank(arg)) {
+    if (StringUtils.isBlank(arg)) {
       throw new IllegalArgumentException(message);
     }
   }
 
   private void validateArgumentNullability(Object obj, String message) {
-    if(obj == null) {
+    if (obj == null) {
       throw new IllegalArgumentException(message);
     }
+  }
+
+  @Override
+  public Map<String, SettingValue> getSettingsByContextAndScope(String contextType,
+                                                                String contextName,
+                                                                String scopeType,
+                                                                String scopeName) {
+
+    Map<String, SettingValue> settingsKeyValue = new HashMap<>();
+    List<SettingsEntity> settingsList = settingsDAO.getSettingsByContextAndScope(contextType, contextName, scopeType, scopeName);
+    settingsList.stream().forEach(setting -> settingsKeyValue.put(setting.getName(), SettingValue.create(setting.getValue())));
+
+    return settingsKeyValue;
   }
 }
