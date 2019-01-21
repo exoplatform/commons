@@ -41,7 +41,7 @@ public class FileServiceImpl implements FileService {
   @Override
   public FileItem getFile(long id) throws FileStorageException {
     FileItem fileItem;
-    FileInfo fileInfo = dataStorage.getFileInfo(id);
+    FileInfo fileInfo = getFileInfo(id);
 
     if (fileInfo == null || StringUtils.isEmpty(fileInfo.getChecksum())) {
       return null;

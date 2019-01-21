@@ -65,7 +65,6 @@ public class FileItem {
   public void setInputStream(InputStream inputStream) throws Exception {
     if (inputStream != null) {
       this.data = IOUtils.toByteArray(inputStream);
-      setChecksum(new ByteArrayInputStream(data));
     }
   }
 

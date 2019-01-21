@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import static org.junit.Assert.*;
 
 /**
@@ -54,7 +55,9 @@ public class RdbmsResourceProviderTest extends CommonsJPAIntegrationTest {
     ByteArrayInputStream createdData = (ByteArrayInputStream) rdbmsResourceProvider.getStream(file.getFileInfo().getChecksum());
     assertNotNull(createdData);
 
-    file.setInputStream(new ByteArrayInputStream("test-updated".getBytes()));
+    InputStream inputStream =new ByteArrayInputStream("test-updated".getBytes());
+    file.setInputStream(inputStream);
+    file.setChecksum(inputStream);
     rdbmsResourceProvider.put(file);
 
     // Then
