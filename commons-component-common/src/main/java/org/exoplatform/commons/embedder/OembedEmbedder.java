@@ -57,7 +57,7 @@ public class OembedEmbedder extends AbstractEmbedder {
 
   private static final String  EMBED_THUMBNAIL  = "thumbnail";
 
-  private static final Pattern SHORTEN_DAILY_MOTION_PATTERN = Pattern.compile("http://dai\\.ly/.*");
+  private static final Pattern SHORTEN_DAILY_MOTION_PATTERN = Pattern.compile("(https?)://dai\\.ly/.*");
 
   /**
    * constructor
@@ -108,7 +108,11 @@ public class OembedEmbedder extends AbstractEmbedder {
           // https://www.dailymotion.com/services/oembed?format=json&url=https://dai.ly/xxxxx is working.
           Matcher shortenMatcher = SHORTEN_DAILY_MOTION_PATTERN.matcher(url);
           if (shortenMatcher.find()) {
-            url = correctURIString(url, "https", true);
+            if(shortenMatcher.group(1).equalsIgnoreCase("http")) {
+              url = correctURIString(url, "https", true);
+            }
+            // COMMONS-578 : Working for sharing dailymotion videos since it does not work anymore with shortened urls
+            url = url.replaceFirst("dai\\.ly", "www.dailymotion.com/embed/video");
           }
           return new URL(correctURIString(String.format(endpoint, url),scheme, false));
         }
