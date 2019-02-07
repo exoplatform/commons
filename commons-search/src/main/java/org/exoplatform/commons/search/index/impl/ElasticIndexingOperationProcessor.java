@@ -777,12 +777,22 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
                    previousIndex,
                    index,
                    type);
-          elasticIndexingClient.sendReindexTypeRequest(index, previousIndex, type, pipeline);
-          LOG.info("Reindexation finished for index alias {} from old index {} to new index {}, for type {}",
-                   indexAlias,
-                   previousIndex,
-                   index,
-                   type);
+            try {
+                elasticIndexingClient.sendReindexTypeRequest(index, previousIndex, type, pipeline);
+                LOG.info("Reindexation finished for index alias {} from old index {} to new index {}, for type {}",
+                        indexAlias,
+                        previousIndex,
+                        index,
+                        type);
+            } catch (Exception e) {
+                LOG.warn("Reindexation using pipeline error for index alias {} from old index {} to new index {}, for type {}. The reindexation will proceed from eXo DB",
+                        indexAlias,
+                        previousIndex,
+                        index,
+                        type);
+                ExoContainerContext.setCurrentContainer(exoContainer);
+                reindexAllByEntityType(type);
+            }
         }
 
         // This algorithm should be thread safe
@@ -809,6 +819,8 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
         }
       } catch (Exception e) {
         LOG.error("An error occurred while upgrading index " + previousIndex + " type " + type, e);
+      } finally {
+          typesOrIndexUpgrading.remove(indexAlias);
       }
     }
   }
