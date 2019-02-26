@@ -85,8 +85,8 @@ CKEDITOR.dialog.add( 'simpleLinkDialog', function( editor ) {
             dialog.findOne('.cke_dialog_ui_button_cancel').$.className = 'btn';
             dialog.findOne('.cke_dialog_footer').$.className = 'uiActionBorder';
             dialog.findOne('.cke_dialog_title').$.className = 'popupHeader';
-            dialog.findOne('.cke_dialog_close_button').$.className = 'uiIconClose cke_dialog_close_button';
-            dialogCover.className = 'uiPopupWrapper';
+            dialog.findOne('.cke_dialog_close_button').$.className = 'uiIconClose cke_dialog_close_button';         	
+            dialogCover.className = 'cke_dialog_background_cover uiPopupWrapper';
             dialogCover.style.backgroundColor = '';
             dialogCover.style.opacity = '';
         }
