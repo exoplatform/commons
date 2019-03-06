@@ -920,9 +920,11 @@ function UIDSUpload() {
     }
 
     var form = uploadFrame.contentWindow.document.getElementById(id);
-    var file  = jQuery(clickEle ,form);
-    if(file.attr("value") == null || file.attr("value") == '') return;
-    var fileName = file.attr("value").replace(/C:\\fakepath\\/i, '');
+    var file = jQuery(clickEle, form);
+    if(!file.val()) {
+      return;
+    }
+    var fileName = file.val().replace(/C:\\fakepath\\/i, '');
 
     if(eXo.commons.DocumentSelector.listFileName.indexOf(fileName) != -1
         && checkSupportVersion(eXo.commons.DocumentSelector.listFiles, fileName)){
@@ -1014,9 +1016,11 @@ function UIDSUpload() {
 
 	  var form = uploadFrame.contentWindow.document.getElementById(id);
 
-	  var file  = jQuery(clickEle ,form);
-	  if(file.attr("value") == null || file.attr("value") == '') return;  
-	  var fileName = file.attr("value").replace(/C:\\fakepath\\/i, '');
+	  var file = jQuery(clickEle, form);
+	  if(!file.val()) {
+	    return;
+	  }
+	  var fileName = file.val().replace(/C:\\fakepath\\/i, '');
 	  jQuery(".fileNameLabel").html(fileName)
                             .attr({'rel':'tooltip', 'data-placement':'bottom', 'data-original-title' : fileName})
                             .tooltip();
