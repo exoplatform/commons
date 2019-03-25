@@ -172,6 +172,11 @@ public class SimpleMockOrganizationService implements OrganizationService {
       return groups;
     }
 
+    @Override
+    public ListAccess<Group> findGroupsByKeyword(String s) throws Exception {
+      return null;
+    }
+
     public Collection<Group> findGroups(Group parent) throws Exception {
       Collection<Group> groups = new HashSet<Group>();
       Iterator<SimpleMembership> mbIt = storage.iterator();
