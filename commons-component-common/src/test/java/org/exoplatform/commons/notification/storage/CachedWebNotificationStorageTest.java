@@ -244,6 +244,8 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     NotificationInfo createdFirstInfo = cachedStorage.get(info.getId());
     assertEquals(info.getTitle(), createdFirstInfo.getTitle());
     for (int i = 0; i < 5; i++) {
+      // this sleep makes sure notifications are saved at different timestamps, so they are sorted correctly when fetching
+      Thread.sleep(1);
       cachedStorage.save(makeWebNotificationInfo(userId));
     }
     end();
@@ -253,6 +255,7 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
     assertEquals(6, onPopoverInfos.size());
     List<NotificationInfo> viewAllInfos = cachedStorage.get(new WebNotificationFilter(userId, false), 0 , 10);
     assertEquals(6, viewAllInfos.size());
+
     //
     NotificationInfo lastOnPopoverInfo = onPopoverInfos.get(onPopoverInfos.size() - 1);
     assertEquals(createdFirstInfo.getId(), lastOnPopoverInfo.getId());
