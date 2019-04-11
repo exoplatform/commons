@@ -37,7 +37,7 @@ public class HTMLSanitizerTest {
   public void testEncodeImg() throws Exception {
     String input1 = "<img alt='crying' height='23' src='http://localhost:8080/CommonsResources/ckeditor/plugins/smiley/images/cry_smile.png' title='crying' width='23' onerror='alert('XSS')' onmousemove='alert('XSS1')'/>";
     assertEquals("<img alt=\"crying\" height=\"23\" src=\"http://localhost:8080/CommonsResources/ckeditor/plugins/smiley/images/cry_smile.png\" title=\"crying\" width=\"23\" />",
-                 HTMLSanitizer.sanitize(input1));
+            HTMLSanitizer.sanitize(input1));
   }
 
   @Test
@@ -59,5 +59,12 @@ public class HTMLSanitizerTest {
     String input = "<a href=\"../good.html\">click here</a>";
     String sanitized = HTMLSanitizer.sanitize(input);
     assertEquals("<a href=\"../good.html\" rel=\"nofollow\">click here</a>", sanitized);
+  }
+
+  @Test
+  public void testStarAllowedInImageLinks() throws Exception {
+    String input = "https://cdn-images-1.medium.com/max/800/0*ssnGrTXEfHtQQ-tJ";
+    String sanitized = HTMLSanitizer.sanitize(input);
+    assertEquals(input, sanitized);
   }
 }
