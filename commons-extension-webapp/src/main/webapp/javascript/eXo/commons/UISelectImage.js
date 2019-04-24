@@ -25,80 +25,80 @@
       this.enableOKButton(false);
 
       this.$parentDialog.find(".selectImageBox").html(
-        '<div class="alert alert-error hidden"> \
-          <i class="uiIconError"></i><span class="message"></span> \
-        </div> \
-        <div class="dropFileArea"> \
-          <div class="backButton hidden"> \
-            <a href="javascript:void(0)">${CKEditor.image.Back}</a> \
-          </div> \
-          <div class="imageURLContainer hidden"> \
-            <label for="composerImageURL">${CKEditor.Image.URL}:</label> \
-            <div class="clearfix"></div> \
-            <input type="text" name="composerImageURL" placeholder="https://" class="imageURL" /> \
-          </a> \
-          </div> \
-          <div class="uploadContainer hidden">  \
-            <div class="fileNameAndSize" data-toggle="tooltip" rel="tooltip" data-placement="top">  \
-            </div>  \
-            <div class="progressBar">  \
-              <div class="progress progress-striped pull-left">  \
-                <div class="bar" style="width:0%">0%</div>  \
-              </div>  \
-              <div class="abortFile pull-right">  \
-                <a href="#" class="actionIcon" rel="tooltip" data-placement="top" title="${CKEditor.image.CancelUpload}">  \
-                  <i class="uiIconAbort uiIconLightGray"></i>  \
-                </a>  \
-              </div>  \
-            </div>  \
-            <div class="fileHidden">  \
-              <input class="file" name="file" type="file" accept=".gif,.jpg,.jpeg,.png">  \
-            </div>  \
-          </div>  \
-          <div class="selectImageLinks"> \
-            <span class="dropFileDescription visible-desktop hidden-tablet hidden-phone">${CKEditor.image.DropYouImageHere}<br /></span> \
-            <span class="hidden-tablet hidden-phone">${CKEditor.image.or}<br /></span> \
-            <span class="uploadImageLink"> \
-              <a href="javascript:void(0)"><span class="visible-desktop hidden-tablet hidden-phone">${CKEditor.image.uploadFromYourDesktop}</span><span class="hidden-desktop visible-tablet visible-phone">${CKEditor.image.UploadFromYourMobile}</span>\</a> \
-              <br /> \
-            </span> \
-            <span>${CKEditor.image.or}</span> \
-            <span class="selectFromExistingUpload"> \
-              <br /> \
-              <a href="javascript:void(0)"><span>${CKEditor.image.selectFromExistingUploads}</span></a> \
-              <br /> \
-            </span> \
-            <span>${CKEditor.image.or}</span> \
-            <span class="selectImageURL"> \
-              <br /> \
-              <a href="javascript:void(0)"><span>${CKEditor.image.pointAnImageURL}</span></a>\
-            </span> \
-          </div> \
-          <div class="selectedImagePreview hidden"> \
-            <img referrerpolicy="no-referrer" /> \
-          </div> \
-        </div> \
-        <div class="removeFile hidden">  \
-          <a href="javascript:void(0)">  \
-            ${CKEditor.image.RemoveImage}  \
-          </a>  \
-        </div>  \
-        <div class="selectImageAlign clearfix"> \
-          <span class="selectImageAlignLabel"> \
-            ${CKEditor.image.Alignment}: \
-          </span> \
-          <div class="btn-group"> \
-            <a class="btn" data-placement="top" rel="tooltip" data-align="Left" data-original-title="${CKEditor.image.alignment.Left}"> \
-              <i class="uiIconAlignLeft"/> \
-            </a> \
-            <a class="btn " data-placement="top" rel="tooltip" data-align="Middle" data-original-title="${CKEditor.image.alignment.Middle}"> \
-              <i class="uiIconAlignCenter"/> \
-            </a> \
-            <a class="btn " data-placement="top" rel="tooltip" data-align="Right" data-original-title="${CKEditor.image.alignment.Right}"> \
-              <i class="uiIconAlignRight"/> \
-            </a> \
-          </div> \
-        </div>'
+        '<div class="alert alert-error hidden">' +
+          '<i class="uiIconError"></i><span class="message"></span>' +
+        '</div>' +
+        '<div class="dropFileArea">' +
+          '<div class="backButton hidden">' +
+            '<a href="javascript:void(0)">${CKEditor.image.Back}</a>' +
+          '</div>' +
+          '<div class="imageURLContainer hidden">' +
+            '<label for="composerImageURL">${CKEditor.Image.URL}:</label>' +
+            '<div class="clearfix"></div>' +
+            '<input type="text" name="composerImageURL" placeholder="https://" class="imageURL" />' +
+          '</a>' +
+          '</div>' +
+          '<div class="uploadContainer hidden">' +
+            '<div class="fileNameAndSize" data-toggle="tooltip" rel="tooltip" data-placement="top">' +
+            '</div>' +
+            '<div class="progressBar">' +
+              '<div class="progress progress-striped pull-left">' +
+                '<div class="bar" style="width:0%">0%</div>' +
+              '</div>' +
+              '<div class="abortFile pull-right">' +
+                '<a href="#" class="actionIcon" rel="tooltip" data-placement="top" title="${CKEditor.image.CancelUpload}">' +
+                  '<i class="uiIconAbort uiIconLightGray"></i>' +
+                '</a>' +
+              '</div>' +
+            '</div>' +
+            '<div class="fileHidden">' +
+              '<input class="file" name="file" type="file" accept=".gif,.jpg,.jpeg,.png">' +
+            '</div>' +
+          '</div>' +
+          '<div class="selectImageLinks">' +
+            '<span class="dropFileDescription visible-desktop hidden-tablet hidden-phone">${CKEditor.image.DropYouImageHere}<br /></span>' +
+            '<span class="hidden-tablet hidden-phone">${CKEditor.image.or}<br /></span>' +
+            '<span class="uploadImageLink">' +
+              '<a href="javascript:void(0)"><span class="visible-desktop hidden-tablet hidden-phone">${CKEditor.image.uploadFromYourDesktop}</span><span class="hidden-desktop visible-tablet visible-phone">${CKEditor.image.UploadFromYourMobile}</span>\</a>' +
+              '<br />' +
+            '</span>' +
+            '<span>${CKEditor.image.or}</span>' +
+            '<span class="selectFromExistingUpload">' +
+              '<br />' +
+              '<a href="javascript:void(0)"><span>${CKEditor.image.selectFromExistingUploads}</span></a>' +
+              '<br />' +
+            '</span>' +
+            '<span>${CKEditor.image.or}</span>' +
+            '<span class="selectImageURL">' +
+              '<br />' +
+              '<a href="javascript:void(0)"><span>${CKEditor.image.pointAnImageURL}</span></a>' +
+            '</span>' +
+          '</div>' +
+          '<div class="selectedImagePreview hidden">' +
+            '<img referrerpolicy="no-referrer" />' +
+          '</div>' +
+        '</div>' +
+        '<div class="removeFile hidden">' +
+          '<a href="javascript:void(0)">' +
+            '${CKEditor.image.RemoveImage}' +
+          '</a>' +
+        '</div>' +
+        '<div class="selectImageAlign clearfix">' +
+          '<span class="selectImageAlignLabel">' +
+            '${CKEditor.image.Alignment}:' +
+          '</span>' +
+          '<div class="btn-group">' +
+            '<a class="btn" data-placement="top" rel="tooltip" data-align="Left" data-original-title="${CKEditor.image.alignment.Left}">' +
+              '<i class="uiIconAlignLeft"/>' +
+            '</a>' +
+            '<a class="btn " data-placement="top" rel="tooltip" data-align="Middle" data-original-title="${CKEditor.image.alignment.Middle}">' +
+              '<i class="uiIconAlignCenter"/>' +
+            '</a>' +
+            '<a class="btn " data-placement="top" rel="tooltip" data-align="Right" data-original-title="${CKEditor.image.alignment.Right}">' +
+              '<i class="uiIconAlignRight"/>' +
+            '</a>' +
+          '</div>' +
+        '</div>'
       );
 
       this.uploadLinksCnt = this.$parentDialog.find(".selectImageLinks");

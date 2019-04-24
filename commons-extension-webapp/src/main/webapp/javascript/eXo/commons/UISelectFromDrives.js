@@ -16,46 +16,46 @@
 
         this.selectExistingDriveCnt = this.imageDialogWindowCnt.find(".selectExistingDriveDialog");
         if (this.selectExistingDriveCnt.length == 0) {
-          this.imageDialogWindowCnt.append('<div class="selectExistingDriveDialog" id="UIPopupComposer" > \
-              <div class="PopupContent popupContent"> \
-                <div class="UIDocActivityPopup" id="UIDocActivityPopup"> \
-                  <div id="UIDocumentSelectorTab"> \
-                    <div class="breadcrumbContainer"> \
-                      <ul class="breadcrumb pull-left" id="BreadcumbsContainer"> \
-                        <li class="backBTN desktop-hidden tablet-hidden mobile-visible"> \
-                          <a class="uiIconGoBack" href="javascript:void(0);" data-toggle="tooltip" rel="tooltip" data-placement="bottom" title="" data-original-title="${CKEditor.image.Back}"></a> \
-                        </li> \
-                        <li class="drives"> \
-                          <a class="normal" href="javascript:void(0);" data-toggle="tooltip" rel="tooltip" data-placement="top" title="" data-original-title="${SelectFromDrivesPopup.drives.link.title}"> \
-                            ${SelectFromDrivesPopup.drives.link.title} \
-                          </a> \
-                        </li> \
-                      </ul> \
-                      <div class="searchBox pull-right"> \
-                        <input type="text"> <a href="#"><i \
-                          class="uiIconSearch uiIconLightGray"></i></a> \
-                      </div> \
-                    </div> \
-                    <div class="selectionBox"> \
-                      <div class="emptyFolder"> \
-                        <div style="margin-top: 50px;">${SelectFromDrivesPopup.EmptyFolder}</div> \
-                      </div> \
-                      <div class="emptyResults"> \
-                        <div style="margin-top: 50px;">${SelectFromDrivesPopup.NoResults}</div> \
-                      </div> \
-                      <h4 class="foldersTitle">${SelectFromDrivesPopup.Folders}</h4> \
-                      <h4 class="filesTitle clearfix">${SelectFromDrivesPopup.Files}</h4> \
-                    </div> \
-                  </div> \
-                  <div class="clearfix uiActionBorder"> \
-                    <div class="uiAction pull-right"> \
-                      <button class="btn selectFileBTN" type="button" disabled>${SelectFromDrivesPopup.Select}</button> \
-                      <button class="btn cancelBTN" type="button">${SelectFromDrivesPopup.Cancel}</button> \
-                    </div> \
-                  </div> \
-                </div> \
-              </div> \
-            </div> ');
+          this.imageDialogWindowCnt.append('<div class="selectExistingDriveDialog" id="UIPopupComposer" >' +
+              '<div class="PopupContent popupContent">' +
+                '<div class="UIDocActivityPopup" id="UIDocActivityPopup">' +
+                  '<div id="UIDocumentSelectorTab">' +
+                    '<div class="breadcrumbContainer">' +
+                      '<ul class="breadcrumb pull-left" id="BreadcumbsContainer">' +
+                        '<li class="backBTN desktop-hidden tablet-hidden mobile-visible">' +
+                          '<a class="uiIconGoBack" href="javascript:void(0);" data-toggle="tooltip" rel="tooltip" data-placement="bottom" title="" data-original-title="${CKEditor.image.Back}"></a>' +
+                        '</li>' +
+                        '<li class="drives">' +
+                          '<a class="normal" href="javascript:void(0);" data-toggle="tooltip" rel="tooltip" data-placement="top" title="" data-original-title="${SelectFromDrivesPopup.drives.link.title}">' +
+                            '${SelectFromDrivesPopup.drives.link.title}' +
+                          '</a>' +
+                        '</li>' +
+                      '</ul>' +
+                      '<div class="searchBox pull-right">' +
+                        '<input type="text"> <a href="#"><i ' +
+                          'class="uiIconSearch uiIconLightGray"></i></a>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="selectionBox">' +
+                      '<div class="emptyFolder">' +
+                        '<div style="margin-top: 50px;">${SelectFromDrivesPopup.EmptyFolder}</div>' +
+                      '</div>' +
+                      '<div class="emptyResults">' +
+                        '<div style="margin-top: 50px;">${SelectFromDrivesPopup.NoResults}</div>' +
+                      '</div>' +
+                      '<h4 class="foldersTitle">${SelectFromDrivesPopup.Folders}</h4>' +
+                      '<h4 class="filesTitle clearfix">${SelectFromDrivesPopup.Files}</h4>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="clearfix uiActionBorder">' +
+                    '<div class="uiAction pull-right">' +
+                      '<button class="btn selectFileBTN" type="button" disabled>${SelectFromDrivesPopup.Select}</button>' +
+                      '<button class="btn cancelBTN" type="button">${SelectFromDrivesPopup.Cancel}</button>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</div> ');
           this.selectExistingDriveCnt = this.imageDialogWindowCnt.find(".selectExistingDriveDialog");
           var self = this;
           this.selectExistingDriveCnt.find(".breadcrumb .drives").on("click", function () {
@@ -150,14 +150,14 @@
           if(!folderPath || !folderPath.trim().length) {
             driveClass = "active";
           }
-          this.breadCrumbCnt.append('<li class="arrow"> \
-              <span class="uiIconMiniArrowRight"></span> \
-            </li> \
-            <li class="folder"> \
-            <a class="' + driveClass + '" href="javascript:void(0);" data-toggle="tooltip" rel="tooltip" data-placement="top" title="" data-original-title="' + driveData.attr("label") + '"> \
-            ' + driveData.attr("label") + ' \
-            </a> \
-          </li>');
+          this.breadCrumbCnt.append('<li class="arrow">' +
+              '<span class="uiIconMiniArrowRight"></span>' +
+            '</li>' +
+            '<li class="folder">' +
+            '<a class="' + driveClass + '" href="javascript:void(0);" data-toggle="tooltip" rel="tooltip" data-placement="top" title="" data-original-title="' + driveData.attr("label") + '">' +
+                driveData.attr("label") +
+            '</a>' +
+          '</li>');
   
           if(folderPath && folderPath.trim().length) {
             var lastIndexOfSlash = -1;
@@ -171,14 +171,14 @@
                 folderLabel = folderName;
               }
               var folderClass = newLastIndexOfSlash >= 0 ? "normal" : "active";
-              this.breadCrumbCnt.append('<li class="arrow"> \
-                    <span class="uiIconMiniArrowRight"></span> \
-                  </li> \
-                  <li class="folder" data-path="' + breadCrumbPath + '"> \
-                  <a class="' + folderClass + '" href="javascript:void(0);" data-toggle="tooltip" rel="tooltip" data-placement="top" title="" data-original-title="' + folderLabel + '"> \
-                  ' + folderLabel + ' \
-                  </a> \
-                </li>');
+              this.breadCrumbCnt.append('<li class="arrow">' +
+                    '<span class="uiIconMiniArrowRight"></span>' +
+                  '</li>' +
+                  '<li class="folder" data-path="' + breadCrumbPath + '">' +
+                  '<a class="' + folderClass + '" href="javascript:void(0);" data-toggle="tooltip" rel="tooltip" data-placement="top" title="" data-original-title="' + folderLabel + '">' +
+                      folderLabel +
+                  '</a>' +
+                '</li>');
               lastIndexOfSlash = newLastIndexOfSlash;
             } while (lastIndexOfSlash >= 0 );
           }
@@ -204,12 +204,12 @@
               this.selectExistingDriveCnt.find(".selectionBox > .filesTitle").removeClass("hidden");
               filesArray.each(function() {
                 var relativePath = $(this).attr("path").replace(self.selectedDriveData.attr("path") + "/", "");
-                $('<div class="fileSelection"> \
-                  <a href="javascript:void(0);" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("title") + '" data-name="' + $(this).attr("name") + '" data-url="' + $(this).attr("url") + '"> \
-                    <div class="' + $(this).attr("nodeTypeCssClass") + ' selectionIcon center"></div> \
-                    <div class="selectionLabel truncate center">' + $(this).attr("title") + '</div> \
-                  </a> \
-                </div>').insertAfter(".selectExistingDriveDialog .filesTitle");
+                $('<div class="fileSelection">' +
+                  '<a href="javascript:void(0);" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("title") + '" data-name="' + $(this).attr("name") + '" data-url="' + $(this).attr("url") + '">' +
+                    '<div class="' + $(this).attr("nodeTypeCssClass") + ' selectionIcon center"></div>' +
+                    '<div class="selectionLabel truncate center">' + $(this).attr("title") + '</div>' +
+                  '</a>' +
+                '</div>').insertAfter(".selectExistingDriveDialog .filesTitle");
               });
               this.selectExistingDriveCnt.find(".fileSelection a").on("click", function() {
                 self.selectExistingDriveCnt.find(".fileSelection").removeClass("selected");
@@ -222,14 +222,14 @@
               this.selectExistingDriveCnt.find(".selectionBox > .foldersTitle").removeClass("hidden");
               foldersArray.each(function() {
                 var relativePath = $(this).attr("path").replace(self.selectedDriveData.attr("path") + "/", "");
-                $('<div class="folderSelection"> \
-                  <a href="javascript:void(0);" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("title") + '" data-name="' + $(this).attr("name") + '" data-path="' + $(this).attr("currentFolder") + '"> \
-                    <i class="' + $(this).attr("nodeTypeCssClass") + ' uiIconEcmsLightGray selectionIcon center"></i> \
-                    <div class="selectionLabel truncate center"> \
-                    ' + $(this).attr("title") + ' \
-                    </div> \
-                  </a> \
-                </div>').insertAfter(".selectExistingDriveDialog .foldersTitle");
+                $('<div class="folderSelection">' +
+                  '<a href="javascript:void(0);" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("title") + '" data-name="' + $(this).attr("name") + '" data-path="' + $(this).attr("currentFolder") + '">' +
+                    '<i class="' + $(this).attr("nodeTypeCssClass") + ' uiIconEcmsLightGray selectionIcon center"></i>' +
+                    '<div class="selectionLabel truncate center">' +
+                        $(this).attr("title") +
+                    '</div>' +
+                  '</a>' +
+                '</div>').insertAfter(".selectExistingDriveDialog .foldersTitle");
               });
               this.selectExistingDriveCnt.find(".folderSelection a").on("click", function() {
                 var path = $(this).attr("data-path");
@@ -242,32 +242,32 @@
           var driveDatas = this.getDrives();
           if(driveDatas.personalDrives) {
             driveDatas.personalDrives.find("Folder").each(function() {
-              $('<div class="driveData" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("label") + '" style="width:135px;"> \
-                  <a href="javascript:void(0);" data-name="' + $(this).attr("name") + '"> \
-                    <i class="' + $(this).attr("nodeTypeCssClass") + ' uiIconEcms24x24Drive' + $(this).attr("name").replace(" ", "") + ' uiIconEcms24x24DrivePrivate uiIconEcmsLightGray selectionIcon center"></i> \
-                    <div class="selectionLabel center">' + $(this).attr("label") + '</div> \
-                  </a> \
-                </div>').insertAfter(".selectExistingDriveDialog .filesTitle");
+              $('<div class="driveData" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("label") + '" style="width:135px;">' +
+                  '<a href="javascript:void(0);" data-name="' + $(this).attr("name") + '">' +
+                    '<i class="' + $(this).attr("nodeTypeCssClass") + ' uiIconEcms24x24Drive' + $(this).attr("name").replace(" ", "") + ' uiIconEcms24x24DrivePrivate uiIconEcmsLightGray selectionIcon center"></i>' +
+                    '<div class="selectionLabel center">' + $(this).attr("label") + '</div>' +
+                  '</a>' +
+                '</div>').insertAfter(".selectExistingDriveDialog .filesTitle");
             });
           }
           if(driveDatas.groupDrives) {
             driveDatas.groupDrives.find("Folder").each(function() {
-              $('<div class="driveData" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("label") + '" style="width:135px;"> \
-                  <a href="javascript:void(0);" data-name="' + $(this).attr("name") + '"> \
-                    <i class="' + $(this).attr("nodeTypeCssClass") + ' uiIconEcms24x24Drive' + $(this).attr("name").replace(" ", "") + ' uiIconEcms24x24DriveGroup uiIconEcmsLightGray selectionIcon center"></i> \
-                    <div class="selectionLabel center">' + $(this).attr("label") + '</div> \
-                  </a> \
-                </div>').insertAfter(".selectExistingDriveDialog .filesTitle");
+              $('<div class="driveData" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("label") + '" style="width:135px;">' +
+                  '<a href="javascript:void(0);" data-name="' + $(this).attr("name") + '">' +
+                    '<i class="' + $(this).attr("nodeTypeCssClass") + ' uiIconEcms24x24Drive' + $(this).attr("name").replace(" ", "") + ' uiIconEcms24x24DriveGroup uiIconEcmsLightGray selectionIcon center"></i>' +
+                    '<div class="selectionLabel center">' + $(this).attr("label") + '</div>' +
+                  '</a>' +
+                '</div>').insertAfter(".selectExistingDriveDialog .filesTitle");
             });
           }
           if(driveDatas.generalDrives) {
             driveDatas.generalDrives.find("Folder").each(function() {
-              $('<div class="driveData" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("label") + '" style="width: 135px;"> \
-                  <a href="javascript:void(0);" data-name="' + $(this).attr("name") + '"> \
-                    <i class="' + $(this).attr("nodeTypeCssClass") + ' uiIconEcms24x24Drive' + $(this).attr("name").replace(" ", "") + ' uiIconEcms24x24DriveGeneral uiIconEcmsLightGray selectionIcon center"></i> \
-                    <div class="selectionLabel center">' + $(this).attr("label") + '</div> \
-                  </a> \
-                </div>').insertAfter(".selectExistingDriveDialog .filesTitle");
+              $('<div class="driveData" rel="tooltip" data-placement="bottom" title="" data-original-title="' + $(this).attr("label") + '" style="width: 135px;">' +
+                  '<a href="javascript:void(0);" data-name="' + $(this).attr("name") + '">' +
+                    '<i class="' + $(this).attr("nodeTypeCssClass") + ' uiIconEcms24x24Drive' + $(this).attr("name").replace(" ", "") + ' uiIconEcms24x24DriveGeneral uiIconEcmsLightGray selectionIcon center"></i>' +
+                    '<div class="selectionLabel center">' + $(this).attr("label") + '</div>' +
+                  '</a>' +
+                '</div>').insertAfter(".selectExistingDriveDialog .filesTitle");
             });
           }
           this.selectExistingDriveCnt.find(".driveData a").on("click", function() {

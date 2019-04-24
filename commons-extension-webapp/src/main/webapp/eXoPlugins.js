@@ -2,13 +2,14 @@ var eXp = {
 };
 
 eXp.init = function(){
-	with (window.opener.eXo.env.portal) {
-		eXo.ecm.ECS.portalName = portalName;
-		eXo.ecm.ECS.context = context;
-		eXo.ecm.ECS.accessMode = accessMode;
-		eXo.ecm.ECS.userId = userName;
-		eXo.ecm.ECS.userLanguage = language;
-	}  
+	var portal = window.opener.eXo.env.portal;
+
+	eXo.ecm.ECS.portalName = portal.portalName;
+	eXo.ecm.ECS.context = portal.context;
+	eXo.ecm.ECS.accessMode = portal.accessMode;
+	eXo.ecm.ECS.userId = portal.userName;
+	eXo.ecm.ECS.userLanguage = portal.language;
+
 	var parentLocation = window.opener.location;
 	eXo.ecm.ECS.hostName = parentLocation.href.substring(0, parentLocation.href.indexOf(parentLocation.pathname));
 	eXo.ecm.ECS.repositoryName = "repository";
