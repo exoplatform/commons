@@ -44,6 +44,12 @@ import java.util.List;
 public class MailLifecycle extends AbstractNotificationLifecycle {
   private static final Log LOG = ExoLogger.getLogger(MailLifecycle.class);
 
+  private NotificationContextFactory notificationContextFactory;
+
+  public MailLifecycle() {
+    this.notificationContextFactory = CommonsUtils.getService(NotificationContextFactory.class);
+  }
+
   @Override
   public void process(NotificationContext ctx, String... userIds) {
     NotificationInfo notification = ctx.getNotificationInfo();
@@ -112,7 +118,7 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
   
   @Override
   public void send(NotificationContext ctx) {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
     NotificationInfo notification = ctx.getNotificationInfo();
     
     AbstractTemplateBuilder builder = getChannel().getTemplateBuilder(notification.getKey());
@@ -130,7 +136,7 @@ public class MailLifecycle extends AbstractNotificationLifecycle {
           LOG.warn(String.format("The email %s is not valid for sending notification", msg.getTo()));
         }
         if (stats) {
-          NotificationContextFactory.getInstance().getStatisticsCollector().createMessageInfoCount(msg.getPluginId());
+          notificationContextFactory.getStatisticsCollector().createMessageInfoCount(msg.getPluginId());
         }
       }
     }

@@ -47,7 +47,7 @@ public abstract class AbstractJCRTestCase extends AbstractExoContainerTestCase {
   
   private static final Log LOG = ExoLogger.getLogger(AbstractJCRTestCase.class);
 
-  private static String tempDir;
+  private String tempDir;
 
   @Before
   public void setUp(){    

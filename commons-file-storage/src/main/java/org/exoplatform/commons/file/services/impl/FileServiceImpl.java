@@ -8,6 +8,7 @@ import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.file.services.FileStorageException;
+import org.exoplatform.commons.file.services.NameSpaceService;
 import org.exoplatform.commons.file.storage.DataStorage;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -28,9 +29,12 @@ public class FileServiceImpl implements FileService {
 
   private BinaryProvider      binaryProvider;
 
-  public FileServiceImpl(DataStorage dataStorage, BinaryProvider resourceProvider) throws Exception {
+  private NameSpaceService    nameSpaceService;
+
+  public FileServiceImpl(DataStorage dataStorage, BinaryProvider resourceProvider, NameSpaceService nameSpaceService) throws Exception {
     this.dataStorage = dataStorage;
     this.binaryProvider = resourceProvider;
+    this.nameSpaceService = nameSpaceService;
   }
 
   @Override
@@ -68,7 +72,7 @@ public class FileServiceImpl implements FileService {
     if (fileInfo.getNameSpace() != null && !fileInfo.getNameSpace().isEmpty()) {
       nSpace = dataStorage.getNameSpace(fileInfo.getNameSpace());
     } else {
-      nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
+      nSpace = dataStorage.getNameSpace(nameSpaceService.getDefaultNameSpace());
     }
     FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
     FileInfo createdFileInfoEntity = transaction.twoPhaseCommit(2, file.getAsStream());
@@ -91,7 +95,7 @@ public class FileServiceImpl implements FileService {
     if (fileInfo.getNameSpace() != null && !fileInfo.getNameSpace().isEmpty()) {
       nSpace = dataStorage.getNameSpace(fileInfo.getNameSpace());
     } else {
-      nSpace = dataStorage.getNameSpace(NameSpaceServiceImpl.getDefaultNameSpace());
+      nSpace = dataStorage.getNameSpace(nameSpaceService.getDefaultNameSpace());
     }
     FileStorageTransaction transaction = new FileStorageTransaction(fileInfo, nSpace);
     FileInfo createdFileInfoEntity = transaction.twoPhaseCommit(0, file.getAsStream());

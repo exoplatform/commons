@@ -339,7 +339,7 @@ public class ExoWebSocketTransport extends AbstractWebSocketTransport<Session> {
     @Override
     public void setHttpSessionAttribute(String name, Object value) {
       if (session != null)
-        session.setAttribute(name, value);
+        session.setAttribute(name, value); // NOSONAR
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2013 eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License
@@ -35,10 +35,6 @@ import org.exoplatform.services.resources.LocalePolicy;
 
 public class NotificationPluginUtils {
   
-  private static OrganizationService organizationService;
-  
-  private static SettingService settingService;
-  
   public static final String NOTIFICATION_SENDER_NAME  = "exo:notificationSenderName";
   
   public static final String NOTIFICATION_SENDER_EMAIL = "exo:notificationSenderEmail";
@@ -64,7 +60,7 @@ public class NotificationPluginUtils {
   }
   
   private static ExoContainerContext getExoContainerContext() {
-    return (ExoContainerContext) PortalContainer.getInstance().getComponentInstanceOfType(ExoContainerContext.class);
+    return PortalContainer.getInstance().getComponentInstanceOfType(ExoContainerContext.class);
   }
 
   public static String getFullName(String userId) {
@@ -154,19 +150,11 @@ public class NotificationPluginUtils {
   }
 
   public static OrganizationService getOrganizationService() {
-    if (organizationService == null) {
-      organizationService = (OrganizationService) PortalContainer.getInstance()
-            .getComponentInstanceOfType(OrganizationService.class);
-    }
-    return organizationService;
+      return ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(OrganizationService.class);
   }
   
   public static SettingService getSettingService() {
-    if (settingService == null) {
-      settingService = (SettingService) PortalContainer.getInstance()
-            .getComponentInstanceOfType(SettingService.class);
-    }
-    return settingService;
+    return ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SettingService.class);
   }
 
   private static void startRequest(Object service) {

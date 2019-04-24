@@ -1,7 +1,7 @@
 package org.mortbay.cometd.continuation;
 
 /*
- * Copyright (C) 2003-2008 eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -113,7 +113,7 @@ public class EXoContinuationCometdServlet extends CometDServlet {
       }
     };
     PortalContainer.addInitTask(config.getServletContext(), task);
-    instance = this;
+    instance = this; // NOSONAR
   }
   
   public void reInit() {
@@ -169,23 +169,19 @@ public class EXoContinuationCometdServlet extends CometDServlet {
                                                                                   IOException {
     if (getContainer() == null || getBayeux() == null) {
       final AsyncContext ac = request.startAsync(request, response);
-      ac.start(new Runnable() {
-        
-        @Override
-        public void run() {
-          while (getContainer() == null || getBayeux() == null) {
-            try {
-              Thread.sleep(5000);
-            } catch (InterruptedException e) {
-              LOG.error(e);
-            }
-          }
-          
+      ac.start(() -> {
+        while (getContainer() == null || getBayeux() == null) {
           try {
-            EXoContinuationCometdServlet.this.service(ac.getRequest(), ac.getResponse());
-          } catch (Exception e) {
+            Thread.sleep(5000);
+          } catch (InterruptedException e) {
             LOG.error(e);
           }
+        }
+
+        try {
+          EXoContinuationCometdServlet.this.service(ac.getRequest(), ac.getResponse());
+        } catch (Exception e) {
+          LOG.error(e);
         }
       });
     } else {

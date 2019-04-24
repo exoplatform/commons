@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2013 eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,8 +38,6 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   
   private static final Log LOG = ExoLogger.getLogger(NotificationExecutorImpl.class);
 
-  private static NotificationExecutor executor;
-
   private final List<NotificationCommand>  commands;
   
   //The executor to execute multiple threads
@@ -48,16 +46,9 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   private NotificationService notificationService;
   
   public NotificationExecutorImpl() {
-    commands = new CopyOnWriteArrayList<NotificationCommand>();
+    commands = new CopyOnWriteArrayList<>();
     notificationService = CommonsUtils.getService(NotificationService.class);
     completionService = CommonsUtils.getService(NotificationCompletionService.class);
-  }
-  
-  public static NotificationExecutor getInstance() {
-    if (executor == null) {
-      executor = new NotificationExecutorImpl();
-    }
-    return executor;
   }
   
   private boolean process(final NotificationContext ctx, final NotificationCommand command) {
@@ -65,23 +56,20 @@ public class NotificationExecutorImpl implements NotificationExecutor {
       if (command.getPlugin().isValid(ctx) == false) {
         return false;
       }
-      Callable<Boolean> task = new Callable<Boolean>() {
-        @Override
-        public Boolean call() throws Exception {
-          try {
-            ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
-            NotificationInfo notifiction = create(ctx, command);
-            if (notifiction != null) {
-              notificationService.process(notifiction);
-            }
-          } catch (Exception e) {
-            LOG.warn("Process NotificationInfo is failed: " + e.getMessage(), e);
-            LOG.debug(e.getMessage(), e);
-            return false;
+      Callable<Boolean> task = () -> {
+        try {
+          ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
+          NotificationInfo notifiction = create(ctx, command);
+          if (notifiction != null) {
+            notificationService.process(notifiction);
           }
-          //
-          return true;
+        } catch (Exception e) {
+          LOG.warn("Process NotificationInfo is failed: " + e.getMessage(), e);
+          LOG.debug(e.getMessage(), e);
+          return false;
         }
+        //
+        return true;
       };
       completionService.addTask(task);
 

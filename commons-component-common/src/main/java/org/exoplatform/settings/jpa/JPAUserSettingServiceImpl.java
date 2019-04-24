@@ -21,11 +21,7 @@ package org.exoplatform.settings.jpa;
 
 import static org.exoplatform.commons.api.settings.data.Context.USER;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,7 +30,9 @@ import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
+import org.exoplatform.commons.api.notification.model.PluginInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.persistence.DataInitializer;
 import org.exoplatform.commons.api.settings.SettingService;
@@ -58,9 +56,13 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
 
   public static final String    NAME_PATTERN       = "exo:{CHANNELID}Channel";
 
-  private SettingService settingService;
+  private SettingService        settingService;
 
   private ChannelManager        channelManager;
+
+  private PluginSettingService  pluginSettingService;
+
+  private UserSetting           defaultSetting;
 
   /**
    * JPAUserSettingServiceImpl must depend on DataInitializer to make sure data
@@ -69,9 +71,11 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
   public JPAUserSettingServiceImpl(SettingService settingService,
                                    NotificationConfiguration configuration,
                                    ChannelManager channelManager,
+                                   PluginSettingService pluginSettingService,
                                    DataInitializer dataInitializer) {
     this.settingService = settingService;
     this.channelManager = channelManager;
+    this.pluginSettingService = pluginSettingService;
   }
 
   /**
@@ -118,7 +122,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
    */
   @Override
   public UserSetting get(String userId) {
-    UserSetting model = UserSetting.getDefaultInstance();
+    UserSetting model = getDefaultSettings();
     model.setUserId(userId);
 
     Map<Scope, Map<String, SettingValue<String>>> userNotificationSettings = settingService.getSettingsByContext(USER.id(userId));
@@ -209,6 +213,40 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
         LOG.error("Failed to init default settings for user " + userName, e);
       }
     }
+  }
+
+  @Override
+  public UserSetting getDefaultSettings() {
+    if (defaultSetting == null) {
+      defaultSetting = UserSetting.getInstance();
+      List<String> activeChannels = getDefaultSettingActiveChannels();
+      if (activeChannels.size() > 0) {
+        defaultSetting.getChannelActives().addAll(activeChannels);
+      } else {
+        for (AbstractChannel channel : channelManager.getChannels()) {
+          defaultSetting.setChannelActive(channel.getId());
+        }
+      }
+      //
+      List<PluginInfo> plugins = pluginSettingService.getAllPlugins();
+      for (PluginInfo pluginInfo : plugins) {
+        for (String defaultConf : pluginInfo.getDefaultConfig()) {
+          for (String channelId : pluginInfo.getAllChannelActive()) {
+            if (UserSetting.FREQUENCY.getFrequecy(defaultConf) == UserSetting.FREQUENCY.INSTANTLY) {
+              defaultSetting.addChannelPlugin(channelId, pluginInfo.getType());
+            } else {
+              defaultSetting.addPlugin(pluginInfo.getType(), UserSetting.FREQUENCY.getFrequecy(defaultConf));
+            }
+          }
+        }
+      }
+    }
+    return defaultSetting.clone();
+  }
+
+  private List<String> getDefaultSettingActiveChannels() {
+    String activeChannels = System.getProperty("exo.notification.channels", "");
+    return activeChannels.isEmpty() ? new ArrayList<String>() : Arrays.asList(activeChannels.split(","));
   }
 
   /**

@@ -73,6 +73,12 @@ public interface UserSettingService {
   void initDefaultSettings(User[] users);
 
   /**
+   * Returns the default settings of an user
+   * @return
+   */
+  UserSetting getDefaultSettings();
+
+  /**
    * Stores the read time point when user clicks mark all read his/her messages.
    * This value will be using to decide the read status of message.
    *  + If less than the read time point, Read = TRUE

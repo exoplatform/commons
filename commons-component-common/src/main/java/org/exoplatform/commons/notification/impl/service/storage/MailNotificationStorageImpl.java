@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2013 eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License
@@ -48,13 +48,16 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
   
   private static final String       REMOVE_DAILY     = "removeDaily";
 
+  private NotificationContextFactory notificationContextFactory;
+
   private String                    workspace;
 
   private final ReentrantLock lock = new ReentrantLock();
 
   private Map<String, Set<String>>  removeByCallBack = new ConcurrentHashMap<String, Set<String>>();
 
-  public MailNotificationStorageImpl(NotificationConfiguration configuration) {
+  public MailNotificationStorageImpl(NotificationConfiguration configuration, NotificationContextFactory notificationContextFactory) {
+    this.notificationContextFactory = notificationContextFactory;
     this.workspace = configuration.getWorkspace();
   }
 
@@ -76,8 +79,8 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
       messageHomeNode.getSession().save();
       
       //record statistics insert entity
-      if (NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled()) {
-        NotificationContextFactory.getInstance().getStatisticsCollector().insertEntity(NTF_MESSAGE);
+      if (notificationContextFactory.getStatistics().isStatisticsEnabled()) {
+        notificationContextFactory.getStatisticsCollector().insertEntity(NTF_MESSAGE);
       }
       
     } catch (Exception e) {
@@ -189,7 +192,7 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
   }
 
   private NodeIterator getWeeklyNodes(Node messageHomeNode, String userId) throws Exception {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
     long startTime = 0;
     if ( stats ) startTime = System.currentTimeMillis();
     //
@@ -207,13 +210,13 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
     
     //record statistics insert entity
     if (stats) {
-      NotificationContextFactory.getInstance().getStatisticsCollector().queryExecuted(strQuery.toString(), it.getSize(), System.currentTimeMillis() - startTime);
+      notificationContextFactory.getStatisticsCollector().queryExecuted(strQuery.toString(), it.getSize(), System.currentTimeMillis() - startTime);
     }
     return it;
   }
   
   private NodeIterator getDailyNodes(Node pluginDayNode, String userId) throws Exception {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
     long startTime = 0;
     if ( stats ) startTime = System.currentTimeMillis();
     //
@@ -232,7 +235,7 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
     NodeIterator it = query.execute().getNodes();
     
     if (stats) {
-      NotificationContextFactory.getInstance().getStatisticsCollector().queryExecuted(strQuery.toString(), it.getSize(), System.currentTimeMillis() - startTime);
+      notificationContextFactory.getStatisticsCollector().queryExecuted(strQuery.toString(), it.getSize(), System.currentTimeMillis() - startTime);
     }
     return it;
   }
@@ -306,7 +309,7 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
   }
 
   private void removeProperty(Session session, String path, String property, String value) {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
     try {
       Node node = (Node) session.getItem(path);
       List<String> values = NotificationUtils.valuesToList(node.getProperty(property).getValues());
@@ -320,7 +323,7 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
         
         //record entity update here
         if (stats) {
-          NotificationContextFactory.getInstance().getStatisticsCollector().updateEntity(NTF_MESSAGE);
+          notificationContextFactory.getStatisticsCollector().updateEntity(NTF_MESSAGE);
         }
       }
     } catch (Exception e) {
@@ -330,7 +333,7 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
 
   @Override
   public void removeMessageAfterSent(NotificationContext ctx) throws Exception {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
     boolean created =  NotificationSessionManager.createSystemProvider();
     SessionProvider sProvider =  NotificationSessionManager.getSessionProvider();
     
@@ -346,7 +349,7 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
             session.getItem(nodePath).remove();
             //record entity delete here
             if (stats) {
-              NotificationContextFactory.getInstance().getStatisticsCollector().deleteEntity(NTF_MESSAGE);
+              notificationContextFactory.getStatisticsCollector().deleteEntity(NTF_MESSAGE);
             }
             
             LOG.debug("Remove NotificationMessage " + nodePath);

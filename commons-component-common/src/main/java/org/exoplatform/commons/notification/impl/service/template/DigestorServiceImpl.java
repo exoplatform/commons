@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2013 eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License
@@ -51,7 +51,11 @@ public class DigestorServiceImpl implements DigestorService {
   private static final Log LOG = ExoLogger.getLogger(DigestorServiceImpl.class);
   private static final Pattern LI_PATTERN = Pattern.compile("<li([^>]+)>(.+?)</li>");
 
-  public DigestorServiceImpl() {}
+  private NotificationContextFactory notificationContextFactory;
+
+  public DigestorServiceImpl(NotificationContextFactory notificationContextFactory) {
+    this.notificationContextFactory = notificationContextFactory;
+  }
   
   
   public MessageInfo buildMessage(NotificationContext jobContext, Map<PluginKey, List<NotificationInfo>> notificationData, UserSetting userSetting) {
@@ -126,9 +130,9 @@ public class DigestorServiceImpl implements DigestorService {
     
     LOG.debug("End build template of DigestorProviderImpl ... " + (System.currentTimeMillis() - startTime) + " ms");
     
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
     if (stats) {
-      NotificationContextFactory.getInstance().getStatisticsCollector().createDigestCount(messageInfo.getPluginId());
+      notificationContextFactory.getStatisticsCollector().createDigestCount(messageInfo.getPluginId());
     }
     
     return messageInfo;

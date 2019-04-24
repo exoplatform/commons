@@ -45,14 +45,18 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
 
   private ListenerService     listenerService;
 
+  private NotificationContextFactory notificationContextFactory;
+
   public JPAQueueMessageImpl(MailService mailService,
                              MailQueueDAO mailQueueDAO,
                              ListenerService listenerService,
                              DataInitializer dataInitializer,
+                             NotificationContextFactory notificationContextFactory,
                              InitParams params) {
     this.mailService = mailService;
     this.mailQueueDAO = mailQueueDAO;
     this.listenerService = listenerService;
+    this.notificationContextFactory = notificationContextFactory;
 
     maxToSend = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, MAX_TO_SEND_DEFAULT);
   }
@@ -107,7 +111,7 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
   @Override
   @ExoTransactional
   public void send() {
-    final boolean statsEnabled = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean statsEnabled = notificationContextFactory.getStatistics().isStatisticsEnabled();
     int messagesSize = 0;
     //
     Set<MessageInfo> messages = load();
@@ -129,7 +133,7 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
           LOG.debug("Mail message '{}' removed from queue, to user: {}", messageInfo.getId(), messageInfo.getTo());
           //
           if (statsEnabled) {
-            NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
+            notificationContextFactory.getStatisticsCollector().pollQueue(messageInfo.getPluginId());
           }
         }
       } catch (Exception e) {

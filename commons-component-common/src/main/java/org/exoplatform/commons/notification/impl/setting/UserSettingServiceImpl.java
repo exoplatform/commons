@@ -19,7 +19,9 @@ package org.exoplatform.commons.notification.impl.setting;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
+import org.exoplatform.commons.api.notification.model.PluginInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
@@ -44,6 +46,7 @@ import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -55,6 +58,9 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   private static final Scope    NOTIFICATION_SCOPE = Scope.GLOBAL.id(null);
   private SettingService        settingService;
   private ChannelManager        channelManager;
+  private PluginSettingService  pluginSettingService;
+
+  private UserSetting           defaultSetting;
 
   private final String          workspace;
 
@@ -65,10 +71,11 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
   transient final ReentrantLock lock = new ReentrantLock();
   
   public UserSettingServiceImpl(SettingService settingService, NotificationConfiguration configuration,
-                                ChannelManager channelManager) {
+                                ChannelManager channelManager, PluginSettingService pluginSettingService) {
     this.settingService = settingService;
     this.workspace = configuration.getWorkspace();
     this.channelManager = channelManager;
+    this.pluginSettingService = pluginSettingService;
   }
 
   private Node getUserSettingHome(Session session) throws Exception {
@@ -142,7 +149,7 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
       model.setWeeklyPlugins(getArrayListValue(userId, EXO_WEEKLY, new ArrayList<String>()));
       //
     } else {
-      model = UserSetting.getDefaultInstance().setUserId(userId);
+      model = getDefaultSettings().setUserId(userId);
       initDefaultSettings(userId);
     }
     SettingValue<?> value = getSettingValue(userId, EXO_LAST_READ_DATE);
@@ -199,6 +206,40 @@ public class UserSettingServiceImpl extends AbstractService implements UserSetti
     } finally {
       NotificationSessionManager.closeSessionProvider(created);
     }
+  }
+
+  @Override
+  public UserSetting getDefaultSettings() {
+    if (defaultSetting == null) {
+      defaultSetting = UserSetting.getInstance();
+      List<String> activeChannels = getDefaultSettingActiveChannels();
+      if (activeChannels.size() > 0) {
+        defaultSetting.getChannelActives().addAll(activeChannels);
+      } else {
+        for (AbstractChannel channel : channelManager.getChannels()) {
+          defaultSetting.setChannelActive(channel.getId());
+        }
+      }
+      //
+      List<PluginInfo> plugins = pluginSettingService.getAllPlugins();
+      for (PluginInfo pluginInfo : plugins) {
+        for (String defaultConf : pluginInfo.getDefaultConfig()) {
+          for (String channelId : pluginInfo.getAllChannelActive()) {
+            if (UserSetting.FREQUENCY.getFrequecy(defaultConf) == UserSetting.FREQUENCY.INSTANTLY) {
+              defaultSetting.addChannelPlugin(channelId, pluginInfo.getType());
+            } else {
+              defaultSetting.addPlugin(pluginInfo.getType(), UserSetting.FREQUENCY.getFrequecy(defaultConf));
+            }
+          }
+        }
+      }
+    }
+    return defaultSetting.clone();
+  }
+
+  private List<String> getDefaultSettingActiveChannels() {
+    String activeChannels = System.getProperty("exo.notification.channels", "");
+    return activeChannels.isEmpty() ? new ArrayList<String>() : Arrays.asList(activeChannels.split(","));
   }
 
   private void addMixin(SessionProvider sProvider, User[] users) {

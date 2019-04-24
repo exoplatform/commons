@@ -83,7 +83,7 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
       User user = new UserImpl(userId);
       organizationService.getUserHandler().createUser(user, true);
       //
-      userSetting = UserSetting.getDefaultInstance().setUserId(userId);
+      userSetting = userSettingService.getDefaultSettings().setUserId(userId);
       userSetting.setLastReadDate(System.currentTimeMillis());
       userSettingService.save(userSetting);
       //

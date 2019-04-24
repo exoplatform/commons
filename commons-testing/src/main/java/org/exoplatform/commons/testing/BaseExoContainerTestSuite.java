@@ -61,7 +61,7 @@ public abstract class BaseExoContainerTestSuite {
     testCaseClazz = (config != null) ? config.value() : AbstractKernelTest.class;
   }
   
-  protected static void beforeSetup() throws Exception {
+  protected synchronized static void beforeSetup() throws Exception {
     Class<?> key = testCaseClazz;
 
     //
@@ -81,7 +81,7 @@ public abstract class BaseExoContainerTestSuite {
     }
   }
   
-  protected static void afterTearDown() {
+  protected synchronized static void afterTearDown() {
     Class<?> key = testCaseClazz;
 
     //

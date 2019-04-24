@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 eXo Platform SAS.
+ * Copyright (C) 2019 eXo Platform SAS.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -56,7 +56,8 @@ public class EntityManagerService implements ComponentRequestLifecycle {
   private static final Log            LOGGER                      = ExoLogger.getLogger(EntityManagerService.class);
   private static final String         EXO_JPA_DATASOURCE_NAME     = "exo.jpa.datasource.name";
   private static final String         EXO_PREFIX_FOR_HIB_SETTINGS = "exo.jpa.";
-  private static EntityManagerFactory entityManagerFactory;
+
+  private EntityManagerFactory        entityManagerFactory;
 
   private ThreadLocal<EntityManager>  instance                    = new ThreadLocal<>();
 
