@@ -42,7 +42,7 @@ public abstract class BaseExoContainerTestSuite {
   private static KernelBootstrap bootstrap;
 
   /** . */
-  private static final Map<Class<?>, AtomicLong> counters = new HashMap<Class<?>, AtomicLong>();
+  private static final Map<Class<?>, AtomicLong> counters = new HashMap<>();
   
   private static Class<?> testCaseClazz = null;
   
@@ -56,12 +56,12 @@ public abstract class BaseExoContainerTestSuite {
     afterTearDown();
   }
   
-  protected static void initConfiguration(Class<?> clazz) {
+  protected static synchronized void initConfiguration(Class<?> clazz) {
     ConfigTestCase config = clazz.getAnnotation(ConfigTestCase.class);
     testCaseClazz = (config != null) ? config.value() : AbstractKernelTest.class;
   }
   
-  protected static void beforeSetup() throws Exception {
+  protected static synchronized void beforeSetup() throws Exception {
     Class<?> key = testCaseClazz;
 
     //
@@ -81,7 +81,7 @@ public abstract class BaseExoContainerTestSuite {
     }
   }
   
-  protected static void afterTearDown() {
+  protected static synchronized void afterTearDown() {
     Class<?> key = testCaseClazz;
 
     //

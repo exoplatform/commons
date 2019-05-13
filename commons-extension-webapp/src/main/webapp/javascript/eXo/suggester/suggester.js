@@ -295,7 +295,6 @@
       } else {
         return $.error("Method " + method + " does not exist on eXo suggester");
       }
-      return;
     }
 
     if (!settings) settings = {};

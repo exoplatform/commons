@@ -21,7 +21,18 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.management.annotations.*;
+import org.exoplatform.management.jmx.annotations.NameTemplate;
+import org.exoplatform.management.jmx.annotations.Property;
+import org.exoplatform.management.rest.annotations.RESTEndpoint;
 
+@Managed
+@ManagedDescription("eXo Feature Service")
+@NameTemplate({
+    @Property(key = "service", value = "feature"),
+    @Property(key = "view", value = "ExoFeatureService")
+})
+@RESTEndpoint(path = "featureservice")
 public class ExoFeatureServiceImpl implements ExoFeatureService {
   
   private static final String NAME_SPACES = "exo:";
@@ -32,8 +43,11 @@ public class ExoFeatureServiceImpl implements ExoFeatureService {
     this.settingService = settingService;
   }
 
+  @Managed
+  @ManagedDescription("Determine if the feature is active")
+  @Impact(ImpactType.READ)
   @Override
-  public boolean isActiveFeature(String featureName) {
+  public boolean isActiveFeature(@ManagedDescription("Feature name") @ManagedName("featureName") String featureName) {
     SettingValue<?> sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), (NAME_SPACES + featureName));
     return (sValue == null) ? true : Boolean.valueOf(sValue.getValue().toString());
   }
@@ -41,6 +55,15 @@ public class ExoFeatureServiceImpl implements ExoFeatureService {
   @Override
   public void saveActiveFeature(String featureName, boolean isActive) {
     settingService.set(Context.GLOBAL, Scope.GLOBAL.id(null), (NAME_SPACES + featureName), SettingValue.create(isActive));
+  }
+
+  @Managed
+  @ManagedDescription("Activate/Deactivate feature")
+  @Impact(ImpactType.WRITE)
+  public void changeFeatureActivation(@ManagedDescription("Feature name") @ManagedName("featureName") String featureName,
+                                @ManagedDescription("Is active") @ManagedName("isActive") String isActive) {
+    boolean isActiveBool = Boolean.parseBoolean(isActive);
+    saveActiveFeature(featureName, isActiveBool);
   }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-${year} eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -75,6 +75,8 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
   /** .. */
   private NotificationConfiguration notificationConfiguration;
 
+  private NotificationContextFactory notificationContextFactory;
+
   /** The lock protecting all mutators */
   transient final ReentrantLock     lock                = new ReentrantLock();
 
@@ -88,17 +90,19 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
                           MailService mailService,
                           ListenerService listenerService,
                           SettingService settingService,
+                          NotificationContextFactory notificationContextFactory,
                           InitParams params) {
     this.notificationConfiguration = notificationConfiguration;
     this.listenerService = listenerService;
     this.mailService = mailService;
+    this.notificationContextFactory = notificationContextFactory;
 
     maxToSend = NotificationUtils.getSystemValue(params, MAX_TO_SEND_SYS_KEY, MAX_TO_SEND_KEY, MAX_TO_SEND_DEFAULT);
   }
 
   @Override
   public boolean put(MessageInfo message) throws Exception {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
     //
     if (message == null || message.getTo() == null || message.getTo().length() == 0) {
       return false;
@@ -121,7 +125,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
 
   @Override
   public void send() throws Exception {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       //
@@ -142,7 +146,7 @@ public class QueueMessageImpl extends AbstractService implements QueueMessage, S
           //
           idsRemovingLocal.get().add(messageInfo.getId());
           if (stats) {
-            NotificationContextFactory.getInstance().getStatisticsCollector().pollQueue(messageInfo.getPluginId());
+            notificationContextFactory.getStatisticsCollector().pollQueue(messageInfo.getPluginId());
           }
         }
       }

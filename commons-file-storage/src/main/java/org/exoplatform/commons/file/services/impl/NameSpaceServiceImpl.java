@@ -45,7 +45,7 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
 
   private List<NameSpacePlugin> nameSpacePlugins       = new ArrayList<NameSpacePlugin>();
 
-  private static String         defaultNamespace;
+  private String                defaultNamespace;
 
   private DataStorage           dataStorage;
 
@@ -109,7 +109,7 @@ public class NameSpaceServiceImpl implements NameSpaceService, Startable {
     }
   }
 
-  public static String getDefaultNameSpace() {
+  public String getDefaultNameSpace() {
     return defaultNamespace;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2013 eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License
@@ -173,7 +173,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   }
 
   private void send(NotificationContext context, List<UserSetting> userSettings) {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
 
     for (UserSetting userSetting : userSettings) {
       if (!userSetting.isChannelActive(MailChannel.ID) || !userSetting.isEnabled()
@@ -186,7 +186,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   }
 
   private void sendDefault(NotificationContext context, List<UserSetting> userSettings, UserSetting defaultConfigPlugins) {
-    final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
+    final boolean stats = notificationContextFactory.getStatistics().isStatisticsEnabled();
 
     for (UserSetting userSetting : userSettings) {
       if (!userSetting.isEnabled() || NotificationUtils.isDeletedMember(userSetting.getUserId())) {
@@ -210,8 +210,8 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
           CommonsUtils.getService(QueueMessage.class).put(messageInfo);
 
           if (stats) {
-            NotificationContextFactory.getInstance().getStatisticsCollector().createMessageInfoCount(messageInfo.getPluginId());
-            NotificationContextFactory.getInstance().getStatisticsCollector().putQueue(messageInfo.getPluginId());
+            notificationContextFactory.getStatisticsCollector().createMessageInfoCount(messageInfo.getPluginId());
+            notificationContextFactory.getStatisticsCollector().putQueue(messageInfo.getPluginId());
           }
         } catch (Exception e) {
           LOG.error("An error occurred while putting message " + messageInfo.getId() + " to user " + messageInfo.getTo()
@@ -232,7 +232,7 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
   private UserSetting getDefaultUserSetting(List<String> activatedPluginsByAdminSetting) {
     UserSetting setting = UserSetting.getInstance();
     // default setting loaded from configuration xml file
-    UserSetting defaultSetting = UserSetting.getDefaultInstance();
+    UserSetting defaultSetting = userService.getDefaultSettings();
     for (String string : activatedPluginsByAdminSetting) {
       if (defaultSetting.isInWeekly(string)) {
         setting.addPlugin(string, FREQUENCY.WEEKLY);

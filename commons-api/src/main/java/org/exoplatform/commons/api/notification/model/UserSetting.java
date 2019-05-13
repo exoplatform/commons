@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2013 eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public License
@@ -19,20 +19,10 @@ package org.exoplatform.commons.api.notification.model;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.exoplatform.commons.api.notification.channel.AbstractChannel;
-import org.exoplatform.commons.api.notification.channel.ChannelManager;
-import org.exoplatform.commons.api.notification.service.setting.PluginSettingService;
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
-
 /**
  * User setting notification
  */
 public class UserSetting {
-  private static UserSetting defaultSetting = null;
-
   public static String EMAIL_CHANNEL = "MAIL_CHANNEL";
 
   public enum FREQUENCY {
@@ -330,47 +320,6 @@ public class UserSetting {
   @Override
   public String toString() {
     return "UserSetting : {userId : " + userId + "}";
-  }
-  
-  public static final UserSetting getDefaultInstance() {
-    if (defaultSetting == null) {
-      ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
-      if (currentContainer instanceof RootContainer) {
-        currentContainer = PortalContainer.getInstance();
-      }
-      PluginSettingService settingService = (PluginSettingService) currentContainer.
-                                              getComponentInstanceOfType(PluginSettingService.class);
-      ChannelManager channelManager = (ChannelManager) currentContainer.
-                                              getComponentInstanceOfType(ChannelManager.class);
-      defaultSetting = getInstance();
-      List<String> activeChannels = getDefaultSettingActiveChannels();
-      if (activeChannels.size() > 0) {
-        defaultSetting.channelActives.addAll(activeChannels);
-      } else {
-        for (AbstractChannel channel : channelManager.getChannels()) {
-          defaultSetting.setChannelActive(channel.getId());
-        }
-      }
-      //
-      List<PluginInfo> plugins = settingService.getAllPlugins();
-      for (PluginInfo pluginInfo : plugins) {
-        for (String defaultConf : pluginInfo.getDefaultConfig()) {
-          for (String channelId : pluginInfo.getAllChannelActive()) {
-            if (FREQUENCY.getFrequecy(defaultConf) == FREQUENCY.INSTANTLY) {
-              defaultSetting.addChannelPlugin(channelId, pluginInfo.getType());
-            } else {
-              defaultSetting.addPlugin(pluginInfo.getType(), FREQUENCY.getFrequecy(defaultConf));
-            }
-          }
-        }
-      }
-    }
-    return defaultSetting.clone();
-  }
-
-  private static List<String> getDefaultSettingActiveChannels() {
-    String activeChannels = System.getProperty("exo.notification.channels", "");
-    return activeChannels.isEmpty() ? new ArrayList<String>() : Arrays.asList(activeChannels.split(","));
   }
 
   public boolean isEnabled() {

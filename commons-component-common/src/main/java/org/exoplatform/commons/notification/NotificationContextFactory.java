@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2013 eXo Platform SAS.
+ * Copyright (C) 2003-2019 eXo Platform SAS.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,8 +31,6 @@ public class NotificationContextFactory {
   
   private final StatisticsService statisticsService;
   
-  private static NotificationContextFactory instance = null;
-  
   public NotificationContextFactory(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
@@ -48,12 +46,4 @@ public class NotificationContextFactory {
   public Statistics getStatistics() {
     return this.statisticsService.getStatistics();
   }
-
-  public static NotificationContextFactory getInstance() {
-    if (instance == null) {
-      instance = CommonsUtils.getService(NotificationContextFactory.class);
-    }
-    return instance;
-  }
-
 }

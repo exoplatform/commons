@@ -2,24 +2,25 @@
 
 var LinkSelector = {
 	init : function() {
-		with (window.opener.eXo.env.portal) {
-			this.portalName = portalName;
-			this.context = context;	
-			this.userId = userName;
-			this.userLanguage = language;
-			var parentLocation = window.opener.location;
-			this.hostName = parentLocation.href.substring(0, parentLocation.href.indexOf(parentLocation.pathname));
-			this.repositoryName = "repository";
-			this.workspaceName = "collaboration";
-			this.cmdPortalLink = "/portalLinks/";
-			this.cmdGetFolderAndFile = "getFoldersAndFiles?";
-			this.resourceType = eXp.getUrlParam("type") || "File";
-			this.connector	= eXp.getUrlParam("connector") ||  window.opener.eXo.ecm.WCMUtils.getRestContext();
-			this.currentNode = "";
-			this.currentFolder = "/";
-			this.xmlHttpRequest = false;
-			this.eventNode = false;
-		}
+		var portal = window.opener.eXo.env.portal;
+
+		this.portalName = portal.portalName;
+		this.context = portal.context;
+		this.userId = portal.userName;
+		this.userLanguage = portal.language;
+		var parentLocation = window.opener.location;
+		this.hostName = parentLocation.href.substring(0, parentLocation.href.indexOf(parentLocation.pathname));
+		this.repositoryName = "repository";
+		this.workspaceName = "collaboration";
+		this.cmdPortalLink = "/portalLinks/";
+		this.cmdGetFolderAndFile = "getFoldersAndFiles?";
+		this.resourceType = eXp.getUrlParam("type") || "File";
+		this.connector	= eXp.getUrlParam("connector") ||  window.opener.eXo.ecm.WCMUtils.getRestContext();
+		this.currentNode = "";
+		this.currentFolder = "/";
+		this.xmlHttpRequest = false;
+		this.eventNode = false;
+
 		this.initGadget();
 	}
 }; 
