@@ -580,7 +580,7 @@
                                                                        } else {
                                                                             nodePath = decodeURIComponent(addressBarContent);
                                                                        }
-                                                                       window.open('/eXoWCMResources/eXoPlugins/content/content.html?insertContentType=Image&subPath='+subPath+'&nodePath=' + nodePath + '&viewType=thumbnail&components=' + previewImageId + '&currentInstance=' + editor.name, 'WCMGadgetSelector', 'width=1024,height=600');
+                                                                       window.open('/eXoWCMResources/eXoPlugins/content/content.html?insertContentType=Image&subPath='+ encodeURIComponent(subPath) +'&nodePath=' + encodeURIComponent(nodePath) + '&viewType=thumbnail&components=' + previewImageId + '&currentInstance=' + editor.name, 'WCMGadgetSelector', 'width=1024,height=600');
                                                                        window.popup_opened = true;
 								},
 								hidden: false,
