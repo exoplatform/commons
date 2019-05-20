@@ -1,7 +1,7 @@
 require(['SHARED/jquery'],function($) {
-  function handleBeforeunload(editor) {
+  function handleBeforeUnload(editor) {
     $(window).on( 'beforeunload', evt => {
-      if ( editor.checkDirty() ) {
+      if ( $(`.${editor.id}`).length && $(`.${editor.id}`).is(":visible") && editor.getData().trim() && editor.checkDirty() ) {
         return false;
       }
     });
@@ -10,7 +10,7 @@ require(['SHARED/jquery'],function($) {
   CKEDITOR.plugins.add( 'confirmBeforeReload', {
     init : function(editor) {
       editor.on('instanceReady', function(evt) {
-        handleBeforeunload(editor);
+        handleBeforeUnload(editor);
       });
     }
   });
