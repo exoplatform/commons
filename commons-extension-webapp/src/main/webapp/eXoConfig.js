@@ -6,7 +6,6 @@ CKEDITOR.eXoPath = CKEDITOR.basePath.substr(0, CKEDITOR.basePath.indexOf("ckedit
 
 // config to add custom plugin	
 (function() {CKEDITOR.plugins.addExternal('content','/eXoWCMResources/eXoPlugins/content/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('insertGadget','/commons-extension/eXoPlugins/insertGadget/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('insertPortalLink','/commons-extension/eXoPlugins/insertPortalLink/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('simpleLink','/commons-extension/eXoPlugins/simpleLink/','plugin.js');})();
 (function() {CKEDITOR.plugins.addExternal('acceptInline','/eXoWCMResources/eXoPlugins/acceptInline/','plugin.js');})();
@@ -14,7 +13,7 @@ CKEDITOR.eXoPath = CKEDITOR.basePath.substr(0, CKEDITOR.basePath.indexOf("ckedit
 (function() {CKEDITOR.plugins.addExternal('helpBBCode','/forum/eXoPlugins/helpBBCode/','plugin.js');})();
 
 CKEDITOR.editorConfig = function( config ){
-	config.extraPlugins = 'content,insertGadget,insertPortalLink,acceptInline,cancelInline,onchange,helpBBCode,syntaxhighlight';
+	config.extraPlugins = 'content,insertPortalLink,acceptInline,cancelInline,onchange,helpBBCode,syntaxhighlight';
 	config.removePlugins = 'scayt,wsc';
 	config.toolbarCanCollapse = false;
 	config.skin = 'moono-exo';
@@ -58,7 +57,7 @@ CKEDITOR.editorConfig = function( config ){
 	config.toolbar_CompleteWCM = [
 		['Source','Templates'],
 		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','-','Undo','Redo'],
-		['insertGadget.btn','Flash','Table','SpecialChar', 'content.btn', 'Image'], 		['Bold','Italic','Underline','Strike','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','NumberedList','BulletedList','-','TextColor','BGColor','-','RemoveFormat'],
+		['Flash','Table','SpecialChar', 'content.btn', 'Image'], 		['Bold','Italic','Underline','Strike','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','NumberedList','BulletedList','-','TextColor','BGColor','-','RemoveFormat'],
 		['Link','insertPortalLink.btn','Unlink','Anchor'],		
 		['Styles','Format','Font','FontSize', '-' ,'Maximize']
 	] ;
@@ -74,12 +73,12 @@ CKEDITOR.editorConfig = function( config ){
 	config.toolbar_SuperBasicWCM = [
 		   ['Source','-','Bold','Italic','Underline'],
 		   ['-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-		   ['-','Link','Unlink','insertPortalLink.btn','insertGadget.btn','content.btn', 'Image'],	
+		   ['-','Link','Unlink','insertPortalLink.btn','content.btn', 'Image'],
 	] ;
 
 	config.toolbar_InlineEdit = [
 		['Cut','Copy','Paste','PasteText','PasteFromWord','-','Find','Replace','SelectAll','-','Undo','Redo'],
-		['insertGadget.btn','Flash','Table','SpecialChar', 'content.btn', 'Image'],
+		['Flash','Table','SpecialChar', 'content.btn', 'Image'],
                 ['Bold','Italic','Underline','Strike','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 		'/',
                 ['NumberedList','BulletedList','-','TextColor','BGColor','-','RemoveFormat'],		
