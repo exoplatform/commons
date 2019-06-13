@@ -4,10 +4,10 @@
   <parent>
     <artifactId>commons</artifactId>
     <groupId>org.exoplatform.commons</groupId>
-    <version>5.3.x-SNAPSHOT</version>
+    <version>5.3.0-M10</version>
   </parent>
   <artifactId>commons-gifbackport</artifactId>
-  <version>5.3.x-SNAPSHOT</version>
+  <version>5.3.0-M10</version>
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Component GIF plugin backport</name>
   <description>eXo javax.imageio GIF plugin backport</description>
