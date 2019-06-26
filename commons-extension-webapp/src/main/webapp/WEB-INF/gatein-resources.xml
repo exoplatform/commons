@@ -211,6 +211,18 @@
 		</depends>
 	</module>
 
+    <module>
+        <name>mask-layer</name>
+        <as>mask_layer</as>
+        <script>
+            <path>/javascript/eXo/commons/MaskLayerControl.js</path>
+        </script>
+        <depends>
+            <module>jquery</module>
+            <as>gj</as>
+        </depends>
+    </module>
+
 	<module>
 		<name>suggester</name>
 		<script>
