@@ -26,6 +26,9 @@ import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.management.rest.annotations.RESTEndpoint;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Managed
 @ManagedDescription("eXo Feature Service")
 @NameTemplate({
@@ -38,7 +41,9 @@ public class ExoFeatureServiceImpl implements ExoFeatureService {
   private static final String NAME_SPACES = "exo:";
 
   private SettingService      settingService;
-  
+
+  private Map<String, Boolean> featuresProperties = new HashMap<>();
+
   public ExoFeatureServiceImpl(SettingService      settingService) {
     this.settingService = settingService;
   }
@@ -48,8 +53,26 @@ public class ExoFeatureServiceImpl implements ExoFeatureService {
   @Impact(ImpactType.READ)
   @Override
   public boolean isActiveFeature(@ManagedDescription("Feature name") @ManagedName("featureName") String featureName) {
+    Boolean active;
     SettingValue<?> sValue = settingService.get(Context.GLOBAL, Scope.GLOBAL.id(null), (NAME_SPACES + featureName));
-    return (sValue == null) ? true : Boolean.valueOf(sValue.getValue().toString());
+    if(sValue != null) {
+      active = Boolean.valueOf(sValue.getValue().toString());
+    } else {
+      active = getFeaturePropertyValue(featureName);
+    }
+    return active == null ? true : active;
+  }
+
+  private Boolean getFeaturePropertyValue(String featureName) {
+    String propertyName = "exo.feature." + featureName + ".enabled";
+    if(featuresProperties.containsKey(propertyName)) {
+      return featuresProperties.get(propertyName);
+    } else {
+      String propertyValue = System.getProperty(propertyName);
+      Boolean active = propertyValue != null ? Boolean.valueOf(propertyValue) : null;
+      featuresProperties.put(propertyName, active);
+      return active;
+    }
   }
 
   @Override

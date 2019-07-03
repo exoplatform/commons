@@ -29,14 +29,81 @@ public class FeatureServiceTest extends BaseCommonsTestCase  {
     featureService = getService(ExoFeatureService.class);
   }
   
-  public void testSaveActiveFeature() throws Exception {
-    //
-    featureService.saveActiveFeature("notification", false);
-    assertFalse(featureService.isActiveFeature("notification"));
-    
-    //
-    featureService.saveActiveFeature("notification", true);
-    assertTrue(featureService.isActiveFeature("notification"));
+  public void testShouldFeatureBeActiveWhenSettingIsTrue() {
+    // Given
+    featureService.saveActiveFeature("feature1", true);
+
+    // When
+    boolean activeFeature = featureService.isActiveFeature("feature1");
+
+    // Then
+    assertTrue(activeFeature);
   }
 
+  public void testShouldFeatureNotBeActiveWhenSettingIsFalse() {
+    // Given
+    featureService.saveActiveFeature("feature2", false);
+
+    // When
+    boolean activeFeature = featureService.isActiveFeature("feature2");
+
+    // Then
+    assertFalse(activeFeature);
+  }
+
+  public void testShouldFeatureBeActiveWhenNoSettingAndNoProperty() {
+    // Given
+
+    // When
+    boolean activeFeature = featureService.isActiveFeature("feature3");
+
+    // Then
+    assertTrue(activeFeature);
+  }
+
+  public void testShouldFeatureBeActiveWhenNoSettingAndPropertyIsTrue() {
+    // Given
+    System.setProperty("exo.feature.feature3.enabled", "true");
+
+    // When
+    boolean activeFeature = featureService.isActiveFeature("feature3");
+
+    // Then
+    assertTrue(activeFeature);
+  }
+
+  public void testShouldFeatureNotBeActiveWhenNoSettingAndPropertyIsFalse() {
+    // Given
+    System.setProperty("exo.feature.feature4.enabled", "false");
+
+    // When
+    boolean activeFeature = featureService.isActiveFeature("feature4");
+
+    // Then
+    assertFalse(activeFeature);
+  }
+
+  public void testShouldFeatureBeActiveWhenSettingIsTrueAndPropertyIsFalse() {
+    // Given
+    featureService.saveActiveFeature("feature5", true);
+    System.setProperty("exo.feature.feature5.enabled", "false");
+
+    // When
+    boolean activeFeature = featureService.isActiveFeature("feature5");
+
+    // Then
+    assertTrue(activeFeature);
+  }
+
+  public void testShouldFeatureNotBeActiveWhenSettingIsFalseAndPropertyIsTrue() {
+    // Given
+    featureService.saveActiveFeature("feature6", false);
+    System.setProperty("exo.feature.feature6.enabled", "true");
+
+    // When
+    boolean activeFeature = featureService.isActiveFeature("feature6");
+
+    // Then
+    assertFalse(activeFeature);
+  }
 }
