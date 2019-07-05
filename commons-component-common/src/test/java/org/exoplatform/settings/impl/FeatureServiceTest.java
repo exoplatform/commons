@@ -16,13 +16,17 @@
  */
 package org.exoplatform.settings.impl;
 
-import org.exoplatform.commons.api.settings.ExoFeatureService;
-import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.apache.commons.lang3.StringUtils;
 
-public class FeatureServiceTest extends BaseCommonsTestCase  {
-  
+import org.exoplatform.commons.api.settings.ExoFeatureService;
+import org.exoplatform.commons.api.settings.FeaturePlugin;
+import org.exoplatform.commons.testing.BaseCommonsTestCase;
+import org.exoplatform.commons.utils.CommonsUtils;
+
+public class FeatureServiceTest extends BaseCommonsTestCase {
+
   private ExoFeatureService featureService;
-  
+
   @Override
   public void setUp() throws Exception {
     super.setUp();
@@ -106,4 +110,53 @@ public class FeatureServiceTest extends BaseCommonsTestCase  {
     // Then
     assertFalse(activeFeature);
   }
+
+  public void testSaveActiveFeature() throws Exception {
+    //
+    featureService.saveActiveFeature("notification", false);
+    assertFalse(featureService.isActiveFeature("notification"));
+
+    //
+    featureService.saveActiveFeature("notification", true);
+    assertTrue(featureService.isActiveFeature("notification"));
+  }
+
+  public void testActiveFeatureForUser() throws Exception {
+    assertTrue("Feature should be enabled if no flag is stored in DB", featureService.isActiveFeature("wallet"));
+    assertFalse("Feature should be disabled for a user if no plugin is added with this feature",
+                featureService.isFeatureActiveForUser("wallet", "toto"));
+
+    featureService.saveActiveFeature("wallet", false);
+    assertFalse("Feature should be disabled after disabling it", featureService.isActiveFeature("wallet"));
+    assertFalse("Feature should be disabled for all users after disabling it",
+                featureService.isFeatureActiveForUser("wallet", "toto"));
+
+    featureService.saveActiveFeature("wallet", true);
+    assertTrue("Feature should be enabled if it's changed on DB", featureService.isActiveFeature("wallet"));
+    assertFalse("Feature should be disabled for user even it's globally enabled",
+                featureService.isFeatureActiveForUser("wallet", "toto"));
+
+    featureService.addFeaturePlugin(new FeaturePlugin() {
+      @Override
+      public String getName() {
+        return "wallet";
+      }
+
+      @Override
+      public boolean isFeatureActiveForUser(String featureName, String username) {
+        return StringUtils.equals("toto", username);
+      }
+    });
+
+    assertTrue("Feature should be globally enabled even after adding a plugin", featureService.isActiveFeature("wallet"));
+    assertTrue("Feature should be enabled for user 'toto' only switch plugin code",
+               featureService.isFeatureActiveForUser("wallet", "toto"));
+    assertTrue("Feature should be enabled for user 'toto' only switch plugin code",
+               CommonsUtils.isFeatureActive("wallet", "toto"));
+    assertFalse("Feature should be enabled only for user 'toto' switch plugin code",
+                featureService.isFeatureActiveForUser("wallet", "titi"));
+    assertFalse("Feature should be enabled only for user 'toto' switch plugin code",
+                CommonsUtils.isFeatureActive("wallet", "titi"));
+  }
+
 }

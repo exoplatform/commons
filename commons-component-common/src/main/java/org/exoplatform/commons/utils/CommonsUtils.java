@@ -205,6 +205,14 @@ public class CommonsUtils {
       return featureService.isActiveFeature(featureName);
     }
 
+    public static boolean isFeatureActive(String featureName, String username) {
+      ExoFeatureService featureService = getService(ExoFeatureService.class);
+      if (featureService == null) {
+        return false;
+      }
+      return featureService.isFeatureActiveForUser(featureName, username);
+    }
+
     /**
      * Get the current domain name by configuration
      * 

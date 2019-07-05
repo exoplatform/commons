@@ -16,18 +16,16 @@
  */
 package org.exoplatform.settings.impl;
 
-import org.exoplatform.commons.api.settings.ExoFeatureService;
-import org.exoplatform.commons.api.settings.SettingService;
-import org.exoplatform.commons.api.settings.SettingValue;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.exoplatform.commons.api.settings.*;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.management.annotations.*;
 import org.exoplatform.management.jmx.annotations.NameTemplate;
 import org.exoplatform.management.jmx.annotations.Property;
 import org.exoplatform.management.rest.annotations.RESTEndpoint;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Managed
 @ManagedDescription("eXo Feature Service")
@@ -43,6 +41,8 @@ public class ExoFeatureServiceImpl implements ExoFeatureService {
   private SettingService      settingService;
 
   private Map<String, Boolean> featuresProperties = new HashMap<>();
+
+  private Map<String, FeaturePlugin> plugins     = new HashMap<>();
 
   public ExoFeatureServiceImpl(SettingService      settingService) {
     this.settingService = settingService;
@@ -89,5 +89,18 @@ public class ExoFeatureServiceImpl implements ExoFeatureService {
     saveActiveFeature(featureName, isActiveBool);
   }
 
+  @Override
+  public void addFeaturePlugin(FeaturePlugin featurePlugin) {
+    plugins.put(featurePlugin.getName(), featurePlugin);
+  }
+
+  @Override
+  public boolean isFeatureActiveForUser(String featureName, String username) {
+    if (!isActiveFeature(featureName)) {
+      return false;
+    }
+    FeaturePlugin featurePlugin = plugins.get(featureName);
+    return featurePlugin != null && featurePlugin.isFeatureActiveForUser(featureName, username);
+  }
 
 }

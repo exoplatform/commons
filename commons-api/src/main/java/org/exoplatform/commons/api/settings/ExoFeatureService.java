@@ -16,9 +16,8 @@
  */
 package org.exoplatform.commons.api.settings;
 
-
 public interface ExoFeatureService {
-  
+
   /**
    * Check the status of a feature
    * 
@@ -35,4 +34,20 @@ public interface ExoFeatureService {
    */
   public void saveActiveFeature(String featureName, boolean isActive);
 
+  /**
+   * Add a feature plugin that will manage feature enablement that will be
+   * applied only on one feature identified by its name
+   * 
+   * @param featurePlugin of type {@link FeaturePlugin}
+   */
+  void addFeaturePlugin(FeaturePlugin featurePlugin);
+
+  /**
+   * Determines whether the feature is active for a user or not
+   * 
+   * @param featureName
+   * @param username
+   * @return true if active, else false
+   */
+  boolean isFeatureActiveForUser(String featureName, String username);
 }
