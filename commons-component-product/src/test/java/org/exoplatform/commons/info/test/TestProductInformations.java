@@ -149,6 +149,28 @@ public class TestProductInformations extends BasicTestCase {
 
   }
 
+  public void testUnlockInformation() throws Exception {
+    // Given
+    Properties p = new Properties();
+    p.setProperty(ProductInformations.EDITION, "edition");
+    p.setProperty(ProductInformations.NB_USERS, "1");
+    p.setProperty(ProductInformations.KEY_GENERATION_DATE, "0");
+    p.setProperty(ProductInformations.DELAY, "0");
+    p.setProperty(ProductInformations.PRODUCT_CODE, "0");
+    p.setProperty(ProductInformations.PRODUCT_KEY, "0");
+
+    // When
+    productInformations.setUnlockInformation(p);
+
+    // Then
+    assertEquals(productInformations.getEdition(), "edition");
+    assertEquals(productInformations.getNumberOfUsers(), "1");
+    assertEquals(productInformations.getDateOfLicence(), "0");
+    assertEquals(productInformations.getDuration(), "0");
+    assertEquals(productInformations.getProductCode(), "0");
+    assertEquals(productInformations.getProductKey(), "0");
+  }
+
   public void testShouldUpdateProductInformationMapWhenProductInformationExistsInDB() throws Exception {
     // Given
     Properties properties = new Properties();

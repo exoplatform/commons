@@ -375,6 +375,11 @@ public class ProductInformations implements Startable {
       LOG.error("Can't load product informations from the JCR: the data stored in the JCR couldn't be parsed.", exception);
       return;
     }
+    finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
   }
 
   public void setUnlockInformation(Properties unlockInformation) {
