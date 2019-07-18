@@ -354,5 +354,57 @@
           <module>promisePolyfill</module>
       </depends>
   </module>
+
+  <module>
+    <name>vuetify</name>
+    <script>
+      <minify>false</minify>
+      <path>/javascript/vuetify.min.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>jQueryUI</name>
+    <as>JQueryUI</as>
+    <script>
+      <minify>false</minify>
+      <path>/javascript/jquery-ui-1.18.12.min.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+      <as>jQuery</as>
+    </depends>
+  </module>
+
+  <module>
+    <name>vueChart</name>
+    <as>VueChart</as>
+    <script>
+      <minify>false</minify>
+      <adapter>
+        (function() {
+          <include>/javascript/vue-chartjs.min.js</include>
+          return VueChartJs;
+        })();
+      </adapter>
+    </script>
+    <depends>
+      <module>chart</module>
+      <as>Chart</as>
+    </depends>
+  </module>
+
+  <module>
+    <name>chart</name>
+    <as>Chart</as>
+    <script>
+      <minify>false</minify>
+      <path>/javascript/Chart.bundle.min.js</path>
+    </script>
+  </module>
+
 </gatein-resources>
 
