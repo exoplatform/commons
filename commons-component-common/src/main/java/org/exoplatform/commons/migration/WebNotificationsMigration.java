@@ -235,6 +235,10 @@ public class WebNotificationsMigration {
     } catch (Exception e) {
       LOG.error("Error while verifying if web notification nodes exist in JCR - Cause : " + e.getMessage(), e);
       return true;
+    } finally {
+      if (sProvider != null) {
+        sProvider.close();
+      }
     }
     return false;
   }
