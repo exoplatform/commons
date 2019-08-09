@@ -122,6 +122,9 @@ public class WebNotificationsMigration {
             LOG.error("Error while migrating Web Notification data from JCR to RDBMS - Cause : " + e.getMessage(), e);
           } finally {
             RequestLifeCycle.end();
+            if (sProvider != null) {
+              sProvider.close();
+            }
           }
           settingService.set(Context.GLOBAL, Scope.APPLICATION.id(WEB_NOTIFICATION_MIGRATION_DONE_KEY), WEB_NOTIFICATION_RDBMS_MIGRATION_DONE, SettingValue.create("true"));
         } else {
