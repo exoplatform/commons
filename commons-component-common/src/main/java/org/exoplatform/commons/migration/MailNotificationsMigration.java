@@ -95,6 +95,11 @@ public class MailNotificationsMigration {
     } catch (Exception e) {
       LOG.error("Error while getting Notification nodes for Notifications migration - Cause : " + e.getMessage(), e);
     }
+    finally {
+      if (jcrSession != null) {
+        jcrSession.logout();
+      }
+    }
     return jcrSession;
   }
 

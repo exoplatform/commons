@@ -89,6 +89,56 @@ public class TestProductInformations extends BasicTestCase {
     assertEquals(productInformations.getVersion("org.exoplatform.cs"), NEW_VERSION);
     assertEquals(productInformations.getCurrentProductGroupId(), "org.exoplatform.commons");
 
+    // Clean environment
+    settingService.remove(Context.GLOBAL, Scope.APPLICATION.id(productInformations.product_Information));
+    Map<String, SettingValue> settingsListTest = getProductInformationFromJPA();
+    assertTrue(settingsListTest.isEmpty());
+
+  }
+
+  public void testUnlockInformation() throws Exception {
+    // Given
+    Properties p = new Properties();
+    p.setProperty(ProductInformations.EDITION, "edition");
+    p.setProperty(ProductInformations.NB_USERS, "1");
+    p.setProperty(ProductInformations.KEY_GENERATION_DATE, "0");
+    p.setProperty(ProductInformations.DELAY, "0");
+    p.setProperty(ProductInformations.PRODUCT_CODE, "0");
+    p.setProperty(ProductInformations.PRODUCT_KEY, "0");
+
+    // When
+    productInformations.setUnlockInformation(p);
+
+    // Then
+    assertEquals(productInformations.getEdition(), "edition");
+    assertEquals(productInformations.getNumberOfUsers(), "1");
+    assertEquals(productInformations.getDateOfLicence(), "0");
+    assertEquals(productInformations.getDuration(), "0");
+    assertEquals(productInformations.getProductCode(), "0");
+    assertEquals(productInformations.getProductKey(), "0");
+  }
+
+  public void testShouldUpdateProductInformationMapWhenProductInformationExistsInDB() throws Exception {
+    // Given
+    Properties properties = new Properties();
+    InputStream oldVersionsContent = configurationManager.getInputStream(OLD_PRODUCT_INFORMATIONS_FILE);
+    properties.load(oldVersionsContent);
+    productInformations.initProductInformation(properties);
+    productInformations.storeProductInformation(productInformations.getProductInformation());
+
+    // When
+    productInformations.start();
+
+    // Then
+    Map<String, SettingValue> productInformationSettings = getProductInformationFromJPA();
+    assertFalse(productInformations.isFirstRun());
+    assertNotNull(productInformationSettings);
+    assertFalse(productInformationSettings.isEmpty());
+    productInformationSettings.entrySet()
+                              .stream()
+                              .filter(entry -> !"product.groupId".equals(entry.getKey()))
+                              .forEach(entry -> assertEquals(OLD_VERSION, entry.getValue().getValue()));
+
     assertEquals(productInformations.getPreviousVersion(), OLD_VERSION);
     assertEquals(productInformations.getPreviousRevision(), OLD_VERSION);
     assertEquals(productInformations.getPreviousBuildNumber(), OLD_VERSION);
