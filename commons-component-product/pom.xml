@@ -10,6 +10,9 @@
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Product Informations</name>
   <description>Product informations: version, revision and build numbers</description>
+  <properties>
+    <exo.test.coverage.ratio>0.66</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.jcr</groupId>

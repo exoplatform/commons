@@ -400,6 +400,11 @@ public class ProductInformations implements Startable {
     if (LOG.isDebugEnabled()) {
       LOG.debug("start method end");
     }
+    finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
   }
 
   /**
