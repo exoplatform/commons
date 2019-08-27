@@ -89,11 +89,6 @@ public class TestProductInformations extends BasicTestCase {
     assertEquals(productInformations.getVersion("org.exoplatform.cs"), NEW_VERSION);
     assertEquals(productInformations.getCurrentProductGroupId(), "org.exoplatform.commons");
 
-    // Clean environment
-    settingService.remove(Context.GLOBAL, Scope.APPLICATION.id(productInformations.product_Information));
-    Map<String, SettingValue> settingsListTest = getProductInformationFromJPA();
-    assertTrue(settingsListTest.isEmpty());
-
   }
 
   public void testUnlockInformation() throws Exception {
@@ -123,22 +118,13 @@ public class TestProductInformations extends BasicTestCase {
     Properties properties = new Properties();
     InputStream oldVersionsContent = configurationManager.getInputStream(OLD_PRODUCT_INFORMATIONS_FILE);
     properties.load(oldVersionsContent);
-    productInformations.initProductInformation(properties);
-    productInformations.storeProductInformation(productInformations.getProductInformation());
+    Session session = repositoryService.getCurrentRepository().getSystemSession(productInformations.getWorkspaceName());
+
 
     // When
     productInformations.start();
 
     // Then
-    Map<String, SettingValue> productInformationSettings = getProductInformationFromJPA();
-    assertFalse(productInformations.isFirstRun());
-    assertNotNull(productInformationSettings);
-    assertFalse(productInformationSettings.isEmpty());
-    productInformationSettings.entrySet()
-                              .stream()
-                              .filter(entry -> !"product.groupId".equals(entry.getKey()))
-                              .forEach(entry -> assertEquals(OLD_VERSION, entry.getValue().getValue()));
-
     assertEquals(productInformations.getPreviousVersion(), OLD_VERSION);
     assertEquals(productInformations.getPreviousRevision(), OLD_VERSION);
     assertEquals(productInformations.getPreviousBuildNumber(), OLD_VERSION);
@@ -164,7 +150,7 @@ public class TestProductInformations extends BasicTestCase {
     InputStream newVersionsContentIS = configurationManager.getInputStream(NEW_PRODUCT_INFORMATIONS_FILE);
     byte[] binaries = new byte[newVersionsContentIS.available()];
     newVersionsContentIS.read(binaries);
-    Properties properties = new Properties();
+    properties = new Properties();
     properties.load(new ByteArrayInputStream(binaries));
     String newVersionsContent = getPropertiesAsString(properties);
     newVersionsContent = newVersionsContent.split(ProductInformations.PRODUCT_GROUP_ID)[1];
