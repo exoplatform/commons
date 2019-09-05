@@ -296,10 +296,15 @@
   </module>
   <module>
       <name>vueI18n</name>
-      <as>vuei18n</as>
+      <as>VueI18n</as>
       <script>
           <minify>false</minify>
-          <path>/javascript/vue-i18n.min.js</path>
+          <adapter>
+            (function() {
+              <include>/javascript/vue-i18n.min.js</include>
+              return VueI18n;
+            })();
+          </adapter>
       </script>
       <depends>
           <module>vue</module>
