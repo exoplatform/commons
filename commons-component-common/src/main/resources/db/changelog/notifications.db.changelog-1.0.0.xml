@@ -213,4 +213,14 @@
                               columnDataType="NVARCHAR(200)"
                               defaultNullValue=""/>
     </changeSet>
+
+    <changeSet author="notifications" id="1.0.0-20" dbms="mysql">
+        <sql>
+            ALTER TABLE NTF_WEB_NOTIFS_PARAMS MODIFY COLUMN PARAM_VALUE longtext CHARACTER SET utf8mb4 COLLATE
+            utf8mb4_unicode_ci;
+            ALTER TABLE NTF_WEB_NOTIFS MODIFY COLUMN TEXT longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+            ALTER TABLE NTF_EMAIL_NOTIFS_PARAMS MODIFY COLUMN PARAM_VALUE longtext CHARACTER SET utf8mb4 COLLATE
+            utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
