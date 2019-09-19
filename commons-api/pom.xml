@@ -27,12 +27,6 @@
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-webui-component</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>exo.portal.component.common</artifactId>
-          <groupId>org.exoplatform.gatein.portal</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.jcr</groupId>
