@@ -19,6 +19,10 @@
 package org.exoplatform.commons.utils;
 
 import junit.framework.TestCase;
+import org.junit.Test;
+
+import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -37,5 +41,14 @@ public class DateUtilsTest extends TestCase {
         } catch (IllegalArgumentException exp) {
 
         }
+    }
+
+    @Test
+    public void testGetRelativeTimeLabel() {
+        assertEquals("less than a minute ago", DateUtils.getRelativeTimeLabel(Locale.ENGLISH, new Date().getTime() - 30L));
+        assertEquals("about a month ago", DateUtils.getRelativeTimeLabel(Locale.ENGLISH, new Date().getTime() - 3000000000L));
+        assertEquals("about 2 months ago", DateUtils.getRelativeTimeLabel(Locale.ENGLISH, new Date().getTime() - 7000000000L));
+        assertEquals("about 3 months ago", DateUtils.getRelativeTimeLabel(Locale.ENGLISH, new Date().getTime() - 10000000000L));
+
     }
 }
