@@ -18,8 +18,8 @@
  */
 package org.exoplatform.commons.utils;
 
-import java.util.Map;
-import java.util.TimeZone;
+import org.exoplatform.services.resources.ResourceBundleService;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,6 +33,7 @@ public class DateUtils {
      */
     private static volatile Map<String, TimeZone> TIME_ZONES = new ConcurrentHashMap<String, TimeZone>();
 
+    public static final String COMMONS_RESOUCE_BUNDLE_NAME = "locale.commons.Commons";
 
     /**
      * This method is similar to {@link TimeZone#getTimeZone(String)} with less contention
@@ -48,5 +49,57 @@ public class DateUtils {
             TIME_ZONES.put(ID, tz);
         }
         return tz;
+    }
+
+    /**
+     * Gets prettyTime by timestamp.
+     *
+     * @param locale
+     * @param postedTime
+     * @return String
+     */
+    public static String getRelativeTimeLabel(Locale locale, long postedTime) {
+        ResourceBundleService rs = CommonsUtils.getService(ResourceBundleService.class);
+        ResourceBundle resourceBundle = rs.getResourceBundle(COMMONS_RESOUCE_BUNDLE_NAME, locale);
+        long time = (new Date().getTime() - postedTime) / 1000;
+        long value;
+        if (time < 60) {
+            return resourceBundle.getString("TimeConvert.label.Less_Than_A_Minute");
+        } else {
+            if (time < 120) {
+                return resourceBundle.getString("TimeConvert.label.About_A_Minute");
+            } else {
+                if (time < 3600) {
+                    value = Math.round(time / 60);
+                    return resourceBundle.getString("TimeConvert.label.About_?_Minutes").replaceFirst("\\{0\\}", String.valueOf(value));
+                } else {
+                    if (time < 7200) {
+                        return resourceBundle.getString("TimeConvert.label.About_An_Hour");
+                    } else {
+                        if (time < 86400) {
+                            value = Math.round(time / 3600);
+                            return resourceBundle.getString("TimeConvert.label.About_?_Hours").replaceFirst("\\{0\\}", String.valueOf(value));
+                        } else {
+                            if (time < 172800) {
+                                return resourceBundle.getString("TimeConvert.label.About_A_Day");
+                            } else {
+                                if (time < 2592000) {
+                                    value = Math.round(time / 86400);
+                                    return resourceBundle.getString("TimeConvert.label.About_?_Days").replaceFirst("\\{0\\}", String.valueOf(value));
+                                } else {
+                                    if (time < 5184000) {
+                                        return resourceBundle.getString("TimeConvert.label.About_A_Month");
+                                    } else {
+                                        value = Math.round(time / 2592000);
+                                        return resourceBundle.getString("TimeConvert.label.About_?_Months")
+                                                .replaceFirst("\\{0\\}", String.valueOf(value));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
