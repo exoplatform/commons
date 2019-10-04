@@ -17,6 +17,7 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
   private String searchType; //search type name
   private String displayName; //for use when rendering
   private boolean enable = true;
+  private boolean enabledForAnonymous = false;
   
   /**
    * Gets a search type.
@@ -66,6 +67,14 @@ public abstract class SearchServiceConnector extends BaseComponentPlugin {
    */
   public void setEnable(boolean enable) {
     this.enable = enable;
+  }
+  
+  public boolean isEnabledForAnonymous() {
+    return enabledForAnonymous;
+  }
+  
+  public void setEnabledForAnonymous(boolean enabledForAnonymous) {
+    this.enabledForAnonymous = enabledForAnonymous;
   }
 
   /**
