@@ -61,7 +61,7 @@ public class DateUtils {
     public static String getRelativeTimeLabel(Locale locale, long postedTime) {
         ResourceBundleService rs = CommonsUtils.getService(ResourceBundleService.class);
         ResourceBundle resourceBundle = rs.getResourceBundle(COMMONS_RESOUCE_BUNDLE_NAME, locale);
-        long time = (new Date().getTime() - postedTime) / 1000;
+        long time = (System.currentTimeMillis() - postedTime) / 1000;
         long value;
         if (time < 60) {
             return resourceBundle.getString("TimeConvert.label.Less_Than_A_Minute");
