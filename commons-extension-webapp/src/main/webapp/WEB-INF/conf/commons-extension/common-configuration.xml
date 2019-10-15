@@ -17,10 +17,6 @@
 	<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
   </component>
 
-  <component>
-    <type>org.exoplatform.settings.rest.SettingResource</type>
-  </component>
-
   <external-component-plugins>
     <target-component>org.exoplatform.services.organization.OrganizationService</target-component>
     <component-plugin>

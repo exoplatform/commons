@@ -5,20 +5,6 @@
 
     <!--Declare DataInitializer at RootContainer Level to ensure initData before instantiation of declared service
         at portalContainer level (for example QuartzSheduler see PLF-6640)-->
-    <component>
-        <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
-        <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
-        <init-params>
-            <value-param>
-                <name>liquibase.datasource</name>
-                <value>${exo.jpa.datasource.name:java:/comp/env/exo-jpa_portal}</value>
-            </value-param>
-            <value-param>
-                <name>liquibase.contexts</name>
-                <value>${exo.liquibase.contexts:production}</value>
-            </value-param>
-        </init-params>
-    </component>
 
     <component profiles="cluster">
         <type>org.exoplatform.commons.cluster.ClusterNodeName</type>
@@ -39,7 +25,6 @@
                 <values-param>
                     <name>changelogs</name>
                     <description>Change logs of commons</description>
-                    <value>db/changelog/settings.db.changelog-1.0.0.xml</value>
                     <value>db/changelog/notifications.db.changelog-1.0.0.xml</value>
                 </values-param>
             </init-params>

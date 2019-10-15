@@ -4,29 +4,6 @@
   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-      <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
-  </component>
-
-  <component>
-    <type>org.exoplatform.settings.jpa.JPASettingServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.settings.SettingService</key>
-    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
-  </component>
-
-  <component>
-    <type>org.exoplatform.settings.jpa.dao.SettingContextDAO</type>
-  </component>
-  <component>
-    <type>org.exoplatform.settings.jpa.dao.SettingScopeDAO</type>
-  </component>
-  <component>
-    <type>org.exoplatform.settings.jpa.dao.SettingsDAO</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailParamDAO</type>
   </component>
   <component>
@@ -87,20 +64,6 @@
 
   <component>
     <type>org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.event.EventManager</key>
-    <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
-  </component>
-
-  <component>
-    <type>org.exoplatform.settings.impl.SettingServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.settings.SettingService</key>
-    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
   </component>
 
   <component>
@@ -173,34 +136,6 @@
   </component>
 
   <external-component-plugins>
-    <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
-    <component-plugin>
-      <name>chromattic</name>
-      <set-method>addLifeCycle</set-method>
-      <type>org.exoplatform.commons.chromattic.ChromatticLifeCycle</type>
-      <init-params>
-        <value-param>
-          <name>domain-name</name>
-          <value>setting</value>
-        </value-param>
-        <value-param>
-          <name>workspace-name</name>
-          <value>portal-system</value>
-        </value-param>
-        <values-param>
-          <name>entities</name>
-          <value>org.exoplatform.settings.chromattic.SettingsRoot</value>
-          <value>org.exoplatform.settings.chromattic.ContextEntity</value>
-          <value>org.exoplatform.settings.chromattic.SimpleContextEntity
-          </value>
-          <value>org.exoplatform.settings.chromattic.SubContextEntity</value>
-          <value>org.exoplatform.settings.chromattic.ScopeEntity</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
-  <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
     <component-plugin>
       <name>add.nodeType</name>
@@ -210,7 +145,6 @@
         <values-param>
           <name>autoCreatedInNewRepository</name>
           <description>Node types configuration file</description>
-          <value>jar:/conf/settings-nodetypes.xml</value>
           <value>jar:/conf/notification-nodetypes.xml</value>
         </values-param>
       </init-params>
@@ -222,7 +156,6 @@
       <init-params>
         <properties-param>
           <name>namespaces</name>
-          <property name="stg" value="http://www.gatein.org/jcr/stg/1.0/" />
           <property name="ntf" value="http://www.gatein.org/jcr/ntf/1.0/" />
         </properties-param>
       </init-params>
@@ -237,18 +170,6 @@
       <type>org.exoplatform.services.cache.ExoCacheConfigPlugin</type>
       <description>The Cache configuration for the setting service</description>
       <init-params>
-        <!-- SettingService -->
-        <object-param>
-          <name>commons.SettingService</name>
-          <description>The Cache configuration for the navigation service</description>
-          <object type="org.exoplatform.services.cache.impl.infinispan.generic.GenericExoCacheConfig">
-            <field name="name"><string>commons.SettingService</string></field>
-            <field name="maxSize"><int>${exo.cache.commons.SettingService.MaxNodes:100000}</int></field>
-            <field name="liveTime"><long>${exo.cache.commons.SettingService.TimeToLive:86400}</long></field>
-            <field name="cacheMode" profiles="cluster"><string>${exo.cache.commons.SettingService:replication}</string></field>
-            <field name="strategy" profiles="cluster"><string>${exo.cache.commons.SettingService.strategy:LIRS}</string></field>
-          </object>
-        </object-param>
         <!-- WebNotificationCache -->
         <object-param>
           <name>commons.WebNotificationCache</name>
