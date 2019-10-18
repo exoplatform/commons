@@ -134,7 +134,6 @@ public class MailNotificationsMigration {
               LOG.info("No mail notification data to migrate from JCR to RDBMS");
             }
             cleanupMailNotifications();
-
             return null;
           }
         });
