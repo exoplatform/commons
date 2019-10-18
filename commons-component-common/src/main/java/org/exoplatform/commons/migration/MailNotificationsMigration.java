@@ -134,6 +134,7 @@ public class MailNotificationsMigration {
               LOG.info("No mail notification data to migrate from JCR to RDBMS");
             }
             cleanupMailNotifications();
+
             return null;
           }
         });
@@ -202,6 +203,8 @@ public class MailNotificationsMigration {
             LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
           }
         }
+        schedulerService.resumeJob("NotificationDailyJob", "Notification");
+        schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
         return null;
       }
     });
@@ -228,6 +231,8 @@ public class MailNotificationsMigration {
             LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
           }
         }
+        schedulerService.resumeJob("NotificationDailyJob", "Notification");
+        schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
         return null;
       }
     });
