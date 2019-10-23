@@ -1314,7 +1314,7 @@
         // not be available during plugin's afterInit in the future — a moment when
         // alignCommandIntegrator is called.
         if ( enabled === undefined )
-          enabled = editor.filter.checkFeature( editor.widgets.registered.image.features.align );
+          enabled = editor.filter.checkFeature( editor.widgets.registered.selectImage.features.align );
 
         // Don't allow justify commands when widget alignment is disabled (http://dev.ckeditor.com/ticket/11004).
         if ( !enabled )
