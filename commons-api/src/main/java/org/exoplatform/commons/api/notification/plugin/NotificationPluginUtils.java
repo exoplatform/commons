@@ -124,7 +124,7 @@ public class NotificationPluginUtils {
    */
   public static String getBrandingPortalName() {
     SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL.id(null), BRANDING_PORTAL_NAME);
-    return name != null ? (String) name.getValue() : "eXo";
+    return name != null ? (String) name.getValue() : System.getProperty("exo.notifications.portalname", "eXo");
   }
   
   public static String getTo(String to) {
