@@ -26,7 +26,7 @@
     <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO</type>
   </component>
 
-  <component>
+  <component profiles="all">
     <type>org.exoplatform.commons.notification.impl.service.storage.MailNotificationStorageImpl</type>
   </component>
 
