@@ -180,31 +180,26 @@ public class MailNotificationsMigration {
           schedulerService.pauseJob("NotificationDailyJob", "Notification");
           schedulerService.pauseJob("NotificationWeeklyJob", "Notification");
           try {
-            try {
               LOG.info("=== Start cleaning Mail notifications data from JCR");
               long startTime = System.currentTimeMillis();
               deleteJcrMailNotifications();
               setMailNotifCleanupDone();
               long endTime = System.currentTimeMillis();
               LOG.info("=== Mail notifications JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-            } catch (Exception e) {
-              LOG.error("Error while cleaning Mail notifications JCR data", e);
-            } finally {
-              RequestLifeCycle.end();
-            }
-            try {
-              LOG.info("=== Start cleaning Mail messages data from JCR");
-              long startTime = System.currentTimeMillis();
-              deleteJcrMailMessages();
-              long endTime = System.currentTimeMillis();
-              LOG.info("=== Mail messages JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
-
-            } catch (Exception e) {
-              LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
-            }
+          } catch (Exception e) {
+            LOG.error("Error while cleaning Mail notifications JCR data", e);
           } finally {
-            schedulerService.resumeJob("NotificationDailyJob", "Notification");
-            schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
+            RequestLifeCycle.end();
+          }
+          try {
+            LOG.info("=== Start cleaning Mail messages data from JCR");
+            long startTime = System.currentTimeMillis();
+            deleteJcrMailMessages();
+            long endTime = System.currentTimeMillis();
+            LOG.info("=== Mail messages JCR data cleaning due to RDBMS migration done in " + (endTime - startTime) + " ms");
+
+          } catch (Exception e) {
+            LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
           }
         }
         return null;
@@ -231,9 +226,6 @@ public class MailNotificationsMigration {
 
           } catch (Exception e) {
             LOG.error("Error while cleaning Mail messages JCR data to RDBMS - Cause : " + e.getMessage(), e);
-          } finally {
-            schedulerService.resumeJob("NotificationDailyJob", "Notification");
-            schedulerService.resumeJob("NotificationWeeklyJob", "Notification");
           }
         }
         return null;
