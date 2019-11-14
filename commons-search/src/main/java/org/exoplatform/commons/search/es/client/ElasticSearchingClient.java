@@ -23,6 +23,7 @@ public class ElasticSearchingClient extends ElasticClient {
   private static final String ES_SEARCH_CLIENT_PROPERTY_NAME = "exo.es.search.server.url";
   private static final String ES_SEARCH_CLIENT_PROPERTY_USERNAME = "exo.es.search.server.username";
   private static final String ES_SEARCH_CLIENT_PROPERTY_PASSWORD = "exo.es.search.server.password";
+  private static final String ES_SEARCH_CLIENT_PROPERTY_MAX_CONNECTIONS = "exo.es.search.http.connections.max";
 
 
   public ElasticSearchingClient(ElasticIndexingAuditTrail auditTrail) {
@@ -95,7 +96,24 @@ public class ElasticSearchingClient extends ElasticClient {
 
   @Override
   protected HttpClientConnectionManager getClientConnectionManager() {
-    return new PoolingHttpClientConnectionManager();
+    PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+    String maxConnectionsProperty = PropertyManager.getProperty(ES_SEARCH_CLIENT_PROPERTY_MAX_CONNECTIONS);
+    if(StringUtils.isNotBlank(maxConnectionsProperty)) {
+      maxConnectionsProperty = maxConnectionsProperty.trim();
+      if(StringUtils.isNumeric(maxConnectionsProperty)) {
+        int maxConnections = Integer.parseInt(maxConnectionsProperty);
+        if(maxConnections > 0) {
+          connectionManager.setDefaultMaxPerRoute(maxConnections);
+        } else {
+          LOG.warn(ES_SEARCH_CLIENT_PROPERTY_MAX_CONNECTIONS + " value is not a positive number : " + maxConnectionsProperty +
+                  ". Using default HTTP max connections (" + connectionManager.getDefaultMaxPerRoute() + ").");
+        }
+      } else {
+        LOG.warn(ES_SEARCH_CLIENT_PROPERTY_MAX_CONNECTIONS + " value is not a valid number : " + maxConnectionsProperty +
+                ". Using default HTTP max connections (" + connectionManager.getDefaultMaxPerRoute() + ").");
+      }
+    }
+    return connectionManager;
   }
 
 }
