@@ -23,6 +23,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.exoplatform.commons.search.es.client.ElasticIndexingAuditTrail;
 import org.exoplatform.commons.search.es.client.ElasticSearchingClient;
 import org.exoplatform.commons.utils.PropertyManager;
@@ -39,6 +40,7 @@ import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -166,6 +168,60 @@ public class ElasticSearchingClientTest {
     //Then
     verify(auditTrail).logRejectedSearchOperation(eq("search_type"), eq("test"), eq("type1"), eq(HttpStatus.SC_NOT_FOUND), anyString(), anyLong());
     verifyNoMoreInteractions(auditTrail);
+  }
+
+  @Test
+  public void shouldUseDefaultHttpMaxConnectionsPerRouteWhenNoConfiguration() {
+    //Given
+    PropertyManager.setProperty("exo.es.search.http.connections.max", "");
+
+    //When
+    PoolingHttpClientConnectionManager clientConnectionManager = (PoolingHttpClientConnectionManager) elasticSearchingClient.getClientConnectionManager();
+
+    //Then
+    assertEquals(2, clientConnectionManager.getDefaultMaxPerRoute());
+  }
+
+  @Test
+  public void shouldUseDefaultHttpMaxConnectionsPerRouteWhenConfiguredValueIsNotANumber() {
+    //Given
+    PropertyManager.setProperty("exo.es.search.http.connections.max", "string");
+
+    //When
+    PoolingHttpClientConnectionManager clientConnectionManager = (PoolingHttpClientConnectionManager) elasticSearchingClient.getClientConnectionManager();
+
+    //Then
+    assertEquals(2, clientConnectionManager.getDefaultMaxPerRoute());
+
+    PropertyManager.setProperty("exo.es.search.http.connections.max", "");
+  }
+
+  @Test
+  public void shouldUseDefaultHttpMaxConnectionsPerRouteWhenConfiguredValueIsNotAPositiveNumber() {
+    //Given
+    PropertyManager.setProperty("exo.es.search.http.connections.max", "0");
+
+    //When
+    PoolingHttpClientConnectionManager clientConnectionManager = (PoolingHttpClientConnectionManager) elasticSearchingClient.getClientConnectionManager();
+
+    //Then
+    assertEquals(2, clientConnectionManager.getDefaultMaxPerRoute());
+
+    PropertyManager.setProperty("exo.es.search.http.connections.max", "");
+  }
+
+  @Test
+  public void shouldUseConfiguredHttpMaxConnectionsPerRouteWhenConfiguredValueIsAPositiveNumber() {
+    //Given
+    PropertyManager.setProperty("exo.es.search.http.connections.max", "10");
+
+    //When
+    PoolingHttpClientConnectionManager clientConnectionManager = (PoolingHttpClientConnectionManager) elasticSearchingClient.getClientConnectionManager();
+
+    //Then
+    assertEquals(10, clientConnectionManager.getDefaultMaxPerRoute());
+
+    PropertyManager.setProperty("exo.es.search.http.connections.max", "");
   }
 
   private void initClientMock(Integer postStatus, String postContent) throws IOException {
