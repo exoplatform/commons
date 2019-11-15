@@ -61,9 +61,7 @@
         containerNode.html(imageNode);
         var maskNode = eXo.core.UIMaskLayer.createMask('UIPortalApplication',
             containerNode[0], 30, 'CENTER');
-        gj(containerNode).find('img:first').on('click', function() {
-          hidePicture();
-        });
+        gj(containerNode).find('img:first').on('click', this.hidePicture);
         this.scrollHandler();
         gj(document).on('keydown', this.hidePictureByKey);
       }
@@ -76,8 +74,8 @@
 
   MaskLayerControl.prototype.hidePictureByKey = function(e) {
       if(e.which && e.which === 27) {
-        this.hidePicture();
-        gj(document).off('keydown', this.hidePictureByKey);
+        eXo.commons.MaskLayerControl.hidePicture();
+        gj(document).off('keydown', eXo.commons.MaskLayerControl.hidePictureByKey);
       }
     };
 
