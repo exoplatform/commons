@@ -14,7 +14,7 @@
     <org.elasticsearch.test.guava.version>18.0</org.elasticsearch.test.guava.version>
     <org.elasticsearch.test.jodatime.version>2.9.5</org.elasticsearch.test.jodatime.version>
     <!-- Issue with the PLF pom parent that trigger lucene 3.6.2 needed by JCR (Only working with impl version < 0.20.6) -->
-    <lucene.version>6.6.1</lucene.version>
+    <lucene.version>7.1.0</lucene.version>
     <!-- Issue with the PLF pom parent that trigger tika 1.5 needed by JCR -->
     <org.apache.tika.version>1.18</org.apache.tika.version>
     <pdfbox.version>2.0.9</pdfbox.version>
