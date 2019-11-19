@@ -1,22 +1,31 @@
 ﻿/*
 	eXo config plugins
 */
+// force env when using the eXo Android app (the eXo Android app uses a custom user agent which
+// is not known by CKEditor and which makes it not initialize the editor)
+var userAgent = navigator.userAgent.toLowerCase();
+if(userAgent != null && userAgent.indexOf('exo/') == 0 && userAgent.indexOf('(android)') > 0) {
+  CKEDITOR.env.mobile = true;
+  CKEDITOR.env.chrome = true;
+  CKEDITOR.env.gecko = false;
+  CKEDITOR.env.webkit = true;
+}
 
 CKEDITOR.eXoPath = CKEDITOR.basePath.substr(0, CKEDITOR.basePath.indexOf("ckeditor/"));
 
-// config to add custom plugin	
-(function() {CKEDITOR.plugins.addExternal('content','/eXoWCMResources/eXoPlugins/content/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('insertPortalLink','/commons-extension/eXoPlugins/insertPortalLink/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('simpleLink','/commons-extension/eXoPlugins/simpleLink/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('acceptInline','/eXoWCMResources/eXoPlugins/acceptInline/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('cancelInline','/eXoWCMResources/eXoPlugins/cancelInline/','plugin.js');})();
-(function() {CKEDITOR.plugins.addExternal('helpBBCode','/forum/eXoPlugins/helpBBCode/','plugin.js');})();
-
 CKEDITOR.editorConfig = function( config ){
+  // config to add custom plugin  
+  CKEDITOR.plugins.addExternal('content','/eXoWCMResources/eXoPlugins/content/','plugin.js');
+  CKEDITOR.plugins.addExternal('insertPortalLink','/commons-extension/eXoPlugins/insertPortalLink/','plugin.js');
+  CKEDITOR.plugins.addExternal('simpleLink','/commons-extension/eXoPlugins/simpleLink/','plugin.js');
+  CKEDITOR.plugins.addExternal('acceptInline','/eXoWCMResources/eXoPlugins/acceptInline/','plugin.js');
+  CKEDITOR.plugins.addExternal('cancelInline','/eXoWCMResources/eXoPlugins/cancelInline/','plugin.js');
+  CKEDITOR.plugins.addExternal('helpBBCode','/forum/eXoPlugins/helpBBCode/','plugin.js');
+
 	config.extraPlugins = 'content,insertPortalLink,acceptInline,cancelInline,onchange,helpBBCode,syntaxhighlight';
 	config.removePlugins = 'scayt,wsc';
 	config.toolbarCanCollapse = false;
-	config.skin = 'moono-exo';
+	config.skin = 'moono-exo,/commons-extension/ckeditor/skins/moono-exo/';
 	config.allowedContent = true;
 	config.resize_enabled = true;
 	config.language = eXo.env.portal.language || 'en';
@@ -24,6 +33,9 @@ CKEDITOR.editorConfig = function( config ){
 	config.pasteFromWordRemoveStyles = false;
         config.syntaxhighlight_lang = 'java';
 	config.syntaxhighlight_hideControls = true;
+
+  // style inside the editor
+	config.contentsCss = '/commons-extension/ckeditorCustom/contents.css';
 
 
 	config.toolbar_Default = [

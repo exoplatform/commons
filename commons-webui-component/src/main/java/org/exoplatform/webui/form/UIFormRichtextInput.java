@@ -208,8 +208,13 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
             .append("   CKEDITOR.remove(" + instance + "); " + instance + " = null;\n")
             .append("}\n")
             .append("CKEDITOR.plugins.addExternal('confirmBeforeReload','/commons-extension/eXoPlugins/confirmBeforeReload/','plugin.js');")
-            .append(" CKEDITOR.replace('").append(name).append("', {extraPlugins: 'confirmBeforeReload', toolbar:'").append(toolbar).append("', height:")
-            .append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
+            .append("$('[name=\\'").append(name).append("\\']').ckeditor({")
+            .append("customConfig: '/commons-extension/eXoConfig.js',")
+            .append("extraPlugins: 'confirmBeforeReload',")
+            .append("removePlugins: 'hideBottomToolbar',")
+            .append("toolbar:'").append(toolbar).append("',")
+            .append("toolbarLocation: 'top',")
+            .append("height:").append(height).append(", contentsCss:").append(css).append(", enterMode:").append(enterMode)
             .append((isPasteAsPlainText) ? ", forcePasteAsPlainText: true" : "")
             .append(", forceEnterMode:").append(forceEnterMode)
             .append(", shiftEnterMode:").append(shiftEnterMode).append("});\n")
@@ -236,7 +241,7 @@ public class UIFormRichtextInput extends UIFormInputBase<String> {
     //end function   
     jsBuilder.append("}\n");
     jsBuilder.append(functionName + "();\n");
-    context.getJavascriptManager().require("/commons-extension/ckeditor/ckeditor.js").addScripts(jsBuilder.toString());
+    context.getJavascriptManager().require("SHARED/commons-editor", "editor").require("SHARED/jquery", "$").addScripts(jsBuilder.toString());
     //
     return builder.toString();
   }
