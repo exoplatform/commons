@@ -58,7 +58,7 @@ import javax.servlet.http.HttpServletRequest;
 @ComponentConfig(
   lifecycle = Lifecycle.class, 
   template = "classpath:groovy/webui/commons/UISpaceSwitcher.gtmpl",
-  events = {@EventConfig(listeners = UISpacesSwitcher.SelectSpaceActionListener.class)}
+  events = {@EventConfig(listeners = UISpacesSwitcher.SelectSpaceActionListener.class, csrfCheck = false)}
 )
 public class UISpacesSwitcher extends UIContainer {
 
