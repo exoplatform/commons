@@ -50,5 +50,12 @@ public interface MailNotificationStorage {
    * @throws Exception
    */
   void removeMessageAfterSent(NotificationContext context) throws Exception;
+
+  /**
+   * Removes all digest messages. This is used for migration purpose
+   *
+   * @throws Exception
+   */
+  void deleteAllDigests() throws Exception;
   
 }

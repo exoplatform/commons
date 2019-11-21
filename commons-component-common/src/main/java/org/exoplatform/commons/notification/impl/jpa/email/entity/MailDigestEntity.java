@@ -28,7 +28,8 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
       "WHERE m.type= :digestType"),
   @NamedQuery(name = "NotificationsMailDigestEntity.deleteDigestsOfTypeByNotificationsIds", query = "DELETE FROM NotificationsMailDigestEntity m " +
       "WHERE m.type= :digestType " +
-      "AND m.notification.id IN (:notificationIds) ")
+      "AND m.notification.id IN (:notificationIds) "),
+    @NamedQuery(name = "NotificationsMailDigestEntity.deleteAllDigests", query = "DELETE FROM NotificationsMailDigestEntity m ")
 })
 public class MailDigestEntity {
   @Id
