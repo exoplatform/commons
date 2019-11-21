@@ -78,4 +78,25 @@ public class MailDigestDAOTest extends CommonsDAOJPAImplTest {
     assertNull(mailNotifEntity1);
     assertNull(mailNotifEntity2);
   }
+
+  @Test
+  public void testDeleteAll() throws Exception {
+    MailNotifEntity mailNotifEntity1 = new MailNotifEntity();
+    MailNotifEntity mailNotifEntity2 = new MailNotifEntity();
+
+    //Given
+    mailNotifEntity1 = mailNotifDAO.create(mailNotifEntity1);
+    mailNotifEntity2 = mailNotifDAO.create(mailNotifEntity2);
+
+    mailDigestDAO.create(new MailDigestEntity().setNotification(mailNotifEntity1).setType("daily"));
+    mailDigestDAO.create(new MailDigestEntity().setNotification(mailNotifEntity1).setType("weekly"));
+    mailDigestDAO.create(new MailDigestEntity().setNotification(mailNotifEntity2).setType("daily"));
+    mailDigestDAO.create(new MailDigestEntity().setNotification(mailNotifEntity2).setType("weekly"));
+
+    //when
+    notificationDataStorage.deleteAllDigests();
+
+    //then
+    assertEquals(0L,mailDigestDAO.count().longValue());
+  }
 }

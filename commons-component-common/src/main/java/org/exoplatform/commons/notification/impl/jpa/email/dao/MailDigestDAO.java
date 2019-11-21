@@ -22,4 +22,10 @@ public class MailDigestDAO extends GenericDAOJPAImpl<MailDigestEntity, Long> {
         .setParameter("notificationIds", mailNotifsIds);
     query.executeUpdate();
   }
+
+  @ExoTransactional
+  public void deleteAllDigests() {
+    Query query = getEntityManager().createNamedQuery("NotificationsMailDigestEntity.deleteAllDigests");
+    query.executeUpdate();
+  }
 }

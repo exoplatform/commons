@@ -166,6 +166,12 @@ public class JPAMailNotificationStorage implements MailNotificationStorage {
     } while (allNotificationsWithoutDigests.size() == QUERY_LIMIT);
   }
 
+  @Override
+  @ExoTransactional
+  public void deleteAllDigests() throws Exception {
+    mailDigestDAO.deleteAllDigests();
+  }
+
   private List<NotificationInfo> getWeeklyNotifs(NotificationContext context, String pluginId, String userId) {
     return getNotificationsByDigestAndPluginId(context, WEEKLY_NOTIFS, pluginId, userId);
   }
