@@ -382,4 +382,9 @@ public class MailNotificationStorageImpl extends AbstractService implements Mail
     }
   }
 
+  @Override
+  public void deleteAllDigests() throws Exception {
+    throw new UnsupportedOperationException("Operation deleteAllDigest is not supported");
+  }
+
 }
