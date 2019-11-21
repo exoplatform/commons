@@ -56,6 +56,8 @@ public interface MailNotificationStorage {
    *
    * @throws Exception
    */
-  void deleteAllDigests() throws Exception;
-  
+  default void deleteAllDigests() throws Exception {
+    throw new UnsupportedOperationException();
+  }
+
 }
