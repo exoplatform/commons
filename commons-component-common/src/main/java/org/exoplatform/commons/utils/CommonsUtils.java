@@ -16,10 +16,6 @@ import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.core.ManageableRepository;
-import org.exoplatform.services.jcr.ext.app.SessionProviderService;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
@@ -119,28 +115,6 @@ public class CommonsUtils {
   }
 
     /**
-     * Gets the system session provider.
-     *
-     * @return the system session provider
-     */
-    public static SessionProvider getSystemSessionProvider() {
-      SessionProviderService sessionProviderService = getService(SessionProviderService.class);
-      SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-      return sessionProvider;
-    }
-
-    /**
-     * Gets the session provider.
-     *
-     * @return the session provider
-     */
-    public static SessionProvider getUserSessionProvider() {
-      SessionProviderService sessionProviderService = getService(SessionProviderService.class);
-      SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-      return sessionProvider;
-    }
-    
-    /**
      * Gets the service.
      *
      * @param clazz the clazz
@@ -170,23 +144,6 @@ public class CommonsUtils {
       }
       return clazz.cast(container.getComponentInstanceOfType(clazz));
     }
-    
-    /**
-     * Get the current repository
-     *
-     * @return the current manageable repository
-     */
-    public static ManageableRepository getRepository() {
-      try {
-        RepositoryService repositoryService = getService(RepositoryService.class);
-        return repositoryService.getCurrentRepository();
-      } catch (Exception e) {
-        if (LOG.isErrorEnabled()) {
-          LOG.error("getRepository() failed because of ", e);
-        }
-      }
-      return null;
-    }   
     
     public static String getRestContextName() {
         ExoContainer container = ExoContainerContext.getCurrentContainer();
@@ -223,12 +180,6 @@ public class CommonsUtils {
       if (sysDomain == null || sysDomain.length() == 0) {
         throw new NullPointerException("Get the domain is unsuccessfully. Please, add configuration domain on configuration.properties file with key: " +
                                          CONFIGURED_DOMAIN_URL_KEY);
-      }
-      // multiple tenant
-      String masterHost = System.getProperty(CONFIGURED_TENANT_MASTER_HOST_KEY);
-      if (masterHost != null && masterHost.length() > 0) {
-        String currentTenant = getRepository().getConfiguration().getName();
-        return sysDomain.replace(masterHost, currentTenant + "." + masterHost);
       }
       //
       return sysDomain;

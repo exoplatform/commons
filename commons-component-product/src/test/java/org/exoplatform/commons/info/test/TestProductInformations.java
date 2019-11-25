@@ -116,22 +116,14 @@ public class TestProductInformations extends BasicTestCase {
     assertEquals(productInformations.getPreviousVersion(), OLD_VERSION);
     assertEquals(productInformations.getPreviousRevision(), OLD_VERSION);
     assertEquals(productInformations.getPreviousBuildNumber(), OLD_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.ide"), OLD_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.exoplatform.social"), OLD_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.gatein.portal"), OLD_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.ecms"), OLD_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.ks"), OLD_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.cs"), OLD_VERSION);
 
     assertEquals(productInformations.getVersion(), NEW_VERSION);
     assertEquals(productInformations.getRevision(), NEW_VERSION);
     assertEquals(productInformations.getBuildNumber(), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.ide"), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.exoplatform.social"), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.gatein.portal"), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.ecms"), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.ks"), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.cs"), NEW_VERSION);
     assertEquals(productInformations.getCurrentProductGroupId(), "org.exoplatform.commons");
 
     // clean environment
@@ -160,23 +152,15 @@ public class TestProductInformations extends BasicTestCase {
     assertEquals(productInformations.getPreviousVersion(), NEW_VERSION);
     assertEquals(productInformations.getPreviousRevision(), NEW_VERSION);
     assertEquals(productInformations.getPreviousBuildNumber(), NEW_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.ide"), NEW_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.exoplatform.social"), NEW_VERSION);
     assertEquals(productInformations.getPreviousVersion("org.gatein.portal"), NEW_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.ecms"), NEW_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.ks"), NEW_VERSION);
-    assertEquals(productInformations.getPreviousVersion("org.exoplatform.cs"), NEW_VERSION);
 
     // Assert productInformation loaded from properties file
     assertEquals(productInformations.getVersion(), NEW_VERSION);
     assertEquals(productInformations.getRevision(), NEW_VERSION);
     assertEquals(productInformations.getBuildNumber(), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.ide"), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.exoplatform.social"), NEW_VERSION);
     assertEquals(productInformations.getVersion("org.gatein.portal"), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.ecms"), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.ks"), NEW_VERSION);
-    assertEquals(productInformations.getVersion("org.exoplatform.cs"), NEW_VERSION);
     assertEquals(productInformations.getCurrentProductGroupId(), "org.exoplatform.commons");
 
     // clean environment

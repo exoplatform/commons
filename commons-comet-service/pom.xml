@@ -50,32 +50,6 @@
       <artifactId>exo.ws.rest.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.jcr</groupId>
-      <artifactId>exo.jcr.component.core</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>xml-apis</artifactId>
-          <groupId>xml-apis</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>xml-apis-ext</artifactId>
-          <groupId>xml-apis</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>stax-api</artifactId>
-          <groupId>javax.xml.stream</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jboss-transaction-api</artifactId>
-          <groupId>org.jboss.javaee</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>ow2-jta-1.1-spec</artifactId>
-          <groupId>org.ow2.spec.ee</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>picocontainer</groupId>
       <artifactId>picocontainer</artifactId>
       <exclusions>

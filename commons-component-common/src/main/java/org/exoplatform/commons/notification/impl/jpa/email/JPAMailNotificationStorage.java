@@ -1,7 +1,5 @@
 package org.exoplatform.commons.notification.impl.jpa.email;
 
-import static org.exoplatform.commons.notification.impl.jpa.EntityConverter.convertParamsEntityToParams;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -248,6 +246,14 @@ public class JPAMailNotificationStorage implements MailNotificationStorage {
                                                .setId(String.valueOf(notifEntity.getId()));
 
     return message;
+  }
+
+  private static Map<String, String> convertParamsEntityToParams(Collection<MailParamEntity> paramsEntityList) {
+    Map<String, String> params = new HashMap<String, String>();
+    for (MailParamEntity paramsEntity : paramsEntityList) {
+      params.put(paramsEntity.getName(), paramsEntity.getValue());
+    }
+    return params;
   }
 
   private List<MailNotifEntity> getNotifsByDate(NotificationContext context, String pluginId) {

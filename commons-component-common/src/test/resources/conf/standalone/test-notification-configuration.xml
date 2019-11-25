@@ -31,28 +31,49 @@
   </component>
   
   <component>
-    <key>org.exoplatform.commons.api.notification.channel.ChannelManager</key>
-    <type>org.exoplatform.commons.notification.channel.ChannelManagerImpl</type>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailParamDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailDigestDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailNotifDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.dao.MailQueueDAO</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebParamsDAO</type>
+  </component>
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.JPAMailNotificationStorage</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.settings.jpa.JPAUserSettingServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
+    <type>org.exoplatform.settings.jpa.CacheUserSettingServiceImpl</type>
   </component>
   
   <component>
-    <key>org.exoplatform.commons.api.notification.service.storage.MailNotificationStorage</key>
-    <type>org.exoplatform.commons.notification.impl.service.storage.MailNotificationStorageImpl</type>
+    <key>org.exoplatform.commons.api.notification.channel.ChannelManager</key>
+    <type>org.exoplatform.commons.notification.channel.ChannelManagerImpl</type>
   </component>
-
-  <component>
-    <type>org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage</key>
-    <type>org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage</type>
-  </component>
-
-  <component>
-		<key>org.exoplatform.commons.api.notification.service.WebNotificationService</key>
-		<type>org.exoplatform.commons.notification.impl.service.WebNotificationServiceImpl</type>
-	</component>
 
   <component>
     <type>org.exoplatform.commons.notification.impl.PluginStatisticService</type>
@@ -76,24 +97,14 @@
     <type>org.exoplatform.commons.testing.mock.MockJobSchedulerService</type>
   </component>
 
-  <component>
-    <key>org.exoplatform.commons.api.notification.service.storage.NotificationService</key>
-    <type>org.exoplatform.commons.notification.impl.service.NotificationServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.notification.service.setting.UserSettingService</key>
-    <type>org.exoplatform.commons.notification.impl.setting.UserSettingServiceImpl</type>
-  </component>
+    <component>
+      <key>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</key>
+      <type>org.exoplatform.settings.jpa.JPAPluginSettingServiceImpl</type>
+    </component>
 
   <component>
     <key>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</key>
-    <type>org.exoplatform.commons.notification.impl.setting.PluginSettingServiceImpl</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.commons.api.notification.command.NotificationCommand</key>
-    <type>org.exoplatform.commons.notification.impl.command.NotificationCommandImpl</type>
+    <type>org.exoplatform.settings.jpa.JPAPluginSettingServiceImpl</type>
   </component>
 
   <component>
@@ -101,53 +112,17 @@
     <type>org.exoplatform.commons.notification.impl.service.template.DigestorServiceImpl</type>
   </component>
 
-	<component>
-		<key>org.exoplatform.commons.api.notification.service.QueueMessage</key>
-		<type>org.exoplatform.commons.notification.impl.service.QueueMessageImpl</type>
-		<init-params>
-			<value-param>
-				<name>maxToSend</name> <!-- Max number of mails to send in period time -->
-				<value>50</value>
-			</value-param>
-			<value-param>
-				<name>initialDelay</name><!-- The start time will call send email notification -->
-				<value>120</value>
-			</value-param>
-			<value-param>
-				<name>delayTime</name><!-- The time to repeat interval call send email notification -->
-				<value>60</value>
-			</value-param>
-		</init-params>
-	</component>
-
   <component>
-    <type>org.exoplatform.commons.notification.NotificationConfiguration</type>
+    <key>org.exoplatform.commons.api.notification.service.QueueMessage</key>
+    <type>org.exoplatform.commons.notification.impl.jpa.email.JPAQueueMessageImpl</type>
     <init-params>
       <value-param>
-        <name>workspace</name>
-        <value>portal-test</value>
-      </value-param>
-
-      <value-param>
-        <name>dayOfWeekend</name><!-- The day of week to send weekly notification-->
-        <value></value><!-- The value is number lest than 7 and more than 0 or name day of week (Monday, Tuesday, Wednesday...)-->
-      </value-param>
-      <value-param>
-        <name>dayOfMonthend</name>
-        <value>28</value>
-      </value-param>
-
-      <value-param>
-        <name>period</name><!-- repeat interval call make email notification -->
-        <value>10m</value><!-- The value is number of m/h/d or +time milliseconds (ex: +180000)-->
-      </value-param>
-      <value-param>
-        <name>startAtTime</name><!-- The start time will call make email notification -->
-        <value>11:00pm</value><!-- The value is number hours of a day: 23, 11:15am, 11:20pm -->
+        <name>numberOfMailPerBatch</name> <!-- Max number of mails to send in the configured period of time -->
+        <value>${exo.notification.service.QueueMessage.numberOfMailPerBatch:30}</value>
       </value-param>
     </init-params>
   </component>
-  
+
   <component>
     <key>org.exoplatform.commons.api.notification.service.NotificationCompletionService</key>
     <type>org.exoplatform.commons.api.notification.service.NotificationCompletionService</type>
@@ -167,7 +142,12 @@
   <component>
     <type>org.exoplatform.commons.notification.cache.TemplateCaching</type>
   </component>
-  
+
+  <component>
+    <key>org.exoplatform.services.mail.MailService</key>
+    <type>org.exoplatform.commons.testing.mock.MockMailService</type>
+  </component>
+
   <!-- channel register -->
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
@@ -197,182 +177,6 @@
           <name>channel-id</name>
           <value>MAIL_CHANNEL</value>
         </value-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-  
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator</target-component>
-    <component-plugin>
-      <name>addPaths</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.jcr.ext.hierarchy.impl.AddPathPlugin</type>
-      <init-params>
-        <object-param>
-          <name>notification.configuration</name>
-          <description>configuration for the notification path</description>
-          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig">
-            <field name="workspaces">
-              <collection type="java.util.ArrayList">
-                <value>
-                  <string>portal-test</string>
-                </value>
-              </collection>
-            </field>
-            <field name="jcrPaths">
-              <collection type="java.util.ArrayList">
-                <value>               
-                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>stgSettings</string></field>
-                    <field  name="path"><string>/settings</string></field>
-                    <field name="nodeType"><string>stg:settings</string></field>
-                    <field name="permissions">
-                      <collection type="java.util.ArrayList">               
-                        <value>                            
-                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
-                            <field name="identity"><string>*:/platform/administrators</string></field>
-                            <field name="read"><string>true</string></field>                
-                            <field name="addNode"><string>true</string></field>                
-                            <field name="setProperty"><string>true</string></field>                
-                            <field name="remove"><string>true</string></field>                
-                          </object>  
-                        </value>                        
-                      </collection>
-                    </field>                       
-                  </object>
-                </value>
-                <value>               
-                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>stgUsers</string></field>
-                    <field  name="path"><string>/settings/user</string></field>
-                    <field name="nodeType"><string>stg:subcontext</string></field>
-                    <field name="permissions">
-                      <collection type="java.util.ArrayList">               
-                        <value>                            
-                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
-                            <field name="identity"><string>*:/platform/administrators</string></field>
-                            <field name="read"><string>true</string></field>                
-                            <field name="addNode"><string>true</string></field>                
-                            <field name="setProperty"><string>true</string></field>                
-                            <field name="remove"><string>true</string></field>                
-                          </object>  
-                        </value>                        
-                      </collection>
-                    </field>                       
-                  </object>
-                </value>
-                <value>               
-                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>stgGlobal</string></field>
-                    <field  name="path"><string>/settings/global</string></field>
-                    <field name="nodeType"><string>stg:simplecontext</string></field>
-                    <field name="permissions">
-                      <collection type="java.util.ArrayList">               
-                        <value>                            
-                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
-                            <field name="identity"><string>*:/platform/administrators</string></field>
-                            <field name="read"><string>true</string></field>                
-                            <field name="addNode"><string>true</string></field>                
-                            <field name="setProperty"><string>true</string></field>                
-                            <field name="remove"><string>true</string></field>                
-                          </object>  
-                        </value>                        
-                      </collection>
-                    </field>                       
-                  </object>
-                </value>
-
-                <value>               
-                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>eXoNotification</string></field>
-                    <field  name="path"><string>/eXoNotification</string></field>
-                    <field name="nodeType"><string>ntf:notification</string></field>
-                    <field name="permissions">
-                      <collection type="java.util.ArrayList">               
-                        <value>                            
-                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
-                            <field name="identity"><string>*:/platform/administrators</string></field>
-                            <field name="read"><string>true</string></field>                
-                            <field name="addNode"><string>true</string></field>                
-                            <field name="setProperty"><string>true</string></field>                
-                            <field name="remove"><string>true</string></field>                
-                          </object>  
-                        </value>                        
-                      </collection>
-                    </field>                       
-                  </object>
-                </value>
-                <value>               
-                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>messageHome</string></field>
-                    <field  name="path"><string>/eXoNotification/messageHome</string></field>
-                    <field name="nodeType"><string>ntf:messageHome</string></field>
-                    <field name="mixinTypes">
-                      <collection type="java.util.ArrayList">
-                        <value><string>mix:subMessageHome</string></value>
-                      </collection>
-                    </field>
-                    <field name="permissions">
-                      <collection type="java.util.ArrayList">               
-                        <value>                            
-                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
-                            <field name="identity"><string>*:/platform/administrators</string></field>
-                            <field name="read"><string>true</string></field>                
-                            <field name="addNode"><string>true</string></field>                
-                            <field name="setProperty"><string>true</string></field>                
-                            <field name="remove"><string>true</string></field>                
-                          </object>  
-                        </value>                        
-                      </collection>
-                    </field>                       
-                  </object>
-                </value>
-
-								<value>               
-                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>messageInfoHome</string></field>
-                    <field  name="path"><string>/eXoNotification/messageInfoHome</string></field>
-                    <field name="nodeType"><string>ntf:messageInfoHome</string></field>
-                    <field name="permissions">
-                      <collection type="java.util.ArrayList">               
-                        <value>                            
-                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
-                            <field name="identity"><string>*:/platform/administrators</string></field>
-                            <field name="read"><string>true</string></field>
-                            <field name="addNode"><string>true</string></field>
-                            <field name="setProperty"><string>true</string></field>
-                            <field name="remove"><string>true</string></field>
-                          </object>  
-                        </value>                        
-                      </collection>
-                    </field>
-                  </object>
-                </value>
-                <value>               
-                  <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$JcrPath">                 
-                    <field  name="alias"><string>webChannel</string></field>
-                    <field  name="path"><string>/eXoNotification/web</string></field>
-                    <field name="nodeType"><string>ntf:channel</string></field>
-                    <field name="permissions">
-                      <collection type="java.util.ArrayList">
-                        <value>                            
-                          <object type="org.exoplatform.services.jcr.ext.hierarchy.impl.HierarchyConfig$Permission">             
-                            <field name="identity"><string>*:/platform/administrators</string></field>
-                            <field name="read"><string>true</string></field>
-                            <field name="addNode"><string>true</string></field>
-                            <field name="setProperty"><string>true</string></field>
-                            <field name="remove"><string>true</string></field>
-                          </object>
-                        </value>                        
-                      </collection>
-                    </field>
-                  </object>
-                </value>
-
-              </collection>
-            </field>
-          </object>
-        </object-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>

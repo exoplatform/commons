@@ -95,11 +95,11 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     UpgradePluginFromVersionZERO upgradePortalPlugin = new UpgradePluginFromVersionZERO(params);
     upgradePortalPlugin.setName("portalUpgrade");
 
-    // Create upgrade plugin for ECMS
+    // Create upgrade plugin for Social
     params = new InitParams();
     param = new ValueParam();
     param.setName("product.group.id");
-    param.setValue("org.exoplatform.ecms");
+    param.setValue("org.exoplatform.social");
     params.addParameter(param);
 
     param = new ValueParam();
@@ -107,8 +107,8 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     param.setValue("2");
     params.addParameter(param);
 
-    UpgradePluginFromVersionX upgradeECMSPlugin = new UpgradePluginFromVersionX(params);
-    upgradeECMSPlugin.setName("ecmsUpgrade");
+    UpgradePluginFromVersionX upgradeSocialPlugin = new UpgradePluginFromVersionX(params);
+    upgradeSocialPlugin.setName("socialUpgrade");
 
     // Creare a dummy plugin: is not enabled
     UpgradeProductPlugin dummyPlugin = new UpgradeProductPlugin(params) {
@@ -128,7 +128,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     // Property enable = true
     assertTrue(upgradePortalPlugin.isEnabled());
     // Property enable = null
-    assertTrue(upgradeECMSPlugin.isEnabled());
+    assertTrue(upgradeSocialPlugin.isEnabled());
     // Set property enable = false
     assertFalse(dummyPlugin.isEnabled());
 
@@ -138,14 +138,14 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
 
     String portalVersion = productInformations.getVersion("org.gatein.portal");
     String portalPrevVersion = productInformations.getPreviousVersion("org.gatein.portal");
-    String ecmsVersion = productInformations.getVersion("org.exoplatform.ecms");
-    String ecmsPrevVersion = productInformations.getPreviousVersion("org.exoplatform.ecms");
+    String socialVersion = productInformations.getVersion("org.exoplatform.social");
+    String socialPrevVersion = productInformations.getPreviousVersion("org.exoplatform.social");
 
     // Verify upgrade portal plugin: only upgrade from version 0
     assertEquals(portalPrevVersion.equals("0"), versions.contains(portalVersion + "-ZERO-Version"));
 
-    // Verify upgrade ecms plugin: only upgrade from version != 0
-    assertEquals(ecmsPrevVersion.equals("0"), versions.contains(ecmsVersion + "-X-Version"));
+    // Verify upgrade Social plugin: only upgrade from version != 0
+    assertEquals(socialPrevVersion.equals("0"), versions.contains(socialVersion + "-X-Version"));
   }
 
   public void testUpgradeWithDisabledPlugin() {
@@ -170,7 +170,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     params = new InitParams();
     param = new ValueParam();
     param.setName("product.group.id");
-    param.setValue("org.exoplatform.ecms");
+    param.setValue("org.exoplatform.social");
     params.addParameter(param);
 
     param = new ValueParam();
@@ -205,7 +205,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   public void testUpgradeWithTargetVersion() {
     productInformations.setFirstRun(false);
 
-    // Create upgrade plugin for ECMS
+    // Create upgrade plugin for Social
     InitParams params = new InitParams();
     ValueParam param = new ValueParam();
     param.setName("product.group.id");
@@ -254,7 +254,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   public void testUpgradeAsynchronous() {
     productInformations.setFirstRun(false);
 
-    // Create upgrade plugin for ECMS
+    // Create upgrade plugin for Social
     InitParams params = new InitParams();
     ValueParam param = new ValueParam();
     param.setName("product.group.id");
@@ -342,7 +342,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   public void testUpgradeExecutedOnce() {
     productInformations.setFirstRun(false);
 
-    // Create upgrade plugin for ECMS
+    // Create upgrade plugin for Social
     InitParams params = new InitParams();
     ValueParam param = new ValueParam();
     param.setName("product.group.id");
@@ -445,7 +445,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
   public void testUpgradeErrorFirstCall() {
     productInformations.setFirstRun(false);
 
-    // Create upgrade plugin for ECMS
+    // Create upgrade plugin for Social
     InitParams params = new InitParams();
     ValueParam param = new ValueParam();
     param.setName("product.group.id");
@@ -509,7 +509,7 @@ public class UpgradeProductTest extends BaseCommonsTestCase {
     UpgradePluginFromVersionZERO upgradePortalPlugin = new UpgradePluginFromVersionZERO(params);
     upgradePortalPlugin.setName("portalUpgrade");
 
-    // Create upgrade plugin for ECMS
+    // Create upgrade plugin for Social
     params = new InitParams();
     param = new ValueParam();
     param.setName("product.group.id");

@@ -54,8 +54,6 @@ public class MailQueueMessageManager implements ManagementAware, Startable {
 
   private static final String SEND_EMAIL_NOTIFICATION_JOB       = "SendEmailNotificationJob";
 
-  private static final String CACHE_REPO_NAME                   = "repositoryName";
-
   private static final Log    LOG                               = ExoLogger.getExoLogger(MailQueueMessageManager.class);
 
   private boolean             isOn                              = false;
@@ -233,7 +231,6 @@ public class MailQueueMessageManager implements ManagementAware, Startable {
           schedulerService.removeJob(info);
 
           JobDataMap jdatamap = new JobDataMap();
-          jdatamap.put(CACHE_REPO_NAME, CommonsUtils.getRepository().getConfiguration().getName());
           //
           schedulerService.addPeriodJob(info, periodInfo, jdatamap);
           LOG.debug("Job executes interval: " + interval);

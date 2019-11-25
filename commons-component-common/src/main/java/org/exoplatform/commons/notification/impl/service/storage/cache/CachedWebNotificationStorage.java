@@ -26,16 +26,9 @@ import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
-import org.exoplatform.commons.notification.impl.service.storage.WebNotificationStorageImpl;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.IntegerData;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsData;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsKey;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoCacheKey;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoData;
-import org.exoplatform.services.cache.CacheService;
-import org.exoplatform.services.cache.CachedObjectSelector;
-import org.exoplatform.services.cache.ExoCache;
-import org.exoplatform.services.cache.ObjectCacheInfo;
+import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.*;
+import org.exoplatform.services.cache.*;
 
 public class CachedWebNotificationStorage implements WebNotificationStorage {
   //
@@ -53,7 +46,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
   
   private WebNotificationStorage storage;
 
-  public CachedWebNotificationStorage(WebNotificationStorageImpl storage, CacheService cacheService) {
+  public CachedWebNotificationStorage(JPAWebNotificationStorage storage, CacheService cacheService) {
     this.storage = storage;
     exoWebNotificationCache = cacheService.getCacheInstance(WEB_NOTIFICATION_CACHING_NAME);
     exoWebNotificationsCache = cacheService.getCacheInstance(LIST_WEB_NOTIFICATION_CACHING_NAME);

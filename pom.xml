@@ -14,9 +14,6 @@
   <name>eXo PLF:: Commons</name>
   <modules>
     <module>commons-api</module>
-    <module>commons-comet-ext-service</module>
-    <module>commons-comet-ext-webapp-cometd</module>
-    <module>commons-comet-ext-webapp-rest</module>
     <module>commons-comet-service</module>
     <module>commons-comet-webapp</module>
     <module>commons-component-common</module>

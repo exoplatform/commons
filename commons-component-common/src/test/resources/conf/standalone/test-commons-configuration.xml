@@ -13,6 +13,11 @@
     </component>
 
     <component>
+      <key>org.exoplatform.services.organization.OrganizationService</key>
+      <type>org.exoplatform.settings.impl.MockOrganizationService</type>
+    </component>
+
+    <component>
         <type>org.exoplatform.services.scheduler.impl.QuartzSheduler</type>
     </component>
 
@@ -24,11 +29,6 @@
     <component>
         <key>org.exoplatform.commons.api.event.EventManager</key>
         <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
-    </component>
-
-    <component>
-        <key>org.exoplatform.commons.chromattic.ChromatticManager</key>
-        <type>org.exoplatform.commons.chromattic.ChromatticManager</type>
     </component>
 
     <component>
@@ -152,59 +152,4 @@
             </value-param>
         </init-params>
     </component>
-
-    <external-component-plugins>
-        <target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
-        <component-plugin>
-            <name>chromattic</name>
-            <set-method>addLifeCycle</set-method>
-            <type>org.exoplatform.commons.chromattic.ChromatticLifeCycle</type>
-            <init-params>
-                <value-param>
-                    <name>domain-name</name>
-                    <value>setting</value>
-                </value-param>
-                <value-param>
-                    <name>workspace-name</name>
-                    <value>portal-test</value>
-                </value-param>
-                <values-param>
-                    <name>entities</name>
-                    <value>org.exoplatform.settings.chromattic.SettingsRoot</value>
-                    <value>org.exoplatform.settings.chromattic.ContextEntity</value>
-                    <value>org.exoplatform.settings.chromattic.SimpleContextEntity</value>
-                    <value>org.exoplatform.settings.chromattic.SubContextEntity</value>
-                    <value>org.exoplatform.settings.chromattic.ScopeEntity</value>
-                </values-param>
-            </init-params>
-        </component-plugin>
-    </external-component-plugins>
-
-    <external-component-plugins>
-        <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
-        <component-plugin>
-            <name>add.nodeType</name>
-            <set-method>addPlugin</set-method>
-            <type>org.exoplatform.services.jcr.impl.AddNodeTypePlugin</type>
-            <init-params>
-                <values-param>
-                    <name>autoCreatedInNewRepository</name>
-                    <description>Node types configuration file</description>
-                    <value>classpath:/conf/jcr/test-nodetypes-config.xml</value>
-                    <value>classpath:/conf/portal/activity-extension-nodetypes.xml</value>
-                </values-param>
-            </init-params>
-        </component-plugin>
-        <component-plugin>
-            <name>add.namespaces</name>
-            <set-method>addPlugin</set-method>
-            <type>org.exoplatform.services.jcr.impl.AddNamespacesPlugin</type>
-            <init-params>
-                <properties-param>
-                    <name>namespaces</name>
-                    <property name="stg" value="http://www.gatein.org/jcr/token/1.0/" />
-                </properties-param>
-            </init-params>
-        </component-plugin>
-    </external-component-plugins>
 </configuration>

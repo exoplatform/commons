@@ -24,7 +24,7 @@ import org.exoplatform.services.security.Identity;
 @ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
   @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/commons-configuration.xml"),
   @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-cache-configuration.xml") })
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml") })
 public class JPAWebNotificationStorageTest extends BaseNotificationTestCase {
 
   private JPAWebNotificationStorage webNotificationStorage;

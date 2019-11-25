@@ -16,6 +16,10 @@
  */
 package org.exoplatform.commons.notification.impl.command;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
@@ -23,34 +27,29 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.NotificationUtils;
-import org.exoplatform.commons.notification.impl.NotificationSessionManager;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 public class NotificationExecutorImpl implements NotificationExecutor {
-  
-  private static final Log LOG = ExoLogger.getLogger(NotificationExecutorImpl.class);
 
-  private final List<NotificationCommand>  commands;
-  
-  //The executor to execute multiple threads
-  private NotificationCompletionService completionService; 
-  
-  private NotificationService notificationService;
-  
+  private static final Log                LOG = ExoLogger.getLogger(NotificationExecutorImpl.class);
+
+  private final List<NotificationCommand> commands;
+
+  // The executor to execute multiple threads
+  private NotificationCompletionService   completionService;
+
+  private NotificationService             notificationService;
+
   public NotificationExecutorImpl() {
     commands = new CopyOnWriteArrayList<>();
     notificationService = CommonsUtils.getService(NotificationService.class);
     completionService = CommonsUtils.getService(NotificationCompletionService.class);
   }
-  
+
   private boolean process(final NotificationContext ctx, final NotificationCommand command) {
     try {
       if (command.getPlugin().isValid(ctx) == false) {
@@ -87,27 +86,21 @@ public class NotificationExecutorImpl implements NotificationExecutor {
   @Override
   public boolean execute(NotificationContext ctx) {
     boolean result = true;
-    
+
     // Notification will not be executed when the feature is off
     if (CommonsUtils.isFeatureActive(NotificationUtils.FEATURE_NAME) == false) {
       commands.clear();
       return result;
     }
-    
-    boolean created = NotificationSessionManager.createSystemProvider();
-    try {
-      for(NotificationCommand command : commands) {
-        result &= process(ctx, command);
-        printLog(ctx);
-      }
-    } finally {
-      NotificationSessionManager.closeSessionProvider(created);
+
+    for (NotificationCommand command : commands) {
+      result &= process(ctx, command);
+      printLog(ctx);
     }
     commands.clear();
-
     return result;
   }
-  
+
   private void printLog(NotificationContext ctx) {
     if (ctx.isFailed()) {
       LOG.error("Failed to process the notification.", ctx.getException());
@@ -127,5 +120,5 @@ public class NotificationExecutorImpl implements NotificationExecutor {
     this.commands.addAll(commands);
     return this;
   }
-  
+
 }

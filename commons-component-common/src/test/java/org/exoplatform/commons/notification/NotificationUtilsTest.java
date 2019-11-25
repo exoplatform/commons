@@ -29,7 +29,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.services.idgenerator.impl.IDGeneratorServiceImpl;
-import org.exoplatform.services.jcr.util.IdGenerator;
 
 public class NotificationUtilsTest extends TestCase {
 
@@ -143,7 +142,6 @@ public class NotificationUtilsTest extends TestCase {
 
   public void testNotificationInfoClone() {
     //
-    new IdGenerator(new IDGeneratorServiceImpl());
     Map<String, String> ownerParameter = new HashMap<String, String>();
     ownerParameter.put("test", "value test");
     NotificationInfo info = NotificationInfo.instance();

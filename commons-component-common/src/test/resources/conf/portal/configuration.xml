@@ -3,140 +3,76 @@
 			   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
 			   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
-	<component>
-		<type>org.exoplatform.portal.config.UserACL</type>
-		<init-params>
-			<value-param>
-				<name>super.user</name>
-				<value>root</value>
-			</value-param>
-		</init-params>
-	</component>
-
-	<component>
-		<key>org.exoplatform.commons.api.event.EventManager</key>
-		<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
-	</component>
-	<component>
-		<key>org.exoplatform.commons.chromattic.ChromatticManager</key>
-		<type>org.exoplatform.commons.chromattic.ChromatticManager</type>
-	</component>
-
-	<component>
-		<key>org.exoplatform.settings.impl.SettingServiceImpl</key>
-		<type>org.exoplatform.settings.impl.SettingServiceImpl</type>
-	</component>
-
-	<component>
-		<type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
-	</component>
-
-	<component>
-		<key>PropertyManagerConfigurator</key>
-		<type>org.exoplatform.container.PropertyConfigurator</type>
-		<init-params>
-			<value-param>
-				<name>properties.url</name>
-				<value>classpath:/conf/exo.properties</value>
-			</value-param>
-		</init-params>
-	</component>
-
-	<component>
-		<key>org.exoplatform.services.user.UserStateService</key>
-		<type>org.exoplatform.services.user.UserStateService</type>
-	</component>
-
   <component>
-      <key>org.exoplatform.services.cache.CacheService</key>
-      <jmx-name>cache:type=CacheService</jmx-name>
-      <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
-      <init-params>
-          <object-param>
-              <name>cache.config.default</name>
-              <object type="org.exoplatform.services.cache.ExoCacheConfig">
-                  <field name="name">
-                      <string>default</string>
-                  </field>
-                  <field name="maxSize">
-                      <int>30000</int>
-                  </field>
-                  <field name="liveTime">
-                      <long>60000</long>
-                  </field>
-                  <field name="implementation">
-                      <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
-                  </field>
-              </object>
-          </object-param>
-      </init-params>
+    <type>org.exoplatform.portal.config.UserACL</type>
+    <init-params>
+      <value-param>
+        <name>super.user</name>
+        <value>root</value>
+      </value-param>
+    </init-params>
   </component>
 
-    <component>
-        <key>org.exoplatform.commons.api.settings.SettingService</key>
-        <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
-    </component>
-	<external-component-plugins>
-		<target-component>org.exoplatform.commons.chromattic.ChromatticManager</target-component>
-		<component-plugin>
-			<name>chromattic</name>
-			<set-method>addLifeCycle</set-method>
-			<type>org.exoplatform.commons.chromattic.ChromatticLifeCycle</type>
-			<init-params>
-				<value-param>
-					<name>domain-name</name>
-					<value>setting</value>
-				</value-param>
-				<value-param>
-					<name>workspace-name</name>
-					<value>portal-test</value>
-				</value-param>
-				<values-param>
-					<name>entities</name>
-					<value>org.exoplatform.settings.chromattic.SettingsRoot</value>
-					<value>org.exoplatform.settings.chromattic.ContextEntity</value>
-					<value>org.exoplatform.settings.chromattic.SimpleContextEntity</value>
-					<value>org.exoplatform.settings.chromattic.SubContextEntity</value>
-					<value>org.exoplatform.settings.chromattic.ScopeEntity</value>
-				</values-param>
-			</init-params>
-		</component-plugin>
-	</external-component-plugins>
+  <component>
+    <key>org.exoplatform.commons.api.event.EventManager</key>
+    <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
+  </component>
 
-	<external-component-plugins>
-		<target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
-		<component-plugin>
-			<name>add.nodeType</name>
-			<set-method>addPlugin</set-method>
-			<type>org.exoplatform.services.jcr.impl.AddNodeTypePlugin</type>
-			<init-params>
-				<values-param>
-					<name>autoCreatedInNewRepository</name>
-					<description>Node types configuration file</description>
-					<value>classpath:/conf/jcr/test-nodetypes-config.xml</value>
-					<value>jar:/conf/notification-nodetypes.xml</value>
-					<value>jar:/conf/portal/activity-extension-nodetypes.xml</value>
-					<value>jar:/conf/settings-nodetypes.xml</value>
-				</values-param>
-			</init-params>
-		</component-plugin>
-		<component-plugin>
-			<name>add.namespaces</name>
-			<set-method>addPlugin</set-method>
-			<type>org.exoplatform.services.jcr.impl.AddNamespacesPlugin</type>
-			<init-params>
-				<properties-param>
-					<name>namespaces</name>
-					<property name="stg" value="http://www.gatein.org/jcr/token/1.0/" />
-					<property name="ntf" value="http://www.gatein.org/jcr/ntf/1.0/" />
-				</properties-param>
-			</init-params>
-		</component-plugin>
-	</external-component-plugins>
+  <component>
+    <key>org.exoplatform.settings.impl.SettingServiceImpl</key>
+    <type>org.exoplatform.settings.impl.SettingServiceImpl</type>
+  </component>
 
-	<import>classpath:/conf/jcr/jcr-configuration.xml</import>
+  <component>
+    <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
+  </component>
+
+  <component>
+    <key>PropertyManagerConfigurator</key>
+    <type>org.exoplatform.container.PropertyConfigurator</type>
+    <init-params>
+      <value-param>
+        <name>properties.url</name>
+        <value>classpath:/conf/exo.properties</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.user.UserStateService</key>
+    <type>org.exoplatform.services.user.UserStateService</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.cache.CacheService</key>
+    <jmx-name>cache:type=CacheService</jmx-name>
+    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
+    <init-params>
+      <object-param>
+        <name>cache.config.default</name>
+        <object type="org.exoplatform.services.cache.ExoCacheConfig">
+          <field name="name">
+            <string>default</string>
+          </field>
+          <field name="maxSize">
+            <int>30000</int>
+          </field>
+          <field name="liveTime">
+            <long>60000</long>
+          </field>
+          <field name="implementation">
+            <string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string>
+          </field>
+        </object>
+      </object-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.commons.api.settings.SettingService</key>
+    <type>org.exoplatform.settings.cache.CacheSettingServiceImpl</type>
+  </component>
+
 	<import>classpath:/conf/standalone/test-commons-configuration.xml</import>
 	<import>classpath:/conf/standalone/test-notification-configuration.xml</import>
-	<import>classpath:/conf/standalone/test-conteninitializerservice-configuration.xml</import>
-	<import>classpath:/conf/standalone/test-initialize-data-configuration.xml</import>
 </configuration>

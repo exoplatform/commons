@@ -237,8 +237,7 @@ public class ProductInformations implements Startable {
   }
 
   /**
-   * This method migrate from the JCR the stored products versions to JPA. If
-   * it's the first server start up, then store the declared one.
+   * This service will store the declared product versions at startup.
    */
   @SuppressWarnings("rawtypes")
   public void start() {

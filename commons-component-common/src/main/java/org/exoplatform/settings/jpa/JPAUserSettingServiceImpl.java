@@ -39,7 +39,6 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.notification.NotificationConfiguration;
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.job.NotificationJob;
@@ -54,7 +53,7 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
   /** Setting Scope on Common Setting **/
   public static final Scope     NOTIFICATION_SCOPE = Scope.APPLICATION.id("NOTIFICATION");
 
-  public static final String    NAME_PATTERN       = "exo:{CHANNELID}Channel";
+  public static final String   NAME_PATTERN       = "exo:{CHANNELID}Channel";
 
   private SettingService        settingService;
 
@@ -69,7 +68,6 @@ public class JPAUserSettingServiceImpl extends AbstractService implements UserSe
    * structure is created before initializing it
    */
   public JPAUserSettingServiceImpl(SettingService settingService,
-                                   NotificationConfiguration configuration,
                                    ChannelManager channelManager,
                                    PluginSettingService pluginSettingService,
                                    DataInitializer dataInitializer) {
