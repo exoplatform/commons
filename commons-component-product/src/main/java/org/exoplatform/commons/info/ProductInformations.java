@@ -18,28 +18,20 @@
  */
 package org.exoplatform.commons.info;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+
+import org.picocontainer.Startable;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.core.ManageableRepository;
-import org.exoplatform.services.jcr.ext.app.SessionProviderService;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.settings.jpa.entity.SettingsEntity;
-import org.picocontainer.Startable;
-
-import javax.jcr.*;
-import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:anouar.chattouna@exoplatform.com">Anouar
@@ -47,83 +39,58 @@ import java.util.stream.Collectors;
  * @version $Revision$
  */
 public class ProductInformations implements Startable {
+  public static final String  PRODUCT_INFORMATION                   = "ProductInformation";
 
-  public static final String     product_Information                   = "ProductInformation";
+  public static final String  ENTERPRISE_EDITION                    = "ENTERPRISE";
 
-  public static final String     ENTERPRISE_EDITION                    = "ENTERPRISE";
+  public static final String  EXPRESS_EDITION                       = "EXPRESS";
 
-  public static final String     EXPRESS_EDITION                       = "EXPRESS";
+  public static final String  EDITION                               = "edition";
 
-  public static final String     EDITION                               = "edition";
+  public static final String  KEY_GENERATION_DATE                   = "key generation date";
 
-  public static final String     KEY_GENERATION_DATE                   = "key generation date";
+  public static final String  DELAY                                 = "delay";
 
-  public static final String     DELAY                                 = "delay";
+  public static final String  PRODUCT_CODE                          = "productCode";
 
-  public static final String     PRODUCT_CODE                          = "productCode";
+  public static final String  PRODUCT_KEY                           = "productKey";
 
-  public static final String     PRODUCT_KEY                           = "productKey";
+  public static final String  NB_USERS                              = "number of users";
 
-  public static final String     NB_USERS                              = "number of users";
+  public static final String  PRODUCT_GROUP_ID                      = "product.groupId";
 
-  public static final String     PRODUCT_GROUP_ID                      = "product.groupId";
+  public static final String  PRODUCT_REVISION                      = "product.revision";
 
-  public static final String     PRODUCT_REVISION                      = "product.revision";
+  public static final String  PRODUCT_BUILD_NUMBER                  = "product.buildNumber";
 
-  public static final String     PRODUCT_BUILD_NUMBER                  = "product.buildNumber";
+  public static final String  WORKING_WORSPACE_NAME                 = "working.worspace.name";
 
-  public static final String     WORKING_WORSPACE_NAME                 = "working.worspace.name";
-
-  public static final String     PRODUCT_VERSIONS_DECLARATION_FILE     = "product.versions.declaration.file";
-
-  /**
-   * Constant that will be used in nodeHierarchyCreator.getJcrPath: it represents
-   * the Application data root node Alias
-   */
-  public static final String     EXO_APPLICATIONS_DATA_NODE_ALIAS      = "exoApplicationDataNode";
+  public static final String  PRODUCT_VERSIONS_DECLARATION_FILE     = "product.versions.declaration.file";
 
   /**
    * Service application data node name
    */
-  public static final String     UPGRADE_PRODUCT_SERVICE_NODE_NAME     = "ProductInformationsService";
+  public static final String  UPGRADE_PRODUCT_SERVICE_NODE_NAME     = "ProductInformationsService";
 
   /**
    * node name where the Product version declaration is
    */
-  public static final String     PRODUCT_VERSION_DECLARATION_NODE_NAME = "productVersionDeclarationNode";
+  public static final String  PRODUCT_VERSION_DECLARATION_NODE_NAME = "productVersionDeclarationNode";
 
-  private static final Log       LOG                                   = ExoLogger.getLogger(ProductInformations.class);
+  private static final Log    LOG                                   = ExoLogger.getLogger(ProductInformations.class);
 
-  public String                  applicationDataRootNodePath           = null;
+  private Properties          productInformationProperties          = new Properties();
 
-  private String                 productVersionDeclarationNodePath     = null;
+  private Map<String, String> productInformation                    = new HashMap<>();
 
-  private String                 workspaceName                         = null;
+  private boolean             firstRun                              = false;
 
-  private Properties             productInformationProperties          = new Properties();
-
-  private Map<String, String>    productInformation                    = new HashMap<>();
-
-  private boolean                firstRun                              = false;
-
-  private SettingService         settingService;
-
-  private NodeHierarchyCreator   nodeHierarchyCreator;
-
-  private RepositoryService      repositoryService                     = null;
-
-  private SessionProviderService sessionProviderService                = null;
+  private SettingService      settingService;
 
   public ProductInformations(ConfigurationManager cmanager,
-                             NodeHierarchyCreator nodeHierarchyCreator,
                              InitParams initParams,
-                             SettingService settingService,
-                             SessionProviderService sessionProviderService,
-                             RepositoryService repositoryService) {
-    this.repositoryService = repositoryService;
-    this.sessionProviderService = sessionProviderService;
+                             SettingService settingService) {
     this.settingService = settingService;
-    this.nodeHierarchyCreator = nodeHierarchyCreator;
     if (!initParams.containsKey(PRODUCT_VERSIONS_DECLARATION_FILE)) {
       if (LOG.isErrorEnabled()) {
         LOG.error("Couldn't find the init value param: " + PRODUCT_VERSIONS_DECLARATION_FILE);
@@ -141,7 +108,6 @@ public class ProductInformations implements Startable {
       if (LOG.isErrorEnabled()) {
         LOG.error("Couldn't parse the file " + filePath, exception);
       }
-      return;
     } catch (Exception exception) {
       // ConfigurationManager.getInputStream() throws Exception().
       // It's from another project and we cannot modify it. So we have to catch
@@ -149,34 +115,30 @@ public class ProductInformations implements Startable {
       if (LOG.isErrorEnabled()) {
         LOG.error("Error occured while reading the file " + filePath, exception);
       }
-      return;
-    }
-    if (initParams.containsKey(WORKING_WORSPACE_NAME)) {
-      workspaceName = initParams.getValueParam(WORKING_WORSPACE_NAME).getValue();
     }
   }
 
-  public String getEdition() throws MissingProductInformationException {
+  public String getEdition() {
     return productInformation.get(EDITION);
   }
 
-  public String getNumberOfUsers() throws MissingProductInformationException {
+  public String getNumberOfUsers() {
     return productInformation.get(NB_USERS);
   }
 
-  public String getDateOfLicence() throws MissingProductInformationException {
+  public String getDateOfLicence() {
     return productInformation.get(KEY_GENERATION_DATE);
   }
 
-  public String getDuration() throws MissingProductInformationException {
+  public String getDuration() {
     return productInformation.get(DELAY);
   }
 
-  public String getProductCode() throws MissingProductInformationException {
+  public String getProductCode() {
     return productInformation.get(PRODUCT_CODE);
   }
 
-  public String getProductKey() throws MissingProductInformationException {
+  public String getProductKey() {
     return productInformation.get(PRODUCT_KEY);
   }
 
@@ -249,8 +211,8 @@ public class ProductInformations implements Startable {
 
   /**
    * @return an empty string if the properties file is not found, otherwise the
-   *         platform.buildNumber property. This method return the build number of
-   *         the platform.
+   *         platform.buildNumber property. This method return the build number
+   *         of the platform.
    */
   public String getPreviousBuildNumber() throws MissingProductInformationException {
     if (!productInformation.containsKey(PRODUCT_BUILD_NUMBER)) {
@@ -275,18 +237,17 @@ public class ProductInformations implements Startable {
   }
 
   /**
-   * This method migrate from the JCR the stored products versions to JPA. If it's
-   * the first server start up, then store the declared one.
+   * This method migrate from the JCR the stored products versions to JPA. If
+   * it's the first server start up, then store the declared one.
    */
+  @SuppressWarnings("rawtypes")
   public void start() {
     try {
-      migrateProductInformation();
       // Load product information from DB
-      Map<String, SettingValue> productInformationSettings =
-                                                           settingService.getSettingsByContextAndScope(Context.GLOBAL.getName(),
-                                                                                                       Context.GLOBAL.getId(),
-                                                                                                       Scope.APPLICATION.getName(),
-                                                                                                       product_Information);
+      Map<String, SettingValue> productInformationSettings = settingService.getSettingsByContextAndScope(Context.GLOBAL.getName(),
+                                                                                                         Context.GLOBAL.getId(),
+                                                                                                         Scope.APPLICATION.getName(),
+                                                                                                         PRODUCT_INFORMATION);
       if (productInformationSettings != null && !productInformationSettings.isEmpty()) {
         productInformationSettings.entrySet()
                                   .stream()
@@ -308,13 +269,14 @@ public class ProductInformations implements Startable {
    * This method is called by eXo Kernel when stopping the parent ExoContainer
    */
   public void stop() {
+    // NOthing to stop
   }
 
   public void storeProductInformation(Map<String, String> map) {
     try {
       for (Map.Entry<String, String> entry : map.entrySet()) {
         settingService.set(Context.GLOBAL,
-                           Scope.APPLICATION.id(product_Information),
+                           Scope.APPLICATION.id(PRODUCT_INFORMATION),
                            entry.getKey(),
                            SettingValue.create(entry.getValue()));
       }
@@ -325,61 +287,6 @@ public class ProductInformations implements Startable {
 
   public void initProductInformation(Properties properties) {
     properties.entrySet().stream().forEach(entry -> productInformation.put((String) entry.getKey(), (String) entry.getValue()));
-  }
-
-  /**
-   * Migrate product information from JCR to RDBMS
-   */
-  public void migrateProductInformation() {
-    if (workspaceName == null || workspaceName.equals("")) {
-      try {
-        workspaceName = repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
-        if (LOG.isInfoEnabled()) {
-          LOG.info("Workspace wasn't specified, use '" + workspaceName + "' as default workspace of this repository.");
-        }
-      } catch (RepositoryException exception) {
-        LOG.error("Error occured while getting default workspace name.", exception);
-        return;
-      }
-    }
-    Session session = null;
-    try {
-      session = getSession();
-      applicationDataRootNodePath = nodeHierarchyCreator.getJcrPath(EXO_APPLICATIONS_DATA_NODE_ALIAS);
-      productVersionDeclarationNodePath = applicationDataRootNodePath + "/" + UPGRADE_PRODUCT_SERVICE_NODE_NAME + "/"
-          + PRODUCT_VERSION_DECLARATION_NODE_NAME;
-      if (session.itemExists(productVersionDeclarationNodePath)) {
-        Node productVersionDeclarationNode = (Node) session.getItem(productVersionDeclarationNodePath);
-        Node productVersionDeclarationNodeContent = productVersionDeclarationNode.getNode("jcr:content");
-        String data = productVersionDeclarationNodeContent.getProperty("jcr:data").getString();
-        Properties jcrInformation = new Properties();
-        jcrInformation.load(new ByteArrayInputStream(data.getBytes()));
-        initProductInformation(jcrInformation);
-        storeProductInformation(productInformation);
-        productVersionDeclarationNode.getParent().remove();
-        LOG.info("productVersionDeclaration node removed!");
-        session.save();
-      } else {
-        LOG.info("No product information to migrate from JCR to RDBMS");
-      }
-    } catch (LoginException exception) {
-      LOG.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
-      return;
-    } catch (NoSuchWorkspaceException exception) {
-      LOG.error("Can't load product informations from the JCR: Error when getting JCR session.", exception);
-      return;
-    } catch (RepositoryException exception) {
-      LOG.error("Can't load product informations from the JCR!", exception);
-      return;
-    } catch (IOException exception) {
-      LOG.error("Can't load product informations from the JCR: the data stored in the JCR couldn't be parsed.", exception);
-      return;
-    }
-    finally {
-      if (session != null) {
-        session.logout();
-      }
-    }
   }
 
   public void setUnlockInformation(Properties unlockInformation) {
@@ -398,19 +305,6 @@ public class ProductInformations implements Startable {
     }
   }
 
-  public String getWorkspaceName() {
-    return workspaceName;
-  }
-
-  public String getProductVersionDeclarationNodePath() {
-    return this.productVersionDeclarationNodePath;
-  }
-
-  private static String currentFlag() {
-    DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    return dateFormat.format(Calendar.getInstance(TimeZone.getDefault()).getTime());
-  }
-
   public void setProductInformationProperties(Properties productInformationProperties) {
     this.productInformationProperties = productInformationProperties;
   }
@@ -425,12 +319,6 @@ public class ProductInformations implements Startable {
 
   public void setFirstRun(boolean firstRun) {
     this.firstRun = firstRun;
-  }
-
-  private Session getSession() throws RepositoryException, LoginException, NoSuchWorkspaceException {
-    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    ManageableRepository repository = repositoryService.getCurrentRepository();
-    return sessionProvider.getSession(workspaceName, repository);
   }
 
 }
