@@ -30,6 +30,7 @@ import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -56,8 +57,10 @@ public class NotificationExecutorImpl implements NotificationExecutor {
         return false;
       }
       Callable<Boolean> task = () -> {
+        PortalContainer container = PortalContainer.getInstance();
+        ExoContainerContext.setCurrentContainer(container);
+        RequestLifeCycle.begin(container);
         try {
-          ExoContainerContext.setCurrentContainer(PortalContainer.getInstance());
           NotificationInfo notifiction = create(ctx, command);
           if (notifiction != null) {
             notificationService.process(notifiction);
@@ -66,6 +69,8 @@ public class NotificationExecutorImpl implements NotificationExecutor {
           LOG.warn("Process NotificationInfo is failed: " + e.getMessage(), e);
           LOG.debug(e.getMessage(), e);
           return false;
+        } finally {
+          RequestLifeCycle.end();
         }
         //
         return true;
