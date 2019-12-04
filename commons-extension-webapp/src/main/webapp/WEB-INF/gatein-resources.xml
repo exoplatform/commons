@@ -410,6 +410,23 @@
       <path>/javascript/Chart.bundle.min.js</path>
     </script>
   </module>
-
+  <module>
+    <name>platform-responsive</name>
+    <as>platformResponsive</as>
+    <script>
+      <path>/javascript/eXo/responsive/responsive.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>common-utils</module>
+      <as>common_utils</as>
+    </depends>
+    <depends>
+      <module>jq_perfect_scrollbar</module>
+    </depends>
+  </module>
 </gatein-resources>
 

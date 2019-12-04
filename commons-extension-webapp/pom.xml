@@ -9,7 +9,47 @@
   <artifactId>commons-extension-webapp</artifactId>
   <packaging>war</packaging>
   <name>eXo PLF:: Commons - Commons Extension Webapp</name>
+  <properties>
+    <!-- Use version required by Juzu Less plugin -->
+    <org.antlr.runtime.version>3.4</org.antlr.runtime.version>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr-runtime</artifactId>
+        <version>${org.antlr.runtime.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
+    <!-- Juzu -->
+    <dependency>
+      <groupId>org.juzu</groupId>
+      <artifactId>juzu-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.juzu</groupId>
+      <artifactId>juzu-plugins-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.juzu</groupId>
+      <artifactId>juzu-plugins-less</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.juzu</groupId>
+      <artifactId>juzu-plugins-less4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.juzu</groupId>
+      <artifactId>juzu-plugins-webjars</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.juzu</groupId>
+      <artifactId>juzu-plugins-portlet</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>commons-component-common</artifactId>
@@ -19,6 +59,18 @@
       <groupId>org.exoplatform.gatein.portal</groupId>
       <artifactId>exo.portal.component.resources</artifactId>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.portlet</groupId>
+      <artifactId>portlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
     </dependency>
   </dependencies>
   <build>
