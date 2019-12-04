@@ -23,6 +23,7 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
+import org.exoplatform.commons.utils.MailUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.ComponentRequestLifecycle;
@@ -35,11 +36,7 @@ import org.exoplatform.services.resources.LocaleContextInfo;
 import org.exoplatform.services.resources.LocalePolicy;
 
 public class NotificationPluginUtils {
-  
-  public static final String NOTIFICATION_SENDER_NAME  = "exo:notificationSenderName";
-  
-  public static final String NOTIFICATION_SENDER_EMAIL = "exo:notificationSenderEmail";
-  
+
   public static final String BRANDING_PORTAL_NAME = "exo:brandingPortalName";
   
   public static final String BRANDING_COMPANY_NAME_SETTING_KEY = "exo.branding.company.name";
@@ -108,19 +105,9 @@ public class NotificationPluginUtils {
       return from;
     }
 
-    return new StringBuffer(getSenderName()).append("<").append(getEmailFrom()).append(">").toString();
+    return new StringBuffer(MailUtils.getSenderName()).append("<").append(MailUtils.getSenderEmail()).append(">").toString();
   }
 
-  public static String getEmailFrom() {
-    SettingValue<?> mail = getSettingService().get(Context.GLOBAL, Scope.GLOBAL.id(null), NOTIFICATION_SENDER_EMAIL);
-    return mail != null ? (String) mail.getValue() : System.getProperty("gatein.email.smtp.from", "noreply@exoplatform.com");
-  }
-
-  public static String getSenderName() {
-    SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL.id(null), NOTIFICATION_SENDER_NAME);
-    return name != null ? (String) name.getValue() : System.getProperty("exo.notifications.portalname", "eXo");
-  }
-  
   /**
    * Get branding Portal Name 
    * @return
