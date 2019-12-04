@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.codec.binary.StringUtils;
+
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
@@ -110,8 +112,10 @@ public class TestProductInformations extends BasicTestCase {
     assertFalse(productInformationSettings.isEmpty());
     productInformationSettings.entrySet()
                               .stream()
-                              .filter(entry -> !"product.groupId".equals(entry.getKey()))
-                              .forEach(entry -> assertEquals(OLD_VERSION, entry.getValue().getValue()));
+                              .filter(entry -> entry.getKey().startsWith("org.exoplatform"))
+                              .forEach(entry -> assertEquals("'" + entry.getKey() + "' doesn't have an expected value",
+                                                             OLD_VERSION,
+                                                             entry.getValue().getValue()));
 
     assertEquals(productInformations.getPreviousVersion(), OLD_VERSION);
     assertEquals(productInformations.getPreviousRevision(), OLD_VERSION);

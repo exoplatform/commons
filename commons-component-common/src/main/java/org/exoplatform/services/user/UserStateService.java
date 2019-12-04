@@ -16,11 +16,7 @@
  */
 package org.exoplatform.services.user;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -33,19 +29,23 @@ import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityConstants;
 
 public class UserStateService {
-  private static final Log LOG = ExoLogger.getLogger(UserStateService.class.getName());
-  public static String DEFAULT_STATUS = "available";
-  private final static String USER_STATE_CACHING_NAME = "commons.UserStateService";
-  private static final int DEFAULT_OFFLINE_DELAY = 60000;
-  private int delay = 60*1000;
+  private static final Log         LOG                     = ExoLogger.getLogger(UserStateService.class.getName());
 
-  ExoCache<String, UserStateModel> userStateCache = null;
+  public static final String       DEFAULT_STATUS          = "available";
+
+  public static final String       USER_STATE_CACHE_NAME = "commons.UserStateService";
+
+  private static final int         DEFAULT_OFFLINE_DELAY   = 60000;
+
+  private final int                delay;
+
+  ExoCache<String, UserStateModel> userStateCache          = null;
 
   public UserStateService(CacheService cacheService) {
-    userStateCache = cacheService.getCacheInstance(USER_STATE_CACHING_NAME);
+    userStateCache = cacheService.getCacheInstance(USER_STATE_CACHE_NAME);
     String strDelay = System.getProperty("user.status.offline.delay");
-    delay = NumberUtils.toInt(strDelay, DEFAULT_OFFLINE_DELAY);
-    delay = (delay > 0) ? delay : DEFAULT_OFFLINE_DELAY;
+    int configuredDelay = NumberUtils.toInt(strDelay, DEFAULT_OFFLINE_DELAY);
+    delay = (configuredDelay > 0) ? configuredDelay : DEFAULT_OFFLINE_DELAY;
   }
 
   public int getDelay() {
@@ -56,14 +56,14 @@ public class UserStateService {
   public void save(UserStateModel model) {
     userStateCache.put(model.getUserId(), model);
   }
-  
-  //Get userState for a user
+
+  // Get userState for a user
   public UserStateModel getUserState(String userId) {
     if (StringUtils.isBlank(userId)) {
       throw new IllegalArgumentException("Parameter userId is mandatory");
     }
     UserStateModel model = getUserStateFromCache(userId);
-    if(model != null) {
+    if (model != null) {
       model = model.clone();
     } else {
       ConversationState state = ConversationState.getCurrent();
@@ -78,7 +78,7 @@ public class UserStateService {
     return model;
   }
 
-  //Ping to update last activity
+  // Ping to update last activity
   public UserStateModel ping(String userId) {
     if (userId == null || IdentityConstants.ANONIM.equals(userId)) {
       return null;
@@ -93,11 +93,12 @@ public class UserStateService {
     save(model);
     return model;
   }
-  
-  //Get all users online
+
+  // Get all users online
   public List<UserStateModel> online() {
-    List<UserStateModel> onlineUsers = new LinkedList<UserStateModel>();
+    List<UserStateModel> onlineUsers = new LinkedList<>();
     try {
+      @SuppressWarnings("unchecked")
       List<UserStateModel> users = (List<UserStateModel>) userStateCache.getCachedObjects();
       //
       Collections.sort(users, new LastActivityComparatorASC());
@@ -107,11 +108,11 @@ public class UserStateService {
         }
       }
     } catch (Exception e) {
-      LOG.error("Exception when getting online user: {}",e);
-    }     
+      LOG.error("Exception when getting online user: {}", e);
+    }
     return onlineUsers;
   }
-  
+
   public boolean isOnline(String userId) {
     UserStateModel model = getUserState(userId);
     if (model != null) {
@@ -122,7 +123,7 @@ public class UserStateService {
 
   public UserStateModel lastLogin() {
     List<UserStateModel> online = online();
-    if (online.size() > 0) {
+    if (!online.isEmpty()) {
       return online.get(online.size() - 1);
     }
     return null;
@@ -142,7 +143,7 @@ public class UserStateService {
     return false;
   }
 
-  static public class LastActivityComparatorASC implements Comparator<UserStateModel> {
+  public static class LastActivityComparatorASC implements Comparator<UserStateModel> {
     public int compare(UserStateModel u1, UserStateModel u2) {
       Long date1 = u1.getLastActivity();
       Long date2 = u2.getLastActivity();

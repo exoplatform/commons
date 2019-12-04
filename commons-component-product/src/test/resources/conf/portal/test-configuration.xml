@@ -20,4 +20,14 @@
     </init-params>
   </component>
 
+  <component>
+    <type>org.exoplatform.commons.info.ProductInformations</type>
+    <init-params>
+      <value-param>
+        <name>product.versions.declaration.file</name>
+        <value>classpath:/conf/data/product_new.properties</value>
+      </value-param>
+    </init-params>
+  </component>
+
 </configuration>

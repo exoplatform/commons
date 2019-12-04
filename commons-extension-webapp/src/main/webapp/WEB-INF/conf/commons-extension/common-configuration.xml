@@ -5,11 +5,91 @@
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-      <type>org.exoplatform.commons.resource.ResourceBundleREST</type>
+    <type>org.exoplatform.commons.resource.ResourceBundleREST</type>
   </component>
   <component>
     <key>org.exoplatform.commons.api.event.EventManager</key>
-	<type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
+    <type>org.exoplatform.commons.event.impl.EventManagerImpl</type>
+  </component>
+  <component>
+    <type>org.exoplatform.account.setup.rest.WelcomeScreenRestService</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.commons.info.PlatformInformationRESTService</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.account.setup.web.AccountSetupService</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.account.setup.web.PingBackService</type>
+    <init-params>
+      <value-param>
+        <name>pingBackUrl</name>
+        <value>http://www.exoplatform.com/company/en/products/e-01011000-01101111</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.software.register.UnlockService</type>
+    <init-params>
+      <value-param>
+        <name>delayPeriod</name>
+        <value>30</value>
+      </value-param>
+      <value-param>
+        <name>KeyContent</name>
+        <value>Platform 4 - 30 days evaluation</value>
+      </value-param>
+      <value-param>
+        <name>registrationFormUrl</name>
+        <value>http://exoplatform.com/buy</value>
+      </value-param>
+      <value-param>
+        <name>extendFormUrl</name>
+        <value>http://www.exoplatform.com/extend-your-evaluation</value>
+      </value-param>
+      <value-param>
+        <name>subscriptionUrl</name>
+        <value>http://www.exoplatform.com/company/en/products/editions</value>
+      </value-param>
+      <value-param>
+        <name>defaultPingBackUrl</name>
+        <value>http://www.exoplatform.com/company/en/products/e-01011000-01101111</value>
+      </value-param>
+      <value-param>
+        <name>exo.license.path</name>
+        <description>To allow customize license.xml patn</description>
+        <value>${exo.license.path:}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.software.register.service.SoftwareRegistrationService</key>
+    <type>org.exoplatform.software.register.service.impl.SoftwareRegistrationServiceImpl</type>
+    <init-params>
+      <value-param>
+        <name>registration.skip</name>
+        <description>To allow skip plf registration</description>
+        <value>${registration.skip:false}</value>
+      </value-param>
+      <value-param>
+        <name>registration.host</name>
+        <value>${registration.host:https://community.exoplatform.com}</value>
+      </value-param>
+      <value-param>
+        <name>registration.skipAllow</name>
+        <value>${registration.skipAllow:2}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <type>org.exoplatform.software.register.service.RestPLFRegistration</type>
   </component>
 
   <external-component-plugins>

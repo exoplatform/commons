@@ -26,6 +26,7 @@
     <module>commons-webui-component</module>
     <module>commons-webui-ext</module>
     <module>commons-search</module>
+    <module>commons-registration</module>
   </modules>
   <scm>
     <connection>scm:git:git://github.com/exoplatform/commons.git</connection>
@@ -154,6 +155,12 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-component-upgrade</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-registration</artifactId>
+        <version>${project.version}</version>
+        <type>war</type>
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>

@@ -117,6 +117,14 @@
     </init-params>
   </component>
 
+  <component>
+    <type>org.exoplatform.services.user.UserStateService</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.services.user.UserStateServiceREST</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.services.cache.CacheService</target-component>
     <component-plugin>
