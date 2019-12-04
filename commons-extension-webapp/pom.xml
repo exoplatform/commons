@@ -20,13 +20,6 @@
       <artifactId>exo.portal.component.resources</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <!-- We want to be sure to use the right version in the dependency plugin but it's not required in the package -->
-    <dependency>
-      <groupId>org.exoplatform.platform-ui</groupId>
-      <artifactId>platform-ui-skin</artifactId>
-      <type>war</type>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
   <build>
     <finalName>commons-extension</finalName>
