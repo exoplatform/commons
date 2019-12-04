@@ -3,6 +3,21 @@
 <gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4"
 	xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
+  <portlet>
+    <name>NotificationsAdminJuzuPortlet</name>
+    <module>
+      <script>
+        <path>/javascript/eXo/admin/notificationsAdmin.js</path>
+      </script>
+      <depends>
+        <module>juzu-ajax</module>
+      </depends>
+      <depends>
+        <module>jquery</module>
+        <as>gj</as>
+      </depends>
+    </module>
+  </portlet>
 
 	<module>
 		<name>commons-document</name>

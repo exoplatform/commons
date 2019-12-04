@@ -19,4 +19,19 @@
        <title>eXo Search Indexing Management Application</title>
      </portlet-info>
    </portlet>
+
+   <portlet>
+     <portlet-name>NotificationsAdminJuzuPortlet</portlet-name>
+     <display-name xml:lang="EN">Notifications Administration</display-name>
+     <portlet-class>org.exoplatform.platform.portlet.juzu.notificationsAdmin.NotificationsAdminPortlet</portlet-class>
+     <supports>
+       <mime-type>text/html</mime-type>
+     </supports>
+     <supported-locale>en</supported-locale>
+     <resource-bundle>locale.portlet.notification.notificationsAdmin</resource-bundle>
+     <portlet-info>
+       <title>Notifications Administration Portlet</title>
+       <keywords>Notification</keywords>
+     </portlet-info>
+   </portlet>
 </portlet-app>
