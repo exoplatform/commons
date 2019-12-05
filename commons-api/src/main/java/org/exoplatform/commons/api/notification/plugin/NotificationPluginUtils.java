@@ -18,6 +18,7 @@ package org.exoplatform.commons.api.notification.plugin;
 
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
@@ -40,6 +41,8 @@ public class NotificationPluginUtils {
   public static final String NOTIFICATION_SENDER_EMAIL = "exo:notificationSenderEmail";
   
   public static final String BRANDING_PORTAL_NAME = "exo:brandingPortalName";
+  
+  public static final String BRANDING_COMPANY_NAME_SETTING_KEY = "exo.branding.company.name";
 
   public static String getPortalName() {
     return getExoContainerContext().getPortalContainerName();
@@ -124,7 +127,10 @@ public class NotificationPluginUtils {
    */
   public static String getBrandingPortalName() {
     SettingValue<?> name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL.id(null), BRANDING_PORTAL_NAME);
-    return name != null ? (String) name.getValue() : "eXo";
+    if (name == null) {
+      name = getSettingService().get(Context.GLOBAL, Scope.GLOBAL, BRANDING_COMPANY_NAME_SETTING_KEY);
+    }
+    return name != null && StringUtils.isNotBlank((CharSequence) name.getValue()) ? (String) name.getValue() : "eXo";
   }
   
   public static String getTo(String to) {
