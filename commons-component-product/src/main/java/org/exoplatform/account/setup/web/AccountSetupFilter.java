@@ -14,7 +14,7 @@ import org.exoplatform.web.filter.Filter;
  * @author <a href="fbradai@exoplatform.com">Fbradai</a>
  */
 public class AccountSetupFilter implements Filter {
-  private static final String PLF_PLATFORM_EXTENSION_SERVLET_CTX = "/platform-extension";
+  private static final String PLF_PLATFORM_EXTENSION_SERVLET_CTX = "/commons-extension";
 
   private static final String ACCOUNT_SETUP_SERVLET              = "/accountSetup";
 
