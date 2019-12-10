@@ -83,16 +83,7 @@
       <artifactId>juzu-plugins-portlet</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>commons-component-common</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>commons-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>commons-juzu</artifactId>

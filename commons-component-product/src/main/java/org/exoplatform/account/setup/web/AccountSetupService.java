@@ -69,14 +69,21 @@ public class AccountSetupService {
                             String emailAccount,
                             String userPasswordAccount,
                             String adminPassword) {
-    MembershipType membershipType;
-    try {
-      RequestLifeCycle.begin((ComponentRequestLifecycle) organizationService);
+    MembershipTypeHandler membershipTypeHandler = organizationService.getMembershipTypeHandler();
+    UserHandler userHandler = organizationService.getUserHandler();
 
-      MembershipTypeHandler membershipTypeHandler = organizationService.getMembershipTypeHandler();
+    RequestLifeCycle.begin((ComponentRequestLifecycle) organizationService);
+    try {
+      // Set password for admin user
+      try {
+        User adminUser = userHandler.findUserByName(ADMIN_FIRST_NAME);
+        adminUser.setPassword(adminPassword);
+        organizationService.getUserHandler().saveUser(adminUser, false);
+      } catch (Exception e) {
+        LOG.error("Can not set password to the created user", e);
+      }
 
       // Create user account
-      UserHandler userHandler = organizationService.getUserHandler();
       User user = userHandler.createUserInstance(userNameAccount);
       user.setPassword(userPasswordAccount);
       user.setFirstName(firstNameAccount);
@@ -89,34 +96,7 @@ public class AccountSetupService {
         LOG.error("Can not create User", e);
       }
 
-      // Assign the membership "*:/platform/administrators" to the created user
-      try {
-        Group group = organizationService.getGroupHandler().findGroupById(PLATFORM_USERS_GROUP);
-        membershipType = membershipTypeHandler.findMembershipType(MEMBERSHIP_TYPE_MANAGER);
-        organizationService.getMembershipHandler().linkMembership(user, group, membershipType, true);
-      } catch (Exception e) {
-        LOG.error("Can not assign *:/platform/administrators membership to the created user", e);
-      }
-
-      // Assign the membership "*:/platform/web-contributors" to the created
-      // user
-      try {
-        Group group = organizationService.getGroupHandler().findGroupById(PLATFORM_WEB_CONTRIBUTORS_GROUP);
-        membershipType = membershipTypeHandler.findMembershipType(MEMBERSHIP_TYPE_MANAGER);
-        organizationService.getMembershipHandler().linkMembership(user, group, membershipType, true);
-      } catch (Exception e) {
-        LOG.error("Can not assign *:/platform/web-contributors membership to the created user", e);
-      }
-
-      // Assign the membership "member:/developer" to the created user
-      try {
-        Group group = organizationService.getGroupHandler().findGroupById(PLATFORM_DEVELOPERS_GROUP);
-        membershipType = membershipTypeHandler.findMembershipType(MEMBERSHIP_TYPE_MANAGER);
-        organizationService.getMembershipHandler().linkMembership(user, group, membershipType, true);
-      } catch (Exception e) {
-        LOG.error("Can not assign *:/developers membership to the created user", e);
-      }
-
+      MembershipType membershipType;
       // Assign the membership "*:/platform/users" to the created user
       try {
         Group group = organizationService.getGroupHandler().findGroupById(PLATFORM_PLATFORM_USERS_GROUP);
@@ -126,13 +106,27 @@ public class AccountSetupService {
         LOG.error("Can not assign *:/platform/users membership to the created user", e);
       }
 
-      // Set password for admin user
+      // Assign the membership "*:/platform/administrators" to the created user
       try {
-        User adminUser = userHandler.findUserByName(ADMIN_FIRST_NAME);
-        adminUser.setPassword(adminPassword);
-        organizationService.getUserHandler().saveUser(adminUser, false);
+        Group group = organizationService.getGroupHandler().findGroupById(PLATFORM_USERS_GROUP);
+        if (group != null) {
+          membershipType = membershipTypeHandler.findMembershipType(MEMBERSHIP_TYPE_MANAGER);
+          organizationService.getMembershipHandler().linkMembership(user, group, membershipType, true);
+        }
       } catch (Exception e) {
-        LOG.error("Can not set password to the created user", e);
+        LOG.error("Can not assign *:/platform/administrators membership to the created user", e);
+      }
+
+      // Assign the membership "*:/platform/web-contributors" to the created
+      // user
+      try {
+        Group group = organizationService.getGroupHandler().findGroupById(PLATFORM_WEB_CONTRIBUTORS_GROUP);
+        if (group != null) {
+          membershipType = membershipTypeHandler.findMembershipType(MEMBERSHIP_TYPE_MANAGER);
+          organizationService.getMembershipHandler().linkMembership(user, group, membershipType, true);
+        }
+      } catch (Exception e) {
+        LOG.error("Can not assign *:/platform/web-contributors membership to the created user", e);
       }
 
       setSkipSetup(true);

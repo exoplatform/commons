@@ -248,12 +248,14 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
       ((ServerSessionImpl) session).cancelSchedule();
     }
 
-    try {
-      seti.stop();
-      oort.stop();
-      super.stop();
-    } catch (Exception e) {
-      LOG.error(e.getMessage(), e);
+    if (seti != null && oort != null) {
+      try {
+        seti.stop();
+        oort.stop();
+        super.stop();
+      } catch (Exception e) {
+        LOG.error(e.getMessage(), e);
+      }
     }
   }
 

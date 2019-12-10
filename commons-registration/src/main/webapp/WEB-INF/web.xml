@@ -51,15 +51,15 @@
 
   <servlet>
     <servlet-name>SoftwareRegisterViewServlet</servlet-name>
-    <servlet-class>org.exoplatform.platform.common.software.register.web.SoftwareRegisterViewServlet</servlet-class>
+    <servlet-class>org.exoplatform.software.register.web.SoftwareRegisterViewServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>SoftwareRegisterAuthViewServlet</servlet-name>
-    <servlet-class>org.exoplatform.platform.common.software.register.web.SoftwareRegisterAuthViewServlet</servlet-class>
+    <servlet-class>org.exoplatform.software.register.web.SoftwareRegisterAuthViewServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>SoftwareRegisterActionServlet</servlet-name>
-    <servlet-class>org.exoplatform.platform.common.software.register.web.SoftwareRegisterActionServlet</servlet-class>
+    <servlet-class>org.exoplatform.software.register.web.SoftwareRegisterActionServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>

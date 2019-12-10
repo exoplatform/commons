@@ -1,4 +1,4 @@
-<%@ page import="org.exoplatform.platform.common.account.setup.web.PingBackServlet" %>
+<%@ page import="org.exoplatform.account.setup.web.PingBackServlet" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.exoplatform.container.PortalContainer"%>
 <%@ page import="org.exoplatform.services.resources.ResourceBundleService"%>
@@ -62,6 +62,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="shortcut icon" type="image/x-icon"  href="/portal/favicon.ico" />
     <link href="/commons-extension/css/welcome-screens/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
     <link href="<%=cssPath%>" rel="stylesheet" type="text/css" />
 
@@ -70,71 +71,72 @@
     <script type="text/javascript" src="/commons-extension/javascript/welcome-screens/welcomescreens.js"></script>
 
 </head>
-<form name="tcForm" action="<%= contextPath + "/accountSetupAction"%>" method="post">
-  <div class="backLight"></div>
-  <div class="uiWelcomeBox" id="AccountSetup1"  >
+<div class="backLight"></div>
+<div class="uiWelcomeBox" id="AccountSetup1"  >
     <div class="header"><%=rb.getString("AccountSetupViewServlet.label.header1")%></div>
     <div class="content form-horizontal" id="AccountSetup">
-      <h5><%=rb.getString("AccountSetupViewServlet.label.create_account")%></h5>
-      <p class="desc"><%=rb.getString("AccountSetupViewServlet.label.primary_user")%></p>
-      <div class="control-group" id ="usernameId">
-          <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.userName")%>:</label>
-          <div class="controls">
-              <input type="text" name="username" id="userNameAccount" placeholder="<%=rb.getString("AccountSetupViewServlet.label.user_Name")%>" class="inputFieldLarge"/>
-              <input type="hidden" id="usernameRegExpid" value="<%=usernameRegExp%>"/>
-              <input type="hidden" id="formatMsgid" value="<%=formatMsg%>"/>
-              <input type="hidden" id="usernameMaxLengthid" value="<%=max%>"/>
-              <input type="hidden" id="usernameMinLengthid" value="<%=min%>"/>
-          </div>
-      </div>
-      <div class="control-group" id="fullnameId">
-          <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.full_Name")%>:</label>
-          <div class="controls"><input type="text" name="firstNameAccount" id="firstNameAccount" placeholder="<%=rb.getString("AccountSetupViewServlet.label.first_Name")%>" class="inputFieldMedium"/><input type="text" name="lastNameAccount" id="lastNameAccount" placeholder="<%=rb.getString("AccountSetupViewServlet.label.last_Name")%>" class="inputFieldMedium" /></div>
-      </div>
-      <div class="control-group" id="emailId">
-          <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.email")%>:</label>
-          <div class="controls"><input type="text" name="emailAccount" id="emailAccount" class="inputFieldLarge" /></div>
-      </div>
-      <div class="control-group" id="passwordId">
-          <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.password")%>:</label>
-          <div class="controls"><input type="password" name="password" id="userPasswordAccount" class="inputFieldMini" /><span class="confirmLabel"><%=rb.getString("AccountSetupViewServlet.label.confirm")%>:</span><input type="password" name="confirmUserPasswordAccount" id="confirmUserPasswordAccount" class="inputFieldMini" />
-          </div>
-      </div>
-  
-      <h5><%=rb.getString("AccountSetupViewServlet.label.addmin_password")%></h5>
-      <p class="desc"><%=rb.getString("AccountSetupViewServlet.label.login_root")%></p>
-      <div class="control-group" id="adminUsernameId">
-          <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.userName")%>:</label>
-          <div class="controls"><input type="text" name="adminFirstName" id="adminFirstName" placeholder="root" readonly="readonly" class="inputFieldLarge disable" /></div>
-      </div>
-      <div class="control-group" id="adminPasswordId">
-          <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.password")%>:</label>
-          <div class="controls">
-              <input type="password" name="adminPassword" id="adminPassword" class="inputFieldMini" /><span class="confirmLabel"><%=rb.getString("AccountSetupViewServlet.label.confirm")%>:</span><input type="password" name="confirmAdminPassword" id="confirmAdminPassword" class="inputFieldMini" />
-          </div>
-      </div>
+        <h5><%=rb.getString("AccountSetupViewServlet.label.create_account")%></h5>
+        <p class="desc"><%=rb.getString("AccountSetupViewServlet.label.primary_user")%></p>
+        <form name="tcForm" action="<%= contextPath + "/accountSetupAction"%>" method="post">
+            <div class="control-group" id ="usernameId">
+                <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.userName")%>:</label>
+                <div class="controls">
+                    <input type="text" name="username" id="userNameAccount" placeholder="<%=rb.getString("AccountSetupViewServlet.label.user_Name")%>" class="inputFieldLarge"/>
+                    <input type="hidden" id="usernameRegExpid" value="<%=usernameRegExp%>"/>
+                    <input type="hidden" id="formatMsgid" value="<%=formatMsg%>"/>
+                    <input type="hidden" id="usernameMaxLengthid" value="<%=max%>"/>
+                    <input type="hidden" id="usernameMinLengthid" value="<%=min%>"/>
+                </div>
+            </div>
+            <div class="control-group" id="fullnameId">
+                <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.full_Name")%>:</label>
+                <div class="controls"><input type="text" name="firstNameAccount" id="firstNameAccount" placeholder="<%=rb.getString("AccountSetupViewServlet.label.first_Name")%>" class="inputFieldMedium"/><input type="text" name="lastNameAccount" id="lastNameAccount" placeholder="<%=rb.getString("AccountSetupViewServlet.label.last_Name")%>" class="inputFieldMedium" /></div>
+            </div>
+            <div class="control-group" id="emailId">
+                <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.email")%>:</label>
+                <div class="controls"><input type="text" name="emailAccount" id="emailAccount" class="inputFieldLarge" /></div>
+            </div>
+            <div class="control-group" id="passwordId">
+                <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.password")%>:</label>
+                <div class="controls"><input type="password" name="password" id="userPasswordAccount" class="inputFieldMini" /><span class="confirmLabel"><%=rb.getString("AccountSetupViewServlet.label.confirm")%>:</span><input type="password" name="confirmUserPasswordAccount" id="confirmUserPasswordAccount" class="inputFieldMini" />
+                </div>
+            </div>
+
+            <h5><%=rb.getString("AccountSetupViewServlet.label.addmin_password")%></h5>
+            <p class="desc"><%=rb.getString("AccountSetupViewServlet.label.login_root")%></p>
+            <div class="control-group" id="adminUsernameId">
+                <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.userName")%>:</label>
+                <div class="controls"><input type="text" name="adminFirstName" id="adminFirstName" placeholder="root" readonly="readonly" class="inputFieldLarge disable" /></div>
+            </div>
+            <div class="control-group" id="adminPasswordId">
+                <label class="control-label"><%=rb.getString("AccountSetupViewServlet.label.password")%>:</label>
+                <div class="controls">
+                    <input type="password" name="adminPassword" id="adminPassword" class="inputFieldMini" /><span class="confirmLabel"><%=rb.getString("AccountSetupViewServlet.label.confirm")%>:</span><input type="password" name="confirmAdminPassword" id="confirmAdminPassword" class="inputFieldMini" />
+                </div>
+            </div>
     </div>
     <!-- Please do not make it Button it may cause blocker problem -->
     <div class="bottom">
-      <button class="btn btn-primary" id="continueButton" onclick="WelcomeScreens.exit();return false;"><%=rb.getString("AccountSetupViewServlet.label.submit")%></button>
-      <button class="btn" name="setupbutton" value="skipform"><%=rb.getString("AccountSetupViewServlet.label.skip")%></button>
+        <button class="btn btn-primary" id="continueButton" onclick="WelcomeScreens.exit();return false;"><%=rb.getString("AccountSetupViewServlet.label.submit")%></button>
+        <button class="btn" name="setupbutton" value="skipform"><%=rb.getString("AccountSetupViewServlet.label.skip")%></button>
     </div>
-  </div>
+</div>
 </div>
 <div>
-  <div class="uiWelcomeBox" id="Greetings" style="display: none">
-      <div class="header"><%=rb.getString("AccountSetupViewServlet.label.greetings")%></div>
-      <div class="content form-horizontal" id="AccountSetup">
-          <p>
-              <strong><%=rb.getString("AccountSetupViewServlet.label.almost_done")%></strong>, <%=rb.getString("AccountSetupViewServlet.label.add_your_colleagues")%>.
-          </p>
-          <div class="screenShot"><a href="javascript:void(0);"></a></div>
-      </div>
-      <div class="bottom"><button name="setupbutton" value="submitform" class="btn btn-primary"><%=rb.getString("AccountSetupViewServlet.label.start")%></button></div>
-  </div>
+    <!--	<div class="backLight"></div>    -->
+    <div class="uiWelcomeBox" id="Greetings" style="display: none">
+        <div class="header"><%=rb.getString("AccountSetupViewServlet.label.greetings")%></div>
+        <div class="content form-horizontal" id="AccountSetup">
+            <p>
+                <strong><%=rb.getString("AccountSetupViewServlet.label.almost_done")%></strong>, <%=rb.getString("AccountSetupViewServlet.label.add_your_colleagues")%>.
+            </p>
+            <div class="screenShot"><a href="javascript:void(0);"></a></div>
+        </div>
+        <div class="bottom"><button name="setupbutton" value="submitform" class="btn btn-primary"><%=rb.getString("AccountSetupViewServlet.label.start")%></button></div>
+    </div>
 </div>
 </form>
-<% 	if (!pingBackService.isLandingPageDisplayed()) { %>
+<% 	if(!pingBackService.isLandingPageDisplayed()){ %>
 <iframe src="<%=pingBackService.getPingBackUrl()%>" style="display:none;" id="pingBackUrlFrame" onload="setFormDisplayed()"></iframe>
 <iframe src="about:blank" style="display:none;" id="pingBackUrlActivation"></iframe>
 <script>

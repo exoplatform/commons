@@ -20,6 +20,7 @@
     <module>commons-component-product</module>
     <module>commons-component-upgrade</module>
     <module>commons-extension-webapp</module>
+    <module>commons-welcome-screens-webapp</module>
     <module>commons-gifbackport</module>
     <module>commons-juzu</module>
     <module>commons-testing</module>
@@ -208,6 +209,18 @@
         <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-file-storage</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-welcome-screens-webapp</artifactId>
+        <version>${project.version}</version>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-welcome-screens-webapp</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
       </dependency>
     </dependencies>
   </dependencyManagement>

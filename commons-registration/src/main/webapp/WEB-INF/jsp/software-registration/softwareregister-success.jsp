@@ -47,6 +47,7 @@
   <title><%=rb.getString("SoftwareRegister.label.register")%></title>
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <link rel="shortcut icon" type="image/x-icon"  href="/portal/favicon.ico" />
   <link href="<%=cssPath%>" rel="stylesheet" type="text/css"/>
   <script type="text/javascript" src="/eXoResources/javascript/jquery-3.2.1.js"></script>
   <script type="text/javascript" src="/registration/javascript/registration/software-registration.js"></script>
