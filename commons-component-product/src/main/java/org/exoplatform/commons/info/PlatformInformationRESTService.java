@@ -68,7 +68,7 @@ public class PlatformInformationRESTService implements ResourceContainer {
     cacheControl.setNoCache(true);
     cacheControl.setNoStore(true);
     try {
-      String plfProfile = ExoContainer.getProfiles().toString().trim();
+      String plfProfile = ExoContainer.getCurrentProfiles().toString().trim();
       String runningProfile = plfProfile.substring(1, plfProfile.length() - 1);
       JsonPlatformInfo jsonPlatformInfo = new JsonPlatformInfo();
       jsonPlatformInfo.setPlatformVersion(platformInformations.getVersion());
@@ -99,7 +99,7 @@ public class PlatformInformationRESTService implements ResourceContainer {
 
   public JsonPlatformInfo getJsonPlatformInfo() {
     try {
-      String plfProfile = ExoContainer.getProfiles().toString().trim();
+      String plfProfile = ExoContainer.getCurrentProfiles().toString().trim();
       String runningProfile = plfProfile.substring(1, plfProfile.length() - 1);
       JsonPlatformInfo jsonPlatformInfo = new JsonPlatformInfo();
       jsonPlatformInfo.setPlatformVersion(platformInformations.getVersion());
