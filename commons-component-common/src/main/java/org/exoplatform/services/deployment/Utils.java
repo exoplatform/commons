@@ -81,45 +81,40 @@ public class Utils {
   public static void processImportHistory(Node currentNode,
                                           InputStream versionHistorySourceStream,
                                           Map<String, String> mapHistoryValue) throws Exception {
-
-    for (String uuid : mapHistoryValue.keySet()) {
-      ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(versionHistorySourceStream));
+    ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(versionHistorySourceStream));
+    ZipEntry entry = zipInputStream.getNextEntry();
+    while (entry != null) {
+      int available = -1;
       byte[] data = new byte[1024];
+      String uuid = entry.getName().split(".xml")[0];
       ByteArrayOutputStream out = new ByteArrayOutputStream();
-      ZipEntry entry = zipInputStream.getNextEntry();
-      while (entry != null) {
-        int available = -1;
-        if (entry.getName().equals(uuid + ".xml")) {
-          while ((available = zipInputStream.read(data, 0, 1024)) > -1) {
-            out.write(data, 0, available);
-          }
-          try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(out.toByteArray());
-            String value = mapHistoryValue.get(uuid);
-            Node versionableNode = currentNode.getSession().getNodeByUUID(uuid);
-            importHistory((NodeImpl) versionableNode,
-                          inputStream,
-                          getBaseVersionUUID(value),
-                          getPredecessors(value),
-                          getVersionHistory(value));
-            currentNode.getSession().save();
-          } catch (ItemNotFoundException item) {
-            currentNode.getSession().refresh(false);
-            LOG.error("Can not found versionable node" + item, item);
-          } catch (RepositoryException e) {
-            currentNode.getSession().refresh(false);
-            LOG.error("Import version history failed " + e, e);
-          }
-          zipInputStream.closeEntry();
-          entry = zipInputStream.getNextEntry();
-        } else {
-          zipInputStream.closeEntry();
-          entry = zipInputStream.getNextEntry();
+      if (mapHistoryValue.get(uuid) != null) {
+        while ((available = zipInputStream.read(data, 0, 1024)) > -1) {
+          out.write(data, 0, available);
+        }
+        try {
+          ByteArrayInputStream inputStream = new ByteArrayInputStream(out.toByteArray());
+          String value = mapHistoryValue.get(uuid);
+          Node versionableNode = currentNode.getSession().getNodeByUUID(uuid);
+          importHistory((NodeImpl) versionableNode,
+                        inputStream,
+                        getBaseVersionUUID(value),
+                        getPredecessors(value),
+                        getVersionHistory(value));
+          currentNode.getSession().save();
+        } catch (ItemNotFoundException item) {
+          currentNode.getSession().refresh(false);
+          LOG.error("Can not found versionable node" + item, item);
+        } catch (RepositoryException e) {
+          currentNode.getSession().refresh(false);
+          LOG.error("Import version history failed " + e, e);
         }
       }
+      zipInputStream.closeEntry();
+      entry = zipInputStream.getNextEntry();
       out.close();
-      zipInputStream.close();
     }
+    zipInputStream.close();
   }
 
   /**
