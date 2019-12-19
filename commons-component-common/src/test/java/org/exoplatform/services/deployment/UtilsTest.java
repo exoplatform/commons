@@ -19,10 +19,7 @@ package org.exoplatform.services.deployment;
 import java.io.*;
 import java.util.*;
 
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Value;
+import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
@@ -46,6 +43,8 @@ public class UtilsTest extends BaseNotificationTestCase {
   private static final String DOC_VIEW            = "docview";
 
   private static final String SYS_VIEW            = "sysview";
+  
+  private static final String SYSVIEW_VERSIONHISTORY ="sysview_versionHistory";
 
   private static final int    CREATE_NEW_BEHAVIOR = 0;
 
@@ -93,49 +92,68 @@ public class UtilsTest extends BaseNotificationTestCase {
     /*******************************************
      * Create JCR data structure for test case *
      *******************************************/
-    Node testFolder = root.addNode("testFolder", "nt:folder");
-    Node sandbox = root.addNode("sandbox", "nt:folder");
+    Node testFolder = root.addNode("testFolder", "nt:unstructured");
+    Node sandbox = root.addNode("sandbox", "nt:unstructured");
+    testFolder.addNode("content1", "nt:unstructured");
+    testFolder.addNode("content2", "nt:unstructured");
+    Node file1 = testFolder.getNode("content1");
+    Node file2 = testFolder.getNode("content2");
 
-    testFolder.addNode("subFolder1", "nt:folder");
-    testFolder.addNode("subFolder2", "nt:folder");
-    session.save();
-
-    if (!testFolder.isNodeType("mix:versionable")) {
-      testFolder.addMixin("mix:versionable");
+    
+    //versioning file1
+    if(!file1.isNodeType("mix:versionable")) {
+      file1.addMixin("mix:versionable");
+      session.save();
     }
+    //versioning file2
+    if(!file2.isNodeType("mix:versionable")) {
+      file2.addMixin("mix:versionable");
+      session.save();
+    }
+
+    file1.checkin();
+    file1.checkout();
+    file1.checkin();
+    file1.checkout();
+    file1.checkin();
+    file1.checkout();
+    file2.checkin();
+    file2.checkout();
+    file2.checkin();
+    file2.checkout();
     session.save();
+  
+
 
     /*****************
      * Export data *
      *****************/
-    File exportData = exportNode(testFolder, SYS_VIEW); // export test folder to
-                                                        // XML
-    File zippedVersionHistory = exportVersionHistory(testFolder, SYS_VIEW); // export
-                                                                            // version
-                                                                            // history
-                                                                            // of
-    // test
-    // folder
+    File exportData = exportNode(testFolder, SYS_VIEW); // export test folder to XML
+    File zippedVersionHistory = exportVersionHistory(testFolder, SYSVIEW_VERSIONHISTORY); // export version history of test folder
 
     /******************************
      * Import data into sandbox *
      ******************************/
     // import XML data
-    session.importXML(sandbox.getPath(), new BufferedInputStream(new TempFileInputStream(exportData)), CREATE_NEW_BEHAVIOR);
+    session.importXML(sandbox.getPath(), new BufferedInputStream(new TempFileInputStream(exportData)), ImportUUIDBehavior.IMPORT_UUID_COLLISION_REMOVE_EXISTING);
     session.save();
+    Node importedNode = sandbox.getNode("testFolder");
+    Node importedContent1 = importedNode.getNode("content1");
+    Node importedContent2 = importedNode.getNode("content2");
     // import version history data
     Map<String, String> mapHistoryValue = Utils.getMapImportHistory(new BufferedInputStream(new FileInputStream(zippedVersionHistory)));
     Utils.processImportHistory(sandbox, new BufferedInputStream(new TempFileInputStream(zippedVersionHistory)), mapHistoryValue);
+    session.save();
 
     /*****************
      * Assertion *
      *****************/
-    assertTrue(sandbox.hasNode("testFolder"));
 
-    Node importedNode = sandbox.getNode("testFolder");
-    assertTrue(importedNode.isNodeType("mix:versionable"));
-    assertTrue(importedNode.hasNode("subFolder1"));
-    assertTrue(importedNode.hasNode("subFolder2"));
+    assertTrue(sandbox.hasNode("testFolder"));
+    assertTrue(importedNode.hasNode("content1"));
+    assertTrue(importedNode.hasNode("content2"));
+    assertEquals(4, importedContent1.getVersionHistory().getAllVersions().getSize());
+    assertEquals(3, importedContent2.getVersionHistory().getAllVersions().getSize());
   }
 
   /**
