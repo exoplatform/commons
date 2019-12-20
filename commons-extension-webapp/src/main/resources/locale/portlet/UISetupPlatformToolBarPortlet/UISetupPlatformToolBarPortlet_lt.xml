@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>Programos</applications>
+<content>Turinys</content>
+<siteExplorer>Site Explorer</siteExplorer>
+<wcmAdmin>Turinio administravimas</wcmAdmin>
+<users>Vartotojai</users>
+<newStaff>Įtraukti vartotojus</newStaff>
+<org-management>Manage Users</org-management>
+<portal>Portalas</portal>
+<administration>Administration</administration>
+<system>Sistema</system>
+<groupnavigation>Grupės svetainės</groupnavigation>
+<pageManagement>Puslapiai</pageManagement>
+<portalnavigation>Svetainės</portalnavigation>
+<spaces>Erdvės</spaces>
+<Branding>Prekės ženklas</Branding>
+      <Notification>Notifications</Notification>
+<ide>IDE</ide>
+<search>Search Administration</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

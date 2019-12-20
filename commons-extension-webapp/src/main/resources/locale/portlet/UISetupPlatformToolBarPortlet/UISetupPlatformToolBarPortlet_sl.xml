@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>Aplikacije</applications>
+<content>Vsebina</content>
+<siteExplorer>Raziskovalec mest</siteExplorer>
+<wcmAdmin>Urejanje vsebine</wcmAdmin>
+<users>Skupnost</users>
+<newStaff>Dodaj uporabnike</newStaff>
+<org-management>Upravljanje uporabnikov</org-management>
+<portal>Portal</portal>
+<administration>Skrbništvo</administration>
+<system>Sistem</system>
+<groupnavigation>Skupna mesta</groupnavigation>
+<pageManagement>Strani</pageManagement>
+<portalnavigation>Mesta</portalnavigation>
+<spaces>Prostori</spaces>
+<Branding>Partnersko povezovanje</Branding>
+      <Notification>Obvestila</Notification>
+<ide>IDE</ide>
+<search>Upravljanje iskanja</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

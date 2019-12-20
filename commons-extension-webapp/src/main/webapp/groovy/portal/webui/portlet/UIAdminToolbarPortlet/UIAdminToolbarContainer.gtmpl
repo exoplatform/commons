@@ -1,0 +1,110 @@
+<%	
+	import org.exoplatform.web.application.JavascriptManager;
+	import org.exoplatform.portal.webui.util.Util;
+	import org.exoplatform.portal.application.PortalRequestContext ;
+
+	def rcontext = _ctx.getRequestContext();
+	 
+  JavascriptManager jsmanager = rcontext.getJavascriptManager();
+	String addPageLabel = _ctx.appRes("UIAdminToolbarPortlet.action.AddPage");	
+	String editPageLabel = _ctx.appRes("UIAdminToolbarPortlet.action.Layout");
+	String editSiteLayout = _ctx.appRes("UIAdminToolbarPortlet.action.siteLayout");
+	String editNavigation = _ctx.appRes("UIAdminToolbarPortlet.action.EditNavigation");
+	String editorLabel = _ctx.appRes("UIAdminToolbarPortlet.action.Editor");
+	String seoLabel = _ctx.appRes("UIAdminToolbarPortlet.action.Properties");
+  String siteLabel = _ctx.appRes("UIAdminToolbarPortlet.action.Site");
+	String addSiteLabel = _ctx.appRes("UIAdminToolbarPortlet.action.AddSite");
+
+	PortalRequestContext context = Util.getPortalRequestContext();
+
+	boolean userCouldEditNavigation = uicomponent.hasEditPermissionOnNavigation() && !uicomponent.isUserNavigation();
+	boolean userCouldEditPage = uicomponent.hasEditPermissionOnPage();
+	boolean userCouldEditPortal = uicomponent.hasEditPermissionOnPortal();
+	
+%>
+
+<div class="uiAdminToolbarPortlet uiDropdownWithIcon dropdown pull-left" id="$uicomponent.id">
+	<a class="dropdown-toggle" data-toggle="dropdown">
+		<i class="uiIconPLF24x24Edit"></i>$editorLabel
+	</a>
+	
+		<ul class="dropdown-menu">
+      <% if(userCouldEditPage){
+        String quickEditLabel = _ctx.appRes("UIAdminToolbarPortlet.action.Content");
+        String quiEditClass = "quickEditUnchecked";
+        Boolean quickEdit = (Boolean) context.getRequest().getSession().getAttribute(uicomponent.TURN_ON_QUICK_EDIT);
+        if(quickEdit != null && quickEdit) {
+          quiEditClass = "quickEditChecked"
+        }
+      %>
+			<li>
+				<a href="javascript:void(0);" onclick="<%=uicomponent.event("ChangeEditing")%>">
+					$quickEditLabel
+					<i class="$quiEditClass"></i>
+				</a>
+			</li>
+			<li class="divider">&nbsp;</li>
+			<li class="dropdown-submenu">
+				<a href="#" tabindex="-1">
+					<%=_ctx.appRes("UIAdminToolbarPortlet.action.Page")%>
+				</a>
+				<ul class="dropdown-menu">
+        <%
+          String editPageRequest = "javascript:ajaxGet(eXo.env.server.createPortalURL('" + uicomponent.getUIPageId() + "', 'EditCurrentPage', true))";
+        %>
+					<li>
+						<a href="javascript:void(0);" onclick="$editPageRequest">
+							$editPageLabel
+						</a>
+					</li>
+          <% if(uicomponent.getSEOClass() != null) { %>
+  					<li>
+  						<div class="seoImgBlock">
+  							<%uicomponent.renderChild(uicomponent.getSEOClass());%>
+  						</div>
+  					</li>
+          <% } %>
+					<li class="divider">&nbsp;</li>
+					<li>	
+						<a href="javascript:void(0);" onclick="ajaxGet(eXo.env.server.createPortalURL('UIWorkingWorkspace', 'PageCreationWizard', true))">
+							$addPageLabel
+						</a>
+					</li>
+				</ul>
+			</li>
+			<% } %>
+			<% if(userCouldEditPortal || userCouldEditNavigation) { %>
+			<li class="dropdown-submenu">
+				<a href="#" tabindex="-1">
+					$siteLabel
+				</a>
+				<ul class="dropdown-menu">
+					<% if(userCouldEditPortal){ %>
+					<li>	
+						<a href="javascript:void(0);" onclick="ajaxGet(eXo.env.server.createPortalURL('UIWorkingWorkspace', 'EditInline', true))">
+							$editSiteLayout
+						</a>
+					</li>
+					<% } %>
+					<% if(userCouldEditNavigation){ %>
+					<li>	
+						<a href="javascript:void(0);" onclick="<%=uicomponent.event("EditNavigation", null);%>">
+							$editNavigation
+						</a>
+					</li>
+					<% } %>
+					<% if(userCouldEditPortal){ %>
+					<li class="divider">&nbsp;</li>
+					<li>	
+						<a href="javascript:void(0);" onclick="javascript:ajaxGet(eXo.env.server.createPortalURL('UIWorkingWorkspace', 'CreatePortal', true))">
+							$addSiteLabel
+						</a>
+					</li>
+					<% } %>
+				</ul>
+			</li>
+			<% } %>
+		</ul>
+		
+</div>
+<%uicomponent.renderChildren();%>

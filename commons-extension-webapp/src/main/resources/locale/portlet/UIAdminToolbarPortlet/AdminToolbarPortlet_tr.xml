@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+   <UIAdminToolbarPortlet>
+      <action>
+         <AddPage>Sayfa Ekle</AddPage>
+         <EditNavigation>Gezintiyi düzenle</EditNavigation>
+         <Content>Satır içi düzenle</Content>
+         <Editor>Düzenle</Editor>
+         <Page>Sayfa</Page>
+         <Site>Site</Site>
+         <Layout>Yerleşimi Değiştir</Layout>
+         <siteLayout>Yerleşimi Düzenle</siteLayout>
+         <ManagePages>Sayfaları Yönet</ManagePages>
+         <GroupSite>Grup Sitesi</GroupSite>
+         <Properties>#{UISEOToolbarForm.label.seo}</Properties>
+         <AddSite>Site Ekle</AddSite>
+      </action>
+<ManageSites>Siteleri Yönet</ManageSites>
+<ManageGroupSites>Grup Siteleri Yönet</ManageGroupSites>
+   </UIAdminToolbarPortlet>
+
+  <UISEOForm>
+    <label>
+      <title>Başlık:</title>  
+      <description>Açıklama:</description>
+      <keywords>Anahtar Sözcükler:</keywords>
+      <language>Dil:</language>
+      <robots>Robotlar:</robots>
+      <sitemap>Site Haritası:</sitemap>
+      <sitemapvisible>Site Haritasındaki görünür</sitemapvisible>
+  <isInherited>Üst sayfadan miras</isInherited>
+      <priority>Öncelik:</priority>
+      <frequency>Frekans:</frequency>
+      <select-language>Dil Seçin</select-language>
+      <option>
+        <Always>Her zaman</Always>
+        <Hourly>Saatlik</Hourly>
+        <Daily>Günlük</Daily>
+        <Weekly>Haftalık</Weekly>
+        <Monthly>Aylık</Monthly>
+        <Yearly>Yıllık</Yearly>
+        <Never>Asla</Never>
+      </option> 
+    </label>
+ 
+    <action>
+      <Save>#{word.save}</Save>
+      <Cancel>#{word.cancel}</Cancel>
+    </action>
+    <msg>
+      <repository-exception>Beklenmeyen bir hata oluştu. Sayfa meta veriler kaydedilemez.</repository-exception>
+      <confirm-delete>SEO verisini silmek istediğinizden emin misiniz?</confirm-delete>
+    </msg>
+    <title>
+    <seo-delete>Sil</seo-delete>
+    </title>
+<help> 
+  <priority>Geçerli değerler aralık 0.0 ile 1.0.</priority>
+  <description>Araştırmacı Yardımı: Bir sonraki sayfaya aradıkları bir bağlantı olduğunu onlara bildirin.</description>
+  <keywords>Sayfadaki en önemli terimler virgülle ayrılmalıdır.</keywords>  
+    </help>  
+  </UISEOForm>
+  <UISEOPopupWindow>
+  <title>
+      <UISEOForm>#{UISEOToolbarForm.title.seo}</UISEOForm>
+  </title>
+  </UISEOPopupWindow>    
+  <UISEOToolbarForm>
+  <title>
+      <seo>SEO Yönetimi</seo>
+  </title>
+  <label>
+    <seo>SEO</seo>
+  </label>
+  </UISEOToolbarForm>  
+  <FloatNumberValidator>
+    <msg>
+      <Invalid-number>Öncelik alanı geçersiz bir değere sahip. Lütfen 0.0 ile 1.0 arasında bir sayı girin.</Invalid-number>
+    </msg>
+  </FloatNumberValidator>
+  
+  <Locale>
+    <label>      
+      <it>İtalyanca</it>      
+      <fr>Fransızca</fr>
+      <en>İngilizce</en>      
+    </label>
+  </Locale>
+  
+</bundle>

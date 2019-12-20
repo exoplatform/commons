@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>Aplicacions</applications>
+<content>Contingut</content>
+<siteExplorer>Explorador de Continguts</siteExplorer>
+<wcmAdmin>Gestió de continguts</wcmAdmin>
+<users>Comunitat</users>
+<newStaff>Afegeix Usuaris/es</newStaff>
+<org-management>Gestió d'usuaris</org-management>
+<portal>Portal</portal>
+<administration>Adminstració</administration>
+<system>Sistema</system>
+<groupnavigation>Llocs dels Grups</groupnavigation>
+<pageManagement>Pàgines</pageManagement>
+<portalnavigation>Llocs</portalnavigation>
+<spaces>Espais</spaces>
+<Branding>Logotips</Branding>
+      <Notification>Notificacions</Notification>
+<ide>IDE</ide>
+<search>Cerca</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

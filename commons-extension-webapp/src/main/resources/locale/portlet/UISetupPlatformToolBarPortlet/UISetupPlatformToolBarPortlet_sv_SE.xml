@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>Program</applications>
+<content>Innehåll</content>
+<siteExplorer>Site Explorer</siteExplorer>
+<wcmAdmin>Innehållsadministration</wcmAdmin>
+<users>Användare</users>
+<newStaff>Lägg till användare</newStaff>
+<org-management>Manage Users</org-management>
+<portal>Portal</portal>
+<administration>Administration</administration>
+<system>System</system>
+<groupnavigation>Grupp platser</groupnavigation>
+<pageManagement>Sidor</pageManagement>
+<portalnavigation>Platser</portalnavigation>
+<spaces>Webb-ytor</spaces>
+<Branding>Branding</Branding>
+      <Notification>Notifications</Notification>
+<ide>IDE</ide>
+<search>Search Administration</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

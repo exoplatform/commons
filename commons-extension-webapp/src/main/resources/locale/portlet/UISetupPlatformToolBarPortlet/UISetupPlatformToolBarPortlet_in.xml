@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>Aplikasi</applications>
+<content>Konten</content>
+<siteExplorer>Situs Penjelajah</siteExplorer>
+<wcmAdmin>Administrasi Konten</wcmAdmin>
+<users>Pengguna</users>
+<newStaff>Tambahkan Pengguna</newStaff>
+<org-management>Kelola Pengguna</org-management>
+<portal>Portal</portal>
+<administration>Administrasi</administration>
+<system>Sistem</system>
+<groupnavigation>Situs Group</groupnavigation>
+<pageManagement>Halaman</pageManagement>
+<portalnavigation>Situs</portalnavigation>
+<spaces>Ruang</spaces>
+<Branding>Merek</Branding>
+      <Notification>Pemberitahuan</Notification>
+<ide>IDE</ide>
+<search>Administrasi Pencarian</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

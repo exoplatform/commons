@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>Aplicaţii</applications>
+<content>Conţinut</content>
+<siteExplorer>Navigare site</siteExplorer>
+<wcmAdmin>Administrare conţinut</wcmAdmin>
+<users>Utilizatori</users>
+<newStaff>Adaugă utilizatori</newStaff>
+<org-management>Editează Cont-uri</org-management>
+<portal>Portal</portal>
+<administration>Administrare</administration>
+<system>Sistem</system>
+<groupnavigation>Site-uri de grup</groupnavigation>
+<pageManagement>Pagini</pageManagement>
+<portalnavigation>Site-uri</portalnavigation>
+<spaces>Spații</spaces>
+<Branding>Personalizare</Branding>
+      <Notification>Notificări</Notification>
+<ide>IDE</ide>
+<search>Căutare administrație</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

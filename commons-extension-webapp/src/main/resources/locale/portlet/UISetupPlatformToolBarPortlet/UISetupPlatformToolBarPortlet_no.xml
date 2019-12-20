@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>Applikasjoner</applications>
+<content>Innhold</content>
+<siteExplorer>Site Explorer</siteExplorer>
+<wcmAdmin>Innholds administrasjon</wcmAdmin>
+<users>Brukere</users>
+<newStaff>Legge til brukere</newStaff>
+<org-management>Manage Users</org-management>
+<portal>Portal</portal>
+<administration>Administration</administration>
+<system>System</system>
+<groupnavigation>Gruppe nettsteder</groupnavigation>
+<pageManagement>Sider</pageManagement>
+<portalnavigation>Nettsteder</portalnavigation>
+<spaces>Fellesskap</spaces>
+<Branding>Merkenavn tilpassing</Branding>
+      <Notification>Notifications</Notification>
+<ide>IDE</ide>
+<search>Search Administration</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

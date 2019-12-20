@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+   <UIAdminToolbarPortlet>
+      <action>
+         <AddPage>Tambahkan Halaman</AddPage>
+         <EditNavigation>Sunting Navigasi</EditNavigation>
+         <Content>Sunting Inline</Content>
+         <Editor>Sunting</Editor>
+         <Page>Halaman</Page>
+         <Site>Situs</Site>
+         <Layout>Sunting Tata Letak</Layout>
+         <siteLayout>Sunting Tata Letak</siteLayout>
+         <ManagePages>Mengelola Halaman</ManagePages>
+         <GroupSite>Situs Grup</GroupSite>
+         <Properties>#{UISEOToolbarForm.label.seo}</Properties>
+         <AddSite>Tambahkan Situs</AddSite>
+      </action>
+<ManageSites>Mengelola Situs</ManageSites>
+<ManageGroupSites>Mengelola Situs Grup</ManageGroupSites>
+   </UIAdminToolbarPortlet>
+
+  <UISEOForm>
+    <label>
+      <title>Judul:</title>  
+      <description>Penjelasan:</description>
+      <keywords>Kata kunci:</keywords>
+      <language>Bahasa:</language>
+      <robots>Robot:</robots>
+      <sitemap>Sitemap:</sitemap>
+      <sitemapvisible>Nampak di sitemap</sitemapvisible>
+  <isInherited>Mewarisi dari halaman utama</isInherited>
+      <priority>Prioritas:</priority>
+      <frequency>Frekuensi:</frequency>
+      <select-language>Pilih Bahasa</select-language>
+      <option>
+        <Always>Selalu</Always>
+        <Hourly>Per jam</Hourly>
+        <Daily>Harian</Daily>
+        <Weekly>Mingguan</Weekly>
+        <Monthly>Bulanan</Monthly>
+        <Yearly>Tahunan</Yearly>
+        <Never>Tidak pernah</Never>
+      </option> 
+    </label>
+ 
+    <action>
+      <Save>#{word.save}</Save>
+      <Cancel>#{word.cancel}</Cancel>
+    </action>
+    <msg>
+      <repository-exception>Terjadi kesalahan tidak terduga. Tidak dapat menyimpan metadata halaman.</repository-exception>
+      <confirm-delete>Apakah anda yakin ingin untuk menghapus data SEO?</confirm-delete>
+    </msg>
+    <title>
+    <seo-delete>Hapus</seo-delete>
+    </title>
+<help> 
+  <priority>Nilai yang valid berkisar dari 0.0 ke 1.0.</priority>
+  <description>Pencarian bantuan: beritahu kepada mereka bahwa laman berikut memiliki tautan dengan apa yang mereka cari.</description>
+  <keywords>Istilah yang paling penting dari halaman harus dipisahkan dengan sebuah koma.</keywords>  
+    </help>  
+  </UISEOForm>
+  <UISEOPopupWindow>
+  <title>
+      <UISEOForm>#{UISEOToolbarForm.title.seo}</UISEOForm>
+  </title>
+  </UISEOPopupWindow>    
+  <UISEOToolbarForm>
+  <title>
+      <seo>Manajemen SEO</seo>
+  </title>
+  <label>
+    <seo>SEO</seo>
+  </label>
+  </UISEOToolbarForm>  
+  <FloatNumberValidator>
+    <msg>
+      <Invalid-number>Bidang prioritas memiliki nilai yang tidak valid. Silahkan masukkan sebuah angka antara 0.0 dan 1.0.</Invalid-number>
+    </msg>
+  </FloatNumberValidator>
+  
+  <Locale>
+    <label>      
+      <it>Italia</it>      
+      <fr>Prancis</fr>
+      <en>Inggris</en>      
+    </label>
+  </Locale>
+  
+</bundle>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>برنامه های کاربردی</applications>
+<content>محتوا</content>
+<siteExplorer>مرورگر سایت</siteExplorer>
+<wcmAdmin>مدیریت محتوا</wcmAdmin>
+<users>کاربران</users>
+<newStaff>افزودن کاربرها</newStaff>
+<org-management>مدیریت کاربران و گروه ها</org-management>
+<portal>پرتال</portal>
+<administration>مدیریت</administration>
+<system>سیستم</system>
+<groupnavigation>سایت گروه ها</groupnavigation>
+<pageManagement>صفحات</pageManagement>
+<portalnavigation>سایت ها</portalnavigation>
+<spaces>فضاها</spaces>
+<Branding>علامت گذاری</Branding>
+      <Notification>اطلاعیه ها</Notification>
+<ide>محیط نرم افزاری</ide>
+<search>جستجو</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

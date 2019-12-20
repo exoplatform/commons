@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+<UISetupPlatformToolBarPortlet>
+<label>
+<applications>アプリケーション</applications>
+<content>コンテンツ</content>
+<siteExplorer>サイト エクスプ ローラー</siteExplorer>
+<wcmAdmin>コンテンツ管理</wcmAdmin>
+<users>ユーザー</users>
+<newStaff>ユーザーを追加</newStaff>
+<org-management>ユーザーを管理</org-management>
+<portal>ポータル</portal>
+<administration>管理者</administration>
+<system>システム</system>
+<groupnavigation>グループ サイト</groupnavigation>
+<pageManagement>ページ</pageManagement>
+<portalnavigation>サイト</portalnavigation>
+<spaces>スペース</spaces>
+<Branding>ブランディング</Branding>
+      <Notification>通知</Notification>
+<ide>IDE</ide>
+<search>管理者を検索</search>
+</label>
+</UISetupPlatformToolBarPortlet>
+</bundle>

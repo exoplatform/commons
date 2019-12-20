@@ -1,0 +1,64 @@
+<%
+  import org.exoplatform.portal.config.model.PageNode;
+  import java.util.List;
+  import org.exoplatform.web.application.JavascriptManager;
+  import org.exoplatform.commons.utils.CommonsUtils;
+
+%>
+<%// Begin render page nodes method
+  void renderPageNodes(List<PageNode> pageNodes) {
+    if(pageNodes == null || pageNodes.isEmpty()) {
+      return;
+    }
+
+    for(PageNode pageNode : pageNodes) {
+      if (uicomponent.NOTIFICATION_NODE_NAME.equals(pageNode.getName())) {
+        if (CommonsUtils.isFeatureActive(uicomponent.NOTIFICATION_NODE_NAME) == false)
+          continue;
+      }
+      if(!uicomponent.hasPermissionOnPageNode(pageNode)) {
+        continue;
+      }
+      String href = uicomponent.getHREF(pageNode);
+      String label = uicomponent.getEncodedResolvedLabel(pageNode);
+      boolean hasChild = uicomponent.hasChild(pageNode);
+      String icon = pageNode.getIcon();
+      if(icon == null) icon = "uiIconFile";
+      def clazz = "";
+      if(hasChild){
+        clazz = "dropdown-submenu";
+      }
+      %><li class="$clazz">
+      <%if(href != null) {%>
+        <a href="$href">$label</a>
+    <%} else {%>
+        <a href="#">$label</a>
+    <%}
+      if(hasChild) {%>
+        <ul class="dropdown-menu">
+        <%
+          List<PageNode> childPageNodes = uicomponent.getChildren(pageNode);
+          renderPageNodes(childPageNodes);
+        %>
+        </ul>
+    <%}%>
+        </li>
+  <%}%>
+<%} // End render method 
+
+List<PageNode> pagesNodes = uicomponent.getPageNodes();
+if(pagesNodes!=null && !pagesNodes.isEmpty()) {
+  def rcontext = _ctx.getRequestContext();
+
+  JavascriptManager jsmanager = rcontext.getJavascriptManager();
+
+%>
+  <div class="uiSetupPlatformToolBarPortlet uiDropdownWithIcon dropdown pull-left" id="$uicomponent.id">
+      <a class="dropdown-toggle" data-toggle="dropdown">
+				<i class="uiIconPLF24x24Setup"></i><%=_ctx.appRes("UISetupPlatformToolBarPortlet.label.administration")%>
+			</a>
+      <ul class="dropdown-menu">
+        <%  renderPageNodes(pagesNodes); %>
+      </ul>
+  </div>
+<%} %>

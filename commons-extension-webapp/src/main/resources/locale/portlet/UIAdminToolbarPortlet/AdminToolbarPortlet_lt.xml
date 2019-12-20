@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+   <UIAdminToolbarPortlet>
+      <action>
+         <AddPage>Pridėti puslapį</AddPage>
+         <EditNavigation>Edit Navigation</EditNavigation>
+         <Content>Inline Edit</Content>
+         <Editor>Redaguoti</Editor>
+         <Page>Puslapis</Page>
+         <Site>Svetainė</Site>
+         <Layout>Redaguoti išdėstymą</Layout>
+         <siteLayout>Edit Layout</siteLayout>
+         <ManagePages>Tvarkyti puslapius</ManagePages>
+         <GroupSite>Grupės svetainė</GroupSite>
+         <Properties>#{UISEOToolbarForm.label.seo}</Properties>
+         <AddSite>Pridėti svetainę</AddSite>
+      </action>
+<ManageSites>Valdyti svetaines</ManageSites>
+<ManageGroupSites>Valdyti grupės svetaines</ManageGroupSites>
+   </UIAdminToolbarPortlet>
+
+  <UISEOForm>
+    <label>
+      <title>Title:</title>  
+      <description>Description:</description>
+      <keywords>Keywords:</keywords>
+      <language>Language:</language>
+      <robots>Robots:</robots>
+      <sitemap>Sitemap:</sitemap>
+      <sitemapvisible>Matomas svetainės žemėlapyje</sitemapvisible>
+  <isInherited>Paveldėtas iš pagrindinio puslapio</isInherited>
+      <priority>Priority:</priority>
+      <frequency>Frequency:</frequency>
+      <select-language>Pasirinkite kalbą</select-language>
+      <option>
+        <Always>Visada</Always>
+        <Hourly>Kas valandą</Hourly>
+        <Daily>Kasdien</Daily>
+        <Weekly>Kas savaitę</Weekly>
+        <Monthly>Kas mėnesį</Monthly>
+        <Yearly>Kas metus</Yearly>
+        <Never>Niekada</Never>
+      </option> 
+    </label>
+ 
+    <action>
+      <Save>#{word.save}</Save>
+      <Cancel>#{word.cancel}</Cancel>
+    </action>
+    <msg>
+      <repository-exception>Įvyko netikėta klaida. Negalima įrašyti puslapio metaduomenų.</repository-exception>
+      <confirm-delete>Ar tikrai norite ištrinti šiuos SEO duomenis?</confirm-delete>
+    </msg>
+    <title>
+    <seo-delete>Ištrinti</seo-delete>
+    </title>
+<help> 
+  <priority>Leistinos reikšmės svyruoja nuo 0,0 iki 1,0.</priority>
+  <description>Padėti vartotojams: leiskite jiems žinoti, kad šis puslapis yra susijęs su tai ko jie ieško.</description>
+  <keywords>Svarbiausios sąlygos puslapyje turi būti atskirtos kableliu.</keywords>  
+    </help>  
+  </UISEOForm>
+  <UISEOPopupWindow>
+  <title>
+      <UISEOForm>#{UISEOToolbarForm.title.seo}</UISEOForm>
+  </title>
+  </UISEOPopupWindow>    
+  <UISEOToolbarForm>
+  <title>
+      <seo>SEO valdymas</seo>
+  </title>
+  <label>
+    <seo>SEO</seo>
+  </label>
+  </UISEOToolbarForm>  
+  <FloatNumberValidator>
+    <msg>
+      <Invalid-number>Prioriteto laukelyje yra neleistina reikšmė. Įveskite skaičių nuo 0,0 iki 1,0.</Invalid-number>
+    </msg>
+  </FloatNumberValidator>
+  
+  <Locale>
+    <label>      
+      <it>Italų</it>      
+      <fr>Prancūzų</fr>
+      <en>Anglų</en>      
+    </label>
+  </Locale>
+  
+</bundle>

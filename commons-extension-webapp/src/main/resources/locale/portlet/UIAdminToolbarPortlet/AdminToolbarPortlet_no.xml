@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+   <UIAdminToolbarPortlet>
+      <action>
+         <AddPage>Legg til side</AddPage>
+         <EditNavigation>Edit Navigation</EditNavigation>
+         <Content>Inline Edit</Content>
+         <Editor>Rediger</Editor>
+         <Page>Side</Page>
+         <Site>Nettsted</Site>
+         <Layout>Rediger layout</Layout>
+         <siteLayout>Edit Layout</siteLayout>
+         <ManagePages>Administrere sider</ManagePages>
+         <GroupSite>Gruppe nettsider</GroupSite>
+         <Properties>#{UISEOToolbarForm.label.seo}</Properties>
+         <AddSite>Legge til nettsted</AddSite>
+      </action>
+<ManageSites>Administrer nettsteder</ManageSites>
+<ManageGroupSites>Administrere gruppe nettsteder</ManageGroupSites>
+   </UIAdminToolbarPortlet>
+
+  <UISEOForm>
+    <label>
+      <title>Title:</title>  
+      <description>Description:</description>
+      <keywords>Keywords:</keywords>
+      <language>Language:</language>
+      <robots>Robots:</robots>
+      <sitemap>Sitemap:</sitemap>
+      <sitemapvisible>Synlig i nettstedskartet</sitemapvisible>
+  <isInherited>Arvet fra overordnet side</isInherited>
+      <priority>Priority:</priority>
+      <frequency>Frequency:</frequency>
+      <select-language>Velg språk</select-language>
+      <option>
+        <Always>Alltid</Always>
+        <Hourly>Hver time</Hourly>
+        <Daily>Daglig</Daily>
+        <Weekly>Ukentlig</Weekly>
+        <Monthly>Månedlig</Monthly>
+        <Yearly>Årlig</Yearly>
+        <Never>Aldri</Never>
+      </option> 
+    </label>
+ 
+    <action>
+      <Save>#{word.save}</Save>
+      <Cancel>#{word.cancel}</Cancel>
+    </action>
+    <msg>
+      <repository-exception>Det oppstod en uventet feil. Kan ikke lagre sidens metadata.</repository-exception>
+      <confirm-delete>Er du sikker på at du vil slette disse SEO data?</confirm-delete>
+    </msg>
+    <title>
+    <seo-delete>Slette</seo-delete>
+    </title>
+<help> 
+  <priority>Gyldige verdier er  fra 0,0 til 1,0.</priority>
+  <description>Hjelp de som søker: la dem få vite at denne side har en link med det de leter etter.</description>
+  <keywords>De viktigste ordene og uttrykkene på siden må være atskilt med semikolon.</keywords>  
+    </help>  
+  </UISEOForm>
+  <UISEOPopupWindow>
+  <title>
+      <UISEOForm>#{UISEOToolbarForm.title.seo}</UISEOForm>
+  </title>
+  </UISEOPopupWindow>    
+  <UISEOToolbarForm>
+  <title>
+      <seo>SEO Management</seo>
+  </title>
+  <label>
+    <seo>SEO</seo>
+  </label>
+  </UISEOToolbarForm>  
+  <FloatNumberValidator>
+    <msg>
+      <Invalid-number>Feltet prioritet har en ugyldig verdi. Angi et nummer mellom 0.0 og 1.0.</Invalid-number>
+    </msg>
+  </FloatNumberValidator>
+  
+  <Locale>
+    <label>      
+      <it>Italiensk</it>      
+      <fr>Fransk</fr>
+      <en>Engelsk</en>      
+    </label>
+  </Locale>
+  
+</bundle>
