@@ -30,4 +30,5 @@
   <import>war:/conf/commons-extension/notification-configuration.xml</import>
   <import>war:/conf/commons-extension/account-setup-configuration.xml</import>
   <import>war:/conf/commons-extension/setup-menu-configuration.xml</import>
+  <import>war:/conf/commons-extension/resource-bundle-configuration.xml</import>
 </configuration>

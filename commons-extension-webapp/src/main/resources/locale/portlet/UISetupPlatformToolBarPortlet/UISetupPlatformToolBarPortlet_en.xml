@@ -16,9 +16,10 @@
       <pageManagement>Pages</pageManagement>
       <portalnavigation>Sites</portalnavigation>
       <spaces>Spaces</spaces>
+      <spacesTemplates>Manage templates</spacesTemplates>
+      <spacesAdministration>Manage spaces</spacesAdministration>
       <Branding>Branding</Branding>
       <Notification>Notifications</Notification>
-      <ide>IDE</ide>
       <search>Search Administration</search>
       <searchIndexing>Search indexing</searchIndexing>
     </label>

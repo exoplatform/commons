@@ -15,10 +15,11 @@
 <groupnavigation>Sites de Groupe</groupnavigation>
 <pageManagement>Pages</pageManagement>
 <portalnavigation>Sites</portalnavigation>
-<spaces>Espaces</spaces>
+      <spaces>Spaces</spaces>
+      <spacesTemplates>Manage templates</spacesTemplates>
+      <spacesAdministration>Manage spaces</spacesAdministration>
 <Branding>Thème</Branding>
       <Notification>Notifications</Notification>
-<ide>IDE</ide>
 <search>Recherche</search>
 </label>
 </UISetupPlatformToolBarPortlet>
