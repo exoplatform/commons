@@ -78,6 +78,8 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     got.setId(notifId);
     got.setTitle("new title");
     storage.update(got, true);
+    end();
+    begin();
     got = storage.get(notifId);
     assertEquals("new title", got.getTitle());
     assertFalse(lastUpdatedTime == got.getLastModifiedDate());
@@ -86,6 +88,8 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     lastUpdatedTime = got.getLastModifiedDate();
     got.setTitle("new new title");
     storage.update(got, false);
+    end();
+    begin();
     got = storage.get(notifId);
     assertEquals("new new title", got.getTitle());
     assertTrue(lastUpdatedTime == got.getLastModifiedDate());
