@@ -5,7 +5,10 @@ import java.lang.reflect.Method;
 import java.net.*;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.info.*;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.services.log.ExoLogger;
@@ -18,7 +21,9 @@ public class PingBackService {
 
   private static final String LOOP_FUSE_FORM_DISPLAYED = "formDisplayed";
 
-  private static final String COMMUNITY_EDITION        = "community";
+  public static final String  COMMUNITY_EDITION        = "community";
+
+  public static final String  ENTERPRISE_EDITION       = "enterprise";
 
   private boolean             loopfuseFormDisplayed    = false;
 
@@ -81,12 +86,9 @@ public class PingBackService {
 
   private String getPlatformEdition(ProductInformations platformInformations) {
     try {
-      Class<?> c = Class.forName("org.exoplatform.platform.edition.PlatformEdition");
-      Method getEditionMethod = c.getMethod("getEdition");
-      String platformEdition = (String) getEditionMethod.invoke(null);
-      if ((platformEdition != null) && (platformEdition.equals("enterprise"))) {
-        if ((platformInformations.getEdition() != null) && (!platformInformations.getEdition().equals("")))
-          platformEdition = platformInformations.getEdition();
+      String platformEdition = ExoContainer.hasProfile(COMMUNITY_EDITION) ? COMMUNITY_EDITION : ENTERPRISE_EDITION;
+      if (platformEdition.equals(ENTERPRISE_EDITION) && StringUtils.isNotBlank(platformInformations.getEdition())) {
+        platformEdition = platformInformations.getEdition();
       }
       return platformEdition;
     } catch (Exception e) {

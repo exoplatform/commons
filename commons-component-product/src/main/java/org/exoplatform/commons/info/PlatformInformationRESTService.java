@@ -43,7 +43,9 @@ public class PlatformInformationRESTService implements ResourceContainer {
 
   private static final Log             LOG               = ExoLogger.getLogger(PlatformInformationRESTService.class);
 
-  public static final java.lang.String COMMUNITY_EDITION = "community";
+  public static final java.lang.String COMMUNITY_EDITION  = "community";
+
+  public static final java.lang.String ENTERPRISE_EDITION = "enterprise";
 
   private ProductInformations          platformInformations;
 
@@ -137,9 +139,7 @@ public class PlatformInformationRESTService implements ResourceContainer {
 
   public String getPlatformEdition() {
     try {
-      Class<?> c = Class.forName("org.exoplatform.platform.edition.PlatformEdition");
-      Method getEditionMethod = c.getMethod("getEdition");
-      String platformEdition = (String) getEditionMethod.invoke(null);
+      String platformEdition = ExoContainer.hasProfile(COMMUNITY_EDITION) ? COMMUNITY_EDITION : ENTERPRISE_EDITION;
       if (StringUtils.isBlank(platformEdition) && platformInformations != null) {
         platformEdition = platformInformations.getEdition();
       }
