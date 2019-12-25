@@ -171,17 +171,6 @@ public class CommonsUtils {
     }
 
     /**
-     * Indicates whether or not a given profile exists
-     * 
-     * @param profileName the name of the profile to check
-     * @return <code>true</code> if the profile exists in current container,
-     *         <code>false</code> otherwise.
-     */
-    public static boolean hasProfile(String profileName) {
-      return ExoContainer.getCurrentProfiles().contains(profileName);
-    }
-
-    /**
      * Get the current domain name by configuration
      * 
      * @return the current domain name.
