@@ -26,10 +26,8 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.portal.config.model.ModelObject;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.mop.Described;
-import org.exoplatform.portal.mop.ProtectedContainer;
+import org.exoplatform.portal.config.model.*;
+import org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.page.PageContext;
@@ -97,7 +95,7 @@ public class UIPageNodeForm extends UIFormTabPane
    
    final private static String VISIBLE = "visible";
    
-   private Map<String, Described.State> cachedLabels;
+   private Map<String, State> cachedLabels;
    
    private String selectedLocale;
 
@@ -163,7 +161,7 @@ public class UIPageNodeForm extends UIFormTabPane
    {
       pageNode_ = pageNode;
       selectedLocale = getUIFormSelectBox(LANGUAGES).getValue();
-      cachedLabels = new HashMap<String, Described.State>();
+      cachedLabels = new HashMap<String, State>();
       if (pageNode == null)
       {
          getUIStringInput("name").setEditable(UIFormStringInput.ENABLE);
@@ -276,7 +274,7 @@ public class UIPageNodeForm extends UIFormTabPane
          icon = "Default";
       getChild(UIFormInputIconSelector.class).setSelectedIcon(icon);
       getUIStringInput(LABEL).setValue(pageNode.getLabel());
-      Map<Locale, Described.State> i18nizedLabels = pageNode.getI18nizedLabels();
+      Map<Locale, State> i18nizedLabels = pageNode.getI18nizedLabels();
       if (i18nizedLabels != null)
       {
         for (Locale key : i18nizedLabels.keySet())
@@ -360,8 +358,8 @@ public class UIPageNodeForm extends UIFormTabPane
       }
 
 
-      cachedLabels.put(getUIFormSelectBox(LANGUAGES).getValue(), new Described.State(getUIStringInput(I18N_LABEL).getValue(), null));
-      Map<Locale, Described.State> labels = new HashMap<Locale, Described.State>(cachedLabels.size());
+      cachedLabels.put(getUIFormSelectBox(LANGUAGES).getValue(), new State(getUIStringInput(I18N_LABEL).getValue(), null));
+      Map<Locale, State> labels = new HashMap<Locale, State>(cachedLabels.size());
       getUIFormSelectBox(LANGUAGES).getValue();
       for (String strLocale : cachedLabels.keySet())
       {
@@ -605,7 +603,7 @@ public class UIPageNodeForm extends UIFormTabPane
    
    private void updateCachedLabels(String locale, String label)
    {
-      cachedLabels.put(locale, new Described.State(label, null));
+      cachedLabels.put(locale, new State(label, null));
    }
 
 
@@ -722,8 +720,8 @@ public class UIPageNodeForm extends UIFormTabPane
          }
          /* Once there is a UI for setting these permissions, the defaults should
              * be replaced accordingly */
-         List<String> moveAppsPermissions = ProtectedContainer.DEFAULT_MOVE_APPLICATIONS_PERMISSIONS;
-         List<String> moveContainersPermissions = ProtectedContainer.DEFAULT_MOVE_CONTAINERS_PERMISSIONS;
+         List<String> moveAppsPermissions = Container.DEFAULT_MOVE_APPLICATIONS_PERMISSIONS;
+         List<String> moveContainersPermissions = Container.DEFAULT_MOVE_CONTAINERS_PERMISSIONS;
          
          UIFormStringInput uiPageName = uiInputSet.getChildById("pageName");
          UIFormStringInput uiPageTitle = uiInputSet.getChildById("pageTitle");

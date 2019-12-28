@@ -19,11 +19,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.settings.impl.SettingServiceImpl</key>
-    <type>org.exoplatform.settings.impl.SettingServiceImpl</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
   </component>
 
