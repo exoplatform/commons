@@ -141,6 +141,12 @@
       </dependency>
       <dependency>
         <groupId>org.exoplatform.commons</groupId>
+        <artifactId>commons-component-common</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.exoplatform.commons</groupId>
         <artifactId>commons-component-product</artifactId>
         <version>${project.version}</version>
       </dependency>

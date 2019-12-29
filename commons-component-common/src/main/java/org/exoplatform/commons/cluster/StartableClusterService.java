@@ -100,6 +100,7 @@ public class StartableClusterService implements Startable {
         /** Unregister node name , If  System.exit() is called before Thread migration is done.**/
         SecurityHelper.doPrivilegedAction(new PrivilegedAction<Void>() {
             public Void run() {
+                ExoContainerContext.setCurrentContainer(container);
                 Runtime.getRuntime().addShutdownHook(hook);
                 return null;
             }
@@ -119,6 +120,7 @@ public class StartableClusterService implements Startable {
                 task = new TimerTask() {
                     @Override
                     public void run() {
+                        ExoContainerContext.setCurrentContainer(container);
                         //check  if exist at least one service is not done
                         //If all cluster aware services is done, cancel the actual timer Task
                         if(checkAllIsDone()){
@@ -252,6 +254,7 @@ public class StartableClusterService implements Startable {
         public void run() {
             SecurityHelper.doPrivilegedAction(new PrivilegedAction<Void>() {
                 public Void run() {
+                    ExoContainerContext.setCurrentContainer(container);
                     resetSetting();
                     return null;
                 }
