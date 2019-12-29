@@ -74,11 +74,12 @@ public class YoutubeEmbedder extends AbstractEmbedder {
         } catch (Exception e) {
           LOG.info("Cannot get scheme from Portal Request Context", e);
         }
-      } else {
-        return null;
       }
     }
-    
+    if (feedsURL == null) {
+      return null;
+    }
+
     String youtubeV3APIKey = System.getProperty(YOUTUBE_V3_API_KEY_PROPERTY);
     
     //

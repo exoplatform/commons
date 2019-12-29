@@ -96,7 +96,7 @@ public class OembedEmbedder extends AbstractEmbedder {
         Matcher matcher = pattern.matcher(url);
         if (matcher.find()) {
           String endpoint = schemeEndpointMap.get(pattern);
-          String scheme = "http";
+          String scheme = "https";
           try {
             PortalRequestContext portalRequestContext = Util.getPortalRequestContext();
             scheme = portalRequestContext.getRequest().getScheme();
@@ -114,7 +114,7 @@ public class OembedEmbedder extends AbstractEmbedder {
             // COMMONS-578 : Working for sharing dailymotion videos since it does not work anymore with shortened urls
             url = url.replaceFirst("dai\\.ly", "www.dailymotion.com/embed/video");
           }
-          return new URL(correctURIString(String.format(endpoint, url),scheme, false));
+          return new URL(correctURIString(String.format(endpoint, url), scheme, false));
         }
       }
     } catch (MalformedURLException e) {
