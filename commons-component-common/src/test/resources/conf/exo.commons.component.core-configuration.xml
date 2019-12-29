@@ -47,11 +47,6 @@
   </component>
 
   <component>
-    <key>org.exoplatform.services.organization.OrganizationService</key>
-    <type>org.exoplatform.settings.impl.MockOrganizationService</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.services.scheduler.impl.QuartzSheduler</type>
   </component>
 
@@ -383,11 +378,6 @@
         <value>${exo.notification.service.QueueMessage.numberOfMailPerBatch:30}</value>
       </value-param>
     </init-params>
-  </component>
-
-  <component>
-    <key>org.exoplatform.services.organization.OrganizationService</key>
-    <type>org.exoplatform.settings.impl.MockOrganizationService</type>
   </component>
 
   <component>
