@@ -19,9 +19,6 @@ import org.exoplatform.settings.jpa.dao.SettingContextDAO;
 import org.exoplatform.settings.jpa.dao.SettingScopeDAO;
 import org.exoplatform.settings.jpa.dao.SettingsDAO;
 
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml") })
 public class CommonsDAOJPAImplTest extends BaseCommonsTestCase {
   protected SettingContextDAO settingContextDAO;
 

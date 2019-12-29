@@ -27,9 +27,11 @@ import org.exoplatform.services.idgenerator.IDGeneratorService;
  * Created by The eXo Platform SAS Author : eXoPlatform hailt@exoplatform.com
  * May 22, 2012
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
+@ConfiguredBy({
+    @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
     @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml") })
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.commons.component.core-dependencies-configuration.xml"),
+    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/exo.commons.component.core-configuration.xml") })
 public abstract class BaseCommonsTestCase extends AbstractKernelTest {
 
   protected static IDGeneratorService idGeneratorService;

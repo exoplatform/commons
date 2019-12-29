@@ -5,19 +5,12 @@ import java.util.List;
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.notification.channel.MailChannel;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.jpa.BaseTest;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.idm.UserImpl;
 import org.exoplatform.settings.jpa.JPAUserSettingServiceImpl;
 
-@ConfiguredBy({
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-notification-configuration.xml")
-})
 public class JPAUserSettingServiceTest extends BaseTest {
 
   protected static JPAUserSettingServiceImpl userSettingService;
