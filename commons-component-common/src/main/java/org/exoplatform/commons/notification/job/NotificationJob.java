@@ -25,6 +25,7 @@ import org.exoplatform.commons.api.notification.service.NotificationCompletionSe
 import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.*;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -58,12 +59,14 @@ public abstract class NotificationJob implements Job {
       public Boolean call() throws Exception {
         ExoContainer currentContainer = ExoContainerContext.getCurrentContainer();
         ExoContainerContext.setCurrentContainer(container);
+        RequestLifeCycle.begin(container);
         try {
           processSendNotification(context);
         } catch (Exception e) {
           LOG.error("Failed to running NotificationJob", e);
           return false;
         } finally {
+          RequestLifeCycle.end();
           ExoContainerContext.setCurrentContainer(currentContainer);
         }
         return true;
