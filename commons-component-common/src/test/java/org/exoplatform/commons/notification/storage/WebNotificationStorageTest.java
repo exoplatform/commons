@@ -78,21 +78,20 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     got.setId(notifId);
     got.setTitle("new title");
     storage.update(got, true);
-    end();
-    begin();
-    got = storage.get(notifId);
+    restartTransaction();
+
+    got = storage.get(got.getId());
     assertEquals("new title", got.getTitle());
-    assertFalse(lastUpdatedTime == got.getLastModifiedDate());
+    assertFalse(got.getLastModifiedDate() + " should have been modified and not equal anymore to " + lastUpdatedTime, lastUpdatedTime == got.getLastModifiedDate());
     
     //update but don't move top, the lastUpdatedTime will not be modified
     lastUpdatedTime = got.getLastModifiedDate();
     got.setTitle("new new title");
     storage.update(got, false);
-    end();
-    begin();
+    restartTransaction();
     got = storage.get(notifId);
     assertEquals("new new title", got.getTitle());
-    assertTrue(lastUpdatedTime == got.getLastModifiedDate());
+    assertTrue(got.getLastModifiedDate() + " should be equal to " + lastUpdatedTime, lastUpdatedTime == got.getLastModifiedDate());
   }
 
   public void testGetNewMessage() throws Exception  {

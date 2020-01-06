@@ -90,7 +90,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
     storage.update(notification, moveTop);
     //
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notification.getId());
-    exoWebNotificationCache.put(key, new WebNotifInfoData(notification));
+    exoWebNotificationCache.remove(key);
     clearWebNotificationCountCache(notification.getTo());
     clearUserWebNotificationList(notification.getTo());
   }
@@ -377,7 +377,7 @@ public class CachedWebNotificationStorage implements WebNotificationStorage {
    * Clear the notification from the cache.
    * @param notificationId
    */
-  private void clearWebNotificationCache(String notificationId) {
+  public void clearWebNotificationCache(String notificationId) {
     WebNotifInfoCacheKey key = WebNotifInfoCacheKey.key(notificationId);
     exoWebNotificationCache.remove(key);
   }

@@ -147,6 +147,8 @@ public class WebUsersDAOTest extends CommonsDAOJPAImplTest {
     webUsersEntity3.setNotification(webNotifEntity3);
     webUsersEntity3 = webUsersDAO.create(webUsersEntity3);
 
+    end();
+    begin();
     EntityManagerHolder.get().clear();
 
     //Then
