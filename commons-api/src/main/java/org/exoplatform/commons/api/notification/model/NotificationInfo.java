@@ -20,6 +20,7 @@ import java.util.*;
 
 import org.apache.commons.lang.ArrayUtils;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.idgenerator.IDGeneratorService;
 
@@ -494,12 +495,17 @@ public class NotificationInfo {
 
   public static IDGeneratorService getIdGeneratorService() {
     if (idGeneratorService == null) {
-      idGeneratorService = PortalContainer.getInstance().getComponentInstanceOfType(IDGeneratorService.class);
+      idGeneratorService = ExoContainerContext.getService(IDGeneratorService.class);
     }
     return idGeneratorService;
   }
 
   public static String generate() {
-    return getIdGeneratorService().generateStringID(Long.toString(System.currentTimeMillis()));
+    String generatedString = Long.toString(System.currentTimeMillis());
+    if (getIdGeneratorService() == null) {
+      return generatedString;
+    } else {
+      return getIdGeneratorService().generateStringID(generatedString);
+    }
   }
 }
