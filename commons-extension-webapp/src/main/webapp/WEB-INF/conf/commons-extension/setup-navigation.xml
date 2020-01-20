@@ -25,7 +25,7 @@
       <page-reference>group::platform/administrators::registry</page-reference>
     </node>
     <node>
-      <name>portal</name>
+      <name>administration</name>
       <label>#{UISetupPlatformToolBarPortlet.label.portal}</label>
       <page-reference>group::platform/administrators::branding</page-reference>
       <node>
