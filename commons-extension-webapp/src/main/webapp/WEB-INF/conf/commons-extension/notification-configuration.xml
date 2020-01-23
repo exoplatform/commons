@@ -32,6 +32,10 @@
       </component-plugin>    
     </component-plugins>   
   </component>
+  
+  <component>
+	<type>org.exoplatform.commons.api.notification.rest.WebNotificationRestService</type>
+  </component>
    
   <component profiles="all">
     <key>org.exoplatform.commons.api.notification.channel.ChannelManager</key>
