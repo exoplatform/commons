@@ -15,14 +15,4 @@
         <type>org.exoplatform.commons.cluster.StartableClusterAwareTest$ClassC</type>
     </component>
 
-    <component>
-        <type>org.exoplatform.commons.cluster.StartableClusterService</type>
-        <init-params>
-            <value-param>
-                <name>exo.cluster.startable.check.period</name>
-                <value>${exo.cluster.startable.check.period:100}</value>
-            </value-param>
-        </init-params>
-    </component>
-
 </configuration>

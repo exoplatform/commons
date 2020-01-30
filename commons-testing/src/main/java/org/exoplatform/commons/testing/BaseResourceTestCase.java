@@ -16,67 +16,43 @@
  */
 package org.exoplatform.commons.testing;
 
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.configuration.ConfigurationManager;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.rest.ContainerResponseWriter;
-import org.exoplatform.services.rest.impl.ApplicationContextImpl;
-import org.exoplatform.services.rest.impl.ContainerRequest;
-import org.exoplatform.services.rest.impl.ContainerResponse;
-import org.exoplatform.services.rest.impl.EnvironmentContext;
-import org.exoplatform.services.rest.impl.InputHeadersMap;
-import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
-import org.exoplatform.services.rest.impl.ProviderBinder;
-import org.exoplatform.services.rest.impl.RequestHandlerImpl;
-import org.exoplatform.services.rest.impl.ResourceBinder;
-import org.exoplatform.services.rest.tools.DummyContainerResponseWriter;
-
-import javax.jcr.Node;
-import javax.jcr.Session;
-import javax.ws.rs.core.MultivaluedMap;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-//import org.exoplatform.services.test.mock.MockHttpServletRequest;
+
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.rest.ContainerResponseWriter;
+import org.exoplatform.services.rest.impl.*;
+import org.exoplatform.services.rest.tools.DummyContainerResponseWriter;
 
 /**
- * Created by The eXo Platform SAS
- * Author : eXoPlatform
- *          exo@exoplatform.com
- * Apr 23, 2014  
+ * Created by The eXo Platform SAS Author : eXoPlatform exo@exoplatform.com Apr
+ * 23, 2014
  */
-//@ConfiguredBy({
-//  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/test-configuration.xml")
-//  })
-public class BaseResourceTestCase extends BaseExoTestCase {
-  protected static Log log = ExoLogger.getLogger(BaseResourceTestCase.class.getName());
-  protected SessionProvider sessionProvider;
-  protected ProviderBinder providerBinder;
-  protected ResourceBinder resourceBinder;
-  protected RequestHandlerImpl requestHandler;
-  
-  protected final String         REPO_NAME      = "repository";
-  protected final String         WORKSPACE_NAME = "portal-test";
+public abstract class BaseResourceTestCase extends BaseExoTestCase {
+  protected static Log           log = ExoLogger.getLogger(BaseResourceTestCase.class.getName());
+
+  protected ProviderBinder       providerBinder;
+
+  protected ResourceBinder       resourceBinder;
+
+  protected RequestHandlerImpl   requestHandler;
+
   protected PortalContainer      container;
-  protected RepositoryService    repositoryService;
+
   protected ConfigurationManager configurationManager;
-  protected Session              session;
-  protected Node                 root;
-  
+
   public void setUp() throws Exception {
     super.setUp();
     container = PortalContainer.getInstance();
-    repositoryService = getService(RepositoryService.class);
     configurationManager = getService(ConfigurationManager.class);
 
-    repositoryService.setCurrentRepositoryName(REPO_NAME);
-    session = repositoryService.getCurrentRepository().getSystemSession(WORKSPACE_NAME);
-    root = session.getRootNode();
-    
     resourceBinder = getService(ResourceBinder.class);
     requestHandler = getService(RequestHandlerImpl.class);
     // Reset providers to be sure it is clean
@@ -84,17 +60,17 @@ public class BaseResourceTestCase extends BaseExoTestCase {
     providerBinder = ProviderBinder.getInstance();
     ApplicationContextImpl.setCurrent(new ApplicationContextImpl(null, null, providerBinder));
     resourceBinder.clear();
-    begin();    
+    begin();
   }
-  
+
   public void tearDown() throws Exception {
     end();
     super.tearDown();
   }
-  
-  
+
   /**
    * Get response with provided writer
+   * 
    * @param method
    * @param requestURI
    * @param baseURI
@@ -109,7 +85,7 @@ public class BaseResourceTestCase extends BaseExoTestCase {
                                    String baseURI,
                                    Map<String, List<String>> headers,
                                    byte[] data,
-                                   ContainerResponseWriter writer) throws Exception{
+                                   ContainerResponseWriter writer) throws Exception {
 
     if (headers == null) {
       headers = new MultivaluedMapImpl();
@@ -121,8 +97,9 @@ public class BaseResourceTestCase extends BaseExoTestCase {
     }
 
     EnvironmentContext envctx = new EnvironmentContext();
-//  HttpServletRequest httpRequest = new MockHttpServletRequest("", in, in != null ? in.available() : 0, method, headers);
-//    envctx.put(HttpServletRequest.class, httpRequest);
+    // HttpServletRequest httpRequest = new MockHttpServletRequest("", in, in !=
+    // null ? in.available() : 0, method, headers);
+    // envctx.put(HttpServletRequest.class, httpRequest);
     EnvironmentContext.setCurrent(envctx);
     ContainerRequest request = new ContainerRequest(method,
                                                     new URI(requestURI),
@@ -136,6 +113,7 @@ public class BaseResourceTestCase extends BaseExoTestCase {
 
   /**
    * Get response without provided writer
+   * 
    * @param method
    * @param requestURI
    * @param baseURI
@@ -151,10 +129,10 @@ public class BaseResourceTestCase extends BaseExoTestCase {
                                    byte[] data) throws Exception {
     return service(method, requestURI, baseURI, headers, data, new DummyContainerResponseWriter());
   }
-  
+
   /**
-   * Register supplied class as per-request root resource if it has valid
-   * JAX-RS annotations and no one resource with the same UriPattern already
+   * Register supplied class as per-request root resource if it has valid JAX-RS
+   * annotations and no one resource with the same UriPattern already
    * registered.
    * 
    * @param resourceClass class of candidate to be root resource
@@ -193,7 +171,7 @@ public class BaseResourceTestCase extends BaseExoTestCase {
   public void removeResource(Class clazz) {
     this.resourceBinder.removeResource(clazz);
   }
-  
+
   protected <T> T getService(Class<T> clazz) {
     return clazz.cast(container.getComponentInstanceOfType(clazz));
   }

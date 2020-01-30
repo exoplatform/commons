@@ -17,35 +17,31 @@
 package org.exoplatform.commons.notification;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.jcr.Value;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
 import org.exoplatform.commons.api.notification.template.Element;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.notification.impl.AbstractService;
-import org.exoplatform.commons.notification.template.DigestTemplate;
-import org.exoplatform.commons.notification.template.SimpleElement;
-import org.exoplatform.commons.notification.template.TemplateUtils;
+import org.exoplatform.commons.notification.template.*;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.organization.OrganizationService;
 
 
 public class NotificationUtils {
+
+  public static final String EXO_IS_ACTIVE             = "exo:isActive";
 
   public static final String DEFAULT_SUBJECT_KEY       = "Notification.subject.{0}";
 
@@ -170,26 +166,6 @@ public class NotificationUtils {
     return result;
   }
 
-  public static String[] valuesToArray(Value[] values) throws Exception {
-    if (values.length < 1)
-      return new String[] {};
-    List<String> list = valuesToList(values);
-    return list.toArray(new String[list.size()]);
-  }
-
-  public static List<String> valuesToList(Value[] values) throws Exception {
-    List<String> list = new ArrayList<String>();
-    if (values.length < 1)
-      return list;
-    String s;
-    for (int i = 0; i < values.length; ++i) {
-      s = values[i].getString();
-      if (s != null && s.trim().length() > 0)
-        list.add(s);
-    }
-    return list;
-  }
-  
   public static String getValueParam(InitParams params, String key, String defaultValue) {
     try {
       return params.getValueParam(key).getValue();
@@ -253,7 +229,7 @@ public class NotificationUtils {
   public static boolean isActiveSetting(String userId) {
     try {
       SettingService settingService = CommonsUtils.getService(SettingService.class);
-      SettingValue<String> value = (SettingValue<String>) settingService.get(Context.USER.id(userId), Scope.GLOBAL, AbstractService.EXO_IS_ACTIVE);
+      SettingValue<String> value = (SettingValue<String>) settingService.get(Context.USER.id(userId), Scope.GLOBAL, EXO_IS_ACTIVE);
       return (value == null || value.getValue() == null) ? false : true;
     } catch (Exception e) {
       return false;
@@ -285,7 +261,7 @@ public class NotificationUtils {
     String displayTitle = removeLinkTitle(title);
     
     //Work-around for SOC-4730 : for calendar activity only, the title is not stored by raw data but 
-    //it's escaped before store to jcr. We need to unescape the title when build the notification
+    //it's escaped before storing it. We need to unescape the title when build the notification
     if (CALENDAR_ACTIVITY.equals(activityType)) {
       displayTitle = StringEscapeUtils.unescapeHtml(displayTitle);
     }

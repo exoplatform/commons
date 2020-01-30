@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - API</name>
   <properties>
-    <exo.test.coverage.ratio>0.00</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.01</exo.test.coverage.ratio>
   </properties>
   <dependencies>
     <dependency>
@@ -35,20 +35,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.jcr</groupId>
-      <artifactId>exo.jcr.component.core</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>xml-apis</artifactId>
-          <groupId>xml-apis</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>xml-apis-ext</artifactId>
-          <groupId>xml-apis</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
     </dependency>
@@ -57,6 +43,12 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>xpp3</groupId>
+          <artifactId>xpp3_min</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

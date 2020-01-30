@@ -1,30 +1,18 @@
 package org.exoplatform.jpa.notifications.web.impl;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
+import org.exoplatform.commons.api.notification.model.*;
+import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.commons.notification.impl.jpa.web.JPAWebNotificationStorage;
-import org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO;
-import org.exoplatform.commons.notification.impl.jpa.web.dao.WebParamsDAO;
-import org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO;
+import org.exoplatform.commons.notification.impl.jpa.web.dao.*;
 import org.exoplatform.commons.notification.plugin.PluginTest;
 import org.exoplatform.commons.persistence.impl.EntityManagerHolder;
-import org.exoplatform.component.test.ConfigurationUnit;
-import org.exoplatform.component.test.ConfiguredBy;
-import org.exoplatform.component.test.ContainerScope;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/commons-configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/test-portal-configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-cache-configuration.xml") })
 public class JPAWebNotificationStorageTest extends BaseNotificationTestCase {
 
   private JPAWebNotificationStorage webNotificationStorage;
@@ -105,32 +93,33 @@ public class JPAWebNotificationStorageTest extends BaseNotificationTestCase {
     }
   }
 
-  public void testUpdateNotification() throws Exception {
+  public void testUpdateJPANotification() throws Exception {
     String userId = "john";
     NotificationInfo info = makeWebNotificationInfo(userId);
-    String notifId = info.getId();
     webNotificationStorage.save(info);
     NotificationInfo got = webNotificationStorage.get(info.getId());
     assertEquals("The title", got.getTitle());
     long lastUpdatedTime = got.getLastModifiedDate();
 
-    //update and move top, the lastUpdatedTime will be modified
+    // update and move top, the lastUpdatedTime will be modified
     got = makeWebNotificationInfo(userId);
-    got.setId(notifId);
     got.setTitle("new title");
     got.setId(info.getId());
     webNotificationStorage.update(got, true);
+    restartTransaction();
+
     got = webNotificationStorage.get(got.getId());
     assertEquals("new title", got.getTitle());
-    assertFalse(lastUpdatedTime == got.getLastModifiedDate());
+    assertFalse(got.getLastModifiedDate() + " should have been modified and not equal anymore to " + lastUpdatedTime,
+                lastUpdatedTime == got.getLastModifiedDate());
 
-    //update but don't move top, the lastUpdatedTime will not be modified
+    // update but don't move top, the lastUpdatedTime will not be modified
     lastUpdatedTime = got.getLastModifiedDate();
     got.setTitle("new new title");
     webNotificationStorage.update(got, false);
     got = webNotificationStorage.get(got.getId());
     assertEquals("new new title", got.getTitle());
-    assertTrue(lastUpdatedTime == got.getLastModifiedDate());
+    assertTrue(got.getLastModifiedDate() + " should equal to " + lastUpdatedTime, lastUpdatedTime == got.getLastModifiedDate());
   }
 
   public void testRemoveByJob() throws Exception {

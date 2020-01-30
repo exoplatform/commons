@@ -37,11 +37,6 @@ import org.exoplatform.services.security.MembershipEntry;
  *          exo@exoplatform.com
  * Apr 22, 2014  
  */
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/test-root-configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/commons-configuration.xml"),
-  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml") })
 public class UserStateServiceTest extends BaseNotificationTestCase {
   private String SUPER_USER = "root";
 

@@ -16,7 +16,6 @@ package org.mortbay.cometd.continuation;
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-import javax.jcr.RepositoryException;
 import javax.servlet.ServletConfig;
 
 import java.util.HashMap;
@@ -40,7 +39,6 @@ import org.cometd.server.BayeuxServerImpl;
 import org.cometd.server.ServerSessionImpl;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.picocontainer.Disposable;
@@ -80,9 +78,7 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
 
   private Oort                            oort;
 
-  private RepositoryService               repoService;
-
-  private ServletConfig servletConfig;
+  private ServletConfig                   servletConfig;
 
   /**
    * Logger.
@@ -92,10 +88,9 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
   /**
    * Default constructor.
    */
-  public EXoContinuationBayeux(RepositoryService repoService) {
+  public EXoContinuationBayeux() {
     super();
     this.setSecurityPolicy(new EXoSecurityPolicy(this));
-    this.repoService = repoService;
     //
     EXoContinuationCometdServlet servlet = EXoContinuationCometdServlet.getInstance();
     if (servlet != null) {
@@ -117,9 +112,8 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
   }
 
   public long getTimeout() {
-      return getOption(AbstractServerTransport.TIMEOUT_OPTION, 30000);
+    return getOption(AbstractServerTransport.TIMEOUT_OPTION, 30000);
   }
-  
 
   /**
    * @return context name of cometd webapp
@@ -171,12 +165,10 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
   }
 
   public boolean isSubscribed(String eXoID, String clientID) {
-    eXoID = toCloudId(eXoID);
     return (clientIDs.get(eXoID) != null && clientIDs.get(eXoID).contains(clientID));
   }
 
   public boolean isPresent(String eXoID) {
-    eXoID = toCloudId(eXoID);
     return seti.isPresent(eXoID);
   }
 
@@ -216,7 +208,6 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
    * @param id The id of the message (or null for a random id).
    */
   public void sendMessage(String eXoID, String channel, Object data, String id) {
-    eXoID = toCloudId(eXoID);
     seti.sendMessage(eXoID, channel, data);
   }
 
@@ -243,22 +234,6 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
     return systemClient;
   }
 
-  private String toCloudId(String eXoID) {
-    if (repoService != null) {
-      try {
-        String currRepo = repoService.getCurrentRepository().getConfiguration().getName();
-        StringBuilder builder = new StringBuilder(currRepo);
-        builder.append(cloudIDSeparator);
-        builder.append(eXoID);
-        return builder.toString();
-      } catch (RepositoryException e) {
-        LOG.error(e.getMessage(), e);
-      }
-    }
-
-    return eXoID;
-  }
-  
   public ServletConfig getServletConfig() {
     return servletConfig;
   }
@@ -270,15 +245,17 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
   @Override
   public void dispose() {
     for (ServerSession session : getSessions()) {
-      ((ServerSessionImpl)session).cancelSchedule();
+      ((ServerSessionImpl) session).cancelSchedule();
     }
 
-    try {
-      seti.stop();
-      oort.stop();
-      super.stop();
-    } catch (Exception e) {
-      LOG.error(e.getMessage(), e);
+    if (seti != null && oort != null) {
+      try {
+        seti.stop();
+        oort.stop();
+        super.stop();
+      } catch (Exception e) {
+        LOG.error(e.getMessage(), e);
+      }
     }
   }
 
@@ -305,7 +282,7 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
      */
     @Override
     public boolean canCreate(BayeuxServer server, ServerSession client, String channelId, ServerMessage message) {
-      //      
+      //
       Boolean b = client != null && !ChannelId.isMeta(channelId);
       return b;
     }
@@ -321,7 +298,6 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
         client.addListener(this);
 
         String eXoID = (String) message.get("exoId");
-        eXoID = bayeux.toCloudId(eXoID);
         Set<String> cIds = clientIDs.get(eXoID);
         if (cIds == null) {
           cIds = new ConcurrentHashSet<String>();
@@ -366,6 +342,5 @@ public class EXoContinuationBayeux extends BayeuxServerImpl implements Disposabl
       }
     }
   }
-
 
 }

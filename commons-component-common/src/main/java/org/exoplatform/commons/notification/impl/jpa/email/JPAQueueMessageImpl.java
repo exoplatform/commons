@@ -1,7 +1,5 @@
 package org.exoplatform.commons.notification.impl.jpa.email;
 
-import static org.exoplatform.commons.notification.impl.jpa.EntityConverter.convertQueueEntityToMessageInfo;
-
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -202,6 +200,19 @@ public class JPAQueueMessageImpl implements QueueMessage, Startable {
       }
     }
     return messages;
+  }
+
+  private static MessageInfo convertQueueEntityToMessageInfo(MailQueueEntity mailQueueEntity) {
+    MessageInfo messageInfo = new MessageInfo();
+    messageInfo.setId(String.valueOf(mailQueueEntity.getId()));
+    messageInfo.pluginId(mailQueueEntity.getType());
+    messageInfo.from(mailQueueEntity.getFrom());
+    messageInfo.to(mailQueueEntity.getTo());
+    messageInfo.subject(mailQueueEntity.getSubject());
+    messageInfo.body(mailQueueEntity.getBody());
+    messageInfo.footer(mailQueueEntity.getFooter());
+    messageInfo.setCreatedTime(mailQueueEntity.getCreationDate().getTimeInMillis());
+    return messageInfo;
   }
 
   private void removeMessageInfo(String id) throws Exception {

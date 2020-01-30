@@ -18,59 +18,62 @@ package org.exoplatform.commons.api.notification.model;
 
 import java.util.*;
 
-import javax.jcr.Value;
-
 import org.apache.commons.lang.ArrayUtils;
-import org.exoplatform.services.jcr.util.IdGenerator;
+
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.idgenerator.IDGeneratorService;
 
 public class NotificationInfo {
-  public static final String  PREFIX_ID     = "NotificationMessage";
+  public static final String        PREFIX_ID      = "NotificationMessage";
 
-  public static final String  FOR_ALL_USER  = "&forAllUser";
+  public static final String        FOR_ALL_USER   = "&forAllUser";
 
-  private String              id;
+  private static IDGeneratorService idGeneratorService;
 
-  private PluginKey           key;                                           //
+  private String                    id;
 
-  private String              from;
+  private PluginKey                 key;                                   //
 
-  private String              to;
+  private String                    from;
 
-  private int                 order;
+  private String                    to;
 
-  private Map<String, String> ownerParameter = new HashMap<String, String>();
+  private int                       order;
 
-  private List<String>        sendToUserIds  = new ArrayList<String>();
+  private Map<String, String>       ownerParameter = new HashMap<>();
+
+  private List<String>              sendToUserIds  = new ArrayList<>();
 
   // list users send by frequency
-  private String[]            sendToDaily;
+  private String[]                  sendToDaily;
 
-  private String[]            sendToWeekly;
+  private String[]                  sendToWeekly;
 
-  private long                lastModifiedDate;
-  
-  private String              title = "";
-  
-  private ChannelKey          channelKey;
-  
-  private Calendar            dateCreated;
-  
-  private boolean             isOnPopOver    = true;
+  private long                      lastModifiedDate;
 
-  private boolean             read           = false;
+  private String                    title          = "";
 
-  private boolean             resetOnBadge   = false;
+  private ChannelKey                channelKey;
 
-  private boolean             isUpdate       = false;
+  private Calendar                  dateCreated;
+
+  private boolean                   isOnPopOver    = true;
+
+  private boolean                   read           = false;
+
+  private boolean                   resetOnBadge   = false;
+
+  private boolean                   isUpdate       = false;
 
   public NotificationInfo() {
-    this.id = PREFIX_ID + IdGenerator.generate();
+    this.id = PREFIX_ID + generate();
     this.sendToDaily = new String[] { "" };
     this.sendToWeekly = new String[] { "" };
     this.lastModifiedDate = System.currentTimeMillis();
     this.setDateCreated(Calendar.getInstance());
   }
-  
+
   public static NotificationInfo instance() {
     return new NotificationInfo();
   }
@@ -94,10 +97,10 @@ public class NotificationInfo {
     }
     return this;
   }
-  
+
   public boolean isSendAll() {
-    return ArrayUtils.contains(sendToDaily, FOR_ALL_USER) || 
-      ArrayUtils.contains(sendToWeekly, FOR_ALL_USER);
+    return ArrayUtils.contains(sendToDaily, FOR_ALL_USER) ||
+        ArrayUtils.contains(sendToWeekly, FOR_ALL_USER);
   }
 
   public boolean isUpdate() {
@@ -117,7 +120,7 @@ public class NotificationInfo {
     this.key = key;
     return this;
   }
-  
+
   public NotificationInfo key(String id) {
     this.key = PluginKey.key(id);
     return this;
@@ -134,6 +137,7 @@ public class NotificationInfo {
 
   /**
    * Gets the title of the notification
+   * 
    * @return
    */
   public String getTitle() {
@@ -142,6 +146,7 @@ public class NotificationInfo {
 
   /**
    * Sets the title of the notification
+   * 
    * @param title
    */
   public NotificationInfo setTitle(String title) {
@@ -151,6 +156,7 @@ public class NotificationInfo {
 
   /**
    * Gets the channel key of the notification
+   * 
    * @return
    */
   public ChannelKey getChannelKey() {
@@ -159,6 +165,7 @@ public class NotificationInfo {
 
   /**
    * Sets the channel of the notification
+   * 
    * @param channelKey
    */
   public void setChannelKey(ChannelKey channelKey) {
@@ -230,7 +237,8 @@ public class NotificationInfo {
    * @return the array ownerParameter
    */
   public String[] getArrayOwnerParameter() {
-    if (ownerParameter.size() == 0) return new String[] {""};
+    if (ownerParameter.size() == 0)
+      return new String[] { "" };
 
     String[] strs = ownerParameter.toString().split(", ");
     strs[0] = strs[0].replace("{", "");
@@ -254,35 +262,14 @@ public class NotificationInfo {
     this.ownerParameter.put(key, value);
     return this;
   }
-  
+
   public NotificationInfo end() {
     return this;
   }
 
   /**
-   * @param values the value to set ownerParameter
-   */
-  public NotificationInfo setOwnerParameter(Value[] values) {
-    if (values == null || values.length == 0) return this;
-
-    for (Value val : values) {
-      try {
-        String str = val.getString();
-        if (str.indexOf("=") > 0) {
-          String key = str.substring(0, str.indexOf("=")).trim();
-          String value = str.substring(str.indexOf("=") + 1).trim();
-          with(key, value);
-        }
-      } catch (Exception e) {
-        continue;
-      }
-
-    }
-    return this;
-  }
-
-  /**
    * Get the last modified date
+   * 
    * @return
    */
   public long getLastModifiedDate() {
@@ -313,7 +300,7 @@ public class NotificationInfo {
     this.dateCreated = dateCreated;
     return this;
   }
-  
+
   public boolean isOnPopOver() {
     return isOnPopOver;
   }
@@ -368,7 +355,7 @@ public class NotificationInfo {
     this.sendToWeekly = userIds;
     return this;
   }
-  
+
   /**
    * @param userId the userId to add into sendToWeekly
    */
@@ -376,7 +363,7 @@ public class NotificationInfo {
     this.sendToWeekly = addMoreItemInArray(sendToWeekly, userId);
     return this;
   }
-  
+
   /**
    * @param userId the userId to remove into sendToWeekly
    */
@@ -411,7 +398,7 @@ public class NotificationInfo {
       if (super.equals(o)) {
         return true;
       }
-      if(m.getId() == null || this.id == null) {
+      if (m.getId() == null || this.id == null) {
         return false;
       }
       if (m.getId().equals(this.id)) {
@@ -428,23 +415,26 @@ public class NotificationInfo {
 
   @Override
   public String toString() {
-    StringBuffer buffer = new StringBuffer("{");
-    buffer.append("providerType: ").append(key)
-    .append(", sendToDaily: ").append(Arrays.asList(sendToDaily).toString())
-    .append(", sendToWeekly: ").append(Arrays.asList(sendToWeekly).toString());
+    StringBuilder buffer = new StringBuilder("{");
+    buffer.append("providerType: ")
+          .append(key)
+          .append(", sendToDaily: ")
+          .append(Arrays.asList(sendToDaily).toString())
+          .append(", sendToWeekly: ")
+          .append(Arrays.asList(sendToWeekly).toString());
     return buffer.toString();
   }
-  
+
   private String[] addMoreItemInArray(String[] src, String element) {
-    if(element == null || element.trim().length() == 0) {
+    if (element == null || element.trim().length() == 0) {
       return src;
     }
     //
-    List<String> where = new ArrayList<String>();
-    if (src.length > 1 || (src.length == 1 && src[0].equals("") == false)) {
-      where = new ArrayList<String>(Arrays.asList(src));
+    List<String> where = new ArrayList<>();
+    if (src.length > 1 || (src.length == 1 && !src[0].equals(""))) {
+      where = new ArrayList<>(Arrays.asList(src));
     }
-    if (where.contains(element) == false) {
+    if (!where.contains(element)) {
       where.add(element);
       return where.toArray(new String[where.size()]);
     }
@@ -456,9 +446,9 @@ public class NotificationInfo {
       return src;
     }
     //
-    List<String> where = new ArrayList<String>();
-    if (src.length > 1 || (src.length == 1 && src[0].equals("") == false)) {
-      where = new ArrayList<String>(Arrays.asList(src));
+    List<String> where = new ArrayList<>();
+    if (src.length > 1 || (src.length == 1 && !src[0].equals(""))) {
+      where = new ArrayList<>(Arrays.asList(src));
     }
     if (where.contains(element)) {
       where.remove(element);
@@ -468,7 +458,7 @@ public class NotificationInfo {
   }
 
   @Override
-  public NotificationInfo clone() {
+  public NotificationInfo clone() { // NOSONAR
     return clone(false);
   }
 
@@ -484,7 +474,7 @@ public class NotificationInfo {
            .setSendToWeekly(arrayCopy(sendToWeekly))
            .setTo(to)
            .setId(isNew ? null : id);
-    if(!isNew) {
+    if (!isNew) {
       message.setOnPopOver(isOnPopOver)
              .setResetOnBadge(resetOnBadge)
              .setRead(read);
@@ -493,13 +483,29 @@ public class NotificationInfo {
   }
 
   /**
-   * Copy the array string, 
-   *  if source is empty or null, return array has one empty item. 
+   * Copy the array string, if source is empty or null, return array has one
+   * empty item.
+   * 
    * @param source
    * @return
    */
   private String[] arrayCopy(String[] source) {
-    return (source != null && source.length > 0) ? 
-              Arrays.asList(source).toArray(new String[source.length]) : new String[] { "" };
+    return (source != null && source.length > 0) ? Arrays.asList(source).toArray(new String[source.length]) : new String[] { "" };
+  }
+
+  public static IDGeneratorService getIdGeneratorService() {
+    if (idGeneratorService == null) {
+      idGeneratorService = ExoContainerContext.getService(IDGeneratorService.class);
+    }
+    return idGeneratorService;
+  }
+
+  public static String generate() {
+    String generatedString = Long.toString(System.currentTimeMillis());
+    if (getIdGeneratorService() == null) {
+      return generatedString;
+    } else {
+      return getIdGeneratorService().generateStringID(generatedString);
+    }
   }
 }

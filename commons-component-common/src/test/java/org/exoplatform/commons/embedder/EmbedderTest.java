@@ -153,6 +153,7 @@ public class EmbedderTest extends BaseCommonsTestCase {
   private void assertRetrurnedData(String youTubeURL) {
     embedder = EmbedderFactory.getInstance(youTubeURL);
     ExoMedia videoObj = embedder.getExoMedia();
+    assertNotNull(videoObj);
     assertNotNull(videoObj.getTitle());
     assertNotNull(videoObj.getHtml());
     assertNotNull(videoObj.getDescription());

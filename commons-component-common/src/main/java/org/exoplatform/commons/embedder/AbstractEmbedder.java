@@ -28,11 +28,14 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.UriBuilder;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
+import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 public abstract class AbstractEmbedder implements Embedder {
-  
+
   protected Map<Pattern, String> schemeEndpointMap = new HashMap<Pattern, String>();
   protected String url;
   private Pattern pattern;
@@ -90,7 +93,12 @@ public abstract class AbstractEmbedder implements Embedder {
         stringBuffer.append(eachLine);
       }
       bufferedReader.close();
-      return new JSONObject(stringBuffer.toString());
+      String jsonString = stringBuffer.toString();
+      if (StringUtils.isBlank(jsonString)) {
+        getExoLogger().warn("Empty response returned from '" + url + "'");
+        return null;
+      }
+      return new JSONObject(jsonString);
     } catch (Exception e) {
       getExoLogger().warn("Can't get json from url: " + url.toString());
       return null;

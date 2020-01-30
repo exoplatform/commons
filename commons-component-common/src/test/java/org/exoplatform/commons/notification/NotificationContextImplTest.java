@@ -42,8 +42,10 @@ public class NotificationContextImplTest extends BaseNotificationTestCase {
     NotificationContext context = NotificationContextImpl.cloneInstance();
     context.append(NotificationJob.JOB_DAILY, true);
     Boolean value = context.value(NotificationJob.JOB_DAILY);
+    assertNotNull(value);
     assertTrue(value);
     value = context.value(NotificationJob.JOB_WEEKLY);
+    assertNotNull(value);
     assertFalse(value);
   }
   
@@ -51,8 +53,10 @@ public class NotificationContextImplTest extends BaseNotificationTestCase {
     NotificationContext context = NotificationContextImpl.cloneInstance();
     context.append(NotificationJob.JOB_WEEKLY, true);
     Boolean value = context.value(NotificationJob.JOB_WEEKLY);
+    assertNotNull(value);
     assertTrue(value);
     value = context.value(NotificationJob.JOB_DAILY);
+    assertNotNull(value);
     assertFalse(value);
   }
 }

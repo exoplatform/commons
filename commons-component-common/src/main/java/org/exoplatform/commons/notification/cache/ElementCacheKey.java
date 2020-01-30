@@ -16,7 +16,9 @@
  */
 package org.exoplatform.commons.notification.cache;
 
-public class ElementCacheKey extends ScopeCacheKey {
+import java.io.Serializable;
+
+public class ElementCacheKey implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final String      pluinId;

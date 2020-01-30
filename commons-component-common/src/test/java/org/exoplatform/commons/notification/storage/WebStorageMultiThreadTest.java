@@ -6,14 +6,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import javax.jcr.Node;
-
 import org.exoplatform.commons.api.notification.model.UserSetting;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.jcr.util.IdGenerator;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
@@ -35,7 +33,6 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
   
   @Override
   public void setUp() throws Exception {
-    initCollaborationWorkspace();
     super.setUp();
     //
     organizationService = getService(OrganizationService.class);
@@ -57,14 +54,6 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
 
   @Override
   protected void tearDown() throws Exception {
-    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
-    for (String userId : userIds) {
-      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
-      if (userNodeApp.hasNode(NOTIFICATIONS)) {
-        userNodeApp.getNode(NOTIFICATIONS).remove();
-        userNodeApp.save();
-      }
-    }
     for (String string : userIds) {
       organizationService.getUserHandler().removeUser(string, false);
     }
@@ -79,7 +68,7 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
     UserSetting userSetting;
     for (int i = 0; i < number; i++) {
       String first = (isSameFirst) ? "" : String.valueOf(new Random().nextInt(1000));
-      String userId = first + "user" + i + String.valueOf(IdGenerator.generate()).hashCode();
+      String userId = first + "user" + i + String.valueOf(generate()).hashCode();
       User user = new UserImpl(userId);
       organizationService.getUserHandler().createUser(user, true);
       //
@@ -106,13 +95,17 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
           @Override
           public void process() {
             long t = System.currentTimeMillis();
+            ExoContainerContext.setCurrentContainer(getContainer());
+            RequestLifeCycle.begin(getContainer());
             try {
               storage.save(makeWebNotificationInfo(userId));
               ++HCR_save;
             } catch (Exception e) {
-              assertFalse(true);
+              fail(e);
               LOG.error(e);
+              Thread.currentThread().interrupt();
             } finally {
+              RequestLifeCycle.end();
               HCT_time += (System.currentTimeMillis() - t);
             }
           }
@@ -129,14 +122,17 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
         @Override
         public void process() {
           long t = System.currentTimeMillis();
+          ExoContainerContext.setCurrentContainer(getContainer());
+          RequestLifeCycle.begin(getContainer());
           try {
             WebNotificationFilter filter = new WebNotificationFilter(userId);
             //
             storage.get(filter, 0, 20);
           } catch (Exception e) {
-            assertFalse(true);
+            fail(e);
             LOG.error(e);
           } finally {
+            RequestLifeCycle.end();
             HCT_get_time += (System.currentTimeMillis() - t);
           }
         }
@@ -165,8 +161,11 @@ public class WebStorageMultiThreadTest extends BaseNotificationTestCase {
       this.latch = latch;
     }
     public void run() {
-      process();
-      latch.countDown();
+      try {
+        process();
+      } finally {
+        latch.countDown();
+      }
     }
     protected abstract void process();
   }

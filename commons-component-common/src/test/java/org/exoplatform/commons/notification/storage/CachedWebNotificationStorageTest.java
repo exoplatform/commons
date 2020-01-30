@@ -3,22 +3,15 @@ package org.exoplatform.commons.notification.storage;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.jcr.Node;
-
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.notification.BaseNotificationTestCase;
 import org.exoplatform.commons.notification.impl.service.storage.cache.CachedWebNotificationStorage;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.IntegerData;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsData;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.ListWebNotificationsKey;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoCacheKey;
-import org.exoplatform.commons.notification.impl.service.storage.cache.model.WebNotifInfoData;
+import org.exoplatform.commons.notification.impl.service.storage.cache.model.*;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
 
 public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
   protected WebNotificationStorage cachedStorage;
@@ -36,7 +29,6 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
 
   @Override
   public void setUp() throws Exception {
-    initCollaborationWorkspace();
     super.setUp();
     cachedStorage = getService(WebNotificationStorage.class);
     cacheService = getService(CacheService.class);
@@ -50,15 +42,6 @@ public class CachedWebNotificationStorageTest extends BaseNotificationTestCase {
   
   @Override
   public void tearDown() throws Exception {
-    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
-    for (String userId : userIds) {
-      Node userNodeApp = nodeHierarchyCreator.getUserApplicationNode(sessionProvider, userId);
-      if (userNodeApp.hasNode(NOTIFICATIONS)) {
-        userNodeApp.getNode(NOTIFICATIONS).remove();
-        userNodeApp.save();
-      }
-    }
-    
     exoWebNotificationCache.clearCache();
     exoWebNotificationsCache.clearCache();
     exoWebNotificationCountCache.clearCache();

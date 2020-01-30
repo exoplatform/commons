@@ -10,66 +10,14 @@
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Commons Search</name>
   <properties>
-    <exo.test.coverage.ratio>0.43</exo.test.coverage.ratio>
-    <org.elasticsearch.test.guava.version>18.0</org.elasticsearch.test.guava.version>
-    <org.elasticsearch.test.jodatime.version>2.9.5</org.elasticsearch.test.jodatime.version>
-    <!-- Issue with the PLF pom parent that trigger lucene 3.6.2 needed by JCR (Only working with impl version < 0.20.6) -->
-    <lucene.version>6.6.1</lucene.version>
-    <!-- Issue with the PLF pom parent that trigger tika 1.5 needed by JCR -->
-    <org.apache.tika.version>1.18</org.apache.tika.version>
-    <pdfbox.version>2.0.9</pdfbox.version>
-    <jempbox.version>1.8.13</jempbox.version>
+    <exo.test.coverage.ratio>0.44</exo.test.coverage.ratio>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${org.elasticsearch.test.guava.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>${org.elasticsearch.test.jodatime.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-core</artifactId>
-        <version>${lucene.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.tika</groupId>
-        <artifactId>tika-parsers</artifactId>
-        <version>${org.apache.tika.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.tika</groupId>
-        <artifactId>tika-core</artifactId>
-        <version>${org.apache.tika.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <!-- PLF dependencies -->
     <dependency>
       <groupId>org.exoplatform.commons</groupId>
       <artifactId>commons-component-common</artifactId>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>lucene-spellchecker</artifactId>
-          <groupId>org.apache.lucene</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>exo.jcr.component.core</artifactId>
-          <groupId>org.exoplatform.jcr</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>exo.jcr.component.ext</artifactId>
-          <groupId>org.exoplatform.jcr</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Others dependencies -->
     <dependency>
@@ -88,12 +36,7 @@
     <dependency>
       <groupId>io.swagger</groupId>
       <artifactId>swagger-jaxrs</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>annotations</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
-        </exclusion>
-      </exclusions>
+      <scope>provided</scope>
     </dependency>
     <!-- TEST -->
     <dependency>
@@ -170,36 +113,6 @@
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>${commons-logging.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-      <version>${org.apache.tika.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-parsers</artifactId>
-      <version>${org.apache.tika.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>${org.joda.time.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.pdfbox</groupId>
-      <artifactId>pdfbox-tools</artifactId>
-      <version>${pdfbox.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.pdfbox</groupId>
-      <artifactId>debugger-app</artifactId>
-      <version>${pdfbox.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

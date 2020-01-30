@@ -16,21 +16,12 @@
  */
 package org.exoplatform.settings.jpa;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.exoplatform.commons.api.notification.channel.AbstractChannel;
 import org.exoplatform.commons.api.notification.channel.ChannelManager;
-import org.exoplatform.commons.api.notification.model.GroupProvider;
-import org.exoplatform.commons.api.notification.model.OrderComparatorASC;
-import org.exoplatform.commons.api.notification.model.PluginInfo;
-import org.exoplatform.commons.api.notification.model.UserSetting;
+import org.exoplatform.commons.api.notification.model.*;
 import org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin;
 import org.exoplatform.commons.api.notification.plugin.config.GroupConfig;
 import org.exoplatform.commons.api.notification.plugin.config.PluginConfig;
@@ -43,7 +34,7 @@ import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 
 public class JPAPluginSettingServiceImpl extends AbstractService implements PluginSettingService {
-  private static final String NAME_SPACES = "exo:";
+  private static final String NAME_SPACES        = "exo:";
 
   private List<PluginConfig> pluginConfigs = new ArrayList<PluginConfig>();
 

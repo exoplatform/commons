@@ -62,21 +62,24 @@ public class YoutubeEmbedder extends AbstractEmbedder {
   public ExoMedia getExoMedia() {
     String feedsURL = null;
     String scheme = "http";
-    for(Pattern pattern : schemeEndpointMap.keySet()) {
+    for (Pattern pattern : schemeEndpointMap.keySet()) {
       Matcher matcher = pattern.matcher(url);
-      if(matcher.find()) {
+      if (matcher.find()) {
         feedsURL = schemeEndpointMap.get(pattern);
         try {
           PortalRequestContext portalRequestContext = Util.getPortalRequestContext();
-          scheme = portalRequestContext.getRequest().getScheme();
+          if (portalRequestContext != null && portalRequestContext.getRequest() != null) {
+            scheme = portalRequestContext.getRequest().getScheme();
+          }
         } catch (Exception e) {
-          LOG.info("Cannot get scheme from Portal Request Context");
+          LOG.info("Cannot get scheme from Portal Request Context", e);
         }
-      } else {
-        return null;
       }
     }
-    
+    if (feedsURL == null) {
+      return null;
+    }
+
     String youtubeV3APIKey = System.getProperty(YOUTUBE_V3_API_KEY_PROPERTY);
     
     //

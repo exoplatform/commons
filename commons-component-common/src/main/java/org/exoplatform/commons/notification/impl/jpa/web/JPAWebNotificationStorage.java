@@ -1,34 +1,24 @@
 package org.exoplatform.commons.notification.impl.jpa.web;
 
-import static org.exoplatform.commons.notification.impl.jpa.EntityConverter.convertWebNotifEntityToNotificationInfo;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-
 import org.apache.commons.lang3.tuple.Pair;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.WebNotificationFilter;
+
+import org.exoplatform.commons.api.notification.NotificationMessageUtils;
+import org.exoplatform.commons.api.notification.model.*;
 import org.exoplatform.commons.api.notification.service.setting.UserSettingService;
 import org.exoplatform.commons.api.notification.service.storage.WebNotificationStorage;
 import org.exoplatform.commons.api.persistence.ExoTransactional;
-import org.exoplatform.commons.notification.impl.jpa.EntityConverter;
-import org.exoplatform.commons.notification.impl.jpa.web.dao.WebNotifDAO;
-import org.exoplatform.commons.notification.impl.jpa.web.dao.WebParamsDAO;
-import org.exoplatform.commons.notification.impl.jpa.web.dao.WebUsersDAO;
-import org.exoplatform.commons.notification.impl.jpa.web.entity.WebNotifEntity;
-import org.exoplatform.commons.notification.impl.jpa.web.entity.WebParamsEntity;
-import org.exoplatform.commons.notification.impl.jpa.web.entity.WebUsersEntity;
+import org.exoplatform.commons.notification.impl.jpa.web.dao.*;
+import org.exoplatform.commons.notification.impl.jpa.web.entity.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 public class JPAWebNotificationStorage implements WebNotificationStorage {
 
-  private static final Log         LOG                   = ExoLogger.getLogger(JPAWebNotificationStorage.class);
+  private static final Log         LOG            = ExoLogger.getLogger(JPAWebNotificationStorage.class);
 
   private final UserSettingService userSettingService;
 
@@ -38,7 +28,7 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
 
   private WebUsersDAO              webUsersDAO;
 
-  private static final String      NTF_NAME_SPACE        = "ntf:";
+  private static final String      NTF_NAME_SPACE = "ntf:";
 
   public JPAWebNotificationStorage(WebNotifDAO webNotifDAO,
                                    WebParamsDAO webParamsDAO,
@@ -128,7 +118,7 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
       webUsersDAO.delete(webUsersEntity);
     }
     removed = notifEntities.size() > 0;
-    if(removed) {
+    if (removed) {
       for (WebNotifEntity webNotifEntity : notifEntities) {
         webParamsDAO.deleteAll(new ArrayList<>(webNotifEntity.getParameters()));
       }
@@ -191,9 +181,9 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   public NotificationInfo getUnreadNotification(String pluginId, String activityId, String userId) {
     List<WebUsersEntity> list = webUsersDAO.findUnreadNotification(pluginId, userId, "activityId", activityId);
 
-    if (list.size() > 0) {
+    if (!list.isEmpty()) {
       WebUsersEntity webUsersNotification = list.get(0);
-      return EntityConverter.convertWebNotifEntityToNotificationInfo(webUsersNotification);
+      return convertWebNotifEntityToNotificationInfo(webUsersNotification);
     }
     return null;
   }
@@ -323,5 +313,38 @@ public class JPAWebNotificationStorage implements WebNotificationStorage {
   @ExoTransactional
   private WebUsersEntity getWebNotification(Long notificationId) {
     return webUsersDAO.find(notificationId);
+  }
+
+  /**
+   * Convert user web notification entity to notification DTO
+   * 
+   * @param webUsersEntity user web notification
+   * @return notification DTO
+   */
+  public NotificationInfo convertWebNotifEntityToNotificationInfo(WebUsersEntity webUsersEntity) {
+    NotificationInfo notificationInfo = new NotificationInfo();
+    WebNotifEntity notification = webUsersEntity.getNotification();
+
+    notificationInfo.setLastModifiedDate(webUsersEntity.getUpdateDate());
+
+    Set<WebParamsEntity> parameters = notification.getParameters();
+    Map<String, String> ownerParameters =
+                                        parameters.stream()
+                                                  .collect(Collectors.toMap(WebParamsEntity::getName,
+                                                                            value -> value.getValue() == null ? ""
+                                                                                                              : value.getValue()));
+    ownerParameters.put(NotificationMessageUtils.READ_PORPERTY.getKey(), String.valueOf(webUsersEntity.isRead()));
+    notificationInfo.setOwnerParameter(ownerParameters);
+
+    notificationInfo.key(new PluginKey(notification.getType()));
+    notificationInfo.setTitle(notification.getText());
+    notificationInfo.setFrom(notification.getSender());
+    notificationInfo.to(webUsersEntity.getReceiver());
+    notificationInfo.setRead(webUsersEntity.isRead());
+    notificationInfo.setOnPopOver(webUsersEntity.isShowPopover());
+    notificationInfo.setResetOnBadge(webUsersEntity.isResetNumberOnBadge());
+    notificationInfo.setDateCreated(notification.getCreationDate());
+    notificationInfo.setId(String.valueOf(webUsersEntity.getId()));
+    return notificationInfo;
   }
 }

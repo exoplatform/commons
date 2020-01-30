@@ -17,8 +17,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 
-@ConfiguredBy({ @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/configuration.xml"),
-    @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/standalone/test-jpa-configuration.xml") })
 public class ExoTransactionalAnnotationTest extends BaseTest {
   @Override
   public void setUp() {
@@ -116,8 +114,8 @@ public class ExoTransactionalAnnotationTest extends BaseTest {
 
   @Test
   public void testMultipleTransactions() {
-    PortalContainer container = PortalContainer.getInstance();
-    EntityManagerService entityManagerService = container.getComponentInstanceOfType(EntityManagerService.class);
+    PortalContainer container = getContainer();
+    EntityManagerService entityManagerService = getContainer().getComponentInstanceOfType(EntityManagerService.class);
     entityManagerService.startRequest(container);
 
     // Given
@@ -190,9 +188,9 @@ public class ExoTransactionalAnnotationTest extends BaseTest {
 
   @Test
   public void testRequestLifeCycle() {
+    PortalContainer container = getContainer();
     // Given
-    PortalContainer container = PortalContainer.getInstance();
-    EntityManagerService service = container.getComponentInstanceOfType(EntityManagerService.class);
+    EntityManagerService service = getContainer().getComponentInstanceOfType(EntityManagerService.class);
     service.startRequest(container);
     TaskDao dao = new TaskDao();
     int initialSize = dao.findAll().size();
@@ -223,7 +221,7 @@ public class ExoTransactionalAnnotationTest extends BaseTest {
   @Test
   public void test_ifRollbackPreviousTransaction_noErrorToCommitNextTransaction() {
     // Given
-    PortalContainer container = PortalContainer.getInstance();
+    PortalContainer container = getContainer();
     EntityManagerService service = container.getComponentInstanceOfType(EntityManagerService.class);
     service.startRequest(container);
 

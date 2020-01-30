@@ -699,13 +699,17 @@ public class ElasticIndexingOperationProcessor extends IndexingOperationProcesso
 
   @Override
   public void start() {
-    String esVersion = elasticIndexingClient.sendGetESVersion();
-    if (esVersion == null || !esVersion.startsWith(this.esVersion + ".")) {
-      LOG.error("Expected Version of ES version is " + this.esVersion + " but was " + esVersion
-          + ". If this is a compatible version, you can configure 'exo.es.version.minor' to delete this error message.");
+    try {
+      String esVersion = elasticIndexingClient.sendGetESVersion();
+      if (esVersion == null || !esVersion.startsWith(this.esVersion + ".")) {
+        LOG.error("Expected Version of ES version is " + this.esVersion + " but was " + esVersion
+            + ". If this is a compatible version, you can configure 'exo.es.version.minor' to delete this error message.");
+      }
+      // ES index and type need to be created for all registered connectors
+      initConnectors();
+    } catch (Exception e) {
+      LOG.error("Error while initializing ES connectors", e);
     }
-    // ES index and type need to be created for all registered connectors
-    initConnectors();
   }
 
   @Override

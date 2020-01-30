@@ -25,10 +25,10 @@
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
   <import>war:/conf/commons-extension/cometd-configuration.xml</import>
   <import>war:/conf/commons-extension/common-configuration.xml</import>
-  <import>war:/conf/commons-extension/jcr-ext-configuration.xml</import>
-  <import>war:/conf/commons-extension/upgrade-configuration.xml</import>
   <import>war:/conf/commons-extension/webui-configuration.xml</import>
   <import>war:/conf/commons-extension/css-class-configuration.xml</import>
   <import>war:/conf/commons-extension/notification-configuration.xml</import>
-  <import>war:/conf/commons-extension/jcr/jcr-configuration.xml</import>
+  <import>war:/conf/commons-extension/account-setup-configuration.xml</import>
+  <import>war:/conf/commons-extension/setup-menu-configuration.xml</import>
+  <import>war:/conf/commons-extension/resource-bundle-configuration.xml</import>
 </configuration>

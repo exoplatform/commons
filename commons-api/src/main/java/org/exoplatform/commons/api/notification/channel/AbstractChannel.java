@@ -16,6 +16,8 @@
  */
 package org.exoplatform.commons.api.notification.channel;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
 import org.exoplatform.commons.api.notification.channel.template.PluginTemplateBuilderAdapter;
@@ -26,7 +28,6 @@ import org.exoplatform.commons.api.notification.model.ChannelKey;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.container.component.BaseComponentPlugin;
-import org.jboss.util.Strings;
 
 /**
  * Created by The eXo Platform SAS
@@ -106,7 +107,7 @@ public abstract class AbstractChannel extends BaseComponentPlugin {
    * @param key the plugin key
    */
   public String getTemplateFilePath(PluginKey key) {
-    return Strings.EMPTY;
+    return StringUtils.EMPTY;
   }
   
   /**

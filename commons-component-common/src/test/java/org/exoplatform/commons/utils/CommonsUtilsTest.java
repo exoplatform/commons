@@ -17,7 +17,6 @@
 package org.exoplatform.commons.utils;
 
 import org.exoplatform.commons.testing.BaseCommonsTestCase;
-import org.exoplatform.services.jcr.RepositoryService;
 
 public class CommonsUtilsTest extends BaseCommonsTestCase {
 
@@ -32,12 +31,7 @@ public class CommonsUtilsTest extends BaseCommonsTestCase {
     super.tearDown();
     System.setProperty(CommonsUtils.CONFIGURED_DOMAIN_URL_KEY, "http://localhost:8080");
   }
-  
-  public void testGetService() {
-    RepositoryService service = CommonsUtils.getService(RepositoryService.class);
-    assertNotNull(service);
-  }
-  
+
   public void testGetRestContextName() {
     assertEquals("rest", CommonsUtils.getRestContextName());
   }
@@ -50,17 +44,7 @@ public class CommonsUtilsTest extends BaseCommonsTestCase {
       assertEquals("Get the domain is unsuccessfully. Please, add configuration domain on " +
       "configuration.properties file with key: " + CommonsUtils.CONFIGURED_DOMAIN_URL_KEY, e.getMessage());
     }
-    // Standalone
     System.setProperty(CommonsUtils.CONFIGURED_DOMAIN_URL_KEY, "http://exoplatfom.com");
-    //
     assertEquals("http://exoplatfom.com", CommonsUtils.getCurrentDomain());
-
-    // Multiple tenant
-    System.setProperty(CommonsUtils.CONFIGURED_DOMAIN_URL_KEY, "http://exoplatfom.net");
-    System.setProperty(CommonsUtils.CONFIGURED_TENANT_MASTER_HOST_KEY, "exoplatfom.net");
-    //
-    assertEquals("http://repository.exoplatfom.net", CommonsUtils.getCurrentDomain());
-    //
-    System.clearProperty(CommonsUtils.CONFIGURED_TENANT_MASTER_HOST_KEY);
   }
 }
