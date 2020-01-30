@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Commons Search</name>
   <properties>
-    <exo.test.coverage.ratio>0.43</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.44</exo.test.coverage.ratio>
   </properties>
   <dependencies>
     <!-- PLF dependencies -->

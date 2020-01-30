@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
   <name>eXo PLF:: Commons - Testing</name>
   <properties>
-    <exo.test.coverage.ratio>0.40</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.28</exo.test.coverage.ratio>
   </properties>
   <dependencies>
     <!-- Required by exo.kernel.container for tests purpose -->

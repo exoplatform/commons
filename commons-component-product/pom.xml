@@ -12,7 +12,7 @@
   <name>eXo PLF:: Commons - Product Informations</name>
   <description>Product informations: version, revision and build numbers</description>
   <properties>
-    <exo.test.coverage.ratio>0.66</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.08</exo.test.coverage.ratio>
   </properties>
   <dependencies>
     <dependency>
