@@ -14,41 +14,39 @@
 		<key>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceDelegate</key>
 		<type>org.exoplatform.ws.frameworks.cometd.transport.ContinuationServiceLocalDelegate</type>
 	</component>
-	<!-- 
- <component>
-  <type>org.exoplatform.ws.frameworks.cometd.transport.RESTContinuationService</type>
- </component>
- <component>
-  <type>org.exoplatform.ws.frameworks.cometd.loadbalancer.RESTLoadBalancerService</type>
- </component>
- <component> 
-  <key>org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancer</key>
-  <type>org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancerImpl</type>
-  <init-params>
-  <object-param>
-  <name>cometd.lb.configuration</name>
-  <description>cometd lb nodes</description>
-  <object type="org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancerImpl$LoadBalancerConf">
-   <field name="nodes">
-    <collection type="java.util.ArrayList">
-     <value>
-      <object type="org.exoplatform.ws.frameworks.cometd.loadbalancer.Node">
-       <field name="id">
-        <string>1</string>
-       </field>
-       <field name="url">
-        <string>http://localhost:8081</string>
-       </field>
-       <field name="maxConnection">
-        <int>10000</int>
-       </field>
-      </object>
-     </value>
-    </collection>
-   </field>
-  </object>
- </object-param>
-</init-params>
- </component>
- -->
+	 <component>
+	  <type>org.exoplatform.ws.frameworks.cometd.transport.RESTContinuationService</type>
+	 </component>
+	 <!--<component>
+	  <type>org.exoplatform.ws.frameworks.cometd.loadbalancer.RESTLoadBalancerService</type>
+	 </component>
+	 <component>
+	  <key>org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancer</key>
+	  <type>org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancerImpl</type>
+	  <init-params>
+	  <object-param>
+	  <name>cometd.lb.configuration</name>
+	  <description>cometd lb nodes</description>
+	  <object type="org.exoplatform.ws.frameworks.cometd.loadbalancer.LoadBalancerImpl$LoadBalancerConf">
+	   <field name="nodes">
+		<collection type="java.util.ArrayList">
+		 <value>
+		  <object type="org.exoplatform.ws.frameworks.cometd.loadbalancer.Node">
+		   <field name="id">
+			<string>1</string>
+		   </field>
+		   <field name="url">
+			<string>http://localhost:8081</string>
+		   </field>
+		   <field name="maxConnection">
+			<int>10000</int>
+		   </field>
+		  </object>
+		 </value>
+		</collection>
+	   </field>
+	  </object>
+	 </object-param>
+	</init-params>
+	 </component>-->
 </configuration>
