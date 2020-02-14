@@ -150,7 +150,7 @@ public class NotificationsAdministration {
     JSON data = new JSON();
     data.set("name", name);
     data.set("email", email);
-    if (name != null && name.length() > 0 && NotificationUtils.isValidEmailAddresses(email)) {
+    if (name != null && name.length() > 0 && NotificationUtils.isValidNotificationSenderName(name) && NotificationUtils.isValidEmailAddresses(email)) {
       settingService.set(org.exoplatform.commons.api.settings.data.Context.GLOBAL,
                          Scope.GLOBAL,
                          MailUtils.SENDER_NAME_PARAM,
@@ -160,6 +160,10 @@ public class NotificationsAdministration {
                          MailUtils.SENDER_EMAIL_PARAM,
                          SettingValue.create(email));
       data.set("status", "OK");
+    } else if (!NotificationUtils.isValidNotificationSenderName(name))  {
+      data.set("status", "NameNOK");
+    } else if (!NotificationUtils.isValidEmailAddresses(email)) {
+      data.set("status", "EmailNOK");
     } else {
       data.set("status", "NOK");
     }

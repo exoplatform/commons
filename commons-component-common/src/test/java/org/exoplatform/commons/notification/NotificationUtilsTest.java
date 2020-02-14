@@ -56,6 +56,42 @@ public class NotificationUtilsTest extends TestCase {
     actual = NotificationUtils.getLocale(language);
     assertEquals(new Locale("pt", "BR", "BR"), actual);
   }
+
+  public void testIsValidNotificationSenderName() {
+    String senderName = "";
+    // senderName is empty
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName contains only spaces
+    senderName = "    ";
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName starts with space(s) and contain letters and numbers
+    senderName = "    test123456";
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName contains special characters
+    senderName = "test12, 34 56; test";
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName contains only numbers
+    senderName = "123456";
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName starts with number
+    senderName = "123 test 456";
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName contains only numbers and spaces
+    senderName = "123 45 6";
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName contains letters and numbers
+    senderName = "test123456";
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName contains letters, spaces & numbers
+    senderName = "test12 34 56 test";
+    assertFalse(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName contains only letters
+    senderName = "test";
+    assertTrue(NotificationUtils.isValidNotificationSenderName(senderName));
+    // senderName contains only letters and spaces
+    senderName = "test  test";
+    assertTrue(NotificationUtils.isValidNotificationSenderName(senderName));
+  }
   
   public void testIsValidEmailAddresses() {
     String emails = "";

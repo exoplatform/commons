@@ -58,6 +58,8 @@ public class NotificationUtils {
   private static final Pattern LINK_PATTERN = Pattern.compile("<a ([^>]+)>([^<]+)</a>");
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile("^[_a-zA-Z0-9-+]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*(\\.[a-zA-Z]{2,})$");
+
+  private static final Pattern NOTIFICATION_SENDER_NAME_PATTERN = Pattern.compile("^[a-zA-Z]+[a-zA-Z ]*$");
   
   private static final String styleCSS = " style=\"color: #2f5e92; text-decoration: none;\"";
   
@@ -197,7 +199,19 @@ public class NotificationUtils {
   public static int getSystemValue(InitParams params, String systemKey, String paramKey, int defaultValue) {
     return Integer.valueOf(getSystemValue(params, systemKey, paramKey, String.valueOf(defaultValue)));
   }
-  
+
+  public static boolean isValidNotificationSenderName(String name){
+    if (name == null || name.length() < 0)
+      return false;
+    try {
+        Matcher matcher = NOTIFICATION_SENDER_NAME_PATTERN.matcher(name.trim());
+        if (! matcher.find()) return false;
+      } catch (Exception e) {
+      return false;
+    }
+    return true;
+  }
+
   public static boolean isValidEmailAddresses(String addressList){
     if (addressList == null || addressList.length() < 0)
       return false;
