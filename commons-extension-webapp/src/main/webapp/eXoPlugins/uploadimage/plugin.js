@@ -119,7 +119,6 @@
 
 					var img = new CKEDITOR.dom.element( 'img' );
 					img.setAttribute( 'src', loadingImage );
-          img.setAttribute( 'align', "left" );
 					return img;
 				},
 
@@ -137,7 +136,7 @@
 				},
 
 				onUploaded: function( upload ) {
-					this.replaceWith( '<img src="' + upload.url + '" align="left" />' );
+					this.replaceWith( '<img src="' + upload.url + '" />' );
 					if(editor.resizeEditor) {
 					  editor.resizeEditor();
 					} else if(editor.resize) {
