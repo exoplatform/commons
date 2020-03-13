@@ -81,7 +81,8 @@
     <title>Login</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>   
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
+      <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
+      <link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
     <link href="<%=loginCssPath%>" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="/eXoResources/javascript/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="/commons-extension/javascript/switch-button.js"></script>

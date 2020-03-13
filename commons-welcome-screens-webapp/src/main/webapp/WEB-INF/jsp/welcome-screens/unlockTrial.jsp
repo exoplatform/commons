@@ -35,7 +35,8 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title><%=rb.getString("UnlockTrial.label.welcome")%></title>
-		<link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />	
+		<link rel="shortcut icon" type="image/x-icon"  href="<%=contextPath%>/favicon.ico" />
+        <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
 		<link rel="stylesheet" type="text/css" href="<%=coreCssPath%>"/>
 		<link rel="stylesheet" type="text/css" href="<%=customCssPath%>"/>
 		<link rel="stylesheet" type="text/css" href="<%=trialCssPath%>"/>

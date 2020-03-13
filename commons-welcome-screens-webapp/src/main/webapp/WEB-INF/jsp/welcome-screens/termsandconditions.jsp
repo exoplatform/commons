@@ -46,7 +46,7 @@
 		<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 		<title>eXo Subscription Agreement</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
+        <link id="brandingSkin" rel="stylesheet" type="text/css" href="/rest/v1/platform/branding/css">
 		<link href="<%=cssPath%>" rel="stylesheet" type="text/css"/>
 	</head>
 	<body>
