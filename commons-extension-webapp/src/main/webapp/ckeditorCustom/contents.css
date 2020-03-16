@@ -3,6 +3,8 @@ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 
+@import "/rest/v1/platform/branding/css";
+
 @font-face {
 	font-family: 'PLF-FONT-ICONS';
 	src: url('/eXoSkin/skin/fonts/PLF-FONT-ICONS.eot?-m9uidt');
