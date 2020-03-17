@@ -39,6 +39,7 @@ import org.exoplatform.services.log.Log;
  * @version $Revision$
  */
 public class ProductInformations implements Startable {
+
   public static final String  PRODUCT_INFORMATION                   = "ProductInformation";
 
   public static final String  ENTERPRISE_EDITION                    = "ENTERPRISE";

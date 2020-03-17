@@ -18,8 +18,6 @@
  */
 package org.exoplatform.commons.info;
 
-import java.lang.reflect.Method;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
@@ -31,7 +29,6 @@ import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
-import org.exoplatform.software.register.Utils;
 
 /**
  * @author <a href="mailto:anouar.chattouna@exoplatform.com">Anouar
@@ -110,15 +107,11 @@ public class PlatformInformationRESTService implements ResourceContainer {
       jsonPlatformInfo.setIsMobileCompliant(isMobileCompliant().toString());
       jsonPlatformInfo.setRunningProfile(runningProfile);
       jsonPlatformInfo.setPlatformEdition(getPlatformEdition());
-      if ((platformInformations.getEdition() != null) && (!platformInformations.getEdition().equals(""))) {
-        jsonPlatformInfo.setDuration(platformInformations.getDuration());
-        jsonPlatformInfo.setDateOfKeyGeneration(platformInformations.getDateOfLicence());
-        jsonPlatformInfo.setNbUsers(platformInformations.getNumberOfUsers());
-        jsonPlatformInfo.setProductCode(platformInformations.getProductCode());
-        jsonPlatformInfo.setUnlockKey(platformInformations.getProductKey());
-      } else {
-        jsonPlatformInfo.setProductCode(Utils.readFromFile(Utils.PRODUCT_CODE, Utils.HOME_CONFIG_FILE_LOCATION));
-      }
+      jsonPlatformInfo.setDuration(platformInformations.getDuration());
+      jsonPlatformInfo.setDateOfKeyGeneration(platformInformations.getDateOfLicence());
+      jsonPlatformInfo.setNbUsers(platformInformations.getNumberOfUsers());
+      jsonPlatformInfo.setProductCode(platformInformations.getProductCode());
+      jsonPlatformInfo.setUnlockKey(platformInformations.getProductKey());
       if (LOG.isDebugEnabled()) {
         LOG.debug("Getting Platform Informations: eXo Platform (v" + platformInformations.getVersion() + " - build "
             + platformInformations.getBuildNumber() + " - rev. " + platformInformations.getRevision());

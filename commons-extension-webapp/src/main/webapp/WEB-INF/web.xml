@@ -48,12 +48,6 @@
   </servlet>
 
   <servlet>
-    <servlet-name>PingBackServlet</servlet-name>
-    <servlet-class>org.exoplatform.account.setup.web.PingBackServlet</servlet-class>
-    <load-on-startup>0</load-on-startup>
-  </servlet>
-
-  <servlet>
     <servlet-name>accountSetupViewServlet</servlet-name>
     <servlet-class>org.exoplatform.account.setup.web.AccountSetupViewServlet</servlet-class>
   </servlet>
@@ -66,11 +60,6 @@
   <servlet-mapping>
     <servlet-name>accountSetupViewServlet</servlet-name>
     <url-pattern>/accountSetup</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>PingBackServlet</servlet-name>
-    <url-pattern>/PingBackServlet</url-pattern>
   </servlet-mapping>
 
   <absolute-ordering/>
