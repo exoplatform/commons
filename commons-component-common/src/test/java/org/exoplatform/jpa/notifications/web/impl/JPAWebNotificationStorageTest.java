@@ -105,6 +105,8 @@ public class JPAWebNotificationStorageTest extends BaseNotificationTestCase {
     got = makeWebNotificationInfo(userId);
     got.setTitle("new title");
     got.setId(info.getId());
+    // wait 1 millisecond to not have same updated timestamp
+    Thread.sleep(1);
     webNotificationStorage.update(got, true);
     restartTransaction();
 

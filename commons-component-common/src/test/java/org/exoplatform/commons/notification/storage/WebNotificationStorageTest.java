@@ -77,6 +77,8 @@ public class WebNotificationStorageTest extends BaseNotificationTestCase {
     got = makeWebNotificationInfo(userId);
     got.setId(notifId);
     got.setTitle("new title");
+    // wait 1 millisecond to not have same updated timestamp
+    Thread.sleep(1);
     storage.update(got, true);
     restartTransaction();
 
