@@ -31,8 +31,6 @@ public class AccountSetup extends HttpServlet {
 
   private final static String ADMIN_PASSWORD        = "adminPassword";
 
-  private final static String INTRANET_HOME         = "/portal/intranet";
-
   private final static String INITIAL_URI_PARAM     = "initialURI";
 
   private final static String ACCOUNT_SETUP_BUTTON  = "setupbutton";
@@ -73,7 +71,7 @@ public class AccountSetup extends HttpServlet {
 
       // Redirect to requested page
       redirectURI = "/" + PortalContainer.getCurrentPortalContainerName() + "/login?" + "username="
-          + URLEncoder.encode(userNameAccount, "UTF-8") + "&password=" + userPasswordAccount + "&initialURI=" + INTRANET_HOME;
+          + URLEncoder.encode(userNameAccount, "UTF-8") + "&password=" + userPasswordAccount;
     }
     response.setCharacterEncoding("UTF-8");
     response.sendRedirect(redirectURI);

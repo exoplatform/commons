@@ -34,7 +34,6 @@ public class CommonsUtils {
 
 	public static final String CONFIGURED_TENANT_MASTER_HOST_KEY = "tenant.masterhost";
 	public static final String CONFIGURED_DOMAIN_URL_KEY = "gatein.email.domain.url";
-	public static final String DEFAULT_SITE = "intranet";
 
   public static OrganizationService getOrganizationService(){
     return (OrganizationService)ExoContainerContext.getCurrentContainer().getComponentInstance(OrganizationService.class) ;
@@ -200,11 +199,7 @@ public class CommonsUtils {
       return pContext.getPortalOwner();
     } else {
       UserPortalConfigService portalConfig = getService(UserPortalConfigService.class);
-      if (portalConfig != null) {
-        return portalConfig.getDefaultPortal();
-      } else {
-        return DEFAULT_SITE;
-      }
+      return portalConfig.getDefaultPortal();
     }
   }
 
@@ -223,11 +218,7 @@ public class CommonsUtils {
         return pContext.getSiteKey();
       } else {
         UserPortalConfigService portalConfig = getService(UserPortalConfigService.class);
-        if (portalConfig != null) {
-          return SiteKey.portal(portalConfig.getDefaultPortal());
-        } else {
-          return SiteKey.portal(DEFAULT_SITE);
-        }
+        return SiteKey.portal(portalConfig.getDefaultPortal());
       }
     }
 

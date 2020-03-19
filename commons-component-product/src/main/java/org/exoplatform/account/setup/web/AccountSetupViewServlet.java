@@ -11,7 +11,6 @@ import org.exoplatform.container.PortalContainer;
  * @author <a href="fbradai@exoplatform.com">Fbradai</a>
  */
 public class AccountSetupViewServlet extends HttpServlet {
-  private final static String INTRANET_HOME_PAGE = "/portal/intranet";
 
   private final static String AS_JSP_RESOURCE    = "/WEB-INF/jsp/welcome-screens/accountSetup.jsp";
 
@@ -22,7 +21,7 @@ public class AccountSetupViewServlet extends HttpServlet {
     accountSetupService = PortalContainer.getInstance().getComponentInstanceOfType(AccountSetupService.class);
 
     if (accountSetupService.mustSkipAccountSetup()) {
-      response.sendRedirect(INTRANET_HOME_PAGE);
+      response.sendRedirect("/");
     } else {
       getServletContext().getRequestDispatcher(AS_JSP_RESOURCE).forward(request, response);
     }
