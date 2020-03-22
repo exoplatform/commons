@@ -199,7 +199,7 @@ public class CommonsUtils {
       return pContext.getPortalOwner();
     } else {
       UserPortalConfigService portalConfig = getService(UserPortalConfigService.class);
-      return portalConfig.getDefaultPortal();
+      return portalConfig == null ? null : portalConfig.getDefaultPortal();
     }
   }
 
@@ -218,7 +218,7 @@ public class CommonsUtils {
         return pContext.getSiteKey();
       } else {
         UserPortalConfigService portalConfig = getService(UserPortalConfigService.class);
-        return SiteKey.portal(portalConfig.getDefaultPortal());
+        return portalConfig == null ? null : SiteKey.portal(portalConfig.getDefaultPortal());
       }
     }
 
