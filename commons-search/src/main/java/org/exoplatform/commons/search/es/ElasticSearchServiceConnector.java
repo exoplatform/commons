@@ -36,6 +36,7 @@ import org.json.simple.parser.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by The eXo Platform SAS
@@ -155,8 +156,6 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   }
 
   protected String buildFilteredQuery(String query, Collection<String> sites, List<ElasticSearchFilter> filters, int offset, int limit, String sort, String order) {
-    String escapedQuery = escapeReservedCharacters(query);
-
     StringBuilder esQuery = new StringBuilder();
     esQuery.append("{\n");
     esQuery.append("     \"from\" : " + offset + ",\n");
@@ -167,18 +166,31 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     //https://www.impl.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_track_scores
     esQuery.append("     \"track_scores\": true,\n");
     esQuery.append("     \"sort\" : [\n");
-    esQuery.append("       { \"" + (StringUtils.isNotBlank(sortMapping.get(sort))?sortMapping.get(sort):"_score") + "\" : ");
+    esQuery.append("       { \"" + (StringUtils.isNotBlank(sortMapping.get(sort)) ? sortMapping.get(sort) : "_score") + "\" : ");
     esQuery.append(             "{\"order\" : \"" + (StringUtils.isNotBlank(order)?order:"desc") + "\"}}\n");
     esQuery.append("     ],\n");
     esQuery.append("     \"_source\": [" + getSourceFields() + "],");
     esQuery.append("     \"query\": {\n");
     esQuery.append("        \"bool\" : {\n");
-    esQuery.append("            \"must\" : {\n");
-    esQuery.append("                \"query_string\" : {\n");
-    esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
-    esQuery.append("                    \"query\" : \"" + escapedQuery + "\"\n");
-    esQuery.append("                }\n");
-    esQuery.append("            },\n");
+    if (StringUtils.isNotBlank(query)) {
+      String escapedQuery = escapeReservedCharacters(query);
+      esQuery.append("            \"must\" : {\n");
+      esQuery.append("                \"query_string\" : {\n");
+      esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
+      esQuery.append("                    \"query\" : \"" + escapedQuery + "\",\n");
+      esQuery.append("                    \"fuzziness\" : 0.5,\n");
+      esQuery.append("                    \"minimum_should_match\" : \"90%\"\n");
+      esQuery.append("                }\n");
+      esQuery.append("            },\n");
+      esQuery.append("            \"should\" : {\n");
+      esQuery.append("                \"multi_match\" : {\n");
+      esQuery.append("                    \"type\" : \"phrase\",\n");
+      esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
+      esQuery.append("                    \"boost\" : 5,\n");
+      esQuery.append("                    \"query\" : \"" + escapedQuery + "\"\n");
+      esQuery.append("                }\n");
+      esQuery.append("            },\n");
+    }
     esQuery.append("            \"filter\" : {\n");
     esQuery.append("              \"bool\" : {\n");
     esQuery.append("                \"must\" : [\n");
@@ -209,13 +221,14 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     esQuery.append("        }\n");
     esQuery.append("     },\n");
     esQuery.append("     \"highlight\" : {\n");
-    esQuery.append("       \"pre_tags\" : [\"<strong>\"],\n");
-    esQuery.append("       \"post_tags\" : [\"</strong>\"],\n");
+    esQuery.append("       \"pre_tags\" : [\"<span class='searchMatchExcerpt'>\"],\n");
+    esQuery.append("       \"post_tags\" : [\"</span>\"],\n");
     esQuery.append("       \"fields\" : {\n");
     for (int i=0; i<this.searchFields.size(); i++) {
       esQuery.append("         \""+searchFields.get(i)+"\" : {\n")
               .append("          \"type\" : \"unified\",\n")
               .append("          \"fragment_size\" : " + this.highlightFragmentSize + ",\n")
+              .append("          \"no_match_size\" : 0,\n")
               .append("          \"number_of_fragments\" : " + this.highlightFragmentNumber + "}");
       if (i<this.searchFields.size()-1) {
         esQuery.append(",");
@@ -287,15 +300,20 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     String detail = buildDetail(jsonHit, searchContext);
     //Get the excerpt
     JSONObject hitHighlight = (JSONObject) jsonHit.get("highlight");
+    Map<String, List<String>> excerpts = new HashMap<>();
     StringBuilder excerpt = new StringBuilder();
     if(hitHighlight != null) {
       Iterator<?> keys = hitHighlight.keySet().iterator();
       while (keys.hasNext()) {
         String key = (String) keys.next();
         JSONArray highlights = (JSONArray) hitHighlight.get(key);
-        for (Object highlight : highlights) {
-          excerpt.append("... ").append(highlight);
-        }
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        List<String> excerptsList = (List<String>) ((ArrayList) highlights).stream() // NOSONAR
+                                                                           .map(Object::toString)
+                                                                           .collect(Collectors.toList());
+        excerpts.put(key, excerptsList);
+        excerpt.append("... ").append(StringUtils.join(excerptsList, "..."));
       }
     }
 
@@ -304,6 +322,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     return new SearchResult(
             url,
             title,
+            excerpts,
             excerpt.toString(),
             detail,
             img,

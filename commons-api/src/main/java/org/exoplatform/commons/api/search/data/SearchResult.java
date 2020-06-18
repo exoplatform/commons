@@ -1,5 +1,8 @@
 package org.exoplatform.commons.api.search.data;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Search result returned by SearchService and all of its connectors, for rendering their search results on UI in a unified format.
  *   
@@ -10,11 +13,20 @@ public class SearchResult {
   private String previewUrl;  //preview url of this result
   private String title; //title to be displayed on UI
   private String excerpt; //the excerpt to be displayed on UI
+  private Map<String, List<String>> excerpts; //the excerpts by field and the corresponding list of excerpts
   private String detail; //details information
   private String imageUrl; //an image to be displayed on UI
   private long date; //created or modified date, for sorting on UI
   private long relevancy; //the result's relevancy, for sorting on UI
-  
+
+  public Map<String, List<String>> getExcerpts() {
+    return excerpts;
+  }
+
+  public void setExcerpts(Map<String, List<String>> excerpts) {
+    this.excerpts = excerpts;
+  }
+
   /**
    * Get url of result 
    * @return String
@@ -186,6 +198,18 @@ public class SearchResult {
   public SearchResult(String url, String previewUrl, String title, String excerpt, String detail, String imageUrl, long date, long relevancy) {
     this(url, title, excerpt, detail, imageUrl, date, relevancy);
     this.previewUrl = previewUrl;
+  }
+
+  public SearchResult(String url,
+                      String title,
+                      Map<String, List<String>> excerpts,
+                      String excerpt,
+                      String detail,
+                      String imageUrl,
+                      Long date,
+                      long relevancy) {
+    this(url, title, excerpt, detail, imageUrl, date, relevancy);
+    this.excerpts = excerpts;
   }
 
   @Override
