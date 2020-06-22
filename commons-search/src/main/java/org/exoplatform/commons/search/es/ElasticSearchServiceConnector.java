@@ -48,7 +48,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   private static final Log LOG = ExoLogger.getLogger(ElasticSearchServiceConnector.class);
 
   public static final String HIGHLIGHT_FRAGMENT_SIZE_PARAM_NAME = "highlightFragmentSize";
-  public static final int HIGHLIGHT_FRAGMENT_SIZE_DEFAULT_VALUE = 150;
+  public static final int HIGHLIGHT_FRAGMENT_SIZE_DEFAULT_VALUE = 100;
   public static final String HIGHLIGHT_FRAGMENT_NUMBER_PARAM_NAME = "highlightFragmentNumber";
   public static final int HIGHLIGHT_FRAGMENT_NUMBER_DEFAULT_VALUE = 3;
 
@@ -61,6 +61,8 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   //Type is optional: if null, search on all the index
   private String type;
   private List<String> searchFields;
+  private List<String> boostedSearchFields;
+  private List<String> searchFieldsWithBoost;
 
   public int highlightFragmentSize;
   public int highlightFragmentNumber;
@@ -81,6 +83,23 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     if (StringUtils.isNotBlank(param.getProperty("titleField"))) this.titleElasticFieldName = param.getProperty("titleField");
     if (StringUtils.isNotBlank(param.getProperty("updatedDateField"))) this.updatedDateElasticFieldName = param.getProperty("updatedDateField");
     this.searchFields = new ArrayList<>(Arrays.asList(param.getProperty("searchFields").split(",")));
+    if (StringUtils.isBlank(param.getProperty("boostedSearchFields"))) {
+      if (this.searchFields.contains(this.titleElasticFieldName)) {
+        this.boostedSearchFields = Collections.singletonList(this.titleElasticFieldName);
+      }
+    } else {
+      this.boostedSearchFields = new ArrayList<>(Arrays.asList(param.getProperty("boostedSearchFields").split(",")));;
+    }
+    if (this.boostedSearchFields != null && !this.boostedSearchFields.isEmpty()) {
+      this.searchFieldsWithBoost = this.searchFields.stream().map(searchField -> {
+        if (this.boostedSearchFields.contains(searchField)) {
+          searchField = searchField + "^5"; // Boost 5
+        }
+        return searchField;
+      }).collect(Collectors.toList());
+    } else {
+      this.searchFieldsWithBoost = this.searchFields;
+    }
 
     // highlight fragment size
     String highlightFragmentSizeParamValue = param.getProperty(HIGHLIGHT_FRAGMENT_SIZE_PARAM_NAME);
@@ -148,7 +167,6 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     String esQuery = buildFilteredQuery(query, sites, filters, offset, limit, sort, order);
     String jsonResponse = this.client.sendRequest(esQuery, this.index, this.type);
     return buildResult(jsonResponse, context);
-
   }
 
   protected String buildQuery(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
@@ -173,21 +191,19 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     esQuery.append("     \"query\": {\n");
     esQuery.append("        \"bool\" : {\n");
     if (StringUtils.isNotBlank(query)) {
-      String escapedQuery = escapeReservedCharacters(query);
+      List<String> queryParts = Arrays.asList(query.split(" "));
+      queryParts = queryParts.stream().map(queryPart -> {
+        queryPart = this.escapeReservedCharacters(queryPart);
+        if (queryPart.length() > 5) {
+          queryPart = queryPart + "~1";
+        }
+        return queryPart;
+      }).collect(Collectors.toList());
+      String escapedQueryWithAndOperator = StringUtils.join(queryParts, " AND ");
       esQuery.append("            \"must\" : {\n");
       esQuery.append("                \"query_string\" : {\n");
       esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
-      esQuery.append("                    \"query\" : \"" + escapedQuery + "\",\n");
-      esQuery.append("                    \"fuzziness\" : 0.5,\n");
-      esQuery.append("                    \"minimum_should_match\" : \"90%\"\n");
-      esQuery.append("                }\n");
-      esQuery.append("            },\n");
-      esQuery.append("            \"should\" : {\n");
-      esQuery.append("                \"multi_match\" : {\n");
-      esQuery.append("                    \"type\" : \"phrase\",\n");
-      esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
-      esQuery.append("                    \"boost\" : 5,\n");
-      esQuery.append("                    \"query\" : \"" + escapedQuery + "\"\n");
+      esQuery.append("                    \"query\" : \"" + escapedQueryWithAndOperator + "\"\n");
       esQuery.append("                }\n");
       esQuery.append("            },\n");
     }
@@ -432,7 +448,9 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
 
   protected String getFields() {
     List<String> fields = new ArrayList<>();
-    for (String searchField: searchFields) {
+    List<String> fieldsToUse = this.searchFieldsWithBoost != null
+        && !this.searchFieldsWithBoost.isEmpty() ? this.searchFieldsWithBoost : this.searchFields;
+    for (String searchField: fieldsToUse) {
       fields.add("\"" + searchField + "\"");
     }
     return StringUtils.join(fields, ",");
