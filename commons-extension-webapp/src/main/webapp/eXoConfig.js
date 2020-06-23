@@ -18,11 +18,11 @@ CKEDITOR.editorConfig = function( config ){
   CKEDITOR.plugins.addExternal('content','/eXoWCMResources/eXoPlugins/content/','plugin.js');
   CKEDITOR.plugins.addExternal('insertPortalLink','/commons-extension/eXoPlugins/insertPortalLink/','plugin.js');
   CKEDITOR.plugins.addExternal('simpleLink','/commons-extension/eXoPlugins/simpleLink/','plugin.js');
+  CKEDITOR.plugins.addExternal('confirmBeforeReload','/commons-extension/eXoPlugins/confirmBeforeReload/','plugin.js');
   CKEDITOR.plugins.addExternal('acceptInline','/eXoWCMResources/eXoPlugins/acceptInline/','plugin.js');
   CKEDITOR.plugins.addExternal('cancelInline','/eXoWCMResources/eXoPlugins/cancelInline/','plugin.js');
-  CKEDITOR.plugins.addExternal('helpBBCode','/forum/eXoPlugins/helpBBCode/','plugin.js');
 
-	config.extraPlugins = 'content,insertPortalLink,acceptInline,cancelInline,onchange,helpBBCode,syntaxhighlight';
+	config.extraPlugins = 'content,insertPortalLink,acceptInline,cancelInline,onchange,syntaxhighlight,confirmBeforeReload';
 	config.removePlugins = 'scayt,wsc';
 	config.toolbarCanCollapse = false;
 	config.skin = 'moono-exo,/commons-extension/ckeditor/skins/moono-exo/';
@@ -108,14 +108,14 @@ CKEDITOR.editorConfig = function( config ){
 		['Source','Maximize','-','Cut','Copy','PasteText','-','Undo','Redo','-','Bold','Italic','Underline'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
-		['Link','Unlink','-','Blockquote', 'Syntaxhighlight','Smiley','helpBBCode.btn']
+		['Link','Unlink','-','Blockquote', 'Syntaxhighlight','Smiley']
 	] ;
 
 	config.toolbar_FAQ = [
 		['Maximize','-','Cut','Copy','PasteText','-','Undo','Redo','-','Bold','Italic','Underline'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],	
 		['NumberedList','BulletedList','Outdent','Indent','-','TextColor'],
-		['Blockquote', 'Syntaxhighlight','helpBBCode.btn']
+		['Blockquote', 'Syntaxhighlight']
 	] ;
 
 };
