@@ -36,6 +36,7 @@ import org.json.simple.parser.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by The eXo Platform SAS
@@ -47,7 +48,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   private static final Log LOG = ExoLogger.getLogger(ElasticSearchServiceConnector.class);
 
   public static final String HIGHLIGHT_FRAGMENT_SIZE_PARAM_NAME = "highlightFragmentSize";
-  public static final int HIGHLIGHT_FRAGMENT_SIZE_DEFAULT_VALUE = 150;
+  public static final int HIGHLIGHT_FRAGMENT_SIZE_DEFAULT_VALUE = 100;
   public static final String HIGHLIGHT_FRAGMENT_NUMBER_PARAM_NAME = "highlightFragmentNumber";
   public static final int HIGHLIGHT_FRAGMENT_NUMBER_DEFAULT_VALUE = 3;
 
@@ -60,6 +61,8 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   //Type is optional: if null, search on all the index
   private String type;
   private List<String> searchFields;
+  private List<String> boostedSearchFields;
+  private List<String> searchFieldsWithBoost;
 
   public int highlightFragmentSize;
   public int highlightFragmentNumber;
@@ -80,6 +83,23 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     if (StringUtils.isNotBlank(param.getProperty("titleField"))) this.titleElasticFieldName = param.getProperty("titleField");
     if (StringUtils.isNotBlank(param.getProperty("updatedDateField"))) this.updatedDateElasticFieldName = param.getProperty("updatedDateField");
     this.searchFields = new ArrayList<>(Arrays.asList(param.getProperty("searchFields").split(",")));
+    if (StringUtils.isBlank(param.getProperty("boostedSearchFields"))) {
+      if (this.searchFields.contains(this.titleElasticFieldName)) {
+        this.boostedSearchFields = Collections.singletonList(this.titleElasticFieldName);
+      }
+    } else {
+      this.boostedSearchFields = new ArrayList<>(Arrays.asList(param.getProperty("boostedSearchFields").split(",")));;
+    }
+    if (this.boostedSearchFields != null && !this.boostedSearchFields.isEmpty()) {
+      this.searchFieldsWithBoost = this.searchFields.stream().map(searchField -> {
+        if (this.boostedSearchFields.contains(searchField)) {
+          searchField = searchField + "^5"; // Boost 5
+        }
+        return searchField;
+      }).collect(Collectors.toList());
+    } else {
+      this.searchFieldsWithBoost = this.searchFields;
+    }
 
     // highlight fragment size
     String highlightFragmentSizeParamValue = param.getProperty(HIGHLIGHT_FRAGMENT_SIZE_PARAM_NAME);
@@ -119,6 +139,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   @Override
   public Collection<SearchResult> search(SearchContext context, String query, Collection<String> sites,
                                          int offset, int limit, String sort, String order) {
+    query = query.replaceAll("~[0-1]*(\\.[0-1]*)?", "");
     String esQuery = buildQuery(query, sites, offset, limit, sort, order);
     String jsonResponse = this.client.sendRequest(esQuery, this.index, this.type);
     return buildResult(jsonResponse, context);
@@ -147,7 +168,6 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     String esQuery = buildFilteredQuery(query, sites, filters, offset, limit, sort, order);
     String jsonResponse = this.client.sendRequest(esQuery, this.index, this.type);
     return buildResult(jsonResponse, context);
-
   }
 
   protected String buildQuery(String query, Collection<String> sites, int offset, int limit, String sort, String order) {
@@ -155,8 +175,6 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
   }
 
   protected String buildFilteredQuery(String query, Collection<String> sites, List<ElasticSearchFilter> filters, int offset, int limit, String sort, String order) {
-    String escapedQuery = escapeReservedCharacters(query);
-
     StringBuilder esQuery = new StringBuilder();
     esQuery.append("{\n");
     esQuery.append("     \"from\" : " + offset + ",\n");
@@ -167,18 +185,38 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     //https://www.impl.co/guide/en/elasticsearch/reference/current/search-request-sort.html#_track_scores
     esQuery.append("     \"track_scores\": true,\n");
     esQuery.append("     \"sort\" : [\n");
-    esQuery.append("       { \"" + (StringUtils.isNotBlank(sortMapping.get(sort))?sortMapping.get(sort):"_score") + "\" : ");
+    esQuery.append("       { \"" + (StringUtils.isNotBlank(sortMapping.get(sort)) ? sortMapping.get(sort) : "_score") + "\" : ");
     esQuery.append(             "{\"order\" : \"" + (StringUtils.isNotBlank(order)?order:"desc") + "\"}}\n");
     esQuery.append("     ],\n");
     esQuery.append("     \"_source\": [" + getSourceFields() + "],");
     esQuery.append("     \"query\": {\n");
     esQuery.append("        \"bool\" : {\n");
-    esQuery.append("            \"must\" : {\n");
-    esQuery.append("                \"query_string\" : {\n");
-    esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
-    esQuery.append("                    \"query\" : \"" + escapedQuery + "\"\n");
-    esQuery.append("                }\n");
-    esQuery.append("            },\n");
+    if (StringUtils.isNotBlank(query)) {
+      List<String> queryParts = Arrays.asList(query.split(" "));
+      queryParts = queryParts.stream().filter(StringUtils::isNotBlank).map(queryPart -> {
+        queryPart = this.escapeReservedCharacters(queryPart);
+        if (queryPart.length() > 5) {
+          queryPart = queryPart + "~1"; // fuzzy search on big words
+        }
+        return queryPart;
+      }).collect(Collectors.toList());
+      String escapedQueryWithAndOperator = StringUtils.join(queryParts, " AND ");
+      String escapedQueryWithoutOperator = StringUtils.join(queryParts, " ");
+      esQuery.append("            \"must\" : {\n");
+      esQuery.append("                \"query_string\" : {\n");
+      esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
+      esQuery.append("                    \"query\" : \"" + escapedQueryWithAndOperator + "\"\n");
+      esQuery.append("                }\n");
+      esQuery.append("            },\n");
+      esQuery.append("            \"should\" : {\n");
+      esQuery.append("                \"multi_match\" : {\n");
+      esQuery.append("                    \"type\" : \"phrase\",\n");
+      esQuery.append("                    \"fields\" : [" + getFields() + "],\n");
+      esQuery.append("                    \"boost\" : 5,\n");
+      esQuery.append("                    \"query\" : \"" + escapedQueryWithoutOperator + "\"\n");
+      esQuery.append("                }\n");
+      esQuery.append("            },\n");
+    }
     esQuery.append("            \"filter\" : {\n");
     esQuery.append("              \"bool\" : {\n");
     esQuery.append("                \"must\" : [\n");
@@ -209,13 +247,14 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     esQuery.append("        }\n");
     esQuery.append("     },\n");
     esQuery.append("     \"highlight\" : {\n");
-    esQuery.append("       \"pre_tags\" : [\"<strong>\"],\n");
-    esQuery.append("       \"post_tags\" : [\"</strong>\"],\n");
+    esQuery.append("       \"pre_tags\" : [\"<span class='searchMatchExcerpt'>\"],\n");
+    esQuery.append("       \"post_tags\" : [\"</span>\"],\n");
     esQuery.append("       \"fields\" : {\n");
     for (int i=0; i<this.searchFields.size(); i++) {
       esQuery.append("         \""+searchFields.get(i)+"\" : {\n")
               .append("          \"type\" : \"unified\",\n")
               .append("          \"fragment_size\" : " + this.highlightFragmentSize + ",\n")
+              .append("          \"no_match_size\" : 0,\n")
               .append("          \"number_of_fragments\" : " + this.highlightFragmentNumber + "}");
       if (i<this.searchFields.size()-1) {
         esQuery.append(",");
@@ -287,15 +326,20 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     String detail = buildDetail(jsonHit, searchContext);
     //Get the excerpt
     JSONObject hitHighlight = (JSONObject) jsonHit.get("highlight");
+    Map<String, List<String>> excerpts = new HashMap<>();
     StringBuilder excerpt = new StringBuilder();
     if(hitHighlight != null) {
       Iterator<?> keys = hitHighlight.keySet().iterator();
       while (keys.hasNext()) {
         String key = (String) keys.next();
         JSONArray highlights = (JSONArray) hitHighlight.get(key);
-        for (Object highlight : highlights) {
-          excerpt.append("... ").append(highlight);
-        }
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        List<String> excerptsList = (List<String>) ((ArrayList) highlights).stream() // NOSONAR
+                                                                           .map(Object::toString)
+                                                                           .collect(Collectors.toList());
+        excerpts.put(key, excerptsList);
+        excerpt.append("... ").append(StringUtils.join(excerptsList, "..."));
       }
     }
 
@@ -304,6 +348,7 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     return new SearchResult(
             url,
             title,
+            excerpts,
             excerpt.toString(),
             detail,
             img,
@@ -413,7 +458,9 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
 
   protected String getFields() {
     List<String> fields = new ArrayList<>();
-    for (String searchField: searchFields) {
+    List<String> fieldsToUse = this.searchFieldsWithBoost != null
+        && !this.searchFieldsWithBoost.isEmpty() ? this.searchFieldsWithBoost : this.searchFields;
+    for (String searchField: fieldsToUse) {
       fields.add("\"" + searchField + "\"");
     }
     return StringUtils.join(fields, ",");
