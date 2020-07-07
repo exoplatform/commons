@@ -247,8 +247,8 @@ public class ElasticSearchServiceConnector extends SearchServiceConnector {
     esQuery.append("        }\n");
     esQuery.append("     },\n");
     esQuery.append("     \"highlight\" : {\n");
-    esQuery.append("       \"pre_tags\" : [\"<span class='searchMatchExcerpt'>\"],\n");
-    esQuery.append("       \"post_tags\" : [\"</span>\"],\n");
+    esQuery.append("       \"pre_tags\" : [\"<strong>\"],\n");
+    esQuery.append("       \"post_tags\" : [\"</strong>\"],\n");
     esQuery.append("       \"fields\" : {\n");
     for (int i=0; i<this.searchFields.size(); i++) {
       esQuery.append("         \""+searchFields.get(i)+"\" : {\n")
