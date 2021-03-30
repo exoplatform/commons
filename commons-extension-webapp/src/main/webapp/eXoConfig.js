@@ -33,6 +33,7 @@ CKEDITOR.editorConfig = function( config ){
 	config.pasteFromWordRemoveStyles = false;
         config.syntaxhighlight_lang = 'java';
 	config.syntaxhighlight_hideControls = true;
+	CKEDITOR.dtd.$removeEmpty['i'] = false;
 
   // style inside the editor
 	config.contentsCss = '/commons-extension/ckeditorCustom/contents.css';
